@@ -1,158 +1,145 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Vizyon 2026 | Sosyal Girişim</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <title>Vizyon 2027 | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            background-color: #0f0f0f; /* Derin ve profesyonel siyah */
-            color: #ffffff;
-            font-family: 'Inter', sans-serif;
-            text-align: center;
-            padding: 40px 20px;
-            margin: 0;
+        body { background-color: #0a0a0a; color: #ffffff; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
+        
+        /* GİRİŞ EKRANI */
+        #welcome-screen {
+            height: 100vh;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            transition: all 0.8s ease-in-out; padding: 20px;
         }
 
-        h1 {
-            color: #00ff88; /* Başarı ve gelecek yeşili */
-            font-size: 3.5rem;
-            margin-bottom: 10px;
-            letter-spacing: -2px;
+        /* ANA PANEL (DASHBOARD) */
+        #main-content {
+            display: none; opacity: 0; padding: 40px 20px; max-width: 1200px; margin: 0 auto;
+            transition: opacity 1s ease;
         }
 
-        p.subtitle {
-            color: #888;
-            font-size: 1.2rem;
-            max-width: 700px;
-            margin: 0 auto 30px;
-            line-height: 1.6;
+        h1, h2 { color: #00ff88; letter-spacing: -1px; }
+
+        /* İSTATİSTİK KARTLARI */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px; margin: 30px 0;
+        }
+        .stat-card {
+            background: #151515; padding: 20px; border-radius: 15px; border: 1px solid #222; text-align: center;
+        }
+        .stat-card h4 { margin: 0; color: #888; font-size: 0.8rem; text-transform: uppercase; }
+        .stat-card p { margin: 10px 0 0; color: #00ff88; font-size: 1.8rem; font-weight: bold; }
+
+        /* PROJE LİSTESİ */
+        .project-section {
+            background: #111; padding: 30px; border-radius: 20px; border: 1px solid #222; margin-top: 30px;
+        }
+        .project-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 0; border-bottom: 1px solid #222;
+        }
+        .project-item:last-child { border-bottom: none; }
+        .status-badge {
+            background: rgba(0, 255, 136, 0.1); color: #00ff88; 
+            padding: 5px 12px; border-radius: 20px; font-size: 0.8rem;
         }
 
-        /* Hero Görseli */
-        .hero-img {
-            width: 90%;
-            max-width: 800px;
-            border-radius: 20px;
-            border: 1px solid #333;
-            box-shadow: 0 20px 40px rgba(0, 255, 136, 0.15);
-            transition: transform 0.5s ease;
+        /* GERİ SAYIM BAR */
+        #countdown-bar {
+            background: #1a1a1a; padding: 20px; border-radius: 15px; 
+            border-left: 5px solid #00ff88; margin-bottom: 40px; text-align: left;
         }
 
-        .hero-img:hover {
-            transform: scale(1.02);
+        .cta-btn { 
+            background-color: #00ff88; color: #000; border: none; padding: 20px 50px; 
+            font-size: 1.2rem; font-weight: bold; cursor: pointer; border-radius: 50px; 
+            transition: 0.3s; text-decoration: none; display: inline-block;
         }
-
-        /* Vizyon Kutuları */
-        .container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 25px;
-            margin-top: 50px;
-        }
-
-        .box {
-            background: linear-gradient(145deg, #1a1a1a, #111);
-            padding: 35px 25px;
-            border-radius: 15px;
-            width: 280px;
-            border: 1px solid #222;
-            transition: all 0.3s ease;
-            text-align: left; /* Okunabilirlik için sola yaslı */
-        }
-
-        .box:hover {
-            border-color: #00ff88;
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.2);
-        }
-
-        .box h3 {
-            color: #00ff88;
-            margin-top: 0;
-            font-size: 1.4rem;
-        }
-
-        .box p {
-            color: #ccc;
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-
-        /* Aksiyon Butonu */
-        .cta-btn {
-            background-color: #00ff88;
-            color: #000;
-            border: none;
-            padding: 20px 45px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 50px;
-            margin-top: 60px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4);
-        }
-
-        .cta-btn:hover {
-            transform: scale(1.05);
-            background-color: #05e67c;
-            box-shadow: 0 6px 30px rgba(0, 255, 136, 0.6);
-        }
-
-        footer-links {
-            display: block;
-            margin-top: 40px;
-            padding-bottom: 20px;
-        }
-
-        footer-links a {
-            color: #444;
-            text-decoration: none;
-            font-size: 13px;
-            margin: 0 10px;
-            transition: color 0.3s;
-        }
-
-        footer-links a:hover {
-            color: #00ff88;
-        }
+        .cta-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0,255,136,0.4); }
     </style>
 </head>
 <body>
 
-    <h1>Global Vizyon 2026</h1>
-    <p class="subtitle">Teknolojiyi kullanarak insanlık için erişilebilir ve sürdürülebilir çözümler inşa ediyorum.</p>
+    <div id="welcome-screen">
+        <h1 style="font-size: 4rem;">2027</h1>
+        <p style="color: #888; font-size: 1.5rem; margin-bottom: 30px;">Geleceğin Kapısı Aralanıyor...</p>
+        <button class="cta-btn" onclick="enterVision()">VİZYONU AÇ</button>
+    </div>
 
-    <img src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80" 
-         alt="Gelecek Ofisim" class="hero-img">
-
-    <div class="container">
-        <div class="box">
-            <h3>🌍 Erişilebilir Teknoloji</h3>
-            <p>Yüksek maliyetli dijital çözümleri, herkesin kullanabileceği uygun maliyetli platformlara dönüştürmek.</p>
+    <div id="main-content">
+        <div id="countdown-bar">
+            <span style="color: #888;">Büyük Açılışa Kalan:</span> 
+            <span id="timer" style="color: #00ff88; font-weight: bold; margin-left: 10px;">...</span>
         </div>
 
-        <div class="box">
-            <h3>💡 Açık Kaynak Kültürü</h3>
-            <p>Bilgiyi paylaşarak genç yazılımcıların ve dezavantajlı grupların teknoloji dünyasına adım atmasını sağlamak.</p>
+        <h2>Geliştirme Paneli</h2>
+        <p style="color: #666;">Muhammed Eymen | Yazılım Girişimcisi & Vizyoner</p>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h4>Hedeflenen Kullanıcı</h4>
+                <p>1M+</p>
+            </div>
+            <div class="stat-card">
+                <h4>Öğrenilen Teknolojiler</h4>
+                <p>12</p>
+            </div>
+            <div class="stat-card">
+                <h4>Proje Durumu</h4>
+                <p>%35</p>
+            </div>
         </div>
 
-        <div class="box">
-            <h3>🚀 Sürdürülebilir Yapay Zeka</h3>
-            <p>İnsanlığın günlük sorunlarını yapay zeka ile optimize ederek zaman ve enerji tasarrufu sağlamak.</p>
+        <div class="project-section">
+            <h3 style="margin-top: 0;">Aktif Çalışmalar</h3>
+            <div class="project-item">
+                <span>Erişilebilir Eğitim Platformu</span>
+                <span class="status-badge">Geliştiriliyor</span>
+            </div>
+            <div class="project-item">
+                <span>Yapay Zeka Destekli Tasarruf Modülü</span>
+                <span class="status-badge">Planlama</span>
+            </div>
+            <div class="project-item">
+                <span>Açık Kaynak Kod Kütüphanesi</span>
+                <span class="status-badge">Test Aşaması</span>
+            </div>
+        </div>
+
+        <div style="margin-top: 50px; text-align: center;">
+            <p style="color: #444;">Daha fazlası için sistemin tam kapasiteye geçmesini bekleyin.</p>
+            <a href="mailto:turkmenmuhammedeymen@gmail.com" style="color: #00ff88; text-decoration: none; font-weight: bold;">[ Bize Ulaşın ]</a>
         </div>
     </div>
 
-    <button class="cta-btn" onclick="alert('İnsanlık için büyük bir adımın temeli atıldı!')">Vizyonu Onayla</button>
-    
-    <div class="footer-links">
-        <a href="#">Etik Değerlerimiz</a> | 
-        <a href="#">Şeffaflık Raporu</a> | 
-        <a href="#">Küresel Hedefler</a>
-    </div>
+    <script>
+        function enterVision() {
+            const welcome = document.getElementById('welcome-screen');
+            const main = document.getElementById('main-content');
+            welcome.style.opacity = '0';
+            setTimeout(() => {
+                welcome.style.display = 'none';
+                main.style.display = 'block';
+                setTimeout(() => { main.style.opacity = '1'; }, 50);
+            }, 800);
+        }
 
+        function updateTimer() {
+            const future = new Date("Jan 1, 2027 00:00:00").getTime();
+            const now = new Date().getTime();
+            const diff = future - now;
+            if (diff < 0) { document.getElementById("timer").innerText = "VİZYON BAŞLADI!"; return; }
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById("timer").innerText = `${d} Gün ${h} Saat ${m} Dakika`;
+        }
+        setInterval(updateTimer, 1000);
+        updateTimer();
+    </script>
 </body>
 </html>
