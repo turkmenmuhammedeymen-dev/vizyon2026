@@ -7,149 +7,117 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #00ff88; --bg: #0a0a0a; --card: #151515; --text: #ffffff; --beta: #ffcc00; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; min-height: 100vh; }
         
         /* SAYFA YÖNETİMİ */
-        .page-section { display: none; opacity: 0; transition: opacity 0.5s ease-in-out; min-height: 100vh; width: 100%; }
-        .active-section { display: block; opacity: 1; }
+        .page-section { display: none; opacity: 0; min-height: 100vh; width: 100%; box-sizing: border-box; }
+        .active-section { display: flex !important; flex-direction: column; opacity: 1; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* GİRİŞ EKRANI */
-        #welcome-screen {
-            display: flex; flex-direction: column; justify-content: center; 
-            align-items: center; text-align: center; background: radial-gradient(circle at center, #111 0%, #0a0a0a 100%);
-        }
+        /* GİRİŞ EKRANI ÖZEL */
+        #welcome-screen { justify-content: center; align-items: center; text-align: center; background: radial-gradient(circle at center, #111 0%, #0a0a0a 100%); }
 
-        /* DASHBOARD GENEL */
-        .container { padding: 40px 20px; max-width: 1100px; margin: 0 auto; box-sizing: border-box; }
-        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #222; padding-bottom: 20px; }
+        /* DASHBOARD & CONTAINER */
+        .container { padding: 40px 20px; max-width: 1100px; margin: 0 auto; display: none; }
+        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #222; padding-bottom: 20px; width: 100%; }
         
-        /* KARTLAR & KUTULAR */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid #222; transition: 0.3s; }
-        .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 30px; }
+        /* GRID VE KUTULAR */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; width: 100%; }
+        .card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid #222; }
+        .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 30px; width: 100%; }
         .admin-box { background: #111; border: 1px dashed #444; padding: 30px 15px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .admin-box:hover { border-color: var(--primary); background: #1a1a1a; transform: translateY(-3px); }
+        .admin-box:hover { border-color: var(--primary); background: #1a1a1a; transform: translateY(-3px); border-style: solid; }
 
         /* BUTONLAR */
         .cta-btn { background: var(--primary); color: #000; border: none; padding: 18px 50px; font-size: 1.1rem; font-weight: 800; cursor: pointer; border-radius: 50px; margin-bottom: 15px; box-shadow: 0 0 20px rgba(0,255,136,0.2); }
         .dev-btn { background: transparent; color: var(--primary); border: 2px solid var(--primary); padding: 12px 25px; border-radius: 30px; cursor: pointer; font-weight: 600; margin: 5px; transition: 0.3s; }
         .dev-btn:hover { background: var(--primary); color: #000; }
-        .back-btn { display: inline-block; color: var(--primary); cursor: pointer; font-weight: bold; margin-bottom: 20px; font-size: 1rem; border: 1px solid var(--primary); padding: 5px 15px; border-radius: 5px; }
+        .back-btn { align-self: flex-start; color: var(--primary); cursor: pointer; font-weight: bold; margin-bottom: 20px; border: 1px solid var(--primary); padding: 8px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); }
 
-        /* GİZLİLİK EKRANI */
-        #privacy-screen { background: #050505; }
-        .privacy-content { background: #111; padding: 30px; border-radius: 15px; border: 1px solid #222; line-height: 1.6; color: #ccc; max-width: 800px; margin: 0 auto; }
+        /* GİZLİLİK */
+        .privacy-content { background: #111; padding: 30px; border-radius: 15px; border: 1px solid #222; line-height: 1.6; color: #ccc; text-align: left; }
 
-        .footer { margin-top: 50px; text-align: center; border-top: 1px solid #222; padding-top: 30px; color: #444; font-size: 0.85rem; }
+        .footer { margin-top: auto; padding: 40px 0; text-align: center; border-top: 1px solid #222; color: #444; width: 100%; }
         .status-badge { background: rgba(0,255,136,0.1); color: var(--primary); padding: 8px 15px; border-radius: 10px; font-weight: bold; border: 1px solid var(--primary); }
     </style>
 </head>
-<body onload="checkSession()">
+<body onload="initSystem()">
 
-    <div id="welcome-screen" class="page-section active-section">
+    <section id="welcome-screen" class="page-section active-section">
         <div style="letter-spacing: 4px; color: var(--primary); font-size: 0.9rem; font-weight: bold; margin-bottom: 10px;">MUHAMMED EYMEN VİZYON</div>
-        <h1 style="font-size: 6rem; margin: 0; color: #fff;">2027</h1>
+        <h1 style="font-size: 6rem; margin: 0;">2027</h1>
         <p style="color: #666; margin-bottom: 40px;">Geleceğin Altyapısı Şekilleniyor</p>
         
-        <button class="cta-btn" onclick="showSection('main-dashboard')">VİZYONA GİRİŞ YAP</button>
+        <button class="cta-btn" onclick="goTo('main-dashboard')">VİZYONA GİRİŞ YAP</button>
         
-        <div style="margin-top: 10px;">
-            <button class="dev-btn" onclick="devLoginAttempt()">GELİŞTİRİCİ GİRİŞİ</button>
-            <button class="dev-btn" style="border-color: var(--beta); color: var(--beta);" onclick="betaLoginAttempt()">BETA TEST KULLANICI <br><small>(Sadece Kurucu)</small></button>
+        <div>
+            <button class="dev-btn" onclick="tryDevLogin()">GELİŞTİRİCİ GİRİŞİ</button>
+            <button class="dev-btn" style="border-color: var(--beta); color: var(--beta);" onclick="tryBetaLogin()">BETA TEST KULLANICI <br><small>(Sadece Kurucu)</small></button>
         </div>
         
-        <p style="font-size: 0.8rem; color: #555; margin-top: 30px; cursor: pointer; text-decoration: underline;" onclick="showSection('privacy-screen')">🛡️ Gizlilik Sözleşmesi: Veriler Güvende</p>
-    </div>
+        <p style="font-size: 0.8rem; color: #555; margin-top: 30px; cursor: pointer; text-decoration: underline;" onclick="goTo('privacy-screen')">🛡️ Gizlilik Sözleşmesi: Veriler Güvende</p>
+    </section>
 
-    <div id="privacy-screen" class="page-section container">
-        <div class="back-btn" onclick="showSection('welcome-screen')">← GERİ DÖN</div>
+    <section id="privacy-screen" class="page-section container">
+        <div class="back-btn" onclick="goTo('welcome-screen')">← GERİ DÖN</div>
         <h1 style="color: var(--primary);">Gizlilik ve Veri Güvenliği</h1>
         <div class="privacy-content">
-            <p><strong>1. Veri Şifreleme:</strong> Tüm kullanıcı verileri ve geliştirici logları 256-bit uçtan uca şifreleme ile korunmaktadır.</p>
-            <p><strong>2. 2027 Vizyonu:</strong> Toplanan veriler sadece sistem optimizasyonu ve "Vizyon 2027" projelerinin geliştirilmesi amacıyla kullanılır.</p>
-            <p><strong>3. Paylaşım Yasağı:</strong> Platform sahibi Muhammed Eymen haricinde hiçbir veri 3. şahıslar veya kurumlarla paylaşılmaz.</p>
-            <p><strong>4. Çerez Yönetimi:</strong> Sistem, giriş oturumunuzu hatırlamak için yerel depolama (Local Storage) kullanır.</p>
-            <p style="color: var(--primary); margin-top: 20px;"><em>"Güvenliğiniz, vizyonumuzun temelidir."</em></p>
+            <p><strong>1. Veri Şifreleme:</strong> Tüm veriler uçtan uca şifrelidir.</p>
+            <p><strong>2. 2027 Vizyonu:</strong> Geliştirme amaçlı veri kullanımı esastır.</p>
+            <p><strong>3. Güvenlik:</strong> Muhammed Eymen güvencesi altındadır.</p>
         </div>
-    </div>
+        <div class="footer">© 2026 Güvenlik Paneli</div>
+    </section>
 
-    <div id="main-dashboard" class="page-section container">
-        <div class="back-btn" onclick="showSection('welcome-screen')">← ANA SAYFAYA DÖN</div>
+    <section id="main-dashboard" class="page-section container">
+        <div class="back-btn" onclick="goTo('welcome-screen')">← ANA SAYFA</div>
         <div class="header-bar">
-            <div>
-                <h2 style="margin: 0;">Yönetim Merkezi</h2>
-                <small style="color: var(--primary);">Genel Erişim Paneli</small>
-            </div>
+            <h2>Yönetim Merkezi</h2>
             <div id="timer" class="status-badge">Yükleniyor...</div>
         </div>
         <div class="grid">
-            <div class="card">
-                <h3>🚀 Aktif Projeler</h3>
-                <p>Sistem altyapısı %92 oranında tamamlandı. Küresel entegrasyon bekleniyor.</p>
-            </div>
-            <div class="card">
-                <h3>📊 Sistem Durumu</h3>
-                <p>Tüm sunucular aktif. Veri güvenliği: Üst Düzey.</p>
-            </div>
+            <div class="card"><h3>🚀 Projeler</h3><p>Altyapı %92 tamamlandı.</p></div>
+            <div class="card"><h3>📊 Sistem</h3><p>Veri güvenliği: Aktif.</p></div>
         </div>
-        <div class="footer">
-            <p>📧 İletişim: turkmenmuhammedeymen@gmail.com</p>
-            <p>© 2026 - 2027 Vizyon Projesi</p>
-        </div>
-    </div>
+        <div class="footer">📧 turkmenmuhammedeymen@gmail.com</div>
+    </section>
 
-    <div id="admin-select" class="page-section container">
-        <div class="back-btn" onclick="logout()">← ÇIKIŞ YAP</div>
-        <h1 style="color: var(--primary);">Geliştirici Yönetim Paneli</h1>
-        <p style="color: #888;">Lütfen yetkili profilinizi seçiniz:</p>
-        <div class="admin-grid" style="max-width: 600px;">
-            <div class="admin-box" onclick="profileLogin('Eymen')" style="border-style: solid;">
-                <h3 style="margin: 0;">Muhammed Eymen</h3>
-                <small style="color: var(--primary);">Kurucu / Platform Sahibi</small>
-            </div>
-            <div class="admin-box" onclick="profileLogin('Ibrahim')" style="border-style: solid;">
-                <h3 style="margin: 0;">İbrahim</h3>
-                <small style="color: #ccc;">Sistem Yöneticisi</small>
-            </div>
+    <section id="admin-select" class="page-section container">
+        <div class="back-btn" onclick="doLogout()">← ÇIKIŞ YAP</div>
+        <h1 style="color: var(--primary);">Geliştirici Paneli</h1>
+        <div class="admin-grid">
+            <div class="admin-box" onclick="tryProfileLogin('Eymen')"><h3>Muhammed Eymen</h3><small>KURUCU</small></div>
+            <div class="admin-box" onclick="tryProfileLogin('Ibrahim')"><h3>İbrahim</h3><small>ADMIN</small></div>
         </div>
-    </div>
+    </section>
 
-    <div id="private-profile" class="page-section container">
-        <div class="back-btn" onclick="showSection('admin-select')">← PANEL SEÇİMİNE DÖN</div>
-        <div style="text-align: center; margin-bottom: 40px;">
-            <h1 id="welcome-msg" style="color: var(--primary); margin-bottom: 5px;"></h1>
-            <p id="role-msg" style="color: #888; font-weight: bold; margin-top: 0;"></p>
-            <div style="font-style: italic; color: #555;">"Selam ve Dua İle..."</div>
+    <section id="private-profile" class="page-section container">
+        <div class="back-btn" onclick="goTo('admin-select')">← GERİ</div>
+        <div style="text-align: center;">
+            <h1 id="welcome-msg" style="color: var(--primary); margin:0;"></h1>
+            <p id="role-msg" style="color: #888; font-weight: bold;"></p>
+            <p>"Selam ve Dua İle..."</p>
         </div>
         
-        <div class="card" style="margin-bottom: 30px; border-color: #333; background: #0e0e0e;">
-            <h4 style="margin: 0 0 15px 0; color: var(--primary);">📊 Canlı Kayıt Verileri (Admin)</h4>
-            <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px;">
-                <span><strong>Toplam:</strong> 1,240</span>
-                <span><strong>Aktif:</strong> 856</span>
-                <span><strong>Son Kayıt:</strong> t***4@gmail.com</span>
-            </div>
+        <div class="card" style="margin: 20px 0;">
+            <h4 style="color:var(--primary); margin:0 0 10px 0;">📊 Canlı Veriler</h4>
+            <p>Toplam Kayıt: 1,240 | Aktif: 856</p>
         </div>
 
         <div class="admin-grid">
             <div class="admin-box">📂 Projelerim</div>
             <div class="admin-box">📩 Proje Talebi</div>
-            <div class="admin-box">🗑️ Silinen Projeler</div>
+            <div class="admin-box">🗑️ Silinenler</div>
             <div class="admin-box">📦 Paket Seç</div>
             <div class="admin-box">⚙️ Kendin Oluştur</div>
-            <div id="eymen-exclusive" style="display: contents;"></div>
+            <div id="eymen-extras" style="display: contents;"></div>
         </div>
-        
-        <div class="footer">
-            <p>📧 Admin İletişim Hattı: turkmenmuhammedeymen@gmail.com</p>
-        </div>
-    </div>
+        <div class="footer">İletişim: turkmenmuhammedeymen@gmail.com</div>
+    </section>
 
-    <div id="beta-panel" class="page-section container">
-        <div class="back-btn" onclick="logout()">← ÇIKIŞ YAP</div>
+    <section id="beta-panel" class="page-section container">
+        <div class="back-btn" onclick="doLogout()">← ÇIKIŞ YAP</div>
         <h1 style="color: var(--beta); text-align: center;">Allah'ın Selamı Üzerine Olsun</h1>
-        <p style="text-align: center; color: #888;">2027 Gelecek Özellikler Test Alanı (Beta)</p>
-        
         <div class="admin-grid">
             <div class="admin-box">🛍️ Siparişlerim</div>
             <div class="admin-box">🗑️ Silinenler</div>
@@ -157,101 +125,68 @@
             <div class="admin-box">🛠️ Kendin Oluştur</div>
             <div class="admin-box">🔮 Projelerim</div>
         </div>
-        <div class="footer">
-            <p>Beta Test Aşaması © 2026</p>
-        </div>
-    </div>
+    </section>
 
     <script>
-        // Sayfa Geçiş ve Bellek Yönetimi
-        function showSection(id) {
+        // SİSTEMİ BAŞLAT
+        function initSystem() {
+            localStorage.clear(); // Hataları önlemek için eski veriyi temizle
+            goTo('welcome-screen');
+            startTimer();
+        }
+
+        // SAYFA GEÇİŞİ (HATASIZ)
+        function goTo(id) {
             document.querySelectorAll('.page-section').forEach(s => {
                 s.classList.remove('active-section');
+                s.style.display = 'none';
             });
             const target = document.getElementById(id);
             if(target) {
-                target.classList.add('active-section');
-                localStorage.setItem('vizyon_current_page', id);
+                target.style.display = (id === 'welcome-screen') ? 'flex' : 'block';
+                setTimeout(() => target.classList.add('active-section'), 10);
             }
         }
 
-        function logout() {
-            localStorage.removeItem('vizyon_current_page');
-            localStorage.removeItem('vizyon_user');
-            showSection('welcome-screen');
+        function doLogout() {
+            initSystem();
         }
 
-        function checkSession() {
-            const lastPage = localStorage.getItem('vizyon_current_page');
-            const lastUser = localStorage.getItem('vizyon_user');
-            
-            if(lastUser === 'Eymen') loadProfile("Muhammed Eymen", "KURUCU / PLATFORM SAHİBİ", true);
-            else if(lastUser === 'Ibrahim') loadProfile("İbrahim", "SİSTEM YÖNETİCİSİ", false);
-            else if(lastPage) showSection(lastPage);
-            
-            updateTimer();
+        // GİRİŞLER
+        function tryDevLogin() {
+            let p = prompt("Geliştirici Şifresi:");
+            if(p === "4402") goTo('admin-select');
+            else if(p !== null) alert("Hatalı!");
         }
 
-        // Giriş Fonksiyonları
-        function devLoginAttempt() {
-            const pass = prompt("Geliştirici Şifresini Giriniz:");
-            if(pass === "4402") {
-                showSection('admin-select');
-            } else if(pass !== null) {
-                alert("Hatalı Geliştirici Şifresi!");
-            }
+        function tryBetaLogin() {
+            let p = prompt("Beta Şifresi (Kurucu):");
+            if(p === "İman571") goTo('beta-panel');
+            else if(p !== null) alert("Hatalı!");
         }
 
-        function betaLoginAttempt() {
-            const pass = prompt("Beta Erişim Şifresi (Kurucu):");
-            if(pass === "İman571") {
-                showSection('beta-panel');
-            } else if(pass !== null) {
-                alert("Hatalı Beta Şifresi!");
-            }
+        function tryProfileLogin(user) {
+            let p = prompt(user + " Şifresi:");
+            if(user === 'Eymen' && p === 'Eymen11Amele44') {
+                document.getElementById('welcome-msg').innerText = "Selamun Aleyküm, Eymen";
+                document.getElementById('role-msg').innerText = "KURUCU / PLATFORM SAHİBİ";
+                document.getElementById('eymen-extras').innerHTML = '<div class="admin-box" style="border-style:solid; border-color:var(--primary)">🎁 Üyelik Hediye</div><div class="admin-box" style="border-style:solid; border-color:var(--primary)">📱 Kullanıcıya Ulaş</div>';
+                goTo('private-profile');
+            } else if(user === 'Ibrahim' && p === 'İbrm4411') {
+                document.getElementById('welcome-msg').innerText = "Selamun Aleyküm, İbrahim";
+                document.getElementById('role-msg').innerText = "SİSTEM YÖNETİCİSİ";
+                document.getElementById('eymen-extras').innerHTML = '';
+                goTo('private-profile');
+            } else if(p !== null) alert("Yanlış Şifre!");
         }
 
-        function profileLogin(user) {
-            const pass = prompt(user + " için profil şifresini giriniz:");
-            if(user === 'Eymen' && pass === 'Eymen11Amele44') {
-                localStorage.setItem('vizyon_user', 'Eymen');
-                loadProfile("Muhammed Eymen", "KURUCU / PLATFORM SAHİBİ", true);
-            } else if(user === 'Ibrahim' && pass === 'İbrm4411') {
-                localStorage.setItem('vizyon_user', 'Ibrahim');
-                loadProfile("İbrahim", "SİSTEM YÖNETİCİSİ", false);
-            } else if(pass !== null) {
-                alert("Hatalı Profil Şifresi!");
-            }
-        }
-
-        function loadProfile(name, role, isEymen) {
-            document.getElementById('welcome-msg').innerText = "Selamun Aleyküm, " + name;
-            document.getElementById('role-msg').innerText = role;
-            const specialArea = document.getElementById('eymen-exclusive');
-            
-            if(isEymen) {
-                specialArea.innerHTML = `
-                    <div class="admin-box" style="border-color:var(--primary); border-style:solid;">🎁 Üyelik Hediye Et</div>
-                    <div class="admin-box" style="border-color:var(--primary); border-style:solid;">📱 Kullanıcıya Ulaş</div>
-                `;
-            } else {
-                specialArea.innerHTML = '';
-            }
-            showSection('private-profile');
-        }
-
-        // Geri Sayım
-        function updateTimer() {
-            const targetDate = new Date("Jan 1, 2027 00:00:00").getTime();
+        function startTimer() {
+            const target = new Date("Jan 1, 2027 00:00:00").getTime();
             setInterval(() => {
-                const now = new Date().getTime();
-                const diff = targetDate - now;
-                if (diff < 0) {
-                    document.getElementById("timer").innerText = "VİZYON BAŞLADI!";
-                    return;
-                }
+                const diff = target - new Date().getTime();
                 const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                document.getElementById("timer").innerText = days + " GÜN KALDI";
+                const el = document.getElementById("timer");
+                if(el) el.innerText = days > 0 ? days + " GÜN KALDI" : "VİZYON BAŞLADI!";
             }, 1000);
         }
     </script>
