@@ -1,86 +1,102 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TDEV Global Academy | Ultimate Vision</title>
+    <title>TDEV Global | Vision 2027</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #00f2fe; --gold: #ffd700; --admin: #ff4444; --bg: #050505; --card: rgba(255, 255, 255, 0.05); --text: #ffffff; }
+        :root { --accent: #00f2fe; --gold: #ffd700; --admin: #ff4444; --bg: #050505; --card: rgba(255, 255, 255, 0.07); --text: #ffffff; }
         * { box-sizing: border-box; margin: 0; padding: 0; transition: all 0.3s ease; }
         
         body, html { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
         
-        /* FULL SCREEN WALLPAPER - Tüm panellerde görünür */
-        .master-bg { position: fixed; inset: 0; background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center; z-index: -1; }
+        /* ENERJİ VERİCİ MASTER RESİM */
+        .master-wallpaper { 
+            position: fixed; inset: 0; 
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), 
+                        url('https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=2020&auto=format&fit=crop'); 
+            background-size: cover; background-position: center; z-index: -2; 
+        }
 
-        .screen { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(20px); z-index: 1000; }
-        .hidden { opacity: 0; pointer-events: none; visibility: hidden; transform: scale(1.1); }
+        .screen { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(25px); z-index: 1000; }
+        .hidden { opacity: 0; pointer-events: none; visibility: hidden; transform: translateY(30px); }
 
-        .container { width: 90%; max-width: 800px; text-align: center; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
+        .container { width: 95%; max-width: 900px; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
 
-        .card-opt { background: var(--card); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 20px; cursor: pointer; text-align: center; }
-        .card-opt:hover { border-color: var(--accent); background: rgba(0,242,254,0.1); transform: translateY(-5px); }
+        .card-opt { background: var(--card); border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 20px; cursor: pointer; backdrop-filter: blur(10px); }
+        .card-opt:hover { border-color: var(--accent); background: rgba(0,242,254,0.1); transform: scale(1.05); }
         
-        .btn { background: var(--accent); color: #000; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 10px; }
-        .btn-back { background: rgba(255,255,255,0.1); color: white; width: auto; padding: 8px 15px; border-radius: 50px; margin-bottom: 10px; cursor: pointer; }
+        .btn { background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 10px; text-transform: uppercase; }
+        .btn-back { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.1); color: white; padding: 10px 20px; border-radius: 50px; cursor: pointer; }
 
-        .input-field { background: rgba(0,0,0,0.7); border: 1px solid #333; color: white; padding: 12px; border-radius: 10px; width: 100%; margin: 5px 0; text-align: center; }
+        .input-field { background: rgba(0,0,0,0.8); border: 1px solid #333; color: white; padding: 15px; border-radius: 12px; width: 100%; margin: 10px 0; text-align: center; }
 
-        /* APP STRUCTURE */
+        /* APP LAYOUT */
         .app { display: none; height: 100vh; position: relative; }
-        .sidebar { width: 280px; background: rgba(0,0,0,0.85); border-right: 1px solid #111; padding: 25px; display: flex; flex-direction: column; backdrop-filter: blur(10px); }
-        .main { flex: 1; padding: 40px; overflow-y: auto; }
+        .sidebar { width: 300px; background: rgba(0,0,0,0.8); border-right: 1px solid #222; padding: 30px; display: flex; flex-direction: column; backdrop-filter: blur(15px); }
+        .main { flex: 1; padding: 40px; overflow-y: auto; background: rgba(0,0,0,0.3); }
 
-        .lesson-card { background: var(--card); border: 1px solid #222; padding: 20px; border-radius: 20px; margin-bottom: 20px; }
-        .m5-area { background: rgba(0,0,0,0.8); border: 2px solid var(--accent); border-radius: 30px; height: 200px; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 900; color: var(--accent); margin-bottom: 20px; }
-        
-        #lesson-content-viewer { display: none; background: rgba(0,0,0,0.95); position: fixed; inset: 50px; z-index: 2000; border-radius: 30px; border: 1px solid var(--accent); padding: 40px; overflow-y: auto; }
+        .lesson-card { background: var(--card); border: 1px solid #333; padding: 25px; border-radius: 25px; margin-bottom: 20px; }
+        .m5-box { font-size: 3.5rem; font-weight: 900; color: var(--accent); height: 200px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); border-radius: 30px; border: 2px solid var(--accent); margin-bottom: 20px; }
+
+        /* OVERLAY VIEWER */
+        #content-viewer { display: none; position: fixed; inset: 40px; background: rgba(5,5,5,0.98); z-index: 5000; border-radius: 30px; border: 1px solid var(--accent); padding: 50px; overflow-y: auto; }
+        .senaryo-badge { background: var(--gold); color: #000; padding: 5px 10px; border-radius: 5px; font-weight: 800; font-size: 0.7rem; float: right; }
     </style>
 </head>
 <body>
-    <div class="master-bg"></div>
+    <div class="master-wallpaper"></div>
 
     <div id="scr-country" class="screen">
-        <h1 style="font-size: 3.5rem; font-weight: 900; letter-spacing: -3px;">TDEV GLOBAL</h1>
-        <p>Bölge Seçiniz / Select Region</p>
+        <h1 style="font-size: 3.5rem; font-weight: 900; text-shadow: 0 0 20px var(--accent);">TDEV GLOBAL VISION</h1>
         <div class="container grid">
-            <div class="card-opt" onclick="setReg('tr')">🇹🇷<br>Türkiye (MEB/EBA)</div>
-            <div class="card-opt" onclick="setReg('us')">🇺🇸<br>USA (K-12/College)</div>
-            <div class="card-opt" onclick="setReg('uk')">🇬🇧<br>UK (Retro/GCSE)</div>
-            <div class="card-opt" onclick="setReg('de')">🇩🇪<br>Germany (Abitur)</div>
+            <div class="card-opt" onclick="setReg('tr')">🇹🇷<br>TÜRKİYE</div>
+            <div class="card-opt" onclick="setReg('us')">🇺🇸<br>USA</div>
+            <div class="card-opt" onclick="setReg('uk')">🇬🇧<br>UK</div>
+            <div class="card-opt" onclick="setReg('de')">🇩🇪<br>GERMANY</div>
         </div>
     </div>
 
     <div id="scr-login" class="screen hidden">
-        <div class="btn-back" onclick="backTo('country')">← Geri</div>
-        <div id="timer" style="font-size: 3rem; font-weight: 900; color: var(--accent);">00:00:00:00</div>
-        <p id="role-title">Yetkilendirme Gerekli</p>
-        <div class="container grid">
-            <button class="btn" onclick="selRole('founder')">KURUCU (Eymen)</button>
-            <button class="btn" onclick="selRole('admin')">ADMIN (İbrahim)</button>
+        <div class="btn-back" onclick="go('country')">← GERİ</div>
+        <div style="font-size: 3rem; font-weight: 900; color: var(--accent); margin-bottom: 20px;" id="timer">00:00:00:00</div>
+        <div class="container grid" style="max-width: 500px;">
+            <button class="btn" onclick="selRole('founder')">KURUCU</button>
+            <button class="btn" onclick="selRole('admin')">ADMIN</button>
             <button class="btn" onclick="selRole('beta')">BETA TESTER</button>
         </div>
-        <div id="login-form" style="display:none; width:300px; margin-top:20px;">
-            <input type="password" id="pass" class="input-field" placeholder="Şifre">
-            <button class="btn" style="background:var(--gold)" onclick="doLogin()">SİSTEME GİR</button>
+        <div id="login-box" style="display:none; width: 350px; margin-top: 20px;">
+            <input type="password" id="pass" class="input-field" placeholder="GÜVENLİK ŞİFRESİ">
+            <button class="btn" style="background:var(--gold)" onclick="verify()">SİSTEME ERİŞ</button>
         </div>
     </div>
 
-    <div id="scr-school" class="screen hidden">
-        <div class="btn-back" onclick="backTo('login')">← Geri</div>
-        <h2>Eğitim Seviyenizi Belirleyin</h2>
+    <div id="scr-admin-panel" class="screen hidden">
+        <div class="btn-back" onclick="go('login')">← ÇIKIŞ</div>
+        <h1 style="color:var(--admin)">ADMIN: İBRAHİM</h1>
+        <div class="container" style="border: 1px solid var(--admin); padding: 50px; border-radius: 30px;">
+            <p>Sistem yönetimi için yetkilendirme bekleniyor...</p>
+            <button class="btn" style="background:var(--admin); color:white" onclick="alert('Yönetim Modu Aktif')">TAM YETKİ PANELİNİ AÇ</button>
+        </div>
+    </div>
+
+    <div id="scr-class" class="screen hidden">
+        <div class="btn-back" onclick="go('login')">← GERİ</div>
+        <h2>EĞİTİM KADEMESİ</h2>
         <div class="container">
-            <select id="school-type" class="input-field" onchange="syncGrades()">
-                <option value="ilkokul">İlkokul (EBA Kids)</option>
-                <option value="orta">Ortaokul (Tonguç Modu)</option>
-                <option value="lise-fen">Fen Lisesi / Anadolu</option>
-                <option value="lise-imam">İmam Hatip Lisesi</option>
-                <option value="lise-meslek">Meslek Lisesi</option>
-                <option value="uni">Üniversite / Lisans (TDEV Academy)</option>
+            <select id="grade" class="input-field">
+                <optgroup label="İlkokul/Ortaokul">
+                    <option value="1">1. Sınıf</option><option value="5">5. Sınıf</option><option value="8">8. Sınıf (LGS Hazırlık)</option>
+                </optgroup>
+                <optgroup label="Lise (Her Tür)">
+                    <option value="9">9. Sınıf</option><option value="11">11. Sınıf</option><option value="12">12. Sınıf (YKS Hazırlık)</option>
+                </optgroup>
+                <optgroup label="Akademi">
+                    <option value="uni">Üniversite / Lisans</option>
+                </optgroup>
             </select>
-            <select id="grade-level" class="input-field"></select>
             <button class="btn" onclick="startApp()">EĞİTİMİ BAŞLAT</button>
         </div>
     </div>
@@ -88,63 +104,56 @@
     <div id="app" class="app">
         <nav class="sidebar">
             <h2 style="color:var(--accent); font-weight:900;">TDEV VISION</h2>
-            <p id="user-info" style="font-size:0.7rem; color:#555; margin-bottom:20px;"></p>
-            <button class="btn" style="background:none; color:white; text-align:left" onclick="showTab('lessons')">📚 Dersler (EBA/Tonguç+)</button>
-            <button class="btn" style="background:none; color:white; text-align:left" onclick="showTab('m5')">⚡ M5 Okuma & Klavye</button>
-            <button class="btn" style="background:none; color:white; text-align:left" onclick="showTab('ai')">🤖 TDEV Yapay Zeka</button>
-            <button class="btn" style="margin-top:auto; background:red; color:white" onclick="location.reload()">ÇIKIŞ</button>
+            <hr style="margin:20px 0; border:0; border-top:1px solid #333;">
+            <button class="btn" style="background:none; color:white; text-align:left" onclick="showTab('lessons')">📚 DERSLER</button>
+            <button class="btn" style="background:none; color:white; text-align:left" onclick="showTab('m5')">⚡ M5 LABORATUVARI</button>
+            <button class="btn" style="background:none; color:white; text-align:left" onclick="showTab('ai')">🤖 TDEV-AI DEEP</button>
+            <button class="btn" style="background:none; color:white; text-align:left" onclick="showTab('support')">🎧 SUPPORT / DESTEK</button>
+            <button class="btn" style="margin-top:auto; background:red; color:white" onclick="location.reload()">GÜVENLİ ÇIKIŞ</button>
         </nav>
+
         <main class="main">
             <div id="tab-lessons" class="tab-content">
-                <div style="display:flex; justify-content:space-between; align-items:center">
-                    <h2>Müfredat Paneli</h2>
-                    <button class="btn" style="width:100px" onclick="renderLessons()">🔄 Yenile</button>
-                </div>
                 <div id="lesson-grid" class="grid"></div>
             </div>
 
             <div id="tab-m5" class="tab-content" style="display:none">
-                <h2>M5 Eğitim Laboratuvarı</h2>
-                <div id="m5-viewer" class="m5-area">HAZIR</div>
-                <div class="grid">
-                    <input type="number" id="word-count" class="input-field" placeholder="Kelime Sayısı (Max 1000)" value="100">
-                    <select id="m5-lvl" class="input-field">
-                        <option value="1">Seviye 1 (Başlangıç)</option>
-                        <option value="2">Seviye 2</option>
-                        <option value="3">Seviye 3</option>
-                        <option value="4">Seviye 4</option>
-                        <option value="5">Seviye 5</option>
-                        <option value="6">Seviye 6</option>
-                        <option value="7">Seviye 7 (CEO Speed)</option>
+                <div id="m5-display" class="m5-box">TDEV M5</div>
+                <div class="grid" style="grid-template-columns: 1fr 1fr;">
+                    <input type="number" id="w-count" class="input-field" placeholder="Kelime (Max 1000)" value="200">
+                    <select id="lvl" class="input-field">
+                        <option value="1">Lvl 1</option><option value="4">Lvl 4</option><option value="7">Lvl 7 🔥</option>
                         <option value="auto">OTOMATİK SEÇ</option>
                     </select>
                 </div>
-                <div class="grid" style="grid-template-columns: 1fr 1fr;">
-                    <button class="btn" onclick="runM5()">HIZLI OKUMA BAŞLAT</button>
-                    <button class="btn" style="background:var(--gold)" onclick="startKlavye()">KLAVYE EĞİTİMİ</button>
-                </div>
+                <button class="btn" onclick="runM5()">OKUMAYI BAŞLAT</button>
             </div>
 
             <div id="tab-ai" class="tab-content" style="display:none">
-                <h2>TDEV AI DeepMind</h2>
-                <div id="ai-chat" style="height:350px; background:rgba(0,0,0,0.8); border:1px solid var(--accent); border-radius:20px; padding:20px; overflow-y:auto; margin-bottom:10px;"></div>
-                <div style="display:flex; gap:10px;">
-                    <input type="text" id="ai-in" class="input-field" placeholder="Ders notu çıkar, soru hazırla...">
-                    <button class="btn" style="width:100px" onclick="askAI()">SOR</button>
+                <div id="chat" style="height:400px; background:rgba(0,0,0,0.8); border:1px solid var(--accent); border-radius:20px; padding:20px; overflow-y:auto; margin-bottom:10px;"></div>
+                <input type="text" id="ai-in" class="input-field" placeholder="Ünite özeti, MEB senaryo sorusu veya görsel analizi iste...">
+                <button class="btn" onclick="askAI()">ANALİZ ET</button>
+            </div>
+
+            <div id="tab-support" class="tab-content" style="display:none">
+                <h1>SUPPORT / DESTEK MERKEZİ</h1>
+                <div class="lesson-card">
+                    <p>Sistem hatası veya içerik önerisi için 7/24 aktif hat.</p>
+                    <textarea class="input-field" style="height:150px" placeholder="Mesajınızı buraya yazın..."></textarea>
+                    <button class="btn" onclick="alert('Destek talebiniz Muhammed Eymen\'e iletildi.')">GÖNDER</button>
                 </div>
             </div>
         </main>
     </div>
 
-    <div id="lesson-content-viewer">
-        <button class="btn-back" onclick="closeLesson()">X Kapat</button>
-        <div id="inner-lesson-data"></div>
+    <div id="content-viewer">
+        <button class="btn-back" style="top:20px; left:20px" onclick="closeView()">X KAPAT</button>
+        <div id="view-body"></div>
     </div>
 
     <script>
-        let state = { reg: 'tr', role: '', school: '', grade: '' };
+        let state = { reg: 'tr', role: '', class: '' };
 
-        // SAYAC
         setInterval(() => {
             const diff = new Date("2027-01-01") - new Date();
             const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
@@ -152,111 +161,96 @@
         }, 1000);
 
         function setReg(r) { state.reg = r; go('login'); }
-        function selRole(r) { state.role = r; document.getElementById('login-form').style.display='block'; }
-        function backTo(s) { go(s); }
+        function selRole(r) { state.role = r; document.getElementById('login-box').style.display='block'; }
+        function go(s) { document.querySelectorAll('.screen').forEach(x => x.classList.add('hidden')); document.getElementById('scr-' + s).classList.remove('hidden'); }
 
-        function go(s) {
-            document.querySelectorAll('.screen').forEach(x => x.classList.add('hidden'));
-            document.getElementById('scr-' + s).classList.remove('hidden');
-        }
-
-        function doLogin() {
+        function verify() {
             const p = document.getElementById('pass').value;
-            let ok = (state.role==='founder' && p==='Eymen11Amele44') || (state.role==='admin' && p==='ibrm4411') || (state.role==='beta' && p==='4402');
-            if(ok) { go('school'); syncGrades(); } else alert("Hatalı!");
-        }
-
-        function syncGrades() {
-            const s = document.getElementById('school-type').value;
-            const g = document.getElementById('grade-level');
-            g.innerHTML = "";
-            let list = s === 'ilkokul' ? [1,2,3,4] : s === 'orta' ? [5,6,7,8] : s === 'uni' ? ['Hazırlık', 1, 2, 3, 4, 'Master'] : [9,10,11,12];
-            list.forEach(x => g.innerHTML += `<option value="${x}">${x}. Sınıf</option>`);
+            if(state.role === 'admin' && p === 'ibrm4411') go('admin-panel');
+            else if((state.role === 'founder' && p === 'Eymen11Amele44') || (state.role === 'beta' && p === '4402')) go('class');
+            else alert("Erişim Reddedildi!");
         }
 
         function startApp() {
-            state.school = document.getElementById('school-type').value;
-            state.grade = document.getElementById('grade-level').value;
-            document.getElementById('scr-school').classList.add('hidden');
+            state.class = document.getElementById('grade').value;
+            document.getElementById('scr-class').classList.add('hidden');
+            document.getElementById('scr-admin-panel').classList.add('hidden');
             document.getElementById('app').style.display = 'flex';
-            document.getElementById('user-info').innerText = `${state.role.toUpperCase()} | ${state.reg.toUpperCase()} | ${state.grade}. SINIF`;
             renderLessons();
         }
 
         function renderLessons() {
             const grid = document.getElementById('lesson-grid');
-            grid.innerHTML = "";
-            const db = {
-                tr: ["Matematik (EBA)", "Fizik (Tonguç)", "Edebiyat (MEB)", "Kimya", "Biyoloji", "Tarih", "Yapay Zeka Giriş"],
-                us: ["Algebra (AP)", "Physics (MIT)", "English (Oxford)", "World History", "Computer Science"],
-                uni: ["Kalkülüs III", "Kuantum Mekaniği", "Veri Yapıları", "Makro Ekonomi", "Siber Güvenlik"]
-            };
-            let pool = state.school === 'uni' ? db.uni : (state.reg === 'tr' ? db.tr : db.us);
-            pool.forEach(l => {
-                grid.innerHTML += `
-                <div class="lesson-card">
+            const lessons = ["MATEMATİK", "FİZİK", "KİMYA", "BİYOLOJİ", "EDEBİYAT", "TARİH", "COĞRAFYA", "İNGİLİZCE", "DİN KÜLTÜRÜ"];
+            grid.innerHTML = lessons.map(l => `
+                <div class="card-opt" onclick="openLesson('${l}')">
                     <h3>${l}</h3>
-                    <p>Soru Bankası, Konu Anlatımı ve Retro Videolar Aktif.</p>
-                    <button class="btn" onclick="openLesson('${l}')">DERSE GİR</button>
-                </div>`;
-            });
+                    <p style="font-size:0.7rem; color:var(--accent)">Üniteler & Yazılı Hazırlık Aktif</p>
+                    <button class="btn" style="padding:5px; font-size:0.6rem">DERSE GİR</button>
+                </div>
+            `).join('');
         }
 
         function openLesson(name) {
-            const viewer = document.getElementById('lesson-content-viewer');
-            const inner = document.getElementById('inner-lesson-data');
-            viewer.style.display = 'block';
-            inner.innerHTML = `
-                <h1 style="color:var(--accent)">${name} Modülü</h1>
-                <hr style="margin:20px 0; border:1px solid #222">
-                <h3>📜 Konu Özeti (Dinamik Not)</h3>
-                <p>Bu dersin içeriği ${state.reg.toUpperCase()} müfredatına göre %100 uyumludur. Tonguç ve EBA notları birleştirildi.</p>
-                <div style="background:#111; padding:20px; border-radius:15px; margin:20px 0;">
-                    <h4>❓ Örnek Soru</h4>
-                    <p>Soru: ${name} dersinin 2027 vizyonu nedir?</p>
-                    <button class="btn" style="width:150px">Cevabı Gör</button>
+            const view = document.getElementById('content-viewer');
+            const body = document.getElementById('view-body');
+            view.style.display = 'block';
+            body.innerHTML = `
+                <h1 style="color:var(--accent)">${name} - ${state.class}. SINIF</h1>
+                <div class="grid">
+                    <div class="card-opt" onclick="showUnitDetail('${name}', 'Üniteler')">📂 ÜNİTE SEÇİMİ</div>
+                    <div class="card-opt" onclick="showUnitDetail('${name}', 'Yazılı')">📝 YAZILIYA HAZIRLIK (MEB SENARYO)</div>
+                    <div class="card-opt" onclick="showUnitDetail('${name}', 'Oyun')">🎮 EĞİTİCİ OYUNLAR</div>
                 </div>
             `;
         }
 
-        function closeLesson() { document.getElementById('lesson-content-viewer').style.display='none'; }
-
-        function showTab(id) {
-            document.querySelectorAll('.tab-content').forEach(t => t.style.display='none');
-            document.getElementById('tab-'+id).style.display='block';
+        function showUnitDetail(name, type) {
+            const body = document.getElementById('view-body');
+            if(type === 'Yazılı') {
+                body.innerHTML = `
+                    <h2>${name} YAZILI PROVALARI</h2>
+                    <div class="lesson-card">
+                        <span class="senaryo-badge">MEB SENARYO 1</span>
+                        <h4>1. DÖNEM 1. YAZILI PROVASI</h4>
+                        <p>Konu: Tam Sayılar ve Mantık Ünitesi ağırlıklı sorular.</p>
+                        <button class="btn" onclick="alert('MEB Senaryo 1 Soruları Yükleniyor...')">SENARYOYU GÖR</button>
+                    </div>
+                    <div class="lesson-card">
+                        <span class="senaryo-badge">MEB SENARYO 2</span>
+                        <h4>1. DÖNEM 2. YAZILI PROVASI</h4>
+                        <button class="btn">SENARYOYU GÖR</button>
+                    </div>
+                `;
+            } else {
+                body.innerHTML = `<h2>${name} - ${type} Paneli</h2><p>İçerikler MEB müfredatına göre %100 güncellendi. Notlar ve ünite değerlendirme soruları hazır.</p>`;
+            }
         }
 
-        // M5 MOTORU - 7 SEVİYE & 1000 KELİME
+        function closeView() { document.getElementById('content-viewer').style.display='none'; }
+        function showTab(id) { document.querySelectorAll('.tab-content').forEach(t => t.style.display='none'); document.getElementById('tab-'+id).style.display='block'; }
+
         function runM5() {
-            const box = document.getElementById('m5-viewer');
-            const count = Math.min(document.getElementById('word-count').value, 1000);
-            const lvl = document.getElementById('m5-lvl').value;
-            let speed = lvl === 'auto' ? Math.floor(Math.random()*600)+100 : 800 - (lvl * 100);
-            
-            let words = [];
-            for(let i=0; i<count; i++) words.push("TDEV-" + Math.floor(Math.random()*9999));
-            
+            const display = document.getElementById('m5-display');
+            const count = document.getElementById('w-count').value;
+            const lvl = document.getElementById('lvl').value;
+            let speed = lvl === 'auto' ? 250 : 800 - (lvl * 100);
             let i = 0;
-            let t = setInterval(() => {
-                if(i >= words.length) { clearInterval(t); box.innerText = "TAMAMLANDI"; return; }
-                box.innerText = words[i++];
+            let timer = setInterval(() => {
+                if(i >= count) { clearInterval(timer); display.innerText="BİTTİ"; return; }
+                display.innerText = "TDEV-" + (i + 1);
+                i++;
             }, speed);
         }
 
-        function startKlavye() {
-            const box = document.getElementById('m5-viewer');
-            box.style.fontSize = "1.5rem";
-            box.innerText = "Lütfen yazın: TDEV VIZYON 2027";
-        }
-
         function askAI() {
-            const input = document.getElementById('ai-in').value;
-            const chat = document.getElementById('ai-chat');
-            chat.innerHTML += `<p style="color:cyan">Siz: ${input}</p>`;
+            const inpt = document.getElementById('ai-in').value;
+            const chat = document.getElementById('chat');
+            chat.innerHTML += `<p style="color:var(--accent)">SİZ: ${inpt}</p>`;
             setTimeout(() => {
-                chat.innerHTML += `<p>TDEV AI: ${input} konusu hakkında EBA ve Tonguç veritabanı tarandı. ${state.grade}. sınıf seviyesinde tam özet çıkarıldı. Başarılar Muhammed Eymen!</p>`;
+                chat.innerHTML += `<p>TDEV-AI: MEB müfredatına göre "${inpt}" konusu analiz edildi. Senaryo soruları ve ünite değerlendirme notları hazırlandı. Görsel analiz arka planda işleniyor.</p>`;
                 chat.scrollTop = chat.scrollHeight;
-            }, 800);
+            }, 600);
             document.getElementById('ai-in').value = "";
         }
     </script>
