@@ -3,54 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TDEV Global | Vision 2027</title>
+    <title>TDEV Global | Quantum Vision 2027</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #00f2fe; --gold: #ffd700; --admin: #ff4444; --bg: #050505; --card: rgba(255, 255, 255, 0.07); --text: #ffffff; }
-        * { box-sizing: border-box; margin: 0; padding: 0; transition: all 0.3s ease; }
+        :root { --accent: #00f2fe; --gold: #ffd700; --admin: #ff4444; --bg: #050505; --card: rgba(255, 255, 255, 0.08); --text: #ffffff; }
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: all 0.2s ease; }
         
         body, html { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
         
-        /* ENERJİ VERİCİ MASTER RESİM */
+        /* ANA ARKA PLAN */
         .master-wallpaper { 
             position: fixed; inset: 0; 
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), 
-                        url('https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=2020&auto=format&fit=crop'); 
+            background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)), 
+                        url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop'); 
             background-size: cover; background-position: center; z-index: -2; 
         }
 
-        .screen { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(25px); z-index: 1000; }
-        .hidden { opacity: 0; pointer-events: none; visibility: hidden; transform: translateY(30px); }
+        .screen { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(20px); z-index: 1000; }
+        .hidden { opacity: 0; pointer-events: none; visibility: hidden; transform: scale(0.9); }
 
-        .container { width: 95%; max-width: 900px; text-align: center; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
+        .container { width: 95%; max-width: 1000px; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
 
-        .card-opt { background: var(--card); border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 20px; cursor: pointer; backdrop-filter: blur(10px); }
-        .card-opt:hover { border-color: var(--accent); background: rgba(0,242,254,0.1); transform: scale(1.05); }
+        .card-opt { background: var(--card); border: 1px solid rgba(255,255,255,0.12); padding: 25px; border-radius: 24px; cursor: pointer; backdrop-filter: blur(15px); }
+        .card-opt:hover { border-color: var(--accent); background: rgba(0,242,254,0.15); transform: translateY(-8px); box-shadow: 0 10px 30px rgba(0,242,254,0.2); }
         
-        .btn { background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 10px; text-transform: uppercase; }
-        .btn-back { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.1); color: white; padding: 10px 20px; border-radius: 50px; cursor: pointer; }
+        .btn { background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 14px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-back { position: absolute; top: 25px; left: 25px; background: rgba(255,255,255,0.1); color: white; padding: 10px 25px; border-radius: 50px; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
 
-        .input-field { background: rgba(0,0,0,0.8); border: 1px solid #333; color: white; padding: 15px; border-radius: 12px; width: 100%; margin: 10px 0; text-align: center; }
+        .input-field { background: rgba(0,0,0,0.8); border: 1px solid #333; color: white; padding: 16px; border-radius: 14px; width: 100%; margin: 8px 0; text-align: center; font-size: 1rem; }
 
-        /* APP LAYOUT */
+        /* APP ANA YAPI */
         .app { display: none; height: 100vh; position: relative; }
-        .sidebar { width: 300px; background: rgba(0,0,0,0.8); border-right: 1px solid #222; padding: 30px; display: flex; flex-direction: column; backdrop-filter: blur(15px); }
-        .main { flex: 1; padding: 40px; overflow-y: auto; background: rgba(0,0,0,0.3); }
+        .sidebar { width: 280px; background: rgba(0,0,0,0.9); border-right: 1px solid #222; padding: 30px; display: flex; flex-direction: column; backdrop-filter: blur(20px); }
+        .main { flex: 1; padding: 40px; overflow-y: auto; background: rgba(0,0,0,0.2); }
 
-        .lesson-card { background: var(--card); border: 1px solid #333; padding: 25px; border-radius: 25px; margin-bottom: 20px; }
-        .m5-box { font-size: 3.5rem; font-weight: 900; color: var(--accent); height: 200px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); border-radius: 30px; border: 2px solid var(--accent); margin-bottom: 20px; }
+        /* M5 LABORATUVARI */
+        .m5-box { font-size: 4rem; font-weight: 900; color: var(--accent); height: 220px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.7); border-radius: 35px; border: 3px solid var(--accent); margin-bottom: 25px; text-shadow: 0 0 20px var(--accent); }
 
-        /* OVERLAY VIEWER */
-        #content-viewer { display: none; position: fixed; inset: 40px; background: rgba(5,5,5,0.98); z-index: 5000; border-radius: 30px; border: 1px solid var(--accent); padding: 50px; overflow-y: auto; }
-        .senaryo-badge { background: var(--gold); color: #000; padding: 5px 10px; border-radius: 5px; font-weight: 800; font-size: 0.7rem; float: right; }
+        /* İÇERİK GÖRÜNTÜLEYİCİ */
+        #content-viewer { display: none; position: fixed; inset: 30px; background: rgba(3,3,3,0.99); z-index: 5000; border-radius: 40px; border: 2px solid var(--accent); padding: 40px; overflow-y: auto; box-shadow: 0 0 100px rgba(0,0,0,1); }
+        .senaryo-card { background: rgba(255,255,255,0.03); border-left: 5px solid var(--gold); padding: 20px; margin-bottom: 15px; border-radius: 0 15px 15px 0; }
     </style>
 </head>
 <body>
     <div class="master-wallpaper"></div>
 
     <div id="scr-country" class="screen">
-        <h1 style="font-size: 3.5rem; font-weight: 900; text-shadow: 0 0 20px var(--accent);">TDEV GLOBAL VISION</h1>
+        <h1 style="font-size: 4rem; font-weight: 900; margin-bottom: 20px;">TDEV GLOBAL</h1>
+        <p style="letter-spacing: 5px; color: var(--accent); margin-bottom: 30px;">REGION SELECTOR</p>
         <div class="container grid">
             <div class="card-opt" onclick="setReg('tr')">🇹🇷<br>TÜRKİYE</div>
             <div class="card-opt" onclick="setReg('us')">🇺🇸<br>USA</div>
@@ -61,13 +62,13 @@
 
     <div id="scr-login" class="screen hidden">
         <div class="btn-back" onclick="go('country')">← GERİ</div>
-        <div style="font-size: 3rem; font-weight: 900; color: var(--accent); margin-bottom: 20px;" id="timer">00:00:00:00</div>
+        <div id="timer" style="font-size: 3.5rem; font-weight: 900; color: var(--accent); margin-bottom: 15px;">00:00:00:00</div>
         <div class="container grid" style="max-width: 500px;">
-            <button class="btn" onclick="selRole('founder')">KURUCU</button>
-            <button class="btn" onclick="selRole('admin')">ADMIN</button>
+            <button class="btn" onclick="selRole('founder')">KURUCU (EYMEN)</button>
+            <button class="btn" onclick="selRole('admin')">ADMIN (İBRAHİM)</button>
             <button class="btn" onclick="selRole('beta')">BETA TESTER</button>
         </div>
-        <div id="login-box" style="display:none; width: 350px; margin-top: 20px;">
+        <div id="login-box" style="display:none; width: 350px; margin-top: 25px;">
             <input type="password" id="pass" class="input-field" placeholder="GÜVENLİK ŞİFRESİ">
             <button class="btn" style="background:var(--gold)" onclick="verify()">SİSTEME ERİŞ</button>
         </div>
@@ -75,118 +76,116 @@
 
     <div id="scr-admin-panel" class="screen hidden">
         <div class="btn-back" onclick="go('login')">← ÇIKIŞ</div>
-        <h1 style="color:var(--admin)">ADMIN: İBRAHİM</h1>
-        <div class="container" style="border: 1px solid var(--admin); padding: 50px; border-radius: 30px;">
-            <p>Sistem yönetimi için yetkilendirme bekleniyor...</p>
-            <button class="btn" style="background:var(--admin); color:white" onclick="alert('Yönetim Modu Aktif')">TAM YETKİ PANELİNİ AÇ</button>
+        <h1 style="color:var(--admin); font-size: 3rem;">İBRAHİM</h1>
+        <div class="container" style="padding: 100px; border: 1px solid rgba(255,255,255,0.1); border-radius: 40px; background: rgba(0,0,0,0.5);">
+            <p style="color: #666; letter-spacing: 5px;">YÖNETİM MODU AKTİF - VERİLER TARANIYOR</p>
         </div>
     </div>
 
     <div id="scr-class" class="screen hidden">
         <div class="btn-back" onclick="go('login')">← GERİ</div>
-        <h2>EĞİTİM KADEMESİ</h2>
-        <div class="container">
+        <h2 style="margin-bottom: 20px;">EĞİTİM KADEMESİ SEÇİN</h2>
+        <div class="container" style="max-width: 400px;">
             <select id="grade" class="input-field">
-                <optgroup label="İlkokul/Ortaokul">
-                    <option value="1">1. Sınıf</option><option value="5">5. Sınıf</option><option value="8">8. Sınıf (LGS Hazırlık)</option>
-                </optgroup>
-                <optgroup label="Lise (Her Tür)">
-                    <option value="9">9. Sınıf</option><option value="11">11. Sınıf</option><option value="12">12. Sınıf (YKS Hazırlık)</option>
-                </optgroup>
-                <optgroup label="Akademi">
-                    <option value="uni">Üniversite / Lisans</option>
-                </optgroup>
+                <option value="1">1. Sınıf</option><option value="5">5. Sınıf</option>
+                <option value="8">8. Sınıf (LGS)</option><option value="9">9. Sınıf</option>
+                <option value="12">12. Sınıf (YKS)</option><option value="uni">Üniversite</option>
             </select>
-            <button class="btn" onclick="startApp()">EĞİTİMİ BAŞLAT</button>
+            <button class="btn" onclick="startApp()">VİZYONU BAŞLAT</button>
         </div>
     </div>
 
     <div id="app" class="app">
         <nav class="sidebar">
-            <h2 style="color:var(--accent); font-weight:900;">TDEV VISION</h2>
-            <hr style="margin:20px 0; border:0; border-top:1px solid #333;">
+            <h1 style="color:var(--accent); font-weight:900; font-size: 1.8rem;">TDEV V7</h1>
+            <hr style="margin:20px 0; border:0; border-top:1px solid #222;">
             <button class="btn" style="background:none; color:white; text-align:left" onclick="showTab('lessons')">📚 DERSLER</button>
-            <button class="btn" style="background:none; color:white; text-align:left" onclick="showTab('m5')">⚡ M5 LABORATUVARI</button>
-            <button class="btn" style="background:none; color:white; text-align:left" onclick="showTab('ai')">🤖 TDEV-AI DEEP</button>
-            <button class="btn" style="background:none; color:white; text-align:left" onclick="showTab('support')">🎧 SUPPORT / DESTEK</button>
-            <button class="btn" style="margin-top:auto; background:red; color:white" onclick="location.reload()">GÜVENLİ ÇIKIŞ</button>
+            <button class="btn" style="background:none; color:white; text-align:left" onclick="showTab('m5')">⚡ M5 QUANTUM</button>
+            <button class="btn" style="background:none; color:white; text-align:left" onclick="showTab('ai')">🤖 TDEV AI</button>
+            <button class="btn" style="background:none; color:white; text-align:left" onclick="showTab('support')">🎧 DESTEK</button>
+            <button class="btn" style="margin-top:auto; background:red; color:white" onclick="location.reload()">SİSTEMİ KAPAT</button>
         </nav>
 
         <main class="main">
             <div id="tab-lessons" class="tab-content">
+                <h2 style="margin-bottom: 20px;">MÜFREDAT VE SINAV MERKEZİ</h2>
                 <div id="lesson-grid" class="grid"></div>
             </div>
 
             <div id="tab-m5" class="tab-content" style="display:none">
-                <div id="m5-display" class="m5-box">TDEV M5</div>
-                <div class="grid" style="grid-template-columns: 1fr 1fr;">
-                    <input type="number" id="w-count" class="input-field" placeholder="Kelime (Max 1000)" value="200">
-                    <select id="lvl" class="input-field">
-                        <option value="1">Lvl 1</option><option value="4">Lvl 4</option><option value="7">Lvl 7 🔥</option>
-                        <option value="auto">OTOMATİK SEÇ</option>
-                    </select>
+                <div id="m5-display" class="m5-box">READY</div>
+                <div class="grid">
+                    <div>
+                        <label>Kelime Sayısı</label>
+                        <input type="number" id="w-count" class="input-field" value="500">
+                    </div>
+                    <div>
+                        <label>Hız (MS)</label>
+                        <input type="number" id="speed-ms" class="input-field" value="50">
+                    </div>
                 </div>
-                <button class="btn" onclick="runM5()">OKUMAYI BAŞLAT</button>
+                <button class="btn" onclick="runM5()">QUANTUM OKUMAYI BAŞLAT</button>
             </div>
 
             <div id="tab-ai" class="tab-content" style="display:none">
-                <div id="chat" style="height:400px; background:rgba(0,0,0,0.8); border:1px solid var(--accent); border-radius:20px; padding:20px; overflow-y:auto; margin-bottom:10px;"></div>
-                <input type="text" id="ai-in" class="input-field" placeholder="Ünite özeti, MEB senaryo sorusu veya görsel analizi iste...">
+                <div id="chat" style="height:450px; background:rgba(0,0,0,0.8); border:1px solid var(--accent); border-radius:25px; padding:25px; overflow-y:auto; margin-bottom:15px;">
+                    <p style="color:var(--accent)">TDEV-AI: Sistem hazır, Kurucu Eymen. Nasıl yardımcı olabilirim?</p>
+                </div>
+                <input type="text" id="ai-in" class="input-field" placeholder="Konu analizi iste...">
                 <button class="btn" onclick="askAI()">ANALİZ ET</button>
             </div>
 
             <div id="tab-support" class="tab-content" style="display:none">
-                <h1>SUPPORT / DESTEK MERKEZİ</h1>
-                <div class="lesson-card">
-                    <p>Sistem hatası veya içerik önerisi için 7/24 aktif hat.</p>
-                    <textarea class="input-field" style="height:150px" placeholder="Mesajınızı buraya yazın..."></textarea>
-                    <button class="btn" onclick="alert('Destek talebiniz Muhammed Eymen\'e iletildi.')">GÖNDER</button>
+                <h1>DESTEK HATTI</h1>
+                <div class="card-opt" style="text-align:left">
+                    <p>Sorunlarınızı Muhammed Eymen Vizyonuna iletin.</p>
+                    <textarea class="input-field" style="height:200px; text-align:left" placeholder="Mesajınız..."></textarea>
+                    <button class="btn">GÖNDER</button>
                 </div>
             </div>
         </main>
     </div>
 
     <div id="content-viewer">
-        <button class="btn-back" style="top:20px; left:20px" onclick="closeView()">X KAPAT</button>
-        <div id="view-body"></div>
+        <button class="btn-back" onclick="closeView()">X KAPAT</button>
+        <div id="view-body" style="margin-top: 60px;"></div>
     </div>
 
     <script>
         let state = { reg: 'tr', role: '', class: '' };
 
+        // GERİ SAYIM (2027 VİZYONU)
         setInterval(() => {
             const diff = new Date("2027-01-01") - new Date();
             const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
             document.getElementById('timer').innerText = `${d}g ${h}s ${m}d ${s}s`;
         }, 1000);
 
+        function go(s) { document.querySelectorAll('.screen').forEach(x => x.classList.add('hidden')); document.getElementById('scr-' + s).classList.remove('hidden'); }
         function setReg(r) { state.reg = r; go('login'); }
         function selRole(r) { state.role = r; document.getElementById('login-box').style.display='block'; }
-        function go(s) { document.querySelectorAll('.screen').forEach(x => x.classList.add('hidden')); document.getElementById('scr-' + s).classList.remove('hidden'); }
 
         function verify() {
             const p = document.getElementById('pass').value;
             if(state.role === 'admin' && p === 'ibrm4411') go('admin-panel');
             else if((state.role === 'founder' && p === 'Eymen11Amele44') || (state.role === 'beta' && p === '4402')) go('class');
-            else alert("Erişim Reddedildi!");
+            else alert("ŞİFRE HATALI!");
         }
 
         function startApp() {
             state.class = document.getElementById('grade').value;
-            document.getElementById('scr-class').classList.add('hidden');
-            document.getElementById('scr-admin-panel').classList.add('hidden');
+            go('app');
             document.getElementById('app').style.display = 'flex';
             renderLessons();
         }
 
         function renderLessons() {
             const grid = document.getElementById('lesson-grid');
-            const lessons = ["MATEMATİK", "FİZİK", "KİMYA", "BİYOLOJİ", "EDEBİYAT", "TARİH", "COĞRAFYA", "İNGİLİZCE", "DİN KÜLTÜRÜ"];
+            const lessons = ["MATEMATİK", "FİZİK", "EDEBİYAT", "BİYOLOJİ", "TARİH", "İNGİLİZCE", "GEOMETRİ"];
             grid.innerHTML = lessons.map(l => `
                 <div class="card-opt" onclick="openLesson('${l}')">
-                    <h3>${l}</h3>
-                    <p style="font-size:0.7rem; color:var(--accent)">Üniteler & Yazılı Hazırlık Aktif</p>
-                    <button class="btn" style="padding:5px; font-size:0.6rem">DERSE GİR</button>
+                    <h3 style="color:var(--accent)">${l}</h3>
+                    <p style="font-size:0.8rem">MEB SENARYOLARI VE ÖZEL NOTLAR</p>
                 </div>
             `).join('');
         }
@@ -196,34 +195,28 @@
             const body = document.getElementById('view-body');
             view.style.display = 'block';
             body.innerHTML = `
-                <h1 style="color:var(--accent)">${name} - ${state.class}. SINIF</h1>
+                <h1 style="border-bottom: 2px solid var(--accent); padding-bottom: 15px;">${name} - ${state.class}. SINIF ANALİZİ</h1>
                 <div class="grid">
-                    <div class="card-opt" onclick="showUnitDetail('${name}', 'Üniteler')">📂 ÜNİTE SEÇİMİ</div>
-                    <div class="card-opt" onclick="showUnitDetail('${name}', 'Yazılı')">📝 YAZILIYA HAZIRLIK (MEB SENARYO)</div>
-                    <div class="card-opt" onclick="showUnitDetail('${name}', 'Oyun')">🎮 EĞİTİCİ OYUNLAR</div>
+                    <div class="card-opt" onclick="showSection('${name}', 'notlar')">📑 DERS NOTLARINI GÖR</div>
+                    <div class="card-opt" onclick="showSection('${name}', 'yazili')">✍️ MEB YAZILI SENARYOLARI</div>
                 </div>
+                <div id="detail-area" style="margin-top:30px;"></div>
             `;
         }
 
-        function showUnitDetail(name, type) {
-            const body = document.getElementById('view-body');
-            if(type === 'Yazılı') {
-                body.innerHTML = `
-                    <h2>${name} YAZILI PROVALARI</h2>
-                    <div class="lesson-card">
-                        <span class="senaryo-badge">MEB SENARYO 1</span>
-                        <h4>1. DÖNEM 1. YAZILI PROVASI</h4>
-                        <p>Konu: Tam Sayılar ve Mantık Ünitesi ağırlıklı sorular.</p>
-                        <button class="btn" onclick="alert('MEB Senaryo 1 Soruları Yükleniyor...')">SENARYOYU GÖR</button>
-                    </div>
-                    <div class="lesson-card">
-                        <span class="senaryo-badge">MEB SENARYO 2</span>
-                        <h4>1. DÖNEM 2. YAZILI PROVASI</h4>
-                        <button class="btn">SENARYOYU GÖR</button>
+        function showSection(name, type) {
+            const area = document.getElementById('detail-area');
+            if(type === 'yazili') {
+                area.innerHTML = `
+                    <h3>2024-2025 GÜNCEL SENARYOLAR</h3>
+                    <div class="senaryo-card">
+                        <h4>SENARYO 1: TEMEL KAZANIMLAR</h4>
+                        <p>${name} dersi için MEB tarafından yayınlanan 1. senaryo soruları ve çözüm stratejileri.</p>
+                        <button class="btn" style="width:150px; font-size:0.7rem">İNDİR / AÇ</button>
                     </div>
                 `;
             } else {
-                body.innerHTML = `<h2>${name} - ${type} Paneli</h2><p>İçerikler MEB müfredatına göre %100 güncellendi. Notlar ve ünite değerlendirme soruları hazır.</p>`;
+                area.innerHTML = `<div class="card-opt"><h3>KRİTİK BİLGİLER</h3><p>Müfredata uygun özet notlar burada listelenecektir.</p></div>`;
             }
         }
 
@@ -233,12 +226,11 @@
         function runM5() {
             const display = document.getElementById('m5-display');
             const count = document.getElementById('w-count').value;
-            const lvl = document.getElementById('lvl').value;
-            let speed = lvl === 'auto' ? 250 : 800 - (lvl * 100);
+            const speed = document.getElementById('speed-ms').value;
             let i = 0;
             let timer = setInterval(() => {
-                if(i >= count) { clearInterval(timer); display.innerText="BİTTİ"; return; }
-                display.innerText = "TDEV-" + (i + 1);
+                if(i >= count) { clearInterval(timer); display.innerText="TAMAMLANDI"; return; }
+                display.innerText = "VERİ-" + (i + 1);
                 i++;
             }, speed);
         }
@@ -246,9 +238,10 @@
         function askAI() {
             const inpt = document.getElementById('ai-in').value;
             const chat = document.getElementById('chat');
-            chat.innerHTML += `<p style="color:var(--accent)">SİZ: ${inpt}</p>`;
+            if(!inpt) return;
+            chat.innerHTML += `<p style="color:var(--accent); margin-bottom:10px;">EYMEN: ${inpt}</p>`;
             setTimeout(() => {
-                chat.innerHTML += `<p>TDEV-AI: MEB müfredatına göre "${inpt}" konusu analiz edildi. Senaryo soruları ve ünite değerlendirme notları hazırlandı. Görsel analiz arka planda işleniyor.</p>`;
+                chat.innerHTML += `<p style="margin-bottom:20px;">TDEV-AI: Analiz tamamlandı. "${inpt}" konusu 2027 vizyonu kapsamında ders modüllerine eklendi.</p>`;
                 chat.scrollTop = chat.scrollHeight;
             }, 600);
             document.getElementById('ai-in').value = "";
