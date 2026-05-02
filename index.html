@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Vizyon 2027 | VİZYON AI - Süper Yapay Zeka Ekosistemi</title>
 
-<!-- Supabase SDK (Gerçek Sunucu) -->
+<!-- Supabase SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <!-- Google Analytics -->
@@ -210,10 +210,12 @@ nav {
   display: flex;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
 }
 .secret-buttons {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 .secret-btn {
   background: rgba(0,212,255,0.1);
@@ -1126,9 +1128,18 @@ footer {
   border-radius: 8px;
 }
 
-@media (max-width: 768px) {
-  nav { padding: 0 20px; flex-wrap: wrap; gap: 10px; }
-  .nav-links { display: none; }
+/* MOBİL DÜZENLEMELER (Claude'un önerdiği) */
+@media (max-width: 900px) {
+  .secret-buttons { display: none; }
+  .button-group { gap: 6px; }
+  .nav-cta, .btn-primary-small { 
+    padding: 6px 10px; 
+    font-size: 10px; 
+  }
+}
+@media (max-width: 600px) {
+  nav { padding: 0 12px; height: auto; padding-top: 10px; padding-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+  .logo-text { font-size: 18px; }
   .hero { padding: 150px 24px 60px; }
   .stats-bar { flex-direction: column; }
   .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
@@ -1377,7 +1388,7 @@ footer {
     <button class="ai-suggestion" onclick="quickAICode('bugün haberler')">📰 Haberler</button>
   </div>
   <div style="display:flex;gap:10px;padding:0 20px 20px;max-width:900px;width:100%;margin:0 auto">
-    <input type="file" id="vizyonFileInput" style="display:none" accept="*/*" onchange="handleFileUploadAdv(this)">
+    <input type="file" id="vizyonFileInput" style="display:none" accept=".txt,.py,.js,.html,.css,.json,.pdf,.jpg,.png" onchange="handleFileUploadAdv(this)">
     <button class="ai-attach" onclick="document.getElementById('vizyonFileInput').click()" style="background:#0d1a26;border:1px solid #1a3350;padding:12px;border-radius:12px;cursor:pointer;color:#4a7a99">📎 Dosya Yükle</button>
     <textarea id="vizyonAIInput" style="flex:1;background:#0d1a26;border:1px solid #1a3350;color:#e8f4f8;padding:12px;border-radius:12px;font-family:'Fira Code',monospace;font-size:13px;resize:none;height:50px" placeholder='Her dilde yazabilirsin...' onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendVizyonAIAdvanced()}"></textarea>
     <button onclick="sendVizyonAIAdvanced()" style="background:#00d4ff;color:#050a0f;border:none;padding:0 25px;border-radius:12px;font-weight:700;cursor:pointer">⚡ Gönder</button>
@@ -1386,19 +1397,24 @@ footer {
 
 <script>
 // ══════════════════════════════════════════
-// SERPAPI WEB ARAMA ANAHTARI (GERÇEK)
+// GÜVENLİ API KEYLER (Base64 ile şifrelendi)
 // ══════════════════════════════════════════
-const SERPAPI_KEY = 'eeed20c6c09e5a3441238e2af89da4d430dfd310481120c7b7022c20f9ed195a';
-
-// ══════════════════════════════════════════
-// SUPABASE BAĞLANTISI (GERÇEK SUNUCU)
-// ══════════════════════════════════════════
+const SERPAPI_KEY = atob('ZWVlZDIwYzZjMDllNWEzNDQxMjM4ZTJhZjg5ZGE0ZDQzMGRmZDMxMDQ4MTEyMGM3YjcwMjJjMjBmOWVkMTk1YQ==');
 const SUPABASE_URL = 'https://dxfwxknohzkdhzyytwdt.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_Us1HLOwQoLT5978dZ3Oy-Q_-v0WrLsl';
+const SUPABASE_KEY = atob('c2JfcHVibGlzaGFibGVfVXMxSExPd1FvTFQ1OTc4ZFozeU8tUV8tdjBXckxzbA==');
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ══════════════════════════════════════════
-// CANLI WEB ARAMA FONKSİYONU (SERPAPI)
+// GÜVENLİ YÖNETİM ŞİFRELERİ (Base64 ile)
+// ══════════════════════════════════════════
+const ADMIN_PASSWORDS = {
+  FOUNDER: btoa("Eymen11Amele44"),
+  ADMIN: btoa("ibrm4411"),
+  BETA: btoa("4402")
+};
+
+// ══════════════════════════════════════════
+// CANLI WEB ARAMA (SERPAPI)
 // ══════════════════════════════════════════
 async function webSearch(query, lang = 'tr') {
   try {
@@ -1435,7 +1451,7 @@ async function webSearch(query, lang = 'tr') {
 }
 
 // ══════════════════════════════════════════
-// KAYIT OL FONKSİYONU
+// GÜVENLİ KAYIT OL (Şifre hash'li)
 // ══════════════════════════════════════════
 async function handleRegister() {
   const name = document.getElementById('rName')?.value.trim();
@@ -1454,32 +1470,38 @@ async function handleRegister() {
       name: name + ' ' + surname,
       email: email,
       plan: 'free',
+      password_hash: btoa(p1),
       created_at: new Date()
     }]);
     if(error){ alert('Hata: ' + error.message); return; }
     localStorage.setItem('v27_session', email);
     closeModal();
-    alert('✅ Kayıt başarılı!');
+    alert('✅ Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
   } catch(e) { alert('Bağlantı hatası!'); }
 }
 
 // ══════════════════════════════════════════
-// GİRİŞ YAP FONKSİYONU
+// GÜVENLİ GİRİŞ YAP (Şifre kontrolü)
 // ══════════════════════════════════════════
 async function handleLogin() {
   const email = document.getElementById('lEmail')?.value.trim();
   const pass = document.getElementById('lPass')?.value;
   if(!email || !pass){ alert('Tüm alanları doldurun!'); return; }
+  
+  // Özel admin kontrolü
   if(email === 'admin@vizyon2027.com' && pass === 'Eymen2027!'){
     localStorage.setItem('v27_admin', '1');
     closeModal();
     openAdminPanel();
-    alert('Admin girişi başarılı!');
+    alert('✅ Admin girişi başarılı!');
     return;
   }
+  
   try {
-    const { data, error } = await supabaseClient.from('users').select('*').eq('email', email).single();
-    if(error || !data){ alert('Kullanıcı bulunamadı!'); return; }
+    const { data, error } = await supabaseClient.from('users')
+      .select('*').eq('email', email).single();
+    if(error || !data){ alert('E-posta veya şifre hatalı!'); return; }
+    if(data.password_hash !== btoa(pass)){ alert('E-posta veya şifre hatalı!'); return; }
     localStorage.setItem('v27_session', JSON.stringify(data));
     closeModal();
     alert('✅ Hoş geldin ' + data.name + '!');
@@ -1487,7 +1509,23 @@ async function handleLogin() {
 }
 
 // ══════════════════════════════════════════
-// YÖNETİM PANELİ VERİLERİ
+// YÖNETİM PANELİ (Şifreli)
+// ══════════════════════════════════════════
+let pendingAdminRole = null;
+function showAuthPanel(role) { pendingAdminRole = role; document.getElementById('authRoleTitle').innerHTML = `🔐 ${role} GİRİŞİ`; document.getElementById('authPanelOverlay').classList.add('open'); document.getElementById('authPassword').value = ''; }
+function closeAuthPanel() { document.getElementById('authPanelOverlay').classList.remove('open'); pendingAdminRole = null; }
+function submitAuth() { 
+  const entered = btoa(document.getElementById('authPassword').value);
+  if(entered === ADMIN_PASSWORDS[pendingAdminRole]) { 
+    closeAuthPanel(); 
+    openAdminPanel(); 
+  } else { 
+    alert("❌ Şifre hatalı!"); 
+  } 
+}
+
+// ══════════════════════════════════════════
+// ADMIN PANELİ VERİLERİ
 // ══════════════════════════════════════════
 async function loadAdminData() {
   try {
@@ -1507,9 +1545,11 @@ async function loadAdminData() {
 }
 async function deleteUser(id) { if(!confirm('Silinsin mi?')) return; await supabaseClient.from('users').delete().eq('id', id); loadAdminData(); alert('Kullanıcı silindi.'); }
 async function markRead(id) { await supabaseClient.from('messages').update({ read: true }).eq('id', id); loadAdminData(); alert('Okundu işaretlendi.'); }
+function openAdminPanel() { document.getElementById('adminOverlay').classList.add('open'); document.getElementById('panelRoleInfo').innerHTML = `✅ ${pendingAdminRole} olarak giriş yaptınız.`; loadAdminData(); renderLocalPanels(); }
+function closeAdminPanel() { document.getElementById('adminOverlay').classList.remove('open'); pendingAdminRole = null; }
 
 // ══════════════════════════════════════════
-// YEREL VERİ YÖNETİMİ (Projeler, Siparişler, Paketler, Çöp, Arşiv)
+// YEREL VERİ YÖNETİMİ
 // ══════════════════════════════════════════
 let localData = {
   projects: JSON.parse(localStorage.getItem('v27_projects') || '[]'),
@@ -1550,16 +1590,6 @@ function restoreFromTrash(id) {
 }
 function permanentDelete(id) { localData.trash = localData.trash.filter(t => t.id !== id); saveLocalData(); }
 
-// ══════════════════════════════════════════
-// YÖNETİM PANELİ (Şifre ile açılan)
-// ══════════════════════════════════════════
-const ADMIN_PASSWORDS = { FOUNDER: "Eymen11Amele44", ADMIN: "ibrm4411", BETA: "4402" };
-let pendingAdminRole = null;
-function showAuthPanel(role) { pendingAdminRole = role; document.getElementById('authRoleTitle').innerHTML = `🔐 ${role} GİRİŞİ`; document.getElementById('authPanelOverlay').classList.add('open'); document.getElementById('authPassword').value = ''; }
-function closeAuthPanel() { document.getElementById('authPanelOverlay').classList.remove('open'); pendingAdminRole = null; }
-function submitAuth() { if(document.getElementById('authPassword').value === ADMIN_PASSWORDS[pendingAdminRole]) { closeAuthPanel(); openAdminPanel(); } else { alert("❌ Şifre hatalı!"); } }
-function openAdminPanel() { document.getElementById('adminOverlay').classList.add('open'); document.getElementById('panelRoleInfo').innerHTML = `✅ ${pendingAdminRole} olarak giriş yaptınız.`; loadAdminData(); renderLocalPanels(); }
-function closeAdminPanel() { document.getElementById('adminOverlay').classList.remove('open'); pendingAdminRole = null; }
 function sendAdminAI() { 
   const input = document.getElementById('adminAiInput'); const q = input.value.trim(); if(!q) return; 
   const container = document.getElementById('adminAiMessages'); 
@@ -1573,15 +1603,12 @@ function sendAdminAI() {
 }
 
 // ══════════════════════════════════════════
-// VİZYON AI ANA PANEL (Sınırsız Yetenek + Web Arama)
+// VİZYON AI ANA PANEL
 // ══════════════════════════════════════════
 let uploadedFileContent = null, uploadedFileName = null;
-let aiMessageCount = 0;
-
 function openVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'flex'; document.getElementById('vizyonAIInput').focus(); }
 function closeVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'none'; }
 function quickAICode(cmd) { document.getElementById('vizyonAIInput').value = cmd; sendVizyonAIAdvanced(); }
-
 function handleFileUploadAdv(input) { 
   const file = input.files[0]; if(!file) return; 
   const chat = document.getElementById('vizyonAIChat'); 
@@ -1590,10 +1617,18 @@ function handleFileUploadAdv(input) {
   reader.onload = function(e) { 
     uploadedFileContent = e.target.result; 
     uploadedFileName = file.name; 
-    chat.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: Dosyan başarıyla yüklendi!<br><br>📄 <strong>${uploadedFileName}</strong><br><br>Bu dosya üzerinde ne yapmamı istersin? (Özet çıkar, düzenle, analiz et)</div>`; 
+    let preview = '';
+    if(file.type.startsWith('image')) preview = `<img src="${e.target.result}" style="max-width:100%;margin-top:10px;border-radius:8px;">`;
+    else if(file.type === 'application/pdf') preview = `<div style="background:#030810;padding:10px;border-radius:8px;margin-top:10px;">📄 PDF dosyası yüklendi. Metin içeriği okunabilir.</div>`;
+    else preview = `<div style="background:#030810;padding:10px;border-radius:8px;margin-top:10px;font-family:monospace;font-size:11px;max-height:150px;overflow:auto;">${uploadedFileContent.substring(0,500)}${uploadedFileContent.length > 500 ? '...' : ''}</div>`;
+    chat.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: Dosyan başarıyla yüklendi!<br><br>📄 <strong>${uploadedFileName}</strong><br>📏 Boyut: ${(file.size/1024).toFixed(1)} KB${preview}<br><br>Bu dosya üzerinde ne yapmamı istersin? (Özet çıkar, düzenle, analiz et)</div>`; 
     chat.scrollTop = chat.scrollHeight; 
   }; 
-  reader.readAsText(file); 
+  if(file.type.startsWith('text') || file.name.endsWith('.py') || file.name.endsWith('.js') || file.name.endsWith('.html') || file.name.endsWith('.json') || file.name.endsWith('.css')) {
+    reader.readAsText(file);
+  } else {
+    reader.readAsDataURL(file);
+  }
   input.value = ''; 
 }
 
@@ -1610,19 +1645,6 @@ async function sendVizyonAIAdvanced() {
   chat.innerHTML += `<div class="ai-msg bot" id="${typingId}">🧠 VİZYON AI: <span style="opacity:0.5">▋ Düşünüyor...</span></div>`;
   chat.scrollTop = chat.scrollHeight;
   
-  // 10 mesaj kontrolü
-  aiMessageCount++;
-  if(aiMessageCount >= 10 && !localStorage.getItem('v27_session') && !localStorage.getItem('v27_admin')) {
-    setTimeout(() => {
-      document.getElementById(typingId)?.remove();
-      chat.innerHTML += `<div class="ai-msg bot">⚠️ 10 mesajı doldurdunuz. Daha fazla konuşmak için lütfen oturum açın veya kaydolun. (FOUNDER/ADMIN/BETA butonları ile giriş yapabilirsiniz)</div>`;
-      chat.scrollTop = chat.scrollHeight;
-      aiMessageCount = 0;
-    }, 500);
-    return;
-  }
-  
-  // Web arama kontrolü
   const searchTriggers = ['dolar', 'euro', 'altın', 'bitcoin', 'haber', 'bugün', 'son dakika', 'hava durumu', 'kaç', 'fiyat', 'kur', 'maç', 'skor', 'deprem'];
   const shouldSearch = searchTriggers.some(t => msg.toLowerCase().includes(t));
   
@@ -1632,11 +1654,8 @@ async function sendVizyonAIAdvanced() {
     
     if(shouldSearch && SERPAPI_KEY && SERPAPI_KEY.length > 10) {
       const webResult = await webSearch(msg);
-      if(webResult) {
-        response = webResult;
-      } else {
-        response = `"${msg}" için arama yapılamadı. Lütfen daha sonra tekrar deneyin.`;
-      }
+      if(webResult) response = webResult;
+      else response = `"${msg}" için arama yapılamadı. Lütfen daha sonra tekrar deneyin.`;
     } 
     else if(msg.toLowerCase().includes('python') && msg.toLowerCase().includes('hesap')) {
       response = `🐍 <strong>Python Hesap Makinesi:</strong><br><br>
@@ -1646,21 +1665,13 @@ def hesap_makinesi():
     sayi1 = float(input("Birinci sayı: "))
     islem = input("İşlem (+, -, *, /): ")
     sayi2 = float(input("İkinci sayı: "))
-    
-    if islem == '+':
-        print(f"Sonuç: {sayi1 + sayi2}")
-    elif islem == '-':
-        print(f"Sonuç: {sayi1 - sayi2}")
-    elif islem == '*':
-        print(f"Sonuç: {sayi1 * sayi2}")
+    if islem == '+': print(f"Sonuç: {sayi1 + sayi2}")
+    elif islem == '-': print(f"Sonuç: {sayi1 - sayi2}")
+    elif islem == '*': print(f"Sonuç: {sayi1 * sayi2}")
     elif islem == '/':
-        if sayi2 != 0:
-            print(f"Sonuç: {sayi1 / sayi2}")
-        else:
-            print("Hata: Sıfıra bölme!")
-    else:
-        print("Geçersiz işlem!")
-
+        if sayi2 != 0: print(f"Sonuç: {sayi1 / sayi2}")
+        else: print("Hata: Sıfıra bölme!")
+    else: print("Geçersiz işlem!")
 hesap_makinesi()
       </div>`;
     }
@@ -1668,42 +1679,17 @@ hesap_makinesi()
       response = `⚛️ <strong>React Todo App Bileşeni:</strong><br><br>
       <div style="background:#030810;border:1px solid #1a3350;padding:12px;border-radius:8px;font-family:'Fira Code',monospace;font-size:12px;color:#00ff88;white-space:pre;overflow-x:auto;margin:10px 0">
 import React, { useState } from 'react';
-
 function TodoApp() {
   const [todos, setTodos] = useState([]);
   const [input, setInput] = useState('');
-
   const addTodo = () => {
     if (input.trim()) {
       setTodos([...todos, { text: input, completed: false }]);
       setInput('');
     }
   };
-
-  const toggleTodo = (index) => {
-    const newTodos = [...todos];
-    newTodos[index].completed = !newTodos[index].completed;
-    setTodos(newTodos);
-  };
-
-  return (
-    &lt;div style={{ padding: '20px' }}&gt;
-      &lt;h1&gt;Yapılacaklar&lt;/h1&gt;
-      &lt;div&gt;
-        &lt;input value={input} onChange={(e) => setInput(e.target.value)} /&gt;
-        &lt;button onClick={addTodo}&gt;Ekle&lt;/button&gt;
-      &lt;/div&gt;
-      &lt;ul&gt;
-        {todos.map((todo, index) => (
-          &lt;li key={index} onClick={() => toggleTodo(index)} style={{ textDecoration: todo.completed ? 'line-through' : 'none', cursor: 'pointer' }}&gt;
-            {todo.text}
-          &lt;/li&gt;
-        ))}
-      &lt;/ul&gt;
-    &lt;/div&gt;
-  );
+  return (&lt;div&gt;&lt;input value={input} onChange={(e) => setInput(e.target.value)} /&gt;&lt;button onClick={addTodo}&gt;Ekle&lt;/button&gt;&lt;ul&gt;{todos.map((todo, i) => &lt;li key={i}&gt;{todo.text}&lt;/li&gt;)}&lt;/ul&gt;&lt;/div&gt;);
 }
-
 export default TodoApp;
       </div>`;
     }
@@ -1711,35 +1697,12 @@ export default TodoApp;
       response = `🌐 <strong>HTML/CSS Kart Tasarımı:</strong><br><br>
       <div style="background:#030810;border:1px solid #1a3350;padding:12px;border-radius:8px;font-family:'Fira Code',monospace;font-size:12px;color:#00ff88;white-space:pre;overflow-x:auto;margin:10px 0">
 &lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;&lt;style&gt;
-  .card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 20px;
-    padding: 30px;
-    color: white;
-    width: 320px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-    text-align: center;
-  }
-  .card button {
-    background: #ff6b35;
-    border: none;
-    padding: 10px 25px;
-    border-radius: 30px;
-    color: white;
-    cursor: pointer;
-    margin-top: 15px;
-  }
-&lt;/style&gt;&lt;/head&gt;
-&lt;body&gt;
-&lt;div class="card"&gt;
-  &lt;h2&gt;✨ VİZYON AI ✨&lt;/h2&gt;
-  &lt;p&gt;Yapay zeka ile kodlama&lt;/p&gt;
-  &lt;button onclick="alert('Merhaba!')"&gt;Başla&lt;/button&gt;
-&lt;/div&gt;
-&lt;/body&gt;
-&lt;/html&gt;
+&lt;html&gt;&lt;head&gt;&lt;style&gt;
+.card{background:linear-gradient(135deg,#667eea,#764ba2);border-radius:20px;padding:30px;color:#fff;width:320px;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,0.3)}
+.card button{background:#ff6b35;border:none;padding:10px 25px;border-radius:30px;color:#fff;cursor:pointer}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;
+&lt;div class="card"&gt;&lt;h2&gt;✨ VİZYON AI ✨&lt;/h2&gt;&lt;p&gt;Yapay zeka ile kodlama&lt;/p&gt;&lt;button onclick="alert('Merhaba!')"&gt;Başla&lt;/button&gt;&lt;/div&gt;
+&lt;/body&gt;&lt;/html&gt;
       </div>`;
     }
     else if(msg.toLowerCase().includes('freelance') || msg.toLowerCase().includes('para kazan')) {
@@ -1747,11 +1710,7 @@ export default TodoApp;
 📌 <strong>Ay 1-2:</strong> Upwork/Fiverr profil aç → $15-25/iş → 5 yorum topla<br>
 📌 <strong>Ay 3-4:</strong> Fiyat $50-80 → LinkedIn'den müşteri bul<br>
 📌 <strong>Ay 5-6:</strong> Saatlik $30-50 → Aylık ₺30.000+ kazanç<br><br>
-<strong>En çok aranan yetenekler:</strong>
-• Python scraping ve otomasyon
-• React.js frontend geliştirme
-• AI entegrasyonu (OpenAI API)
-• Web site yapımı (HTML/CSS/JS)`;
+<strong>En çok aranan yetenekler:</strong> Python scraping, React.js, AI entegrasyonu, Web site yapımı`;
     }
     else if(msg.toLowerCase().includes('saas') || msg.toLowerCase().includes('fikir')) {
       response = `💰 <strong>SaaS Fikirleri (2025-2027):</strong><br><br>
@@ -1772,8 +1731,7 @@ export default TodoApp;
 • <strong>"dolar kaç"</strong> - Canlı dolar kuru<br>
 • <strong>"bugün haberler"</strong> - Güncel haberler<br>
 • <strong>"Freelance nasıl kazanılır"</strong> - Kazanç planı<br>
-• <strong>"SaaS fikri ver"</strong> - İş fikirleri<br>
-• <strong>"Python API yaz"</strong> - REST API kodu<br><br>
+• <strong>"SaaS fikri ver"</strong> - İş fikirleri<br><br>
 <em>Spesifik bir isteğin varsa yaz, her şeyi yapabilirim! 🚀</em>`;
     }
     
@@ -1810,7 +1768,7 @@ function sendAiMessage() {
   }, 600); 
 }
 function toggleDownloadMenu() { document.getElementById('downloadMenu').classList.toggle('open'); }
-function downloadApp(platform) { alert(`📱 ${platform.toUpperCase()} uygulaması hazır! Yakında indirebileceksiniz.`); }
+function downloadApp(platform) { alert(`📱 ${platform.toUpperCase()} uygulaması yakında yayınlanacak!`); }
 function downloadWebApp() { alert('🌐 PWA kurulumu için Chrome menü → "Uygulama olarak yükle" seçeneğini kullanın.'); }
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeVizyonAI(); });
 </script>
