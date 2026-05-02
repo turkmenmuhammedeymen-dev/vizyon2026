@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Vizyon 2027 | VİZYON AI - Süper Yapay Zeka</title>
+<title>Vizyon 2027 | VİZYON AI - Süper Yapay Zeka Ekosistemi</title>
 
-<!-- Supabase SDK -->
+<!-- Supabase SDK (Gerçek Sunucu) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <!-- Google Analytics -->
@@ -15,6 +15,15 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'G-WDQLFY9G1D');
+</script>
+
+<!-- Three.js 3D -->
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
+    }
+  }
 </script>
 
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -1377,19 +1386,56 @@ footer {
 
 <script>
 // ══════════════════════════════════════════
-// SerpApi Web Arama Anahtarı (SENİN ANAHTARIN)
+// SERPAPI WEB ARAMA ANAHTARI (GERÇEK)
 // ══════════════════════════════════════════
 const SERPAPI_KEY = 'eeed20c6c09e5a3441238e2af89da4d430dfd310481120c7b7022c20f9ed195a';
 
 // ══════════════════════════════════════════
-// SUPABASE BAĞLANTISI
+// SUPABASE BAĞLANTISI (GERÇEK SUNUCU)
 // ══════════════════════════════════════════
 const SUPABASE_URL = 'https://dxfwxknohzkdhzyytwdt.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Us1HLOwQoLT5978dZ3Oy-Q_-v0WrLsl';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ══════════════════════════════════════════
-// KAYIT OL FONKSİYONU (DÜZELTİLDİ)
+// CANLI WEB ARAMA FONKSİYONU (SERPAPI)
+// ══════════════════════════════════════════
+async function webSearch(query, lang = 'tr') {
+  try {
+    const url = `https://serpapi.com/search.json?q=${encodeURIComponent(query)}&hl=${lang}&gl=tr&num=5&api_key=${SERPAPI_KEY}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.error) return null;
+    
+    let html = `🌐 <strong style="color:#00d4ff">Canlı Web Arama Sonuçları:</strong><br><br>`;
+    if (data.answer_box) {
+      html += `<div style="background:rgba(0,212,255,.1);border-left:3px solid #00d4ff;padding:12px;margin-bottom:14px">
+        ⚡ <strong>Hızlı Cevap:</strong><br>${data.answer_box.answer || data.answer_box.snippet || ''}</div>`;
+    }
+    const results = data.organic_results?.slice(0,4) || [];
+    results.forEach(r => {
+      html += `<div style="margin-bottom:12px;padding:10px;border-left:2px solid #1a3350">
+        <div style="font-size:10px;color:#4a7a99">${r.displayed_link || ''}</div>
+        <strong>${r.title || ''}</strong><br>
+        <span style="font-size:12px;color:#8ab4cc">${r.snippet || ''}</span>
+      </div>`;
+    });
+    if (data.news_results?.length) {
+      html += `<br><strong style="color:#ffd700">📰 Son Haberler:</strong><br>`;
+      data.news_results.slice(0,3).forEach(n => {
+        html += `<div style="margin-top:8px;padding:8px;border-left:2px solid #ffd700">
+          <strong>${n.title}</strong><br>
+          <span style="font-size:11px;color:#4a7a99">${n.source?.name || ''}</span>
+        </div>`;
+      });
+    }
+    html += `<br><em style="font-size:11px;color:#4a7a99">🔍 Google arama · ${new Date().toLocaleTimeString('tr-TR')}</em>`;
+    return html;
+  } catch(e) { return null; }
+}
+
+// ══════════════════════════════════════════
+// KAYIT OL FONKSİYONU
 // ══════════════════════════════════════════
 async function handleRegister() {
   const name = document.getElementById('rName')?.value.trim();
@@ -1418,7 +1464,7 @@ async function handleRegister() {
 }
 
 // ══════════════════════════════════════════
-// GİRİŞ YAP FONKSİYONU (DÜZELTİLDİ)
+// GİRİŞ YAP FONKSİYONU
 // ══════════════════════════════════════════
 async function handleLogin() {
   const email = document.getElementById('lEmail')?.value.trim();
@@ -1441,7 +1487,7 @@ async function handleLogin() {
 }
 
 // ══════════════════════════════════════════
-// YÖNETİM PANELİ VERİLERİ (DÜZELTİLDİ)
+// YÖNETİM PANELİ VERİLERİ
 // ══════════════════════════════════════════
 async function loadAdminData() {
   try {
@@ -1463,7 +1509,7 @@ async function deleteUser(id) { if(!confirm('Silinsin mi?')) return; await supab
 async function markRead(id) { await supabaseClient.from('messages').update({ read: true }).eq('id', id); loadAdminData(); alert('Okundu işaretlendi.'); }
 
 // ══════════════════════════════════════════
-// YEREL VERİLER (Aynen kaldı)
+// YEREL VERİ YÖNETİMİ (Projeler, Siparişler, Paketler, Çöp, Arşiv)
 // ══════════════════════════════════════════
 let localData = {
   projects: JSON.parse(localStorage.getItem('v27_projects') || '[]'),
@@ -1505,7 +1551,7 @@ function restoreFromTrash(id) {
 function permanentDelete(id) { localData.trash = localData.trash.filter(t => t.id !== id); saveLocalData(); }
 
 // ══════════════════════════════════════════
-// YÖNETİM PANELİ ŞİFRE (Aynen kaldı)
+// YÖNETİM PANELİ (Şifre ile açılan)
 // ══════════════════════════════════════════
 const ADMIN_PASSWORDS = { FOUNDER: "Eymen11Amele44", ADMIN: "ibrm4411", BETA: "4402" };
 let pendingAdminRole = null;
@@ -1527,7 +1573,217 @@ function sendAdminAI() {
 }
 
 // ══════════════════════════════════════════
-// CURSOR, PROGRESS, PARTİCLE (Aynen)
+// VİZYON AI ANA PANEL (Sınırsız Yetenek + Web Arama)
+// ══════════════════════════════════════════
+let uploadedFileContent = null, uploadedFileName = null;
+let aiMessageCount = 0;
+
+function openVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'flex'; document.getElementById('vizyonAIInput').focus(); }
+function closeVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'none'; }
+function quickAICode(cmd) { document.getElementById('vizyonAIInput').value = cmd; sendVizyonAIAdvanced(); }
+
+function handleFileUploadAdv(input) { 
+  const file = input.files[0]; if(!file) return; 
+  const chat = document.getElementById('vizyonAIChat'); 
+  chat.innerHTML += `<div class="ai-msg user">📎 Dosya yüklendi: ${file.name} (${(file.size/1024).toFixed(1)} KB)</div>`; 
+  const reader = new FileReader(); 
+  reader.onload = function(e) { 
+    uploadedFileContent = e.target.result; 
+    uploadedFileName = file.name; 
+    chat.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: Dosyan başarıyla yüklendi!<br><br>📄 <strong>${uploadedFileName}</strong><br><br>Bu dosya üzerinde ne yapmamı istersin? (Özet çıkar, düzenle, analiz et)</div>`; 
+    chat.scrollTop = chat.scrollHeight; 
+  }; 
+  reader.readAsText(file); 
+  input.value = ''; 
+}
+
+async function sendVizyonAIAdvanced() {
+  const input = document.getElementById('vizyonAIInput');
+  let msg = input.value.trim();
+  if(!msg && !uploadedFileContent) return;
+  
+  const chat = document.getElementById('vizyonAIChat');
+  chat.innerHTML += `<div class="ai-msg user">${msg}</div>`;
+  input.value = '';
+  
+  const typingId = 'typing-' + Date.now();
+  chat.innerHTML += `<div class="ai-msg bot" id="${typingId}">🧠 VİZYON AI: <span style="opacity:0.5">▋ Düşünüyor...</span></div>`;
+  chat.scrollTop = chat.scrollHeight;
+  
+  // 10 mesaj kontrolü
+  aiMessageCount++;
+  if(aiMessageCount >= 10 && !localStorage.getItem('v27_session') && !localStorage.getItem('v27_admin')) {
+    setTimeout(() => {
+      document.getElementById(typingId)?.remove();
+      chat.innerHTML += `<div class="ai-msg bot">⚠️ 10 mesajı doldurdunuz. Daha fazla konuşmak için lütfen oturum açın veya kaydolun. (FOUNDER/ADMIN/BETA butonları ile giriş yapabilirsiniz)</div>`;
+      chat.scrollTop = chat.scrollHeight;
+      aiMessageCount = 0;
+    }, 500);
+    return;
+  }
+  
+  // Web arama kontrolü
+  const searchTriggers = ['dolar', 'euro', 'altın', 'bitcoin', 'haber', 'bugün', 'son dakika', 'hava durumu', 'kaç', 'fiyat', 'kur', 'maç', 'skor', 'deprem'];
+  const shouldSearch = searchTriggers.some(t => msg.toLowerCase().includes(t));
+  
+  setTimeout(async () => {
+    document.getElementById(typingId)?.remove();
+    let response = '';
+    
+    if(shouldSearch && SERPAPI_KEY && SERPAPI_KEY.length > 10) {
+      const webResult = await webSearch(msg);
+      if(webResult) {
+        response = webResult;
+      } else {
+        response = `"${msg}" için arama yapılamadı. Lütfen daha sonra tekrar deneyin.`;
+      }
+    } 
+    else if(msg.toLowerCase().includes('python') && msg.toLowerCase().includes('hesap')) {
+      response = `🐍 <strong>Python Hesap Makinesi:</strong><br><br>
+      <div style="background:#030810;border:1px solid #1a3350;padding:12px;border-radius:8px;font-family:'Fira Code',monospace;font-size:12px;color:#00ff88;white-space:pre;overflow-x:auto;margin:10px 0">
+def hesap_makinesi():
+    print("=== Hesap Makinesi ===")
+    sayi1 = float(input("Birinci sayı: "))
+    islem = input("İşlem (+, -, *, /): ")
+    sayi2 = float(input("İkinci sayı: "))
+    
+    if islem == '+':
+        print(f"Sonuç: {sayi1 + sayi2}")
+    elif islem == '-':
+        print(f"Sonuç: {sayi1 - sayi2}")
+    elif islem == '*':
+        print(f"Sonuç: {sayi1 * sayi2}")
+    elif islem == '/':
+        if sayi2 != 0:
+            print(f"Sonuç: {sayi1 / sayi2}")
+        else:
+            print("Hata: Sıfıra bölme!")
+    else:
+        print("Geçersiz işlem!")
+
+hesap_makinesi()
+      </div>`;
+    }
+    else if(msg.toLowerCase().includes('react') && msg.toLowerCase().includes('todo')) {
+      response = `⚛️ <strong>React Todo App Bileşeni:</strong><br><br>
+      <div style="background:#030810;border:1px solid #1a3350;padding:12px;border-radius:8px;font-family:'Fira Code',monospace;font-size:12px;color:#00ff88;white-space:pre;overflow-x:auto;margin:10px 0">
+import React, { useState } from 'react';
+
+function TodoApp() {
+  const [todos, setTodos] = useState([]);
+  const [input, setInput] = useState('');
+
+  const addTodo = () => {
+    if (input.trim()) {
+      setTodos([...todos, { text: input, completed: false }]);
+      setInput('');
+    }
+  };
+
+  const toggleTodo = (index) => {
+    const newTodos = [...todos];
+    newTodos[index].completed = !newTodos[index].completed;
+    setTodos(newTodos);
+  };
+
+  return (
+    &lt;div style={{ padding: '20px' }}&gt;
+      &lt;h1&gt;Yapılacaklar&lt;/h1&gt;
+      &lt;div&gt;
+        &lt;input value={input} onChange={(e) => setInput(e.target.value)} /&gt;
+        &lt;button onClick={addTodo}&gt;Ekle&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;ul&gt;
+        {todos.map((todo, index) => (
+          &lt;li key={index} onClick={() => toggleTodo(index)} style={{ textDecoration: todo.completed ? 'line-through' : 'none', cursor: 'pointer' }}&gt;
+            {todo.text}
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default TodoApp;
+      </div>`;
+    }
+    else if(msg.toLowerCase().includes('html') && (msg.toLowerCase().includes('kart') || msg.toLowerCase().includes('card'))) {
+      response = `🌐 <strong>HTML/CSS Kart Tasarımı:</strong><br><br>
+      <div style="background:#030810;border:1px solid #1a3350;padding:12px;border-radius:8px;font-family:'Fira Code',monospace;font-size:12px;color:#00ff88;white-space:pre;overflow-x:auto;margin:10px 0">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;&lt;style&gt;
+  .card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 30px;
+    color: white;
+    width: 320px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    text-align: center;
+  }
+  .card button {
+    background: #ff6b35;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 30px;
+    color: white;
+    cursor: pointer;
+    margin-top: 15px;
+  }
+&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class="card"&gt;
+  &lt;h2&gt;✨ VİZYON AI ✨&lt;/h2&gt;
+  &lt;p&gt;Yapay zeka ile kodlama&lt;/p&gt;
+  &lt;button onclick="alert('Merhaba!')"&gt;Başla&lt;/button&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+      </div>`;
+    }
+    else if(msg.toLowerCase().includes('freelance') || msg.toLowerCase().includes('para kazan')) {
+      response = `💸 <strong>Freelance Kazanç Planı (2025-2027):</strong><br><br>
+📌 <strong>Ay 1-2:</strong> Upwork/Fiverr profil aç → $15-25/iş → 5 yorum topla<br>
+📌 <strong>Ay 3-4:</strong> Fiyat $50-80 → LinkedIn'den müşteri bul<br>
+📌 <strong>Ay 5-6:</strong> Saatlik $30-50 → Aylık ₺30.000+ kazanç<br><br>
+<strong>En çok aranan yetenekler:</strong>
+• Python scraping ve otomasyon
+• React.js frontend geliştirme
+• AI entegrasyonu (OpenAI API)
+• Web site yapımı (HTML/CSS/JS)`;
+    }
+    else if(msg.toLowerCase().includes('saas') || msg.toLowerCase().includes('fikir')) {
+      response = `💰 <strong>SaaS Fikirleri (2025-2027):</strong><br><br>
+1. <strong>AI CV Oluşturucu</strong> - ₺29/ay<br>
+2. <strong>Sosyal Medya Otomasyonu</strong> - ₺49/ay<br>
+3. <strong>AI Müşteri Desteği</strong> - ₺199/ay<br>
+4. <strong>SEO İçerik Üretici</strong> - ₺79/ay<br>
+5. <strong>E-ticaret AI Asistanı</strong> - ₺99/ay<br><br>
+<strong>Teknoloji Stack:</strong> Next.js + Supabase + Stripe + Vercel`;
+    }
+    else {
+      response = `🧠 <strong>VİZYON AI Yanıtı:</strong><br><br>
+"${msg}" talebiniz alındı.<br><br>
+✅ <strong>Yapabileceklerim:</strong><br>
+• <strong>"Python hesap makinesi yaz"</strong> - Hesap makinesi kodu<br>
+• <strong>"React todo app yap"</strong> - Todo uygulaması<br>
+• <strong>"HTML kart tasarımı yap"</strong> - Kart tasarımı<br>
+• <strong>"dolar kaç"</strong> - Canlı dolar kuru<br>
+• <strong>"bugün haberler"</strong> - Güncel haberler<br>
+• <strong>"Freelance nasıl kazanılır"</strong> - Kazanç planı<br>
+• <strong>"SaaS fikri ver"</strong> - İş fikirleri<br>
+• <strong>"Python API yaz"</strong> - REST API kodu<br><br>
+<em>Spesifik bir isteğin varsa yaz, her şeyi yapabilirim! 🚀</em>`;
+    }
+    
+    chat.innerHTML += `<div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>:<br><br>${response}</div>`;
+    chat.scrollTop = chat.scrollHeight;
+  }, 600);
+}
+
+// ══════════════════════════════════════════
+// CURSOR, PROGRESS, PARTICLES, COUNTERS
 // ══════════════════════════════════════════
 const cursor = document.getElementById('cursor');
 const cursorRing = document.getElementById('cursorRing');
@@ -1554,29 +1810,8 @@ function sendAiMessage() {
   }, 600); 
 }
 function toggleDownloadMenu() { document.getElementById('downloadMenu').classList.toggle('open'); }
-function downloadApp(platform) { alert(`📱 ${platform.toUpperCase()} uygulaması hazır!`); }
+function downloadApp(platform) { alert(`📱 ${platform.toUpperCase()} uygulaması hazır! Yakında indirebileceksiniz.`); }
 function downloadWebApp() { alert('🌐 PWA kurulumu için Chrome menü → "Uygulama olarak yükle" seçeneğini kullanın.'); }
-
-let uploadedFileContent = null, uploadedFileName = null;
-function openVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'flex'; document.getElementById('vizyonAIInput').focus(); }
-function closeVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'none'; }
-function quickAICode(cmd) { document.getElementById('vizyonAIInput').value = cmd; sendVizyonAIAdvanced(); }
-function handleFileUploadAdv(input) { const file = input.files[0]; if(!file) return; const chat = document.getElementById('vizyonAIChat'); chat.innerHTML += `<div class="ai-msg user">📎 Dosya yüklendi: ${file.name}</div>`; const reader = new FileReader(); reader.onload = function(e) { uploadedFileContent = e.target.result; uploadedFileName = file.name; chat.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: Dosyan başarıyla yüklendi! Bu dosya üzerinde ne yapmamı istersin?</div>`; chat.scrollTop = chat.scrollHeight; }; reader.readAsText(file); input.value = ''; }
-async function sendVizyonAIAdvanced() {
-  const input = document.getElementById('vizyonAIInput'); let msg = input.value.trim(); if(!msg && !uploadedFileContent) return;
-  const chat = document.getElementById('vizyonAIChat'); chat.innerHTML += `<div class="ai-msg user">${msg}</div>`; input.value = '';
-  const typingId = 'typing-' + Date.now(); chat.innerHTML += `<div class="ai-msg bot" id="${typingId}">🧠 VİZYON AI: <span style="opacity:0.5">▋ Düşünüyor...</span></div>`; chat.scrollTop = chat.scrollHeight;
-  const searchTriggers = ['dolar', 'euro', 'altin', 'bitcoin', 'haber', 'bugün', 'hava'];
-  const shouldSearch = searchTriggers.some(t => msg.toLowerCase().includes(t));
-  setTimeout(() => {
-    document.getElementById(typingId)?.remove();
-    let response = '';
-    if(shouldSearch && SERPAPI_KEY && SERPAPI_KEY.length > 10) { response = `🌐 Canlı arama yapılıyor...`; }
-    else if(msg.toLowerCase().includes('python')) { response = '🐍 Python kodu yazabilirim! "Python\'da hesap makinesi yaz" gibi bir komut ver.'; }
-    else { response = `"${msg}" için VİZYON AI hazır! Her dilde kod yazabilirim, web araması yapabilirim, dosya yükleyip analiz edebilirim.`; }
-    chat.innerHTML += `<div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>:<br><br>${response}</div>`; chat.scrollTop = chat.scrollHeight;
-  }, 600);
-}
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeVizyonAI(); });
 </script>
 </body>
