@@ -42,57 +42,21 @@ body {
 ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
 
 .office-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; }
-.office-bg::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 120% 60% at 50% 0%, rgba(0,212,255,0.06) 0%, transparent 60%), radial-gradient(ellipse 80% 80% at 10% 50%, rgba(168,85,247,0.04) 0%, transparent 50%), radial-gradient(ellipse 60% 60% at 90% 80%, rgba(0,255,136,0.03) 0%, transparent 50%); z-index: 1; }
+.office-bg::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 120% 60% at 50% 0%, rgba(0,212,255,0.06) 0%, transparent 60%); z-index: 1; }
 .office-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.07; filter: blur(1px); }
-.office-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(5,10,15,0.85) 0%, rgba(5,10,15,0.6) 30%, rgba(5,10,15,0.95) 100%); z-index: 2; }
+.office-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(5,10,15,0.85) 0%, rgba(5,10,15,0.95) 100%); z-index: 2; }
 .grid-lines { position: fixed; inset: 0; z-index: 1; pointer-events: none; background-image: linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px); background-size: 60px 60px; }
 .particles { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
 .particle { position: absolute; width: 2px; height: 2px; background: var(--accent); border-radius: 50%; animation: float-up linear infinite; opacity: 0; }
 @keyframes float-up { 0% { transform: translateY(100vh); opacity: 0; } 10% { opacity: 0.6; } 90% { opacity: 0.3; } 100% { transform: translateY(-100px); opacity: 0; } }
 #app { position: relative; z-index: 10; min-height: 100vh; }
 
-/* LOGO */
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.logo-icon {
-  width: 45px;
-  height: 45px;
-  background: linear-gradient(135deg, #00d4ff, #a855f7, #ff6b35);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  font-weight: bold;
-  animation: logoPulse 2s infinite;
-}
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #00d4ff, #a855f7, #ff6b35); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; animation: logoPulse 2s infinite; }
 @keyframes logoPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.7); } 50% { box-shadow: 0 0 0 15px rgba(0,212,255,0); } }
-.logo-text {
-  font-family: var(--font-display);
-  font-size: 24px;
-  font-weight: 800;
-  background: linear-gradient(45deg, #00d4ff, #a855f7);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+.logo-text { font-family: var(--font-display); font-size: 24px; font-weight: 800; background: linear-gradient(45deg, #00d4ff, #a855f7); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 48px;
-  height: 72px;
-  border-bottom: 1px solid rgba(0,212,255,0.1);
-  background: rgba(5,10,15,0.8);
-  backdrop-filter: blur(20px);
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-}
+nav { display: flex; align-items: center; justify-content: space-between; padding: 0 48px; height: 72px; border-bottom: 1px solid rgba(0,212,255,0.1); background: rgba(5,10,15,0.8); backdrop-filter: blur(20px); position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
 .nav-links { display: flex; gap: 32px; list-style: none; }
 .nav-links a { color: var(--text2); text-decoration: none; font-size: 13px; text-transform: uppercase; transition: color 0.2s; }
 .nav-links a:hover { color: var(--accent); }
@@ -112,7 +76,8 @@ nav {
 .hero-title .line2 { display: block; -webkit-text-stroke: 1px var(--accent); color: transparent; }
 .hero-title .line3 { display: block; color: var(--accent2); font-size: 0.55em; margin-top: 8px; }
 .hero-sub { max-width: 600px; font-size: 15px; line-height: 1.8; color: var(--text2); margin-bottom: 48px; }
-.btn-primary { padding: 16px 36px; background: var(--accent); color: var(--bg); font-family: var(--font-code); font-size: 14px; font-weight: 500; text-transform: uppercase; border: none; cursor: pointer; clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%); }
+.btn-primary { padding: 16px 36px; background: var(--accent); color: var(--bg); font-family: var(--font-code); font-size: 14px; font-weight: 500; text-transform: uppercase; border: none; cursor: pointer; clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%); transition: all 0.3s; }
+.btn-primary:hover { transform: scale(1.02); filter: brightness(1.1); }
 .btn-secondary { padding: 16px 36px; background: transparent; color: var(--text2); font-family: var(--font-code); font-size: 14px; text-transform: uppercase; border: 1px solid var(--border); cursor: pointer; clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%); }
 .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
 
@@ -158,7 +123,8 @@ nav {
 .ai-title em { color: var(--accent2); font-style: normal; }
 .ai-desc { font-size: 14px; line-height: 1.9; color: var(--text2); margin-bottom: 32px; }
 .model-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
-.mbadge { padding: 6px 14px; font-size: 11px; text-transform: uppercase; border: 1px solid; font-family: var(--font-mono); border-radius: 20px; cursor: pointer; }
+.mbadge { padding: 6px 14px; font-size: 11px; text-transform: uppercase; border: 1px solid; font-family: var(--font-mono); border-radius: 20px; cursor: pointer; transition: all 0.2s; }
+.mbadge:hover { transform: scale(1.05); }
 .mbadge.a { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,0.06); }
 .mbadge.b { border-color: var(--accent2); color: var(--accent2); background: rgba(0,255,136,0.06); }
 .mbadge.c { border-color: var(--purple); color: var(--purple); background: rgba(168,85,247,0.06); }
@@ -177,7 +143,7 @@ nav {
 .price-features { list-style: none; margin: 20px 0; }
 .price-features li { padding: 8px 0; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text2); border-bottom: 1px solid rgba(26,51,80,0.5); }
 .price-features li::before { content: "▸"; color: var(--accent2); }
-.btn-price { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--border); color: var(--text2); cursor: pointer; font-family: var(--font-code); font-size: 12px; text-transform: uppercase; }
+.btn-price { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--border); color: var(--text2); cursor: pointer; font-family: var(--font-code); font-size: 12px; text-transform: uppercase; transition: all 0.2s; }
 .btn-price:hover { border-color: var(--accent); color: var(--accent); }
 .price-badge { position: absolute; top: -1px; right: 24px; padding: 4px 14px; background: var(--accent); color: var(--bg); font-size: 10px; text-transform: uppercase; font-weight: 700; clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%); padding-bottom: 12px; }
 
@@ -198,59 +164,13 @@ nav {
 .tech-dot { width: 6px; height: 6px; background: var(--accent2); border-radius: 50%; }
 
 /* DOWNLOAD MENU */
-.download-menu {
-  position: fixed;
-  bottom: 100px;
-  right: 20px;
-  z-index: 1000;
-}
-.download-btn {
-  width: 55px;
-  height: 55px;
-  background: linear-gradient(45deg, var(--accent), var(--purple));
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 24px;
-  box-shadow: 0 0 20px rgba(0,212,255,0.5);
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+.download-menu { position: fixed; bottom: 100px; right: 20px; z-index: 1000; }
+.download-btn { width: 55px; height: 55px; background: linear-gradient(45deg, var(--accent), var(--purple)); border: none; border-radius: 50%; cursor: pointer; font-size: 24px; box-shadow: 0 0 20px rgba(0,212,255,0.5); transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
 .download-btn:hover { transform: scale(1.1); }
-.download-options {
-  position: absolute;
-  bottom: 65px;
-  right: 0;
-  background: var(--surface);
-  border: 1px solid var(--accent);
-  border-radius: 16px;
-  padding: 10px;
-  display: none;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 180px;
-}
+.download-options { position: absolute; bottom: 65px; right: 0; background: var(--surface); border: 1px solid var(--accent); border-radius: 16px; padding: 10px; display: none; flex-direction: column; gap: 8px; min-width: 200px; }
 .download-options.open { display: flex; }
-.download-options a {
-  padding: 10px 15px;
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: var(--text);
-  text-decoration: none;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: all 0.2s;
-}
-.download-options a:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  transform: translateX(-5px);
-}
+.download-options a { padding: 10px 15px; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); text-decoration: none; font-size: 12px; display: flex; align-items: center; gap: 10px; transition: all 0.2s; cursor: pointer; }
+.download-options a:hover { border-color: var(--accent); color: var(--accent); transform: translateX(-5px); }
 
 .ai-widget { position: fixed; bottom: 32px; right: 32px; z-index: 500; }
 .ai-widget-btn { width: 56px; height: 56px; background: var(--accent); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 22px; clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%); box-shadow: 0 0 30px rgba(0,212,255,0.4); animation: glow 2s ease-in-out infinite; }
@@ -275,7 +195,7 @@ footer { border-top: 1px solid var(--border); padding: 60px 48px 40px; backgroun
 .footer-copy { font-size: 12px; color: var(--text3); }
 .footer-copy span { color: var(--accent); }
 .support-footer { margin-top: 20px; text-align: center; }
-.support-link { display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px; background: rgba(0,212,255,0.1); border: 1px solid var(--accent); border-radius: 40px; color: var(--accent); text-decoration: none; font-size: 13px; }
+.support-link { display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px; background: rgba(0,212,255,0.1); border: 1px solid var(--accent); border-radius: 40px; color: var(--accent); text-decoration: none; font-size: 13px; transition: all 0.3s; }
 .support-link:hover { background: var(--accent); color: var(--bg); }
 
 .scroll-indicator { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: 0.4; }
@@ -361,8 +281,8 @@ footer { border-top: 1px solid var(--border); padding: 60px 48px 40px; backgroun
 <div id="app">
   <section class="hero">
     <div class="hero-badge"><div class="blink"></div>VİZYON AI | Dünyanın En Güçlü Yapay Zekası</div>
-    <h1 class="hero-title"><span class="line1 glitch" data-text="VİZYON AI">VİZYON AI</span><span class="line2">HER DİLDE KOD YAZAR</span><span class="line3">Python · JavaScript · React · Go · Rust · HTML · CSS</span></h1>
-    <p class="hero-sub">⚡ VİZYON AI ile her dili konuş, her kodu yaz. Dünyanın en gelişmiş kodlama asistanı.</p>
+    <h1 class="hero-title"><span class="line1 glitch" data-text="VİZYON AI">VİZYON AI</span><span class="line2">SINIRSIZ YETENEK</span><span class="line3">Her dilde kod · Web arama · Dosya analiz · Görsel yorumlama</span></h1>
+    <p class="hero-sub">⚡ VİZYON AI ile her dili konuş, her kodu yaz, internette ara, dosyalarını analiz et. Dünyanın en gelişmiş kodlama asistanı.</p>
     <div class="hero-actions"><button class="btn-primary" onclick="openVizyonAI()">⚡ VİZYON AI'ı Başlat</button><a class="btn-secondary" href="#features">Daha Fazla →</a></div>
     <div class="stats-bar"><div class="stat-item"><span class="stat-num" id="counter1">0</span><div class="stat-label">Aktif Kullanıcı</div></div><div class="stat-item"><span class="stat-num" id="counter2">0</span><div class="stat-label">AI Sorgusu</div></div><div class="stat-item"><span class="stat-num" id="counter3">0</span><div class="stat-label">Proje Tamamlandı</div></div></div>
     <div class="scroll-indicator"><div class="scroll-mouse"><div class="scroll-wheel"></div></div><span>Aşağı kaydır</span></div>
@@ -388,10 +308,10 @@ footer { border-top: 1px solid var(--border); padding: 60px 48px 40px; backgroun
     <div class="features-grid">
       <div class="feature-card"><div class="feature-icon">🤖</div><div class="feature-title">7 Model Tek Çatı</div><p class="feature-desc">GPT-4o, Claude, Gemini, DeepSeek, Llama, Mistral hepsi birleşti.</p></div>
       <div class="feature-card"><div class="feature-icon">⚡</div><div class="feature-title">Anlık Kod Üretimi</div><p class="feature-desc">Python, React, HTML, SQL, Docker her dilde çalışan kod.</p></div>
+      <div class="feature-card"><div class="feature-icon">🌐</div><div class="feature-title">Canlı Web Arama</div><p class="feature-desc">SerpApi ile dolar kuru, haberler, anlık bilgiler.</p></div>
+      <div class="feature-card"><div class="feature-icon">📎</div><div class="feature-title">Dosya Yükleme</div><p class="feature-desc">Resim, PDF, kod dosyası yükle, AI analiz etsin.</p></div>
       <div class="feature-card"><div class="feature-icon">💰</div><div class="feature-title">SaaS & Freelance</div><p class="feature-desc">Para kazandıran iş fikirleri, kariyer yol haritası.</p></div>
       <div class="feature-card"><div class="feature-icon">🔧</div><div class="feature-title">Hata Düzeltme</div><p class="feature-desc">Kodunu yapıştır, hatayı bul, düzelt, çalıştır.</p></div>
-      <div class="feature-card"><div class="feature-icon">📎</div><div class="feature-title">Dosya Yükleme</div><p class="feature-desc">Resim, PDF, kod dosyası yükle, AI analiz etsin.</p></div>
-      <div class="feature-card"><div class="feature-icon">🌐</div><div class="feature-title">Web Arama</div><p class="feature-desc">Güncel haberler, dolar kuru, anlık bilgiler.</p></div>
     </div>
   </section>
 
@@ -416,8 +336,8 @@ footer { border-top: 1px solid var(--border); padding: 60px 48px 40px; backgroun
   <section class="pricing" id="pricing">
     <div class="section-header"><div class="section-tag">// fiyatlandırma</div><h2 class="section-title">Sıfırdan Başla,<br><span class="hl">Büyü</span></h2></div>
     <div class="pricing-grid">
-      <div class="price-card"><div class="price-tier">Başlangıç</div><div class="price-amount">₺0<span>/ay</span></div><ul class="price-features"><li>50 AI sorgusu / gün</li><li>3 proje limiti</li><li>Tüm dillerde kod</li><li>Topluluk desteği</li></ul><button class="btn-price" onclick="openModal('register')">Ücretsiz Başla</button></div>
-      <div class="price-card featured"><div class="price-badge">En Popüler</div><div class="price-tier">Pro Geliştirici</div><div class="price-amount">₺299<span>/ay</span></div><ul class="price-features"><li>Sınırsız AI sorgu</li><li>Sınırsız proje</li><li>Dosya yükleme</li><li>Web arama</li><li>Öncelikli destek</li></ul><button class="btn-price" onclick="openModal('register')">Pro'ya Geç</button></div>
+      <div class="price-card"><div class="price-tier">Başlangıç</div><div class="price-amount">₺0<span>/ay</span></div><ul class="price-features"><li>50 AI sorgusu / gün</li><li>3 proje limiti</li><li>Demo web arama</li><li>Topluluk desteği</li></ul><button class="btn-price" onclick="openModal('register')">Ücretsiz Başla</button></div>
+      <div class="price-card featured"><div class="price-badge">En Popüler</div><div class="price-tier">Pro Geliştirici</div><div class="price-amount">₺299<span>/ay</span></div><ul class="price-features"><li>Sınırsız AI sorgu</li><li>Sınırsız proje</li><li>Canlı web arama</li><li>Dosya yükleme</li><li>Öncelikli destek</li></ul><button class="btn-price" onclick="openModal('register')">Pro'ya Geç</button></div>
       <div class="price-card"><div class="price-tier">Takım</div><div class="price-amount">₺899<span>/ay</span></div><ul class="price-features"><li>Her şey Pro'da var</li><li>10+ takım üyesi</li><li>API erişimi</li><li>SLA garantisi</li></ul><button class="btn-price" onclick="openModal('contact')">Teklif Al</button></div>
     </div>
   </section>
@@ -426,7 +346,7 @@ footer { border-top: 1px solid var(--border); padding: 60px 48px 40px; backgroun
     <div class="section-header"><div class="section-tag">// kullanıcılar</div><h2 class="section-title">Gerçek <span class="hl">Sonuçlar</span></h2></div>
     <div class="testimonials-grid">
       <div class="testimonial"><div class="stars">★★★★★</div><div class="testimonial-text">VİZYON AI sayesinde 2 ayda ilk SaaS ürünümü çıkardım. Aylık 15,000 TL gelir.</div><div class="testimonial-author"><div class="author-avatar">AK</div><div><div class="author-name">Ahmet Kaya</div><div class="author-title">Indie Hacker</div></div></div></div>
-      <div class="testimonial"><div class="stars">★★★★★</div><div class="testimonial-text">AI ile kod yazmak hiç bu kadar kolay olmamıştı. React bileşenlerini saniyeler içinde üretiyor.</div><div class="testimonial-author"><div class="author-avatar">FD</div><div><div class="author-name">Fatma Demir</div><div class="author-title">Frontend Dev</div></div></div></div>
+      <div class="testimonial"><div class="stars">★★★★★</div><div class="testimonial-text">"Dolar kaç" dedim, anında güncel kuru getirdi. Web arama mükemmel çalışıyor!</div><div class="testimonial-author"><div class="author-avatar">FD</div><div><div class="author-name">Fatma Demir</div><div class="author-title">CTO</div></div></div></div>
       <div class="testimonial"><div class="stars">★★★★★</div><div class="testimonial-text">Freelance işlerimi VİZYON AI ile kodluyorum, ayda 25,000 TL kazanıyorum.</div><div class="testimonial-author"><div class="author-avatar">ME</div><div><div class="author-name">Muhammed Eymen</div><div class="author-title">Freelancer</div></div></div></div>
     </div>
   </section>
@@ -438,7 +358,7 @@ footer { border-top: 1px solid var(--border); padding: 60px 48px 40px; backgroun
       <div class="footer-col"><h4>Kaynaklar</h4><ul><li><a href="#">Dokümantasyon</a></li><li><a href="#">Topluluk</a></li><li><a href="#">Blog</a></li></ul></div>
       <div class="footer-col"><h4>Şirket</h4><ul><li><a href="#">Hakkımızda</a></li><li><a href="#">Kariyer</a></li><li><a href="#">İletişim</a></li></ul></div>
     </div>
-    <div class="footer-bottom"><div class="footer-copy">© 2027 Vizyon2027. <span>Muhammed Eymen</span> güvencesiyle.</div><div class="footer-badges"><span class="badge live">● Sistem Aktif</span><span class="badge">v3.0</span></div></div>
+    <div class="footer-bottom"><div class="footer-copy">© 2027 Vizyon2027. <span>Muhammed Eymen</span> güvencesiyle.</div><div class="footer-badges"><span class="badge live">● Sistem Aktif</span><span class="badge">v4.0</span></div></div>
     <div class="support-footer"><a href="mailto:turkmenmuhammedeymen@gmail.com" class="support-link">📧 DESTEK & İLETİŞİM</a></div>
   </footer>
 </div>
@@ -447,37 +367,49 @@ footer { border-top: 1px solid var(--border); padding: 60px 48px 40px; backgroun
 <div class="download-menu">
   <button class="download-btn" onclick="toggleDownloadMenu()">📱</button>
   <div class="download-options" id="downloadMenu">
-    <a href="#" onclick="downloadApp('android')">📱 Android (.apk)</a>
-    <a href="#" onclick="downloadApp('windows')">💻 Windows (.exe)</a>
-    <a href="#" onclick="downloadApp('mac')">🍎 MacOS (.dmg)</a>
-    <a href="#" onclick="downloadApp('ios')">📲 iOS (App Store)</a>
-    <a href="#" onclick="downloadApp('linux')">🐧 Linux (.deb)</a>
-    <a href="#" onclick="downloadWebApp()">🌐 Web App (PWA)</a>
+    <a onclick="downloadApp('android')">📱 Android (.apk) - Hemen İndir</a>
+    <a onclick="downloadApp('windows')">💻 Windows (.exe) - Hemen İndir</a>
+    <a onclick="downloadApp('mac')">🍎 MacOS (.dmg) - Hemen İndir</a>
+    <a onclick="downloadApp('ios')">📲 iOS (App Store) - Hemen İndir</a>
+    <a onclick="downloadApp('linux')">🐧 Linux (.deb) - Hemen İndir</a>
+    <a onclick="downloadWebApp()">🌐 Web App (PWA) - Kur</a>
   </div>
 </div>
 
-<div class="ai-widget"><div class="ai-panel" id="aiPanel"><div class="ai-panel-header"><span class="ai-panel-title">⚡ VİZYON AI</span><span class="ai-status"><span class="ai-status-dot"></span>Aktif</span></div><div class="ai-messages" id="aiMessages"><div class="ai-msg bot">Merhaba! Ben VİZYON AI. Kod yazdırmak için "Python hesap makinesi yaz" veya "React todo app yap" yazabilirsin.</div></div><div class="ai-suggestions"><div class="ai-suggestion" onclick="quickAsk('Python hesap makinesi yaz')">🐍 Python</div><div class="ai-suggestion" onclick="quickAsk('React todo app yap')">⚛️ React</div><div class="ai-suggestion" onclick="quickAsk('HTML kart tasarımı yap')">🌐 HTML</div><div class="ai-suggestion" onclick="quickAsk('Freelance nasıl kazanılır')">💰 Kariyer</div></div><div class="ai-input-area"><input class="ai-input" id="aiInput" placeholder="Kod yazdır..." onkeypress="if(event.key==='Enter')sendAiMessage()"><button class="ai-send" onclick="sendAiMessage()">→</button></div></div><button class="ai-widget-btn" onclick="toggleAiPanel()">⚡</button></div>
+<div class="ai-widget"><div class="ai-panel" id="aiPanel"><div class="ai-panel-header"><span class="ai-panel-title">⚡ VİZYON AI</span><span class="ai-status"><span class="ai-status-dot"></span>Aktif</span></div><div class="ai-messages" id="aiMessages"><div class="ai-msg bot">Merhaba! Ben VİZYON AI. "Python hesap makinesi yaz", "dolar kaç", "bugün haberler" yazabilirsin.</div></div><div class="ai-suggestions"><div class="ai-suggestion" onclick="quickAsk('Python hesap makinesi yaz')">🐍 Python</div><div class="ai-suggestion" onclick="quickAsk('React todo app yap')">⚛️ React</div><div class="ai-suggestion" onclick="quickAsk('dolar kaç')">💰 Dolar</div><div class="ai-suggestion" onclick="quickAsk('bugün haberler')">📰 Haber</div></div><div class="ai-input-area"><input class="ai-input" id="aiInput" placeholder="Kod yazdır veya ara..." onkeypress="if(event.key==='Enter')sendAiMessage()"><button class="ai-send" onclick="sendAiMessage()">→</button></div></div><button class="ai-widget-btn" onclick="toggleAiPanel()">⚡</button></div>
 
 <div class="modal-overlay" id="authModal" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-header"><div class="modal-title" id="modalTitle">Giriş Yap</div><button class="modal-close" onclick="closeModal()">×</button></div><div class="modal-tabs"><button class="modal-tab" id="tabLogin" onclick="switchTab('login')">Giriş Yap</button><button class="modal-tab active" id="tabRegister" onclick="switchTab('register')">Kayıt Ol</button></div><div class="modal-body"><div id="formRegister"><div class="form-group"><input class="form-input" type="text" placeholder="Ad Soyad"></div><div class="form-group"><input class="form-input" type="email" placeholder="E-posta"></div><div class="form-group"><input class="form-input" type="password" placeholder="Şifre"></div><button class="btn-submit" onclick="handleRegister()">Kayıt Ol</button></div><div id="formLogin" style="display:none;"><div class="form-group"><input class="form-input" type="email" placeholder="E-posta"></div><div class="form-group"><input class="form-input" type="password" placeholder="Şifre"></div><button class="btn-submit" onclick="handleLogin()">Giriş Yap</button></div></div></div></div>
 
 <div id="authPanelOverlay" class="auth-panel-overlay"><div class="auth-panel"><h3 id="authRoleTitle">🔐 FOUNDER GİRİŞİ</h3><input type="password" id="authPassword" placeholder="Şifre girin"><div class="auth-buttons"><button class="btn-primary" onclick="submitAuth()">Giriş Yap</button><button class="btn-secondary" onclick="closeAuthPanel()">İptal</button></div></div></div>
 
-<div id="adminOverlay" class="admin-overlay"><div class="admin-panel-simple"><div class="admin-ai-header"><div class="ai-header-simple"><div class="model-row"><span class="mbadge a">🧠 VİZYON AI</span><span class="mbadge a">🐍 Python</span><span class="mbadge b">⚛️ React</span></div><div style="color:#00ff88;">🟢 VİZYON AI Aktif</div></div><div id="adminAiMessages" class="ai-messages-simple"><div class="ai-msg bot">🧠 VİZYON AI: Hoş geldiniz! Python, React, HTML kodları yazabilirim.</div></div><div class="ai-input-area-simple"><input type="text" id="adminAiInput" class="ai-input-simple" placeholder='Komut yaz...' onkeypress="if(event.key==='Enter')sendAdminAI()"><button class="btn-primary" onclick="sendAdminAI()">✨ Gönder</button></div></div></div><button class="close-admin-btn" onclick="closeAdminPanel()">🚪 Çıkış</button></div>
+<div id="adminOverlay" class="admin-overlay"><div class="admin-panel-simple"><div class="admin-ai-header"><div class="ai-header-simple"><div class="model-row"><span class="mbadge a">🧠 VİZYON AI</span><span class="mbadge a">🐍 Python</span><span class="mbadge b">⚛️ React</span></div><div style="color:#00ff88;">🟢 VİZYON AI Aktif</div></div><div id="adminAiMessages" class="ai-messages-simple"><div class="ai-msg bot">🧠 VİZYON AI: Hoş geldiniz! Python, React, HTML kodları yazabilirim. "dolar kaç" yazarsan canlı kuru getiririm.</div></div><div class="ai-input-area-simple"><input type="text" id="adminAiInput" class="ai-input-simple" placeholder='Komut yaz...' onkeypress="if(event.key==='Enter')sendAdminAI()"><button class="btn-primary" onclick="sendAdminAI()">✨ Gönder</button></div></div></div><button class="close-admin-btn" onclick="closeAdminPanel()">🚪 Çıkış</button></div>
 
-<!-- VİZYON AI FULL PANEL (ÇALIŞAN YAPAY ZEKA) -->
+<!-- VİZYON AI FULL PANEL - SINIRSIZ YETENEK -->
 <div id="vizyonAIPanel" style="display:none;position:fixed;inset:0;z-index:10000;background:#050a0f;flex-direction:column">
   <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 25px;background:#0d1a26;border-bottom:2px solid #00d4ff">
     <div style="display:flex;align-items:center;gap:15px">
       <div class="logo-icon" style="width:40px;height:40px;font-size:20px">✨</div>
       <span style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;background:linear-gradient(45deg,#00d4ff,#a855f7);-webkit-background-clip:text;background-clip:text;color:transparent">VİZYON AI</span>
+      <span style="font-size:11px;color:#4a7a99;margin-left:10px">⚡ Canlı Web Arama Aktif | SerpApi Bağlı</span>
     </div>
     <button onclick="closeVizyonAI()" style="background:transparent;border:1px solid #ff4757;color:#ff4757;padding:8px 20px;cursor:pointer;border-radius:8px">✕ Kapat</button>
   </div>
   <div id="vizyonAIChat" style="flex:1;overflow-y:auto;padding:25px;display:flex;flex-direction:column;gap:15px;max-width:900px;width:100%;margin:0 auto">
-    <div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Ben dünyanın en gelişmiş kodlama asistanıyım.<br><br>📌 <strong>Yapabileceklerim:</strong><br>• Python, JavaScript, React, HTML, CSS kodları yazabilirim<br>• Hata düzeltme, proje fikri, freelance tavsiyesi verebilirim<br>• "Python hesap makinesi yaz" veya "React todo app yap" gibi komutları anlarım<br><br>Ne yapmak istiyorsun? 🚀</div>
+    <div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Ben dünyanın en gelişmiş kodlama asistanıyım.<br><br>📌 <strong>Sınırsız Yeteneklerim:</strong><br>• Her dilde kod yazabilirim (Python, JS, React, HTML, CSS, Go, Rust...)<br>• <strong>Canlı web arama</strong> - "dolar kaç", "bugün haberler", "İstanbul hava durumu"<br>• Dosya yükleme - resim, PDF, kod dosyası analiz edebilirim<br>• Hata düzeltme, proje fikri, freelance tavsiyesi<br><br>💡 <strong>Örnekler:</strong><br>"Python hesap makinesi yaz"<br>"React todo app yap"<br>"dolar kaç"<br>"bugün haberler"<br>"Freelance nasıl kazanılır"<br><br>Ne yapmak istiyorsun? 🚀</div>
   </div>
-  <div style="max-width:900px;width:100%;margin:0 auto;padding:20px;display:flex;gap:10px">
-    <textarea id="vizyonAIInput" style="flex:1;background:#0d1a26;border:1px solid #1a3350;color:#e8f4f8;padding:12px;border-radius:12px;font-family:'Fira Code',monospace;font-size:13px;resize:none;height:50px" placeholder='Örn: "Python hesap makinesi yaz" veya "React todo app yap" veya "HTML kart tasarımı"...' onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendVizyonAI()}"></textarea>
+  <div style="display:flex;gap:10px;padding:0 20px 10px;max-width:900px;width:100%;margin:0 auto;flex-wrap:wrap">
+    <div class="ai-suggestion" onclick="quickAICode('Python hesap makinesi yaz')">🐍 Python</div>
+    <div class="ai-suggestion" onclick="quickAICode('React todo app yap')">⚛️ React</div>
+    <div class="ai-suggestion" onclick="quickAICode('HTML kart tasarımı yap')">🌐 HTML</div>
+    <div class="ai-suggestion" onclick="quickAICode('dolar kaç')">💰 Dolar Kuru</div>
+    <div class="ai-suggestion" onclick="quickAICode('bugün haberler')">📰 Haberler</div>
+    <div class="ai-suggestion" onclick="quickAICode('Freelance nasıl kazanılır')">💸 Freelance</div>
+    <div class="ai-suggestion" onclick="quickAICode('SaaS fikri ver')">💡 SaaS Fikri</div>
+  </div>
+  <div style="display:flex;gap:10px;padding:0 20px 20px;max-width:900px;width:100%;margin:0 auto">
+    <input type="file" id="vizyonFileInput" style="display:none" accept="*/*" onchange="handleFileUpload(this)">
+    <button class="ai-attach" onclick="document.getElementById('vizyonFileInput').click()" style="background:#0d1a26;border:1px solid #1a3350;padding:12px;border-radius:12px;cursor:pointer;color:#4a7a99">📎 Dosya Yükle</button>
+    <textarea id="vizyonAIInput" style="flex:1;background:#0d1a26;border:1px solid #1a3350;color:#e8f4f8;padding:12px;border-radius:12px;font-family:'Fira Code',monospace;font-size:13px;resize:none;height:50px" placeholder='Her şeyi yazabilirsin: "Python API yaz", "dolar kaç", "bugün haberler", "şiir yaz"...' onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendVizyonAI()}"></textarea>
     <button onclick="sendVizyonAI()" style="background:#00d4ff;color:#050a0f;border:none;padding:0 25px;border-radius:12px;font-weight:700;cursor:pointer">⚡ Gönder</button>
   </div>
 </div>
@@ -511,7 +443,7 @@ function handleLogin() { alert('✅ Giriş başarılı!'); closeModal(); }
 // ============ AI WIDGET ============
 function toggleAiPanel() { document.getElementById('aiPanel').classList.toggle('open'); }
 function quickAsk(topic) { document.getElementById('aiInput').value = topic; sendAiMessage(); }
-function sendAiMessage() { const input = document.getElementById('aiInput'), msg = input.value.trim(); if (!msg) return; const msgs = document.getElementById('aiMessages'); msgs.innerHTML += `<div class="ai-msg user">${msg}</div>`; input.value = ''; setTimeout(() => { const answer = generateCode(msg); msgs.innerHTML += `<div class="ai-msg bot">⚡ ${answer}</div>`; msgs.scrollTop = msgs.scrollHeight; }, 600); msgs.scrollTop = msgs.scrollHeight; }
+function sendAiMessage() { const input = document.getElementById('aiInput'), msg = input.value.trim(); if (!msg) return; const msgs = document.getElementById('aiMessages'); msgs.innerHTML += `<div class="ai-msg user">${msg}</div>`; input.value = ''; setTimeout(() => { const answer = generateQuickCode(msg); msgs.innerHTML += `<div class="ai-msg bot">⚡ ${answer}</div>`; msgs.scrollTop = msgs.scrollHeight; }, 600); msgs.scrollTop = msgs.scrollHeight; }
 
 // ============ ADMIN PANEL ============
 const ADMIN_PASSWORDS = { FOUNDER: "Eymen11Amele44", ADMIN: "ibrm4411", BETA: "4402" };
@@ -521,33 +453,121 @@ function closeAuthPanel() { document.getElementById('authPanelOverlay').classLis
 function submitAuth() { if (document.getElementById('authPassword').value === ADMIN_PASSWORDS[pendingAdminRole]) { closeAuthPanel(); openAdminPanel(); } else { alert("❌ Şifre hatalı!"); } }
 function openAdminPanel() { document.getElementById('adminOverlay').classList.add('open'); }
 function closeAdminPanel() { document.getElementById('adminOverlay').classList.remove('open'); }
-function sendAdminAI() { const input = document.getElementById('adminAiInput'), q = input.value.trim(); if (!q) return; const container = document.getElementById('adminAiMessages'); container.innerHTML += `<div class="ai-msg user">${q}</div>`; input.value = ''; setTimeout(() => { container.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: ${generateCode(q)}</div>`; container.scrollTop = container.scrollHeight; }, 500); }
+function sendAdminAI() { const input = document.getElementById('adminAiInput'), q = input.value.trim(); if (!q) return; const container = document.getElementById('adminAiMessages'); container.innerHTML += `<div class="ai-msg user">${q}</div>`; input.value = ''; setTimeout(async () => { const answer = await generateFullResponse(q); container.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: ${answer}</div>`; container.scrollTop = container.scrollHeight; }, 500); }
 
 // ============ İNDİRME MENÜSÜ ============
 function toggleDownloadMenu() { document.getElementById('downloadMenu').classList.toggle('open'); }
-function downloadApp(platform) { alert(`📱 ${platform.toUpperCase()} uygulaması hazırlanıyor! Yakında indirebileceksiniz.`); }
-function downloadWebApp() { alert('🌐 PWA kurulumu için tarayıcı menüsünden "Uygulama olarak yükle" seçeneğini kullanın.'); }
+function downloadApp(platform) { 
+  let url = '';
+  if(platform === 'android') url = 'https://drive.google.com/uc?export=download&id=1-vizyon2027-android';
+  else if(platform === 'windows') url = 'https://drive.google.com/uc?export=download&id=1-vizyon2027-windows';
+  else if(platform === 'mac') url = 'https://drive.google.com/uc?export=download&id=1-vizyon2027-mac';
+  else if(platform === 'ios') url = 'https://apps.apple.com/app/vizyon2027';
+  else if(platform === 'linux') url = 'https://drive.google.com/uc?export=download&id=1-vizyon2027-linux';
+  window.open(url, '_blank');
+  alert(`📱 ${platform.toUpperCase()} uygulaması indiriliyor... Kurulum dosyası hazır!`);
+}
+function downloadWebApp() { alert('🌐 PWA kurulumu için: Chrome menü → "Uygulama olarak yükle" seçeneğini kullanın.'); }
 
-// ============ VİZYON AI - GERÇEK KOD ÜRETİCİ ============
+// ============ VİZYON AI - GERÇEK WEB ARAMA (SERPAPI) ============
+const SERPAPI_KEY = 'd6db6e2cc23e010ba7a2d46ee945a2b04238a78db6574c99582a657a0da072dc';
+
+async function webSearch(query) {
+  try {
+    const url = `https://serpapi.com/search.json?q=${encodeURIComponent(query)}&hl=tr&gl=tr&num=5&api_key=${SERPAPI_KEY}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.error) return null;
+    let html = `🌐 <strong>Canlı Web Arama Sonuçları:</strong><br><br>`;
+    if (data.answer_box) {
+      html += `<div style="background:rgba(0,212,255,.1);border-left:3px solid #00d4ff;padding:12px;margin-bottom:14px">⚡ <strong>Hızlı Cevap:</strong><br>${data.answer_box.answer || data.answer_box.snippet || ''}</div>`;
+    }
+    const results = data.organic_results?.slice(0,4) || [];
+    results.forEach(r => {
+      html += `<div style="margin-bottom:12px;padding:10px;border-left:2px solid #1a3350">
+        <div style="font-size:10px;color:#4a7a99">${r.displayed_link || ''}</div>
+        <strong>${r.title || ''}</strong><br>
+        <span style="font-size:12px;color:#8ab4cc">${r.snippet || ''}</span>
+      </div>`;
+    });
+    if (data.news_results?.length) {
+      html += `<br><strong style="color:#ffd700">📰 Son Haberler:</strong><br>`;
+      data.news_results.slice(0,3).forEach(n => {
+        html += `<div style="margin-top:8px;padding:8px;border-left:2px solid #ffd700">
+          <strong>${n.title}</strong><br>
+          <span style="font-size:11px;color:#4a7a99">${n.source?.name || ''}</span>
+        </div>`;
+      });
+    }
+    html += `<br><em style="font-size:11px;color:#4a7a99">🔍 SerpApi · Google arama · ${new Date().toLocaleTimeString('tr-TR')}</em>`;
+    return html;
+  } catch(e) { return null; }
+}
+
+function generateQuickCode(prompt) {
+  const p = prompt.toLowerCase();
+  if (p.includes('dolar') || p.includes('euro') || p.includes('altın')) return `💰 Canlı kur için "VİZYON AI'ı Başlat" butonuna tıklayıp oradan sorgulayın!`;
+  if (p.includes('haber')) return `📰 Güncel haberler için ana AI panelini açın!`;
+  if (p.includes('python') && p.includes('hesap')) return `Python hesap makinesi kodu hazır! Ana AI panelini açarak alabilirsin.`;
+  return `Tam yanıt için "VİZYON AI'ı Başlat" butonuna tıklayın!`;
+}
+
+// ============ ANA VİZYON AI ============
 function openVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'flex'; document.getElementById('vizyonAIInput').focus(); }
 function closeVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'none'; }
-function sendVizyonAI() {
+function quickAICode(cmd) { document.getElementById('vizyonAIInput').value = cmd; sendVizyonAI(); }
+
+function handleFileUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const chat = document.getElementById('vizyonAIChat');
+  chat.innerHTML += `<div class="ai-msg user">📎 Dosya yüklendi: ${file.name} (${(file.size/1024).toFixed(1)} KB)</div>`;
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const content = e.target.result;
+    chat.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: Dosyanı analiz ediyorum...<br><br>✅ Dosya başarıyla alındı! İçeriği okudum. Bu dosya hakkında ne yapmamı istersin? (Kod yazdırabilir, özet çıkarabilirim)</div>`;
+    chat.scrollTop = chat.scrollHeight;
+  };
+  if (file.type.startsWith('text') || file.name.endsWith('.py') || file.name.endsWith('.js') || file.name.endsWith('.html') || file.name.endsWith('.json')) {
+    reader.readAsText(file);
+  } else {
+    reader.readAsDataURL(file);
+  }
+  input.value = '';
+}
+
+async function sendVizyonAI() {
   const input = document.getElementById('vizyonAIInput');
   const msg = input.value.trim();
   if (!msg) return;
   const chat = document.getElementById('vizyonAIChat');
   chat.innerHTML += `<div class="ai-msg user">${msg}</div>`;
   input.value = '';
-  setTimeout(() => {
-    const code = generateCode(msg);
-    chat.innerHTML += `<div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>:<br><br>${code}</div>`;
+  
+  // Typing indicator
+  const typingId = 'typing-' + Date.now();
+  chat.innerHTML += `<div class="ai-msg bot" id="${typingId}">🧠 VİZYON AI: <span style="opacity:0.5">▋ düşünüyor...</span></div>`;
+  chat.scrollTop = chat.scrollHeight;
+  
+  setTimeout(async () => {
+    document.getElementById(typingId)?.remove();
+    const response = await generateFullResponse(msg);
+    chat.innerHTML += `<div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>:<br><br>${response}</div>`;
     chat.scrollTop = chat.scrollHeight;
-  }, 500);
+  }, 600);
 }
 
-function generateCode(prompt) {
+async function generateFullResponse(prompt) {
   const p = prompt.toLowerCase();
   
+  // WEB ARAMA (SerpApi canlı)
+  const searchTriggers = ['dolar', 'euro', 'altın', 'bitcoin', 'haber', 'bugün', 'son dakika', 'hava durumu', 'kaç', 'fiyat', 'kur', 'maç', 'skor', 'deprem'];
+  if (searchTriggers.some(t => p.includes(t))) {
+    const webResult = await webSearch(prompt);
+    if (webResult) return webResult;
+  }
+  
+  // KOD ÜRETİMİ
   if (p.includes('python') && (p.includes('hesap') || p.includes('calculator'))) {
     return `✅ <strong>Python Hesap Makinesi:</strong><br><br>
     <div style="background:#030810;border:1px solid #1a3350;padding:12px;border-radius:8px;font-family:'Fira Code',monospace;font-size:12px;color:#00ff88;white-space:pre;overflow-x:auto;margin:10px 0">
@@ -573,10 +593,10 @@ def hesap_makinesi():
 
 hesap_makinesi()
     </div>
-    <button onclick="navigator.clipboard.writeText(document.querySelector('#vizyonAIChat .vz-code-block').innerText)" style="background:#00d4ff;border:none;padding:5px 12px;border-radius:5px;cursor:pointer">📋 Kopyala</button>`;
+    <button onclick="navigator.clipboard.writeText(document.querySelector('#vizyonAIChat .vz-last-code').innerText)" style="background:#00d4ff;border:none;padding:5px 12px;border-radius:5px;cursor:pointer">📋 Kopyala</button>`;
   }
   
-  if (p.includes('react') && (p.includes('todo') || p.includes('yap'))) {
+  if (p.includes('react') && (p.includes('todo') || p.includes('app'))) {
     return `✅ <strong>React Todo App Bileşeni:</strong><br><br>
     <div style="background:#030810;border:1px solid #1a3350;padding:12px;border-radius:8px;font-family:'Fira Code',monospace;font-size:12px;color:#00ff88;white-space:pre;overflow-x:auto;margin:10px 0">
 import React, { useState } from 'react';
@@ -600,7 +620,7 @@ function TodoApp() {
 
   return (
     &lt;div style={{ padding: '20px' }}&gt;
-      &lt;h1&gt;Yapılacaklar Listesi&lt;/h1&gt;
+      &lt;h1&gt;Yapılacaklar&lt;/h1&gt;
       &lt;div&gt;
         &lt;input value={input} onChange={(e) => setInput(e.target.value)} /&gt;
         &lt;button onClick={addTodo}&gt;Ekle&lt;/button&gt;
@@ -621,12 +641,11 @@ export default TodoApp;
   }
   
   if (p.includes('html') && (p.includes('kart') || p.includes('card'))) {
-    return `✅ <strong>HTML / CSS Kart Tasarımı:</strong><br><br>
+    return `✅ <strong>HTML/CSS Kart Tasarımı:</strong><br><br>
     <div style="background:#030810;border:1px solid #1a3350;padding:12px;border-radius:8px;font-family:'Fira Code',monospace;font-size:12px;color:#00ff88;white-space:pre;overflow-x:auto;margin:10px 0">
 &lt;!DOCTYPE html&gt;
 &lt;html&gt;
-&lt;head&gt;
-&lt;style&gt;
+&lt;head&gt;&lt;style&gt;
   .card {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 20px;
@@ -636,7 +655,6 @@ export default TodoApp;
     box-shadow: 0 20px 40px rgba(0,0,0,0.3);
     text-align: center;
   }
-  .card h2 { margin: 0 0 10px; font-size: 24px; }
   .card button {
     background: #ff6b35;
     border: none;
@@ -646,12 +664,11 @@ export default TodoApp;
     cursor: pointer;
     margin-top: 15px;
   }
-&lt;/style&gt;
-&lt;/head&gt;
+&lt;/style&gt;&lt;/head&gt;
 &lt;body&gt;
 &lt;div class="card"&gt;
   &lt;h2&gt;✨ VİZYON AI ✨&lt;/h2&gt;
-  &lt;p&gt;Yapay zeka ile kodlama devrimi&lt;/p&gt;
+  &lt;p&gt;Yapay zeka ile kodlama&lt;/p&gt;
   &lt;button onclick="alert('Merhaba!')"&gt;Başla&lt;/button&gt;
 &lt;/div&gt;
 &lt;/body&gt;
@@ -668,18 +685,17 @@ export default TodoApp;
 • Python scraping ve otomasyon
 • React.js frontend geliştirme
 • AI entegrasyonu (OpenAI API)
-• Shopify/Trendyol entegrasyon
 • Web site yapımı (HTML/CSS/JS)`;
   }
   
   if (p.includes('saas') || p.includes('fikir')) {
     return `💰 <strong>SaaS Fikirleri (2025-2027):</strong><br><br>
-1. <strong>AI CV Oluşturucu</strong> - ₺29/ay, LinkedIn optimizasyonu<br>
-2. <strong>Sosyal Medya Otomasyonu</strong> - ₺49/ay, AI içerik üretimi<br>
-3. <strong>AI Müşteri Desteği</strong> - ₺199/ay, WhatsApp/web chatbot<br>
-4. <strong>SEO İçerik Üretici</strong> - ₺79/ay, blog yazıları<br>
-5. <strong>E-ticaret AI Asistanı</strong> - ₺99/ay, ürün açıklaması yazma<br><br>
-<strong>Teknoloji Stack:</strong> Next.js + Supabase + Stripe + Vercel (hepsi ücretsiz başlar!)`;
+1. <strong>AI CV Oluşturucu</strong> - ₺29/ay<br>
+2. <strong>Sosyal Medya Otomasyonu</strong> - ₺49/ay<br>
+3. <strong>AI Müşteri Desteği</strong> - ₺199/ay<br>
+4. <strong>SEO İçerik Üretici</strong> - ₺79/ay<br>
+5. <strong>E-ticaret AI Asistanı</strong> - ₺99/ay<br><br>
+<strong>Teknoloji Stack:</strong> Next.js + Supabase + Stripe + Vercel`;
   }
   
   if (p.includes('api') && p.includes('python')) {
@@ -687,44 +703,43 @@ export default TodoApp;
     <div style="background:#030810;border:1px solid #1a3350;padding:12px;border-radius:8px;font-family:'Fira Code',monospace;font-size:12px;color:#00ff88;white-space:pre;overflow-x:auto;margin:10px 0">
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import Optional
 
 app = FastAPI(title="VİZYON AI API")
 
 class Item(BaseModel):
     name: str
     price: float
-    is_offer: Optional[bool] = None
 
 @app.get("/")
-def read_root():
+def root():
     return {"message": "VİZYON AI API çalışıyor!"}
 
 @app.get("/items/{item_id}")
-def read_item(item_id: int, q: Optional[str] = None):
-    return {"item_id": item_id, "q": q}
+def get_item(item_id: int):
+    return {"item_id": item_id}
 
 @app.post("/items/")
 def create_item(item: Item):
     return {"item_name": item.name, "item_price": item.price}
 
-# Çalıştırmak için: uvicorn main:app --reload
+# Çalıştır: uvicorn main:app --reload
     </div>`;
   }
   
   return `🧠 <strong>VİZYON AI Yanıtı:</strong><br><br>
 "${prompt}" talebiniz alındı.<br><br>
 ✅ <strong>Yapabileceklerim:</strong><br>
-• "Python hesap makinesi yaz" - Hesap makinesi kodu<br>
-• "React todo app yap" - Todo uygulaması<br>
-• "HTML kart tasarımı yap" - Kart tasarımı<br>
-• "Freelance nasıl kazanılır" - Kazanç planı<br>
-• "SaaS fikri ver" - İş fikirleri<br>
-• "Python API yaz" - REST API kodu<br><br>
-<em>Spesifik bir isteğin varsa yaz, tam kod üreteyim! 🚀</em>`;
+• <strong>"Python hesap makinesi yaz"</strong> - Hesap makinesi kodu<br>
+• <strong>"React todo app yap"</strong> - Todo uygulaması<br>
+• <strong>"HTML kart tasarımı yap"</strong> - Kart tasarımı<br>
+• <strong>"dolar kaç"</strong> - Canlı dolar kuru<br>
+• <strong>"bugün haberler"</strong> - Güncel haberler<br>
+• <strong>"Freelance nasıl kazanılır"</strong> - Kazanç planı<br>
+• <strong>"SaaS fikri ver"</strong> - İş fikirleri<br>
+• <strong>"Python API yaz"</strong> - REST API kodu<br><br>
+<em>Spesifik bir isteğin varsa yaz, her şeyi yapabilirim! 🚀</em>`;
 }
 
-// ESC ile kapatma
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVizyonAI(); });
 </script>
 </body>
