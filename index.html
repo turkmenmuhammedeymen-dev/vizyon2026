@@ -1250,7 +1250,6 @@ footer {
   </footer>
 </div>
 
-<!-- İNDİRME MENÜSÜ -->
 <div class="download-menu">
   <button class="download-btn" onclick="toggleDownloadMenu()">📱</button>
   <div class="download-options" id="downloadMenu">
@@ -1389,33 +1388,55 @@ const SUPABASE_URL = 'https://dxfwxknohzkdhzyytwdt.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Us1HLOwQoLT5978dZ3Oy-Q_-v0WrLsl';
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// KAYIT OL
+// ══════════════════════════════════════════
+// KAYIT OL FONKSİYONU
+// ══════════════════════════════════════════
 async function handleRegister() {
   const name = document.getElementById('rName')?.value.trim();
   const surname = document.getElementById('rSurname')?.value.trim();
   const email = document.getElementById('rEmail')?.value.trim();
   const p1 = document.getElementById('rPass')?.value;
   const p2 = document.getElementById('rPass2')?.value;
+
   if(!name){ alert('Ad gerekli!'); return; }
   if(!email || !email.includes('@')){ alert('Geçerli e-posta girin!'); return; }
-  if(p1.length < 8){ alert('Şifre en az 8 karakter!'); return; }
+  if(p1.length < 8){ alert('Şifre en az 8 karakter olmalı!'); return; }
   if(p1 !== p2){ alert('Şifreler eşleşmiyor!'); return; }
+
   try {
-    const { error } = await supabase.from('users').insert([{
-      name: name + ' ' + surname, email: email, plan: 'free', created_at: new Date()
-    }]);
-    if(error){ alert('Hata: ' + error.message); return; }
-    localStorage.setItem('v27_session', email);
+    const { data, error } = await supabase.from('users').insert([{
+      name: name + ' ' + surname,
+      email: email,
+      plan: 'free',
+      created_at: new Date()
+    }]).select();
+
+    if(error){
+      if(error.code === '23505'){
+        alert('Bu e-posta zaten kayıtlı!');
+      } else {
+        alert('Hata: ' + error.message);
+      }
+      return;
+    }
+
+    localStorage.setItem('v27_session', JSON.stringify(data[0]));
     closeModal();
-    alert('✅ Kayıt başarılı!');
-  } catch(e) { alert('Bağlantı hatası!'); }
+    alert('✅ Hoş geldin ' + name + '! Hesabın oluşturuldu.');
+  } catch(e) {
+    alert('Bağlantı hatası!');
+  }
 }
 
-// GİRİŞ YAP
+// ══════════════════════════════════════════
+// GİRİŞ YAP FONKSİYONU
+// ══════════════════════════════════════════
 async function handleLogin() {
   const email = document.getElementById('lEmail')?.value.trim();
   const pass = document.getElementById('lPass')?.value;
+
   if(!email || !pass){ alert('Tüm alanları doldurun!'); return; }
+
   if(email === 'admin@vizyon2027.com' && pass === 'Eymen2027!'){
     localStorage.setItem('v27_admin', '1');
     closeModal();
@@ -1423,36 +1444,56 @@ async function handleLogin() {
     alert('Admin girişi başarılı!');
     return;
   }
+
   try {
     const { data, error } = await supabase.from('users').select('*').eq('email', email).single();
     if(error || !data){ alert('Kullanıcı bulunamadı!'); return; }
     localStorage.setItem('v27_session', JSON.stringify(data));
     closeModal();
     alert('✅ Hoş geldin ' + data.name + '!');
-  } catch(e) { alert('Bağlantı hatası!'); }
+  } catch(e) {
+    alert('Bağlantı hatası!');
+  }
 }
 
-// YÖNETİM PANELİ
+// ══════════════════════════════════════════
+// YÖNETİM PANELİ VERİLERİNİ ÇEK
+// ══════════════════════════════════════════
 async function loadAdminData() {
   try {
     const { data: users } = await supabase.from('users').select('*').order('created_at', { ascending: false });
     const { data: messages } = await supabase.from('messages').select('*').order('created_at', { ascending: false });
+    
     const usersList = document.getElementById('usersList');
     if(usersList && users){
       usersList.innerHTML = users.map(u => `<div class="user-item"><div><strong>${u.name}</strong><br><span style="font-size:11px;">${u.email}</span><br><span class="badge">${u.plan || 'free'}</span></div><button onclick="deleteUser('${u.id}')" style="background:#ff4757;">🗑️ Sil</button></div>`).join('');
       document.getElementById('statUsers').innerText = users.length;
     }
+
     const msgList = document.getElementById('msgList');
     if(msgList && messages){
-      msgList.innerHTML = messages.map(m => `<div class="msg-item"><div><strong>${m.name}</strong><br><span style="font-size:11px;">${m.email}</span><br><span style="font-size:10px;">${m.topic || 'Genel'}</span><br><small>${m.msg?.substring(0,100)}...</small></div><button onclick="markRead('${m.id}')" style="background:#00d4ff">Okundu İşaretle</button></div>`).join('');
+      msgList.innerHTML = messages.map(m => `<div class="msg-item"><div><strong>${m.name}</strong><br><span style="font-size:11px;">${m.email}</span><br><span style="font-size:10px;">${m.topic || 'Genel'}</span><br><small>${m.msg?.substring(0,100)}...</small></div><button onclick="markRead('${m.id}')" style="background:${m.read ? '#1a3350' : '#00d4ff'}">${m.read ? '✓ Okundu' : 'Okundu İşaretle'}</button></div>`).join('');
       document.getElementById('statMessages').innerText = messages.filter(m => !m.read).length;
     }
-  } catch(e) { console.log(e); }
+  } catch(e) { console.log('Veri çekme hatası:', e); }
 }
-async function deleteUser(id) { if(!confirm('Silinsin mi?')) return; await supabase.from('users').delete().eq('id', id); loadAdminData(); alert('Kullanıcı silindi.'); }
-async function markRead(id) { await supabase.from('messages').update({ read: true }).eq('id', id); loadAdminData(); alert('Okundu işaretlendi.'); }
 
-// YEREL VERİLER
+async function deleteUser(id) {
+  if(!confirm('Bu kullanıcı silinsin mi?')) return;
+  await supabase.from('users').delete().eq('id', id);
+  loadAdminData();
+  alert('Kullanıcı silindi.');
+}
+
+async function markRead(id) {
+  await supabase.from('messages').update({ read: true }).eq('id', id);
+  loadAdminData();
+  alert('Mesaj okundu işaretlendi.');
+}
+
+// ══════════════════════════════════════════
+// YEREL VERİ YÖNETİMİ
+// ══════════════════════════════════════════
 let localData = {
   projects: JSON.parse(localStorage.getItem('v27_projects') || '[]'),
   orders: JSON.parse(localStorage.getItem('v27_orders') || '[]'),
@@ -1460,6 +1501,7 @@ let localData = {
   trash: JSON.parse(localStorage.getItem('v27_trash') || '[]'),
   archive: JSON.parse(localStorage.getItem('v27_archive') || '[]')
 };
+
 function saveLocalData() {
   localStorage.setItem('v27_projects', JSON.stringify(localData.projects));
   localStorage.setItem('v27_orders', JSON.stringify(localData.orders));
@@ -1468,52 +1510,111 @@ function saveLocalData() {
   localStorage.setItem('v27_archive', JSON.stringify(localData.archive));
   renderLocalPanels();
 }
-function addProject() { const name = prompt('Proje adı:'); if(name){ localData.projects.push({ id: Date.now(), name }); saveLocalData(); } }
+
+function addProject() {
+  const name = prompt('Proje adı:');
+  if(name){
+    localData.projects.push({ id: Date.now(), name, date: new Date().toLocaleString() });
+    saveLocalData();
+  }
+}
+
 function renderLocalPanels() {
   const projectsDiv = document.getElementById('projectsList');
   const ordersDiv = document.getElementById('ordersList');
   const packagesDiv = document.getElementById('packagesList');
   const trashDiv = document.getElementById('trashList');
   const archiveDiv = document.getElementById('archiveList');
+
   if(projectsDiv) projectsDiv.innerHTML = localData.projects.map(p => `<div class="project-item">📁 ${p.name}<button onclick="deleteToTrash('projects',${p.id})" style="background:#ff4757;margin-left:10px;">🗑️</button></div>`).join('') || '<div>Proje yok</div>';
-  if(ordersDiv) ordersDiv.innerHTML = localData.orders.map(o => `<div class="project-item">📦 ${o.name}</div>`).join('') || '<div>Sipariş yok</div>';
-  if(packagesDiv) packagesDiv.innerHTML = localData.packages.map(p => `<div class="project-item">💎 ${p.name}</div>`).join('') || '<div>Paket yok</div>';
+  if(ordersDiv) ordersDiv.innerHTML = localData.orders.map(o => `<div class="project-item">📦 ${o.name} - ${o.status || 'Bekliyor'}</div>`).join('') || '<div>Sipariş yok</div>';
+  if(packagesDiv) packagesDiv.innerHTML = localData.packages.map(p => `<div class="project-item">💎 ${p.name} - ${p.price || '₺0'}</div>`).join('') || '<div>Paket yok</div>';
   if(trashDiv) trashDiv.innerHTML = localData.trash.map(t => `<div class="project-item">🗑️ ${t.name}<button onclick="restoreFromTrash(${t.id})" style="background:#00d4ff;margin-left:10px;">↺ Geri Al</button><button onclick="permanentDelete(${t.id})" style="background:#ff4757;">💀 Sil</button></div>`).join('') || '<div>Çöp kutusu boş</div>';
   if(archiveDiv) archiveDiv.innerHTML = localData.archive.map(a => `<div class="project-item">📦 ${a.name}</div>`).join('') || '<div>Arşiv boş</div>';
   document.getElementById('statProjects').innerText = localData.projects.length;
 }
+
 function deleteToTrash(type, id) {
   const item = localData[type].find(p => p.id === id);
-  if(item){ localData.trash.push({ ...item, originalType: type }); localData[type] = localData[type].filter(p => p.id !== id); saveLocalData(); }
+  if(item){
+    localData.trash.push({ ...item, originalType: type });
+    localData[type] = localData[type].filter(p => p.id !== id);
+    saveLocalData();
+  }
 }
+
 function restoreFromTrash(id) {
   const idx = localData.trash.findIndex(t => t.id === id);
-  if(idx !== -1){ const restored = localData.trash[idx]; localData[restored.originalType].push({ id: restored.id, name: restored.name }); localData.trash.splice(idx, 1); saveLocalData(); }
+  if(idx !== -1){
+    const restored = localData.trash[idx];
+    localData[restored.originalType].push({ id: restored.id, name: restored.name });
+    localData.trash.splice(idx, 1);
+    saveLocalData();
+  }
 }
-function permanentDelete(id) { localData.trash = localData.trash.filter(t => t.id !== id); saveLocalData(); }
 
-// YÖNETİM PANELİ ŞİFRE
+function permanentDelete(id) {
+  localData.trash = localData.trash.filter(t => t.id !== id);
+  saveLocalData();
+}
+
+// ══════════════════════════════════════════
+// YÖNETİM PANELİ (Şifre ile açılan)
+// ══════════════════════════════════════════
 const ADMIN_PASSWORDS = { FOUNDER: "Eymen11Amele44", ADMIN: "ibrm4411", BETA: "4402" };
 let pendingAdminRole = null;
-function showAuthPanel(role) { pendingAdminRole = role; document.getElementById('authRoleTitle').innerHTML = `🔐 ${role} GİRİŞİ`; document.getElementById('authPanelOverlay').classList.add('open'); document.getElementById('authPassword').value = ''; }
-function closeAuthPanel() { document.getElementById('authPanelOverlay').classList.remove('open'); pendingAdminRole = null; }
-function submitAuth() { if(document.getElementById('authPassword').value === ADMIN_PASSWORDS[pendingAdminRole]) { closeAuthPanel(); openAdminPanel(); } else { alert("❌ Şifre hatalı!"); } }
-function openAdminPanel() { document.getElementById('adminOverlay').classList.add('open'); document.getElementById('panelRoleInfo').innerHTML = `✅ ${pendingAdminRole} olarak giriş yaptınız.`; loadAdminData(); renderLocalPanels(); }
-function closeAdminPanel() { document.getElementById('adminOverlay').classList.remove('open'); pendingAdminRole = null; }
+
+function showAuthPanel(role) { 
+  pendingAdminRole = role; 
+  document.getElementById('authRoleTitle').innerHTML = `🔐 ${role} GİRİŞİ`; 
+  document.getElementById('authPanelOverlay').classList.add('open'); 
+  document.getElementById('authPassword').value = ''; 
+}
+
+function closeAuthPanel() { 
+  document.getElementById('authPanelOverlay').classList.remove('open'); 
+  pendingAdminRole = null; 
+}
+
+function submitAuth() { 
+  if(document.getElementById('authPassword').value === ADMIN_PASSWORDS[pendingAdminRole]) { 
+    closeAuthPanel(); 
+    openAdminPanel(); 
+  } else { 
+    alert("❌ Şifre hatalı!"); 
+  } 
+}
+
+function openAdminPanel() { 
+  document.getElementById('adminOverlay').classList.add('open'); 
+  document.getElementById('panelRoleInfo').innerHTML = `✅ ${pendingAdminRole} olarak giriş yaptınız.`; 
+  loadAdminData(); 
+  renderLocalPanels(); 
+}
+
+function closeAdminPanel() { 
+  document.getElementById('adminOverlay').classList.remove('open'); 
+  pendingAdminRole = null; 
+}
 
 function sendAdminAI() { 
-  const input = document.getElementById('adminAiInput'); const q = input.value.trim(); if(!q) return; 
+  const input = document.getElementById('adminAiInput'); 
+  const q = input.value.trim(); 
+  if(!q) return; 
   const container = document.getElementById('adminAiMessages'); 
-  container.innerHTML += `<div class="ai-msg user">${q}</div>`; input.value = ''; 
+  container.innerHTML += `<div class="ai-msg user">${q}</div>`; 
+  input.value = ''; 
   setTimeout(() => { 
-    let answer = `"${q}" için VİZYON AI hazır! Python, React, HTML kodları yazabilirim.`; 
-    if(q.toLowerCase().includes('dolar')) answer = '💰 Dolar kuru için web araması yapılıyor...'; 
+    let answer = `"${q}" için VİZYON AI hazır! Python, React, HTML kodları yazabilirim. "dolar kaç" yazarsan canlı kuru getiririm.`; 
+    if(q.toLowerCase().includes('dolar')) answer = '💰 Dolar kuru için web araması yapılıyor... SerpApi ile canlı kuru çekebilirim!'; 
     container.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: ${answer}</div>`; 
     container.scrollTop = container.scrollHeight; 
   }, 500); 
 }
 
-// CURSOR
+// ══════════════════════════════════════════
+// CURSOR, PROGRESS, PARTICLES, COUNTERS
+// ══════════════════════════════════════════
 const cursor = document.getElementById('cursor');
 const cursorRing = document.getElementById('cursorRing');
 let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
@@ -1522,7 +1623,9 @@ function animateCursorRing() { ringX += (mouseX - ringX - 18) * 0.12; ringY += (
 animateCursorRing();
 
 window.addEventListener('scroll', () => { const doc = document.documentElement; const scrollTop = window.scrollY || doc.scrollTop; const scrollHeight = doc.scrollHeight - doc.clientHeight; document.getElementById('progressBar').style.width = (scrollTop / scrollHeight) * 100 + '%'; });
+
 for (let i = 0; i < 40; i++) { const p = document.createElement('div'); p.className = 'particle'; p.style.cssText = `left:${Math.random()*100}%;animation-duration:${8+Math.random()*15}s;animation-delay:${-Math.random()*20}s;`; document.getElementById('particles').appendChild(p); }
+
 function animateCounter(el, target) { let current = 0; const step = Math.ceil(target / 50); const interval = setInterval(() => { current += step; if (current >= target) { el.innerText = target.toLocaleString('tr-TR'); clearInterval(interval); } else { el.innerText = current.toLocaleString('tr-TR'); } }, 30); }
 setTimeout(() => { animateCounter(document.getElementById('counter1'), 48200); animateCounter(document.getElementById('counter2'), 1250000); animateCounter(document.getElementById('counter3'), 87400); }, 500);
 
@@ -1534,38 +1637,98 @@ function toggleAiPanel() { document.getElementById('aiPanel').classList.toggle('
 function quickAsk(topic) { document.getElementById('aiInput').value = topic; sendAiMessage(); }
 function sendAiMessage() { 
   const input = document.getElementById('aiInput'), msg = input.value.trim(); 
-  if(!msg) return; const msgs = document.getElementById('aiMessages'); 
-  msgs.innerHTML += `<div class="ai-msg user">${msg}</div>`; input.value = ''; 
+  if(!msg) return; 
+  const msgs = document.getElementById('aiMessages'); 
+  msgs.innerHTML += `<div class="ai-msg user">${msg}</div>`; 
+  input.value = ''; 
   setTimeout(() => { 
     let response = 'Harika soru! Ana AI panelini açmak için "⚡ VİZYON AI\'ı Başlat" butonuna tıklayın.'; 
-    msgs.innerHTML += `<div class="ai-msg bot">⚡ ${response}</div>`; msgs.scrollTop = msgs.scrollHeight; 
+    msgs.innerHTML += `<div class="ai-msg bot">⚡ ${response}</div>`; 
+    msgs.scrollTop = msgs.scrollHeight; 
   }, 600); 
 }
+
 function toggleDownloadMenu() { document.getElementById('downloadMenu').classList.toggle('open'); }
-function downloadApp(platform) { alert(`📱 ${platform.toUpperCase()} uygulaması hazır!`); }
+function downloadApp(platform) { alert(`📱 ${platform.toUpperCase()} uygulaması hazır! Yakında indirebileceksiniz.`); }
 function downloadWebApp() { alert('🌐 PWA kurulumu için Chrome menü → "Uygulama olarak yükle" seçeneğini kullanın.'); }
 
-let uploadedFileContent = null, uploadedFileName = null;
+let uploadedFileContent = null;
+let uploadedFileName = null;
+
 function openVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'flex'; document.getElementById('vizyonAIInput').focus(); }
 function closeVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'none'; }
 function quickAICode(cmd) { document.getElementById('vizyonAIInput').value = cmd; sendVizyonAIAdvanced(); }
-function handleFileUploadAdv(input) { const file = input.files[0]; if(!file) return; const chat = document.getElementById('vizyonAIChat'); chat.innerHTML += `<div class="ai-msg user">📎 Dosya yüklendi: ${file.name}</div>`; const reader = new FileReader(); reader.onload = function(e) { uploadedFileContent = e.target.result; uploadedFileName = file.name; chat.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: Dosyan başarıyla yüklendi! Bu dosya üzerinde ne yapmamı istersin?</div>`; chat.scrollTop = chat.scrollHeight; }; reader.readAsText(file); input.value = ''; }
+
+function handleFileUploadAdv(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const chat = document.getElementById('vizyonAIChat');
+  chat.innerHTML += `<div class="ai-msg user">📎 Dosya yüklendi: ${file.name} (${(file.size/1024).toFixed(1)} KB)</div>`;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    uploadedFileContent = e.target.result;
+    uploadedFileName = file.name;
+    chat.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: Dosyan başarıyla yüklendi!<br><br>Bu dosya üzerinde ne yapmamı istersin? (Özet çıkar, düzenle, analiz et)</div>`;
+    chat.scrollTop = chat.scrollHeight;
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
 async function sendVizyonAIAdvanced() {
-  const input = document.getElementById('vizyonAIInput'); let msg = input.value.trim(); if(!msg && !uploadedFileContent) return;
-  const chat = document.getElementById('vizyonAIChat'); chat.innerHTML += `<div class="ai-msg user">${msg}</div>`; input.value = '';
-  const typingId = 'typing-' + Date.now(); chat.innerHTML += `<div class="ai-msg bot" id="${typingId}">🧠 VİZYON AI: <span style="opacity:0.5">▋ Düşünüyor...</span></div>`; chat.scrollTop = chat.scrollHeight;
-  const searchTriggers = ['dolar', 'euro', 'altin', 'bitcoin', 'haber', 'bugün', 'hava'];
+  const input = document.getElementById('vizyonAIInput');
+  let msg = input.value.trim();
+  if(!msg && !uploadedFileContent) return;
+  
+  const chat = document.getElementById('vizyonAIChat');
+  chat.innerHTML += `<div class="ai-msg user">${msg}</div>`;
+  input.value = '';
+  
+  const typingId = 'typing-' + Date.now();
+  chat.innerHTML += `<div class="ai-msg bot" id="${typingId}">🧠 VİZYON AI: <span style="opacity:0.5">▋ Düşünüyor...</span></div>`;
+  chat.scrollTop = chat.scrollHeight;
+  
+  const searchTriggers = ['dolar', 'euro', 'altin', 'bitcoin', 'haber', 'bugün', 'son dakika', 'hava durumu', 'kaç', 'fiyat', 'kur'];
   const shouldSearch = searchTriggers.some(t => msg.toLowerCase().includes(t));
-  setTimeout(() => {
+  
+  setTimeout(async () => {
     document.getElementById(typingId)?.remove();
     let response = '';
-    if(shouldSearch && SERPAPI_KEY && SERPAPI_KEY.length > 10) { response = `🌐 Canlı arama yapılıyor... SerpApi ile güncel bilgiler getirilebilir.`; }
-    else if(msg.toLowerCase().includes('python')) { response = '🐍 Python kodu yazabilirim! Örnek: "Python\'da hesap makinesi yaz" gibi bir komut ver.'; }
-    else { response = `"${msg}" için VİZYON AI hazır! Her dilde kod yazabilirim, web araması yapabilirim, dosya yükleyip analiz edebilirim.`; }
-    chat.innerHTML += `<div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>:<br><br>${response}</div>`; chat.scrollTop = chat.scrollHeight;
+    
+    if(shouldSearch && SERPAPI_KEY && SERPAPI_KEY.length > 10) {
+      try {
+        const url = `https://serpapi.com/search.json?q=${encodeURIComponent(msg)}&hl=tr&gl=tr&num=5&api_key=${SERPAPI_KEY}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        if(data && !data.error) {
+          response = `🌐 <strong>Canlı Web Arama Sonuçları:</strong><br><br>`;
+          if(data.answer_box) {
+            response += `<div style="background:rgba(0,212,255,.1);border-left:3px solid #00d4ff;padding:12px;margin-bottom:14px">⚡ <strong>Hızlı Cevap:</strong><br>${data.answer_box.answer || data.answer_box.snippet || ''}</div>`;
+          }
+          const results = data.organic_results?.slice(0,3) || [];
+          results.forEach(r => {
+            response += `<div style="margin-bottom:12px;padding:10px;border-left:2px solid #1a3350"><strong>${r.title || ''}</strong><br><span style="font-size:12px;">${r.snippet || ''}</span></div>`;
+          });
+          response += `<br><em style="font-size:11px;">🔍 SerpApi ile canlı arama</em>`;
+        } else {
+          response = `"${msg}" için web araması yapıldı ancak sonuç bulunamadı.`;
+        }
+      } catch(e) {
+        response = `"${msg}" için web araması sırasında hata oluştu.`;
+      }
+    } else if(msg.toLowerCase().includes('python')) {
+      response = '🐍 Python kodu yazabilirim! Örnek: "Python\'da hesap makinesi yaz" gibi bir komut ver.';
+    } else {
+      response = `"${msg}" için VİZYON AI hazır!<br><br>✅ Her dilde kod yazabilirim.<br>✅ Web araması yapabilirim ("dolar kaç").<br>✅ Dosya yükleyip analiz edebilirim.<br><br>Ne yapmamı istersin? 🚀`;
+    }
+    
+    chat.innerHTML += `<div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>:<br><br>${response}</div>`;
+    chat.scrollTop = chat.scrollHeight;
   }, 600);
 }
+
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeVizyonAI(); });
 </script>
 </body>
-</html>
+</html> 
