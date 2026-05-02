@@ -303,6 +303,13 @@ nav {
   color: var(--text2);
   margin-bottom: 48px;
 }
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 48px;
+}
 .btn-primary {
   padding: 16px 36px;
   background: var(--accent);
@@ -344,6 +351,7 @@ nav {
   background: rgba(13,26,38,0.6);
   max-width: 800px;
   margin: 80px auto 0;
+  flex-wrap: wrap;
 }
 .stat-item {
   flex: 1;
@@ -990,6 +998,11 @@ footer {
 }
 .modal-body { padding: 32px; }
 .form-group { margin-bottom: 20px; }
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
 .form-input {
   width: 100%;
   padding: 12px 16px;
@@ -1065,7 +1078,7 @@ footer {
   display: block;
 }
 .user-list, .project-list, .msg-list {
-  max-height: 250px;
+  max-height: 400px;
   overflow-y: auto;
 }
 .user-item, .project-item, .msg-item {
@@ -1128,26 +1141,51 @@ footer {
   border-radius: 8px;
 }
 
-/* MOBİL DÜZENLEMELER (Claude'un önerdiği) */
+.ai-messages-simple {
+  height: 200px;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  margin: 10px 0;
+}
+.ai-input-area-simple {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.ai-input-simple {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
+  font-family: var(--font-code);
+  font-size: 12px;
+}
+
+@media (max-width: 480px) {
+  .form-row { grid-template-columns: 1fr; }
+  .hero-actions { flex-direction: column; align-items: center; }
+  .stats-bar { flex-direction: column; }
+  .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+}
 @media (max-width: 900px) {
   .secret-buttons { display: none; }
   .button-group { gap: 6px; }
-  .nav-cta, .btn-primary-small { 
-    padding: 6px 10px; 
-    font-size: 10px; 
-  }
+  .nav-cta, .btn-primary-small { padding: 6px 10px; font-size: 10px; }
 }
 @media (max-width: 600px) {
   nav { padding: 0 12px; height: auto; padding-top: 10px; padding-bottom: 10px; flex-wrap: wrap; gap: 10px; }
   .logo-text { font-size: 18px; }
   .hero { padding: 150px 24px 60px; }
-  .stats-bar { flex-direction: column; }
-  .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
   .features, .ai-section, .pricing, .testimonials { padding: 60px 24px; }
   .features-grid, .ai-showcase, .pricing-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
   .admin-panel { padding: 15px; }
-  .admin-table { font-size: 12px; }
 }
 </style>
 </head>
@@ -1338,15 +1376,24 @@ footer {
     <div class="admin-stats">
       <div class="stat-card"><span class="stat-number" id="statUsers">0</span><span>Toplam Kullanıcı</span></div>
       <div class="stat-card"><span class="stat-number" id="statProjects">0</span><span>Toplam Proje</span></div>
-      <div class="stat-card"><span class="stat-number" id="statMessages">0</span><span>İletişim Mesajı</span></div>
+      <div class="stat-card"><span class="stat-number" id="statMessages">0</span><span>Okunmamış Mesaj</span></div>
+      <div class="stat-card"><span class="stat-number" id="statRevenue">₺0</span><span>Aylık Gelir</span></div>
       <div class="stat-card"><span class="stat-number">🟢</span><span>Sistem Aktif</span></div>
     </div>
 
     <h3>👥 Kayıtlı Kullanıcılar</h3>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <input id="userSearchInput" type="text" placeholder="İsim, email, şehir, ülke ara..." oninput="searchUsers()" style="flex:1;min-width:200px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;font-family:var(--font-code);font-size:12px;border-radius:6px">
+      <button onclick="loadAdminData()" style="background:var(--accent);color:var(--bg);border:none;padding:8px 16px;cursor:pointer;border-radius:6px;font-size:12px">↻ Yenile</button>
+      <button onclick="exportUsers()" style="background:var(--accent2);color:var(--bg);border:none;padding:8px 16px;cursor:pointer;border-radius:6px;font-size:12px">⬇ CSV İndir</button>
+    </div>
     <div id="usersList" class="user-list"></div>
 
     <h3>📨 İletişim Mesajları</h3>
     <div id="msgList" class="msg-list"></div>
+
+    <h3>🔐 Son Girişler (Konum & Cihaz)</h3>
+    <div id="loginLogs" class="user-list"></div>
 
     <h3>📁 Projeler</h3>
     <div id="projectsList" class="project-list"></div>
@@ -1397,15 +1444,15 @@ footer {
 
 <script>
 // ══════════════════════════════════════════
-// GÜVENLİ API KEYLER (Base64 ile şifrelendi)
+// GÜVENLİ API KEYLER
 // ══════════════════════════════════════════
-const SERPAPI_KEY = atob('ZWVlZDIwYzZjMDllNWEzNDQxMjM4ZTJhZjg5ZGE0ZDQzMGRmZDMxMDQ4MTEyMGM3YjcwMjJjMjBmOWVkMTk1YQ==');
+const SERPAPI_KEY = 'eeed20c6c09e5a3441238e2af89da4d430dfd310481120c7b7022c20f9ed195a';
 const SUPABASE_URL = 'https://dxfwxknohzkdhzyytwdt.supabase.co';
-const SUPABASE_KEY = atob('c2JfcHVibGlzaGFibGVfVXMxSExPd1FvTFQ1OTc4ZFozeU8tUV8tdjBXckxzbA==');
+const SUPABASE_KEY = 'sb_publishable_Us1HLOwQoLT5978dZ3Oy-Q_-v0WrLsl';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ══════════════════════════════════════════
-// GÜVENLİ YÖNETİM ŞİFRELERİ (Base64 ile)
+// YÖNETİM ŞİFRELERİ
 // ══════════════════════════════════════════
 const ADMIN_PASSWORDS = {
   FOUNDER: btoa("Eymen11Amele44"),
@@ -1414,7 +1461,7 @@ const ADMIN_PASSWORDS = {
 };
 
 // ══════════════════════════════════════════
-// CANLI WEB ARAMA (SERPAPI)
+// CANLI WEB ARAMA
 // ══════════════════════════════════════════
 async function webSearch(query, lang = 'tr') {
   try {
@@ -1422,11 +1469,9 @@ async function webSearch(query, lang = 'tr') {
     const response = await fetch(url);
     const data = await response.json();
     if (data.error) return null;
-    
     let html = `🌐 <strong style="color:#00d4ff">Canlı Web Arama Sonuçları:</strong><br><br>`;
     if (data.answer_box) {
-      html += `<div style="background:rgba(0,212,255,.1);border-left:3px solid #00d4ff;padding:12px;margin-bottom:14px">
-        ⚡ <strong>Hızlı Cevap:</strong><br>${data.answer_box.answer || data.answer_box.snippet || ''}</div>`;
+      html += `<div style="background:rgba(0,212,255,.1);border-left:3px solid #00d4ff;padding:12px;margin-bottom:14px">⚡ <strong>Hızlı Cevap:</strong><br>${data.answer_box.answer || data.answer_box.snippet || ''}</div>`;
     }
     const results = data.organic_results?.slice(0,4) || [];
     results.forEach(r => {
@@ -1451,7 +1496,7 @@ async function webSearch(query, lang = 'tr') {
 }
 
 // ══════════════════════════════════════════
-// GÜVENLİ KAYIT OL (Şifre hash'li)
+// KAYIT OL
 // ══════════════════════════════════════════
 async function handleRegister() {
   const name = document.getElementById('rName')?.value.trim();
@@ -1481,19 +1526,19 @@ async function handleRegister() {
 }
 
 // ══════════════════════════════════════════
-// GÜVENLİ GİRİŞ YAP (Şifre kontrolü)
+// GİRİŞ YAP (Konum + IP + Cihaz takibi)
 // ══════════════════════════════════════════
 async function handleLogin() {
   const email = document.getElementById('lEmail')?.value.trim();
   const pass = document.getElementById('lPass')?.value;
   if(!email || !pass){ alert('Tüm alanları doldurun!'); return; }
   
-  // Özel admin kontrolü
+  // Admin girişi
   if(email === 'admin@vizyon2027.com' && pass === 'Eymen2027!'){
     localStorage.setItem('v27_admin', '1');
+    pendingAdminRole = 'ADMIN';
     closeModal();
     openAdminPanel();
-    alert('✅ Admin girişi başarılı!');
     return;
   }
   
@@ -1502,6 +1547,28 @@ async function handleLogin() {
       .select('*').eq('email', email).single();
     if(error || !data){ alert('E-posta veya şifre hatalı!'); return; }
     if(data.password_hash !== btoa(pass)){ alert('E-posta veya şifre hatalı!'); return; }
+    if(data.is_banned){ alert('❌ Hesabınız yasaklandı. Destek için iletişime geçin.'); return; }
+    
+    // Konum ve cihaz bilgisi
+    try {
+      const geo = await fetch('https://ipapi.co/json/');
+      const loc = await geo.json();
+      await supabaseClient.from('login_logs').insert([{
+        user_email: email,
+        city: loc.city,
+        country: loc.country_name,
+        ip: loc.ip,
+        device: navigator.userAgent.substring(0,100),
+        created_at: new Date()
+      }]);
+      await supabaseClient.from('users').update({
+        last_login: new Date(),
+        city: loc.city,
+        country: loc.country_name,
+        ip_address: loc.ip
+      }).eq('id', data.id);
+    } catch(e) {}
+    
     localStorage.setItem('v27_session', JSON.stringify(data));
     closeModal();
     alert('✅ Hoş geldin ' + data.name + '!');
@@ -1509,44 +1576,146 @@ async function handleLogin() {
 }
 
 // ══════════════════════════════════════════
-// YÖNETİM PANELİ (Şifreli)
+// YÖNETİM PANELİ VERİLERİ
 // ══════════════════════════════════════════
-let pendingAdminRole = null;
-function showAuthPanel(role) { pendingAdminRole = role; document.getElementById('authRoleTitle').innerHTML = `🔐 ${role} GİRİŞİ`; document.getElementById('authPanelOverlay').classList.add('open'); document.getElementById('authPassword').value = ''; }
-function closeAuthPanel() { document.getElementById('authPanelOverlay').classList.remove('open'); pendingAdminRole = null; }
-function submitAuth() { 
-  const entered = btoa(document.getElementById('authPassword').value);
-  if(entered === ADMIN_PASSWORDS[pendingAdminRole]) { 
-    closeAuthPanel(); 
-    openAdminPanel(); 
-  } else { 
-    alert("❌ Şifre hatalı!"); 
-  } 
-}
+let _allUsers = [];
 
-// ══════════════════════════════════════════
-// ADMIN PANELİ VERİLERİ
-// ══════════════════════════════════════════
 async function loadAdminData() {
   try {
     const { data: users } = await supabaseClient.from('users').select('*').order('created_at', { ascending: false });
     const { data: messages } = await supabaseClient.from('messages').select('*').order('created_at', { ascending: false });
-    const usersList = document.getElementById('usersList');
-    if(usersList && users){
-      usersList.innerHTML = users.map(u => `<div class="user-item"><div><strong>${u.name}</strong><br><span style="font-size:11px;">${u.email}</span><br><span class="badge">${u.plan || 'free'}</span></div><button onclick="deleteUser('${u.id}')" style="background:#ff4757;">🗑️ Sil</button></div>`).join('');
-      document.getElementById('statUsers').innerText = users.length;
-    }
+    const { data: logs } = await supabaseClient.from('login_logs').select('*').order('created_at', { ascending: false }).limit(20);
+    
+    document.getElementById('statUsers').innerText = users?.length || 0;
+    document.getElementById('statMessages').innerText = messages?.filter(m=>!m.read).length || 0;
+    document.getElementById('statProjects').innerText = localData.projects.length;
+    
+    const proCount = users?.filter(u=>u.plan==='pro').length || 0;
+    const teamCount = users?.filter(u=>u.plan==='team').length || 0;
+    const rev = (proCount*299)+(teamCount*899);
+    const revEl = document.getElementById('statRevenue');
+    if(revEl) revEl.innerText = '₺'+rev.toLocaleString('tr-TR');
+    
+    _allUsers = users || [];
+    renderUserTable(users || []);
+    
     const msgList = document.getElementById('msgList');
     if(msgList && messages){
-      msgList.innerHTML = messages.map(m => `<div class="msg-item"><div><strong>${m.name}</strong><br><span style="font-size:11px;">${m.email}</span><br><span style="font-size:10px;">${m.topic || 'Genel'}</span><br><small>${m.msg?.substring(0,100)}...</small></div><button onclick="markRead('${m.id}')" style="background:#00d4ff">Okundu İşaretle</button></div>`).join('');
-      document.getElementById('statMessages').innerText = messages.filter(m => !m.read).length;
+      if(!messages.length){
+        msgList.innerHTML = '<div style="color:var(--text3);padding:16px">Henüz mesaj yok.</div>';
+      } else {
+        msgList.innerHTML = messages.map(m => `
+          <div class="msg-item" style="${!m.read?'border-left:3px solid var(--accent2)':''}">
+            <div style="flex:1">
+              <strong style="color:var(--text)">${m.name||'—'}</strong>
+              <span style="font-size:11px;color:var(--text3);margin-left:8px">${m.email||''}</span>
+              <br><span style="font-size:11px;color:var(--accent)">${m.topic||'Genel'}</span>
+              <br><span style="font-size:12px;color:var(--text2)">${m.msg?.substring(0,120)||''}${(m.msg?.length||0)>120?'...':''}</span>
+              <br><span style="font-size:10px;color:var(--text3)">${m.created_at?new Date(m.created_at).toLocaleString('tr-TR'):''}</span>
+            </div>
+            <div style="display:flex;gap:6px;flex-direction:column">
+              ${!m.read?`<button onclick="markRead('${m.id}')" style="background:var(--accent2);color:var(--bg);border:none;padding:6px 10px;cursor:pointer;font-size:11px;border-radius:6px">✓ Okundu</button>`:''}
+              <button onclick="replyMsg('${m.email}')" style="background:var(--accent);color:var(--bg);border:none;padding:6px 10px;cursor:pointer;font-size:11px;border-radius:6px">✉ Yanıtla</button>
+              <button onclick="deleteMsg('${m.id}')" style="background:var(--danger);color:#fff;border:none;padding:6px 10px;cursor:pointer;font-size:11px;border-radius:6px">🗑 Sil</button>
+            </div>
+          </div>`).join('');
+      }
     }
-  } catch(e) { console.log(e); }
+    
+    const logsEl = document.getElementById('loginLogs');
+    if(logsEl && logs){
+      if(!logs.length){
+        logsEl.innerHTML = '<div style="color:var(--text3);padding:16px">Henüz giriş logu yok.</div>';
+      } else {
+        logsEl.innerHTML = logs.map(l=>`
+          <div class="user-item">
+            <div>
+              <strong style="color:var(--accent)">${l.user_email||'—'}</strong>
+              <br><span style="font-size:12px">📍 ${l.city||'?'}, ${l.country||'?'}</span>
+              <br><span style="font-size:11px;color:var(--text3)">🌐 ${l.ip||'?'}</span>
+              <br><span style="font-size:10px;color:var(--text3)">${l.created_at?new Date(l.created_at).toLocaleString('tr-TR'):''}</span>
+            </div>
+            <span style="font-size:10px;color:var(--text3);max-width:150px;overflow:hidden;text-overflow:ellipsis">${l.device?.substring(0,60)||''}</span>
+          </div>`).join('');
+      }
+    }
+  } catch(e) { console.log('Admin veri yükleme hatası:', e); }
 }
-async function deleteUser(id) { if(!confirm('Silinsin mi?')) return; await supabaseClient.from('users').delete().eq('id', id); loadAdminData(); alert('Kullanıcı silindi.'); }
+
+function renderUserTable(users) {
+  const usersList = document.getElementById('usersList');
+  if(!usersList) return;
+  if(!users.length){
+    usersList.innerHTML = '<div style="color:var(--text3);padding:16px">Kullanıcı bulunamadı.</div>';
+    return;
+  }
+  usersList.innerHTML = users.map(u => `
+    <div class="user-item" style="${u.is_banned?'opacity:0.5;border-left:3px solid var(--danger)':''}">
+      <div style="flex:1">
+        <strong style="color:var(--text)">${u.name||'—'}</strong>
+        <span class="badge" style="margin-left:8px;background:${u.plan==='pro'?'var(--accent)':u.plan==='team'?'var(--purple)':'var(--border)'}">${(u.plan||'free').toUpperCase()}</span>
+        ${u.is_banned?'<span class="badge" style="background:var(--danger);margin-left:4px">YASAKLI</span>':''}
+        <br><span style="font-size:11px;color:var(--text3)">${u.email||''}</span>
+        <br><span style="font-size:11px;color:var(--text2)">📍 ${u.city||'?'}, ${u.country||'?'}</span>
+        <br><span style="font-size:10px;color:var(--text3)">Son giriş: ${u.last_login?new Date(u.last_login).toLocaleString('tr-TR'):'Hiç'}</span>
+        <br><span style="font-size:10px;color:var(--text3)">Kayıt: ${u.created_at?new Date(u.created_at).toLocaleDateString('tr-TR'):''}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <select onchange="changePlan('${u.id}',this.value)" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:4px 8px;font-size:11px;border-radius:6px">
+          <option value="free" ${u.plan==='free'?'selected':''}>Free</option>
+          <option value="pro" ${u.plan==='pro'?'selected':''}>Pro ₺299</option>
+          <option value="team" ${u.plan==='team'?'selected':''}>Team ₺899</option>
+        </select>
+        <button onclick="toggleBan('${u.id}','${u.email}',${u.is_banned})" style="background:${u.is_banned?'var(--accent2)':'#ffa500'};color:var(--bg);border:none;padding:5px 8px;cursor:pointer;font-size:10px;border-radius:6px">
+          ${u.is_banned?'✅ Yasağı Kaldır':'🚫 Yasakla'}
+        </button>
+        <button onclick="sendUserEmail('${u.email}')" style="background:var(--accent);color:var(--bg);border:none;padding:5px 8px;cursor:pointer;font-size:10px;border-radius:6px">✉ Mail At</button>
+        <button onclick="deleteUser('${u.id}')" style="background:var(--danger);color:#fff;border:none;padding:5px 8px;cursor:pointer;font-size:10px;border-radius:6px">🗑 Sil</button>
+      </div>
+    </div>`).join('');
+}
+
+function searchUsers() {
+  const q = document.getElementById('userSearchInput')?.value.toLowerCase() || '';
+  const filtered = (_allUsers || []).filter(u =>
+    u.name?.toLowerCase().includes(q) ||
+    u.email?.toLowerCase().includes(q) ||
+    u.city?.toLowerCase().includes(q) ||
+    u.country?.toLowerCase().includes(q) ||
+    u.plan?.toLowerCase().includes(q)
+  );
+  renderUserTable(filtered);
+}
+
+async function changePlan(id, plan) {
+  await supabaseClient.from('users').update({ plan }).eq('id', id);
+  loadAdminData();
+  alert(`✅ Plan güncellendi: ${plan.toUpperCase()}`);
+}
+
+async function toggleBan(id, email, isBanned) {
+  const newBan = !isBanned;
+  await supabaseClient.from('users').update({ is_banned: newBan }).eq('id', id);
+  loadAdminData();
+  alert(newBan ? `🚫 ${email} yasaklandı!` : `✅ ${email} yasağı kaldırıldı!`);
+}
+
+function sendUserEmail(email) { window.open(`mailto:${email}?subject=Vizyon 2027 - Bilgilendirme&body=Merhaba,%0A%0AVizyon 2027 ekibinden size ulaşıyoruz.%0A%0ASaygılarımızla,%0AMuhammed Eymen`, '_blank'); }
+function replyMsg(email) { window.open(`mailto:${email}?subject=Vizyon 2027 - Yanıt`, '_blank'); }
+async function deleteMsg(id) { if(!confirm('Mesaj silinsin mi?')) return; await supabaseClient.from('messages').delete().eq('id', id); loadAdminData(); alert('Mesaj silindi.'); }
+async function deleteUser(id) { if(!confirm('Kullanıcı silinsin mi?')) return; await supabaseClient.from('users').delete().eq('id', id); loadAdminData(); alert('Kullanıcı silindi.'); }
 async function markRead(id) { await supabaseClient.from('messages').update({ read: true }).eq('id', id); loadAdminData(); alert('Okundu işaretlendi.'); }
-function openAdminPanel() { document.getElementById('adminOverlay').classList.add('open'); document.getElementById('panelRoleInfo').innerHTML = `✅ ${pendingAdminRole} olarak giriş yaptınız.`; loadAdminData(); renderLocalPanels(); }
-function closeAdminPanel() { document.getElementById('adminOverlay').classList.remove('open'); pendingAdminRole = null; }
+
+function exportUsers() {
+  const users = _allUsers || [];
+  const csv = 'İsim,Email,Plan,Şehir,Ülke,Son Giriş,Kayıt\n' +
+    users.map(u => `"${u.name}","${u.email}","${u.plan||'free'}","${u.city||''}","${u.country||''}","${u.last_login?new Date(u.last_login).toLocaleString('tr-TR'):''}","${u.created_at?new Date(u.created_at).toLocaleDateString('tr-TR'):''}"`).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
+  a.download = 'vizyon2027_kullanicilar.csv';
+  a.click();
+  alert('✅ CSV indirildi!');
+}
 
 // ══════════════════════════════════════════
 // YEREL VERİ YÖNETİMİ
@@ -1590,17 +1759,86 @@ function restoreFromTrash(id) {
 }
 function permanentDelete(id) { localData.trash = localData.trash.filter(t => t.id !== id); saveLocalData(); }
 
+// ══════════════════════════════════════════
+// YÖNETİM PANELİ ŞİFRE
+// ══════════════════════════════════════════
+let pendingAdminRole = null;
+function showAuthPanel(role) { pendingAdminRole = role; document.getElementById('authRoleTitle').innerHTML = `🔐 ${role} GİRİŞİ`; document.getElementById('authPanelOverlay').classList.add('open'); document.getElementById('authPassword').value = ''; }
+function closeAuthPanel() { document.getElementById('authPanelOverlay').classList.remove('open'); pendingAdminRole = null; }
+function submitAuth() { 
+  const entered = btoa(document.getElementById('authPassword').value);
+  if(entered === ADMIN_PASSWORDS[pendingAdminRole]) { 
+    closeAuthPanel(); 
+    openAdminPanel(); 
+  } else { 
+    alert("❌ Şifre hatalı!"); 
+  } 
+}
+function openAdminPanel() { document.getElementById('adminOverlay').classList.add('open'); document.getElementById('panelRoleInfo').innerHTML = `✅ ${pendingAdminRole} olarak giriş yaptınız.`; loadAdminData(); renderLocalPanels(); }
+function closeAdminPanel() { document.getElementById('adminOverlay').classList.remove('open'); pendingAdminRole = null; }
+
 function sendAdminAI() { 
-  const input = document.getElementById('adminAiInput'); const q = input.value.trim(); if(!q) return; 
+  const input = document.getElementById('adminAiInput'); 
+  const q = input.value.trim(); 
+  if(!q) return; 
   const container = document.getElementById('adminAiMessages'); 
-  container.innerHTML += `<div class="ai-msg user">${q}</div>`; input.value = ''; 
-  setTimeout(() => { 
-    let answer = `"${q}" için VİZYON AI hazır! Python, React, HTML kodları yazabilirim.`; 
-    if(q.toLowerCase().includes('dolar')) answer = '💰 Dolar kuru için web araması yapılıyor...'; 
+  container.innerHTML += `<div class="ai-msg user" style="align-self:flex-end;text-align:right">${q}</div>`; 
+  input.value = ''; 
+  container.scrollTop = container.scrollHeight;
+  
+  const searchTriggers = ['dolar', 'euro', 'altın', 'bitcoin', 'haber', 'bugün', 'fiyat', 'kur', 'hava'];
+  const shouldSearch = searchTriggers.some(t => q.toLowerCase().includes(t));
+  
+  setTimeout(async () => { 
+    let answer = '';
+    if(shouldSearch) {
+      const webRes = await webSearch(q);
+      answer = webRes || `"${q}" için sonuç bulunamadı.`;
+    } else {
+      answer = `"${q}" komutu alındı. Kullanıcı: ${document.getElementById('statUsers').innerText}, Mesaj: ${document.getElementById('statMessages').innerText} adet.`;
+    }
     container.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: ${answer}</div>`; 
     container.scrollTop = container.scrollHeight; 
   }, 500); 
 }
+
+// ══════════════════════════════════════════
+// CURSOR, PROGRESS, PARTICLES, COUNTERS
+// ══════════════════════════════════════════
+const cursor = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursorRing');
+let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; cursor.style.left = (mouseX - 6) + 'px'; cursor.style.top = (mouseY - 6) + 'px'; });
+function animateCursorRing() { ringX += (mouseX - ringX - 18) * 0.12; ringY += (mouseY - ringY - 18) * 0.12; cursorRing.style.left = ringX + 'px'; cursorRing.style.top = ringY + 'px'; requestAnimationFrame(animateCursorRing); }
+animateCursorRing();
+window.addEventListener('scroll', () => { const doc = document.documentElement; const scrollTop = window.scrollY || doc.scrollTop; const scrollHeight = doc.scrollHeight - doc.clientHeight; document.getElementById('progressBar').style.width = (scrollTop / scrollHeight) * 100 + '%'; });
+for (let i = 0; i < 40; i++) { const p = document.createElement('div'); p.className = 'particle'; p.style.cssText = `left:${Math.random()*100}%;animation-duration:${8+Math.random()*15}s;animation-delay:${-Math.random()*20}s;`; document.getElementById('particles').appendChild(p); }
+function animateCounter(el, target) { let current = 0; const step = Math.ceil(target / 50); const interval = setInterval(() => { current += step; if (current >= target) { el.innerText = target.toLocaleString('tr-TR'); clearInterval(interval); } else { el.innerText = current.toLocaleString('tr-TR'); } }, 30); }
+setTimeout(() => { animateCounter(document.getElementById('counter1'), 48200); animateCounter(document.getElementById('counter2'), 1250000); animateCounter(document.getElementById('counter3'), 87400); }, 500);
+function openModal(type) { document.getElementById('authModal').classList.add('open'); switchTab(type === 'login' ? 'login' : 'register'); }
+function closeModal() { document.getElementById('authModal').classList.remove('open'); }
+function switchTab(tab) {
+  document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+  const title = document.getElementById('modalTitle');
+  if(title) title.textContent = tab === 'login' ? 'Giriş Yap' : 'Hesap Oluştur';
+}
+function toggleAiPanel() { document.getElementById('aiPanel').classList.toggle('open'); }
+function quickAsk(topic) { document.getElementById('aiInput').value = topic; sendAiMessage(); }
+function sendAiMessage() { 
+  const input = document.getElementById('aiInput'), msg = input.value.trim(); 
+  if(!msg) return; const msgs = document.getElementById('aiMessages'); 
+  msgs.innerHTML += `<div class="ai-msg user">${msg}</div>`; input.value = ''; 
+  setTimeout(() => { 
+    let response = 'Harika soru! Ana AI panelini açmak için "⚡ VİZYON AI\'ı Başlat" butonuna tıklayın.'; 
+    msgs.innerHTML += `<div class="ai-msg bot">⚡ ${response}</div>`; msgs.scrollTop = msgs.scrollHeight; 
+  }, 600); 
+}
+function toggleDownloadMenu() { document.getElementById('downloadMenu').classList.toggle('open'); }
+function downloadApp(platform) { alert(`📱 ${platform.toUpperCase()} uygulaması yakında yayınlanacak!`); }
+function downloadWebApp() { alert('🌐 PWA kurulumu için Chrome menü → "Uygulama olarak yükle" seçeneğini kullanın.'); }
 
 // ══════════════════════════════════════════
 // VİZYON AI ANA PANEL
@@ -1740,36 +1978,6 @@ export default TodoApp;
   }, 600);
 }
 
-// ══════════════════════════════════════════
-// CURSOR, PROGRESS, PARTICLES, COUNTERS
-// ══════════════════════════════════════════
-const cursor = document.getElementById('cursor');
-const cursorRing = document.getElementById('cursorRing');
-let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
-document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; cursor.style.left = (mouseX - 6) + 'px'; cursor.style.top = (mouseY - 6) + 'px'; });
-function animateCursorRing() { ringX += (mouseX - ringX - 18) * 0.12; ringY += (mouseY - ringY - 18) * 0.12; cursorRing.style.left = ringX + 'px'; cursorRing.style.top = ringY + 'px'; requestAnimationFrame(animateCursorRing); }
-animateCursorRing();
-window.addEventListener('scroll', () => { const doc = document.documentElement; const scrollTop = window.scrollY || doc.scrollTop; const scrollHeight = doc.scrollHeight - doc.clientHeight; document.getElementById('progressBar').style.width = (scrollTop / scrollHeight) * 100 + '%'; });
-for (let i = 0; i < 40; i++) { const p = document.createElement('div'); p.className = 'particle'; p.style.cssText = `left:${Math.random()*100}%;animation-duration:${8+Math.random()*15}s;animation-delay:${-Math.random()*20}s;`; document.getElementById('particles').appendChild(p); }
-function animateCounter(el, target) { let current = 0; const step = Math.ceil(target / 50); const interval = setInterval(() => { current += step; if (current >= target) { el.innerText = target.toLocaleString('tr-TR'); clearInterval(interval); } else { el.innerText = current.toLocaleString('tr-TR'); } }, 30); }
-setTimeout(() => { animateCounter(document.getElementById('counter1'), 48200); animateCounter(document.getElementById('counter2'), 1250000); animateCounter(document.getElementById('counter3'), 87400); }, 500);
-function openModal(type) { document.getElementById('authModal').classList.add('open'); switchTab(type === 'login' ? 'login' : 'register'); }
-function closeModal() { document.getElementById('authModal').classList.remove('open'); }
-function switchTab(tab) { document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none'; document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none'; document.getElementById('tabLogin').classList.toggle('active', tab === 'login'); document.getElementById('tabRegister').classList.toggle('active', tab === 'register'); }
-function toggleAiPanel() { document.getElementById('aiPanel').classList.toggle('open'); }
-function quickAsk(topic) { document.getElementById('aiInput').value = topic; sendAiMessage(); }
-function sendAiMessage() { 
-  const input = document.getElementById('aiInput'), msg = input.value.trim(); 
-  if(!msg) return; const msgs = document.getElementById('aiMessages'); 
-  msgs.innerHTML += `<div class="ai-msg user">${msg}</div>`; input.value = ''; 
-  setTimeout(() => { 
-    let response = 'Harika soru! Ana AI panelini açmak için "⚡ VİZYON AI\'ı Başlat" butonuna tıklayın.'; 
-    msgs.innerHTML += `<div class="ai-msg bot">⚡ ${response}</div>`; msgs.scrollTop = msgs.scrollHeight; 
-  }, 600); 
-}
-function toggleDownloadMenu() { document.getElementById('downloadMenu').classList.toggle('open'); }
-function downloadApp(platform) { alert(`📱 ${platform.toUpperCase()} uygulaması yakında yayınlanacak!`); }
-function downloadWebApp() { alert('🌐 PWA kurulumu için Chrome menü → "Uygulama olarak yükle" seçeneğini kullanın.'); }
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeVizyonAI(); });
 </script>
 </body>
