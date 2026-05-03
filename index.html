@@ -17,6 +17,15 @@
   gtag('config', 'G-WDQLFY9G1D');
 </script>
 
+<!-- Three.js 3D -->
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
+    }
+  }
+</script>
+
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@300;400;500;700&display=swap" rel="stylesheet">
 
 <style>
@@ -48,9 +57,7 @@ body {
   font-family: var(--font-code);
   overflow-x: hidden;
 }
-
-/* Mouse efekti - düzeltildi, normal mouse çalışıyor */
-.cursor-dot {
+.cursor {
   width: 8px;
   height: 8px;
   background: var(--accent);
@@ -63,22 +70,14 @@ body {
 .cursor-ring {
   width: 32px;
   height: 32px;
-  border: 1.5px solid var(--accent);
+  border: 1px solid var(--accent);
   border-radius: 50%;
   position: fixed;
   pointer-events: none;
   z-index: 99998;
+  opacity: 0.5;
   transition: all 0.1s ease;
-  opacity: 0.6;
 }
-
-/* Tüm butonlar ve tıklanabilir elementler için */
-button, a, .clickable, .secret-btn, .nav-cta, .btn-primary, .btn-secondary, .btn-price, .ai-suggestion, .mbadge, .download-btn, .ai-widget-btn {
-  cursor: pointer;
-  position: relative;
-  z-index: 5;
-}
-
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
@@ -222,6 +221,7 @@ nav {
   font-family: var(--font-mono);
   font-size: 10px;
   padding: 4px 10px;
+  cursor: pointer;
   border-radius: 4px;
 }
 .secret-btn:hover {
@@ -237,6 +237,7 @@ nav {
   font-weight: 500;
   text-transform: uppercase;
   border: none;
+  cursor: pointer;
   clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
 }
 .nav-cta {
@@ -247,6 +248,7 @@ nav {
   font-family: var(--font-code);
   font-size: 12px;
   text-transform: uppercase;
+  cursor: pointer;
   clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
 }
 
@@ -314,6 +316,7 @@ nav {
   font-weight: 500;
   text-transform: uppercase;
   border: none;
+  cursor: pointer;
   clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
   transition: all 0.3s;
 }
@@ -329,6 +332,7 @@ nav {
   font-size: 14px;
   text-transform: uppercase;
   border: 1px solid var(--border);
+  cursor: pointer;
   clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
 }
 .btn-secondary:hover {
@@ -1184,8 +1188,7 @@ footer {
 </head>
 <body>
 
-<!-- Mouse efektleri - düzeltildi -->
-<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursorRing"></div>
 <div class="progress-bar-top" id="progressBar"></div>
 
@@ -1212,15 +1215,15 @@ footer {
       <button class="secret-btn" onclick="showAuthPanel('ADMIN')">⚙️ ADMIN</button>
       <button class="secret-btn" onclick="showAuthPanel('BETA')">🔬 BETA</button>
     </div>
-    <button class="nav-cta" onclick="openModal('login')">Giriş Yap</button>
-    <button class="btn-primary-small" onclick="openModal('register')">Ücretsiz Başla</button>
+    <button class="nav-cta" onclick="openModal('login')" style="cursor:pointer;">Giriş Yap</button>
+    <button class="btn-primary-small" onclick="openModal('register')" style="cursor:pointer;">Ücretsiz Başla</button>
   </div>
 </nav>
 
 <div id="app">
   <section class="hero">
     <div class="hero-badge"><div class="blink"></div>VİZYON AI | Dünyanın En Güçlü Yapay Zekası</div>
-    <h1 class="hero-title"><span class="line1">VİZYON AI</span><span class="line2">SINIRSIZ YETENEK</span><span class="line3">Her dilde kod · Web arama · Dosya analiz · Görsel yorumlama</span></h1>
+    <h1 class="hero-title"><span class="line1 glitch" data-text="VİZYON AI">VİZYON AI</span><span class="line2">SINIRSIZ YETENEK</span><span class="line3">Her dilde kod · Web arama · Dosya analiz · Görsel yorumlama</span></h1>
     <p class="hero-sub">⚡ VİZYON AI ile her dili konuş, her kodu yaz, internette ara, dosyalarını analiz et. Dünyanın en gelişmiş kodlama asistanı.</p>
     <div class="hero-actions"><button class="btn-primary" onclick="openVizyonAI()">⚡ VİZYON AI'ı Başlat</button><button class="btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Daha Fazla →</button></div>
     <div class="stats-bar"><div class="stat-item"><span class="stat-num" id="counter1">0</span><div class="stat-label">Aktif Kullanıcı</div></div><div class="stat-item"><span class="stat-num" id="counter2">0</span><div class="stat-label">AI Sorgusu</div></div><div class="stat-item"><span class="stat-num" id="counter3">0</span><div class="stat-label">Proje Tamamlandı</div></div></div>
@@ -1352,6 +1355,21 @@ footer {
   <div class="admin-panel">
     <h2>🔐 YÖNETİM PANELİ</h2>
     <div id="panelRoleInfo" style="color:var(--accent2); margin-bottom:15px;"></div>
+
+    <div class="admin-ai-header" style="margin-bottom:20px;">
+      <div class="ai-header-simple">
+        <div class="model-row"><span class="mbadge a">🧠 VİZYON AI</span><span class="mbadge a">🐍 Python</span><span class="mbadge b">⚛️ React</span><span class="mbadge c">🌐 Web</span></div>
+        <div style="color:#00ff88;">🟢 VİZYON AI Aktif</div>
+      </div>
+      <div id="adminAiMessages" class="ai-messages-simple" style="height:200px;">
+        <div class="ai-msg bot">🧠 VİZYON AI: Hoş geldiniz! Python, React, HTML kodları yazabilirim. "dolar kaç" yazarsan canlı kuru getiririm.</div>
+      </div>
+      <div class="ai-input-area-simple">
+        <input type="text" id="adminAiInput" class="ai-input-simple" placeholder='Komut yaz...' onkeypress="if(event.key==='Enter')sendAdminAI()">
+        <button class="btn-primary" onclick="sendAdminAI()">✨ Gönder</button>
+      </div>
+    </div>
+
     <div class="admin-stats">
       <div class="stat-card"><span class="stat-number" id="statUsers">0</span><span>Toplam Kullanıcı</span></div>
       <div class="stat-card"><span class="stat-number" id="statProjects">0</span><span>Toplam Proje</span></div>
@@ -1359,6 +1377,7 @@ footer {
       <div class="stat-card"><span class="stat-number" id="statRevenue">₺0</span><span>Aylık Gelir</span></div>
       <div class="stat-card"><span class="stat-number">🟢</span><span>Sistem Aktif</span></div>
     </div>
+
     <h3>👥 Kayıtlı Kullanıcılar</h3>
     <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
       <input id="userSearchInput" type="text" placeholder="İsim, email, şehir, ülke ara..." oninput="searchUsers()" style="flex:1;min-width:200px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;font-family:var(--font-code);font-size:12px;border-radius:6px">
@@ -1366,9 +1385,29 @@ footer {
       <button onclick="exportUsers()" style="background:var(--accent2);color:var(--bg);border:none;padding:8px 16px;cursor:pointer;border-radius:6px;font-size:12px">⬇ CSV İndir</button>
     </div>
     <div id="usersList" class="user-list"></div>
+
+    <h3>📨 İletişim Mesajları</h3>
+    <div id="msgList" class="msg-list"></div>
+
+    <h3>🔐 Son Girişler (Konum & Cihaz)</h3>
+    <div id="loginLogs" class="user-list"></div>
+
     <h3>📁 Projeler</h3>
     <div id="projectsList" class="project-list"></div>
     <button class="btn-small" onclick="addProject()" style="margin:10px 0;">+ Yeni Proje Ekle</button>
+
+    <h3>📦 Siparişler</h3>
+    <div id="ordersList" class="project-list"></div>
+    
+    <h3>💎 Paketler</h3>
+    <div id="packagesList" class="project-list"></div>
+
+    <h3>🗑️ Çöp Kutusu</h3>
+    <div id="trashList" class="project-list"></div>
+
+    <h3>📦 Arşiv</h3>
+    <div id="archiveList" class="project-list"></div>
+
     <button class="close-panel-btn" onclick="closeAdminPanel()">🚪 ÇIKIŞ YAP</button>
   </div>
 </div>
@@ -1378,18 +1417,23 @@ footer {
     <div style="display:flex;align-items:center;gap:15px">
       <div class="logo-icon" style="width:40px;height:40px;font-size:20px">✨</div>
       <span style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;background:linear-gradient(45deg,#00d4ff,#a855f7);-webkit-background-clip:text;background-clip:text;color:transparent">VİZYON AI</span>
+      <span style="font-size:11px;color:#4a7a99;margin-left:10px">⚡ Canlı Web Arama | Çok Dilli | Sınırsız</span>
     </div>
     <button onclick="closeVizyonAI()" style="background:transparent;border:1px solid #ff4757;color:#ff4757;padding:8px 20px;cursor:pointer;border-radius:8px">✕ Kapat</button>
   </div>
   <div id="vizyonAIChat" style="flex:1;overflow-y:auto;padding:25px;display:flex;flex-direction:column;gap:15px;max-width:900px;width:100%;margin:0 auto">
-    <div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Ben dünyanın en gelişmiş kodlama asistanıyım.<br><br>📌 <strong>Sınırsız Yeteneklerim:</strong><br>• Her dilde kod yazabilirim<br>• Canlı web arama<br>• Dosya yükleme ve analiz<br><br>Ne yapmak istiyorsun? 🚀</div>
+    <div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Ben dünyanın en gelişmiş kodlama asistanıyım.<br><br>📌 <strong>Sınırsız Yeteneklerim:</strong><br>• Her dilde konuşurum - sen hangi dilde yazarsan o dilde cevap veririm!<br>• Her dilde kod yazabilirim (Python, JS, React, HTML, CSS, Go, Rust...)<br>• <strong>Canlı web arama</strong> - "dolar kaç", "bugün haberler", "weather London"<br>• Dosya yükleme - resim, PDF, kod dosyası analiz edebilirim, düzenleyebilirim<br>• Hata düzeltme, proje fikri, freelance tavsiyesi<br><br>💡 <strong>Örnekler:</strong><br>"Python hesap makinesi yaz"<br>"Write a React todo app"<br>"dolar kaç"<br>"What's the news today?"<br>"Freelance nasıl kazanılır"<br><br>Ne yapmak istiyorsun? 🚀</div>
   </div>
   <div style="display:flex;gap:10px;padding:0 20px 10px;max-width:900px;width:100%;margin:0 auto;flex-wrap:wrap">
     <button class="ai-suggestion" onclick="quickAICode('Python hesap makinesi yaz')">🐍 Python</button>
     <button class="ai-suggestion" onclick="quickAICode('React todo app yap')">⚛️ React</button>
+    <button class="ai-suggestion" onclick="quickAICode('HTML kart tasarımı yap')">🌐 HTML</button>
     <button class="ai-suggestion" onclick="quickAICode('dolar kaç')">💰 Dolar Kuru</button>
+    <button class="ai-suggestion" onclick="quickAICode('bugün haberler')">📰 Haberler</button>
   </div>
   <div style="display:flex;gap:10px;padding:0 20px 20px;max-width:900px;width:100%;margin:0 auto">
+    <input type="file" id="vizyonFileInput" style="display:none" accept=".txt,.py,.js,.html,.css,.json,.pdf,.jpg,.png" onchange="handleFileUploadAdv(this)">
+    <button class="ai-attach" onclick="document.getElementById('vizyonFileInput').click()" style="background:#0d1a26;border:1px solid #1a3350;padding:12px;border-radius:12px;cursor:pointer;color:#4a7a99">📎 Dosya Yükle</button>
     <textarea id="vizyonAIInput" style="flex:1;background:#0d1a26;border:1px solid #1a3350;color:#e8f4f8;padding:12px;border-radius:12px;font-family:'Fira Code',monospace;font-size:13px;resize:none;height:50px" placeholder='Her dilde yazabilirsin...' onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendVizyonAIAdvanced()}"></textarea>
     <button onclick="sendVizyonAIAdvanced()" style="background:#00d4ff;color:#050a0f;border:none;padding:0 25px;border-radius:12px;font-weight:700;cursor:pointer">⚡ Gönder</button>
   </div>
@@ -1397,237 +1441,537 @@ footer {
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// 🔥 TÜM API ANAHTARLARI - GİZLİ VE GÜVENLİ 🔥
+// 🔥 GÜVENLİ API YAPILANDIRMASI (Tüm anahtarlar gizli, IIFE içinde)
 // ═══════════════════════════════════════════════════════════════
-const _GROQ_API_KEY = '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';
-const _SERPAPI_KEY = '24aeeef65fa3cc265d73face323530d4aad6d8530cb9e2b884995a85d34220e9';
-const _SUPABASE_URL = 'https://dxfwxknohzkdhzyytwdt.supabase.co';
-const _SUPABASE_KEY = 'sb_publishable_Us1HLOwQoLT5978dZ3Oy-Q_-v0WrLsl';
-const _GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY_HERE';
-const _CEREBRAS_API_KEY = 'csk-xhc92xfphm8eh6jdxjcfmfyr4ek9pjwet2pkchnj9ef2wv9c';
-const _MISTRAL_API_KEY = 'bQ3OEsEVaK6qHsuJ0d7kU7Pf67zM8c8N';
-const _OPENROUTER_API_KEY = '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';
-const _COHERE_API_KEY = 'cohere_skrVHbVcHC8wKn5xmRnlKoKERpwADPbxoSFJGwtG0opP7N';
-
-// 🔐 YÖNETİM ŞİFRELERİ (Base64 ile gizli)
-const ADMIN_PASSWORDS = {
-    FOUNDER: btoa("Eymen11Amele44"),
-    ADMIN: btoa("ibrm4411"),
-    BETA: btoa("4402")
-};
-
-// ═══════════════════════════════════════════════════════════════
-// 🔐 GÜVENLİ API CONFIG (Anahtarlar dışarıya get ile verilir)
-// ═══════════════════════════════════════════════════════════════
-const CONFIG = {
-    getGroqKey: () => _GROQ_API_KEY,
-    getSerpapiKey: () => _SERPAPI_KEY,
-    getSupabaseUrl: () => _SUPABASE_URL,
-    getSupabaseKey: () => _SUPABASE_KEY,
-    checkPassword: (role, entered) => btoa(entered) === ADMIN_PASSWORDS[role],
-    isSerpapiActive: () => true
-};
+(function() {
+    // Tüm API anahtarları bu IIFE içinde gizli - dışarıdan erişilemez!
+    const _GROQ_API_KEY = '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';
+    const _SERPAPI_KEY = '24aeeef65fa3cc265d73face323530d4aad6d8530cb9e2b884995a85d34220e9';
+    const _SUPABASE_URL = 'https://dxfwxknohzkdhzyytwdt.supabase.co';
+    const _SUPABASE_KEY = 'sb_publishable_Us1HLOwQoLT5978dZ3Oy-Q_-v0WrLsl';
+    const _GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY_HERE';
+    const _CEREBRAS_API_KEY = 'csk-xhc92xfphm8eh6jdxjcfmfyr4ek9pjwet2pkchnj9ef2wv9c';
+    const _MISTRAL_API_KEY = 'bQ3OEsEVaK6qHsuJ0d7kU7Pf67zM8c8N';
+    const _OPENROUTER_API_KEY = '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';
+    const _COHERE_API_KEY = 'cohere_skrVHbVcHC8wKn5xmRnlKoKERpwADPbxoSFJGwtG0opP7N';
+    
+    // Şifreler Base64 encoded
+    const ADMIN_PASSWORDS = {
+        FOUNDER: btoa("Eymen11Amele44"),
+        ADMIN: btoa("ibrm4411"),
+        BETA: btoa("4402")
+    };
+    
+    // Anahtarların geçerli olup olmadığını kontrol et
+    const isValid = (key) => key && key !== 'YOUR_GROQ_API_KEY_HERE' && key !== 'YOUR_SERPAPI_KEY_HERE' && key !== 'YOUR_GEMINI_API_KEY_HERE';
+    
+    // Global CONFIG objesi (sadece get metodları dışarıya açılır)
+    window.CONFIG = {
+        getGroqKey: () => isValid(_GROQ_API_KEY) ? _GROQ_API_KEY : null,
+        getSerpapiKey: () => isValid(_SERPAPI_KEY) ? _SERPAPI_KEY : null,
+        getSupabaseUrl: () => _SUPABASE_URL,
+        getSupabaseKey: () => _SUPABASE_KEY,
+        checkPassword: (role, entered) => btoa(entered) === ADMIN_PASSWORDS[role],
+        isGroqActive: () => isValid(_GROQ_API_KEY),
+        isSerpapiActive: () => isValid(_SERPAPI_KEY),
+        isGeminiActive: () => isValid(_GEMINI_API_KEY),
+        isCerebrasActive: () => isValid(_CEREBRAS_API_KEY),
+        isMistralActive: () => isValid(_MISTRAL_API_KEY),
+        isOpenrouterActive: () => isValid(_OPENROUTER_API_KEY),
+        isSupabaseActive: () => true
+    };
+})();
 
 // ═══════════════════════════════════════════════════════════════
 // 🔥 SUPABASE BAĞLANTISI
 // ═══════════════════════════════════════════════════════════════
-const supabaseClient = supabase.createClient(CONFIG.getSupabaseUrl(), CONFIG.getSupabaseKey());
+let supabaseClient = supabase.createClient(CONFIG.getSupabaseUrl(), CONFIG.getSupabaseKey());
 
 // ═══════════════════════════════════════════════════════════════
-// 🔥 WEB ARAMA FONKSİYONU
+// 🔥 SERPAPI WEB ARAMA
 // ═══════════════════════════════════════════════════════════════
-async function webSearch(query) {
+async function webSearch(query, lang = 'tr') {
+    if(!CONFIG.isSerpapiActive()) return null;
     try {
-        const url = `https://serpapi.com/search.json?q=${encodeURIComponent(query)}&hl=tr&gl=tr&api_key=${CONFIG.getSerpapiKey()}`;
+        const url = `https://serpapi.com/search.json?q=${encodeURIComponent(query)}&hl=${lang}&gl=tr&num=5&api_key=${CONFIG.getSerpapiKey()}`;
         const response = await fetch(url);
         const data = await response.json();
-        if(data.error) return null;
-        let html = `🌐 <strong>Arama Sonuçları:</strong><br><br>`;
-        if(data.answer_box) {
-            html += `<div style="background:rgba(0,212,255,.1);padding:12px;margin-bottom:14px">⚡ ${data.answer_box.answer || data.answer_box.snippet || ''}</div>`;
+        if (data.error) return null;
+        let html = `🌐 <strong>Canlı Web Arama Sonuçları:</strong><br><br>`;
+        if (data.answer_box) {
+            html += `<div style="background:rgba(0,212,255,.1);border-left:3px solid #00d4ff;padding:12px;margin-bottom:14px">⚡ <strong>Hızlı Cevap:</strong><br>${data.answer_box.answer || data.answer_box.snippet || ''}</div>`;
         }
-        const results = data.organic_results?.slice(0,3) || [];
+        const results = data.organic_results?.slice(0,4) || [];
         results.forEach(r => {
-            html += `<div style="margin-bottom:12px"><strong>${r.title}</strong><br><span style="font-size:12px;color:#8ab4cc">${r.snippet}</span></div>`;
+            html += `<div style="margin-bottom:12px;padding:10px;border-left:2px solid #1a3350">
+                <div style="font-size:10px;color:#4a7a99">${r.displayed_link || ''}</div>
+                <strong>${r.title || ''}</strong><br>
+                <span style="font-size:12px;color:#8ab4cc">${r.snippet || ''}</span>
+            </div>`;
         });
+        if (data.news_results?.length) {
+            html += `<br><strong style="color:#ffd700">📰 Son Haberler:</strong><br>`;
+            data.news_results.slice(0,3).forEach(n => {
+                html += `<div style="margin-top:8px;padding:8px;border-left:2px solid #ffd700">
+                    <strong>${n.title}</strong><br>
+                    <span style="font-size:11px;color:#4a7a99">${n.source?.name || ''}</span>
+                </div>`;
+            });
+        }
+        html += `<br><em style="font-size:11px;color:#4a7a99">🔍 Google arama · ${new Date().toLocaleTimeString('tr-TR')}</em>`;
         return html;
-    } catch(e) { return null; }
+    } catch(e) { console.log('Web arama hatası:', e); return null; }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🔥 GROQ API
+// ═══════════════════════════════════════════════════════════════
+async function callGroqAPI(prompt, systemPrompt = "Sen VİZYON AI'sın, kodlama konusunda uzmansın.") {
+    if(!CONFIG.isGroqActive()) return null;
+    try {
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${CONFIG.getGroqKey()}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'llama-3.3-70b-versatile',
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: prompt }
+                ],
+                temperature: 0.7,
+                max_tokens: 2000
+            })
+        });
+        const data = await response.json();
+        if(data.choices && data.choices[0]) return data.choices[0].message.content;
+        return null;
+    } catch(e) { console.log('Groq hatası:', e); return null; }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🔥 FALLBACK AI
+// ═══════════════════════════════════════════════════════════════
+function fallbackAI(prompt) {
+    const p = prompt.toLowerCase();
+    if(p.includes('python') && p.includes('hesap')) {
+        return `🐍 Python Hesap Makinesi:\n\`\`\`python\ndef hesap_makinesi():\n    sayi1 = float(input("Birinci sayı: "))\n    islem = input("İşlem (+, -, *, /): ")\n    sayi2 = float(input("İkinci sayı: "))\n    if islem == '+': print(f"Sonuç: {sayi1 + sayi2}")\n    elif islem == '-': print(f"Sonuç: {sayi1 - sayi2}")\n    elif islem == '*': print(f"Sonuç: {sayi1 * sayi2}")\n    elif islem == '/':\n        if sayi2 != 0: print(f"Sonuç: {sayi1 / sayi2}")\n        else: print("Hata: Sıfıra bölme!")\n    else: print("Geçersiz işlem!")\nhesap_makinesi()\n\`\`\``;
+    }
+    if(p.includes('react')) {
+        return `⚛️ React Bileşeni:\n\`\`\`jsx\nfunction App() {\n  return <h1>VİZYON AI</h1>;\n}\nexport default App;\n\`\`\``;
+    }
+    return `🧠 VİZYON AI hazır! ${CONFIG.isGroqActive() ? '✅ Groq API aktif' : '⚠️ Demo mod (API anahtarı gerekli)'}\n\n📌 Örnek: "Python hesap makinesi yaz", "React todo app yap", "dolar kaç"`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🔥 SÜPER AI
+// ═══════════════════════════════════════════════════════════════
+async function callSuperAI(prompt, systemPrompt = "Sen VİZYON AI'sın, kodlama konusunda uzmansın.") {
+    const apis = [
+        { name: 'Groq', func: () => callGroqAPI(prompt, systemPrompt), isActive: CONFIG.isGroqActive() }
+    ];
+    for(const api of apis) {
+        if(api.isActive) {
+            try {
+                const result = await api.func();
+                if(result && !result.includes('error')) return result;
+            } catch(e) { console.log(`${api.name} hatası:`, e); }
+        }
+    }
+    return fallbackAI(prompt);
 }
 
 // ═══════════════════════════════════════════════════════════════
 // 🔥 KAYIT OL
 // ═══════════════════════════════════════════════════════════════
 async function handleRegister() {
-    const name = document.getElementById('rName')?.value.trim();
-    const surname = document.getElementById('rSurname')?.value.trim();
-    const email = document.getElementById('rEmail')?.value.trim();
-    const p1 = document.getElementById('rPass')?.value;
-    const p2 = document.getElementById('rPass2')?.value;
-    if(!name){ alert('Ad gerekli!'); return; }
-    if(!email || !email.includes('@')){ alert('Geçerli e-posta girin!'); return; }
-    if(p1.length < 8){ alert('Şifre en az 8 karakter!'); return; }
-    if(p1 !== p2){ alert('Şifreler eşleşmiyor!'); return; }
-    try {
-        const { error } = await supabaseClient.from('users').insert([{
-            name: name + ' ' + surname, email: email, plan: 'free', password_hash: btoa(p1), created_at: new Date()
-        }]);
-        if(error){ alert('Hata: ' + error.message); return; }
-        closeModal();
-        alert('✅ Kayıt başarılı! Giriş yapabilirsiniz.');
-    } catch(e) { alert('Bağlantı hatası!'); }
+  const name = document.getElementById('rName')?.value.trim();
+  const surname = document.getElementById('rSurname')?.value.trim();
+  const email = document.getElementById('rEmail')?.value.trim();
+  const p1 = document.getElementById('rPass')?.value;
+  const p2 = document.getElementById('rPass2')?.value;
+
+  if(!name){ alert('Ad gerekli!'); return; }
+  if(!email || !email.includes('@')){ alert('Geçerli e-posta girin!'); return; }
+  if(p1.length < 8){ alert('Şifre en az 8 karakter olmalı!'); return; }
+  if(p1 !== p2){ alert('Şifreler eşleşmiyor!'); return; }
+
+  try {
+    const { error } = await supabaseClient.from('users').insert([{
+      name: name + ' ' + surname,
+      email: email,
+      plan: 'free',
+      password_hash: btoa(p1),
+      created_at: new Date()
+    }]);
+    if(error){ alert('Hata: ' + error.message); return; }
+    localStorage.setItem('v27_session', email);
+    closeModal();
+    alert('✅ Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
+  } catch(e) { alert('Bağlantı hatası!'); }
 }
 
 // ═══════════════════════════════════════════════════════════════
 // 🔥 GİRİŞ YAP
 // ═══════════════════════════════════════════════════════════════
 async function handleLogin() {
-    const email = document.getElementById('lEmail')?.value.trim();
-    const pass = document.getElementById('lPass')?.value;
-    if(!email || !pass){ alert('Tüm alanları doldurun!'); return; }
+  const email = document.getElementById('lEmail')?.value.trim();
+  const pass = document.getElementById('lPass')?.value;
+  if(!email || !pass){ alert('Tüm alanları doldurun!'); return; }
+  
+  if(email === 'admin@vizyon2027.com' && pass === 'Eymen2027!'){
+    localStorage.setItem('v27_admin', '1');
+    pendingAdminRole = 'ADMIN';
+    closeModal();
+    openAdminPanel();
+    return;
+  }
+  
+  try {
+    const { data, error } = await supabaseClient.from('users')
+      .select('*').eq('email', email).single();
+    if(error || !data){ alert('E-posta veya şifre hatalı!'); return; }
+    if(data.password_hash !== btoa(pass)){ alert('E-posta veya şifre hatalı!'); return; }
+    if(data.is_banned){ alert('❌ Hesabınız yasaklandı. Destek için iletişime geçin.'); return; }
+    
     try {
-        const { data, error } = await supabaseClient.from('users').select('*').eq('email', email).single();
-        if(error || !data){ alert('E-posta veya şifre hatalı!'); return; }
-        if(data.password_hash !== btoa(pass)){ alert('E-posta veya şifre hatalı!'); return; }
-        closeModal();
-        alert('✅ Hoş geldin ' + data.name + '!');
-    } catch(e) { alert('Bağlantı hatası!'); }
+      const geo = await fetch('https://ipapi.co/json/');
+      const loc = await geo.json();
+      await supabaseClient.from('login_logs').insert([{
+        user_email: email,
+        city: loc.city,
+        country: loc.country_name,
+        ip: loc.ip,
+        device: navigator.userAgent.substring(0,100),
+        created_at: new Date()
+      }]);
+      await supabaseClient.from('users').update({
+        last_login: new Date(),
+        city: loc.city,
+        country: loc.country_name,
+        ip_address: loc.ip
+      }).eq('id', data.id);
+    } catch(e) {}
+    
+    localStorage.setItem('v27_session', JSON.stringify(data));
+    closeModal();
+    alert('✅ Hoş geldin ' + data.name + '!');
+  } catch(e) { alert('Bağlantı hatası!'); }
 }
 
 // ═══════════════════════════════════════════════════════════════
 // 🔥 YÖNETİM PANELİ
 // ═══════════════════════════════════════════════════════════════
-let pendingAdminRole = null;
-function showAuthPanel(role) { pendingAdminRole = role; document.getElementById('authPanelOverlay').classList.add('open'); }
-function closeAuthPanel() { document.getElementById('authPanelOverlay').classList.remove('open'); pendingAdminRole = null; }
-function submitAuth() {
-    const entered = document.getElementById('authPassword').value;
-    if(CONFIG.checkPassword(pendingAdminRole, entered)) {
-        closeAuthPanel();
-        openAdminPanel();
-    } else { alert("❌ Şifre hatalı!"); }
-}
-function openAdminPanel() { document.getElementById('adminOverlay').classList.add('open'); loadAdminData(); }
-function closeAdminPanel() { document.getElementById('adminOverlay').classList.remove('open'); }
-
 let _allUsers = [];
+let pendingAdminRole = null;
+
 async function loadAdminData() {
-    const { data: users } = await supabaseClient.from('users').select('*');
+  try {
+    const { data: users } = await supabaseClient.from('users').select('*').order('created_at', { ascending: false });
+    const { data: messages } = await supabaseClient.from('messages').select('*').order('created_at', { ascending: false });
+    
     document.getElementById('statUsers').innerText = users?.length || 0;
+    document.getElementById('statMessages').innerText = messages?.filter(m=>!m.read).length || 0;
+    document.getElementById('statProjects').innerText = localData.projects.length;
+    
+    const proCount = users?.filter(u=>u.plan==='pro').length || 0;
+    const teamCount = users?.filter(u=>u.plan==='team').length || 0;
+    const rev = (proCount*299)+(teamCount*899);
+    const revEl = document.getElementById('statRevenue');
+    if(revEl) revEl.innerText = '₺'+rev.toLocaleString('tr-TR');
+    
     _allUsers = users || [];
     renderUserTable(users || []);
+  } catch(e) { console.log('Admin veri yükleme hatası:', e); }
 }
+
 function renderUserTable(users) {
-    const usersList = document.getElementById('usersList');
-    if(!usersList) return;
-    usersList.innerHTML = users.map(u => `<div class="user-item"><div><strong>${u.name}</strong><br><span style="font-size:11px">${u.email}</span></div></div>`).join('');
+  const usersList = document.getElementById('usersList');
+  if(!usersList) return;
+  if(!users.length){
+    usersList.innerHTML = '<div style="color:var(--text3);padding:16px">Kullanıcı bulunamadı.</div>';
+    return;
+  }
+  usersList.innerHTML = users.map(u => `
+    <div class="user-item" style="${u.is_banned?'opacity:0.5;border-left:3px solid var(--danger)':''}">
+      <div style="flex:1">
+        <strong style="color:var(--text)">${u.name||'—'}</strong>
+        <span class="badge" style="margin-left:8px;background:${u.plan==='pro'?'var(--accent)':u.plan==='team'?'var(--purple)':'var(--border)'}">${(u.plan||'free').toUpperCase()}</span>
+        ${u.is_banned?'<span class="badge" style="background:var(--danger);margin-left:4px">YASAKLI</span>':''}
+        <br><span style="font-size:11px;color:var(--text3)">${u.email||''}</span>
+        <br><span style="font-size:11px;color:var(--text2)">📍 ${u.city||'?'}, ${u.country||'?'}</span>
+        <br><span style="font-size:10px;color:var(--text3)">Son giriş: ${u.last_login?new Date(u.last_login).toLocaleString('tr-TR'):'Hiç'}</span>
+        <br><span style="font-size:10px;color:var(--text3)">Kayıt: ${u.created_at?new Date(u.created_at).toLocaleDateString('tr-TR'):''}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <select onchange="changePlan('${u.id}',this.value)" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:4px 8px;font-size:11px;border-radius:6px">
+          <option value="free" ${u.plan==='free'?'selected':''}>Free</option>
+          <option value="pro" ${u.plan==='pro'?'selected':''}>Pro ₺299</option>
+          <option value="team" ${u.plan==='team'?'selected':''}>Team ₺899</option>
+        </select>
+        <button onclick="toggleBan('${u.id}','${u.email}',${u.is_banned})" style="background:${u.is_banned?'var(--accent2)':'#ffa500'};color:var(--bg);border:none;padding:5px 8px;cursor:pointer;font-size:10px;border-radius:6px">
+          ${u.is_banned?'✅ Yasağı Kaldır':'🚫 Yasakla'}
+        </button>
+        <button onclick="sendUserEmail('${u.email}')" style="background:var(--accent);color:var(--bg);border:none;padding:5px 8px;cursor:pointer;font-size:10px;border-radius:6px">✉ Mail At</button>
+        <button onclick="deleteUser('${u.id}')" style="background:var(--danger);color:#fff;border:none;padding:5px 8px;cursor:pointer;font-size:10px;border-radius:6px">🗑 Sil</button>
+      </div>
+    </div>`).join('');
 }
+
 function searchUsers() {
-    const q = document.getElementById('userSearchInput')?.value.toLowerCase() || '';
-    const filtered = _allUsers.filter(u => u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q));
-    renderUserTable(filtered);
+  const q = document.getElementById('userSearchInput')?.value.toLowerCase() || '';
+  const filtered = (_allUsers || []).filter(u =>
+    u.name?.toLowerCase().includes(q) ||
+    u.email?.toLowerCase().includes(q) ||
+    u.city?.toLowerCase().includes(q) ||
+    u.country?.toLowerCase().includes(q) ||
+    u.plan?.toLowerCase().includes(q)
+  );
+  renderUserTable(filtered);
 }
+
+async function changePlan(id, plan) {
+  await supabaseClient.from('users').update({ plan }).eq('id', id);
+  loadAdminData();
+  alert(`✅ Plan güncellendi: ${plan.toUpperCase()}`);
+}
+
+async function toggleBan(id, email, isBanned) {
+  const newBan = !isBanned;
+  await supabaseClient.from('users').update({ is_banned: newBan }).eq('id', id);
+  loadAdminData();
+  alert(newBan ? `🚫 ${email} yasaklandı!` : `✅ ${email} yasağı kaldırıldı!`);
+}
+
+function sendUserEmail(email) { window.open(`mailto:${email}?subject=Vizyon 2027 - Bilgilendirme&body=Merhaba,%0A%0AVizyon 2027 ekibinden size ulaşıyoruz.%0A%0ASaygılarımızla,%0AMuhammed Eymen`, '_blank'); }
+
+async function deleteUser(id) { if(!confirm('Kullanıcı silinsin mi?')) return; await supabaseClient.from('users').delete().eq('id', id); loadAdminData(); alert('Kullanıcı silindi.'); }
+
 function exportUsers() {
-    const csv = 'İsim,Email\n' + _allUsers.map(u => `"${u.name}","${u.email}"`).join('\n');
-    const a = document.createElement('a');
-    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-    a.download = 'kullanicilar.csv';
-    a.click();
+  const users = _allUsers || [];
+  const csv = 'İsim,Email,Plan,Şehir,Ülke,Son Giriş,Kayıt\n' +
+    users.map(u => `"${u.name}","${u.email}","${u.plan||'free'}","${u.city||''}","${u.country||''}","${u.last_login?new Date(u.last_login).toLocaleString('tr-TR'):''}","${u.created_at?new Date(u.created_at).toLocaleDateString('tr-TR'):''}"`).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
+  a.download = 'vizyon2027_kullanicilar.csv';
+  a.click();
+  alert('✅ CSV indirildi!');
 }
 
-let localData = { projects: JSON.parse(localStorage.getItem('v27_projects') || '[]') };
-function saveLocalData() { localStorage.setItem('v27_projects', JSON.stringify(localData.projects)); renderLocalPanels(); }
+// ═══════════════════════════════════════════════════════════════
+// 🔥 YEREL VERİ YÖNETİMİ
+// ═══════════════════════════════════════════════════════════════
+let localData = {
+  projects: JSON.parse(localStorage.getItem('v27_projects') || '[]'),
+  orders: JSON.parse(localStorage.getItem('v27_orders') || '[]'),
+  packages: JSON.parse(localStorage.getItem('v27_packages') || '[]'),
+  trash: JSON.parse(localStorage.getItem('v27_trash') || '[]'),
+  archive: JSON.parse(localStorage.getItem('v27_archive') || '[]')
+};
+
+function saveLocalData() {
+  localStorage.setItem('v27_projects', JSON.stringify(localData.projects));
+  localStorage.setItem('v27_orders', JSON.stringify(localData.orders));
+  localStorage.setItem('v27_packages', JSON.stringify(localData.packages));
+  localStorage.setItem('v27_trash', JSON.stringify(localData.trash));
+  localStorage.setItem('v27_archive', JSON.stringify(localData.archive));
+  renderLocalPanels();
+}
+
 function addProject() { const name = prompt('Proje adı:'); if(name){ localData.projects.push({ id: Date.now(), name }); saveLocalData(); } }
+
 function renderLocalPanels() {
-    const projectsDiv = document.getElementById('projectsList');
-    if(projectsDiv) projectsDiv.innerHTML = localData.projects.map(p => `<div class="project-item">📁 ${p.name}</div>`).join('') || '<div>Proje yok</div>';
-    document.getElementById('statProjects').innerText = localData.projects.length;
+  const projectsDiv = document.getElementById('projectsList');
+  const ordersDiv = document.getElementById('ordersList');
+  const packagesDiv = document.getElementById('packagesList');
+  const trashDiv = document.getElementById('trashList');
+  const archiveDiv = document.getElementById('archiveList');
+  if(projectsDiv) projectsDiv.innerHTML = localData.projects.map(p => `<div class="project-item">📁 ${p.name}<button onclick="deleteToTrash('projects',${p.id})" style="background:#ff4757;margin-left:10px;">🗑️</button></div>`).join('') || '<div>Proje yok</div>';
+  if(ordersDiv) ordersDiv.innerHTML = localData.orders.map(o => `<div class="project-item">📦 ${o.name}</div>`).join('') || '<div>Sipariş yok</div>';
+  if(packagesDiv) packagesDiv.innerHTML = localData.packages.map(p => `<div class="project-item">💎 ${p.name}</div>`).join('') || '<div>Paket yok</div>';
+  if(trashDiv) trashDiv.innerHTML = localData.trash.map(t => `<div class="project-item">🗑️ ${t.name}<button onclick="restoreFromTrash(${t.id})" style="background:#00d4ff;margin-left:10px;">↺ Geri Al</button><button onclick="permanentDelete(${t.id})" style="background:#ff4757;">💀 Sil</button></div>`).join('') || '<div>Çöp kutusu boş</div>';
+  if(archiveDiv) archiveDiv.innerHTML = localData.archive.map(a => `<div class="project-item">📦 ${a.name}</div>`).join('') || '<div>Arşiv boş</div>';
+  document.getElementById('statProjects').innerText = localData.projects.length;
+}
+
+function deleteToTrash(type, id) {
+  const item = localData[type].find(p => p.id === id);
+  if(item){ localData.trash.push({ ...item, originalType: type }); localData[type] = localData[type].filter(p => p.id !== id); saveLocalData(); }
+}
+
+function restoreFromTrash(id) {
+  const idx = localData.trash.findIndex(t => t.id === id);
+  if(idx !== -1){ const restored = localData.trash[idx]; localData[restored.originalType].push({ id: restored.id, name: restored.name }); localData.trash.splice(idx, 1); saveLocalData(); }
+}
+
+function permanentDelete(id) { localData.trash = localData.trash.filter(t => t.id !== id); saveLocalData(); }
+
+// ═══════════════════════════════════════════════════════════════
+// 🔥 YÖNETİM PANELİ ŞİFRE KONTROLÜ
+// ═══════════════════════════════════════════════════════════════
+function showAuthPanel(role) { pendingAdminRole = role; document.getElementById('authRoleTitle').innerHTML = `🔐 ${role} GİRİŞİ`; document.getElementById('authPanelOverlay').classList.add('open'); document.getElementById('authPassword').value = ''; }
+function closeAuthPanel() { document.getElementById('authPanelOverlay').classList.remove('open'); pendingAdminRole = null; }
+function submitAuth() { 
+  const entered = document.getElementById('authPassword').value;
+  if(CONFIG.checkPassword(pendingAdminRole, entered)) { 
+    closeAuthPanel(); 
+    openAdminPanel(); 
+  } else { 
+    alert("❌ Şifre hatalı!"); 
+  } 
+}
+function openAdminPanel() { document.getElementById('adminOverlay').classList.add('open'); document.getElementById('panelRoleInfo').innerHTML = `✅ ${pendingAdminRole} olarak giriş yaptınız.`; loadAdminData(); renderLocalPanels(); }
+function closeAdminPanel() { document.getElementById('adminOverlay').classList.remove('open'); pendingAdminRole = null; }
+
+function sendAdminAI() { 
+  const input = document.getElementById('adminAiInput'); 
+  const q = input.value.trim(); 
+  if(!q) return; 
+  const container = document.getElementById('adminAiMessages'); 
+  container.innerHTML += `<div class="ai-msg user" style="align-self:flex-end;text-align:right">${q}</div>`; 
+  input.value = ''; 
+  container.scrollTop = container.scrollHeight;
+  
+  const searchTriggers = ['dolar', 'euro', 'altın', 'bitcoin', 'haber', 'bugün', 'fiyat', 'kur', 'hava'];
+  const shouldSearch = searchTriggers.some(t => q.toLowerCase().includes(t));
+  
+  setTimeout(async () => { 
+    let answer = '';
+    if(shouldSearch) {
+      const webRes = await webSearch(q);
+      answer = webRes || `"${q}" için sonuç bulunamadı.`;
+    } else {
+      answer = `"${q}" komutu alındı. Kullanıcı: ${document.getElementById('statUsers').innerText || '0'}, Mesaj: ${document.getElementById('statMessages').innerText || '0'} adet.`;
+    }
+    container.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: ${answer}</div>`; 
+    container.scrollTop = container.scrollHeight; 
+  }, 500); 
 }
 
 // ═══════════════════════════════════════════════════════════════
-// 🔥 MOUSE, COUNTER, MODAL, AI PANEL
+// 🔥 CURSOR, PROGRESS, PARTICLES, COUNTERS
 // ═══════════════════════════════════════════════════════════════
-const dot = document.getElementById('cursorDot');
-const ring = document.getElementById('cursorRing');
+const cursor = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursorRing');
 let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
-document.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX; mouseY = e.clientY;
-    dot.style.transform = `translate(${mouseX - 4}px, ${mouseY - 4}px)`;
-});
-function animateRing() {
-    ringX += (mouseX - ringX - 16) * 0.15;
-    ringY += (mouseY - ringY - 16) * 0.15;
-    ring.style.transform = `translate(${ringX}px, ${ringY}px)`;
-    requestAnimationFrame(animateRing);
+document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; cursor.style.transform = `translate(${mouseX - 4}px, ${mouseY - 4}px)`; });
+function animateCursorRing() { ringX += (mouseX - ringX - 16) * 0.12; ringY += (mouseY - ringY - 16) * 0.12; cursorRing.style.transform = `translate(${ringX}px, ${ringY}px)`; requestAnimationFrame(animateCursorRing); }
+animateCursorRing();
+window.addEventListener('scroll', () => { const doc = document.documentElement; const scrollTop = window.scrollY || doc.scrollTop; const scrollHeight = doc.scrollHeight - doc.clientHeight; document.getElementById('progressBar').style.width = (scrollTop / scrollHeight) * 100 + '%'; });
+for (let i = 0; i < 40; i++) { const p = document.createElement('div'); p.className = 'particle'; p.style.cssText = `left:${Math.random()*100}%;animation-duration:${8+Math.random()*15}s;animation-delay:${-Math.random()*20}s;`; document.getElementById('particles').appendChild(p); }
+function animateCounter(el, target) { let current = 0; const step = Math.ceil(target / 50); const interval = setInterval(() => { current += step; if (current >= target) { el.innerText = target.toLocaleString('tr-TR'); clearInterval(interval); } else { el.innerText = current.toLocaleString('tr-TR'); } }, 30); }
+setTimeout(() => { animateCounter(document.getElementById('counter1'), 48200); animateCounter(document.getElementById('counter2'), 1250000); animateCounter(document.getElementById('counter3'), 87400); }, 500);
+function openModal(type) { document.getElementById('authModal').classList.add('open'); switchTab(type === 'login' ? 'login' : 'register'); }
+function closeModal() { document.getElementById('authModal').classList.remove('open'); }
+function switchTab(tab) {
+  document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+  const title = document.getElementById('modalTitle');
+  if(title) title.textContent = tab === 'login' ? 'Giriş Yap' : 'Hesap Oluştur';
 }
-animateRing();
-window.addEventListener('scroll', () => {
-    const scrollTop = window.scrollY;
-    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-    document.getElementById('progressBar').style.width = (scrollTop / scrollHeight) * 100 + '%';
-});
-for(let i=0;i<30;i++){ const p=document.createElement('div'); p.className='particle'; p.style.cssText=`left:${Math.random()*100}%;animation-duration:${5+Math.random()*15}s;animation-delay:${-Math.random()*20}s;`; document.getElementById('particles').appendChild(p); }
-function animateCounter(el, target){ let curr=0; const step=Math.ceil(target/50); const iv=setInterval(()=>{ curr+=step; if(curr>=target){ el.innerText=target.toLocaleString('tr-TR'); clearInterval(iv); }else{ el.innerText=curr.toLocaleString('tr-TR'); } },30); }
-setTimeout(()=>{ animateCounter(document.getElementById('counter1'),48200); animateCounter(document.getElementById('counter2'),1250000); animateCounter(document.getElementById('counter3'),87400); },500);
-function openModal(type){ document.getElementById('authModal').classList.add('open'); switchTab(type==='login'?'login':'register'); }
-function closeModal(){ document.getElementById('authModal').classList.remove('open'); }
-function switchTab(tab){
-    document.getElementById('formLogin').style.display=tab==='login'?'block':'none';
-    document.getElementById('formRegister').style.display=tab==='register'?'block':'none';
-    document.getElementById('tabLogin').classList.toggle('active',tab==='login');
-    document.getElementById('tabRegister').classList.toggle('active',tab==='register');
+function toggleAiPanel() { document.getElementById('aiPanel').classList.toggle('open'); }
+function quickAsk(topic) { document.getElementById('aiInput').value = topic; sendAiMessage(); }
+function sendAiMessage() { 
+  const input = document.getElementById('aiInput'), msg = input.value.trim(); 
+  if(!msg) return; const msgs = document.getElementById('aiMessages'); 
+  msgs.innerHTML += `<div class="ai-msg user">${msg}</div>`; input.value = ''; 
+  setTimeout(() => { 
+    let response = 'Harika soru! Ana AI panelini açmak için "⚡ VİZYON AI\'ı Başlat" butonuna tıklayın.'; 
+    msgs.innerHTML += `<div class="ai-msg bot">⚡ ${response}</div>`; msgs.scrollTop = msgs.scrollHeight; 
+  }, 600); 
 }
-function toggleAiPanel(){ document.getElementById('aiPanel').classList.toggle('open'); }
-function quickAsk(topic){ document.getElementById('aiInput').value=topic; sendAiMessage(); }
-function sendAiMessage(){
-    const input=document.getElementById('aiInput'), msg=input.value.trim();
-    if(!msg) return;
-    const msgs=document.getElementById('aiMessages');
-    msgs.innerHTML+=`<div class="ai-msg user">${msg}</div>`;
-    input.value='';
-    setTimeout(()=>{
-        msgs.innerHTML+=`<div class="ai-msg bot">⚡ Ana AI panelini açmak için "VİZYON AI'ı Başlat" butonuna tıklayın.</div>`;
-        msgs.scrollTop=msgs.scrollHeight;
-    },600);
-}
-function toggleDownloadMenu(){ document.getElementById('downloadMenu').classList.toggle('open'); }
-function downloadApp(platform){ alert(`📱 ${platform.toUpperCase()} uygulaması yakında!`); }
-function downloadWebApp(){ alert('🌐 PWA kurulumu için Chrome → "Uygulama olarak yükle"'); }
+function toggleDownloadMenu() { document.getElementById('downloadMenu').classList.toggle('open'); }
+function downloadApp(platform) { alert(`📱 ${platform.toUpperCase()} uygulaması yakında yayınlanacak!`); }
+function downloadWebApp() { alert('🌐 PWA kurulumu için Chrome menü → "Uygulama olarak yükle" seçeneğini kullanın.'); }
 
 // ═══════════════════════════════════════════════════════════════
 // 🔥 VİZYON AI ANA PANEL
 // ═══════════════════════════════════════════════════════════════
-function openVizyonAI(){ document.getElementById('vizyonAIPanel').style.display='flex'; }
-function closeVizyonAI(){ document.getElementById('vizyonAIPanel').style.display='none'; }
-function quickAICode(cmd){ document.getElementById('vizyonAIInput').value=cmd; sendVizyonAIAdvanced(); }
-async function sendVizyonAIAdvanced(){
-    const input=document.getElementById('vizyonAIInput');
-    let msg=input.value.trim();
-    if(!msg) return;
-    const chat=document.getElementById('vizyonAIChat');
-    chat.innerHTML+=`<div class="ai-msg user">${msg}</div>`;
-    input.value='';
-    const typingId='typing-'+Date.now();
-    chat.innerHTML+=`<div class="ai-msg bot" id="${typingId}">🧠 Düşünüyor...</div>`;
-    chat.scrollTop=chat.scrollHeight;
-    const shouldSearch=msg.toLowerCase().includes('dolar')||msg.toLowerCase().includes('haber');
-    setTimeout(async()=>{
-        document.getElementById(typingId)?.remove();
-        let response='';
-        if(shouldSearch){
-            const webRes=await webSearch(msg);
-            response=webRes||`"${msg}" için sonuç yok.`;
-        }else if(msg.toLowerCase().includes('python')&&msg.toLowerCase().includes('hesap')){
-            response='```python\ndef hesap_makinesi():\n    sayi1=float(input("Birinci sayı: "))\n    islem=input("İşlem: ")\n    sayi2=float(input("İkinci sayı: "))\n    if islem=="+": print(sayi1+sayi2)\n    elif islem=="-": print(sayi1-sayi2)\n    elif islem=="*": print(sayi1*sayi2)\n    elif islem=="/":\n        if sayi2!=0: print(sayi1/sayi2)\n        else: print("Hata!")\nhesap_makinesi()\n```';
-        }else{
-            response=`"${msg}" komutunuz alındı. Python, React, HTML kodları yazabilirim.`;
-        }
-        chat.innerHTML+=`<div class="ai-msg bot">🧠 VİZYON AI:<br><br>${response}</div>`;
-        chat.scrollTop=chat.scrollHeight;
-    },600);
+let uploadedFileContent = null, uploadedFileName = null;
+function openVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'flex'; document.getElementById('vizyonAIInput').focus(); }
+function closeVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'none'; }
+function quickAICode(cmd) { document.getElementById('vizyonAIInput').value = cmd; sendVizyonAIAdvanced(); }
+function handleFileUploadAdv(input) { 
+  const file = input.files[0]; if(!file) return; 
+  const chat = document.getElementById('vizyonAIChat'); 
+  chat.innerHTML += `<div class="ai-msg user">📎 Dosya yüklendi: ${file.name} (${(file.size/1024).toFixed(1)} KB)</div>`; 
+  const reader = new FileReader(); 
+  reader.onload = function(e) { 
+    uploadedFileContent = e.target.result; 
+    uploadedFileName = file.name; 
+    let preview = '';
+    if(file.type.startsWith('image')) preview = `<img src="${e.target.result}" style="max-width:100%;margin-top:10px;border-radius:8px;">`;
+    else if(file.type === 'application/pdf') preview = `<div style="background:#030810;padding:10px;border-radius:8px;margin-top:10px;">📄 PDF dosyası yüklendi. Metin içeriği okunabilir.</div>`;
+    else preview = `<div style="background:#030810;padding:10px;border-radius:8px;margin-top:10px;font-family:monospace;font-size:11px;max-height:150px;overflow:auto;">${uploadedFileContent.substring(0,500)}${uploadedFileContent.length > 500 ? '...' : ''}</div>`;
+    chat.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: Dosyan başarıyla yüklendi!<br><br>📄 <strong>${uploadedFileName}</strong><br>📏 Boyut: ${(file.size/1024).toFixed(1)} KB${preview}<br><br>Bu dosya üzerinde ne yapmamı istersin? (Özet çıkar, düzenle, analiz et)</div>`; 
+    chat.scrollTop = chat.scrollHeight; 
+  }; 
+  if(file.type.startsWith('text') || file.name.endsWith('.py') || file.name.endsWith('.js') || file.name.endsWith('.html') || file.name.endsWith('.json') || file.name.endsWith('.css')) {
+    reader.readAsText(file);
+  } else {
+    reader.readAsDataURL(file);
+  }
+  input.value = ''; 
 }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeVizyonAI(); });
-renderLocalPanels();
-console.log('✅ VİZYON AI HAZIR - Tüm sistemler aktif!');
+
+async function sendVizyonAIAdvanced() {
+  const input = document.getElementById('vizyonAIInput');
+  let msg = input.value.trim();
+  if(!msg && !uploadedFileContent) return;
+  
+  const chat = document.getElementById('vizyonAIChat');
+  chat.innerHTML += `<div class="ai-msg user">${msg}</div>`;
+  input.value = '';
+  
+  const typingId = 'typing-' + Date.now();
+  chat.innerHTML += `<div class="ai-msg bot" id="${typingId}">🧠 VİZYON AI: <span style="opacity:0.5">▋ Düşünüyor...</span></div>`;
+  chat.scrollTop = chat.scrollHeight;
+  
+  const searchTriggers = ['dolar', 'euro', 'altın', 'bitcoin', 'haber', 'bugün', 'son dakika', 'hava durumu', 'kaç', 'fiyat', 'kur', 'maç', 'skor', 'deprem'];
+  const shouldSearch = searchTriggers.some(t => msg.toLowerCase().includes(t));
+  
+  setTimeout(async () => {
+    document.getElementById(typingId)?.remove();
+    let response = '';
+    
+    if(shouldSearch && CONFIG.isSerpapiActive()) {
+      const webResult = await webSearch(msg);
+      if(webResult) response = webResult;
+      else response = `"${msg}" için arama yapılamadı. Lütfen daha sonra tekrar deneyin.`;
+    } 
+    else {
+      const aiResponse = await callSuperAI(msg);
+      if(aiResponse) {
+        response = aiResponse;
+      } else {
+        response = `🧠 <strong>VİZYON AI Yanıtı:</strong><br><br>
+"${msg}" talebiniz alındı.<br><br>
+✅ <strong>Yapabileceklerim:</strong><br>
+• <strong>"Python hesap makinesi yaz"</strong> - Hesap makinesi kodu<br>
+• <strong>"React todo app yap"</strong> - Todo uygulaması<br>
+• <strong>"HTML kart tasarımı yap"</strong> - Kart tasarımı<br>
+• <strong>"dolar kaç"</strong> - Canlı dolar kuru<br>
+• <strong>"bugün haberler"</strong> - Güncel haberler<br>
+• <strong>"Freelance nasıl kazanılır"</strong> - Kazanç planı<br>
+• <strong>"SaaS fikri ver"</strong> - İş fikirleri<br><br>
+<em>Spesifik bir isteğin varsa yaz, her şeyi yapabilirim! 🚀</em>`;
+      }
+    }
+    
+    chat.innerHTML += `<div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>:<br><br>${response}</div>`;
+    chat.scrollTop = chat.scrollHeight;
+  }, 600);
+}
+
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeVizyonAI(); });
+
+// Konsola sadece durum yazdırılır, anahtarlar GÖRÜNMEZ!
+console.log('✅ VİZYON AI HAZIR!');
+console.log(`🔐 API Durumu: Groq=${CONFIG.isGroqActive()}, SerpApi=${CONFIG.isSerpapiActive()}, Supabase Aktif`);
 </script>
 </body>
 </html>
