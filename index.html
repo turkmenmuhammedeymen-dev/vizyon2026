@@ -40,7 +40,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Mavi imleç efekti - basit ve sağlam */
+/* Mavi imleç efekti */
 .custom-cursor {
   width: 10px;
   height: 10px;
@@ -63,7 +63,6 @@ body {
   opacity: 0.6;
 }
 
-/* Tüm tıklanabilir elementler */
 button, a, .secret-btn, .nav-cta, .btn-primary, .btn-secondary, .btn-price, .ai-suggestion, .mbadge, .download-btn, .ai-widget-btn, .close-panel-btn, .btn-submit, .modal-tab, .support-link, .nav-links a {
   cursor: pointer !important;
   z-index: 999 !important;
@@ -1248,14 +1247,24 @@ footer {
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// 🔥 TÜM API ANAHTARLARI (Cloudflare KALDIRILDI - sadece çalışanlar)
+// 🔥 TÜM API ANAHTARLARI (GROQ + SERPAPI + RESEND + CEREBRAS + MISTRAL + OPENROUTER + COHERE)
 // ═══════════════════════════════════════════════════════════════
 (function() {
+    // Ana AI'ler
     const _GROQ_API_KEY = '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';
     const _SERPAPI_KEY = '24aeeef65fa3cc265d73face323530d4aad6d8530cb9e2b884995a85d34220e9';
     const _SUPABASE_URL = 'https://dxfwxknohzkdhzyytwdt.supabase.co';
     const _SUPABASE_KEY = 'sb_publishable_Us1HLOwQoLT5978dZ3Oy-Q_-v0WrLsl';
     const _RESEND_API_KEY = 're_UDkWse8K_5J4mdcWZNaSgex3hYY3ZkYPH';
+    
+    // Diğer AI modelleri
+    const _GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY_HERE';  // SEN EKLE (aistudio.google.com)
+    const _CEREBRAS_API_KEY = 'csk-xhc92xfphm8eh6jdxjcfmfyr4ek9pjwet2pkchnj9ef2wv9c';
+    const _MISTRAL_API_KEY = 'bQ3OEsEVaK6qHsuJ0d7kU7Pf67zM8c8N';
+    const _OPENROUTER_API_KEY = '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';
+    const _COHERE_API_KEY = 'cohere_skrVHbVcHC8wKn5xmRnlKoKERpwADPbxoSFJGwtG0opP7N';
+    const _CF_ACCOUNT_ID = '78c35489ccf4102e472d93aa3f3be7e2';
+    const _CF_API_TOKEN = 'cfk_LCCVkfKHH6pZtyf402DdMAwCLOgjiP3EwnvoK2mWaf595553';
     
     const ADMIN_PASSWORDS = {
         FOUNDER: btoa("Eymen11Amele44"),
@@ -1269,6 +1278,11 @@ footer {
         getSupabaseUrl: () => _SUPABASE_URL,
         getSupabaseKey: () => _SUPABASE_KEY,
         getResendKey: () => _RESEND_API_KEY,
+        getGeminiKey: () => _GEMINI_API_KEY,
+        getCerebrasKey: () => _CEREBRAS_API_KEY,
+        getMistralKey: () => _MISTRAL_API_KEY,
+        getOpenrouterKey: () => _OPENROUTER_API_KEY,
+        getCohereKey: () => _COHERE_API_KEY,
         checkPassword: (role, entered) => btoa(entered) === ADMIN_PASSWORDS[role],
         isSerpapiActive: () => true,
         isResendActive: () => true
@@ -1284,7 +1298,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.scrollTo(0, 0); 
     updateUI(); 
     initCursor(); 
-    initParticles(); 
     initCounters(); 
 });
 
@@ -1310,15 +1323,6 @@ function initCursor() {
     animate();
 }
 
-function initParticles() {
-    for(let i=0; i<20; i++) { 
-        const p = document.createElement('div'); 
-        p.className = 'particle'; 
-        p.style.cssText = `position:fixed;left:${Math.random()*100}%;top:${Math.random()*100}%;width:2px;height:2px;background:#00d4ff;border-radius:50%;opacity:0.3;pointer-events:none;`; 
-        document.body.appendChild(p); 
-    }
-}
-
 function initCounters() {
     const c1 = document.getElementById('counter1');
     const c2 = document.getElementById('counter2');
@@ -1336,12 +1340,131 @@ function updateUI() {
         const plan = currentUser.plan || 'free';
         let txt = plan === 'team' ? '👥 Takım - Sınırsız' : (plan === 'pro' ? '⭐ Pro - 2000/gün' : '🆓 Ücretsiz - 20/gün');
         document.getElementById('queryLimitBadge').innerHTML = `🔍 ${txt} | Kalan: <span>${plan === 'team' ? '∞' : (plan === 'pro' ? '2000' : dailyQueries)}</span>`;
+        if(plan === 'team') {
+            document.getElementById('teamDashboard').style.display = 'block';
+            document.getElementById('teamName').innerHTML = currentUser.name;
+            if(currentUser.team_id) loadTeamData();
+        }
     } else {
         document.getElementById('loginBtn').style.display = 'block';
         document.getElementById('registerBtn').style.display = 'block';
         document.getElementById('logoutBtn').style.display = 'none';
+        document.getElementById('teamDashboard').style.display = 'none';
         document.getElementById('queryLimitBadge').innerHTML = `🔍 Ücretsiz - 20/gün | Kalan: <span>${dailyQueries}</span>`;
     }
+}
+
+// =====================================================
+// 🔥 WEB ARAMA (SERPAPI)
+// =====================================================
+async function webSearch(query) {
+    try {
+        const url = `https://serpapi.com/search.json?q=${encodeURIComponent(query)}&hl=tr&gl=tr&api_key=${CONFIG.getSerpapiKey()}`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+        if(data.error) return null;
+        let html = `🌐 <strong>Arama Sonuçları:</strong><br><br>`;
+        if(data.answer_box) html += `<div style="background:rgba(0,212,255,.1);padding:12px;margin-bottom:14px">⚡ ${data.answer_box.answer || data.answer_box.snippet}</div>`;
+        (data.organic_results?.slice(0,3) || []).forEach(r => {
+            html += `<div style="margin-bottom:12px"><strong>${r.title}</strong><br><span style="font-size:12px;color:#8ab4cc">${r.snippet}</span></div>`;
+        });
+        return html;
+    } catch(e) { return null; }
+}
+
+// =====================================================
+// 🔥 GROQ AI (ÖNCELİKLİ)
+// =====================================================
+async function callGroq(prompt) {
+    try {
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${CONFIG.getGroqKey()}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'llama-3.3-70b-versatile',
+                messages: [{ role: 'user', content: prompt }],
+                temperature: 0.7,
+                max_tokens: 1000
+            })
+        });
+        const data = await res.json();
+        return data.choices?.[0]?.message?.content || null;
+    } catch(e) { return null; }
+}
+
+// =====================================================
+// 🔥 CEREBRAS AI
+// =====================================================
+async function callCerebras(prompt) {
+    try {
+        const res = await fetch('https://api.cerebras.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${CONFIG.getCerebrasKey()}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'llama-3.1-70b',
+                messages: [{ role: 'user', content: prompt }],
+                max_tokens: 1000
+            })
+        });
+        const data = await res.json();
+        return data.choices?.[0]?.message?.content || null;
+    } catch(e) { return null; }
+}
+
+// =====================================================
+// 🔥 MISTRAL AI
+// =====================================================
+async function callMistral(prompt) {
+    try {
+        const res = await fetch('https://api.mistral.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${CONFIG.getMistralKey()}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'codestral-latest',
+                messages: [{ role: 'user', content: prompt }],
+                max_tokens: 2000
+            })
+        });
+        const data = await res.json();
+        return data.choices?.[0]?.message?.content || null;
+    } catch(e) { return null; }
+}
+
+// =====================================================
+// 🔥 OPENROUTER AI (29+ model)
+// =====================================================
+async function callOpenrouter(prompt) {
+    try {
+        const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${CONFIG.getOpenrouterKey()}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'meta-llama/llama-3.3-70b-instruct:free',
+                messages: [{ role: 'user', content: prompt }]
+            })
+        });
+        const data = await res.json();
+        return data.choices?.[0]?.message?.content || null;
+    } catch(e) { return null; }
+}
+
+// =====================================================
+// 🔥 SÜPER AI (Tüm modelleri dene, ilk çalışanı kullan)
+// =====================================================
+async function callSuperAI(prompt) {
+    const apis = [
+        { name: 'Groq', func: () => callGroq(prompt) },
+        { name: 'Cerebras', func: () => callCerebras(prompt) },
+        { name: 'Mistral', func: () => callMistral(prompt) },
+        { name: 'Openrouter', func: () => callOpenrouter(prompt) }
+    ];
+    for(const api of apis) {
+        try {
+            const result = await api.func();
+            if(result && result.length > 0) return result;
+        } catch(e) { console.log(`${api.name} hatası:`, e); }
+    }
+    return null;
 }
 
 async function handleRegister() {
@@ -1425,14 +1548,13 @@ async function buyTeamAndCreate() {
     }
 }
 
-let currentTeam = null;
 async function loadTeamData() {
     if(!currentUser?.team_id) return;
     const { data: team } = await supabaseClient.from('teams').select('*').eq('id', currentUser.team_id).single();
-    if(team) currentTeam = team;
-    document.getElementById('memberCount').innerText = currentTeam?.members?.length || 0;
-    const membersList = document.getElementById('teamMembersList');
-    if(membersList && currentTeam?.members) membersList.innerHTML = currentTeam.members.map(m => `<div class="user-item">👤 ${m}</div>`).join('');
+    if(team) {
+        document.getElementById('memberCount').innerText = team.members?.length || 0;
+        document.getElementById('teamMembersList').innerHTML = (team.members || []).map(m => `<div class="user-item">👤 ${m}</div>`).join('');
+    }
 }
 
 async function inviteToTeam() {
@@ -1490,18 +1612,35 @@ function exportUsers() {
     const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'kullanicilar.csv'; a.click(); 
 }
 
-// AI Panel
+// AI PANEL - TÜM MODELLER
 function openVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'flex'; }
 function closeVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'none'; }
 function quickAICode(cmd) { document.getElementById('vizyonAIInput').value = cmd; sendVizyonAIAdvanced(); }
 async function sendVizyonAIAdvanced() {
-    const input = document.getElementById('vizyonAIInput'); let msg = input.value.trim();
+    const input = document.getElementById('vizyonAIInput');
+    let msg = input.value.trim();
     if(!msg) return;
     const chat = document.getElementById('vizyonAIChat');
     chat.innerHTML += `<div class="ai-msg user">${msg}</div>`;
     input.value = '';
-    chat.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: "${msg}" komutunuz alındı. Gerçek AI yanıtı için internet bağlantınızı kontrol edin.</div>`;
+    const typingId = 'typing-' + Date.now();
+    chat.innerHTML += `<div class="ai-msg bot" id="${typingId}">🧠 Düşünüyor...</div>`;
     chat.scrollTop = chat.scrollHeight;
+    
+    const isSearch = msg.toLowerCase().includes('dolar') || msg.toLowerCase().includes('haber') || msg.toLowerCase().includes('euro') || msg.toLowerCase().includes('altın');
+    setTimeout(async () => {
+        document.getElementById(typingId)?.remove();
+        let response = '';
+        if(isSearch) {
+            const web = await webSearch(msg);
+            response = web || `🔍 "${msg}" için sonuç bulunamadı.`;
+        } else {
+            const ai = await callSuperAI(msg);
+            response = ai || `🤖 AI yanıtı alınamadı. Lütfen daha sonra tekrar deneyin.`;
+        }
+        chat.innerHTML += `<div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>:<br><br>${response}</div>`;
+        chat.scrollTop = chat.scrollHeight;
+    }, 800);
 }
 
 function openModal(t){ document.getElementById('authModal').classList.add('open'); switchTab(t); }
@@ -1521,13 +1660,12 @@ function sendAiMessage(){
     const msgs = document.getElementById('aiMessages');
     msgs.innerHTML += `<div class="ai-msg user">${msg}</div>`;
     inp.value = '';
-    setTimeout(() => { msgs.innerHTML += `<div class="ai-msg bot">⚡ Ana AI panelini aç.</div>`; msgs.scrollTop = msgs.scrollHeight; }, 500);
+    setTimeout(() => { msgs.innerHTML += `<div class="ai-msg bot">⚡ Ana paneli aç.</div>`; msgs.scrollTop = msgs.scrollHeight; }, 500);
 }
 function toggleDownloadMenu(){ document.getElementById('downloadMenu').classList.toggle('open'); }
 function downloadApp(p){ alert(`📱 ${p.toUpperCase()} yakında!`); }
 function downloadWebApp(){ alert('🌐 PWA kurulumu için Chrome menü'); }
 
-// HTML'e verify panel ekle
 const modalBody = document.querySelector('#authModal .modal-body');
 if(modalBody && !document.getElementById('verifyPanel')) {
     modalBody.innerHTML += `<div id="verifyPanel" style="display:none;"><div class="form-group"><label>E-posta</label><input class="form-input" id="verifyEmail" type="email"></div><div class="form-group"><label>Doğrulama Kodu</label><input class="form-input" id="verifyCode" type="text"></div><button class="btn-submit" onclick="verifyAccount()">Doğrula</button></div>`;
