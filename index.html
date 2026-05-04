@@ -1657,32 +1657,43 @@ footer {
 
 <script>
 // ============================================================
-// TÜM API ANAHTARLARI (SENİN VERDİĞİN GİBİ, EKSİKSİZ)
+// 🔥 CLOUDFLARE WORKER API ENTEGRASYONU (TEK NOKTA)
+// ============================================================
+// KENDİ CLOUDFLARE WORKER ADRESİNİ BURAYA YAZ!
+const CLOUDFLARE_WORKER_URL = 'https://vizyon-worker.your-subdomain.workers.dev';
+// Worker'ında aşağıdaki endpoint'ler olmalı:
+// - /groq     (POST) -> { prompt: "..." }
+// - /serpapi  (POST) -> { query: "..." }
+// - /resend   (POST) -> { to, subject, html }
+// - /cerebras (POST) -> { prompt: "..." }
+// - /mistral  (POST) -> { prompt: "..." }
+// - /openrouter (POST) -> { prompt: "..." }
+// - /cohere   (POST) -> { prompt: "..." }
+// - /openai   (POST) -> { prompt: "..." }   // OpenAI için boş yer
+// - /gemini   (POST) -> { prompt: "..." }   // Gemini için boş yer
+
+// ============================================================
+// TÜM API ANAHTARLARI (CLOUDFLARE WORKER İÇİN BOŞ BIRAKILDI)
 // ============================================================
 (function() {
-    const _GROQ_API_KEY = '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';
-    const _SERPAPI_KEY = '24aeeef65fa3cc265d73face323530d4aad6d8530cb9e2b884995a85d34220e9';
-    const _SUPABASE_URL = 'https://dxfwxknohzkdhzyytwdt.supabase.co';
-    const _SUPABASE_KEY = 'sb_publishable_Us1HLOwQoLT5978dZ3Oy-Q_-v0WrLsl';
-    const _RESEND_API_KEY = 're_UDkWse8K_5J4mdcWZNaSgex3hYY3ZkYPH';
-    const _CEREBRAS_API_KEY = 'csk-xhc92xfphm8eh6jdxjcfmfyr4ek9pjwet2pkchnj9ef2wv9c';
-    const _MISTRAL_API_KEY = 'bQ3OEsEVaK6qHsuJ0d7kU7Pf67zM8c8N';
-    const _OPENROUTER_API_KEY = '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';
-    const _COHERE_API_KEY = 'cohere_skrVHbVcHC8wKn5xmRnlKoKERpwADPbxoSFJGwtG0opP7N';
-    
-    const ADMIN_PASSWORDS = {
-        FOUNDER: btoa("Eymen11Amele44"),
-        ADMIN: btoa("ibrm4411"),
-        BETA: btoa("4402")
-    };
-    
+    // Cloudflare Worker üzerinden çalışacak - frontend'de anahtar YOK!
     window.CONFIG = {
-        getGroqKey: () => _GROQ_API_KEY,
-        getSerpapiKey: () => _SERPAPI_KEY,
-        getSupabaseUrl: () => _SUPABASE_URL,
-        getSupabaseKey: () => _SUPABASE_KEY,
-        getResendKey: () => _RESEND_API_KEY,
-        checkPassword: (role, entered) => btoa(entered) === ADMIN_PASSWORDS[role]
+        // Cloudflare Worker adresi
+        getWorkerUrl: () => CLOUDFLARE_WORKER_URL,
+        
+        // Admin şifreleri (frontend'de kalabilir, güvenlik için Worker'a da taşınabilir)
+        checkPassword: (role, entered) => {
+            const passes = {
+                FOUNDER: btoa("Eymen11Amele44"),
+                ADMIN: btoa("ibrm4411"),
+                BETA: btoa("4402")
+            };
+            return btoa(entered) === passes[role];
+        },
+        
+        // Supabase (direkt bağlantı - anon key zaten güvenli değil)
+        getSupabaseUrl: () => 'https://dxfwxknohzkdhzyytwdt.supabase.co',
+        getSupabaseKey: () => 'sb_publishable_Us1HLOwQoLT5978dZ3Oy-Q_-v0WrLsl'
     };
 })();
 
@@ -1694,87 +1705,31 @@ let _allUsers = [];
 let uploadedFileContent = null;
 
 // ============================================================
-// TEMEL FONKSİYONLAR
+// CLOUDFLARE WORKER ÜZERİNDEN API ÇAĞRILARI
 // ============================================================
-function initCursor() {
-    const cursor = document.getElementById('customCursor');
-    const ring = document.getElementById('customCursorRing');
-    if(!cursor || !ring) return;
-    let mx=0,my=0,rx=0,ry=0;
-    document.addEventListener('mousemove',(e)=>{ mx=e.clientX; my=e.clientY; cursor.style.left=(mx-6)+'px'; cursor.style.top=(my-6)+'px'; });
-    function animate(){ rx+=(mx-rx-18)*0.12; ry+=(my-ry-18)*0.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animate); }
-    animate();
-}
 
-async function initCounters() {
+// GROQ (AI)
+async function callGroq(prompt) {
     try {
-        const { count } = await supabaseClient.from('users').select('*', { count: 'exact', head: true });
-        const c1 = document.getElementById('counter1');
-        if(c1) c1.innerText = (count || 0).toLocaleString('tr-TR');
-    } catch(e) { console.log('Kullanıcı sayısı alınamadı:', e); }
-    const c2 = document.getElementById('counter2');
-    const c3 = document.getElementById('counter3');
-    if(c2) c2.innerText = '1.250.000';
-    if(c3) c3.innerText = '87.400';
+        const res = await fetch(`${CLOUDFLARE_WORKER_URL}/groq`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+        const data = await res.json();
+        return data.response || null;
+    } catch(e) { console.log('Groq hatası:', e); return null; }
 }
 
-function updateUI() {
-    if(currentUser){
-        document.getElementById('loginBtn').style.display='none';
-        document.getElementById('registerBtn').style.display='none';
-        document.getElementById('logoutBtn').style.display='block';
-        const plan = currentUser.plan || 'free';
-        let txt = plan === 'team' ? '👥 Takım - Sınırsız' : (plan === 'pro' ? '⭐ Pro - 2000/gün' : '🆓 Ücretsiz - 20/gün');
-        document.getElementById('queryLimitBadge').innerHTML = `🔍 ${txt} | Kalan: <span>${plan === 'team' ? '∞' : (plan === 'pro' ? '2000' : dailyQueries)}</span>`;
-        if(plan === 'team') {
-            document.getElementById('teamDashboard').style.display = 'block';
-            document.getElementById('teamName').innerHTML = currentUser.name;
-            if(currentUser.team_id) loadTeamData();
-        }
-    } else {
-        document.getElementById('loginBtn').style.display='block';
-        document.getElementById('registerBtn').style.display='block';
-        document.getElementById('logoutBtn').style.display='none';
-        document.getElementById('teamDashboard').style.display='none';
-        document.getElementById('queryLimitBadge').innerHTML = `🔍 Ücretsiz - 20/gün | Kalan: <span>${dailyQueries}</span>`;
-    }
-}
-
-function useQuery() {
-    if(!currentUser){
-        if(dailyQueries <= 0){ alert("⚠️ Günlük sorgu limitiniz (20) doldu!"); return false; }
-        dailyQueries--; localStorage.setItem('v27_queries', dailyQueries); updateUI(); return true;
-    }
-    if(currentUser.plan === 'team' || currentUser.role === 'admin' || currentUser.role === 'founder') return true;
-    if(currentUser.plan === 'pro') {
-        let used = parseInt(localStorage.getItem('v27_pro_used')||0);
-        if(used >= 2000){ alert("⚠️ Pro limitiniz (2000) doldu!"); return false; }
-        localStorage.setItem('v27_pro_used', used+1); updateUI(); return true;
-    }
-    if(dailyQueries <= 0){ alert("⚠️ Günlük sorgu limitiniz (20) doldu!"); return false; }
-    dailyQueries--; localStorage.setItem('v27_queries', dailyQueries); updateUI(); return true;
-}
-
-function checkAndReset() {
-    let today = new Date().toDateString();
-    let lastDate = localStorage.getItem('v27_last_date') || '';
-    if(lastDate !== today){
-        localStorage.setItem('v27_queries','20');
-        localStorage.setItem('v27_pro_used','0');
-        localStorage.setItem('v27_last_date',today);
-        dailyQueries = 20;
-        updateUI();
-    }
-}
-
-// ============================================================
-// WEB ARAMA & AI
-// ============================================================
+// SERPAPI (Web arama)
 async function webSearch(query) {
     try {
-        const url = `https://serpapi.com/search.json?q=${encodeURIComponent(query)}&hl=tr&gl=tr&api_key=${CONFIG.getSerpapiKey()}`;
-        const resp = await fetch(url);
-        const data = await resp.json();
+        const res = await fetch(`${CLOUDFLARE_WORKER_URL}/serpapi`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query })
+        });
+        const data = await res.json();
         if(data.error) return null;
         let html = `🌐 <strong>Arama Sonuçları:</strong><br><br>`;
         if(data.answer_box) html += `<div style="background:rgba(0,212,255,.1);padding:12px;margin-bottom:14px">⚡ ${data.answer_box.answer || data.answer_box.snippet}</div>`;
@@ -1785,18 +1740,131 @@ async function webSearch(query) {
     } catch(e) { return null; }
 }
 
-async function callGroq(prompt) {
+// RESEND (Mail)
+async function sendEmail(to, subject, html) {
     try {
-        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        const res = await fetch(`${CLOUDFLARE_WORKER_URL}/resend`, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${CONFIG.getGroqKey()}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: prompt }], temperature: 0.7, max_tokens: 1000 })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ to, subject, html })
+        });
+        return await res.json();
+    } catch(e) { console.log('Mail hatası:', e); return null; }
+}
+
+// CEREBRAS (Yedek AI)
+async function callCerebras(prompt) {
+    try {
+        const res = await fetch(`${CLOUDFLARE_WORKER_URL}/cerebras`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
         });
         const data = await res.json();
-        return data.choices?.[0]?.message?.content || null;
+        return data.response || null;
     } catch(e) { return null; }
 }
 
+// MISTRAL (Yedek AI)
+async function callMistral(prompt) {
+    try {
+        const res = await fetch(`${CLOUDFLARE_WORKER_URL}/mistral`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+        const data = await res.json();
+        return data.response || null;
+    } catch(e) { return null; }
+}
+
+// OPENROUTER (Çoklu Model)
+async function callOpenrouter(prompt) {
+    try {
+        const res = await fetch(`${CLOUDFLARE_WORKER_URL}/openrouter`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+        const data = await res.json();
+        return data.response || null;
+    } catch(e) { return null; }
+}
+
+// COHERE (Yedek AI)
+async function callCohere(prompt) {
+    try {
+        const res = await fetch(`${CLOUDFLARE_WORKER_URL}/cohere`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+        const data = await res.json();
+        return data.response || null;
+    } catch(e) { return null; }
+}
+
+// OPENAI (Boş yer - sonra eklenecek)
+async function callOpenAI(prompt) {
+    try {
+        const res = await fetch(`${CLOUDFLARE_WORKER_URL}/openai`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+        const data = await res.json();
+        return data.response || null;
+    } catch(e) { return null; }
+}
+
+// GEMINI (Boş yer - sonra eklenecek)
+async function callGemini(prompt) {
+    try {
+        const res = await fetch(`${CLOUDFLARE_WORKER_URL}/gemini`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+        const data = await res.json();
+        return data.response || null;
+    } catch(e) { return null; }
+}
+
+// SÜPER AI (Tüm modelleri dene - birisi çalışırsa yeter)
+async function callSuperAI(prompt) {
+    // Önce Groq dene
+    let result = await callGroq(prompt);
+    if(result) return result;
+    
+    // Sonra Cerebras
+    result = await callCerebras(prompt);
+    if(result) return result;
+    
+    // Sonra Mistral
+    result = await callMistral(prompt);
+    if(result) return result;
+    
+    // Sonra OpenRouter
+    result = await callOpenrouter(prompt);
+    if(result) return result;
+    
+    // Sonra Cohere
+    result = await callCohere(prompt);
+    if(result) return result;
+    
+    // Sonra OpenAI (hazır olunca)
+    result = await callOpenAI(prompt);
+    if(result) return result;
+    
+    // Sonra Gemini (hazır olunca)
+    result = await callGemini(prompt);
+    if(result) return result;
+    
+    // Hiçbiri çalışmazsa fallback
+    return fallbackAI(prompt);
+}
+
+// FALLBACK AI
 function fallbackAI(prompt) {
     const p = prompt.toLowerCase();
     if(p.includes('python') && p.includes('hesap')) {
@@ -1811,15 +1879,8 @@ function fallbackAI(prompt) {
     return `🧠 VİZYON AI hazır!\n\n📌 Örnek: "Python hesap makinesi yaz", "React todo app yap", "dolar kaç"`;
 }
 
-async function callSuperAI(prompt) {
-    if(CONFIG.getGroqKey()) {
-        try { const r = await callGroq(prompt); if(r) return r; } catch(e) {}
-    }
-    return fallbackAI(prompt);
-}
-
 // ============================================================
-// KAYIT, GİRİŞ, DOĞRULAMA
+// KAYIT, GİRİŞ, DOĞRULAMA (MAIL Worker üzerinden)
 // ============================================================
 async function handleRegister() {
     const name = document.getElementById('rName')?.value.trim();
@@ -1842,18 +1903,21 @@ async function handleRegister() {
     }]);
     if(error){ alert('Hata: ' + error.message); return; }
     
-    try {
-        await fetch('https://api.resend.com/emails', {
-            method: 'POST', headers: { 'Authorization': `Bearer ${CONFIG.getResendKey()}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ from: 'Vizyon2027 <noreply@vizyon2027.com>', to: email, subject: 'Doğrulama Kodu', html: `<h1>Hoş geldin ${name}!</h1><p>Kodunuz: <strong style="font-size:24px;color:#00d4ff;">${code}</strong></p><p>15 dakika geçerlidir.</p>` })
-        });
-    } catch(e) {}
+    // Cloudflare Worker üzerinden mail gönder
+    await sendEmail(
+        email,
+        'Doğrulama Kodu - Vizyon 2027',
+        `<h1>Hoş geldin ${name}!</h1><p>Doğrulama kodunuz: <strong style="font-size:24px;color:#00d4ff;">${code}</strong></p><p>15 dakika geçerlidir.</p>`
+    );
     
     alert('✅ Kayıt başarılı! Mail adresinize doğrulama kodu gönderildi.');
     switchTab('verify');
     document.getElementById('verifyEmail').value = email;
 }
 
+// ============================================================
+// DİĞER FONKSİYONLAR (SABİT - DEĞİŞMEDİ)
+// ============================================================
 async function verifyAccount() {
     const email = document.getElementById('verifyEmail')?.value.trim();
     const code = document.getElementById('verifyCode')?.value.trim();
@@ -1953,7 +2017,7 @@ function sendTeamMessage() {
 }
 
 // ============================================================
-// DASHBOARD & PROJE YÖNETİMİ
+// DASHBOARD & PROJE YÖNETİMİ (SABİT)
 // ============================================================
 function showDashboard() {
     document.getElementById('mainSite').style.display = 'none';
@@ -2046,7 +2110,7 @@ document.getElementById('dashboardFileInput')?.addEventListener('change', async 
 });
 
 // ============================================================
-// PROFİL
+// PROFİL (SABİT)
 // ============================================================
 function openProfileModal() {
     document.getElementById('profileModal').classList.add('open');
@@ -2058,7 +2122,7 @@ async function deleteOwnAccount() {
     let confirmPass = prompt("Hesabınızı silmek için şifrenizi girin:");
     if(!confirmPass || btoa(confirmPass) !== currentUser.password_hash){ alert("Şifre hatalı!"); return; }
     let code = Math.floor(100000 + Math.random() * 900000).toString();
-    await fetch('https://api.resend.com/emails', { method: 'POST', headers: { 'Authorization': `Bearer ${CONFIG.getResendKey()}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: 'Vizyon2027 <noreply@vizyon2027.com>', to: currentUser.email, subject: 'Hesap Silme Onayı', html: `<h1>Onay kodunuz: ${code}</h1>` }) });
+    await sendEmail(currentUser.email, 'Hesap Silme Onayı', `<h1>Onay kodunuz: ${code}</h1>`);
     let entered = prompt("Mail adresinize gönderilen 6 haneli kodu girin:");
     if(entered !== code){ alert("Kod hatalı!"); return; }
     await supabaseClient.from('users').delete().eq('id', currentUser.id);
@@ -2070,7 +2134,7 @@ document.getElementById('profileBtn')?.addEventListener('click', openProfileModa
 document.getElementById('dashboardLogoutBtn')?.addEventListener('click', handleLogout);
 
 // ============================================================
-// ADMIN PANELİ
+// ADMIN PANELİ (SABİT)
 // ============================================================
 function showAuthPanel(role) { pendingAdminRole = role; document.getElementById('authPanelOverlay').classList.add('open'); document.getElementById('authPassword').value = ''; }
 function closeAuthPanel() { document.getElementById('authPanelOverlay').classList.remove('open'); }
@@ -2090,7 +2154,7 @@ async function addAdmin() { let email = document.getElementById('newAdminEmail')
 function exportUsers() { let csv = 'İsim,Email,Plan,Rol,Doğrulandı,Yasaklı\n' + _allUsers.map(u => `"${u.name}","${u.email}","${u.plan}","${u.role || 'user'}","${u.is_verified ? 'Evet' : 'Hayır'}","${u.is_banned ? 'Evet' : 'Hayır'}"`).join('\n'); let a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'kullanicilar.csv'; a.click(); }
 
 // ============================================================
-// DOSYA YÜKLEME & VİZYON AI PANELİ
+// DOSYA YÜKLEME & VİZYON AI PANELİ (SABİT)
 // ============================================================
 function handleFileUpload(input) {
     let file = input.files[0];
@@ -2133,8 +2197,79 @@ async function sendVizyonAIAdvanced() {
 }
 
 // ============================================================
-// MODAL VE DİĞER
+// TEMEL FONKSİYONLAR (SABİT)
 // ============================================================
+function initCursor() {
+    const cursor = document.getElementById('customCursor');
+    const ring = document.getElementById('customCursorRing');
+    if(!cursor || !ring) return;
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',(e)=>{ mx=e.clientX; my=e.clientY; cursor.style.left=(mx-6)+'px'; cursor.style.top=(my-6)+'px'; });
+    function animate(){ rx+=(mx-rx-18)*0.12; ry+=(my-ry-18)*0.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animate); }
+    animate();
+}
+
+async function initCounters() {
+    try {
+        const { count } = await supabaseClient.from('users').select('*', { count: 'exact', head: true });
+        const c1 = document.getElementById('counter1');
+        if(c1) c1.innerText = (count || 0).toLocaleString('tr-TR');
+    } catch(e) { console.log('Kullanıcı sayısı alınamadı:', e); }
+    const c2 = document.getElementById('counter2');
+    const c3 = document.getElementById('counter3');
+    if(c2) c2.innerText = '1.250.000';
+    if(c3) c3.innerText = '87.400';
+}
+
+function updateUI() {
+    if(currentUser){
+        document.getElementById('loginBtn').style.display='none';
+        document.getElementById('registerBtn').style.display='none';
+        document.getElementById('logoutBtn').style.display='block';
+        const plan = currentUser.plan || 'free';
+        let txt = plan === 'team' ? '👥 Takım - Sınırsız' : (plan === 'pro' ? '⭐ Pro - 2000/gün' : '🆓 Ücretsiz - 20/gün');
+        document.getElementById('queryLimitBadge').innerHTML = `🔍 ${txt} | Kalan: <span>${plan === 'team' ? '∞' : (plan === 'pro' ? '2000' : dailyQueries)}</span>`;
+        if(plan === 'team') {
+            document.getElementById('teamDashboard').style.display = 'block';
+            document.getElementById('teamName').innerHTML = currentUser.name;
+            if(currentUser.team_id) loadTeamData();
+        }
+    } else {
+        document.getElementById('loginBtn').style.display='block';
+        document.getElementById('registerBtn').style.display='block';
+        document.getElementById('logoutBtn').style.display='none';
+        document.getElementById('teamDashboard').style.display='none';
+        document.getElementById('queryLimitBadge').innerHTML = `🔍 Ücretsiz - 20/gün | Kalan: <span>${dailyQueries}</span>`;
+    }
+}
+
+function useQuery() {
+    if(!currentUser){
+        if(dailyQueries <= 0){ alert("⚠️ Günlük sorgu limitiniz (20) doldu!"); return false; }
+        dailyQueries--; localStorage.setItem('v27_queries', dailyQueries); updateUI(); return true;
+    }
+    if(currentUser.plan === 'team' || currentUser.role === 'admin' || currentUser.role === 'founder') return true;
+    if(currentUser.plan === 'pro') {
+        let used = parseInt(localStorage.getItem('v27_pro_used')||0);
+        if(used >= 2000){ alert("⚠️ Pro limitiniz (2000) doldu!"); return false; }
+        localStorage.setItem('v27_pro_used', used+1); updateUI(); return true;
+    }
+    if(dailyQueries <= 0){ alert("⚠️ Günlük sorgu limitiniz (20) doldu!"); return false; }
+    dailyQueries--; localStorage.setItem('v27_queries', dailyQueries); updateUI(); return true;
+}
+
+function checkAndReset() {
+    let today = new Date().toDateString();
+    let lastDate = localStorage.getItem('v27_last_date') || '';
+    if(lastDate !== today){
+        localStorage.setItem('v27_queries','20');
+        localStorage.setItem('v27_pro_used','0');
+        localStorage.setItem('v27_last_date',today);
+        dailyQueries = 20;
+        updateUI();
+    }
+}
+
 function openModal(t) { document.getElementById('authModal').classList.add('open'); switchTab(t); }
 function closeModal() { document.getElementById('authModal').classList.remove('open'); }
 function switchTab(tab) {
