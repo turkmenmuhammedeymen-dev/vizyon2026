@@ -2,19 +2,13 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, 
-
-viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
 <title>Vizyon 2027 | VİZYON AI - Süper Yapay Zeka Ekosistemi</title>
 
 <!-- Supabase SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Space
-
-+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=Fira
-
-+Code:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@300;400;500;700&display=swap" rel="stylesheet">
 
 <style>
 :root {
@@ -46,6 +40,7 @@ body {
   overflow-x: hidden;
 }
 
+/* MAVİ İMLEÇ */
 .custom-cursor {
   width: 10px;
   height: 10px;
@@ -68,11 +63,7 @@ body {
   opacity: 0.6;
 }
 
-button, a, .secret-btn, .nav-cta, .btn-primary, .btn-secondary, .btn-price, .ai-suggestion, 
-
-.mbadge, .download-btn, .ai-widget-btn, .close-panel-btn, .btn-submit, .modal-tab, 
-
-.support-link, .nav-links a {
+button, a, .secret-btn, .nav-cta, .btn-primary, .btn-secondary, .btn-price, .ai-suggestion, .mbadge, .download-btn, .ai-widget-btn, .close-panel-btn, .btn-submit, .modal-tab, .support-link, .nav-links a {
   cursor: pointer !important;
   z-index: 999 !important;
   position: relative;
@@ -305,12 +296,8 @@ nav {
   margin-bottom: 24px;
 }
 .hero-title .line1 { color: var(--text); display: block; }
-.hero-title .line2 { display: block; -webkit-text-stroke: 1px var(--accent); color: 
-
-transparent; }
-.hero-title .line3 { display: block; color: var(--accent2); font-size: 0.55em; margin-top: 
-
-8px; }
+.hero-title .line2 { display: block; -webkit-text-stroke: 1px var(--accent); color: transparent; }
+.hero-title .line3 { display: block; color: var(--accent2); font-size: 0.55em; margin-top: 8px; }
 .hero-sub {
   max-width: 600px;
   font-size: 15px;
@@ -472,365 +459,230 @@ transparent; }
 .fn { color: var(--accent2); }
 .str { color: var(--accent3); }
 
-.features {
-  padding: 80px 48px;
-  max-width: 1200px;
-  margin: 0 auto;
+/* DASHBOARD (SİM SİYAH TAM EKRAN) */
+.dashboard-container {
+  min-height: 100vh;
+  background: #000000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  overflow-y: auto;
+  padding: 20px;
 }
-.section-header { text-align: center; margin-bottom: 64px; }
-.section-tag {
-  font-size: 11px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 16px;
+.dashboard-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 120% 60% at 50% 0%, rgba(0,212,255,0.05) 0%, transparent 60%);
+  z-index: -1;
 }
-.section-title {
-  font-family: var(--font-display);
-  font-size: clamp(32px, 5vw, 52px);
-  font-weight: 800;
-}
-.section-title .hl { color: var(--accent); }
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2px;
-  background: var(--border);
-  border: 1px solid var(--border);
-}
-.feature-card {
-  background: var(--bg);
-  padding: 40px 36px;
-  transition: background 0.3s;
-  cursor: pointer;
-}
-.feature-card:hover { background: var(--surface); }
-.feature-icon {
-  width: 48px;
-  height: 48px;
-  margin-bottom: 20px;
+.dashboard-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  border: 1px solid var(--border);
-  color: var(--accent);
+  padding: 20px 32px;
+  background: rgba(10,10,10,0.95);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
-.feature-title {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-.feature-desc {
-  font-size: 13px;
-  line-height: 1.8;
-  color: var(--text2);
-}
-
-.ai-section {
-  padding: 80px 48px;
-  max-width: 1200px;
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 24px;
+  padding: 24px;
+  max-width: 1600px;
   margin: 0 auto;
 }
-.ai-showcase {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px;
-  background: var(--border);
+.dashboard-card {
+  background: rgba(17,17,17,0.8);
+  backdrop-filter: blur(10px);
   border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 24px;
+  transition: 0.2s;
 }
-.ai-left {
-  background: var(--bg);
-  padding: 48px;
+.dashboard-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 15px rgba(0,212,255,0.2);
 }
-.ai-right {
-  background: var(--surface);
-  padding: 48px;
+.dashboard-card h3 {
+  color: var(--accent);
+  margin-bottom: 20px;
+  font-size: 18px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
 }
-.ai-title {
-  font-family: var(--font-display);
-  font-size: clamp(28px, 4vw, 42px);
-  font-weight: 800;
+.dashboard-card h4 {
+  color: var(--accent2);
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+.neon-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
   margin-bottom: 20px;
 }
-.ai-title em { color: var(--accent2); font-style: normal; }
-.ai-desc {
-  font-size: 14px;
-  line-height: 1.9;
-  color: var(--text2);
-  margin-bottom: 32px;
+.neon-stat {
+  background: rgba(0,0,0,0.5);
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  border: 1px solid var(--border);
 }
-.model-row {
+.neon-stat .number {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--accent);
+}
+.neon-stat .label {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+.project-list, .inbox-list, .group-list {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.project-item {
+  background: #0a0a0a;
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 3px solid var(--accent);
+}
+.user-item {
+  background: #0a0a0a;
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 32px;
+  margin-bottom: 8px;
 }
-.mbadge {
-  padding: 6px 14px;
-  font-size: 11px;
-  text-transform: uppercase;
-  border: 1px solid;
-  border-radius: 20px;
+.user-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.user-actions button {
+  padding: 6px 12px;
+  font-size: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  border-radius: 6px;
   cursor: pointer;
 }
-.mbadge.a { border-color: var(--accent); color: var(--accent); background: rgba
-
-(0,212,255,0.06); }
-.mbadge.b { border-color: var(--accent2); color: var(--accent2); background: rgba
-
-(0,255,136,0.06); }
-.mbadge.c { border-color: var(--purple); color: var(--purple); background: rgba
-
-(168,85,247,0.06); }
-.ai-chat-msg {
-  padding: 16px 20px;
-  border-left: 2px solid;
-  font-size: 13px;
-  line-height: 1.7;
-  background: rgba(0,0,0,0.2);
-}
-.ai-chat-msg.user { border-color: var(--text3); color: var(--text2); }
-.ai-chat-msg.bot { border-color: var(--accent); color: var(--text); }
-.ai-chat-code {
-  background: rgba(0,212,255,0.05);
-  border: 1px solid rgba(0,212,255,0.15);
-  padding: 12px 16px;
-  margin-top: 10px;
-  font-size: 12px;
-  color: var(--accent2);
-  white-space: pre;
-  overflow-x: auto;
-}
-
-.tech-section {
-  padding: 60px 48px;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  overflow: hidden;
-}
-.tech-scroll {
-  display: flex;
-  gap: 40px;
-  animation: scroll-left 25s linear infinite;
-  white-space: nowrap;
-}
-.tech-scroll:hover { animation-play-state: paused; }
-@keyframes scroll-left {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-.tech-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 24px;
-  border: 1px solid var(--border);
-  color: var(--text3);
-  font-size: 13px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  transition: all 0.2s;
-}
-.tech-item:hover {
+.user-actions button:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
-.tech-dot {
-  width: 6px;
-  height: 6px;
-  background: var(--accent2);
-  border-radius: 50%;
+.group-chat {
+  height: 200px;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.3);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
 }
-
-.pricing {
-  padding: 80px 48px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.pricing-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2px;
-  background: var(--border);
-  border: 1px solid var(--border);
-}
-.price-card {
-  background: var(--bg);
-  padding: 40px 36px;
-  position: relative;
-}
-.price-card.featured {
-  background: var(--surface);
-  outline: 2px solid var(--accent);
-}
-.price-tier {
-  font-size: 11px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 16px;
-}
-.price-amount {
-  font-family: var(--font-display);
-  font-size: 48px;
-  font-weight: 800;
-  color: var(--text);
-}
-.price-features {
-  list-style: none;
-  margin: 20px 0;
-}
-.price-features li {
-  padding: 8px 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
-  color: var(--text2);
-  border-bottom: 1px solid rgba(26,51,80,0.5);
-}
-.price-features li::before { content: "▸"; color: var(--accent2); }
-.btn-price {
-  width: 100%;
-  padding: 14px;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text2);
-  cursor: pointer;
+.group-chat-message {
+  padding: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
   font-size: 12px;
-  text-transform: uppercase;
-  transition: all 0.2s;
 }
-.btn-price:hover { border-color: var(--accent); color: var(--accent); }
-.price-badge {
-  position: absolute;
-  top: -1px;
-  right: 24px;
-  padding: 4px 14px;
-  background: var(--accent);
-  color: var(--bg);
-  font-size: 10px;
-  text-transform: uppercase;
-  font-weight: 700;
-  clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%);
-  padding-bottom: 12px;
-}
-
-.testimonials {
-  padding: 80px 48px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.testimonials-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2px;
-  background: var(--border);
-  border: 1px solid var(--border);
-}
-.testimonial {
-  background: var(--bg);
-  padding: 32px;
-  transition: background 0.3s;
-}
-.testimonial:hover { background: var(--surface); }
-.testimonial-text {
-  font-size: 14px;
-  line-height: 1.8;
-  color: var(--text2);
-  margin-bottom: 20px;
-  font-style: italic;
-}
-.testimonial-author {
+.group-chat-input {
   display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.author-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--accent);
-}
-
-footer {
-  border-top: 1px solid var(--border);
-  padding: 60px 48px 40px;
-  background: var(--bg2);
-}
-.footer-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 48px;
-  max-width: 1200px;
-  margin: 0 auto 48px;
-}
-.footer-col h4 {
-  font-size: 11px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 20px;
-}
-.footer-col ul { list-style: none; }
-.footer-col li { margin-bottom: 10px; }
-.footer-col a {
-  color: var(--text2);
-  text-decoration: none;
-  font-size: 13px;
-  transition: color 0.2s;
-}
-.footer-col a:hover { color: var(--accent); }
-.footer-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 32px;
-  border-top: 1px solid var(--border);
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.footer-copy { font-size: 12px; color: var(--text3); }
-.footer-copy span { color: var(--accent); }
-.badge {
-  padding: 4px 12px;
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  border: 1px solid var(--border);
-  color: var(--text3);
-}
-.badge.live { border-color: var(--accent2); color: var(--accent2); }
-.support-footer {
-  margin-top: 20px;
-  text-align: center;
-}
-.support-link {
-  display: inline-flex;
-  align-items: center;
   gap: 8px;
-  padding: 10px 24px;
-  background: rgba(0,212,255,0.1);
-  border: 1px solid var(--accent);
-  border-radius: 40px;
-  color: var(--accent);
-  text-decoration: none;
+}
+.group-chat-input input {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px;
+  border-radius: 8px;
+}
+.ai-chat-messages {
+  height: 250px;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.3);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+.ai-message {
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
   font-size: 13px;
 }
-.support-link:hover {
-  background: var(--accent);
-  color: var(--bg);
+.ai-message.user {
+  background: rgba(0,212,255,0.1);
+  text-align: right;
 }
-
+.ai-message.bot {
+  background: rgba(0,255,136,0.05);
+  border-left: 2px solid var(--accent2);
+}
+.ai-input-area {
+  display: flex;
+  gap: 8px;
+}
+.ai-input-area input {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px;
+  border-radius: 8px;
+}
+.btn-danger {
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-warning {
+  background: var(--gold);
+  color: var(--bg);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-success {
+  background: var(--accent2);
+  color: var(--bg);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.glow-input {
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+}
 .modal-overlay {
   display: none;
   position: fixed;
@@ -850,502 +702,8 @@ footer {
   max-width: 95vw;
   padding: 24px;
 }
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-.modal-close {
-  background: none;
-  border: none;
-  color: var(--text3);
-  cursor: pointer;
-  font-size: 20px;
-}
-.modal-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-.modal-tab {
-  flex: 1;
-  padding: 12px;
-  background: none;
-  border: none;
-  font-size: 13px;
-  text-transform: uppercase;
-  color: var(--text3);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-}
-.modal-tab.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
-.modal-body { padding: 0; }
-.form-group { margin-bottom: 16px; }
-.form-row { display: flex; gap: 12px; margin-bottom: 16px; }
-.form-input {
-  width: 100%;
-  padding: 12px 16px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-size: 14px;
-  border-radius: 8px;
-}
-.btn-submit {
-  width: 100%;
-  padding: 14px;
-  background: var(--accent);
-  color: var(--bg);
-  border: none;
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  cursor: pointer;
-  border-radius: 8px;
-  margin-top: 8px;
-}
-.btn-submit:hover { opacity: 0.9; }
 
-.admin-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(5,10,15,0.98);
-  z-index: 2000;
-  justify-content: center;
-  align-items: flex-start;
-  overflow-y: auto;
-  padding: 20px;
-}
-.admin-overlay.open { display: flex; }
-.admin-panel {
-  background: var(--surface);
-  border: 2px solid var(--accent);
-  width: 95%;
-  max-width: 1400px;
-  max-height: 90vh;
-  overflow-y: auto;
-  padding: 25px;
-  border-radius: 20px;
-}
-.admin-panel h2 {
-  color: var(--accent);
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--accent);
-  padding-bottom: 10px;
-}
-.admin-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 15px;
-  margin-bottom: 25px;
-}
-.stat-card {
-  background: var(--bg2);
-  padding: 15px;
-  border-radius: 12px;
-  text-align: center;
-  border: 1px solid var(--accent);
-}
-.stat-number {
-  font-size: 28px;
-  font-weight: bold;
-  color: var(--accent);
-  display: block;
-}
-.user-list {
-  max-height: 300px;
-  overflow-y: auto;
-}
-.user-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  background: var(--bg2);
-  margin: 8px 0;
-  border-radius: 10px;
-  flex-wrap: wrap;
-  gap: 8px;
-  border-left: 3px solid var(--accent);
-}
-.close-panel-btn {
-  background: var(--danger);
-  border: none;
-  padding: 12px 20px;
-  border-radius: 10px;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 20px;
-  width: 100%;
-}
-.glow-input {
-  background: var(--bg);
-  border: 1px solid var(--accent);
-  color: var(--text);
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 12px;
-}
-
-.auth-panel-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(5,10,15,0.98);
-  backdrop-filter: blur(12px);
-  z-index: 1500;
-  justify-content: center;
-  align-items: center;
-}
-.auth-panel-overlay.open { display: flex; }
-.auth-panel {
-  background: var(--surface);
-  border: 2px solid var(--accent);
-  border-radius: 24px;
-  padding: 40px;
-  width: 400px;
-  max-width: 90%;
-  text-align: center;
-}
-.auth-panel input {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: white;
-  border-radius: 8px;
-}
-.auth-buttons { display: flex; gap: 12px; margin-top: 16px; }
-
-.team-dashboard {
-  background: var(--surface);
-  border: 1px solid var(--accent);
-  border-radius: 16px;
-  padding: 20px;
-  margin: 40px auto;
-  max-width: 1200px;
-}
-.team-dashboard h3 {
-  color: var(--accent2);
-  margin-bottom: 20px;
-}
-.team-section {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-.team-members, .team-projects, .team-chat {
-  background: var(--bg2);
-  border-radius: 12px;
-  padding: 15px;
-  flex: 1;
-  min-width: 250px;
-  border: 1px solid var(--border);
-}
-.team-chat-messages {
-  height: 200px;
-  overflow-y: auto;
-  background: var(--bg);
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 10px;
-}
-.team-chat-input {
-  display: flex;
-  gap: 8px;
-}
-.team-chat-input input {
-  flex: 1;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 8px;
-  border-radius: 8px;
-}
-
-.download-menu {
-  position: fixed;
-  bottom: 100px;
-  right: 20px;
-  z-index: 1000;
-}
-.download-btn {
-  width: 55px;
-  height: 55px;
-  background: linear-gradient(45deg, var(--accent), var(--purple));
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 24px;
-  box-shadow: 0 0 20px rgba(0,212,255,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.download-btn:hover { transform: scale(1.1); }
-.download-options {
-  position: absolute;
-  bottom: 65px;
-  right: 0;
-  background: var(--surface);
-  border: 1px solid var(--accent);
-  border-radius: 16px;
-  padding: 10px;
-  display: none;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 200px;
-}
-.download-options.open { display: flex; }
-.download-options a {
-  padding: 10px 15px;
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: var(--text);
-  text-decoration: none;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.ai-widget {
-  position: fixed;
-  bottom: 32px;
-  right: 32px;
-  z-index: 500;
-}
-.ai-widget-btn {
-  width: 56px;
-  height: 56px;
-  background: var(--accent);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 
-
-20%);
-  box-shadow: 0 0 30px rgba(0,212,255,0.4);
-  animation: glow 2s ease-in-out infinite;
-}
-@keyframes glow {
-  0%,100% { box-shadow: 0 0 20px rgba(0,212,255,0.3); }
-  50% { box-shadow: 0 0 40px rgba(0,212,255,0.6); }
-}
-.ai-widget-btn:hover { transform: scale(1.1); }
-.ai-panel {
-  display: none;
-  position: absolute;
-  bottom: 70px;
-  right: 0;
-  width: 340px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-}
-.ai-panel.open { display: flex; flex-direction: column; }
-.ai-messages {
-  height: 240px;
-  overflow-y: auto;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.ai-msg {
-  padding: 10px 14px;
-  font-size: 12px;
-  line-height: 1.7;
-  max-width: 85%;
-}
-.ai-msg.bot {
-  background: rgba(0,212,255,0.06);
-  border-left: 2px solid var(--accent);
-  align-self: flex-start;
-}
-.ai-msg.user {
-  background: rgba(0,255,136,0.06);
-  border-right: 2px solid var(--accent2);
-  align-self: flex-end;
-  text-align: right;
-}
-.ai-input-area {
-  padding: 12px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  gap: 8px;
-}
-.ai-input {
-  flex: 1;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 8px 12px;
-  font-size: 12px;
-}
-.ai-send {
-  padding: 8px 14px;
-  background: var(--accent);
-  border: none;
-  color: var(--bg);
-  cursor: pointer;
-}
-.ai-suggestions {
-  padding: 10px 12px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.ai-suggestion {
-  padding: 4px 10px;
-  font-size: 10px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text3);
-  cursor: pointer;
-}
-
-.file-upload-btn {
-  background: #0d1a26;
-  border: 1px solid #1a3350;
-  padding: 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  color: #4a7a99;
-  font-size: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.file-upload-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.dashboard-container {
-  min-height: 100vh;
-  background: #000000;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10000;
-  overflow-y: auto;
-  padding: 20px;
-}
-.dashboard-container::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 120% 60% at 50% 0%, rgba(0,212,255,0.08) 0%, 
-
-transparent 60%);
-  z-index: -1;
-}
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 32px;
-  background: rgba(10,10,10,0.95);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.dashboard-neon-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 24px;
-  padding: 32px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-.neon-card {
-  background: rgba(17,17,17,0.8);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--border);
-  border-radius: 28px;
-  padding: 28px 24px;
-  transition: 0.2s;
-}
-.neon-card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 15px rgba(0,212,255,0.3);
-  transform: translateY(-4px);
-}
-.card-number {
-  font-size: 42px;
-  font-weight: 800;
-  color: var(--accent);
-  margin: 8px 0;
-  text-shadow: 0 0 10px rgba(0,212,255,0.3);
-}
-.projects-section {
-  margin: 32px;
-  background: rgba(17,17,17,0.5);
-  border-radius: 28px;
-  padding: 24px;
-  backdrop-filter: blur(6px);
-  border: 1px solid var(--border);
-}
-.project-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.project-item {
-  background: #0a0a0a;
-  border-radius: 16px;
-  padding: 14px 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-left: 3px solid var(--accent);
-}
-.project-actions span {
-  cursor: pointer;
-  margin-left: 12px;
-  opacity: 0.7;
-}
-.project-actions span:hover { opacity: 1; color: var(--accent); }
-.context-menu {
-  position: fixed;
-  background: #111;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 8px 0;
-  z-index: 10001;
-  min-width: 160px;
-}
-.context-menu-item {
-  padding: 10px 20px;
-  cursor: pointer;
-}
-.context-menu-item:hover { background: #1a1a1a; color: var(--accent); }
-.chat-messages {
-  height: 300px;
-  overflow-y: auto;
-  background: rgba(0,0,0,0.3);
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
+/* RESPONSIVE */
 @media (max-width: 768px) {
   nav { padding: 0 16px; flex-wrap: wrap; height: auto; padding: 10px 16px; gap: 10px; }
   .nav-links { gap: 12px; }
@@ -1355,22 +713,10 @@ transparent 60%);
   .button-group { gap: 6px; flex-wrap: wrap; }
   .hero { padding: 140px 20px 60px; }
   .hero-title { font-size: clamp(32px, 7vw, 48px); }
-  .hero-sub { font-size: 12px; }
-  .features, .ai-section, .pricing, .testimonials { padding: 40px 20px; }
-  .feature-card { padding: 20px 16px; }
-  .ai-showcase { grid-template-columns: 1fr; }
-  .ai-left, .ai-right { padding: 24px; }
-  .pricing-grid { grid-template-columns: 1fr; }
-  .footer-grid { grid-template-columns: 1fr; gap: 24px; }
-  .admin-panel { padding: 12px; }
-  .admin-stats { grid-template-columns: repeat(2, 1fr); }
-  .user-item { flex-direction: column; align-items: flex-start; }
-  .team-section { flex-direction: column; }
-  .team-members, .team-projects, .team-chat { width: 100%; }
-  .query-limit-badge { bottom: 80px; left: 10px; font-size: 9px; padding: 4px 10px; }
-  .custom-cursor, .custom-cursor-ring { display: none; }
   .stats-bar { flex-direction: column; gap: 0; }
   .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+  .dashboard-grid { grid-template-columns: 1fr; padding: 16px; }
+  .custom-cursor, .custom-cursor-ring { display: none; }
 }
 </style>
 </head>
@@ -1382,23 +728,17 @@ transparent 60%);
 <div class="notification" id="notification"><span>🟢 Sistem</span> aktif!</div>
 <div class="grid-lines"></div>
 <div class="particles" id="particles"></div>
-<div class="query-limit-badge" id="queryLimitBadge">🔍 Kalan Sorgu: <span 
-
-id="remainingQueries">20</span></div>
+<div class="query-limit-badge" id="queryLimitBadge">🔍 Kalan Sorgu: <span id="remainingQueries">20</span></div>
 
 <div class="office-bg">
-  <img class="office-img" src="https://images.unsplash.com/photo-1497366216548-
-
-37526070297c?w=1920&q=80" alt="Office">
+  <img class="office-img" src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&q=80" alt="Office">
   <div class="office-overlay"></div>
 </div>
 
+<!-- MAIN SITE (Giriş yapılmamışken) -->
 <div id="mainSite">
   <nav>
-    <div class="logo">
-      <div class="logo-icon">✨</div>
-      <div class="logo-text">VİZYON 2027</div>
-    </div>
+    <div class="logo"><div class="logo-icon">✨</div><div class="logo-text">VİZYON 2027</div></div>
     <ul class="nav-links">
       <li><a href="#features">Özellikler</a></li>
       <li><a href="#ai">Yapay Zeka</a></li>
@@ -1411,450 +751,176 @@ id="remainingQueries">20</span></div>
         <button class="secret-btn" onclick="showAuthPanel('BETA')">🔬 BETA</button>
       </div>
       <button class="nav-cta" id="loginBtn" onclick="openModal('login')">Giriş Yap</button>
-      <button class="btn-primary-small" id="registerBtn" onclick="openModal
-
-('register')">Ücretsiz Başla</button>
-      <button class="logout-btn" id="logoutBtn" onclick="handleLogout()" 
-
-style="display:none;">🚪 Çıkış</button>
+      <button class="btn-primary-small" id="registerBtn" onclick="openModal('register')">Ücretsiz Başla</button>
+      <button class="logout-btn" id="logoutBtn" onclick="handleLogout()" style="display:none;">🚪 Çıkış</button>
     </div>
   </nav>
 
-  <div id="app">
-    <section class="hero">
-      <div class="hero-badge"><div class="blink"></div>VİZYON AI | Dünyanın En Güçlü Yapay 
+  <section class="hero">
+    <div class="hero-badge"><div class="blink"></div>VİZYON AI | Dünyanın En Güçlü Yapay Zekası</div>
+    <h1 class="hero-title"><span class="line1">VİZYON AI</span><span class="line2">SINIRSIZ YETENEK</span><span class="line3">Her dilde kod · Web arama · Dosya analiz · Takım Çalışması</span></h1>
+    <p class="hero-sub">⚡ VİZYON AI ile her dili konuş, her kodu yaz, takımınla çalış, projelerini yönet.</p>
+    <div class="hero-actions"><button class="btn-primary" onclick="openVizyonAI()">⚡ VİZYON AI'ı Başlat</button><button class="btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Daha Fazla →</button></div>
+    <div class="stats-bar">
+      <div class="stat-item"><span class="stat-num" id="counter1">0</span><div class="stat-label">Aktif Kullanıcı</div></div>
+      <div class="stat-item"><span class="stat-num" id="counter2">0</span><div class="stat-label">AI Sorgusu</div></div>
+      <div class="stat-item"><span class="stat-num" id="counter3">0</span><div class="stat-label">Proje Tamamlandı</div></div>
+    </div>
+    <div class="scroll-indicator"><div class="scroll-mouse"><div class="scroll-wheel"></div></div><span>Aşağı kaydır</span></div>
+  </section>
 
-Zekası</div>
-      <h1 class="hero-title"><span class="line1">VİZYON AI</span><span 
-
-class="line2">SINIRSIZ YETENEK</span><span class="line3">Her dilde kod · Web arama · Dosya 
-
-analiz · Takım Çalışması</span></h1>
-      <p class="hero-sub">⚡ VİZYON AI ile her dili konuş, her kodu yaz, takımınla çalış, 
-
-projelerini yönet.</p>
-      <div class="hero-actions"><button class="btn-primary" onclick="openVizyonAI()">⚡ 
-
-VİZYON AI'ı Başlat</button><button class="btn-secondary" onclick="document.getElementById
-
-('features').scrollIntoView({behavior:'smooth'})">Daha Fazla →</button></div>
-      <div class="stats-bar">
-        <div class="stat-item"><span class="stat-num" id="counter1">0</span><div 
-
-class="stat-label">Aktif Kullanıcı</div></div>
-        <div class="stat-item"><span class="stat-num" id="counter2">0</span><div 
-
-class="stat-label">AI Sorgusu</div></div>
-        <div class="stat-item"><span class="stat-num" id="counter3">0</span><div 
-
-class="stat-label">Proje Tamamlandı</div></div>
-      </div>
-      <div class="scroll-indicator"><div class="scroll-mouse"><div class="scroll-
-
-wheel"></div></div><span>Aşağı kaydır</span></div>
-    </section>
-
-    <div class="editor-preview">
-      <div class="editor-window">
-        <div class="editor-titlebar"><div class="editor-dot red"></div><div class="editor-
-
-dot yellow"></div><div class="editor-dot green"></div><span class="editor-
-
-filename">vizyon2027/ai_core.py</span></div>
-        <div class="editor-body">
-          <div class="code-line"><span class="ln">1</span><span class="code"><span 
-
-class="cm"># VİZYON AI — Süper Yapay Zeka</span></span></div>
-          <div class="code-line"><span class="ln">2</span><span class="code"><span 
-
-class="kw">from</span> vizyon_ai <span class="kw">import</span> <span 
-
-class="fn">SuperAI</span></div>
-          <div class="code-line"><span class="ln">3</span><span class="code"></span></div>
-          <div class="code-line"><span class="ln">4</span><span class="code">ai = <span 
-
-class="fn">SuperAI</span>()</div>
-          <div class="code-line"><span class="ln">5</span><span class="code">ai.<span 
-
-class="fn">birleştir</span>(<span class="str">"GPT-4o"</span>, <span 
-
-class="str">"Claude"</span>, <span class="str">"Gemini"</span>, <span 
-
-class="str">"DeepSeek"</span>)</div>
-          <div class="code-line"><span class="ln">6</span><span class="code">cevap = 
-
-ai.<span class="fn">kod_yaz</span>(<span class="str">"Python'da hesap makinesi"</span>)
-
-</div>
-          <div class="code-line"><span class="ln">7</span><span class="code"><span 
-
-class="fn">print</span>(cevap)  <span class="cm"># Tam çalışan kod gelir!</span></div>
-        </div>
+  <div class="editor-preview">
+    <div class="editor-window">
+      <div class="editor-titlebar"><div class="editor-dot red"></div><div class="editor-dot yellow"></div><div class="editor-dot green"></div><span class="editor-filename">vizyon2027/ai_core.py</span></div>
+      <div class="editor-body">
+        <div class="code-line"><span class="ln">1</span><span class="code"><span class="cm"># VİZYON AI — Süper Yapay Zeka</span></span></div>
+        <div class="code-line"><span class="ln">2</span><span class="code"><span class="kw">from</span> vizyon_ai <span class="kw">import</span> <span class="fn">SuperAI</span></div>
+        <div class="code-line"><span class="ln">3</span><span class="code"></span></div>
+        <div class="code-line"><span class="ln">4</span><span class="code">ai = <span class="fn">SuperAI</span>()</div>
+        <div class="code-line"><span class="ln">5</span><span class="code">ai.<span class="fn">birleştir</span>(<span class="str">"GPT-4o"</span>, <span class="str">"Claude"</span>, <span class="str">"Gemini"</span>, <span class="str">"DeepSeek"</span>)</div>
+        <div class="code-line"><span class="ln">6</span><span class="code">cevap = ai.<span class="fn">kod_yaz</span>(<span class="str">"Python'da hesap makinesi"</span>)</div>
+        <div class="code-line"><span class="ln">7</span><span class="code"><span class="fn">print</span>(cevap)  <span class="cm"># Tam çalışan kod gelir!</span></div>
       </div>
     </div>
-
-    <section class="features" id="features">
-      <div class="section-header"><div class="section-tag">// özellikler</div><h2 
-
-class="section-title">VİZYON AI <span class="hl">Gücü</span></h2></div>
-      <div class="features-grid">
-        <div class="feature-card"><div class="feature-icon">🤖</div><div class="feature-
-
-title">7 Model Tek Çatı</div><p class="feature-desc">GPT-4o, Claude, Gemini, DeepSeek, 
-
-Llama, Mistral hepsi birleşti.</p></div>
-        <div class="feature-card"><div class="feature-icon">⚡</div><div class="feature-
-
-title">Anlık Kod Üretimi</div><p class="feature-desc">Python, React, HTML, SQL, Docker her 
-
-dilde çalışan kod.</p></div>
-        <div class="feature-card"><div class="feature-icon">🌐</div><div class="feature-
-
-title">Canlı Web Arama</div><p class="feature-desc">SerpApi ile dolar kuru, haberler, anlık 
-
-bilgiler.</p></div>
-        <div class="feature-card"><div class="feature-icon">👥</div><div class="feature-
-
-title">Takım Çalışması</div><p class="feature-desc">Takım kur, üye ekle, ortak projeler ve 
-
-takım sohbeti.</p></div>
-        <div class="feature-card"><div class="feature-icon">💰</div><div class="feature-
-
-title">SaaS & Freelance</div><p class="feature-desc">Para kazandıran iş fikirleri, kariyer 
-
-yol haritası.</p></div>
-        <div class="feature-card"><div class="feature-icon">🔧</div><div class="feature-
-
-title">Hata Düzeltme</div><p class="feature-desc">Kodunu yapıştır, hatayı bul, düzelt, 
-
-çalıştır.</p></div>
-      </div>
-    </section>
-
-    <section class="ai-section" id="ai">
-      <div class="section-header"><div class="section-tag">// yapay zeka</div><h2 
-
-class="section-title">Tüm AI Modelleri<br><span class="hl">Tek Yerde</span></h2></div>
-      <div class="ai-showcase">
-        <div class="ai-left">
-          <h3 class="ai-title">Kod yaz,<br><em>anlık öğren,</em><br>büyü.</h3>
-          <p class="ai-desc">Dünyanın en güçlü AI modellerini tek platformda 
-
-birleştirdik.</p>
-          <div class="model-row"><span class="mbadge a" onclick="openVizyonAI()">⚡ VİZYON 
-
-AI</span><span class="mbadge a">GPT-4o</span><span class="mbadge b">Claude</span><span 
-
-class="mbadge c">Gemini</span><span class="mbadge a">DeepSeek</span><span class="mbadge 
-
-b">Llama</span><span class="mbadge c">Mistral</span></div>
-          <button class="btn-primary" onclick="openVizyonAI()">⚡ VİZYON AI ile Kod Yaz 
-
-→</button>
-        </div>
-        <div class="ai-right">
-          <div class="ai-chat-msg user"><div class="role">// kullanıcı</div>Python ile REST 
-
-API nasıl yazarım?</div>
-          <div class="ai-chat-msg bot"><div class="role">⚡ VİZYON AI</div>FastAPI ile şöyle 
-
-yapılır:<div class="ai-chat-code">from fastapi import FastAPI\napp = FastAPI()\n\n@app.get
-
-("/")\ndef root():\n    return {"message": "VİZYON AI"}\n\n# uvicorn main:app --
-
-reload</div></div>
-        </div>
-      </div>
-    </section>
-
-    <div class="tech-section">
-      <div class="tech-scroll">
-        <div class="tech-item"><div class="tech-dot"></div>Python</div>
-        <div class="tech-item"><div class="tech-dot"></div>JavaScript</div>
-        <div class="tech-item"><div class="tech-dot"></div>TypeScript</div>
-        <div class="tech-item"><div class="tech-dot"></div>React</div>
-        <div class="tech-item"><div class="tech-dot"></div>Next.js</div>
-        <div class="tech-item"><div class="tech-dot"></div>FastAPI</div>
-        <div class="tech-item"><div class="tech-dot"></div>Docker</div>
-        <div class="tech-item"><div class="tech-dot"></div>PostgreSQL</div>
-        <div class="tech-item"><div class="tech-dot"></div>Redis</div>
-        <div class="tech-item"><div class="tech-dot"></div>GraphQL</div>
-        <div class="tech-item"><div class="tech-dot"></div>TensorFlow</div>
-        <div class="tech-item"><div class="tech-dot"></div>PyTorch</div>
-        <div class="tech-item"><div class="tech-dot"></div>Python</div>
-        <div class="tech-item"><div class="tech-dot"></div>JavaScript</div>
-        <div class="tech-item"><div class="tech-dot"></div>TypeScript</div>
-        <div class="tech-item"><div class="tech-dot"></div>React</div>
-        <div class="tech-item"><div class="tech-dot"></div>Next.js</div>
-        <div class="tech-item"><div class="tech-dot"></div>FastAPI</div>
-        <div class="tech-item"><div class="tech-dot"></div>Docker</div>
-        <div class="tech-item"><div class="tech-dot"></div>PostgreSQL</div>
-        <div class="tech-item"><div class="tech-dot"></div>Redis</div>
-        <div class="tech-item"><div class="tech-dot"></div>GraphQL</div>
-        <div class="tech-item"><div class="tech-dot"></div>TensorFlow</div>
-        <div class="tech-item"><div class="tech-dot"></div>PyTorch</div>
-      </div>
-    </div>
-
-    <div class="team-dashboard" id="teamDashboard" style="display:none;">
-      <h3>👥 TAKIM MASASI - <span id="teamName"></span></h3>
-      <div id="noTeamPanel" style="display:none; text-align:center; padding:40px;">
-        <h3>👥 Henüz bir takımınız yok</h3>
-        <p>Takım paketi satın alarak takım kurabilirsiniz.</p>
-        <button class="btn-primary" onclick="buyTeamAndCreate()">💰 Takım Paketi Satın Al 
-
-(₺899/ay)</button>
-      </div>
-      <div id="teamContent" style="display:none;">
-        <div class="team-section">
-          <div class="team-members">
-            <h4>👤 Takım Üyeleri (<span id="memberCount">0</span>/100)</h4>
-            <div id="teamMembersList"></div>
-            <div style="margin-top: 10px;">
-              <input type="email" id="inviteEmail" placeholder="E-posta ile davet et" 
-
-class="glow-input" style="width: 70%;">
-              <button onclick="inviteToTeam()" class="btn-primary-small">Davet 
-
-Gönder</button>
-            </div>
-          </div>
-          <div class="team-projects">
-            <h4>📁 Ortak Projeler</h4>
-            <div id="teamProjectsList"></div>
-            <div style="margin-top: 10px;">
-              <input type="text" id="newProjectName" placeholder="Yeni proje adı" 
-
-class="glow-input" style="width: 70%;">
-              <button onclick="addTeamProject()" class="btn-primary-small">Ekle</button>
-            </div>
-          </div>
-          <div class="team-chat">
-            <h4>💬 Takım Sohbeti</h4>
-            <div id="teamChatMessages" class="team-chat-messages"></div>
-            <div class="team-chat-input">
-              <input type="text" id="teamChatInput" placeholder="Mesaj yaz..." 
-
-onkeypress="if(event.key==='Enter')sendTeamMessage()">
-              <button onclick="sendTeamMessage()" class="btn-primary-small">Gönder</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <section class="pricing" id="pricing">
-      <div class="section-header"><div class="section-tag">// fiyatlandırma</div><h2 
-
-class="section-title">Sıfırdan Başla,<br><span class="hl">Büyü</span></h2></div>
-      <div class="pricing-grid">
-        <div class="price-card"><div class="price-tier">Ücretsiz</div><div class="price-
-
-amount">₺0<span>/ay</span></div><ul class="price-features"><li>20 AI sorgusu / 
-
-gün</li><li>3 proje limiti</li><li>Demo web arama</li><li>Topluluk desteği</li></ul><button 
-
-class="btn-price" onclick="openModal('register')">Ücretsiz Başla</button></div>
-        <div class="price-card featured"><div class="price-badge">En Popüler</div><div 
-
-class="price-tier">Pro Geliştirici</div><div class="price-
-
-amount">₺299<span>/ay</span></div><ul class="price-features"><li>2000 AI 
-
-sorgu/gün</li><li>Sınırsız proje</li><li>Canlı web arama</li><li>Dosya 
-
-yükleme</li><li>Öncelikli destek</li></ul><button class="btn-price" onclick="buyPackage
-
-('pro')">Pro'ya Geç</button></div>
-        <div class="price-card"><div class="price-tier">Takım</div><div class="price-
-
-amount">₺899<span>/ay</span></div><ul class="price-features"><li>Sınırsız AI 
-
-sorgu</li><li>100 takım üyesi</li><li>Takım masası ve sohbet</li><li>Ortak 
-
-projeler</li><li>API erişimi</li></ul><button class="btn-price" onclick="buyPackage
-
-('team')">Takım Kur</button></div>
-      </div>
-    </section>
-
-    <section class="testimonials">
-      <div class="section-header"><div class="section-tag">// kullanıcılar</div><h2 
-
-class="section-title">Gerçek <span class="hl">Sonuçlar</span></h2></div>
-      <div class="testimonials-grid">
-        <div class="testimonial"><div class="stars">★★★★★</div><div class="testimonial-
-
-text">VİZYON AI sayesinde 2 ayda ilk SaaS ürünümü çıkardım. Aylık 15,000 TL 
-
-gelir.</div><div class="testimonial-author"><div class="author-avatar">AK</div><div><div 
-
-class="author-name">Ahmet Kaya</div><div class="author-title">Indie 
-
-Hacker</div></div></div></div>
-        <div class="testimonial"><div class="stars">★★★★★</div><div class="testimonial-
-
-text">"Dolar kaç" dedim, anında güncel kuru getirdi. Web arama mükemmel çalışıyor!
-
-</div><div class="testimonial-author"><div class="author-avatar">FD</div><div><div 
-
-class="author-name">Fatma Demir</div><div class="author-title">CTO</div></div></div></div>
-        <div class="testimonial"><div class="stars">★★★★★</div><div class="testimonial-
-
-text">Freelance işlerimi VİZYON AI ile kodluyorum, ayda 25,000 TL kazanıyorum.</div><div 
-
-class="testimonial-author"><div class="author-avatar">ME</div><div><div class="author-
-
-name">Muhammed Eymen</div><div class="author-title">Freelancer</div></div></div></div>
-      </div>
-    </section>
-
-    <footer>
-      <div class="footer-grid">
-        <div class="footer-brand"><div class="logo-text" style="font-size:22px;">VİZYON 
-
-2027</div><p style="margin-top:10px;">Dünyanın en güçlü yapay zeka ekosistemi.</p></div>
-        <div class="footer-col"><h4>Platform</h4><ul><li><a href="#">VİZYON 
-
-AI</a></li><li><a href="#">Kod Editörü</a></li><li><a href="#">API</a></li></ul></div>
-        <div class="footer-col"><h4>Kaynaklar</h4><ul><li><a 
-
-href="#">Dokümantasyon</a></li><li><a href="#">Topluluk</a></li><li><a 
-
-href="#">Blog</a></li></ul></div>
-        <div class="footer-col"><h4>Şirket</h4><ul><li><a 
-
-href="#">Hakkımızda</a></li><li><a href="#">Kariyer</a></li><li><a 
-
-href="#">İletişim</a></li></ul></div>
-      </div>
-      <div class="footer-bottom"><div class="footer-copy">© 2027 Vizyon2027. <span>Muhammed 
-
-Eymen</span> güvencesiyle.</div><div class="footer-badges"><span class="badge live">● 
-
-Sistem Aktif</span><span class="badge">v10.0</span></div></div>
-      <div class="support-footer"><a href="mailto:turkmenmuhammedeymen@gmail.com" 
-
-class="support-link">📧 DESTEK & İLETİŞİM</a></div>
-    </footer>
   </div>
+
+  <section class="features" id="features">
+    <div class="section-header"><div class="section-tag">// özellikler</div><h2 class="section-title">VİZYON AI <span class="hl">Gücü</span></h2></div>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon">🤖</div><div class="feature-title">7 Model Tek Çatı</div><p class="feature-desc">GPT-4o, Claude, Gemini, DeepSeek, Llama, Mistral hepsi birleşti.</p></div>
+      <div class="feature-card"><div class="feature-icon">⚡</div><div class="feature-title">Anlık Kod Üretimi</div><p class="feature-desc">Python, React, HTML, SQL, Docker her dilde çalışan kod.</p></div>
+      <div class="feature-card"><div class="feature-icon">🌐</div><div class="feature-title">Canlı Web Arama</div><p class="feature-desc">SerpApi ile dolar kuru, haberler, anlık bilgiler.</p></div>
+      <div class="feature-card"><div class="feature-icon">👥</div><div class="feature-title">Takım Çalışması</div><p class="feature-desc">Takım kur, üye ekle, ortak projeler ve takım sohbeti.</p></div>
+      <div class="feature-card"><div class="feature-icon">💰</div><div class="feature-title">SaaS & Freelance</div><p class="feature-desc">Para kazandıran iş fikirleri, kariyer yol haritası.</p></div>
+      <div class="feature-card"><div class="feature-icon">🔧</div><div class="feature-title">Hata Düzeltme</div><p class="feature-desc">Kodunu yapıştır, hatayı bul, düzelt, çalıştır.</p></div>
+    </div>
+  </section>
+
+  <section class="pricing" id="pricing">
+    <div class="section-header"><div class="section-tag">// fiyatlandırma</div><h2 class="section-title">Sıfırdan Başla,<br><span class="hl">Büyü</span></h2></div>
+    <div class="pricing-grid">
+      <div class="price-card"><div class="price-tier">Ücretsiz</div><div class="price-amount">₺0<span>/ay</span></div><ul class="price-features"><li>20 AI sorgusu / gün</li><li>3 proje limiti</li><li>Demo web arama</li><li>Topluluk desteği</li></ul><button class="btn-price" onclick="openModal('register')">Ücretsiz Başla</button></div>
+      <div class="price-card featured"><div class="price-badge">En Popüler</div><div class="price-tier">Pro Geliştirici</div><div class="price-amount">₺299<span>/ay</span></div><ul class="price-features"><li>2000 AI sorgu/gün</li><li>Sınırsız proje</li><li>Canlı web arama</li><li>Dosya yükleme</li><li>Öncelikli destek</li></ul><button class="btn-price" onclick="buyPackage('pro')">Pro'ya Geç</button></div>
+      <div class="price-card"><div class="price-tier">Takım</div><div class="price-amount">₺899<span>/ay</span></div><ul class="price-features"><li>Sınırsız AI sorgu</li><li>100 takım üyesi</li><li>Takım masası ve sohbet</li><li>Ortak projeler</li><li>API erişimi</li></ul><button class="btn-price" onclick="buyPackage('team')">Takım Kur</button></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="logo-text" style="font-size:22px;">VİZYON 2027</div><p style="margin-top:10px;">Dünyanın en güçlü yapay zeka ekosistemi.</p></div>
+      <div class="footer-col"><h4>Platform</h4><ul><li><a href="#">VİZYON AI</a></li><li><a href="#">Kod Editörü</a></li><li><a href="#">API</a></li></ul></div>
+      <div class="footer-col"><h4>Kaynaklar</h4><ul><li><a href="#">Dokümantasyon</a></li><li><a href="#">Topluluk</a></li><li><a href="#">Blog</a></li></ul></div>
+      <div class="footer-col"><h4>Şirket</h4><ul><li><a href="#">Hakkımızda</a></li><li><a href="#">Kariyer</a></li><li><a href="#">İletişim</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><div class="footer-copy">© 2027 Vizyon2027. <span>Muhammed Eymen</span> güvencesiyle.</div><div class="footer-badges"><span class="badge live">● Sistem Aktif</span><span class="badge">v11.0</span></div></div>
+    <div class="support-footer"><a href="mailto:turkmenmuhammedeymen@gmail.com" class="support-link">📧 DESTEK & İLETİŞİM</a></div>
+  </footer>
 </div>
 
+<!-- DASHBOARD (Giriş yapınca SİM SİYAH TAM EKRAN) -->
 <div id="dashboardArea" style="display: none;">
   <div class="dashboard-container">
     <div class="dashboard-header">
-      <div class="logo"><div class="logo-icon">✨</div><div class="logo-text">VİZYON 
-
-2027</div></div>
-      <div class="user-info"><span id="dashboardUserName"></span><span id="userRoleBadge" 
-
-class="badge"></span><button class="btn-secondary" id="profileBtn">👤 Profil</button><button 
-
-class="logout-btn" id="dashboardLogoutBtn">Çıkış</button></div>
+      <div class="logo"><div class="logo-icon">✨</div><div class="logo-text">VİZYON 2027</div></div>
+      <div class="user-info">
+        <span id="dashboardUserName"></span>
+        <span id="userRoleBadge" class="badge"></span>
+        <span id="userGroupBadge" class="badge" style="margin-left:8px"></span>
+        <button class="btn-secondary" id="profileBtn">👤 Profil</button>
+        <button class="logout-btn" id="dashboardLogoutBtn">Çıkış</button>
+      </div>
     </div>
-    <div class="dashboard-neon-cards">
-      <div class="neon-card"><div class="card-title">📁 Projeler</div><div class="card-
-
-number" id="projectCount">0</div></div>
-      <div class="neon-card"><div class="card-title">⭐ Favoriler</div><div class="card-
-
-number" id="favCount">0</div></div>
-      <div class="neon-card"><div class="card-title">🗄️ Arşiv</div><div class="card-number" 
-
-id="archiveCount">0</div></div>
-      <div class="neon-card"><div class="card-title">🗑️ Çöp Kutusu</div><div class="card-
-
-number" id="trashCount">0</div></div>
+    
+    <div class="dashboard-grid">
+      <!-- VİZYON AI ASİSTAN (EN ÜSTE) -->
+      <div class="dashboard-card">
+        <h3>🤖 VİZYON AI ASİSTAN</h3>
+        <div id="dashboardAiMessages" class="ai-chat-messages">
+          <div class="ai-message bot">Merhaba! Size nasıl yardımcı olabilirim?</div>
+        </div>
+        <div class="ai-input-area">
+          <input type="text" id="dashboardAiInput" placeholder="AI'ya sor..." class="glow-input">
+          <button class="btn-primary" id="dashboardAiSendBtn">Gönder</button>
+        </div>
+      </div>
+      
+      <!-- PROJELER -->
+      <div class="dashboard-card">
+        <h3>📁 PROJELERİM</h3>
+        <div class="neon-stats">
+          <div class="neon-stat"><span class="number" id="projectCount">0</span><span class="label">Toplam</span></div>
+          <div class="neon-stat"><span class="number" id="favCount">0</span><span class="label">Favori</span></div>
+          <div class="neon-stat"><span class="number" id="archiveCount">0</span><span class="label">Arşiv</span></div>
+        </div>
+        <button class="btn-primary-small" id="newProjectBtn" style="margin-bottom:12px">+ Yeni Proje</button>
+        <div id="projectsList" class="project-list"></div>
+      </div>
+      
+      <!-- GELEN KUTUSU / PAKETLER -->
+      <div class="dashboard-card">
+        <h3>📬 GELEN KUTUSU & PAKETLER</h3>
+        <div id="inboxList" class="inbox-list"></div>
+        <div style="margin-top:16px">
+          <h4>🎁 HEDİYE PAKETLERİ</h4>
+          <div id="giftsList" class="inbox-list"></div>
+        </div>
+      </div>
+      
+      <!-- GRUP SİSTEMİ (SADECE GRUBU OLANLAR GÖRÜR) -->
+      <div class="dashboard-card" id="groupSection" style="display:none">
+        <h3>👥 GRUP</h3>
+        <div id="groupInfo"></div>
+        <div id="groupChatMessages" class="group-chat"></div>
+        <div class="group-chat-input">
+          <input type="text" id="groupChatInput" placeholder="Gruba mesaj yaz...">
+          <button class="btn-primary-small" onclick="sendGroupMessage()">Gönder</button>
+        </div>
+        <div style="margin-top:12px">
+          <h4>📁 GRUP PROJELERİ</h4>
+          <div id="groupProjectsList" class="project-list"></div>
+          <div style="margin-top:8px; display:flex; gap:8px">
+            <input type="text" id="newGroupProjectName" placeholder="Yeni proje adı" class="glow-input" style="flex:1">
+            <button class="btn-primary-small" onclick="addGroupProject()">Ekle</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- GRUP KUR (SADECE GRUBU OLMAYANLAR GÖRÜR) -->
+      <div class="dashboard-card" id="noGroupSection">
+        <h3>👥 GRUP</h3>
+        <p style="color:var(--text3); margin-bottom:16px">Henüz bir grubun yok. Grup kur veya davet al!</p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap">
+          <input type="text" id="newGroupName" placeholder="Grup adı" class="glow-input" style="flex:1">
+          <button class="btn-primary" onclick="createGroup()">Grup Kur (₺899/ay)</button>
+        </div>
+        <div style="margin-top:16px">
+          <h4>📨 BEKLEYEN DAVETLER</h4>
+          <div id="groupInvitesList" class="inbox-list"></div>
+        </div>
+      </div>
+      
+      <!-- ADMIN / KURUCU PANELİ -->
+      <div class="dashboard-card" id="adminPanel" style="display:none">
+        <h3>⚙️ YÖNETİM PANELİ</h3>
+        <div id="adminRoleInfo" style="color:var(--accent2); margin-bottom:12px"></div>
+        <div>
+          <h4>👥 TÜM KULLANICILAR</h4>
+          <input type="text" id="userSearch" placeholder="Kullanıcı ara..." class="glow-input" style="width:100%; margin-bottom:12px">
+          <div id="adminUsersList" class="user-list" style="max-height:300px; overflow-y:auto"></div>
+        </div>
+      </div>
     </div>
-    <div class="projects-section">
-      <div class="section-header"><h3>📂 Projelerim</h3><button class="btn-primary" 
-
-id="newProjectBtn">+ Yeni Proje</button></div>
-      <div class="project-list" id="projectsList"></div>
-      <div style="margin-top: 16px; display: flex; gap: 12px;"><input type="text" 
-
-id="searchProject" placeholder="Proje ara..." class="glow-input" style="flex:1"><select 
-
-id="sortProjects" class="glow-input"><option value="date">Tarihe Göre</option><option 
-
-value="name">İsme Göre</option></select></div>
-    </div>
-    <div class="projects-section"><div class="section-header"><h3>📬 Gelen 
-
-Kutusu</h3></div><div id="inboxList" class="project-list"></div></div>
-    <div class="projects-section"><div class="section-header"><h3>🤖 VİZYON AI 
-
-Asistan</h3></div><div id="dashboardChat" class="chat-messages"><div class="ai-msg 
-
-bot">Merhaba! Size nasıl yardımcı olabilirim?</div></div><div style="display:flex; 
-
-gap:10px;"><input type="text" id="dashboardAiInput" placeholder="AI'ya sor..." 
-
-class="glow-input" style="flex:1"><button class="btn-primary" 
-
-id="dashboardAiSendBtn">Gönder</button><input type="file" id="dashboardFileInput" 
-
-style="display:none"><button class="file-upload-btn" onclick="document.getElementById
-
-('dashboardFileInput').click()">📎</button></div></div>
   </div>
 </div>
 
-<div class="download-menu">
-  <button class="download-btn" onclick="toggleDownloadMenu()">📱</button>
-  <div class="download-options" id="downloadMenu">
-    <a onclick="downloadApp('android')">📱 Android (.apk)</a>
-    <a onclick="downloadApp('windows')">💻 Windows (.exe)</a>
-    <a onclick="downloadApp('mac')">🍎 MacOS (.dmg)</a>
-    <a onclick="downloadApp('ios')">📲 iOS (App Store)</a>
-    <a onclick="downloadApp('linux')">🐧 Linux (.deb)</a>
-    <a onclick="downloadWebApp()">🌐 Web App (PWA)</a>
-  </div>
-</div>
-
-<div class="ai-widget"><div class="ai-panel" id="aiPanel"><div class="ai-panel-
-
-header"><span class="ai-panel-title">⚡ VİZYON AI</span><span class="ai-status"><span 
-
-class="ai-status-dot"></span>Aktif</span></div><div class="ai-messages" 
-
-id="aiMessages"><div class="ai-msg bot">Merhaba! Ben VİZYON AI. Hangi dilde yazarsan o 
-
-dilde cevap veririm.</div></div><div class="ai-suggestions"><div class="ai-suggestion" 
-
-onclick="quickAsk('Python hesap makinesi yaz')">🐍 Python</div><div class="ai-suggestion" 
-
-onclick="quickAsk('React todo app yap')">⚛️ React</div><div class="ai-suggestion" 
-
-onclick="quickAsk('dolar kaç')">💰 Dolar</div><div class="ai-suggestion" onclick="quickAsk
-
-('bugün haberler')">📰 Haber</div></div><div class="ai-input-area"><input class="ai-input" 
-
-id="aiInput" placeholder="Her dilde sorabilirsin..." onkeypress="if(event.key==='Enter')
-
-sendAiMessage()"><button class="ai-send" onclick="sendAiMessage
-
-()">→</button></div></div><button class="ai-widget-btn" onclick="toggleAiPanel
-
-()">⚡</button></div>
-
+<!-- MODALAR -->
 <div class="modal-overlay" id="authModal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
-    <div class="modal-header"><h3 id="modalTitle">Hesap Oluştur</h3><button class="modal-
-
-close" onclick="closeModal()">×</button></div>
-    <div class="modal-tabs"><button class="modal-tab" id="tabLogin" onclick="switchTab
-
-('login')">Giriş</button><button class="modal-tab active" id="tabRegister" 
-
-onclick="switchTab('register')">Kayıt</button><button class="modal-tab" id="tabVerify" 
-
-onclick="switchTab('verify')">Doğrula</button></div>
+    <div class="modal-header"><h3 id="modalTitle">Hesap Oluştur</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="modal-tabs"><button class="modal-tab" id="tabLogin" onclick="switchTab('login')">Giriş</button><button class="modal-tab active" id="tabRegister" onclick="switchTab('register')">Kayıt</button><button class="modal-tab" id="tabVerify" onclick="switchTab('verify')">Doğrula</button></div>
     <div class="modal-body">
       <div id="formRegister">
-        <div class="form-row"><input id="rName" placeholder="Ad" class="form-input"><input 
-
-id="rSurname" placeholder="Soyad" class="form-input"></div>
+        <div class="form-row"><input id="rName" placeholder="Ad" class="form-input"><input id="rSurname" placeholder="Soyad" class="form-input"></div>
         <input id="rEmail" placeholder="E-posta" class="form-input">
         <input id="rPass" type="password" placeholder="Şifre (8+)" class="form-input">
         <input id="rPass2" type="password" placeholder="Şifre Tekrar" class="form-input">
@@ -1875,167 +941,17 @@ id="rSurname" placeholder="Soyad" class="form-input"></div>
 </div>
 
 <div id="authPanelOverlay" class="auth-panel-overlay">
-  <div class="auth-panel"><h3 id="authRoleTitle">🔐 YÖNETİM GİRİŞİ</h3><input 
-
-type="password" id="authPassword" placeholder="Şifre"><div class="auth-buttons"><button 
-
-class="btn-primary" onclick="submitAuth()">Giriş</button><button class="btn-secondary" 
-
-onclick="closeAuthPanel()">İptal</button></div></div>
-</div>
-
-<div id="adminOverlay" class="admin-overlay">
-  <div class="admin-panel">
-    <h2>🔐 YÖNETİM PANELİ</h2><div id="panelRoleInfo" style="color:var(--accent2); margin-
-
-bottom:15px;"></div>
-    <div class="admin-stats"><div class="stat-card"><span class="stat-number" 
-
-id="statUsers">0</span><span>Kullanıcı</span></div><div class="stat-card"><span 
-
-class="stat-number" id="statTeams">0</span><span>Takım</span></div><div class="stat-
-
-card"><span class="stat-number" id="statMessages">0</span><span>Mesaj</span></div><div 
-
-class="stat-card"><span class="stat-number" 
-
-id="statRevenue">₺0</span><span>Gelir</span></div></div>
-    <h3>👥 KULLANICILAR</h3>
-    <div style="display:flex;gap:8px;margin-bottom:12px;"><input id="userSearchInput" 
-
-placeholder="İsim, email ara..." class="glow-input" style="flex:1"><button 
-
-onclick="loadAdminData()" style="background:var(--accent);color:var(--
-
-bg);border:none;padding:8px 16px;">↻ Yenile</button><button onclick="exportUsers()" 
-
-style="background:var(--accent2);color:var(--bg);border:none;padding:8px 16px;">⬇ 
-
-CSV</button></div>
-    <div id="usersList" class="user-list"></div>
-    <div style="margin-top:20px;"><h3>➕ Admin Ekle</h3><div 
-
-style="display:flex;gap:8px;"><input id="newAdminEmail" placeholder="E-posta" class="glow-
-
-input" style="flex:1"><button onclick="addAdmin()" class="btn-
-
-primary">Yetkilendir</button></div></div>
-    <button class="close-panel-btn" onclick="closeAdminPanel()">🚪 ÇIKIŞ</button>
-  </div>
-</div>
-
-<div id="vizyonAIPanel" style="display:none;position:fixed;inset:0;z-
-
-index:10000;background:#050a0f;flex-direction:column">
-  <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 
-
-25px;background:#0d1a26;border-bottom:2px solid #00d4ff">
-    <div style="display:flex;align-items:center;gap:15px"><div class="logo-icon" 
-
-style="width:40px;height:40px;font-size:20px">✨</div><span style="font-family:'Syne',sans-
-
-serif;font-size:22px;font-weight:800;background:linear-gradient(45deg,#00d4ff,#a855f7);-
-
-webkit-background-clip:text;background-clip:text;color:transparent">VİZYON AI</span></div>
-    <button onclick="closeVizyonAI()" style="background:transparent;border:1px solid 
-
-#ff4757;color:#ff4757;padding:8px 20px;border-radius:8px">✕ Kapat</button>
-  </div>
-  <div id="vizyonAIChat" style="flex:1;overflow-y:auto;padding:25px;display:flex;flex-
-
-direction:column;gap:15px;max-width:900px;width:100%;margin:0 auto"><div class="ai-msg 
-
-bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Dünyanın en gelişmiş kodlama 
-
-asistanıyım.<br><br>📌 <strong>Sınırsız Yeteneklerim:</strong><br>• Her dilde kod 
-
-yazabilirim<br>• Canlı web arama (dolar, haber)<br>• Dosya yükleme<br>• Takım 
-
-çalışması<br><br>Ne yapmak istiyorsun? 🚀</div></div>
-  <div style="display:flex;gap:10px;padding:0 20px 10px;max-width:900px;width:100%;margin:0 
-
-auto;flex-wrap:wrap"><button class="ai-suggestion" onclick="quickAICode('Python hesap 
-
-makinesi yaz')">🐍 Python</button><button class="ai-suggestion" onclick="quickAICode('React 
-
-todo app yap')">⚛️ React</button><button class="ai-suggestion" onclick="quickAICode('dolar 
-
-kaç')">💰 Dolar</button><button class="ai-suggestion" onclick="quickAICode('bugün 
-
-haberler')">📰 Haberler</button></div>
-  <div style="display:flex;gap:10px;padding:0 20px 20px;max-width:900px;width:100%;margin:0 
-
-auto"><input type="file" id="fileInput" 
-
-accept=".txt,.py,.js,.html,.css,.json,.pdf,.jpg,.png" style="display:none" 
-
-onchange="handleFileUpload(this)"><button class="file-upload-btn" 
-
-onclick="document.getElementById('fileInput').click()">📎 Dosya Yükle</button><textarea 
-
-id="vizyonAIInput" style="flex:1;background:#0d1a26;border:1px solid 
-
-#1a3350;color:#e8f4f8;padding:12px;border-radius:12px;font-family:'Fira 
-
-Code',monospace;font-size:13px;resize:none;height:50px" placeholder='Her dilde 
-
-yazabilirsin...' onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault
-
-();sendVizyonAIAdvanced()}"></textarea><button onclick="sendVizyonAIAdvanced()" 
-
-style="background:#00d4ff;color:#050a0f;border:none;padding:0 25px;border-
-
-radius:12px;font-weight:700">⚡ Gönder</button></div>
+  <div class="auth-panel"><h3 id="authRoleTitle">🔐 YÖNETİM GİRİŞİ</h3><input type="password" id="authPassword" placeholder="Şifre"><div class="auth-buttons"><button class="btn-primary" onclick="submitAuth()">Giriş</button><button class="btn-secondary" onclick="closeAuthPanel()">İptal</button></div></div>
 </div>
 
 <script>
 // ============================================================
-// 🔥 TÜM API ANAHTARLARI (CLOUDFLARE EKLENDİ, DİĞERLERİ BOŞ)
+// TÜM API ANAHTARLARI VE KONFİGÜRASYON
 // ============================================================
-
-// ========== CLOUDFLARE BİLGİLERİ (SENİN VERDİĞİN) ==========
-const CLOUDFLARE_ACCOUNT_ID = '78c35489ccf4102e472d93aa3f3be7e2';
-const CLOUDFLARE_API_TOKEN = 'cfut_DqnWgPqEuHppXSmyqE8PVUepLFarp8ttDxjlxYOnbf34d1f1';
-const CLOUDFLARE_WORKER_URL = 
-
-'https://api.cloudflare.com/client/v4/accounts/78c35489ccf4102e472d93aa3f3be7e2/workers/scr
-
-ipts/vizyon-ai';
-
-// ========== GROQ API (AI) - KENDİ ANAHTARINI KOY ==========
-const GROQ_API_KEY = 'groq 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 ';
-
-// ========== SERPAPI (WEB ARAMA) - KENDİ ANAHTARINI KOY ==========
-const SERPAPI_KEY = '557e473390ddee84464f5df36bf785691c4ce6ec3b7ed0b499f904cbc6653b8a';
-
-// ========== RESEND (MAIL) - KENDİ ANAHTARINI KOY ==========
-const RESEND_API_KEY = 're_jmEwTtMh_4Zc3hA8ULTVK52sM6hoouSDR';
-
-// ========== CEREBRAS (YEDEK AI) - KENDİ ANAHTARINI KOY ==========
-const CEREBRAS_API_KEY = ' csk-xhc92xfphm8eh6jdxjcfmfyr4ek9pjwet2pkchnj9ef2wv9c';
-
-// ========== MISTRAL (YEDEK AI) - KENDİ ANAHTARINI KOY ==========
-const MISTRAL_API_KEY = 'scMQ0OCnqnidPKFGdFbBfRguwgoaMMdc ';
-
-// ========== OPENROUTER (ÇOKLU MODEL) - KENDİ ANAHTARINI KOY ==========
-const OPENROUTER_API_KEY = ' sk-or-v1-
-
-f3eebcefe436fc9ebb075f52e180ef0aeb38d58c1f274826b272ee647c68b480 ';
-
-// ========== COHERE (YEDEK AI) - KENDİ ANAHTARINI KOY ==========
-const COHERE_API_KEY = ' cohere_0dman3Xd7MUTBFOBgy5uhYNPSKPqgVfsURl8Slhe2Hy6f6 ';
-
-// ========== OPENAI - İLERDE EKLERİM DİYORSAN BOŞ BIRAK ==========
-const OPENAI_API_KEY = 'API_ANAHTARINI_BURAYA_YAZ';
-
-// ========== GEMINI - İLERDE EKLERİM DİYORSAN BOŞ BIRAK ==========
-const GEMINI_API_KEY = 'API_ANAHTARINI_BURAYA_YAZ';
-
-// ========== SUPABASE (ZATEN VAR) ==========
 const SUPABASE_URL = 'https://dxfwxknohzkdhzyytwdt.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Us1HLOwQoLT5978dZ3Oy-Q_-v0WrLsl';
+const CLOUDFLARE_WORKER_URL = 'https://vizyon-ai-worker.your-subdomain.workers.dev';
 
-// ========== ADMIN ŞİFRELERİ ==========
 const ADMIN_PASSWORDS = {
     FOUNDER: btoa("Eymen11Amele44"),
     ADMIN: btoa("ibrm4411"),
@@ -2043,225 +959,53 @@ const ADMIN_PASSWORDS = {
 };
 
 let supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let currentUser = JSON.parse(localStorage.getItem('v27_user') || 'null');
+let currentUser = null;
 let dailyQueries = parseInt(localStorage.getItem('v27_queries') || '20');
 let pendingAdminRole = null;
 let _allUsers = [];
-let uploadedFileContent = null;
 
 // ============================================================
-// API ÇAĞRI FONKSİYONLARI
+// API ÇAĞRILARI (CLOUDFLARE WORKER ÜZERİNDEN)
 // ============================================================
-
-async function callGroq(prompt) {
-    if(GROQ_API_KEY && GROQ_API_KEY !== 
-
-'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 ') {
-        try {
-            const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${GROQ_API_KEY}`, 'Content-Type': 
-
-'application/json' },
-                body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 
-
-'user', content: prompt }], temperature: 0.7, max_tokens: 1000 })
-            });
-            const data = await res.json();
-            return data.choices?.[0]?.message?.content || null;
-        } catch(e) { console.log('Groq hatası:', e); }
+async function callSuperAI(prompt) {
+    try {
+        const res = await fetch(`${CLOUDFLARE_WORKER_URL}/super-ai`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+        const data = await res.json();
+        return data.response;
+    } catch(e) {
+        return "🧠 Yapay zeka servislerine ulaşılamıyor.";
     }
-    return null;
 }
 
 async function webSearch(query) {
-    if(SERPAPI_KEY && SERPAPI_KEY !== 
-
-'557e473390ddee84464f5df36bf785691c4ce6ec3b7ed0b499f904cbc6653b8a ') {
-        try {
-            const url = `https://serpapi.com/search.json?q=${encodeURIComponent(query)}
-
-&hl=tr&gl=tr&api_key=${SERPAPI_KEY}`;
-            const resp = await fetch(url);
-            const data = await resp.json();
-            if(data.error) return null;
-            let html = `🌐 <strong>Arama Sonuçları:</strong><br><br>`;
-            if(data.answer_box) html += `<div style="background:rgba
-
-(0,212,255,.1);padding:12px;margin-bottom:14px">⚡ ${data.answer_box.answer || 
-
-data.answer_box.snippet}</div>`;
-            (data.organic_results?.slice(0,3) || []).forEach(r => {
-                html += `<div style="margin-bottom:12px"><strong>${r.title}
-
-</strong><br><span style="font-size:12px;color:#8ab4cc">${r.snippet}</span></div>`;
-            });
-            return html;
-        } catch(e) { return null; }
+    try {
+        const res = await fetch(`${CLOUDFLARE_WORKER_URL}/search`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query })
+        });
+        const data = await res.json();
+        return data.response;
+    } catch(e) {
+        return null;
     }
-    return null;
 }
 
 async function sendEmail(to, subject, html) {
-    if(RESEND_API_KEY && RESEND_API_KEY !== 're_jmEwTtMh_4Zc3hA8ULTVK52sM6hoouSDR') {
-        try {
-            const res = await fetch('https://api.resend.com/emails', {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 
-
-'application/json' },
-                body: JSON.stringify({ from: 'Vizyon2027 <noreply@vizyon2027.com>', to, 
-
-subject, html })
-            });
-            return await res.json();
-        } catch(e) { console.log('Mail hatası:', e); }
-    }
-    return null;
-}
-
-async function callCerebras(prompt) {
-    if(CEREBRAS_API_KEY && CEREBRAS_API_KEY !== ' csk-
-
-xhc92xfphm8eh6jdxjcfmfyr4ek9pjwet2pkchnj9ef2wv9c ') {
-        try {
-            const res = await fetch('https://api.cerebras.ai/v1/chat/completions', {
-                method: 'POST', headers: { 'Authorization': `Bearer ${CEREBRAS_API_KEY}`, 
-
-'Content-Type': 'application/json' },
-                body: JSON.stringify({ model: 'llama-3.1-70b', messages: [{ role: 'user', 
-
-content: prompt }], max_tokens: 1000 })
-            });
-            const data = await res.json();
-            return data.choices?.[0]?.message?.content || null;
-        } catch(e) { return null; }
-    }
-    return null;
-}
-
-async function callMistral(prompt) {
-    if(MISTRAL_API_KEY && MISTRAL_API_KEY !== 'scMQ0OCnqnidPKFGdFbBfRguwgoaMMdc ') {
-        try {
-            const res = await fetch('https://api.mistral.ai/v1/chat/completions', {
-                method: 'POST', headers: { 'Authorization': `Bearer ${MISTRAL_API_KEY}`, 
-
-'Content-Type': 'application/json' },
-                body: JSON.stringify({ model: 'codestral-latest', messages: [{ role: 
-
-'user', content: prompt }], max_tokens: 2000 })
-            });
-            const data = await res.json();
-            return data.choices?.[0]?.message?.content || null;
-        } catch(e) { return null; }
-    }
-    return null;
-}
-
-async function callOpenrouter(prompt) {
-    if(OPENROUTER_API_KEY && OPENROUTER_API_KEY !== 'sk-or-v1-
-
-f3eebcefe436fc9ebb075f52e180ef0aeb38d58c1f274826b272ee647c68b480 ') {
-        try {
-            const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                method: 'POST', headers: { 'Authorization': `Bearer ${OPENROUTER_API_KEY}`, 
-
-'Content-Type': 'application/json' },
-                body: JSON.stringify({ model: 'meta-llama/llama-3.3-70b-instruct:free', 
-
-messages: [{ role: 'user', content: prompt }] })
-            });
-            const data = await res.json();
-            return data.choices?.[0]?.message?.content || null;
-        } catch(e) { return null; }
-    }
-    return null;
-}
-
-async function callCohere(prompt) {
-    if(COHERE_API_KEY && COHERE_API_KEY !== 
-
-'cohere_0dman3Xd7MUTBFOBgy5uhYNPSKPqgVfsURl8Slhe2Hy6f6 ') {
-        try {
-            const res = await fetch('https://api.cohere.ai/v1/generate', {
-                method: 'POST', headers: { 'Authorization': `Bearer ${COHERE_API_KEY}`, 
-
-'Content-Type': 'application/json' },
-                body: JSON.stringify({ model: 'command', prompt: prompt, max_tokens: 1000 
-
-})
-            });
-            const data = await res.json();
-            return data.generations?.[0]?.text || null;
-        } catch(e) { return null; }
-    }
-    return null;
-}
-
-async function callOpenAI(prompt) {
-    if(OPENAI_API_KEY && OPENAI_API_KEY !== 'API_ANAHTARINI_BURAYA_YAZ') {
-        // OpenAI API çağrısı
+    try {
+        const res = await fetch(`${CLOUDFLARE_WORKER_URL}/send-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ to, subject, html })
+        });
+        return await res.json();
+    } catch(e) {
         return null;
     }
-    return null;
-}
-
-async function callGemini(prompt) {
-    if(GEMINI_API_KEY && GEMINI_API_KEY !== 'API_ANAHTARINI_BURAYA_YAZ') {
-        // Gemini API çağrısı
-        return null;
-    }
-    return null;
-}
-
-function fallbackAI(prompt) {
-    const p = prompt.toLowerCase();
-    if(p.includes('python') && p.includes('hesap')) {
-        return `🐍 Python Hesap Makinesi:\n\`\`\`python\ndef hesap_makinesi():\n    sayi1 = 
-
-float(input("Birinci sayı: "))\n    islem = input("İşlem (+, -, *, /): ")\n    sayi2 = 
-
-float(input("İkinci sayı: "))\n    if islem == '+': print(f"Sonuç: {sayi1 + sayi2}")\n    
-
-elif islem == '-': print(f"Sonuç: {sayi1 - sayi2}")\n    elif islem == '*': print(f"Sonuç: 
-
-{sayi1 * sayi2}")\n    elif islem == '/':\n        if sayi2 != 0: print(f"Sonuç: {sayi1 / 
-
-sayi2}")\n        else: print("Hata: Sıfıra bölme!")\n    else: print("Geçersiz 
-
-işlem!")\nhesap_makinesi()\n\`\`\``;
-    }
-    if(p.includes('react')) {
-        return `⚛️ React Bileşeni:\n\`\`\`jsx\nfunction App() { return <h1>VİZYON AI</h1>; 
-
-}\nexport default App;\n\`\`\``;
-    }
-    if(p.includes('dolar')) {
-        return `💰 <strong>Güncel Dolar Kuru:</strong><br>USD/TRY: 34.25 TL<br>EUR/TRY: 
-
-37.12 TL`;
-    }
-    return `🧠 VİZYON AI hazır!\n\n📌 Örnek: "Python hesap makinesi yaz", "React todo app 
-
-yap", "dolar kaç"`;
-}
-
-async function callSuperAI(prompt) {
-    let result = await callGroq(prompt);
-    if(result) return result;
-    result = await callCerebras(prompt);
-    if(result) return result;
-    result = await callMistral(prompt);
-    if(result) return result;
-    result = await callOpenrouter(prompt);
-    if(result) return result;
-    result = await callCohere(prompt);
-    if(result) return result;
-    result = await callOpenAI(prompt);
-    if(result) return result;
-    result = await callGemini(prompt);
-    if(result) return result;
-    return fallbackAI(prompt);
 }
 
 // ============================================================
@@ -2284,18 +1028,11 @@ async function handleRegister() {
     
     const { error } = await supabaseClient.from('users').insert([{
         name: name + ' ' + surname, email: email, plan: 'free', password_hash: btoa(p1),
-        created_at: new Date(), is_verified: false, verification_code: code, 
-
-verification_code_expires: expires
+        created_at: new Date(), is_verified: false, verification_code: code, verification_code_expires: expires
     }]);
     if(error){ alert('Hata: ' + error.message); return; }
     
-    await sendEmail(email, 'Doğrulama Kodu - Vizyon 2027', `<h1>Hoş geldin ${name}!
-
-</h1><p>Doğrulama kodunuz: <strong style="font-size:24px;color:#00d4ff;">${code}
-
-</strong></p><p>15 dakika geçerlidir.</p>`);
-    
+    await sendEmail(email, 'Doğrulama Kodu - Vizyon 2027', `<h1>Hoş geldin ${name}!</h1><p>Kodunuz: <strong>${code}</strong></p><p>15 dakika geçerlidir.</p>`);
     alert('✅ Kayıt başarılı! Mail adresinize doğrulama kodu gönderildi.');
     switchTab('verify');
     document.getElementById('verifyEmail').value = email;
@@ -2305,18 +1042,12 @@ async function verifyAccount() {
     const email = document.getElementById('verifyEmail')?.value.trim();
     const code = document.getElementById('verifyCode')?.value.trim();
     if(!email || !code){ alert('E-posta ve kodu girin!'); return; }
-    const { data: user } = await supabaseClient.from('users').select('*').eq('email', 
-
-email).single();
+    const { data: user } = await supabaseClient.from('users').select('*').eq('email', email).single();
     if(!user){ alert('Kullanıcı bulunamadı!'); return; }
     if(user.is_verified){ alert('Zaten doğrulanmış!'); switchTab('login'); return; }
     if(user.verification_code !== code){ alert('Kod hatalı!'); return; }
-    if(new Date(user.verification_code_expires) < new Date()){ alert('Kod süresi doldu!'); 
-
-return; }
-    await supabaseClient.from('users').update({ is_verified: true, verification_code: null 
-
-}).eq('id', user.id);
+    if(new Date(user.verification_code_expires) < new Date()){ alert('Kod süresi doldu!'); return; }
+    await supabaseClient.from('users').update({ is_verified: true, verification_code: null }).eq('id', user.id);
     alert('✅ Hesap doğrulandı! Giriş yapabilirsiniz.');
     switchTab('login');
 }
@@ -2325,14 +1056,10 @@ async function handleLogin() {
     const email = document.getElementById('lEmail')?.value.trim();
     const pass = document.getElementById('lPass')?.value;
     if(!email || !pass){ alert('Tüm alanları doldurun!'); return; }
-    const { data, error } = await supabaseClient.from('users').select('*').eq('email', 
-
-email).single();
+    const { data, error } = await supabaseClient.from('users').select('*').eq('email', email).single();
     if(error || !data){ alert('Hatalı!'); return; }
     if(data.password_hash !== btoa(pass)){ alert('Şifre hatalı!'); return; }
-    if(!data.is_verified){ alert('Hesabınız doğrulanmamış!'); switchTab('verify'); 
-
-document.getElementById('verifyEmail').value = email; return; }
+    if(!data.is_verified){ alert('Hesabınız doğrulanmamış!'); switchTab('verify'); document.getElementById('verifyEmail').value = email; return; }
     currentUser = data;
     localStorage.setItem('v27_user', JSON.stringify(data));
     closeModal();
@@ -2342,464 +1069,214 @@ document.getElementById('verifyEmail').value = email; return; }
 function handleLogout() { localStorage.clear(); location.reload(); }
 
 // ============================================================
-// DASHBOARD & PROJE YÖNETİMİ
+// DASHBOARD
 // ============================================================
 function showDashboard() {
     document.getElementById('mainSite').style.display = 'none';
     document.getElementById('dashboardArea').style.display = 'block';
     document.getElementById('dashboardUserName').innerHTML = currentUser.name;
-    let roleText = currentUser.role === 'founder' ? '👑 KURUCU' : (currentUser.role === 
-
-'admin' ? '⚙️ ADMIN' : (currentUser.is_beta ? '🔬 BETA' : '👤 KULLANICI'));
+    let roleText = currentUser.role === 'founder' ? '👑 KURUCU' : (currentUser.role === 'admin' ? '⚙️ ADMIN' : (currentUser.is_beta ? '🔬 BETA' : '👤 KULLANICI'));
     document.getElementById('userRoleBadge').innerHTML = roleText;
+    
+    // Admin panelini göster (kurucu veya admin ise)
+    if(currentUser.role === 'founder' || currentUser.role === 'admin') {
+        document.getElementById('adminPanel').style.display = 'block';
+        document.getElementById('adminRoleInfo').innerHTML = currentUser.role === 'founder' ? '👑 KURUCU YETKİLERİNİZ AKTİF' : '⚙️ ADMIN YETKİLERİNİZ AKTİF';
+        loadAdminUsers();
+    }
+    
+    // Grup kontrolü
+    checkUserGroup();
     loadProjects();
     loadInbox();
+    loadGifts();
 }
 
-async function loadProjects() {
-    let { data: proj } = await supabaseClient.from('projects').select('*').eq('user_email', 
-
-currentUser.email).order('created_at', { ascending: false });
-    if(!proj) proj = [];
-    document.getElementById('projectsList').innerHTML = proj.map(p => `<div 
-
-class="project-item" data-id="${p.id}" oncontextmenu="showContextMenu(event,
-
-${p.id})"><span>${p.name}</span><div class="project-actions"><span onclick="toggleFavorite
-
-(${p.id})">⭐</span><span onclick="archiveProject(${p.id})">🗄️</span><span 
-
-onclick="trashProject(${p.id})">🗑️</span></div></div>`).join('');
-    document.getElementById('projectCount').innerHTML = proj.length;
-    document.getElementById('favCount').innerHTML = proj.filter(p => p.is_favorite).length;
-    document.getElementById('archiveCount').innerHTML = proj.filter(p => 
-
-p.is_archived).length;
-    document.getElementById('trashCount').innerHTML = proj.filter(p => 
-
-p.is_deleted).length;
-}
-
-async function loadInbox() {
-    let { data: gifts } = await supabaseClient.from('gifts').select('*').eq
-
-('receiver_email', currentUser.email).eq('accepted', false);
-    const container = document.getElementById('inboxList');
-    if(gifts && gifts.length) {
-        container.innerHTML = gifts.map(g => `<div class="project-item">🎁 <strong>
-
-${g.sender_email}</strong> size ${g.package} paketi hediye etti! <button 
-
-onclick="acceptGift('${g.id}','${g.package}')">Kabul Et</button><button 
-
-onclick="rejectGift('${g.id}')">Reddet</button></div>`).join('');
+async function checkUserGroup() {
+    if(currentUser.group_id) {
+        const { data: group } = await supabaseClient.from('groups').select('*').eq('id', currentUser.group_id).single();
+        if(group) {
+            document.getElementById('groupSection').style.display = 'block';
+            document.getElementById('noGroupSection').style.display = 'none';
+            document.getElementById('groupInfo').innerHTML = `<strong>${group.name}</strong> - Kurucu: ${group.owner_email}<br>Üyeler: ${group.members?.length || 1}/100`;
+            loadGroupChat();
+            loadGroupProjects();
+        }
     } else {
-        container.innerHTML = '<div class="project-item">📭 Henüz bildirim yok.</div>';
+        document.getElementById('groupSection').style.display = 'none';
+        document.getElementById('noGroupSection').style.display = 'block';
+        loadGroupInvites();
     }
 }
 
-async function acceptGift(id, pkg) {
-    await supabaseClient.from('users').update({ plan: pkg }).eq('email', 
+async function createGroup() {
+    const groupName = document.getElementById('newGroupName').value.trim();
+    if(!groupName) { alert('Grup adı girin!'); return; }
+    if(confirm('Grup paketi ₺899/ay - Satın al?')) {
+        const { data } = await supabaseClient.from('groups').insert([{
+            name: groupName, owner_email: currentUser.email, members: [currentUser.email],
+            projects: [], chat_messages: [], created_at: new Date()
+        }]).select();
+        if(data) {
+            await supabaseClient.from('users').update({ group_id: data[0].id, plan: 'team' }).eq('id', currentUser.id);
+            currentUser.group_id = data[0].id;
+            currentUser.plan = 'team';
+            localStorage.setItem('v27_user', JSON.stringify(currentUser));
+            alert('✅ Grup oluşturuldu! Sayfa yenileniyor...');
+            location.reload();
+        }
+    }
+}
 
-currentUser.email);
-    await supabaseClient.from('gifts').update({ accepted: true }).eq('id', id);
-    alert("Paket eklendi!");
+async function loadGroupChat() {
+    const { data: group } = await supabaseClient.from('groups').select('chat_messages').eq('id', currentUser.group_id).single();
+    const container = document.getElementById('groupChatMessages');
+    if(group && group.chat_messages) {
+        container.innerHTML = group.chat_messages.map(m => `<div class="group-chat-message"><strong>${m.user}</strong>: ${m.message}<br><span style="font-size:10px;color:var(--text3)">${m.time}</span></div>`).join('');
+    }
+}
+
+async function sendGroupMessage() {
+    const msg = document.getElementById('groupChatInput').value.trim();
+    if(!msg) return;
+    const { data: group } = await supabaseClient.from('groups').select('chat_messages').eq('id', currentUser.group_id).single();
+    let msgs = group?.chat_messages || [];
+    msgs.push({ user: currentUser.name, message: msg, time: new Date().toLocaleTimeString() });
+    await supabaseClient.from('groups').update({ chat_messages: msgs }).eq('id', currentUser.group_id);
+    document.getElementById('groupChatInput').value = '';
+    loadGroupChat();
+}
+
+async function loadGroupProjects() {
+    const { data: group } = await supabaseClient.from('groups').select('projects').eq('id', currentUser.group_id).single();
+    const container = document.getElementById('groupProjectsList');
+    if(group && group.projects) {
+        container.innerHTML = group.projects.map(p => `<div class="project-item">📁 ${p.name} <span style="font-size:10px;color:var(--text3)">${p.created_by}</span></div>`).join('');
+    }
+}
+
+async function addGroupProject() {
+    const name = document.getElementById('newGroupProjectName').value.trim();
+    if(!name) return;
+    const { data: group } = await supabaseClient.from('groups').select('projects').eq('id', currentUser.group_id).single();
+    let projects = group?.projects || [];
+    projects.push({ name, created_by: currentUser.email, created_at: new Date() });
+    await supabaseClient.from('groups').update({ projects }).eq('id', currentUser.group_id);
+    document.getElementById('newGroupProjectName').value = '';
+    loadGroupProjects();
+}
+
+async function loadGroupInvites() {
+    const { data: invites } = await supabaseClient.from('group_invites').select('*').eq('invited_email', currentUser.email).eq('status', 'pending');
+    const container = document.getElementById('groupInvitesList');
+    container.innerHTML = (invites || []).map(i => `<div class="project-item">🎯 <strong>${i.inviter_email}</strong> sizi "${i.group_name}" grubuna davet etti! <button onclick="acceptGroupInvite('${i.id}','${i.group_id}')" class="btn-primary-small">Kabul Et</button><button onclick="rejectGroupInvite('${i.id}')" class="btn-primary-small" style="background:#ff4757">Reddet</button></div>`).join('');
+}
+
+async function acceptGroupInvite(inviteId, groupId) {
+    await supabaseClient.from('users').update({ group_id: groupId }).eq('id', currentUser.id);
+    await supabaseClient.from('group_invites').update({ status: 'accepted' }).eq('id', inviteId);
+    currentUser.group_id = groupId;
+    localStorage.setItem('v27_user', JSON.stringify(currentUser));
+    alert('✅ Gruba katıldınız! Sayfa yenileniyor...');
     location.reload();
 }
-async function rejectGift(id) { await supabaseClient.from('gifts').update({ accepted: true 
+async function rejectGroupInvite(inviteId) { await supabaseClient.from('group_invites').update({ status: 'rejected' }).eq('id', inviteId); loadGroupInvites(); }
 
-}).eq('id', id); loadInbox(); }
-async function toggleFavorite(id) { let { data: p } = await supabaseClient.from
-
-('projects').select('is_favorite').eq('id', id).single(); await supabaseClient.from
-
-('projects').update({ is_favorite: !p.is_favorite }).eq('id', id); loadProjects(); }
-async function archiveProject(id) { await supabaseClient.from('projects').update({ 
-
-is_archived: true }).eq('id', id); loadProjects(); }
-async function trashProject(id) { if(confirm("Çöp kutusuna taşı?")) await 
-
-supabaseClient.from('projects').update({ is_deleted: true, deleted_at: new Date() }).eq
-
-('id', id); loadProjects(); }
+// ============================================================
+// PROJE YÖNETİMİ
+// ============================================================
+async function loadProjects() {
+    let { data: proj } = await supabaseClient.from('projects').select('*').eq('user_email', currentUser.email).order('created_at', { ascending: false });
+    if(!proj) proj = [];
+    document.getElementById('projectsList').innerHTML = proj.map(p => `<div class="project-item"><span>${p.name}</span><div><button onclick="toggleFavorite(${p.id})" class="btn-primary-small">⭐</button><button onclick="archiveProject(${p.id})" class="btn-primary-small">🗄️</button><button onclick="deleteProject(${p.id})" class="btn-primary-small" style="background:#ff4757">🗑️</button></div></div>`).join('');
+    document.getElementById('projectCount').innerHTML = proj.length;
+    document.getElementById('favCount').innerHTML = proj.filter(p => p.is_favorite).length;
+    document.getElementById('archiveCount').innerHTML = proj.filter(p => p.is_archived).length;
+}
 
 document.getElementById('newProjectBtn')?.addEventListener('click', async () => {
     let name = prompt("Proje adı:");
-    if(name) await supabaseClient.from('projects').insert([{ user_email: currentUser.email, 
-
-name, content: '', created_at: new Date() }]);
+    if(name) await supabaseClient.from('projects').insert([{ user_email: currentUser.email, name, content: '', created_at: new Date() }]);
     loadProjects();
 });
-
-let currentContextProjectId = null;
-function showContextMenu(e, id) {
-    e.preventDefault();
-    currentContextProjectId = id;
-    let menu = document.getElementById('contextMenu');
-    if(!menu){ menu = document.createElement('div'); menu.id = 'contextMenu'; 
-
-menu.className = 'context-menu'; document.body.appendChild(menu); }
-    menu.innerHTML = `<div class="context-menu-item" onclick="renameProject()">✏️ Yeniden 
-
-Adlandır</div><div class="context-menu-item" onclick="copyProject()">📋 Kopyala</div><div 
-
-class="context-menu-item" onclick="deleteProjectPermanent()">💀 Kalıcı Sil</div>`;
-    menu.style.left = e.pageX + 'px';
-    menu.style.top = e.pageY + 'px';
-    menu.style.display = 'block';
-    setTimeout(() => { document.addEventListener('click', () => { if(menu) 
-
-menu.style.display = 'none'; }, { once: true }); }, 0);
-}
-async function renameProject() { let newName = prompt("Yeni ad:"); if(newName) await 
-
-supabaseClient.from('projects').update({ name: newName }).eq('id', 
-
-currentContextProjectId); loadProjects(); }
-async function copyProject() { let { data: p } = await supabaseClient.from
-
-('projects').select('name,content').eq('id', currentContextProjectId).single(); if(p) await 
-
-supabaseClient.from('projects').insert([{ user_email: currentUser.email, name: p.name + " 
-
-(kopya)", content: p.content, created_at: new Date() }]); loadProjects(); }
-async function deleteProjectPermanent() { if(confirm("Kalıcı olarak sil?")) await 
-
-supabaseClient.from('projects').delete().eq('id', currentContextProjectId); loadProjects(); 
-
-}
-
-document.getElementById('dashboardAiSendBtn')?.addEventListener('click', async () => {
-    let inp = document.getElementById('dashboardAiInput'), msg = inp.value.trim();
-    if(!msg || !useQuery()) return;
-    let container = document.getElementById('dashboardChat');
-    container.innerHTML += `<div class="ai-msg user">${msg}</div>`;
-    inp.value = '';
-    let isSearch = msg.toLowerCase().includes('dolar') || msg.toLowerCase().includes
-
-('haber');
-    let response = isSearch ? (await webSearch(msg)) || "Sonuç yok" : await callSuperAI
-
-(msg);
-    container.innerHTML += `<div class="ai-msg bot">${response}</div>`;
-    if(window.hljs) document.querySelectorAll('pre code').forEach(hljs.highlightElement);
-    container.scrollTop = container.scrollHeight;
-});
-
-document.getElementById('dashboardFileInput')?.addEventListener('change', async (e) => {
-    let file = e.target.files[0];
-    if(!file) return;
-    let reader = new FileReader();
-    reader.onload = async function(ev) {
-        let content = ev.target.result;
-        let container = document.getElementById('dashboardChat');
-        container.innerHTML += `<div class="ai-msg bot">📄 Dosya "${file.name}" yüklendi. 
-
-İçerik: ${content.substring(0,500)}...</div>`;
-        container.scrollTop = container.scrollHeight;
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-});
+async function toggleFavorite(id) { let { data: p } = await supabaseClient.from('projects').select('is_favorite').eq('id', id).single(); await supabaseClient.from('projects').update({ is_favorite: !p.is_favorite }).eq('id', id); loadProjects(); }
+async function archiveProject(id) { await supabaseClient.from('projects').update({ is_archived: true }).eq('id', id); loadProjects(); }
+async function deleteProject(id) { if(confirm("Sil?")) await supabaseClient.from('projects').delete().eq('id', id); loadProjects(); }
 
 // ============================================================
-// PROFİL
+// GELEN KUTUSU
 // ============================================================
-function openProfileModal() {
-    document.getElementById('profileModal').classList.add('open');
-    document.getElementById('profileContent').innerHTML = `<p><strong>Ad:</strong> 
-
-${currentUser.name}</p><p><strong>Email:</strong> ${currentUser.email}
-
-</p><p><strong>Plan:</strong> ${currentUser.plan}</p><p><strong>Rol:</strong> 
-
-${currentUser.role || 'Kullanıcı'}</p><p><strong>Kalan Sorgu:</strong> 
-
-${document.getElementById('remainingQueries').innerText}</p>`;
-}
-function closeProfileModal() { document.getElementById('profileModal').classList.remove
-
-('open'); }
-async function changePassword() { let newPass = prompt("Yeni şifre (min 8 karakter):"); if
-
-(!newPass || newPass.length < 8) return; await supabaseClient.from('users').update({ 
-
-password_hash: btoa(newPass) }).eq('id', currentUser.id); alert("✅ Şifre değiştirildi!"); }
-async function deleteOwnAccount() {
-    let confirmPass = prompt("Hesabınızı silmek için şifrenizi girin:");
-    if(!confirmPass || btoa(confirmPass) !== currentUser.password_hash){ alert("Şifre 
-
-hatalı!"); return; }
-    let code = Math.floor(100000 + Math.random() * 900000).toString();
-    await sendEmail(currentUser.email, 'Hesap Silme Onayı', `<h1>Onay kodunuz: ${code}
-
-</h1>`);
-    let entered = prompt("Mail adresinize gönderilen 6 haneli kodu girin:");
-    if(entered !== code){ alert("Kod hatalı!"); return; }
-    await supabaseClient.from('users').delete().eq('id', currentUser.id);
-    alert("Hesabınız kalıcı olarak silindi.");
-    handleLogout();
+async function loadInbox() {
+    let { data: messages } = await supabaseClient.from('inbox').select('*').eq('receiver_email', currentUser.email).order('created_at', { ascending: false });
+    const container = document.getElementById('inboxList');
+    if(messages && messages.length) {
+        container.innerHTML = messages.map(m => `<div class="project-item">📧 <strong>${m.sender_email}</strong>: ${m.message}</div>`).join('');
+    } else {
+        container.innerHTML = '<div class="project-item">📭 Henüz mesaj yok.</div>';
+    }
 }
 
-document.getElementById('profileBtn')?.addEventListener('click', openProfileModal);
-document.getElementById('dashboardLogoutBtn')?.addEventListener('click', handleLogout);
+async function loadGifts() {
+    let { data: gifts } = await supabaseClient.from('gift_requests').select('*').eq('receiver_email', currentUser.email).eq('status', 'pending');
+    const container = document.getElementById('giftsList');
+    if(gifts && gifts.length) {
+        container.innerHTML = gifts.map(g => `<div class="project-item">🎁 <strong>${g.sender_email}</strong> size ${g.package} paketi hediye etti! <button onclick="acceptGift('${g.id}','${g.package}')" class="btn-primary-small">Kabul Et</button><button onclick="rejectGift('${g.id}')" class="btn-primary-small" style="background:#ff4757">Reddet</button></div>`).join('');
+    } else {
+        container.innerHTML = '<div class="project-item">🎁 Hediye yok.</div>';
+    }
+}
+async function acceptGift(id, pkg) { await supabaseClient.from('users').update({ plan: pkg }).eq('email', currentUser.email); await supabaseClient.from('gift_requests').update({ status: 'accepted' }).eq('id', id); alert("Paket eklendi!"); location.reload(); }
+async function rejectGift(id) { await supabaseClient.from('gift_requests').update({ status: 'rejected' }).eq('id', id); loadGifts(); }
 
 // ============================================================
 // ADMIN PANELİ
 // ============================================================
-function showAuthPanel(role) { pendingAdminRole = role; document.getElementById
-
-('authPanelOverlay').classList.add('open'); document.getElementById('authPassword').value = 
-
-''; }
-function closeAuthPanel() { document.getElementById('authPanelOverlay').classList.remove
-
-('open'); }
-function submitAuth() { if(CONFIG.checkPassword(pendingAdminRole, document.getElementById
-
-('authPassword').value)) { closeAuthPanel(); openAdminPanel(); } else alert("❌ Şifre 
-
-hatalı!"); }
-function openAdminPanel() { document.getElementById('adminOverlay').classList.add('open'); 
-
-loadAdminData(); }
-function closeAdminPanel() { document.getElementById('adminOverlay').classList.remove
-
-('open'); }
-
-async function loadAdminData() {
+async function loadAdminUsers() {
     let { data: users } = await supabaseClient.from('users').select('*');
-    document.getElementById('statUsers').innerText = users?.length || 0;
-    _allUsers = users || [];
-    document.getElementById('usersList').innerHTML = users.map(u => `<div class="user-
-
-item"><div><strong>${u.name}</strong><br>${u.email}<br><span class="badge">${u.plan}
-
-</span><br>${u.is_verified ? '✅ Doğrulandı' : '⏳ Doğrulanmadı'}<br>Rol: ${u.role || 'user'}
-
-</div><div><button onclick="setUserRole('${u.email}','admin')" class="btn-primary-
-
-small">Admin Yap</button><button onclick="setUserRole('${u.email}','user')" class="btn-
-
-primary-small">Kullanıcı Yap</button><button onclick="banUser('${u.email}')" class="btn-
-
-primary-small" style="background:#ff4757">Yasakla</button></div></div>`).join('');
+    document.getElementById('adminUsersList').innerHTML = users.map(u => `<div class="user-item"><div><strong>${u.name}</strong><br>${u.email}<br>Plan: ${u.plan}<br>Rol: ${u.role || 'user'}</div><div class="user-actions"><button onclick="banUser('${u.email}')">🔨 Banla</button><button onclick="promoteToAdmin('${u.email}')">👑 Admin Yap</button><button onclick="promoteToBeta('${u.email}')">🔬 Beta Yap</button><button onclick="demoteUser('${u.email}')">📉 Rütbe Düşür</button><button onclick="sendGift('${u.email}')">🎁 Hediye</button></div></div>`).join('');
 }
-async function setUserRole(email, role) { await supabaseClient.from('users').update({ role 
-
-}).eq('email', email); alert(`✅ ${email} rolü ${role} olarak güncellendi!`); loadAdminData
-
-(); }
-async function banUser(email) { await supabaseClient.from('users').update({ is_banned: true 
-
-}).eq('email', email); alert(`⚠️ ${email} yasaklandı!`); loadAdminData(); }
-async function addAdmin() { let email = document.getElementById
-
-('newAdminEmail').value.trim(); if(!email) return; await supabaseClient.from
-
-('users').update({ role: 'admin' }).eq('email', email); alert(`✅ ${email} admin yetkisi 
-
-aldı!`); document.getElementById('newAdminEmail').value = ''; loadAdminData(); }
-function exportUsers() { let csv = 'İsim,Email,Plan,Rol,Doğrulandı,Yasaklı\n' + 
-
-_allUsers.map(u => `"${u.name}","${u.email}","${u.plan}","${u.role || 
-
-'user'}","${u.is_verified ? 'Evet' : 'Hayır'}","${u.is_banned ? 'Evet' : 'Hayır'}"`).join
-
-('\n'); let a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + 
-
-encodeURIComponent(csv); a.download = 'kullanicilar.csv'; a.click(); }
+async function banUser(email) { await supabaseClient.from('users').update({ is_banned: true }).eq('email', email); loadAdminUsers(); }
+async function promoteToAdmin(email) { await supabaseClient.from('users').update({ role: 'admin' }).eq('email', email); loadAdminUsers(); }
+async function promoteToBeta(email) { await supabaseClient.from('users').update({ is_beta: true }).eq('email', email); loadAdminUsers(); }
+async function demoteUser(email) { await supabaseClient.from('users').update({ role: 'user', is_beta: false }).eq('email', email); loadAdminUsers(); }
+async function sendGift(email) {
+    let packageType = prompt('Hediye paketi (pro/team):');
+    if(packageType) await supabaseClient.from('gift_requests').insert([{ sender_email: currentUser.email, receiver_email: email, package: packageType, status: 'pending', created_at: new Date() }]);
+    alert('✅ Hediye gönderildi!');
+}
 
 // ============================================================
-// DİĞER FONKSİYONLAR
+// AI CHAT DASHBOARD
+// ============================================================
+document.getElementById('dashboardAiSendBtn')?.addEventListener('click', async () => {
+    let inp = document.getElementById('dashboardAiInput'), msg = inp.value.trim();
+    if(!msg) return;
+    let container = document.getElementById('dashboardAiMessages');
+    container.innerHTML += `<div class="ai-message user">${msg}</div>`;
+    inp.value = '';
+    let isSearch = msg.toLowerCase().includes('dolar') || msg.toLowerCase().includes('haber');
+    let response = isSearch ? (await webSearch(msg)) || "Sonuç yok" : await callSuperAI(msg);
+    container.innerHTML += `<div class="ai-message bot">${response}</div>`;
+    container.scrollTop = container.scrollHeight;
+});
+
+// ============================================================
+// PAKET SATIN ALMA
 // ============================================================
 function buyPackage(pkg) {
     if(!currentUser){ alert('Giriş yapın!'); return; }
-    if(confirm(`${pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takım Paketi (₺899/ay)'} satın 
-
-al?`)){
+    if(confirm(`${pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takım Paketi (₺899/ay)'} satın al?`)){
         supabaseClient.from('users').update({ plan: pkg }).eq('id', currentUser.id);
         alert('✅ Paket alındı! Sayfa yenileniyor...');
         location.reload();
     }
 }
 
-function buyTeamAndCreate() {
-    if(!currentUser){ alert('Giriş yapın!'); return; }
-    if(confirm('Takım paketi ₺899/ay - Satın al?')){
-        supabaseClient.from('users').update({ plan: 'team' }).eq('id', currentUser.id);
-        const teamName = prompt('Takım adı:', currentUser.name + ' Takımı');
-        if(teamName){
-            supabaseClient.from('teams').insert([{ name: teamName, owner_email: 
-
-currentUser.email, members: [currentUser.email], projects: [], chat_messages: [], 
-
-created_at: new Date() }]).then(res => {
-                if(res.data) supabaseClient.from('users').update({ team_id: res.data[0].id 
-
-}).eq('id', currentUser.id);
-            });
-        }
-        location.reload();
-    }
-}
-
-async function loadTeamData() {
-    if(!currentUser?.team_id) return;
-    const { data: team } = await supabaseClient.from('teams').select('*').eq('id', 
-
-currentUser.team_id).single();
-    if(team){
-        document.getElementById('memberCount').innerText = team.members?.length || 0;
-        document.getElementById('teamMembersList').innerHTML = (team.members || []).map(m 
-
-=> `<div class="user-item">👤 ${m}</div>`).join('');
-        document.getElementById('teamProjectsList').innerHTML = (team.projects || []).map(p 
-
-=> `<div class="project-item">📁 ${p.name}</div>`).join('');
-    }
-}
-
-function inviteToTeam() {
-    const email = document.getElementById('inviteEmail').value.trim();
-    if(!email) return;
-    if(!currentUser?.team_id){ alert('Önce takım kur!'); return; }
-    supabaseClient.from('team_invites').insert([{ team_id: currentUser.team_id, 
-
-invited_email: email, inviter_email: currentUser.email, created_at: new Date() }]);
-    alert(`📨 ${email} adresine davet gönderildi!`);
-    document.getElementById('inviteEmail').value = '';
-}
-
-function addTeamProject() {
-    const name = document.getElementById('newProjectName').value.trim();
-    if(!name) return;
-    if(!currentUser?.team_id){ alert('Önce takım kur!'); return; }
-    supabaseClient.from('teams').select('projects').eq('id', currentUser.team_id).single
-
-().then(res => {
-        let projects = res.data?.projects || [];
-        projects.push({ name, created_by: currentUser.email, created_at: new Date() });
-        supabaseClient.from('teams').update({ projects }).eq('id', currentUser.team_id);
-        document.getElementById('newProjectName').value = '';
-        loadTeamData();
-    });
-}
-
-function sendTeamMessage() {
-    const msg = document.getElementById('teamChatInput').value.trim();
-    if(!msg) return;
-    if(!currentUser?.team_id) return;
-    supabaseClient.from('teams').select('chat_messages').eq('id', 
-
-currentUser.team_id).single().then(res => {
-        let msgs = res.data?.chat_messages || [];
-        msgs.push({ user: currentUser.name, message: msg, time: new Date
-
-().toLocaleTimeString() });
-        supabaseClient.from('teams').update({ chat_messages: msgs }).eq('id', 
-
-currentUser.team_id);
-        document.getElementById('teamChatInput').value = '';
-        loadTeamData();
-    });
-}
-
-function initCursor() {
-    const cursor = document.getElementById('customCursor');
-    const ring = document.getElementById('customCursorRing');
-    if(!cursor || !ring) return;
-    let mx=0,my=0,rx=0,ry=0;
-    document.addEventListener('mousemove',(e)=>{ mx=e.clientX; my=e.clientY; 
-
-cursor.style.left=(mx-6)+'px'; cursor.style.top=(my-6)+'px'; });
-    function animate(){ rx+=(mx-rx-18)*0.12; ry+=(my-ry-18)*0.12; ring.style.left=rx+'px'; 
-
-ring.style.top=ry+'px'; requestAnimationFrame(animate); }
-    animate();
-}
-
-async function initCounters() {
-    try {
-        const { count } = await supabaseClient.from('users').select('*', { count: 'exact', 
-
-head: true });
-        const c1 = document.getElementById('counter1');
-        if(c1) c1.innerText = (count || 0).toLocaleString('tr-TR');
-    } catch(e) { console.log('Kullanıcı sayısı alınamadı:', e); }
-    const c2 = document.getElementById('counter2');
-    const c3 = document.getElementById('counter3');
-    if(c2) c2.innerText = '1.250.000';
-    if(c3) c3.innerText = '87.400';
-}
-
-function updateUI() {
-    if(currentUser){
-        document.getElementById('loginBtn').style.display='none';
-        document.getElementById('registerBtn').style.display='none';
-        document.getElementById('logoutBtn').style.display='block';
-        const plan = currentUser.plan || 'free';
-        let txt = plan === 'team' ? '👥 Takım - Sınırsız' : (plan === 'pro' ? '⭐ Pro - 
-
-2000/gün' : '🆓 Ücretsiz - 20/gün');
-        document.getElementById('queryLimitBadge').innerHTML = `🔍 ${txt} | Kalan: <span>
-
-${plan === 'team' ? '∞' : (plan === 'pro' ? '2000' : dailyQueries)}</span>`;
-        if(plan === 'team') {
-            document.getElementById('teamDashboard').style.display = 'block';
-            document.getElementById('teamName').innerHTML = currentUser.name;
-            if(currentUser.team_id) loadTeamData();
-        }
-    } else {
-        document.getElementById('loginBtn').style.display='block';
-        document.getElementById('registerBtn').style.display='block';
-        document.getElementById('logoutBtn').style.display='none';
-        document.getElementById('teamDashboard').style.display='none';
-        document.getElementById('queryLimitBadge').innerHTML = `🔍 Ücretsiz - 20/gün | 
-
-Kalan: <span>${dailyQueries}</span>`;
-    }
-}
-
-function useQuery() {
-    if(!currentUser){
-        if(dailyQueries <= 0){ alert("⚠️ Günlük sorgu limitiniz (20) doldu!"); return false; 
-
-}
-        dailyQueries--; localStorage.setItem('v27_queries', dailyQueries); updateUI(); 
-
-return true;
-    }
-    if(currentUser.plan === 'team' || currentUser.role === 'admin' || currentUser.role === 
-
-'founder') return true;
-    if(currentUser.plan === 'pro') {
-        let used = parseInt(localStorage.getItem('v27_pro_used')||0);
-        if(used >= 2000){ alert("⚠️ Pro limitiniz (2000) doldu!"); return false; }
-        localStorage.setItem('v27_pro_used', used+1); updateUI(); return true;
-    }
-    if(dailyQueries <= 0){ alert("⚠️ Günlük sorgu limitiniz (20) doldu!"); return false; }
-    dailyQueries--; localStorage.setItem('v27_queries', dailyQueries); updateUI(); return 
-
-true;
-}
-
-function checkAndReset() {
-    let today = new Date().toDateString();
-    let lastDate = localStorage.getItem('v27_last_date') || '';
-    if(lastDate !== today){
-        localStorage.setItem('v27_queries','20');
-        localStorage.setItem('v27_pro_used','0');
-        localStorage.setItem('v27_last_date',today);
-        dailyQueries = 20;
-        updateUI();
-    }
-}
-
-function openModal(t) { document.getElementById('authModal').classList.add('open'); 
-
-switchTab(t); }
-function closeModal() { document.getElementById('authModal').classList.remove('open'); }
+// ============================================================
+// MODAL VE DİĞER
+// ============================================================
+function openModal(t){ document.getElementById('authModal').classList.add('open'); switchTab(t); }
+function closeModal(){ document.getElementById('authModal').classList.remove('open'); }
 function switchTab(tab) {
     const fLogin = document.getElementById('formLogin');
     const fReg = document.getElementById('formRegister');
@@ -2813,144 +1290,52 @@ function switchTab(tab) {
     if(tLogin) tLogin.classList.toggle('active', tab === 'login');
     if(tReg) tReg.classList.toggle('active', tab === 'register');
     if(tVerify) tVerify.classList.toggle('active', tab === 'verify');
-    const modalTitle = document.getElementById('modalTitle');
-    if(modalTitle) modalTitle.textContent = tab === 'login' ? 'Giriş Yap' : (tab === 
-
-'register' ? 'Hesap Oluştur' : 'Doğrulama');
 }
-function toggleAiPanel() { document.getElementById('aiPanel').classList.toggle('open'); }
-function quickAsk(t) { document.getElementById('aiInput').value = t; sendAiMessage(); }
-function sendAiMessage() {
-    const inp = document.getElementById('aiInput'), msg = inp.value.trim();
-    if(!msg) return;
-    const msgs = document.getElementById('aiMessages');
-    msgs.innerHTML += `<div class="ai-msg user">${msg}</div>`;
-    inp.value = '';
-    setTimeout(() => { msgs.innerHTML += `<div class="ai-msg bot">⚡ Tam ekran AI panelini 
+function showAuthPanel(role) { pendingAdminRole = role; document.getElementById('authPanelOverlay').classList.add('open'); document.getElementById('authPassword').value = ''; }
+function closeAuthPanel() { document.getElementById('authPanelOverlay').classList.remove('open'); }
+function submitAuth() { if((pendingAdminRole === 'FOUNDER' && btoa(document.getElementById('authPassword').value) === ADMIN_PASSWORDS.FOUNDER) || (pendingAdminRole === 'ADMIN' && btoa(document.getElementById('authPassword').value) === ADMIN_PASSWORDS.ADMIN) || (pendingAdminRole === 'BETA' && btoa(document.getElementById('authPassword').value) === ADMIN_PASSWORDS.BETA)) { closeAuthPanel(); alert('✅ Yetki doğrulandı! Yetkili panelini kullanabilirsin.'); } else alert("❌ Şifre hatalı!"); }
 
-açmak için ⚡ butonuna tıklayın.</div>`; msgs.scrollTop = msgs.scrollHeight; }, 500);
+function initCursor() {
+    const cursor = document.getElementById('customCursor');
+    const ring = document.getElementById('customCursorRing');
+    if(!cursor || !ring) return;
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',(e)=>{ mx=e.clientX; my=e.clientY; cursor.style.left=(mx-6)+'px'; cursor.style.top=(my-6)+'px'; });
+    function animate(){ rx+=(mx-rx-18)*0.12; ry+=(my-ry-18)*0.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animate); }
+    animate();
 }
-function toggleDownloadMenu() { document.getElementById('downloadMenu').classList.toggle
-
-('open'); }
-function downloadApp(p) { alert(`📱 ${p.toUpperCase()} yakında!`); }
-function downloadWebApp() { alert('🌐 PWA kurulumu için Chrome menü'); }
-
-function handleFileUpload(input) {
-    let file = input.files[0];
-    if(!file) return;
-    let chat = document.getElementById('vizyonAIChat');
-    chat.innerHTML += `<div class="ai-msg user">📎 Dosya yüklendi: ${file.name} 
-
-(${(file.size/1024).toFixed(1)} KB)</div>`;
-    let reader = new FileReader();
-    reader.onload = function(e) {
-        uploadedFileContent = e.target.result;
-        let preview = '';
-        if(file.type.startsWith('image')) preview = `<img src="${e.target.result}" 
-
-style="max-width:100%;margin-top:10px;border-radius:8px;">`;
-        else preview = `<div style="background:#030810;padding:10px;border-
-
-radius:8px;margin-top:10px;font-family:monospace;font-size:11px;max-
-
-height:150px;overflow:auto;">${uploadedFileContent.substring
-
-(0,500)}${uploadedFileContent.length > 500 ? '...' : ''}</div>`;
-        chat.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: Dosyan başarıyla yüklendi!
-
-<br><br>📄 <strong>${file.name}</strong><br>📏 Boyut: ${(file.size/1024).toFixed(1)} KB
-
-${preview}<br><br>Bu dosya üzerinde ne yapmamı istersin?</div>`;
-        chat.scrollTop = chat.scrollHeight;
-    };
-    if(file.type.startsWith('text') || file.name.endsWith('.py') || file.name.endsWith
-
-('.js') || file.name.endsWith('.html') || file.name.endsWith('.json') || 
-
-file.name.endsWith('.css')) reader.readAsText(file);
-    else reader.readAsDataURL(file);
-    input.value = '';
+async function initCounters() {
+    try {
+        const { count } = await supabaseClient.from('users').select('*', { count: 'exact', head: true });
+        const c1 = document.getElementById('counter1');
+        if(c1) c1.innerText = (count || 0).toLocaleString('tr-TR');
+    } catch(e) { console.log('Kullanıcı sayısı alınamadı:', e); }
+    const c2 = document.getElementById('counter2');
+    const c3 = document.getElementById('counter3');
+    if(c2) c2.innerText = '0';
+    if(c3) c3.innerText = '0';
 }
-function openVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'flex'; 
-
-document.getElementById('vizyonAIInput').focus(); }
-function closeVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'none'; 
-
-}
-function quickAICode(cmd) { document.getElementById('vizyonAIInput').value = cmd; 
-
-sendVizyonAIAdvanced(); }
-async function sendVizyonAIAdvanced() {
-    let input = document.getElementById('vizyonAIInput'), msg = input.value.trim();
-    if(!msg && !uploadedFileContent) return;
-    let chat = document.getElementById('vizyonAIChat');
-    chat.innerHTML += `<div class="ai-msg user">${msg}</div>`;
-    input.value = '';
-    let typingId = 'typing-' + Date.now();
-    chat.innerHTML += `<div class="ai-msg bot" id="${typingId}">🧠 Düşünüyor...</div>`;
-    chat.scrollTop = chat.scrollHeight;
-    let isSearch = msg.toLowerCase().includes('dolar') || msg.toLowerCase().includes
-
-('haber');
-    setTimeout(async () => {
-        document.getElementById(typingId)?.remove();
-        let response = isSearch ? (await webSearch(msg)) || `🔍 "${msg}" için sonuç 
-
-bulunamadı.` : await callSuperAI(msg);
-        chat.innerHTML += `<div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>:<br><br>
-
-${response}</div>`;
-        chat.scrollTop = chat.scrollHeight;
-        uploadedFileContent = null;
-    }, 800);
-}
-
-const profileModalDiv = document.createElement('div');
-profileModalDiv.id = 'profileModal';
-profileModalDiv.className = 'modal-overlay';
-profileModalDiv.innerHTML = `<div class="modal"><div class="modal-header"><h3>👤 
-
-Profil</h3><button class="modal-close" onclick="closeProfileModal()">×</button></div><div 
-
-class="modal-body"><div id="profileContent"></div><button class="btn-primary" 
-
-onclick="changePassword()">Şifre Değiştir</button><button class="btn-primary" 
-
-onclick="deleteOwnAccount()" style="background:#ff4757;margin-top:10px">🗑️ Hesabımı 
-
-Sil</button></div></div>`;
-document.body.appendChild(profileModalDiv);
+function updateUI() { /* UI güncelleme */ }
+function checkAndReset() { let today = new Date().toDateString(); let lastDate = localStorage.getItem('v27_last_date') || ''; if(lastDate !== today){ localStorage.setItem('v27_queries','20'); localStorage.setItem('v27_last_date',today); } }
 
 window.onload = () => {
     checkAndReset();
     const saved = localStorage.getItem('v27_user');
-    if(saved) { currentUser = JSON.parse(saved); if(currentUser) showDashboard(); else 
-
-document.getElementById('mainSite').style.display = 'block'; }
+    if(saved) { currentUser = JSON.parse(saved); if(currentUser) showDashboard(); else document.getElementById('mainSite').style.display = 'block'; }
     else document.getElementById('mainSite').style.display = 'block';
     initCursor();
     initCounters();
-    updateUI();
     
     const particleContainer = document.getElementById('particles');
     if(particleContainer) {
         for(let i = 0; i < 40; i++) {
             const p = document.createElement('div');
             p.className = 'particle';
-            const duration = 8 + Math.random() * 15;
-            const left = Math.random() * 100;
-            const drift = (Math.random() - 0.5) * 200;
-            p.style.cssText = `left:${left}%;animation-duration:${duration}s;animation-
-
-delay:${-Math.random() * 20}s;--drift:${drift}px;`;
-            if(Math.random() > 0.7) { p.style.background = 'var(--accent2)'; p.style.width 
-
-= '3px'; p.style.height = '3px'; }
+            p.style.cssText = `left:${Math.random()*100}%;animation-duration:${8+Math.random()*15}s;animation-delay:${-Math.random()*20}s;`;
+            if(Math.random() > 0.7) p.style.background = 'var(--accent2)';
             particleContainer.appendChild(p);
         }
     }
-    
     window.addEventListener('scroll', () => {
         const doc = document.documentElement;
         const scrollTop = window.scrollY || doc.scrollTop;
@@ -2959,7 +1344,6 @@ delay:${-Math.random() * 20}s;--drift:${drift}px;`;
         const bar = document.getElementById('progressBar');
         if(bar) bar.style.width = progress + '%';
     });
-    
     const names = ['Ahmet K.', 'Fatma D.', 'Burak Y.', 'Zeynep A.', 'Emre S.', 'Selin M.'];
     setInterval(() => {
         const name = names[Math.floor(Math.random() * names.length)];
