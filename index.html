@@ -1268,7 +1268,7 @@ footer {
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// 🔥 TÜM API ANAHTARLARI (EKSİKSİZ)
+// 🔥 TÜM API ANAHTARLARI (EKSİKSİZ + TÜM AI MODELLERİ)
 // ═══════════════════════════════════════════════════════════════
 (function() {
     const _GROQ_API_KEY = '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';
@@ -1295,6 +1295,10 @@ footer {
         getSupabaseUrl: () => _SUPABASE_URL,
         getSupabaseKey: () => _SUPABASE_KEY,
         getResendKey: () => _RESEND_API_KEY,
+        getCerebrasKey: () => _CEREBRAS_API_KEY,
+        getMistralKey: () => _MISTRAL_API_KEY,
+        getOpenrouterKey: () => _OPENROUTER_API_KEY,
+        getCohereKey: () => _COHERE_API_KEY,
         checkPassword: (role, entered) => btoa(entered) === ADMIN_PASSWORDS[role],
         isSerpapiActive: () => true,
         isResendActive: () => true
@@ -1305,9 +1309,23 @@ let supabaseClient = supabase.createClient(CONFIG.getSupabaseUrl(), CONFIG.getSu
 let currentUser = JSON.parse(localStorage.getItem('v27_user') || 'null');
 let dailyQueries = parseInt(localStorage.getItem('v27_queries') || '20');
 
+// Günlük sorgu sıfırlama (gece 00:00 kontrolü)
+function checkAndResetDailyQueries() {
+    const lastDate = localStorage.getItem('v27_last_date');
+    const today = new Date().toDateString();
+    if(lastDate !== today) {
+        localStorage.setItem('v27_queries', '20');
+        localStorage.setItem('v27_pro_used', '0');
+        localStorage.setItem('v27_last_date', today);
+        dailyQueries = 20;
+        updateQueryDisplay();
+    }
+}
+
 window.scrollTo(0, 0);
 document.addEventListener('DOMContentLoaded', () => { 
-    window.scrollTo(0, 0); 
+    window.scrollTo(0, 0);
+    checkAndResetDailyQueries();
     updateUI(); 
     initCursor(); 
     initCounters(); 
@@ -1399,6 +1417,74 @@ async function callGroq(prompt) {
     } catch(e) { return null; }
 }
 
+// CEREBRAS AI
+async function callCerebras(prompt) {
+    try {
+        const res = await fetch('https://api.cerebras.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${CONFIG.getCerebrasKey()}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'llama-3.1-70b',
+                messages: [{ role: 'user', content: prompt }],
+                max_tokens: 1000
+            })
+        });
+        const data = await res.json();
+        return data.choices?.[0]?.message?.content || null;
+    } catch(e) { return null; }
+}
+
+// MISTRAL AI
+async function callMistral(prompt) {
+    try {
+        const res = await fetch('https://api.mistral.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${CONFIG.getMistralKey()}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'codestral-latest',
+                messages: [{ role: 'user', content: prompt }],
+                max_tokens: 2000
+            })
+        });
+        const data = await res.json();
+        return data.choices?.[0]?.message?.content || null;
+    } catch(e) { return null; }
+}
+
+// OPENROUTER AI
+async function callOpenrouter(prompt) {
+    try {
+        const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${CONFIG.getOpenrouterKey()}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'meta-llama/llama-3.3-70b-instruct:free',
+                messages: [{ role: 'user', content: prompt }]
+            })
+        });
+        const data = await res.json();
+        return data.choices?.[0]?.message?.content || null;
+    } catch(e) { return null; }
+}
+
+// COHERE AI
+async function callCohere(prompt) {
+    try {
+        const res = await fetch('https://api.cohere.ai/v1/generate', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${CONFIG.getCohereKey()}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'command',
+                prompt: prompt,
+                max_tokens: 500,
+                temperature: 0.7
+            })
+        });
+        const data = await res.json();
+        return data.generations?.[0]?.text || null;
+    } catch(e) { return null; }
+}
+
 // FALLBACK AI (API yoksa demo cevap)
 function fallbackAI(prompt) {
     const p = prompt.toLowerCase();
@@ -1411,13 +1497,23 @@ function fallbackAI(prompt) {
     return `🧠 VİZYON AI hazır!\n\n📌 Örnek: "Python hesap makinesi yaz", "React todo app yap", "dolar kaç"`;
 }
 
-// SÜPER AI
+// SÜPER AI - Tüm modelleri dene, ilk çalışanı kullan
 async function callSuperAI(prompt) {
-    if(CONFIG.getGroqKey()) {
+    const apis = [
+        { name: 'Groq', func: () => callGroq(prompt) },
+        { name: 'Cerebras', func: () => callCerebras(prompt) },
+        { name: 'Mistral', func: () => callMistral(prompt) },
+        { name: 'Openrouter', func: () => callOpenrouter(prompt) },
+        { name: 'Cohere', func: () => callCohere(prompt) }
+    ];
+    for(const api of apis) {
         try {
-            const result = await callGroq(prompt);
-            if(result) return result;
-        } catch(e) { console.log('Groq hatası:', e); }
+            const result = await api.func();
+            if(result && result.length > 0 && !result.includes('error')) {
+                console.log(`${api.name} ile yanıt alındı`);
+                return result;
+            }
+        } catch(e) { console.log(`${api.name} hatası:`, e); }
     }
     return fallbackAI(prompt);
 }
@@ -1671,9 +1767,12 @@ function toggleDownloadMenu(){ document.getElementById('downloadMenu').classList
 function downloadApp(p){ alert(`📱 ${p.toUpperCase()} yakında!`); }
 function downloadWebApp(){ alert('🌐 PWA kurulumu için Chrome menü'); }
 
-const modalBody = document.querySelector('#authModal .modal-body');
-if(modalBody && !document.getElementById('verifyPanel')) {
-    modalBody.innerHTML += `<div id="verifyPanel" style="display:none;"><div class="form-group"><label>E-posta</label><input class="form-input" id="verifyEmail" type="email"></div><div class="form-group"><label>Doğrulama Kodu</label><input class="form-input" id="verifyCode" type="text"></div><button class="btn-submit" onclick="verifyAccount()">Doğrula</button></div>`;
+// verifyPanel sadece bir kez ekleniyor
+if(!document.getElementById('verifyPanel')) {
+    const modalBody = document.querySelector('#authModal .modal-body');
+    if(modalBody) {
+        modalBody.innerHTML += `<div id="verifyPanel" style="display:none;"><div class="form-group"><label>E-posta</label><input class="form-input" id="verifyEmail" type="email"></div><div class="form-group"><label>Doğrulama Kodu</label><input class="form-input" id="verifyCode" type="text"></div><button class="btn-submit" onclick="verifyAccount()">Doğrula</button></div>`;
+    }
 }
 </script>
 </body>
