@@ -12,10 +12,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@300;400;500;700&display=swap" rel="stylesheet">
 
 <style>
-/* ============================================================ */
-/* TAMAMEN YENİLENMİŞ CSS - DAHA PARLAK, DAHA DÜZENLİ */
-/* ============================================================ */
-
 :root {
   --bg: #050a0f;
   --bg2: #0a111a;
@@ -68,7 +64,10 @@ body {
   opacity: 0.7;
 }
 
-/* BUTONLAR */
+button, a, .secret-btn, .nav-cta, .btn-primary, .btn-secondary, .btn-price, .ai-suggestion, .mbadge, .download-btn, .ai-widget-btn, .close-panel-btn, .btn-submit, .modal-tab, .support-link, .nav-links a {
+  cursor: pointer !important;
+  transition: all 0.2s ease;
+}
 .btn-primary {
   background: linear-gradient(135deg, var(--accent), var(--purple));
   color: var(--bg);
@@ -77,10 +76,11 @@ body {
   font-weight: 600;
   border-radius: 40px;
   font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
 }
-.btn-primary:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(0,255,255,0.4); }
+.btn-primary:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 20px rgba(0,255,255,0.4);
+}
 .btn-secondary {
   background: transparent;
   border: 1px solid var(--accent);
@@ -88,9 +88,11 @@ body {
   padding: 12px 28px;
   border-radius: 40px;
   font-size: 14px;
-  cursor: pointer;
 }
-.btn-secondary:hover { background: rgba(0,255,255,0.1); box-shadow: 0 0 15px rgba(0,255,255,0.2); }
+.btn-secondary:hover {
+  background: rgba(0,255,255,0.1);
+  box-shadow: 0 0 15px rgba(0,255,255,0.2);
+}
 .btn-primary-small {
   background: var(--accent);
   color: var(--bg);
@@ -98,15 +100,7 @@ body {
   padding: 8px 20px;
   border-radius: 30px;
   font-size: 13px;
-  cursor: pointer;
-}
-.logout-btn {
-  background: rgba(255,71,87,0.2);
-  border: 1px solid var(--danger);
-  color: var(--danger);
-  padding: 8px 20px;
-  border-radius: 30px;
-  cursor: pointer;
+  font-weight: 600;
 }
 .nav-cta {
   background: transparent;
@@ -115,7 +109,13 @@ body {
   padding: 8px 20px;
   border-radius: 30px;
   font-size: 13px;
-  cursor: pointer;
+}
+.logout-btn {
+  background: rgba(255,71,87,0.2);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  padding: 8px 20px;
+  border-radius: 30px;
 }
 .secret-btn {
   background: rgba(0,255,255,0.1);
@@ -124,9 +124,11 @@ body {
   font-size: 10px;
   padding: 6px 12px;
   border-radius: 20px;
-  cursor: pointer;
 }
-.secret-btn:hover { border-color: var(--accent); color: var(--accent); }
+.secret-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
 .btn-submit {
   width: 100%;
   padding: 14px;
@@ -168,9 +170,12 @@ body {
   color: var(--text2);
   font-size: 12px;
 }
-.file-upload-btn:hover { border-color: var(--accent); color: var(--accent); }
+.file-upload-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
 
-/* ARKA PLAN EFEKTLERİ */
+/* OFFICE BACKGROUND */
 .office-bg {
   position: fixed;
   inset: 0;
@@ -189,6 +194,8 @@ body {
   background: linear-gradient(to bottom, rgba(5,10,15,0.85), rgba(5,10,15,0.95));
   z-index: 2;
 }
+
+/* GRID LINES */
 .grid-lines {
   position: fixed;
   inset: 0;
@@ -198,6 +205,8 @@ body {
                     linear-gradient(90deg, rgba(0,255,255,0.05) 1px, transparent 1px);
   background-size: 60px 60px;
 }
+
+/* PARTICLES */
 .particles {
   position: fixed;
   inset: 0;
@@ -220,6 +229,8 @@ body {
   90% { opacity: 0.3; }
   100% { transform: translateY(-100px); opacity: 0; }
 }
+
+/* PROGRESS BAR */
 .progress-bar-top {
   position: fixed;
   top: 0;
@@ -228,7 +239,10 @@ body {
   background: linear-gradient(90deg, var(--accent), var(--accent2), var(--purple));
   z-index: 200;
   transition: width 0.1s;
+  box-shadow: 0 0 15px var(--accent);
 }
+
+/* NOTIFICATION */
 .notification {
   position: fixed;
   bottom: 32px;
@@ -248,18 +262,7 @@ body {
   backdrop-filter: blur(10px);
 }
 .notification.show { transform: translateY(0); opacity: 1; }
-.query-limit-badge {
-  position: fixed;
-  bottom: 100px;
-  left: 20px;
-  background: rgba(0,255,255,0.15);
-  border: 1px solid var(--accent);
-  border-radius: 30px;
-  padding: 8px 16px;
-  font-size: 12px;
-  z-index: 100;
-  backdrop-filter: blur(10px);
-}
+.notification span { color: var(--accent2); font-weight: 600; }
 
 /* NAVBAR */
 nav {
@@ -318,7 +321,6 @@ nav {
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 1px;
-  transition: color 0.2s;
 }
 .nav-links a:hover { color: var(--accent); }
 .button-group {
@@ -1171,6 +1173,19 @@ footer {
   border-radius: 30px;
   font-size: 12px;
 }
+.query-limit-badge {
+  position: fixed;
+  bottom: 100px;
+  left: 20px;
+  background: rgba(0,255,255,0.15);
+  border: 1px solid var(--accent);
+  border-radius: 30px;
+  padding: 8px 16px;
+  font-size: 12px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  font-weight: 500;
+}
 
 /* DOWNLOAD MENU */
 .download-menu {
@@ -1674,29 +1689,19 @@ footer {
 
 <script>
 // ============================================================
-// 🔥 EDGE FUNCTIONS URL (DOĞRU)
+// 🔥 KONFİGÜRASYON (DOĞRU URL)
 // ============================================================
 const WORKER_URL = 'https://dxfwxknohzkdhzyytwdt.supabase.co/functions/v1/smooth-function';
-
-// ============================================================
-// SUPABASE BAĞLANTISI
-// ============================================================
 const SUPABASE_URL = 'https://dxfwxknohzkdhzyytwdt.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Us1HLOwQoLT5978dZ3Oy-Q_-v0WrLsl';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ============================================================
-// ADMIN ŞİFRELERİ
-// ============================================================
 const ADMIN_PASSWORDS = {
     FOUNDER: btoa("Eymen11Amele44"),
     ADMIN: btoa("ibrm4411"),
     BETA: btoa("4402")
 };
 
-// ============================================================
-// GLOBAL DEĞİŞKENLER
-// ============================================================
 let currentUser = null;
 let dailyQueries = parseInt(localStorage.getItem('v27_queries') || '20');
 let pendingAdminRole = null;
@@ -1766,7 +1771,7 @@ function fallbackAI(prompt) {
 }
 
 // ============================================================
-// KAYIT / GİRİŞ / DOĞRULAMA
+// KAYIT / GİRİş / DOĞRULAMA
 // ============================================================
 async function handleRegister() {
     const name = document.getElementById('rName')?.value.trim();
@@ -2111,6 +2116,7 @@ function submitAuth() {
                 document.getElementById('adminPanel').style.display = 'block';
                 loadAdminUsers();
             }
+            showDashboard();
         }
     } else alert("❌ Şifre hatalı!"); 
 }
@@ -2143,16 +2149,10 @@ function updateUI() {
         const plan = currentUser.plan || 'free';
         let txt = plan === 'team' ? '👥 Takım - Sınırsız' : (plan === 'pro' ? '⭐ Pro - 2000/gün' : '🆓 Ücretsiz - 20/gün');
         document.getElementById('queryLimitBadge').innerHTML = `🔍 ${txt} | Kalan: <span>${plan === 'team' ? '∞' : (plan === 'pro' ? '2000' : dailyQueries)}</span>`;
-        if(plan === 'team') {
-            document.getElementById('teamDashboard').style.display = 'block';
-            document.getElementById('teamName').innerHTML = currentUser.name;
-            if(currentUser.team_id) loadTeamData();
-        }
     } else {
         document.getElementById('loginBtn').style.display='block';
         document.getElementById('registerBtn').style.display='block';
         document.getElementById('logoutBtn').style.display='none';
-        document.getElementById('teamDashboard').style.display='none';
         document.getElementById('queryLimitBadge').innerHTML = `🔍 Ücretsiz - 20/gün | Kalan: <span>${dailyQueries}</span>`;
     }
 }
