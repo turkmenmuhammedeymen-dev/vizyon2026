@@ -8,25 +8,20 @@
 <!-- Supabase SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@300;400;500;700&display=swap" rel="stylesheet">
 
 <style>
-/* ============================================================ */
-/* TAMAMEN YENİLENMİŞ CSS - DAHA PARLAK, DAHA DÜZENLİ */
-/* ============================================================ */
-
 :root {
   --bg: #050a0f;
   --bg2: #0a111a;
   --surface: #0d1a26;
   --surface2: #112233;
   --border: #1a3350;
-  --accent: #0ff;           /* DAHA PARLAK */
-  --accent2: #0f8;          /* DAHA PARLAK */
+  --accent: #0ff;
+  --accent2: #0f8;
   --accent3: #ff6b35;
   --gold: #ffd700;
-  --text: #ffffff;          /* BEYAZ - DAHA OKUNABİLİR */
+  --text: #ffffff;
   --text2: #ccdeee;
   --text3: #8ab4cc;
   --danger: #ff4757;
@@ -45,7 +40,7 @@ body {
   overflow-x: hidden;
 }
 
-/* MAVİ İMLEÇ (DAHA BELİRGİN) */
+/* MAVİ İMLEÇ */
 .custom-cursor {
   width: 12px;
   height: 12px;
@@ -68,13 +63,7 @@ body {
   opacity: 0.7;
 }
 
-/* BUTONLAR (MODERN - YUVARLAK) */
-button, a, .secret-btn, .nav-cta, .btn-primary, .btn-secondary, .btn-price, .ai-suggestion, .mbadge, .download-btn, .ai-widget-btn, .close-panel-btn, .btn-submit, .modal-tab, .support-link, .nav-links a {
-  cursor: pointer !important;
-  z-index: 999 !important;
-  position: relative;
-  transition: all 0.2s ease;
-}
+/* BUTONLAR */
 .btn-primary {
   background: linear-gradient(135deg, var(--accent), var(--purple));
   color: var(--bg);
@@ -83,6 +72,8 @@ button, a, .secret-btn, .nav-cta, .btn-primary, .btn-secondary, .btn-price, .ai-
   font-weight: 600;
   border-radius: 40px;
   font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 .btn-primary:hover {
   transform: scale(1.02);
@@ -95,10 +86,10 @@ button, a, .secret-btn, .nav-cta, .btn-primary, .btn-secondary, .btn-price, .ai-
   padding: 12px 28px;
   border-radius: 40px;
   font-size: 14px;
+  cursor: pointer;
 }
 .btn-secondary:hover {
   background: rgba(0,255,255,0.1);
-  box-shadow: 0 0 15px rgba(0,255,255,0.2);
 }
 
 /* OFFICE BACKGROUND */
@@ -121,7 +112,6 @@ button, a, .secret-btn, .nav-cta, .btn-primary, .btn-secondary, .btn-price, .ai-
   z-index: 2;
 }
 
-/* GRID LINES */
 .grid-lines {
   position: fixed;
   inset: 0;
@@ -132,7 +122,6 @@ button, a, .secret-btn, .nav-cta, .btn-primary, .btn-secondary, .btn-price, .ai-
   background-size: 60px 60px;
 }
 
-/* PARTICLES */
 .particles {
   position: fixed;
   inset: 0;
@@ -156,7 +145,6 @@ button, a, .secret-btn, .nav-cta, .btn-primary, .btn-secondary, .btn-price, .ai-
   100% { transform: translateY(-100px); opacity: 0; }
 }
 
-/* PROGRESS BAR */
 .progress-bar-top {
   position: fixed;
   top: 0;
@@ -165,10 +153,8 @@ button, a, .secret-btn, .nav-cta, .btn-primary, .btn-secondary, .btn-price, .ai-
   background: linear-gradient(90deg, var(--accent), var(--accent2), var(--purple));
   z-index: 200;
   transition: width 0.1s;
-  box-shadow: 0 0 15px var(--accent);
 }
 
-/* NOTIFICATION */
 .notification {
   position: fixed;
   bottom: 32px;
@@ -188,7 +174,6 @@ button, a, .secret-btn, .nav-cta, .btn-primary, .btn-secondary, .btn-price, .ai-
   backdrop-filter: blur(10px);
 }
 .notification.show { transform: translateY(0); opacity: 1; }
-.notification span { color: var(--accent2); font-weight: 600; }
 
 /* NAVBAR */
 nav {
@@ -247,7 +232,6 @@ nav {
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 1px;
-  transition: color 0.2s;
 }
 .nav-links a:hover { color: var(--accent); }
 .button-group {
@@ -266,6 +250,7 @@ nav {
   font-size: 10px;
   padding: 6px 12px;
   border-radius: 20px;
+  cursor: pointer;
 }
 .secret-btn:hover {
   border-color: var(--accent);
@@ -278,7 +263,7 @@ nav {
   padding: 8px 20px;
   border-radius: 30px;
   font-size: 13px;
-  font-weight: 500;
+  cursor: pointer;
 }
 .btn-primary-small {
   background: var(--accent);
@@ -287,7 +272,7 @@ nav {
   padding: 8px 20px;
   border-radius: 30px;
   font-size: 13px;
-  font-weight: 600;
+  cursor: pointer;
 }
 .logout-btn {
   background: rgba(255,71,87,0.2);
@@ -295,6 +280,7 @@ nav {
   color: var(--danger);
   padding: 8px 20px;
   border-radius: 30px;
+  cursor: pointer;
 }
 
 /* HERO */
@@ -318,7 +304,6 @@ nav {
   font-size: 12px;
   color: var(--accent);
   margin-bottom: 32px;
-  backdrop-filter: blur(5px);
 }
 .hero-badge .blink {
   width: 8px;
@@ -338,24 +323,9 @@ nav {
   line-height: 0.95;
   margin-bottom: 24px;
 }
-.hero-title .line1 { 
-  color: var(--text); 
-  display: block;
-  text-shadow: 0 0 20px rgba(0,255,255,0.3);
-}
-.hero-title .line2 { 
-  display: block; 
-  -webkit-text-stroke: 2px var(--accent); 
-  color: transparent;
-  text-shadow: none;
-}
-.hero-title .line3 { 
-  display: block; 
-  color: var(--accent2); 
-  font-size: 0.55em; 
-  margin-top: 8px;
-  letter-spacing: 2px;
-}
+.hero-title .line1 { color: var(--text); display: block; text-shadow: 0 0 20px rgba(0,255,255,0.3); }
+.hero-title .line2 { display: block; -webkit-text-stroke: 2px var(--accent); color: transparent; }
+.hero-title .line3 { display: block; color: var(--accent2); font-size: 0.55em; margin-top: 8px; letter-spacing: 2px; }
 .hero-sub {
   max-width: 600px;
   font-size: 16px;
@@ -409,7 +379,6 @@ nav {
   margin-top: 6px;
 }
 
-/* SCROLL INDICATOR */
 .scroll-indicator {
   position: absolute;
   bottom: 40px;
@@ -420,12 +389,6 @@ nav {
   align-items: center;
   gap: 8px;
   opacity: 0.5;
-}
-.scroll-indicator span {
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--text3);
 }
 .scroll-mouse {
   width: 26px;
@@ -448,7 +411,6 @@ nav {
   to { transform: translateY(10px); opacity: 0; }
 }
 
-/* EDITOR PREVIEW */
 .editor-preview {
   margin: 80px auto;
   max-width: 1000px;
@@ -459,7 +421,6 @@ nav {
   border: 1px solid var(--border);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
 }
 .editor-titlebar {
   display: flex;
@@ -485,9 +446,7 @@ nav {
 .kw { color: var(--purple); }
 .fn { color: var(--accent2); }
 .str { color: var(--accent3); }
-.cm { color: var(--text3); font-style: italic; }
 
-/* FEATURES */
 .features {
   padding: 80px 48px;
   max-width: 1400px;
@@ -506,7 +465,6 @@ nav {
   font-size: clamp(36px, 5vw, 52px);
   font-weight: 800;
 }
-.section-title .hl { color: var(--accent); }
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -547,7 +505,6 @@ nav {
   color: var(--text2);
 }
 
-/* AI SECTION */
 .ai-section {
   padding: 80px 48px;
   max-width: 1400px;
@@ -562,14 +519,8 @@ nav {
   border-radius: 20px;
   overflow: hidden;
 }
-.ai-left {
-  background: var(--bg);
-  padding: 48px;
-}
-.ai-right {
-  background: var(--surface);
-  padding: 48px;
-}
+.ai-left { background: var(--bg); padding: 48px; }
+.ai-right { background: var(--surface); padding: 48px; }
 .ai-title {
   font-family: var(--font-display);
   font-size: clamp(32px, 4vw, 42px);
@@ -624,7 +575,6 @@ nav {
   border-radius: 8px;
 }
 
-/* TECH STACK */
 .tech-section {
   padding: 50px 48px;
   border-top: 1px solid var(--border);
@@ -666,7 +616,6 @@ nav {
   border-radius: 50%;
 }
 
-/* PRICING */
 .pricing {
   padding: 80px 48px;
   max-width: 1400px;
@@ -704,7 +653,6 @@ nav {
   font-weight: 800;
   color: var(--text);
 }
-.price-amount span { font-size: 20px; font-weight: 400; color: var(--text3); }
 .price-features {
   list-style: none;
   margin: 24px 0;
@@ -750,7 +698,6 @@ nav {
   border-radius: 40px;
 }
 
-/* TESTIMONIALS */
 .testimonials {
   padding: 80px 48px;
   max-width: 1400px;
@@ -805,7 +752,6 @@ nav {
 .author-name { font-size: 14px; font-weight: 600; color: var(--text); }
 .author-title { font-size: 11px; color: var(--text3); }
 
-/* FOOTER */
 footer {
   border-top: 1px solid var(--border);
   padding: 60px 48px 40px;
@@ -856,22 +802,6 @@ footer {
   border-radius: 30px;
 }
 .badge.live { border-color: var(--accent2); color: var(--accent2); }
-.support-footer {
-  margin-top: 20px;
-  text-align: center;
-}
-.support-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 24px;
-  background: rgba(0,255,255,0.1);
-  border: 1px solid var(--accent);
-  border-radius: 40px;
-  color: var(--accent);
-  text-decoration: none;
-  font-size: 13px;
-}
 
 /* MODAL */
 .modal-overlay {
@@ -953,7 +883,7 @@ footer {
   margin-top: 8px;
 }
 
-/* DASHBOARD (SİM SİYAH TAM EKRAN) */
+/* DASHBOARD */
 .dashboard-container {
   min-height: 100vh;
   background: #000000;
@@ -1013,11 +943,6 @@ footer {
   border-bottom: 1px solid var(--border);
   padding-bottom: 12px;
 }
-.dashboard-card h4 {
-  color: var(--accent2);
-  margin-bottom: 15px;
-  font-size: 14px;
-}
 .neon-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
@@ -1035,11 +960,6 @@ footer {
   font-size: 28px;
   font-weight: 800;
   color: var(--accent);
-}
-.neon-stat .label {
-  font-size: 11px;
-  color: var(--text3);
-  margin-top: 4px;
 }
 .project-list, .inbox-list {
   display: flex;
@@ -1086,32 +1006,6 @@ footer {
   border-color: var(--accent);
   color: var(--accent);
 }
-.group-chat {
-  height: 200px;
-  overflow-y: auto;
-  background: rgba(0,0,0,0.3);
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 12px;
-}
-.group-chat-message {
-  padding: 8px;
-  margin-bottom: 8px;
-  border-bottom: 1px solid var(--border);
-  font-size: 12px;
-}
-.group-chat-input {
-  display: flex;
-  gap: 8px;
-}
-.group-chat-input input {
-  flex: 1;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 10px;
-  border-radius: 30px;
-}
 .ai-chat-messages {
   height: 250px;
   overflow-y: auto;
@@ -1146,30 +1040,6 @@ footer {
   padding: 12px;
   border-radius: 30px;
 }
-.btn-danger {
-  background: var(--danger);
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 20px;
-  cursor: pointer;
-}
-.btn-warning {
-  background: var(--gold);
-  color: var(--bg);
-  border: none;
-  padding: 6px 12px;
-  border-radius: 20px;
-  cursor: pointer;
-}
-.btn-success {
-  background: var(--accent2);
-  color: var(--bg);
-  border: none;
-  padding: 6px 12px;
-  border-radius: 20px;
-  cursor: pointer;
-}
 .glow-input {
   background: var(--bg);
   border: 1px solid var(--accent);
@@ -1189,10 +1059,8 @@ footer {
   font-size: 12px;
   z-index: 100;
   backdrop-filter: blur(10px);
-  font-weight: 500;
 }
 
-/* DOWNLOAD MENU */
 .download-menu {
   position: fixed;
   bottom: 100px;
@@ -1208,7 +1076,6 @@ footer {
   cursor: pointer;
   font-size: 24px;
   box-shadow: 0 0 20px rgba(0,255,255,0.5);
-  transition: transform 0.2s;
 }
 .download-btn:hover { transform: scale(1.1); }
 .download-options {
@@ -1237,7 +1104,6 @@ footer {
   text-align: center;
 }
 
-/* AI WIDGET */
 .ai-widget {
   position: fixed;
   bottom: 32px;
@@ -1369,7 +1235,6 @@ footer {
   border-radius: 30px;
 }
 .auth-buttons { display: flex; gap: 12px; margin-top: 16px; justify-content: center; }
-.auth-buttons button { padding: 10px 24px; border-radius: 30px; }
 
 .file-upload-btn {
   background: var(--surface);
@@ -1390,25 +1255,17 @@ footer {
   nav { padding: 0 20px; flex-wrap: wrap; height: auto; padding: 12px 20px; gap: 12px; }
   .nav-links { gap: 16px; }
   .nav-links a { font-size: 10px; }
-  .secret-buttons { display: flex; }
-  .secret-btn { padding: 4px 10px; font-size: 9px; }
   .hero { padding: 140px 20px 60px; }
   .hero-title { font-size: clamp(32px, 7vw, 48px); }
-  .hero-sub { font-size: 13px; }
   .stats-bar { flex-direction: column; border-radius: 20px; }
   .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
   .features, .ai-section, .pricing, .testimonials { padding: 40px 20px; }
-  .feature-card { padding: 24px 20px; }
   .ai-showcase { grid-template-columns: 1fr; }
-  .ai-left, .ai-right { padding: 24px; }
   .pricing-grid { grid-template-columns: 1fr; }
-  .footer-grid { grid-template-columns: 1fr; gap: 24px; }
   .dashboard-grid { grid-template-columns: 1fr; padding: 16px; }
   .dashboard-header { flex-direction: column; gap: 12px; }
   .custom-cursor, .custom-cursor-ring { display: none; }
-  .download-menu { bottom: 80px; }
   .notification { bottom: 20px; left: 20px; max-width: 280px; font-size: 11px; }
-  .query-limit-badge { bottom: 80px; left: 10px; font-size: 9px; padding: 4px 10px; }
 }
 </style>
 </head>
@@ -1426,9 +1283,7 @@ footer {
   <div class="office-overlay"></div>
 </div>
 
-<!-- ============================================================ -->
-<!-- MAIN SITE (Giriş yapılmamışken) -->
-<!-- ============================================================ -->
+<!-- MAIN SITE -->
 <div id="mainSite">
   <nav>
     <div class="logo"><div class="logo-icon">✨</div><div class="logo-text">VİZYON 2027</div></div>
@@ -1472,7 +1327,6 @@ footer {
     </div>
   </section>
 
-  <!-- EDITOR PREVIEW -->
   <div class="editor-preview">
     <div class="editor-window">
       <div class="editor-titlebar"><div class="editor-dot red"></div><div class="editor-dot yellow"></div><div class="editor-dot green"></div><span class="editor-filename">vizyon2027/ai_core.py</span></div>
@@ -1488,7 +1342,6 @@ footer {
     </div>
   </div>
 
-  <!-- FEATURES -->
   <section class="features" id="features">
     <div class="section-header"><div class="section-tag">// özellikler</div><h2 class="section-title">VİZYON AI <span class="hl">Gücü</span></h2></div>
     <div class="features-grid">
@@ -1501,7 +1354,6 @@ footer {
     </div>
   </section>
 
-  <!-- AI SECTION -->
   <section class="ai-section" id="ai">
     <div class="section-header"><div class="section-tag">// yapay zeka</div><h2 class="section-title">Tüm AI Modelleri<br><span class="hl">Tek Yerde</span></h2></div>
     <div class="ai-showcase">
@@ -1518,9 +1370,8 @@ footer {
     </div>
   </section>
 
-  <!-- TECH STACK -->
   <div class="tech-section">
-    <div class="tech-scroll" id="techScroll">
+    <div class="tech-scroll">
       <div class="tech-item"><div class="tech-dot"></div>Python</div>
       <div class="tech-item"><div class="tech-dot"></div>JavaScript</div>
       <div class="tech-item"><div class="tech-dot"></div>TypeScript</div>
@@ -1548,7 +1399,43 @@ footer {
     </div>
   </div>
 
-  <!-- PRICING -->
+  <div class="team-dashboard" id="teamDashboard" style="display:none;">
+    <h3>👥 TAKIM MASASI - <span id="teamName"></span></h3>
+    <div id="noTeamPanel" style="display:none; text-align:center; padding:40px;">
+      <h3>👥 Henüz bir takımınız yok</h3>
+      <p>Takım paketi satın alarak takım kurabilirsiniz.</p>
+      <button class="btn-primary" onclick="buyTeamAndCreate()">💰 Takım Paketi Satın Al (₺899/ay)</button>
+    </div>
+    <div id="teamContent" style="display:none;">
+      <div class="team-section">
+        <div class="team-members">
+          <h4>👤 Takım Üyeleri (<span id="memberCount">0</span>/100)</h4>
+          <div id="teamMembersList"></div>
+          <div style="margin-top: 10px;">
+            <input type="email" id="inviteEmail" placeholder="E-posta ile davet et" class="glow-input" style="width: 70%;">
+            <button onclick="inviteToTeam()" class="btn-primary-small">Davet Gönder</button>
+          </div>
+        </div>
+        <div class="team-projects">
+          <h4>📁 Ortak Projeler</h4>
+          <div id="teamProjectsList"></div>
+          <div style="margin-top: 10px;">
+            <input type="text" id="newProjectName" placeholder="Yeni proje adı" class="glow-input" style="width: 70%;">
+            <button onclick="addTeamProject()" class="btn-primary-small">Ekle</button>
+          </div>
+        </div>
+        <div class="team-chat">
+          <h4>💬 Takım Sohbeti</h4>
+          <div id="teamChatMessages" class="team-chat-messages"></div>
+          <div class="team-chat-input">
+            <input type="text" id="teamChatInput" placeholder="Mesaj yaz...">
+            <button onclick="sendTeamMessage()" class="btn-primary-small">Gönder</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <section class="pricing" id="pricing">
     <div class="section-header"><div class="section-tag">// fiyatlandırma</div><h2 class="section-title">Sıfırdan Başla,<br><span class="hl">Büyü</span></h2></div>
     <div class="pricing-grid">
@@ -1558,7 +1445,6 @@ footer {
     </div>
   </section>
 
-  <!-- TESTIMONIALS -->
   <section class="testimonials">
     <div class="section-header"><div class="section-tag">// kullanıcılar</div><h2 class="section-title">Gerçek <span class="hl">Sonuçlar</span></h2></div>
     <div class="testimonials-grid">
@@ -1568,7 +1454,6 @@ footer {
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer>
     <div class="footer-grid">
       <div class="footer-brand"><div class="logo-text" style="font-size:22px;">VİZYON 2027</div><p style="margin-top:10px;">Dünyanın en güçlü yapay zeka ekosistemi.</p></div>
@@ -1576,14 +1461,12 @@ footer {
       <div class="footer-col"><h4>Kaynaklar</h4><ul><li><a href="#">Dokümantasyon</a></li><li><a href="#">Topluluk</a></li><li><a href="#">Blog</a></li></ul></div>
       <div class="footer-col"><h4>Şirket</h4><ul><li><a href="#">Hakkımızda</a></li><li><a href="#">Kariyer</a></li><li><a href="#">İletişim</a></li></ul></div>
     </div>
-    <div class="footer-bottom"><div class="footer-copy">© 2027 Vizyon2027. <span>Muhammed Eymen</span> güvencesiyle.</div><div class="footer-badges"><span class="badge live">● Sistem Aktif</span><span class="badge">v12.0</span></div></div>
+    <div class="footer-bottom"><div class="footer-copy">© 2027 Vizyon2027. <span>Muhammed Eymen</span> güvencesiyle.</div><div class="footer-badges"><span class="badge live">● Sistem Aktif</span><span class="badge">v13.0</span></div></div>
     <div class="support-footer"><a href="mailto:turkmenmuhammedeymen@gmail.com" class="support-link">📧 DESTEK & İLETİŞİM</a></div>
   </footer>
 </div>
 
-<!-- ============================================================ -->
-<!-- DASHBOARD (Giriş yapınca SİM SİYAH TAM EKRAN) -->
-<!-- ============================================================ -->
+<!-- DASHBOARD -->
 <div id="dashboardArea" style="display: none;">
   <div class="dashboard-container">
     <div class="dashboard-header">
@@ -1596,12 +1479,9 @@ footer {
       </div>
     </div>
     <div class="dashboard-grid">
-      <!-- VİZYON AI ASİSTAN -->
       <div class="dashboard-card">
         <h3>🤖 VİZYON AI ASİSTAN</h3>
-        <div id="dashboardAiMessages" class="ai-chat-messages">
-          <div class="ai-message bot">Merhaba! Size nasıl yardımcı olabilirim?</div>
-        </div>
+        <div id="dashboardAiMessages" class="ai-chat-messages"><div class="ai-message bot">Merhaba! Size nasıl yardımcı olabilirim?</div></div>
         <div class="ai-input-area">
           <input type="text" id="dashboardAiInput" placeholder="AI'ya sor..." class="glow-input">
           <button class="btn-primary" id="dashboardAiSendBtn">Gönder</button>
@@ -1609,8 +1489,6 @@ footer {
           <button class="file-upload-btn" onclick="document.getElementById('dashboardFileInput').click()">📎</button>
         </div>
       </div>
-      
-      <!-- PROJELER -->
       <div class="dashboard-card">
         <h3>📁 PROJELERİM</h3>
         <div class="neon-stats">
@@ -1621,66 +1499,21 @@ footer {
         <button class="btn-primary-small" id="newProjectBtn" style="margin-bottom:12px">+ Yeni Proje</button>
         <div id="projectsList" class="project-list"></div>
       </div>
-      
-      <!-- GELEN KUTUSU -->
       <div class="dashboard-card">
         <h3>📬 GELEN KUTUSU</h3>
         <div id="inboxList" class="inbox-list"></div>
-        <div style="margin-top:16px">
-          <h4>🎁 HEDİYE PAKETLERİ</h4>
-          <div id="giftsList" class="inbox-list"></div>
-        </div>
+        <div style="margin-top:16px"><h4>🎁 HEDİYE PAKETLERİ</h4><div id="giftsList" class="inbox-list"></div></div>
       </div>
-      
-      <!-- GRUP SİSTEMİ -->
-      <div class="dashboard-card" id="groupSection" style="display:none">
-        <h3>👥 GRUP</h3>
-        <div id="groupInfo"></div>
-        <div id="groupChatMessages" class="group-chat"></div>
-        <div class="group-chat-input">
-          <input type="text" id="groupChatInput" placeholder="Gruba mesaj yaz...">
-          <button class="btn-primary-small" onclick="sendGroupMessage()">Gönder</button>
-        </div>
-        <div style="margin-top:12px">
-          <h4>📁 GRUP PROJELERİ</h4>
-          <div id="groupProjectsList" class="project-list"></div>
-          <div style="margin-top:8px; display:flex; gap:8px">
-            <input type="text" id="newGroupProjectName" placeholder="Yeni proje adı" class="glow-input" style="flex:1">
-            <button class="btn-primary-small" onclick="addGroupProject()">Ekle</button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="dashboard-card" id="noGroupSection">
-        <h3>👥 GRUP</h3>
-        <p style="color:var(--text3); margin-bottom:16px">Henüz bir grubun yok. Grup kur veya davet al!</p>
-        <div style="display:flex; gap:12px; flex-wrap:wrap">
-          <input type="text" id="newGroupName" placeholder="Grup adı" class="glow-input" style="flex:1">
-          <button class="btn-primary" onclick="createGroup()">Grup Kur (₺899/ay)</button>
-        </div>
-        <div style="margin-top:16px">
-          <h4>📨 BEKLEYEN DAVETLER</h4>
-          <div id="groupInvitesList" class="inbox-list"></div>
-        </div>
-      </div>
-      
-      <!-- ADMIN PANELİ -->
       <div class="dashboard-card" id="adminPanel" style="display:none">
         <h3>⚙️ YÖNETİM PANELİ</h3>
         <div id="adminRoleInfo" style="color:var(--accent2); margin-bottom:12px"></div>
-        <div>
-          <h4>👥 TÜM KULLANICILAR</h4>
-          <input type="text" id="userSearch" placeholder="Kullanıcı ara..." class="glow-input" style="width:100%; margin-bottom:12px">
-          <div id="adminUsersList" class="user-list" style="max-height:300px; overflow-y:auto"></div>
-        </div>
+        <div><h4>👥 TÜM KULLANICILAR</h4><div id="adminUsersList" class="user-list" style="max-height:300px; overflow-y:auto"></div></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ============================================================ -->
 <!-- MODALLAR -->
-<!-- ============================================================ -->
 <div class="modal-overlay" id="authModal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="modal-header"><h3 id="modalTitle">Hesap Oluştur</h3><button class="modal-close" onclick="closeModal()">×</button></div>
@@ -1714,60 +1547,51 @@ footer {
 <div class="download-menu">
   <button class="download-btn" onclick="toggleDownloadMenu()">📱</button>
   <div class="download-options" id="downloadMenu">
-    <a onclick="downloadApp('android')">📱 Android (.apk)</a>
-    <a onclick="downloadApp('windows')">💻 Windows (.exe)</a>
-    <a onclick="downloadApp('mac')">🍎 MacOS (.dmg)</a>
-    <a onclick="downloadApp('ios')">📲 iOS (App Store)</a>
-    <a onclick="downloadApp('linux')">🐧 Linux (.deb)</a>
-    <a onclick="downloadWebApp()">🌐 Web App (PWA)</a>
+    <a onclick="downloadApp('android')">📱 Android</a>
+    <a onclick="downloadApp('windows')">💻 Windows</a>
+    <a onclick="downloadApp('mac')">🍎 MacOS</a>
+    <a onclick="downloadApp('ios')">📲 iOS</a>
+    <a onclick="downloadApp('linux')">🐧 Linux</a>
+    <a onclick="downloadWebApp()">🌐 PWA</a>
   </div>
 </div>
 
-<div class="ai-widget"><div class="ai-panel" id="aiPanel"><div class="ai-panel-header" style="padding:16px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between"><span class="ai-panel-title">⚡ VİZYON AI</span><span class="ai-status">Aktif</span></div><div class="ai-messages" id="aiMessages"><div class="ai-msg bot">Merhaba! Ben VİZYON AI. Hangi dilde yazarsan o dilde cevap veririm.</div></div><div class="ai-suggestions"><div class="ai-suggestion" onclick="quickAsk('Python hesap makinesi yaz')">🐍 Python</div><div class="ai-suggestion" onclick="quickAsk('React todo app yap')">⚛️ React</div><div class="ai-suggestion" onclick="quickAsk('dolar kaç')">💰 Dolar</div><div class="ai-suggestion" onclick="quickAsk('bugün haberler')">📰 Haber</div></div><div class="ai-input-area"><input class="ai-input" id="aiInput" placeholder="Her dilde sorabilirsin..." onkeypress="if(event.key==='Enter')sendAiMessage()"><button class="ai-send" onclick="sendAiMessage()">→</button></div></div><button class="ai-widget-btn" onclick="toggleAiPanel()">⚡</button></div>
+<div class="ai-widget"><div class="ai-panel" id="aiPanel"><div class="ai-panel-header" style="padding:16px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between"><span class="ai-panel-title">⚡ VİZYON AI</span><span class="ai-status">Aktif</span></div><div class="ai-messages" id="aiMessages"><div class="ai-msg bot">Merhaba! Ben VİZYON AI.</div></div><div class="ai-suggestions"><div class="ai-suggestion" onclick="quickAsk('Python hesap makinesi yaz')">🐍 Python</div><div class="ai-suggestion" onclick="quickAsk('React todo app yap')">⚛️ React</div><div class="ai-suggestion" onclick="quickAsk('dolar kaç')">💰 Dolar</div><div class="ai-suggestion" onclick="quickAsk('bugün haberler')">📰 Haber</div></div><div class="ai-input-area"><input class="ai-input" id="aiInput" placeholder="Her dilde sorabilirsin..." onkeypress="if(event.key==='Enter')sendAiMessage()"><button class="ai-send" onclick="sendAiMessage()">→</button></div></div><button class="ai-widget-btn" onclick="toggleAiPanel()">⚡</button></div>
 
 <div id="vizyonAIPanel" style="display:none;position:fixed;inset:0;z-index:10000;background:#050a0f;flex-direction:column">
   <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 25px;background:#0d1a26;border-bottom:2px solid var(--accent)">
     <div style="display:flex;align-items:center;gap:15px"><div class="logo-icon" style="width:40px;height:40px;font-size:20px">✨</div><span style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;background:linear-gradient(45deg,var(--accent),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent">VİZYON AI</span></div>
     <button onclick="closeVizyonAI()" style="background:transparent;border:1px solid var(--danger);color:var(--danger);padding:8px 20px;border-radius:30px">✕ Kapat</button>
   </div>
-  <div id="vizyonAIChat" style="flex:1;overflow-y:auto;padding:25px;display:flex;flex-direction:column;gap:15px;max-width:900px;width:100%;margin:0 auto"><div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Dünyanın en gelişmiş kodlama asistanıyım.<br><br>📌 <strong>Sınırsız Yeteneklerim:</strong><br>• Her dilde kod yazabilirim<br>• Canlı web arama (dolar, haber)<br>• Dosya yükleme<br>• Takım çalışması<br><br>Ne yapmak istiyorsun? 🚀</div></div>
+  <div id="vizyonAIChat" style="flex:1;overflow-y:auto;padding:25px;display:flex;flex-direction:column;gap:15px;max-width:900px;width:100%;margin:0 auto"><div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba!</div></div>
   <div style="display:flex;gap:10px;padding:0 20px 10px;max-width:900px;width:100%;margin:0 auto;flex-wrap:wrap"><button class="ai-suggestion" onclick="quickAICode('Python hesap makinesi yaz')">🐍 Python</button><button class="ai-suggestion" onclick="quickAICode('React todo app yap')">⚛️ React</button><button class="ai-suggestion" onclick="quickAICode('dolar kaç')">💰 Dolar</button><button class="ai-suggestion" onclick="quickAICode('bugün haberler')">📰 Haberler</button></div>
   <div style="display:flex;gap:10px;padding:0 20px 20px;max-width:900px;width:100%;margin:0 auto"><input type="file" id="fileInput" accept=".txt,.py,.js,.html,.css,.json,.pdf,.jpg,.png" style="display:none" onchange="handleFileUpload(this)"><button class="file-upload-btn" onclick="document.getElementById('fileInput').click()">📎 Dosya Yükle</button><textarea id="vizyonAIInput" style="flex:1;background:#0d1a26;border:1px solid var(--border);color:var(--text);padding:12px;border-radius:16px;font-family:'Fira Code',monospace;font-size:13px;resize:none;height:50px" placeholder='Her dilde yazabilirsin...' onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendVizyonAIAdvanced()}"></textarea><button onclick="sendVizyonAIAdvanced()" style="background:linear-gradient(135deg,var(--accent),var(--purple));color:var(--bg);border:none;padding:0 25px;border-radius:40px;font-weight:700">⚡ Gönder</button></div>
 </div>
 
 <script>
 // ============================================================
-// 🔥 EDGE FUNCTIONS URL (KENDİ URL'İNLE DEĞİŞTİR!)
+// KONFİGÜRASYON
 // ============================================================
 const WORKER_URL = 'https://dxfwxknohzkdhzyytwdt.supabase.co/functions/v1/smooth-function';
-
-// ============================================================
-// SUPABASE BAĞLANTISI
-// ============================================================
 const SUPABASE_URL = 'https://dxfwxknohzkdhzyytwdt.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Us1HLOwQoLT5978dZ3Oy-Q_-v0WrLsl';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ============================================================
-// ADMIN ŞİFRELERİ
-// ============================================================
 const ADMIN_PASSWORDS = {
     FOUNDER: btoa("Eymen11Amele44"),
     ADMIN: btoa("ibrm4411"),
     BETA: btoa("4402")
 };
 
-// ============================================================
-// GLOBAL DEĞİŞKENLER
-// ============================================================
 let currentUser = null;
 let dailyQueries = parseInt(localStorage.getItem('v27_queries') || '20');
 let pendingAdminRole = null;
 let _allUsers = [];
 let uploadedFileContent = null;
+let pendingVerificationEmail = null;
 
 // ============================================================
-// API ÇAĞRILARI (EDGE FUNCTIONS ÜZERİNDEN)
+// API ÇAĞRILARI (Edge Functions)
 // ============================================================
 async function callSuperAI(prompt) {
     try {
@@ -1779,7 +1603,6 @@ async function callSuperAI(prompt) {
         const data = await res.json();
         return data.response || 'Yanıt alınamadı.';
     } catch(e) {
-        console.error('Super AI hatası:', e);
         return fallbackAI(prompt);
     }
 }
@@ -1793,10 +1616,7 @@ async function webSearch(query) {
         });
         const data = await res.json();
         return data.response || 'Sonuç bulunamadı.';
-    } catch(e) {
-        console.error('Web arama hatası:', e);
-        return null;
-    }
+    } catch(e) { return null; }
 }
 
 async function sendEmail(to, subject, html) {
@@ -1806,12 +1626,8 @@ async function sendEmail(to, subject, html) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ to, subject, html })
         });
-        const data = await res.json();
-        return data.response;
-    } catch(e) {
-        console.error('Mail hatası:', e);
-        return null;
-    }
+        return await res.json();
+    } catch(e) { return null; }
 }
 
 function fallbackAI(prompt) {
@@ -1829,7 +1645,7 @@ function fallbackAI(prompt) {
 }
 
 // ============================================================
-// KAYIT / GİRİŞ / DOĞRULAMA
+// KAYIT (Doğrulama Kodlu)
 // ============================================================
 async function handleRegister() {
     const name = document.getElementById('rName')?.value.trim();
@@ -1846,50 +1662,97 @@ async function handleRegister() {
     const expires = new Date();
     expires.setMinutes(expires.getMinutes() + 15);
     
+    // Kullanıcıyı doğrulanmamış olarak ekle
     const { error } = await supabaseClient.from('users').insert([{
         name: name + ' ' + surname, email: email, plan: 'free', password_hash: btoa(p1),
         created_at: new Date(), is_verified: false, verification_code: code, verification_code_expires: expires
     }]);
     if(error){ alert('Hata: ' + error.message); return; }
     
-    await sendEmail(email, 'Doğrulama Kodu - Vizyon 2027', `<h1>Hoş geldin ${name}!</h1><p>Kodunuz: <strong>${code}</strong></p><p>15 dakika geçerlidir.</p>`);
-    alert('✅ Kayıt başarılı! Mail adresinize doğrulama kodu gönderildi.');
+    // Doğrulama kodunu e-postaya gönder
+    await sendEmail(email, 'Doğrulama Kodu - Vizyon 2027', `<h1>Hoş geldin ${name}!</h1><p>Doğrulama kodunuz: <strong style="font-size:24px;color:#00d4ff;">${code}</strong></p><p>15 dakika geçerlidir.</p><br><p>Giriş yapmak için bu kodu kullanın.</p>`);
+    
+    alert('✅ Kayıt başarılı! E-posta adresinize doğrulama kodu gönderildi.');
+    pendingVerificationEmail = email;
     switchTab('verify');
     document.getElementById('verifyEmail').value = email;
 }
 
+// ============================================================
+// DOĞRULAMA
+// ============================================================
 async function verifyAccount() {
     const email = document.getElementById('verifyEmail')?.value.trim();
     const code = document.getElementById('verifyCode')?.value.trim();
     if(!email || !code){ alert('E-posta ve kodu girin!'); return; }
+    
     const { data: user } = await supabaseClient.from('users').select('*').eq('email', email).single();
     if(!user){ alert('Kullanıcı bulunamadı!'); return; }
-    if(user.is_verified){ alert('Zaten doğrulanmış!'); switchTab('login'); return; }
+    if(user.is_verified){ alert('Zaten doğrulanmış! Giriş yapabilirsiniz.'); switchTab('login'); return; }
     if(user.verification_code !== code){ alert('Kod hatalı!'); return; }
-    if(new Date(user.verification_code_expires) < new Date()){ alert('Kod süresi doldu!'); return; }
+    if(new Date(user.verification_code_expires) < new Date()){ alert('Kod süresi doldu! Yeniden kayıt olun.'); return; }
+    
     await supabaseClient.from('users').update({ is_verified: true, verification_code: null }).eq('id', user.id);
-    alert('✅ Hesap doğrulandı! Giriş yapabilirsiniz.');
+    alert('✅ Hesap doğrulandı! Şimdi giriş yapabilirsiniz.');
     switchTab('login');
 }
 
+// ============================================================
+// GİRİŞ (Doğrulama Kontrollü)
+// ============================================================
 async function handleLogin() {
     const email = document.getElementById('lEmail')?.value.trim();
     const pass = document.getElementById('lPass')?.value;
     if(!email || !pass){ alert('Tüm alanları doldurun!'); return; }
+    
     const { data, error } = await supabaseClient.from('users').select('*').eq('email', email).single();
-    if(error || !data){ alert('Hatalı!'); return; }
+    if(error || !data){ alert('Hatalı giriş!'); return; }
     if(data.password_hash !== btoa(pass)){ alert('Şifre hatalı!'); return; }
-    if(!data.is_verified){ alert('Hesabınız doğrulanmamış!'); switchTab('verify'); document.getElementById('verifyEmail').value = email; return; }
+    if(!data.is_verified){ 
+        alert('❌ Hesabınız doğrulanmamış! Lütfen e-posta adresinize gönderilen doğrulama kodunu girin.');
+        pendingVerificationEmail = email;
+        switchTab('verify');
+        document.getElementById('verifyEmail').value = email;
+        return;
+    }
+    if(data.is_banned){ alert('Hesabınız yasaklanmıştır!'); return; }
+    
     currentUser = data;
     localStorage.setItem('v27_user', JSON.stringify(data));
     closeModal();
     showDashboard();
 }
 
+// ============================================================
+// HESAP SİLME (Doğrulama Kodlu)
+// ============================================================
+let deleteVerificationCode = null;
+async function requestDeleteVerification() {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    deleteVerificationCode = code;
+    await sendEmail(currentUser.email, 'Hesap Silme Onayı - Vizyon 2027', `<h1>Hesap silme onay kodunuz:</h1><p style="font-size:32px;color:#ff4757"><strong>${code}</strong></p><p>Bu kod 10 dakika geçerlidir.</p>`);
+    const enteredCode = prompt('E-posta adresinize gönderilen 6 haneli doğrulama kodunu girin:');
+    if(enteredCode !== deleteVerificationCode) { alert('Kod hatalı!'); return false; }
+    return true;
+}
+
+async function deleteOwnAccount() {
+    if(!await requestDeleteVerification()) return;
+    const confirmPass = prompt('Hesabınızı silmek için şifrenizi girin:');
+    if(!confirmPass || btoa(confirmPass) !== currentUser.password_hash){ alert('Şifre hatalı!'); return; }
+    
+    await supabaseClient.from('users').delete().eq('id', currentUser.id);
+    alert('Hesabınız kalıcı olarak silindi.');
+    handleLogout();
+}
+
+// ============================================================
+// ÇIKIŞ
+// ============================================================
 function handleLogout() { localStorage.clear(); location.reload(); }
 
 // ============================================================
-// DASHBOARD GÖSTER
+// DASHBOARD
 // ============================================================
 function showDashboard() {
     document.getElementById('mainSite').style.display = 'none';
@@ -1903,108 +1766,11 @@ function showDashboard() {
         document.getElementById('adminRoleInfo').innerHTML = currentUser.role === 'founder' ? '👑 KURUCU YETKİLERİNİZ AKTİF' : '⚙️ ADMIN YETKİLERİNİZ AKTİF';
         loadAdminUsers();
     }
-    checkUserGroup();
     loadProjects();
     loadInbox();
     loadGifts();
 }
 
-// ============================================================
-// GRUP SİSTEMİ
-// ============================================================
-async function checkUserGroup() {
-    if(currentUser.group_id) {
-        const { data: group } = await supabaseClient.from('groups').select('*').eq('id', currentUser.group_id).single();
-        if(group) {
-            document.getElementById('groupSection').style.display = 'block';
-            document.getElementById('noGroupSection').style.display = 'none';
-            document.getElementById('groupInfo').innerHTML = `<strong>${group.name}</strong> - Kurucu: ${group.owner_email}<br>Üyeler: ${group.members?.length || 1}/100`;
-            loadGroupChat();
-            loadGroupProjects();
-        }
-    } else {
-        document.getElementById('groupSection').style.display = 'none';
-        document.getElementById('noGroupSection').style.display = 'block';
-        loadGroupInvites();
-    }
-}
-
-async function createGroup() {
-    const groupName = document.getElementById('newGroupName').value.trim();
-    if(!groupName) { alert('Grup adı girin!'); return; }
-    if(confirm('Grup paketi ₺899/ay - Satın al?')) {
-        const { data } = await supabaseClient.from('groups').insert([{
-            name: groupName, owner_email: currentUser.email, members: [currentUser.email],
-            projects: [], chat_messages: [], created_at: new Date()
-        }]).select();
-        if(data) {
-            await supabaseClient.from('users').update({ group_id: data[0].id, plan: 'team' }).eq('id', currentUser.id);
-            currentUser.group_id = data[0].id;
-            currentUser.plan = 'team';
-            localStorage.setItem('v27_user', JSON.stringify(currentUser));
-            alert('✅ Grup oluşturuldu! Sayfa yenileniyor...');
-            location.reload();
-        }
-    }
-}
-
-async function loadGroupChat() {
-    const { data: group } = await supabaseClient.from('groups').select('chat_messages').eq('id', currentUser.group_id).single();
-    const container = document.getElementById('groupChatMessages');
-    if(group && group.chat_messages) {
-        container.innerHTML = group.chat_messages.map(m => `<div class="group-chat-message"><strong>${m.user}</strong>: ${m.message}<br><span style="font-size:10px;color:var(--text3)">${m.time}</span></div>`).join('');
-    }
-}
-
-async function sendGroupMessage() {
-    const msg = document.getElementById('groupChatInput').value.trim();
-    if(!msg) return;
-    const { data: group } = await supabaseClient.from('groups').select('chat_messages').eq('id', currentUser.group_id).single();
-    let msgs = group?.chat_messages || [];
-    msgs.push({ user: currentUser.name, message: msg, time: new Date().toLocaleTimeString() });
-    await supabaseClient.from('groups').update({ chat_messages: msgs }).eq('id', currentUser.group_id);
-    document.getElementById('groupChatInput').value = '';
-    loadGroupChat();
-}
-
-async function loadGroupProjects() {
-    const { data: group } = await supabaseClient.from('groups').select('projects').eq('id', currentUser.group_id).single();
-    const container = document.getElementById('groupProjectsList');
-    if(group && group.projects) {
-        container.innerHTML = group.projects.map(p => `<div class="project-item">📁 ${p.name} <span style="font-size:10px;color:var(--text3)">${p.created_by}</span></div>`).join('');
-    }
-}
-
-async function addGroupProject() {
-    const name = document.getElementById('newGroupProjectName').value.trim();
-    if(!name) return;
-    const { data: group } = await supabaseClient.from('groups').select('projects').eq('id', currentUser.group_id).single();
-    let projects = group?.projects || [];
-    projects.push({ name, created_by: currentUser.email, created_at: new Date() });
-    await supabaseClient.from('groups').update({ projects }).eq('id', currentUser.group_id);
-    document.getElementById('newGroupProjectName').value = '';
-    loadGroupProjects();
-}
-
-async function loadGroupInvites() {
-    const { data: invites } = await supabaseClient.from('group_invites').select('*').eq('invited_email', currentUser.email).eq('status', 'pending');
-    const container = document.getElementById('groupInvitesList');
-    container.innerHTML = (invites || []).map(i => `<div class="project-item">🎯 <strong>${i.inviter_email}</strong> sizi "${i.group_name}" grubuna davet etti! <button onclick="acceptGroupInvite('${i.id}','${i.group_id}')" class="btn-primary-small">Kabul Et</button><button onclick="rejectGroupInvite('${i.id}')" class="btn-primary-small" style="background:#ff4757">Reddet</button></div>`).join('');
-}
-
-async function acceptGroupInvite(inviteId, groupId) {
-    await supabaseClient.from('users').update({ group_id: groupId }).eq('id', currentUser.id);
-    await supabaseClient.from('group_invites').update({ status: 'accepted' }).eq('id', inviteId);
-    currentUser.group_id = groupId;
-    localStorage.setItem('v27_user', JSON.stringify(currentUser));
-    alert('✅ Gruba katıldınız! Sayfa yenileniyor...');
-    location.reload();
-}
-async function rejectGroupInvite(inviteId) { await supabaseClient.from('group_invites').update({ status: 'rejected' }).eq('id', inviteId); loadGroupInvites(); }
-
-// ============================================================
-// PROJE YÖNETİMİ
-// ============================================================
 async function loadProjects() {
     let { data: proj } = await supabaseClient.from('projects').select('*').eq('user_email', currentUser.email).order('created_at', { ascending: false });
     if(!proj) proj = [];
@@ -2023,41 +1789,27 @@ async function toggleFavorite(id) { let { data: p } = await supabaseClient.from(
 async function archiveProject(id) { await supabaseClient.from('projects').update({ is_archived: true }).eq('id', id); loadProjects(); }
 async function deleteProject(id) { if(confirm("Sil?")) await supabaseClient.from('projects').delete().eq('id', id); loadProjects(); }
 
-// ============================================================
-// GELEN KUTUSU VE HEDİYELER
-// ============================================================
 async function loadInbox() {
     let { data: messages } = await supabaseClient.from('inbox').select('*').eq('receiver_email', currentUser.email).order('created_at', { ascending: false });
     const container = document.getElementById('inboxList');
-    if(messages && messages.length) {
-        container.innerHTML = messages.map(m => `<div class="project-item">📧 <strong>${m.sender_email}</strong>: ${m.message}</div>`).join('');
-    } else {
-        container.innerHTML = '<div class="project-item">📭 Henüz mesaj yok.</div>';
-    }
+    container.innerHTML = (messages && messages.length) ? messages.map(m => `<div class="project-item">📧 <strong>${m.sender_email}</strong>: ${m.message}</div>`).join('') : '<div class="project-item">📭 Henüz mesaj yok.</div>';
 }
 
 async function loadGifts() {
     let { data: gifts } = await supabaseClient.from('gift_requests').select('*').eq('receiver_email', currentUser.email).eq('status', 'pending');
     const container = document.getElementById('giftsList');
-    if(gifts && gifts.length) {
-        container.innerHTML = gifts.map(g => `<div class="project-item">🎁 <strong>${g.sender_email}</strong> size ${g.package} paketi hediye etti! <button onclick="acceptGift('${g.id}','${g.package}')" class="btn-primary-small">Kabul Et</button><button onclick="rejectGift('${g.id}')" class="btn-primary-small" style="background:#ff4757">Reddet</button></div>`).join('');
-    } else {
-        container.innerHTML = '<div class="project-item">🎁 Hediye yok.</div>';
-    }
+    container.innerHTML = (gifts && gifts.length) ? gifts.map(g => `<div class="project-item">🎁 <strong>${g.sender_email}</strong> size ${g.package} paketi hediye etti! <button onclick="acceptGift('${g.id}','${g.package}')" class="btn-primary-small">Kabul Et</button><button onclick="rejectGift('${g.id}')" class="btn-primary-small" style="background:#ff4757">Reddet</button></div>`).join('') : '<div class="project-item">🎁 Hediye yok.</div>';
 }
 async function acceptGift(id, pkg) { await supabaseClient.from('users').update({ plan: pkg }).eq('email', currentUser.email); await supabaseClient.from('gift_requests').update({ status: 'accepted' }).eq('id', id); alert("Paket eklendi!"); location.reload(); }
 async function rejectGift(id) { await supabaseClient.from('gift_requests').update({ status: 'rejected' }).eq('id', id); loadGifts(); }
 
-// ============================================================
-// ADMIN PANELİ
-// ============================================================
 async function loadAdminUsers() {
     let { data: users } = await supabaseClient.from('users').select('*');
     document.getElementById('adminUsersList').innerHTML = users.map(u => `<div class="user-item"><div><strong>${u.name}</strong><br>${u.email}<br>Plan: ${u.plan}<br>Rol: ${u.role || 'user'}</div><div class="user-actions"><button onclick="banUser('${u.email}')">🔨 Banla</button><button onclick="promoteToAdmin('${u.email}')">👑 Admin Yap</button><button onclick="promoteToBeta('${u.email}')">🔬 Beta Yap</button><button onclick="demoteUser('${u.email}')">📉 Rütbe Düşür</button><button onclick="sendGiftToUser('${u.email}')">🎁 Hediye</button></div></div>`).join('');
 }
 async function banUser(email) { await supabaseClient.from('users').update({ is_banned: true }).eq('email', email); loadAdminUsers(); alert(`✅ ${email} yasaklandı!`); }
 async function promoteToAdmin(email) { await supabaseClient.from('users').update({ role: 'admin' }).eq('email', email); loadAdminUsers(); alert(`✅ ${email} admin yapıldı!`); }
-async function promoteToBeta(email) { await supabaseClient.from('users').update({ is_beta: true }).eq('email', email); loadAdminUsers(); alert(`✅ ${email} beta kullanıcı yapıldı!`); }
+async function promoteToBeta(email) { await supabaseClient.from('users').update({ is_beta: true }).eq('email', email); loadAdminUsers(); alert(`✅ ${email} beta yapıldı!`); }
 async function demoteUser(email) { await supabaseClient.from('users').update({ role: 'user', is_beta: false }).eq('email', email); loadAdminUsers(); alert(`✅ ${email} rütbesi düşürüldü!`); }
 async function sendGiftToUser(email) {
     let packageType = prompt('Hediye paketi (pro/team):');
@@ -2066,11 +1818,11 @@ async function sendGiftToUser(email) {
 }
 
 // ============================================================
-// AI CHAT DASHBOARD
+// AI CHAT
 // ============================================================
 document.getElementById('dashboardAiSendBtn')?.addEventListener('click', async () => {
     let inp = document.getElementById('dashboardAiInput'), msg = inp.value.trim();
-    if(!msg || !useQuery()) return;
+    if(!msg) return;
     let container = document.getElementById('dashboardAiMessages');
     container.innerHTML += `<div class="ai-message user">${msg}</div>`;
     inp.value = '';
@@ -2080,46 +1832,20 @@ document.getElementById('dashboardAiSendBtn')?.addEventListener('click', async (
     container.scrollTop = container.scrollHeight;
 });
 
-document.getElementById('dashboardFileInput')?.addEventListener('change', async (e) => {
-    let file = e.target.files[0];
-    if(!file) return;
-    let reader = new FileReader();
-    reader.onload = async function(ev) {
-        let content = ev.target.result;
-        let container = document.getElementById('dashboardAiMessages');
-        container.innerHTML += `<div class="ai-message bot">📄 Dosya "${file.name}" yüklendi. İçerik: ${content.substring(0,500)}...</div>`;
-        container.scrollTop = container.scrollHeight;
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-});
-
 // ============================================================
 // PROFİL
 // ============================================================
 function openProfileModal() {
+    const content = document.getElementById('profileContent');
+    if(content) content.innerHTML = `<p><strong>Ad:</strong> ${currentUser.name}</p><p><strong>Email:</strong> ${currentUser.email}</p><p><strong>Plan:</strong> ${currentUser.plan}</p><p><strong>Rol:</strong> ${currentUser.role || 'Kullanıcı'}</p>`;
     document.getElementById('profileModal').classList.add('open');
-    document.getElementById('profileContent').innerHTML = `<p><strong>Ad:</strong> ${currentUser.name}</p><p><strong>Email:</strong> ${currentUser.email}</p><p><strong>Plan:</strong> ${currentUser.plan}</p><p><strong>Rol:</strong> ${currentUser.role || 'Kullanıcı'}</p><p><strong>Kalan Sorgu:</strong> ${document.getElementById('remainingQueries').innerText}</p>`;
 }
 function closeProfileModal() { document.getElementById('profileModal').classList.remove('open'); }
 async function changePassword() { let newPass = prompt("Yeni şifre (min 8 karakter):"); if(!newPass || newPass.length < 8) return; await supabaseClient.from('users').update({ password_hash: btoa(newPass) }).eq('id', currentUser.id); alert("✅ Şifre değiştirildi!"); }
-async function deleteOwnAccount() {
-    let confirmPass = prompt("Hesabınızı silmek için şifrenizi girin:");
-    if(!confirmPass || btoa(confirmPass) !== currentUser.password_hash){ alert("Şifre hatalı!"); return; }
-    let code = Math.floor(100000 + Math.random() * 900000).toString();
-    await sendEmail(currentUser.email, 'Hesap Silme Onayı', `<h1>Onay kodunuz: ${code}</h1>`);
-    let entered = prompt("Mail adresinize gönderilen 6 haneli kodu girin:");
-    if(entered !== code){ alert("Kod hatalı!"); return; }
-    await supabaseClient.from('users').delete().eq('id', currentUser.id);
-    alert("Hesabınız kalıcı olarak silindi.");
-    handleLogout();
-}
+
 document.getElementById('profileBtn')?.addEventListener('click', openProfileModal);
 document.getElementById('dashboardLogoutBtn')?.addEventListener('click', handleLogout);
 
-// ============================================================
-// PAKET SATIN ALMA
-// ============================================================
 function buyPackage(pkg) {
     if(!currentUser){ alert('Giriş yapın!'); return; }
     if(confirm(`${pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takım Paketi (₺899/ay)'} satın al?`)){
@@ -2130,7 +1856,7 @@ function buyPackage(pkg) {
 }
 
 // ============================================================
-// MODAL VE DİĞER FONKSİYONLAR
+// MODAL, BUTON, DİĞER
 // ============================================================
 function openModal(t){ document.getElementById('authModal').classList.add('open'); switchTab(t); }
 function closeModal(){ document.getElementById('authModal').classList.remove('open'); }
@@ -2147,10 +1873,24 @@ function switchTab(tab) {
     if(tLogin) tLogin.classList.toggle('active', tab === 'login');
     if(tReg) tReg.classList.toggle('active', tab === 'register');
     if(tVerify) tVerify.classList.toggle('active', tab === 'verify');
+    const modalTitle = document.getElementById('modalTitle');
+    if(modalTitle) modalTitle.textContent = tab === 'login' ? 'Giriş Yap' : (tab === 'register' ? 'Hesap Oluştur' : 'Doğrulama');
 }
+
 function showAuthPanel(role) { pendingAdminRole = role; document.getElementById('authPanelOverlay').classList.add('open'); document.getElementById('authPassword').value = ''; }
 function closeAuthPanel() { document.getElementById('authPanelOverlay').classList.remove('open'); }
-function submitAuth() { if((pendingAdminRole === 'FOUNDER' && btoa(document.getElementById('authPassword').value) === ADMIN_PASSWORDS.FOUNDER) || (pendingAdminRole === 'ADMIN' && btoa(document.getElementById('authPassword').value) === ADMIN_PASSWORDS.ADMIN) || (pendingAdminRole === 'BETA' && btoa(document.getElementById('authPassword').value) === ADMIN_PASSWORDS.BETA)) { closeAuthPanel(); alert('✅ Yetki doğrulandı! Yetkili panelini kullanabilirsin.'); } else alert("❌ Şifre hatalı!"); }
+function submitAuth() { 
+    if((pendingAdminRole === 'FOUNDER' && btoa(document.getElementById('authPassword').value) === ADMIN_PASSWORDS.FOUNDER) ||
+       (pendingAdminRole === 'ADMIN' && btoa(document.getElementById('authPassword').value) === ADMIN_PASSWORDS.ADMIN) ||
+       (pendingAdminRole === 'BETA' && btoa(document.getElementById('authPassword').value) === ADMIN_PASSWORDS.BETA)) { 
+        closeAuthPanel(); 
+        alert('✅ Yetki doğrulandı! Yetkili panelini kullanabilirsin.');
+        if(currentUser && (currentUser.role === 'founder' || currentUser.role === 'admin')) {
+            document.getElementById('adminPanel').style.display = 'block';
+            loadAdminUsers();
+        }
+    } else alert("❌ Şifre hatalı!"); 
+}
 
 function initCursor() {
     const cursor = document.getElementById('customCursor');
@@ -2166,7 +1906,7 @@ async function initCounters() {
         const { count } = await supabaseClient.from('users').select('*', { count: 'exact', head: true });
         const c1 = document.getElementById('counter1');
         if(c1) c1.innerText = (count || 0).toLocaleString('tr-TR');
-    } catch(e) { console.log('Kullanıcı sayısı alınamadı:', e); }
+    } catch(e) { console.log('Kullanıcı sayısı alınamadı'); }
     const c2 = document.getElementById('counter2');
     const c3 = document.getElementById('counter3');
     if(c2) c2.innerText = '0';
@@ -2177,19 +1917,11 @@ function updateUI() {
         document.getElementById('loginBtn').style.display='none';
         document.getElementById('registerBtn').style.display='none';
         document.getElementById('logoutBtn').style.display='block';
-        const plan = currentUser.plan || 'free';
-        let txt = plan === 'team' ? '👥 Takım - Sınırsız' : (plan === 'pro' ? '⭐ Pro - 2000/gün' : '🆓 Ücretsiz - 20/gün');
-        document.getElementById('queryLimitBadge').innerHTML = `🔍 ${txt} | Kalan: <span>${plan === 'team' ? '∞' : (plan === 'pro' ? '2000' : dailyQueries)}</span>`;
-        if(plan === 'team') {
-            document.getElementById('teamDashboard').style.display = 'block';
-            document.getElementById('teamName').innerHTML = currentUser.name;
-            if(currentUser.team_id) loadTeamData();
-        }
+        document.getElementById('queryLimitBadge').innerHTML = `🔍 ${currentUser.plan === 'team' ? 'Sınırsız' : (currentUser.plan === 'pro' ? '⭐ 2000/gün' : '🆓 20/gün')} | Kalan: <span>${currentUser.plan === 'team' ? '∞' : dailyQueries}</span>`;
     } else {
         document.getElementById('loginBtn').style.display='block';
         document.getElementById('registerBtn').style.display='block';
         document.getElementById('logoutBtn').style.display='none';
-        document.getElementById('teamDashboard').style.display='none';
         document.getElementById('queryLimitBadge').innerHTML = `🔍 Ücretsiz - 20/gün | Kalan: <span>${dailyQueries}</span>`;
     }
 }
@@ -2226,7 +1958,7 @@ function sendAiMessage() {
     const msgs = document.getElementById('aiMessages');
     msgs.innerHTML += `<div class="ai-msg user">${msg}</div>`;
     inp.value = '';
-    setTimeout(() => { msgs.innerHTML += `<div class="ai-msg bot">⚡ Tam ekran AI panelini açmak için ⚡ butonuna tıklayın.</div>`; msgs.scrollTop = msgs.scrollHeight; }, 500);
+    setTimeout(() => { msgs.innerHTML += `<div class="ai-msg bot">⚡ VİZYON AI: Tam ekran paneli açmak için ⚡ butonuna tıklayın.</div>`; msgs.scrollTop = msgs.scrollHeight; }, 500);
 }
 function toggleDownloadMenu() { document.getElementById('downloadMenu').classList.toggle('open'); }
 function downloadApp(p) { alert(`📱 ${p.toUpperCase()} yakında!`); }
@@ -2236,18 +1968,14 @@ function handleFileUpload(input) {
     let file = input.files[0];
     if(!file) return;
     let chat = document.getElementById('vizyonAIChat');
-    chat.innerHTML += `<div class="ai-msg user">📎 Dosya yüklendi: ${file.name} (${(file.size/1024).toFixed(1)} KB)</div>`;
+    chat.innerHTML += `<div class="ai-msg user">📎 Dosya yüklendi: ${file.name}</div>`;
     let reader = new FileReader();
     reader.onload = function(e) {
         uploadedFileContent = e.target.result;
-        let preview = '';
-        if(file.type.startsWith('image')) preview = `<img src="${e.target.result}" style="max-width:100%;margin-top:10px;border-radius:8px;">`;
-        else preview = `<div style="background:#030810;padding:10px;border-radius:8px;margin-top:10px;font-family:monospace;font-size:11px;max-height:150px;overflow:auto;">${uploadedFileContent.substring(0,500)}${uploadedFileContent.length > 500 ? '...' : ''}</div>`;
-        chat.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: Dosyan başarıyla yüklendi!<br><br>📄 <strong>${file.name}</strong><br>📏 Boyut: ${(file.size/1024).toFixed(1)} KB${preview}<br><br>Bu dosya üzerinde ne yapmamı istersin?</div>`;
+        chat.innerHTML += `<div class="ai-msg bot">🧠 Dosya yüklendi. İçerik: ${uploadedFileContent.substring(0,300)}...</div>`;
         chat.scrollTop = chat.scrollHeight;
     };
-    if(file.type.startsWith('text') || file.name.endsWith('.py') || file.name.endsWith('.js') || file.name.endsWith('.html') || file.name.endsWith('.json') || file.name.endsWith('.css')) reader.readAsText(file);
-    else reader.readAsDataURL(file);
+    reader.readAsText(file);
     input.value = '';
 }
 function openVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'flex'; document.getElementById('vizyonAIInput').focus(); }
@@ -2265,53 +1993,16 @@ async function sendVizyonAIAdvanced() {
     let isSearch = msg.toLowerCase().includes('dolar') || msg.toLowerCase().includes('haber');
     setTimeout(async () => {
         document.getElementById(typingId)?.remove();
-        let response = isSearch ? (await webSearch(msg)) || `🔍 "${msg}" için sonuç bulunamadı.` : await callSuperAI(msg);
-        chat.innerHTML += `<div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>:<br><br>${response}</div>`;
+        let response = isSearch ? (await webSearch(msg)) || `"${msg}" için sonuç yok.` : await callSuperAI(msg);
+        chat.innerHTML += `<div class="ai-msg bot">🧠 ${response}</div>`;
         chat.scrollTop = chat.scrollHeight;
         uploadedFileContent = null;
     }, 800);
 }
-async function loadTeamData() {
-    if(!currentUser?.team_id) return;
-    const { data: team } = await supabaseClient.from('teams').select('*').eq('id', currentUser.team_id).single();
-    if(team){
-        document.getElementById('memberCount').innerText = team.members?.length || 0;
-        document.getElementById('teamMembersList').innerHTML = (team.members || []).map(m => `<div class="user-item">👤 ${m}</div>`).join('');
-        document.getElementById('teamProjectsList').innerHTML = (team.projects || []).map(p => `<div class="project-item">📁 ${p.name}</div>`).join('');
-    }
-}
-function inviteToTeam() {
-    const email = document.getElementById('inviteEmail').value.trim();
-    if(!email) return;
-    if(!currentUser?.team_id){ alert('Önce takım kur!'); return; }
-    supabaseClient.from('team_invites').insert([{ team_id: currentUser.team_id, invited_email: email, inviter_email: currentUser.email, created_at: new Date() }]);
-    alert(`📨 ${email} adresine davet gönderildi!`);
-    document.getElementById('inviteEmail').value = '';
-}
-function addTeamProject() {
-    const name = document.getElementById('newProjectName').value.trim();
-    if(!name) return;
-    if(!currentUser?.team_id){ alert('Önce takım kur!'); return; }
-    supabaseClient.from('teams').select('projects').eq('id', currentUser.team_id).single().then(res => {
-        let projects = res.data?.projects || [];
-        projects.push({ name, created_by: currentUser.email, created_at: new Date() });
-        supabaseClient.from('teams').update({ projects }).eq('id', currentUser.team_id);
-        document.getElementById('newProjectName').value = '';
-        loadTeamData();
-    });
-}
-function sendTeamMessage() {
-    const msg = document.getElementById('teamChatInput').value.trim();
-    if(!msg) return;
-    if(!currentUser?.team_id) return;
-    supabaseClient.from('teams').select('chat_messages').eq('id', currentUser.team_id).single().then(res => {
-        let msgs = res.data?.chat_messages || [];
-        msgs.push({ user: currentUser.name, message: msg, time: new Date().toLocaleTimeString() });
-        supabaseClient.from('teams').update({ chat_messages: msgs }).eq('id', currentUser.team_id);
-        document.getElementById('teamChatInput').value = '';
-        loadTeamData();
-    });
-}
+function inviteToTeam() { alert('Takım özelliği yakında!'); }
+function addTeamProject() { alert('Takım projesi yakında!'); }
+function sendTeamMessage() { alert('Takım sohbeti yakında!'); }
+function buyTeamAndCreate() { alert('Takım paketi satın alındı! İletişime geçin.'); }
 
 const profileModalDiv = document.createElement('div');
 profileModalDiv.id = 'profileModal';
@@ -2328,7 +2019,6 @@ window.onload = () => {
     initCounters();
     updateUI();
     
-    // PARTICLES
     const particleContainer = document.getElementById('particles');
     if(particleContainer) {
         for(let i = 0; i < 50; i++) {
@@ -2340,7 +2030,6 @@ window.onload = () => {
         }
     }
     
-    // PROGRESS BAR
     window.addEventListener('scroll', () => {
         const doc = document.documentElement;
         const scrollTop = window.scrollY || doc.scrollTop;
@@ -2350,7 +2039,6 @@ window.onload = () => {
         if(bar) bar.style.width = progress + '%';
     });
     
-    // BİLDİRİM
     const names = ['Ahmet K.', 'Fatma D.', 'Burak Y.', 'Zeynep A.', 'Emre S.', 'Selin M.'];
     setInterval(() => {
         const name = names[Math.floor(Math.random() * names.length)];
