@@ -1,2327 +1,3047 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-<title>Vizyon 2027 | VİZYON AI - Süper Yapay Zeka Ekosistemi</title>
-
-<!-- Supabase SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@300;400;500;700&display=swap" rel="stylesheet">
-
-<style>
-:root {
-  --bg: #050a0f;
-  --bg2: #0a111a;
-  --surface: #0d1a26;
-  --surface2: #112233;
-  --border: #1a3350;
-  --accent: #0ff;
-  --accent2: #0f8;
-  --accent3: #ff6b35;
-  --gold: #ffd700;
-  --text: #ffffff;
-  --text2: #ccdeee;
-  --text3: #8ab4cc;
-  --danger: #ff4757;
-  --purple: #a855f7;
-  --font-display: 'Syne', sans-serif;
-  --font-code: 'Fira Code', monospace;
-  --font-mono: 'Space Mono', monospace;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-code);
-  overflow-x: hidden;
-}
-
-/* MAVİ İMLEÇ */
-.custom-cursor {
-  width: 12px;
-  height: 12px;
-  background: var(--accent);
-  border-radius: 50%;
-  position: fixed;
-  pointer-events: none;
-  z-index: 99999;
-  box-shadow: 0 0 15px var(--accent);
-}
-.custom-cursor-ring {
-  width: 36px;
-  height: 36px;
-  border: 2px solid var(--accent);
-  border-radius: 50%;
-  position: fixed;
-  pointer-events: none;
-  z-index: 99998;
-  transition: 0.1s linear;
-  opacity: 0.7;
-}
-
-button, a, .secret-btn, .nav-cta, .btn-primary, .btn-secondary, .btn-price, .ai-suggestion, .mbadge, .download-btn, .ai-widget-btn, .close-panel-btn, .btn-submit, .modal-tab, .support-link, .nav-links a {
-  cursor: pointer !important;
-  transition: all 0.2s ease;
-}
-.btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--purple));
-  color: var(--bg);
-  border: none;
-  padding: 12px 28px;
-  font-weight: 600;
-  border-radius: 40px;
-  font-size: 14px;
-}
-.btn-primary:hover {
-  transform: scale(1.02);
-  box-shadow: 0 0 20px rgba(0,255,255,0.4);
-}
-.btn-secondary {
-  background: transparent;
-  border: 1px solid var(--accent);
-  color: var(--accent);
-  padding: 12px 28px;
-  border-radius: 40px;
-  font-size: 14px;
-}
-.btn-secondary:hover {
-  background: rgba(0,255,255,0.1);
-  box-shadow: 0 0 15px rgba(0,255,255,0.2);
-}
-.btn-primary-small {
-  background: var(--accent);
-  color: var(--bg);
-  border: none;
-  padding: 8px 20px;
-  border-radius: 30px;
-  font-size: 13px;
-  font-weight: 600;
-}
-.nav-cta {
-  background: transparent;
-  border: 1px solid var(--accent);
-  color: var(--accent);
-  padding: 8px 20px;
-  border-radius: 30px;
-  font-size: 13px;
-}
-.logout-btn {
-  background: rgba(255,71,87,0.2);
-  border: 1px solid var(--danger);
-  color: var(--danger);
-  padding: 8px 20px;
-  border-radius: 30px;
-}
-.secret-btn {
-  background: rgba(0,255,255,0.1);
-  border: 1px solid var(--border);
-  color: var(--text3);
-  font-size: 10px;
-  padding: 6px 12px;
-  border-radius: 20px;
-}
-.secret-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.btn-submit {
-  width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, var(--accent), var(--purple));
-  color: var(--bg);
-  border: none;
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-  cursor: pointer;
-  border-radius: 40px;
-  margin-top: 8px;
-}
-.btn-price {
-  width: 100%;
-  padding: 14px;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text2);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  text-transform: uppercase;
-  border-radius: 40px;
-  transition: all 0.2s;
-}
-.btn-price:hover { border-color: var(--accent); color: var(--accent); }
-.price-card.featured .btn-price {
-  background: linear-gradient(135deg, var(--accent), var(--purple));
-  color: var(--bg);
-  border: none;
-}
-.file-upload-btn {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 12px 16px;
-  border-radius: 30px;
-  cursor: pointer;
-  color: var(--text2);
-  font-size: 12px;
-}
-.file-upload-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-/* OFFICE BACKGROUND */
-.office-bg {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-}
-.office-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.05;
-}
-.office-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, rgba(5,10,15,0.85), rgba(5,10,15,0.95));
-  z-index: 2;
-}
-
-/* GRID LINES */
-.grid-lines {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background-image: linear-gradient(rgba(0,255,255,0.05) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(0,255,255,0.05) 1px, transparent 1px);
-  background-size: 60px 60px;
-}
-
-/* PARTICLES */
-.particles {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  overflow: hidden;
-}
-.particle {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: var(--accent);
-  border-radius: 50%;
-  animation: float-up linear infinite;
-  opacity: 0;
-}
-@keyframes float-up {
-  0% { transform: translateY(100vh); opacity: 0; }
-  10% { opacity: 0.6; }
-  90% { opacity: 0.3; }
-  100% { transform: translateY(-100px); opacity: 0; }
-}
-
-/* PROGRESS BAR */
-.progress-bar-top {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--purple));
-  z-index: 200;
-  transition: width 0.1s;
-  box-shadow: 0 0 15px var(--accent);
-}
-
-/* NOTIFICATION */
-.notification {
-  position: fixed;
-  bottom: 32px;
-  left: 32px;
-  padding: 14px 20px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 4px solid var(--accent2);
-  font-size: 13px;
-  color: var(--text2);
-  z-index: 600;
-  transform: translateY(100px);
-  opacity: 0;
-  transition: all 0.4s ease;
-  max-width: 320px;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-}
-.notification.show { transform: translateY(0); opacity: 1; }
-.notification span { color: var(--accent2); font-weight: 600; }
-
-/* NAVBAR */
-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 48px;
-  height: 80px;
-  border-bottom: 1px solid rgba(0,255,255,0.15);
-  background: rgba(5,10,15,0.85);
-  backdrop-filter: blur(20px);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-}
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.logo-icon {
-  width: 45px;
-  height: 45px;
-  background: linear-gradient(135deg, var(--accent), var(--purple), var(--accent3));
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  animation: logoPulse 2s infinite;
-}
-@keyframes logoPulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(0,255,255,0.7); }
-  50% { box-shadow: 0 0 0 15px rgba(0,255,255,0); }
-}
-.logo-text {
-  font-family: var(--font-display);
-  font-size: 24px;
-  font-weight: 800;
-  background: linear-gradient(45deg, var(--accent), var(--purple));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-.nav-links {
-  display: flex;
-  gap: 32px;
-  list-style: none;
-}
-.nav-links a {
-  color: var(--text2);
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-.nav-links a:hover { color: var(--accent); }
-.button-group {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-.secret-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-/* HERO */
-.hero {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 140px 48px 80px;
-  position: relative;
-}
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 20px;
-  border: 1px solid rgba(0,255,255,0.3);
-  border-radius: 40px;
-  font-size: 12px;
-  color: var(--accent);
-  margin-bottom: 32px;
-  backdrop-filter: blur(5px);
-}
-.hero-badge .blink {
-  width: 8px;
-  height: 8px;
-  background: var(--accent2);
-  border-radius: 50%;
-  animation: blink 1s step-end infinite;
-}
-@keyframes blink {
-  0%,100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-.hero-title {
-  font-family: var(--font-display);
-  font-size: clamp(48px, 8vw, 96px);
-  font-weight: 800;
-  line-height: 0.95;
-  margin-bottom: 24px;
-}
-.hero-title .line1 { 
-  color: var(--text); 
-  display: block;
-  text-shadow: 0 0 20px rgba(0,255,255,0.3);
-}
-.hero-title .line2 { 
-  display: block; 
-  -webkit-text-stroke: 2px var(--accent); 
-  color: transparent;
-}
-.hero-title .line3 { 
-  display: block; 
-  color: var(--accent2); 
-  font-size: 0.55em; 
-  margin-top: 8px;
-  letter-spacing: 2px;
-}
-.hero-sub {
-  max-width: 600px;
-  font-size: 16px;
-  line-height: 1.8;
-  color: var(--text2);
-  margin-bottom: 48px;
-}
-.hero-actions {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 60px;
-}
-
-/* STATS BAR */
-.stats-bar {
-  display: flex;
-  justify-content: center;
-  gap: 0;
-  margin-top: 20px;
-  border: 1px solid var(--border);
-  background: rgba(13,26,38,0.6);
-  backdrop-filter: blur(10px);
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-  border-radius: 60px;
-  overflow: hidden;
-}
-.stat-item {
-  flex: 1;
-  padding: 24px 32px;
-  text-align: center;
-  border-right: 1px solid var(--border);
-}
-.stat-item:last-child { border-right: none; }
-.stat-num {
-  font-family: var(--font-display);
-  font-size: 36px;
-  font-weight: 800;
-  color: var(--accent);
-  display: block;
-  text-shadow: 0 0 15px rgba(0,255,255,0.3);
-}
-.stat-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: var(--text3);
-  margin-top: 6px;
-}
-
-/* SCROLL INDICATOR */
-.scroll-indicator {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  opacity: 0.5;
-}
-.scroll-indicator span {
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--text3);
-}
-.scroll-mouse {
-  width: 26px;
-  height: 40px;
-  border: 1.5px solid var(--text3);
-  border-radius: 14px;
-  display: flex;
-  justify-content: center;
-  padding-top: 6px;
-}
-.scroll-wheel {
-  width: 2px;
-  height: 8px;
-  background: var(--text3);
-  border-radius: 2px;
-  animation: scroll-anim 1.5s ease infinite;
-}
-@keyframes scroll-anim {
-  from { transform: translateY(0); opacity: 1; }
-  to { transform: translateY(10px); opacity: 0; }
-}
-
-/* EDITOR PREVIEW */
-.editor-preview {
-  margin: 80px auto;
-  max-width: 1000px;
-  padding: 0 20px;
-}
-.editor-window {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-}
-.editor-titlebar {
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-  gap: 8px;
-}
-.editor-dot { width: 12px; height: 12px; border-radius: 50%; }
-.editor-dot.red { background: #ff5f56; }
-.editor-dot.yellow { background: #ffbd2e; }
-.editor-dot.green { background: #27c93f; }
-.editor-filename { margin-left: auto; font-size: 12px; color: var(--text3); }
-.editor-body {
-  padding: 28px 32px;
-  font-family: var(--font-code);
-  font-size: 14px;
-  line-height: 1.8;
-}
-.code-line { display: flex; gap: 24px; }
-.ln { color: var(--text3); min-width: 30px; text-align: right; }
-.kw { color: var(--purple); }
-.fn { color: var(--accent2); }
-.str { color: var(--accent3); }
-.cm { color: var(--text3); font-style: italic; }
-
-/* FEATURES */
-.features {
-  padding: 80px 48px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-.section-header { text-align: center; margin-bottom: 64px; }
-.section-tag {
-  font-size: 12px;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 16px;
-}
-.section-title {
-  font-family: var(--font-display);
-  font-size: clamp(36px, 5vw, 52px);
-  font-weight: 800;
-}
-.section-title .hl { color: var(--accent); }
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  overflow: hidden;
-}
-.feature-card {
-  background: var(--bg);
-  padding: 40px 36px;
-  transition: background 0.3s;
-  cursor: pointer;
-}
-.feature-card:hover { background: var(--surface); }
-.feature-icon {
-  width: 56px;
-  height: 56px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  border: 1px solid var(--border);
-  color: var(--accent);
-  border-radius: 16px;
-}
-.feature-title {
-  font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-.feature-desc {
-  font-size: 13px;
-  line-height: 1.7;
-  color: var(--text2);
-}
-.feature-tag {
-  display: inline-block;
-  margin-top: 16px;
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: 4px 10px;
-  background: rgba(0,255,255,0.08);
-  border: 1px solid rgba(0,255,255,0.2);
-  color: var(--accent);
-  border-radius: 20px;
-}
-
-/* AI SECTION */
-.ai-section {
-  padding: 80px 48px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-.ai-showcase {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  overflow: hidden;
-}
-.ai-left {
-  background: var(--bg);
-  padding: 48px;
-}
-.ai-right {
-  background: var(--surface);
-  padding: 48px;
-}
-.ai-title {
-  font-family: var(--font-display);
-  font-size: clamp(32px, 4vw, 42px);
-  font-weight: 800;
-  margin-bottom: 20px;
-}
-.ai-title em { color: var(--accent2); font-style: normal; }
-.ai-desc {
-  font-size: 14px;
-  line-height: 1.8;
-  color: var(--text2);
-  margin-bottom: 32px;
-}
-.model-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 32px;
-}
-.mbadge {
-  padding: 8px 18px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  border: 1px solid;
-  border-radius: 40px;
-  cursor: pointer;
-}
-.mbadge.a { border-color: var(--accent); color: var(--accent); background: rgba(0,255,255,0.06); }
-.mbadge.b { border-color: var(--accent2); color: var(--accent2); background: rgba(0,255,136,0.06); }
-.mbadge.c { border-color: var(--purple); color: var(--purple); background: rgba(168,85,247,0.06); }
-.ai-chat-msg {
-  padding: 20px;
-  border-left: 3px solid;
-  font-size: 13px;
-  line-height: 1.7;
-  background: rgba(0,0,0,0.2);
-  border-radius: 12px;
-  margin-bottom: 16px;
-}
-.ai-chat-msg.user { border-color: var(--text3); color: var(--text2); }
-.ai-chat-msg.bot { border-color: var(--accent); color: var(--text); }
-.ai-chat-code {
-  background: rgba(0,255,255,0.05);
-  border: 1px solid rgba(0,255,255,0.15);
-  padding: 12px 16px;
-  margin-top: 12px;
-  font-size: 12px;
-  color: var(--accent2);
-  white-space: pre;
-  overflow-x: auto;
-  border-radius: 8px;
-}
-
-/* TECH STACK */
-.tech-section {
-  padding: 50px 48px;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  overflow: hidden;
-}
-.tech-scroll {
-  display: flex;
-  gap: 40px;
-  animation: scroll-left 25s linear infinite;
-  white-space: nowrap;
-}
-.tech-scroll:hover { animation-play-state: paused; }
-@keyframes scroll-left {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-.tech-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 24px;
-  border: 1px solid var(--border);
-  color: var(--text3);
-  font-size: 13px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  border-radius: 40px;
-  transition: all 0.2s;
-}
-.tech-item:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.tech-dot {
-  width: 6px;
-  height: 6px;
-  background: var(--accent2);
-  border-radius: 50%;
-}
-
-/* PRICING */
-.pricing {
-  padding: 80px 48px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-.pricing-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  overflow: hidden;
-}
-.price-card {
-  background: var(--bg);
-  padding: 40px 36px;
-  position: relative;
-}
-.price-card.featured {
-  background: var(--surface);
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
-}
-.price-tier {
-  font-size: 12px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 16px;
-}
-.price-amount {
-  font-family: var(--font-display);
-  font-size: 52px;
-  font-weight: 800;
-  color: var(--text);
-}
-.price-amount span { font-size: 20px; font-weight: 400; color: var(--text3); }
-.price-features {
-  list-style: none;
-  margin: 24px 0;
-}
-.price-features li {
-  padding: 8px 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
-  color: var(--text2);
-}
-.price-features li::before { content: "▸"; color: var(--accent2); }
-.price-badge {
-  position: absolute;
-  top: -12px;
-  right: 24px;
-  padding: 4px 16px;
-  background: linear-gradient(135deg, var(--accent), var(--purple));
-  color: var(--bg);
-  font-size: 10px;
-  text-transform: uppercase;
-  font-weight: 700;
-  border-radius: 40px;
-}
-
-/* TESTIMONIALS */
-.testimonials {
-  padding: 80px 48px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-.testimonials-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  overflow: hidden;
-}
-.testimonial {
-  background: var(--bg);
-  padding: 32px;
-  transition: background 0.3s;
-}
-.testimonial:hover { background: var(--surface); }
-.stars {
-  color: var(--gold);
-  font-size: 14px;
-  margin-bottom: 16px;
-  letter-spacing: 3px;
-}
-.testimonial-text {
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--text2);
-  margin-bottom: 20px;
-  font-style: italic;
-}
-.testimonial-author {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.author-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--accent);
-}
-.author-name { font-size: 14px; font-weight: 600; color: var(--text); }
-.author-title { font-size: 11px; color: var(--text3); }
-
-/* FOOTER */
-footer {
-  border-top: 1px solid var(--border);
-  padding: 60px 48px 40px;
-  background: var(--bg2);
-}
-.footer-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 48px;
-  max-width: 1400px;
-  margin: 0 auto 48px;
-}
-.footer-col h4 {
-  font-size: 12px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 20px;
-}
-.footer-col ul { list-style: none; }
-.footer-col li { margin-bottom: 10px; }
-.footer-col a {
-  color: var(--text2);
-  text-decoration: none;
-  font-size: 13px;
-  transition: color 0.2s;
-}
-.footer-col a:hover { color: var(--accent); }
-.footer-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 32px;
-  border-top: 1px solid var(--border);
-  max-width: 1400px;
-  margin: 0 auto;
-}
-.footer-copy { font-size: 12px; color: var(--text3); }
-.footer-copy span { color: var(--accent); }
-.footer-badges { display: flex; gap: 12px; }
-.badge {
-  padding: 6px 14px;
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  border: 1px solid var(--border);
-  color: var(--text3);
-  border-radius: 30px;
-}
-.badge.live { border-color: var(--accent2); color: var(--accent2); }
-.support-footer {
-  margin-top: 20px;
-  text-align: center;
-}
-.support-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 24px;
-  background: rgba(0,255,255,0.1);
-  border: 1px solid var(--accent);
-  border-radius: 40px;
-  color: var(--accent);
-  text-decoration: none;
-  font-size: 13px;
-}
-.support-link:hover {
-  background: var(--accent);
-  color: var(--bg);
-}
-
-/* MODAL */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(5,10,15,0.95);
-  z-index: 1000;
-  backdrop-filter: blur(8px);
-  align-items: center;
-  justify-content: center;
-}
-.modal-overlay.open { display: flex; }
-.modal {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  width: 480px;
-  max-width: 90vw;
-  padding: 32px;
-}
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-.modal-close {
-  background: none;
-  border: none;
-  color: var(--text3);
-  cursor: pointer;
-  font-size: 24px;
-}
-.modal-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
-}
-.modal-tab {
-  flex: 1;
-  padding: 12px;
-  background: none;
-  border: none;
-  font-size: 13px;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--text3);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-}
-.modal-tab.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
-.form-input {
-  width: 100%;
-  padding: 14px 16px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-size: 14px;
-  border-radius: 12px;
-  margin-bottom: 16px;
-}
-.form-row { display: flex; gap: 12px; margin-bottom: 16px; }
-.form-row .form-input { margin-bottom: 0; }
-
-/* DASHBOARD (SİM SİYAH TAM EKRAN) */
-.dashboard-container {
-  min-height: 100vh;
-  background: #000000;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10000;
-  overflow-y: auto;
-  padding: 20px;
-}
-.dashboard-container::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 120% 60% at 50% 0%, rgba(0,255,255,0.05) 0%, transparent 60%);
-  z-index: -1;
-}
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 32px;
-  background: rgba(10,10,10,0.95);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  border-radius: 16px 16px 0 0;
-}
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-  gap: 24px;
-  padding: 24px;
-  max-width: 1600px;
-  margin: 0 auto;
-}
-.dashboard-card {
-  background: rgba(17,17,17,0.85);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 24px;
-  transition: 0.2s;
-}
-.dashboard-card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 20px rgba(0,255,255,0.1);
-}
-.dashboard-card h3 {
-  color: var(--accent);
-  margin-bottom: 20px;
-  font-size: 18px;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 12px;
-}
-.dashboard-card h4 {
-  color: var(--accent2);
-  margin-bottom: 15px;
-  font-size: 14px;
-}
-.neon-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
-}
-.neon-stat {
-  background: rgba(0,0,0,0.5);
-  border-radius: 16px;
-  padding: 16px;
-  text-align: center;
-  border: 1px solid var(--border);
-}
-.neon-stat .number {
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--accent);
-}
-.neon-stat .label {
-  font-size: 11px;
-  color: var(--text3);
-  margin-top: 4px;
-}
-.project-list, .inbox-list, .user-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 300px;
-  overflow-y: auto;
-}
-.project-item {
-  background: #0a0a0a;
-  border-radius: 12px;
-  padding: 12px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-left: 3px solid var(--accent);
-}
-.user-item {
-  background: #0a0a0a;
-  border-radius: 12px;
-  padding: 12px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-.user-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.user-actions button {
-  padding: 6px 12px;
-  font-size: 10px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text2);
-  border-radius: 20px;
-  cursor: pointer;
-}
-.user-actions button:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.group-chat {
-  height: 200px;
-  overflow-y: auto;
-  background: rgba(0,0,0,0.3);
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 12px;
-}
-.group-chat-message {
-  padding: 8px;
-  margin-bottom: 8px;
-  border-bottom: 1px solid var(--border);
-  font-size: 12px;
-}
-.group-chat-input {
-  display: flex;
-  gap: 8px;
-}
-.group-chat-input input {
-  flex: 1;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 10px;
-  border-radius: 30px;
-}
-.ai-chat-messages {
-  height: 250px;
-  overflow-y: auto;
-  background: rgba(0,0,0,0.3);
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 12px;
-}
-.ai-message {
-  padding: 8px 12px;
-  margin-bottom: 8px;
-  border-radius: 20px;
-  font-size: 13px;
-}
-.ai-message.user {
-  background: rgba(0,255,255,0.1);
-  text-align: right;
-}
-.ai-message.bot {
-  background: rgba(0,255,136,0.05);
-  border-left: 3px solid var(--accent2);
-}
-.ai-input-area {
-  display: flex;
-  gap: 8px;
-}
-.ai-input-area input, .ai-input-area textarea {
-  flex: 1;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 12px;
-  border-radius: 30px;
-}
-.glow-input {
-  background: var(--bg);
-  border: 1px solid var(--accent);
-  color: var(--text);
-  padding: 8px 12px;
-  border-radius: 30px;
-  font-size: 12px;
-}
-.query-limit-badge {
-  position: fixed;
-  bottom: 100px;
-  left: 20px;
-  background: rgba(0,255,255,0.15);
-  border: 1px solid var(--accent);
-  border-radius: 30px;
-  padding: 8px 16px;
-  font-size: 12px;
-  z-index: 100;
-  backdrop-filter: blur(10px);
-  font-weight: 500;
-}
-
-/* DOWNLOAD MENU */
-.download-menu {
-  position: fixed;
-  bottom: 100px;
-  right: 20px;
-  z-index: 1000;
-}
-.download-btn {
-  width: 55px;
-  height: 55px;
-  background: linear-gradient(135deg, var(--accent), var(--purple));
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 24px;
-  box-shadow: 0 0 20px rgba(0,255,255,0.5);
-  transition: transform 0.2s;
-}
-.download-btn:hover { transform: scale(1.1); }
-.download-options {
-  position: absolute;
-  bottom: 65px;
-  right: 0;
-  background: var(--surface);
-  border: 1px solid var(--accent);
-  border-radius: 16px;
-  padding: 10px;
-  display: none;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 180px;
-}
-.download-options.open { display: flex; }
-.download-options a {
-  padding: 10px 15px;
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: var(--text);
-  text-decoration: none;
-  font-size: 12px;
-  cursor: pointer;
-  text-align: center;
-}
-
-/* AI WIDGET */
-.ai-widget {
-  position: fixed;
-  bottom: 32px;
-  right: 32px;
-  z-index: 500;
-}
-.ai-widget-btn {
-  width: 56px;
-  height: 56px;
-  background: linear-gradient(135deg, var(--accent), var(--purple));
-  border: none;
-  cursor: pointer;
-  font-size: 24px;
-  border-radius: 50%;
-  box-shadow: 0 0 30px rgba(0,255,255,0.4);
-  animation: glow 2s ease-in-out infinite;
-}
-@keyframes glow {
-  0%,100% { box-shadow: 0 0 20px rgba(0,255,255,0.3); }
-  50% { box-shadow: 0 0 40px rgba(0,255,255,0.6); }
-}
-.ai-widget-btn:hover { transform: scale(1.1); }
-.ai-panel {
-  display: none;
-  position: absolute;
-  bottom: 70px;
-  right: 0;
-  width: 340px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  overflow: hidden;
-}
-.ai-panel.open { display: flex; flex-direction: column; }
-.ai-messages {
-  height: 240px;
-  overflow-y: auto;
-  padding: 16px;
-}
-.ai-msg {
-  padding: 10px 14px;
-  font-size: 12px;
-  line-height: 1.6;
-  max-width: 85%;
-  border-radius: 18px;
-}
-.ai-msg.bot {
-  background: rgba(0,255,255,0.08);
-  color: var(--text2);
-  align-self: flex-start;
-}
-.ai-msg.user {
-  background: rgba(0,255,136,0.08);
-  color: var(--text2);
-  align-self: flex-end;
-  text-align: right;
-}
-.ai-input-area {
-  padding: 12px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  gap: 8px;
-}
-.ai-input {
-  flex: 1;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 10px;
-  border-radius: 30px;
-  font-size: 12px;
-}
-.ai-send {
-  padding: 8px 16px;
-  background: var(--accent);
-  border: none;
-  color: var(--bg);
-  border-radius: 30px;
-  cursor: pointer;
-  font-weight: 600;
-}
-.ai-suggestions {
-  padding: 12px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.ai-suggestion {
-  padding: 6px 14px;
-  font-size: 10px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text3);
-  border-radius: 30px;
-  cursor: pointer;
-}
-.ai-suggestion:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.auth-panel-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(5,10,15,0.98);
-  backdrop-filter: blur(12px);
-  z-index: 1500;
-  justify-content: center;
-  align-items: center;
-}
-.auth-panel-overlay.open { display: flex; }
-.auth-panel {
-  background: var(--surface);
-  border: 2px solid var(--accent);
-  border-radius: 24px;
-  padding: 40px;
-  width: 400px;
-  max-width: 90%;
-  text-align: center;
-}
-.auth-panel input {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: white;
-  border-radius: 30px;
-}
-.auth-buttons { display: flex; gap: 12px; margin-top: 16px; justify-content: center; }
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  nav { padding: 0 20px; flex-wrap: wrap; height: auto; padding: 12px 20px; gap: 12px; }
-  .nav-links { gap: 16px; }
-  .nav-links a { font-size: 10px; }
-  .hero { padding: 140px 20px 60px; }
-  .hero-title { font-size: clamp(32px, 7vw, 48px); }
-  .stats-bar { flex-direction: column; border-radius: 20px; }
-  .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
-  .features, .ai-section, .pricing, .testimonials { padding: 40px 20px; }
-  .ai-showcase { grid-template-columns: 1fr; }
-  .pricing-grid { grid-template-columns: 1fr; }
-  .dashboard-grid { grid-template-columns: 1fr; padding: 16px; }
-  .dashboard-header { flex-direction: column; gap: 12px; }
-  .custom-cursor, .custom-cursor-ring { display: none; }
-  .notification { bottom: 20px; left: 20px; max-width: 280px; font-size: 11px; }
-  .download-menu { bottom: 80px; }
-  .query-limit-badge { bottom: 80px; left: 10px; font-size: 9px; padding: 4px 10px; }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Vizyon 2027 | VİZYON AI - Süper Yapay Zeka Ekosistemi</title>
+  
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <style>
+    /* ============================================================ */
+    /* TAMAMEN YENİLENMİŞ CSS - DAHA PARLAK, DAHA DÜZENLİ, TÜM EFEKTLER */
+    /* ============================================================ */
+    
+    :root {
+      --bg: #050a0f;
+      --bg2: #0a111a;
+      --surface: #0d1a26;
+      --surface2: #112233;
+      --border: #1a3350;
+      --accent: #0ff;
+      --accent2: #0f8;
+      --accent3: #ff6b35;
+      --gold: #ffd700;
+      --text: #ffffff;
+      --text2: #ccdeee;
+      --text3: #8ab4cc;
+      --danger: #ff4757;
+      --purple: #a855f7;
+      --font-display: 'Syne', sans-serif;
+      --font-code: 'Fira Code', monospace;
+      --font-mono: 'Space Mono', monospace;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-code);
+      overflow-x: hidden;
+    }
+    
+    /* MAVİ İMLEÇ (DAHA BELİRGİN) */
+    .custom-cursor {
+      width: 12px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 99999;
+      box-shadow: 0 0 15px var(--accent);
+    }
+    
+    .custom-cursor-ring {
+      width: 36px;
+      height: 36px;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 99998;
+      transition: 0.1s linear;
+      opacity: 0.7;
+    }
+    
+    /* BUTONLAR (MODERN - YUVARLAK) */
+    button, a, .secret-btn, .nav-cta, .btn-primary, .btn-secondary, .btn-price, .ai-suggestion, .mbadge, .download-btn, .ai-widget-btn, .close-panel-btn, .btn-submit, .modal-tab, .support-link, .nav-links a {
+      cursor: pointer !important;
+      z-index: 999 !important;
+      position: relative;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      color: var(--bg);
+      border: none;
+      padding: 12px 28px;
+      font-weight: 600;
+      border-radius: 40px;
+      font-size: 14px;
+    }
+    
+    .btn-primary:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 12px 28px;
+      border-radius: 40px;
+      font-size: 14px;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(0, 255, 255, 0.1);
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    }
+    
+    .btn-primary-small {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    
+    .btn-price {
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text2);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      border-radius: 40px;
+      transition: all 0.2s;
+    }
+    
+    .btn-price:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .price-card.featured .btn-price {
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      color: var(--bg);
+      border: none;
+    }
+    
+    .logout-btn {
+      background: rgba(255, 71, 87, 0.2);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      padding: 8px 20px;
+      border-radius: 30px;
+    }
+    
+    .nav-cta {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    
+    .secret-btn {
+      background: rgba(0, 255, 255, 0.1);
+      border: 1px solid var(--border);
+      color: var(--text3);
+      font-size: 10px;
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+    
+    .secret-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      color: var(--bg);
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 40px;
+      margin-top: 8px;
+    }
+    
+    .file-upload-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      color: var(--text2);
+      font-size: 12px;
+    }
+    
+    .file-upload-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    /* ARKA PLAN EFEKTLERİ */
+    .office-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+    
+    .office-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.05;
+    }
+    
+    .office-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(5, 10, 15, 0.85), rgba(5, 10, 15, 0.95));
+      z-index: 2;
+    }
+    
+    /* GRID LINES */
+    .grid-lines {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    
+    /* PARTICLES */
+    .particles {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: float-up linear infinite;
+      opacity: 0;
+    }
+    
+    @keyframes float-up {
+      0% {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.6;
+      }
+      90% {
+        opacity: 0.3;
+      }
+      100% {
+        transform: translateY(-100px);
+        opacity: 0;
+      }
+    }
+    
+    /* PROGRESS BAR */
+    .progress-bar-top {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--purple));
+      z-index: 200;
+      transition: width 0.1s;
+      box-shadow: 0 0 15px var(--accent);
+    }
+    
+    /* NOTIFICATION */
+    .notification {
+      position: fixed;
+      bottom: 32px;
+      left: 32px;
+      padding: 14px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent2);
+      font-size: 13px;
+      color: var(--text2);
+      z-index: 600;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.4s ease;
+      max-width: 320px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    .notification span {
+      color: var(--accent2);
+      font-weight: 600;
+    }
+    
+    .query-limit-badge {
+      position: fixed;
+      bottom: 100px;
+      left: 20px;
+      background: rgba(0, 255, 255, 0.15);
+      border: 1px solid var(--accent);
+      border-radius: 30px;
+      padding: 8px 16px;
+      font-size: 12px;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      font-weight: 500;
+    }
+    
+    /* NAVBAR */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 80px;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.15);
+      background: rgba(5, 10, 15, 0.85);
+      backdrop-filter: blur(20px);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .logo-icon {
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, var(--accent), var(--purple), var(--accent3));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      animation: logoPulse 2s infinite;
+    }
+    
+    @keyframes logoPulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.7);
+      }
+      50% {
+        box-shadow: 0 0 0 15px rgba(0, 255, 255, 0);
+      }
+    }
+    
+    .logo-text {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 800;
+      background: linear-gradient(45deg, var(--accent), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    
+    .nav-links a {
+      color: var(--text2);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: color 0.2s;
+    }
+    
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .secret-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 140px 48px 80px;
+      position: relative;
+    }
+    
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      border-radius: 40px;
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 32px;
+      backdrop-filter: blur(5px);
+    }
+    
+    .hero-badge .blink {
+      width: 8px;
+      height: 8px;
+      background: var(--accent2);
+      border-radius: 50%;
+      animation: blink 1s step-end infinite;
+    }
+    
+    @keyframes blink {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0;
+      }
+    }
+    
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(48px, 8vw, 96px);
+      font-weight: 800;
+      line-height: 0.95;
+      margin-bottom: 24px;
+    }
+    
+    .hero-title .line1 {
+      color: var(--text);
+      display: block;
+      text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    }
+    
+    .hero-title .line2 {
+      display: block;
+      -webkit-text-stroke: 2px var(--accent);
+      color: transparent;
+    }
+    
+    .hero-title .line3 {
+      display: block;
+      color: var(--accent2);
+      font-size: 0.55em;
+      margin-top: 8px;
+      letter-spacing: 2px;
+    }
+    
+    .hero-sub {
+      max-width: 600px;
+      font-size: 16px;
+      line-height: 1.8;
+      color: var(--text2);
+      margin-bottom: 48px;
+    }
+    
+    .hero-actions {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 60px;
+    }
+    
+    /* STATS BAR */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin-top: 20px;
+      border: 1px solid var(--border);
+      background: rgba(13, 26, 38, 0.6);
+      backdrop-filter: blur(10px);
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 60px;
+      overflow: hidden;
+    }
+    
+    .stat-item {
+      flex: 1;
+      padding: 24px 32px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    
+    .stat-item:last-child {
+      border-right: none;
+    }
+    
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--accent);
+      display: block;
+      text-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    }
+    
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text3);
+      margin-top: 6px;
+    }
+    
+    /* SCROLL INDICATOR */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.5;
+    }
+    
+    .scroll-indicator span {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+    
+    .scroll-mouse {
+      width: 26px;
+      height: 40px;
+      border: 1.5px solid var(--text3);
+      border-radius: 14px;
+      display: flex;
+      justify-content: center;
+      padding-top: 6px;
+    }
+    
+    .scroll-wheel {
+      width: 2px;
+      height: 8px;
+      background: var(--text3);
+      border-radius: 2px;
+      animation: scroll-anim 1.5s ease infinite;
+    }
+    
+    @keyframes scroll-anim {
+      from {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateY(10px);
+        opacity: 0;
+      }
+    }
+    
+    /* EDITOR PREVIEW */
+    .editor-preview {
+      margin: 80px auto;
+      max-width: 1000px;
+      padding: 0 20px;
+    }
+    
+    .editor-window {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+    
+    .editor-titlebar {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      gap: 8px;
+    }
+    
+    .editor-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    
+    .editor-dot.red {
+      background: #ff5f56;
+    }
+    
+    .editor-dot.yellow {
+      background: #ffbd2e;
+    }
+    
+    .editor-dot.green {
+      background: #27c93f;
+    }
+    
+    .editor-filename {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--text3);
+    }
+    
+    .editor-body {
+      padding: 28px 32px;
+      font-family: var(--font-code);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    
+    .code-line {
+      display: flex;
+      gap: 24px;
+    }
+    
+    .ln {
+      color: var(--text3);
+      min-width: 30px;
+      text-align: right;
+    }
+    
+    .kw {
+      color: var(--purple);
+    }
+    
+    .fn {
+      color: var(--accent2);
+    }
+    
+    .str {
+      color: var(--accent3);
+    }
+    
+    .cm {
+      color: var(--text3);
+      font-style: italic;
+    }
+    
+    /* FEATURES */
+    .features {
+      padding: 80px 48px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .section-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+    
+    .section-tag {
+      font-size: 12px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 5vw, 52px);
+      font-weight: 800;
+    }
+    
+    .section-title .hl {
+      color: var(--accent);
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    
+    .feature-card {
+      background: var(--bg);
+      padding: 40px 36px;
+      transition: background 0.3s;
+      cursor: pointer;
+    }
+    
+    .feature-card:hover {
+      background: var(--surface);
+    }
+    
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      border: 1px solid var(--border);
+      color: var(--accent);
+      border-radius: 16px;
+    }
+    
+    .feature-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    
+    .feature-desc {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text2);
+    }
+    
+    .feature-tag {
+      display: inline-block;
+      margin-top: 16px;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      background: rgba(0, 255, 255, 0.08);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      color: var(--accent);
+      border-radius: 20px;
+    }
+    
+    /* AI SECTION */
+    .ai-section {
+      padding: 80px 48px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .ai-showcase {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    
+    .ai-left {
+      background: var(--bg);
+      padding: 48px;
+    }
+    
+    .ai-right {
+      background: var(--surface);
+      padding: 48px;
+    }
+    
+    .ai-title {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 4vw, 42px);
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+    
+    .ai-title em {
+      color: var(--accent2);
+      font-style: normal;
+    }
+    
+    .ai-desc {
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text2);
+      margin-bottom: 32px;
+    }
+    
+    .model-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    
+    .mbadge {
+      padding: 8px 18px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      border: 1px solid;
+      border-radius: 40px;
+      cursor: pointer;
+    }
+    
+    .mbadge.a {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0, 255, 255, 0.06);
+    }
+    
+    .mbadge.b {
+      border-color: var(--accent2);
+      color: var(--accent2);
+      background: rgba(0, 255, 136, 0.06);
+    }
+    
+    .mbadge.c {
+      border-color: var(--purple);
+      color: var(--purple);
+      background: rgba(168, 85, 247, 0.06);
+    }
+    
+    .ai-chat-msg {
+      padding: 20px;
+      border-left: 3px solid;
+      font-size: 13px;
+      line-height: 1.7;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .ai-chat-msg.user {
+      border-color: var(--text3);
+      color: var(--text2);
+    }
+    
+    .ai-chat-msg.bot {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+    
+    .ai-chat-code {
+      background: rgba(0, 255, 255, 0.05);
+      border: 1px solid rgba(0, 255, 255, 0.15);
+      padding: 12px 16px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--accent2);
+      white-space: pre;
+      overflow-x: auto;
+      border-radius: 8px;
+    }
+    
+    /* TECH STACK */
+    .tech-section {
+      padding: 50px 48px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+    
+    .tech-scroll {
+      display: flex;
+      gap: 40px;
+      animation: scroll-left 25s linear infinite;
+      white-space: nowrap;
+    }
+    
+    .tech-scroll:hover {
+      animation-play-state: paused;
+    }
+    
+    @keyframes scroll-left {
+      from {
+        transform: translateX(0);
+      }
+      to {
+        transform: translateX(-50%);
+      }
+    }
+    
+    .tech-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      border: 1px solid var(--border);
+      color: var(--text3);
+      font-size: 13px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      border-radius: 40px;
+      transition: all 0.2s;
+    }
+    
+    .tech-item:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .tech-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent2);
+      border-radius: 50%;
+    }
+    
+    /* PRICING */
+    .pricing {
+      padding: 80px 48px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    
+    .price-card {
+      background: var(--bg);
+      padding: 40px 36px;
+      position: relative;
+    }
+    
+    .price-card.featured {
+      background: var(--surface);
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+    
+    .price-tier {
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 16px;
+    }
+    
+    .price-amount {
+      font-family: var(--font-display);
+      font-size: 52px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    
+    .price-amount span {
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--text3);
+    }
+    
+    .price-features {
+      list-style: none;
+      margin: 24px 0;
+    }
+    
+    .price-features li {
+      padding: 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text2);
+    }
+    
+    .price-features li::before {
+      content: "▸";
+      color: var(--accent2);
+    }
+    
+    .price-badge {
+      position: absolute;
+      top: -12px;
+      right: 24px;
+      padding: 4px 16px;
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      color: var(--bg);
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 700;
+      border-radius: 40px;
+    }
+    
+    /* TESTIMONIALS */
+    .testimonials {
+      padding: 80px 48px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    
+    .testimonial {
+      background: var(--bg);
+      padding: 32px;
+      transition: background 0.3s;
+    }
+    
+    .testimonial:hover {
+      background: var(--surface);
+    }
+    
+    .stars {
+      color: var(--gold);
+      font-size: 14px;
+      margin-bottom: 16px;
+      letter-spacing: 3px;
+    }
+    
+    .testimonial-text {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text2);
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+    
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .author-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    
+    .author-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .author-title {
+      font-size: 11px;
+      color: var(--text3);
+    }
+    
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 60px 48px 40px;
+      background: var(--bg2);
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      max-width: 1400px;
+      margin: 0 auto 48px;
+    }
+    
+    .footer-col h4 {
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 20px;
+    }
+    
+    .footer-col ul {
+      list-style: none;
+    }
+    
+    .footer-col li {
+      margin-bottom: 10px;
+    }
+    
+    .footer-col a {
+      color: var(--text2);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+    
+    .footer-col a:hover {
+      color: var(--accent);
+    }
+    
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .footer-copy {
+      font-size: 12px;
+      color: var(--text3);
+    }
+    
+    .footer-copy span {
+      color: var(--accent);
+    }
+    
+    .footer-badges {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .badge {
+      padding: 6px 14px;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border: 1px solid var(--border);
+      color: var(--text3);
+      border-radius: 30px;
+    }
+    
+    .badge.live {
+      border-color: var(--accent2);
+      color: var(--accent2);
+    }
+    
+    .support-footer {
+      margin-top: 20px;
+      text-align: center;
+    }
+    
+    .support-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      background: rgba(0, 255, 255, 0.1);
+      border: 1px solid var(--accent);
+      border-radius: 40px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 13px;
+    }
+    
+    .support-link:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+    
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 10, 15, 0.95);
+      z-index: 1000;
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-overlay.open {
+      display: flex;
+    }
+    
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      width: 480px;
+      max-width: 90vw;
+      padding: 32px;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 24px;
+    }
+    
+    .modal-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    
+    .modal-tab {
+      flex: 1;
+      padding: 12px;
+      background: none;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text3);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    
+    .modal-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 14px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .form-row .form-input {
+      margin-bottom: 0;
+    }
+    
+    /* DASHBOARD (SİM SİYAH TAM EKRAN) */
+    .dashboard-container {
+      min-height: 100vh;
+      background: #000000;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10000;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    
+    .dashboard-container::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 120% 60% at 50% 0%, rgba(0, 255, 255, 0.05) 0%, transparent 60%);
+      z-index: -1;
+    }
+    
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 32px;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-radius: 16px 16px 0 0;
+    }
+    
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 24px;
+      padding: 24px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    
+    .dashboard-card {
+      background: rgba(17, 17, 17, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      transition: 0.2s;
+    }
+    
+    .dashboard-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+    }
+    
+    .dashboard-card h3 {
+      color: var(--accent);
+      margin-bottom: 20px;
+      font-size: 18px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+    
+    .dashboard-card h4 {
+      color: var(--accent2);
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+    
+    .neon-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    
+    .neon-stat {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    
+    .neon-stat .number {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    
+    .neon-stat .label {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 4px;
+    }
+    
+    .project-list, .inbox-list, .user-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .project-item {
+      background: #0a0a0a;
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-left: 3px solid var(--accent);
+    }
+    
+    .user-item {
+      background: #0a0a0a;
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .user-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .user-actions button {
+      padding: 6px 12px;
+      font-size: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    
+    .user-actions button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .group-chat {
+      height: 200px;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .group-chat-message {
+      padding: 8px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    
+    .group-chat-input {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .group-chat-input input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px;
+      border-radius: 30px;
+    }
+    
+    .ai-chat-messages {
+      height: 250px;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .ai-message {
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      border-radius: 20px;
+      font-size: 13px;
+    }
+    
+    .ai-message.user {
+      background: rgba(0, 255, 255, 0.1);
+      text-align: right;
+    }
+    
+    .ai-message.bot {
+      background: rgba(0, 255, 136, 0.05);
+      border-left: 3px solid var(--accent2);
+    }
+    
+    .ai-input-area {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .ai-input-area input,
+    .ai-input-area textarea {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px;
+      border-radius: 30px;
+    }
+    
+    .glow-input {
+      background: var(--bg);
+      border: 1px solid var(--accent);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 30px;
+      font-size: 12px;
+    }
+    
+    /* DOWNLOAD MENU */
+    .download-menu {
+      position: fixed;
+      bottom: 100px;
+      right: 20px;
+      z-index: 1000;
+    }
+    
+    .download-btn {
+      width: 55px;
+      height: 55px;
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 24px;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+      transition: transform 0.2s;
+    }
+    
+    .download-btn:hover {
+      transform: scale(1.1);
+    }
+    
+    .download-options {
+      position: absolute;
+      bottom: 65px;
+      right: 0;
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: 16px;
+      padding: 10px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 180px;
+    }
+    
+    .download-options.open {
+      display: flex;
+    }
+    
+    .download-options a {
+      padding: 10px 15px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 12px;
+      cursor: pointer;
+      text-align: center;
+    }
+    
+    /* AI WIDGET */
+    .ai-widget {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      z-index: 500;
+    }
+    
+    .ai-widget-btn {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      border-radius: 50%;
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    @keyframes glow {
+      0%, 100% {
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 40px rgba(0, 255, 255, 0.6);
+      }
+    }
+    
+    .ai-widget-btn:hover {
+      transform: scale(1.1);
+    }
+    
+    .ai-panel {
+      display: none;
+      position: absolute;
+      bottom: 70px;
+      right: 0;
+      width: 340px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    
+    .ai-panel.open {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .ai-messages {
+      height: 240px;
+      overflow-y: auto;
+      padding: 16px;
+    }
+    
+    .ai-msg {
+      padding: 10px 14px;
+      font-size: 12px;
+      line-height: 1.6;
+      max-width: 85%;
+      border-radius: 18px;
+    }
+    
+    .ai-msg.bot {
+      background: rgba(0, 255, 255, 0.08);
+      color: var(--text2);
+      align-self: flex-start;
+    }
+    
+    .ai-msg.user {
+      background: rgba(0, 255, 136, 0.08);
+      color: var(--text2);
+      align-self: flex-end;
+      text-align: right;
+    }
+    
+    .ai-input-area {
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+    }
+    
+    .ai-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px;
+      border-radius: 30px;
+      font-size: 12px;
+    }
+    
+    .ai-send {
+      padding: 8px 16px;
+      background: var(--accent);
+      border: none;
+      color: var(--bg);
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    
+    .ai-suggestions {
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .ai-suggestion {
+      padding: 6px 14px;
+      font-size: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text3);
+      border-radius: 30px;
+      cursor: pointer;
+    }
+    
+    .ai-suggestion:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .auth-panel-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 10, 15, 0.98);
+      backdrop-filter: blur(12px);
+      z-index: 1500;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .auth-panel-overlay.open {
+      display: flex;
+    }
+    
+    .auth-panel {
+      background: var(--surface);
+      border: 2px solid var(--accent);
+      border-radius: 24px;
+      padding: 40px;
+      width: 400px;
+      max-width: 90%;
+      text-align: center;
+    }
+    
+    .auth-panel input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: white;
+      border-radius: 30px;
+    }
+    
+    .auth-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      justify-content: center;
+    }
+    
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav {
+        padding: 0 20px;
+        flex-wrap: wrap;
+        height: auto;
+        padding: 12px 20px;
+        gap: 12px;
+      }
+      .nav-links {
+        gap: 16px;
+      }
+      .nav-links a {
+        font-size: 10px;
+      }
+      .hero {
+        padding: 140px 20px 60px;
+      }
+      .hero-title {
+        font-size: clamp(32px, 7vw, 48px);
+      }
+      .stats-bar {
+        flex-direction: column;
+        border-radius: 20px;
+      }
+      .stat-item {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .features, .ai-section, .pricing, .testimonials {
+        padding: 40px 20px;
+      }
+      .ai-showcase {
+        grid-template-columns: 1fr;
+      }
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        padding: 16px;
+      }
+      .dashboard-header {
+        flex-direction: column;
+        gap: 12px;
+      }
+      .custom-cursor, .custom-cursor-ring {
+        display: none;
+      }
+      .notification {
+        bottom: 20px;
+        left: 20px;
+        max-width: 280px;
+        font-size: 11px;
+      }
+      .download-menu {
+        bottom: 80px;
+      }
+      .query-limit-badge {
+        bottom: 80px;
+        left: 10px;
+        font-size: 9px;
+        padding: 4px 10px;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="custom-cursor" id="customCursor"></div>
-<div class="custom-cursor-ring" id="customCursorRing"></div>
-<div class="progress-bar-top" id="progressBar"></div>
-<div class="grid-lines"></div>
-<div class="particles" id="particles"></div>
-<div class="query-limit-badge" id="queryLimitBadge">🔍 Kalan Sorgu: <span id="remainingQueries">20</span></div>
+  <!-- CURSOR -->
+  <div class="custom-cursor" id="customCursor"></div>
+  <div class="custom-cursor-ring" id="customCursorRing"></div>
 
-<div class="office-bg">
-  <img class="office-img" src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&q=80" alt="Office">
-  <div class="office-overlay"></div>
-</div>
+  <!-- PROGRESS BAR -->
+  <div class="progress-bar-top" id="progressBar"></div>
 
-<!-- ============================================================ -->
-<!-- MAIN SITE (Giriş yapılmamışken) -->
-<!-- ============================================================ -->
-<div id="mainSite">
-  <nav>
-    <div class="logo"><div class="logo-icon">✨</div><div class="logo-text">VİZYON 2027</div></div>
-    <ul class="nav-links">
-      <li><a href="#features">Özellikler</a></li>
-      <li><a href="#ai">Yapay Zeka</a></li>
-      <li><a href="#pricing">Fiyatlar</a></li>
-    </ul>
-    <div class="button-group">
-      <div class="secret-buttons">
-        <button class="secret-btn" onclick="showAuthPanel('FOUNDER')">👑 FOUNDER</button>
-        <button class="secret-btn" onclick="showAuthPanel('ADMIN')">⚙️ ADMIN</button>
-        <button class="secret-btn" onclick="showAuthPanel('BETA')">🔬 BETA</button>
-      </div>
-      <button class="nav-cta" id="loginBtn" onclick="openModal('login')">Giriş Yap</button>
-      <button class="btn-primary-small" id="registerBtn" onclick="openModal('register')">Ücretsiz Başla</button>
-      <button class="logout-btn" id="logoutBtn" onclick="handleLogout()" style="display:none;">🚪 Çıkış</button>
-    </div>
-  </nav>
+  <!-- NOTIFICATION -->
+  <div class="notification" id="notification"><span>🟢 Vizyon 2027</span> Sistemi Aktif!</div>
 
-  <section class="hero">
-    <div class="hero-badge"><div class="blink"></div>VİZYON AI | Dünyanın En Güçlü Yapay Zekası</div>
-    <h1 class="hero-title">
-      <span class="line1">VİZYON AI</span>
-      <span class="line2">SINIRSIZ YETENEK</span>
-      <span class="line3">Her dilde kod · Web arama · Dosya analiz · Takım Çalışması</span>
-    </h1>
-    <p class="hero-sub">⚡ VİZYON AI ile her dili konuş, her kodu yaz, takımınla çalış, projelerini yönet.</p>
-    <div class="hero-actions">
-      <button class="btn-primary" onclick="openVizyonAI()">⚡ VİZYON AI'ı Başlat</button>
-      <button class="btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Daha Fazla →</button>
-    </div>
-    <div class="stats-bar">
-      <div class="stat-item"><span class="stat-num" id="counter1">0</span><div class="stat-label">Aktif Kullanıcı</div></div>
-      <div class="stat-item"><span class="stat-num" id="counter2">0</span><div class="stat-label">AI Sorgusu</div></div>
-      <div class="stat-item"><span class="stat-num" id="counter3">0</span><div class="stat-label">Proje Tamamlandı</div></div>
-    </div>
-    <div class="scroll-indicator">
-      <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
-      <span>Aşağı kaydır</span>
-    </div>
-  </section>
+  <!-- GRID & PARTICLES -->
+  <div class="grid-lines"></div>
+  <div class="particles" id="particles"></div>
 
-  <!-- EDITOR PREVIEW -->
-  <div class="editor-preview">
-    <div class="editor-window">
-      <div class="editor-titlebar"><div class="editor-dot red"></div><div class="editor-dot yellow"></div><div class="editor-dot green"></div><span class="editor-filename">vizyon2027/ai_core.py</span></div>
-      <div class="editor-body">
-        <div class="code-line"><span class="ln">1</span><span class="code"><span class="cm"># VİZYON AI — Süper Yapay Zeka</span></span></div>
-        <div class="code-line"><span class="ln">2</span><span class="code"><span class="kw">from</span> vizyon_ai <span class="kw">import</span> <span class="fn">SuperAI</span></div>
-        <div class="code-line"><span class="ln">3</span><span class="code"></span></div>
-        <div class="code-line"><span class="ln">4</span><span class="code">ai = <span class="fn">SuperAI</span>()</div>
-        <div class="code-line"><span class="ln">5</span><span class="code">ai.<span class="fn">birleştir</span>(<span class="str">"GPT-4o"</span>, <span class="str">"Claude"</span>, <span class="str">"Gemini"</span>, <span class="str">"DeepSeek"</span>)</div>
-        <div class="code-line"><span class="ln">6</span><span class="code">cevap = ai.<span class="fn">kod_yaz</span>(<span class="str">"Python'da hesap makinesi"</span>)</div>
-        <div class="code-line"><span class="ln">7</span><span class="code"><span class="fn">print</span>(cevap)  <span class="cm"># Tam çalışan kod gelir!</span></div>
-      </div>
-    </div>
+  <!-- SORGU LIMIT GOSTERGESI -->
+  <div class="query-limit-badge" id="queryLimitBadge">🔍 Kalan Sorgu: <span id="remainingQueries">20</span></div>
+
+  <!-- OFFICE BACKGROUND -->
+  <div class="office-bg">
+    <img class="office-img"
+      src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&q=80"
+      alt="Office">
+    <div class="office-overlay"></div>
   </div>
 
-  <!-- FEATURES -->
-  <section class="features" id="features">
-    <div class="section-header"><div class="section-tag">// özellikler</div><h2 class="section-title">VİZYON AI <span class="hl">Gücü</span></h2></div>
-    <div class="features-grid">
-      <div class="feature-card"><div class="feature-icon">🤖</div><div class="feature-title">7 Model Tek Çatı</div><p class="feature-desc">GPT-4o, Claude, Gemini, DeepSeek, Llama, Mistral hepsi birleşti.</p></div>
-      <div class="feature-card"><div class="feature-icon">⚡</div><div class="feature-title">Anlık Kod Üretimi</div><p class="feature-desc">Python, React, HTML, SQL, Docker her dilde çalışan kod.</p></div>
-      <div class="feature-card"><div class="feature-icon">🌐</div><div class="feature-title">Canlı Web Arama</div><p class="feature-desc">SerpApi ile dolar kuru, haberler, anlık bilgiler.</p></div>
-      <div class="feature-card"><div class="feature-icon">👥</div><div class="feature-title">Takım Çalışması</div><p class="feature-desc">Takım kur, üye ekle, ortak projeler ve takım sohbeti.</p></div>
-      <div class="feature-card"><div class="feature-icon">💰</div><div class="feature-title">SaaS & Freelance</div><p class="feature-desc">Para kazandıran iş fikirleri, kariyer yol haritası.</p></div>
-      <div class="feature-card"><div class="feature-icon">🔧</div><div class="feature-title">Hata Düzeltme</div><p class="feature-desc">Kodunu yapıştır, hatayı bul, düzelt, çalıştır.</p></div>
-    </div>
-  </section>
-
-  <!-- AI SECTION -->
-  <section class="ai-section" id="ai">
-    <div class="section-header"><div class="section-tag">// yapay zeka</div><h2 class="section-title">Tüm AI Modelleri<br><span class="hl">Tek Yerde</span></h2></div>
-    <div class="ai-showcase">
-      <div class="ai-left">
-        <h3 class="ai-title">Kod yaz,<br><em>anlık öğren,</em><br>büyü.</h3>
-        <p class="ai-desc">Dünyanın en güçlü AI modellerini tek platformda birleştirdik.</p>
-        <div class="model-row"><span class="mbadge a" onclick="openVizyonAI()">⚡ VİZYON AI</span><span class="mbadge a">GPT-4o</span><span class="mbadge b">Claude</span><span class="mbadge c">Gemini</span><span class="mbadge a">DeepSeek</span><span class="mbadge b">Llama</span><span class="mbadge c">Mistral</span></div>
-        <button class="btn-primary" onclick="openVizyonAI()">⚡ VİZYON AI ile Kod Yaz →</button>
+  <!-- ============================================================ -->
+  <!-- MAIN SITE (Giriş yapılmamışken) -->
+  <!-- ============================================================ -->
+  <div id="mainSite">
+    <nav>
+      <div class="logo">
+        <div class="logo-icon">✨</div>
+        <div class="logo-text">VİZYON 2027</div>
       </div>
-      <div class="ai-right">
-        <div class="ai-chat-msg user"><div class="role">// kullanıcı</div>Python ile REST API nasıl yazarım?</div>
-        <div class="ai-chat-msg bot"><div class="role">⚡ VİZYON AI</div>FastAPI ile şöyle yapılır:<div class="ai-chat-code">from fastapi import FastAPI\napp = FastAPI()\n\n@app.get("/")\ndef root():\n    return {"message": "VİZYON AI"}\n\n# uvicorn main:app --reload</div></div>
+      <ul class="nav-links">
+        <li><a href="#features">Özellikler</a></li>
+        <li><a href="#ai">Yapay Zeka</a></li>
+        <li><a href="#pricing">Fiyatlar</a></li>
+      </ul>
+      <div class="button-group">
+        <div class="secret-buttons">
+          <button class="secret-btn" onclick="showAuthPanel('FOUNDER')">👑 FOUNDER</button>
+          <button class="secret-btn" onclick="showAuthPanel('ADMIN')">⚙️ ADMIN</button>
+          <button class="secret-btn" onclick="showAuthPanel('BETA')">🔬 BETA</button>
+        </div>
+        <button class="nav-cta" id="loginBtn" onclick="openModal('login')">Giriş Yap</button>
+        <button class="btn-primary-small" id="registerBtn" onclick="openModal('register')">Ücretsiz
+          Başla</button>
+        <button class="logout-btn" id="logoutBtn" onclick="handleLogout()" style="display: none;">🚪
+          Çıkış</button>
       </div>
-    </div>
-  </section>
+    </nav>
 
-  <!-- TECH STACK -->
-  <div class="tech-section">
-    <div class="tech-scroll">
-      <div class="tech-item"><div class="tech-dot"></div>Python</div>
-      <div class="tech-item"><div class="tech-dot"></div>JavaScript</div>
-      <div class="tech-item"><div class="tech-dot"></div>TypeScript</div>
-      <div class="tech-item"><div class="tech-dot"></div>React</div>
-      <div class="tech-item"><div class="tech-dot"></div>Next.js</div>
-      <div class="tech-item"><div class="tech-dot"></div>FastAPI</div>
-      <div class="tech-item"><div class="tech-dot"></div>Docker</div>
-      <div class="tech-item"><div class="tech-dot"></div>PostgreSQL</div>
-      <div class="tech-item"><div class="tech-dot"></div>Redis</div>
-      <div class="tech-item"><div class="tech-dot"></div>GraphQL</div>
-      <div class="tech-item"><div class="tech-dot"></div>TensorFlow</div>
-      <div class="tech-item"><div class="tech-dot"></div>PyTorch</div>
-      <div class="tech-item"><div class="tech-dot"></div>Python</div>
-      <div class="tech-item"><div class="tech-dot"></div>JavaScript</div>
-      <div class="tech-item"><div class="tech-dot"></div>TypeScript</div>
-      <div class="tech-item"><div class="tech-dot"></div>React</div>
-      <div class="tech-item"><div class="tech-dot"></div>Next.js</div>
-      <div class="tech-item"><div class="tech-dot"></div>FastAPI</div>
-      <div class="tech-item"><div class="tech-dot"></div>Docker</div>
-      <div class="tech-item"><div class="tech-dot"></div>PostgreSQL</div>
-      <div class="tech-item"><div class="tech-dot"></div>Redis</div>
-      <div class="tech-item"><div class="tech-dot"></div>GraphQL</div>
-      <div class="tech-item"><div class="tech-dot"></div>TensorFlow</div>
-      <div class="tech-item"><div class="tech-dot"></div>PyTorch</div>
-    </div>
-  </div>
-
-  <!-- PRICING -->
-  <section class="pricing" id="pricing">
-    <div class="section-header"><div class="section-tag">// fiyatlandırma</div><h2 class="section-title">Sıfırdan Başla,<br><span class="hl">Büyü</span></h2></div>
-    <div class="pricing-grid">
-      <div class="price-card"><div class="price-tier">Ücretsiz</div><div class="price-amount">₺0<span>/ay</span></div><ul class="price-features"><li>20 AI sorgusu / gün</li><li>3 proje limiti</li><li>Demo web arama</li><li>Topluluk desteği</li></ul><button class="btn-price" onclick="openModal('register')">Ücretsiz Başla</button></div>
-      <div class="price-card featured"><div class="price-badge">En Popüler</div><div class="price-tier">Pro Geliştirici</div><div class="price-amount">₺299<span>/ay</span></div><ul class="price-features"><li>2000 AI sorgu/gün</li><li>Sınırsız proje</li><li>Canlı web arama</li><li>Dosya yükleme</li><li>Öncelikli destek</li></ul><button class="btn-price" onclick="buyPackage('pro')">Pro'ya Geç</button></div>
-      <div class="price-card"><div class="price-tier">Takım</div><div class="price-amount">₺899<span>/ay</span></div><ul class="price-features"><li>Sınırsız AI sorgu</li><li>100 takım üyesi</li><li>Takım masası ve sohbet</li><li>Ortak projeler</li><li>API erişimi</li></ul><button class="btn-price" onclick="buyPackage('team')">Takım Kur</button></div>
-    </div>
-  </section>
-
-  <!-- TESTIMONIALS -->
-  <section class="testimonials">
-    <div class="section-header"><div class="section-tag">// kullanıcılar</div><h2 class="section-title">Gerçek <span class="hl">Sonuçlar</span></h2></div>
-    <div class="testimonials-grid">
-      <div class="testimonial"><div class="stars">★★★★★</div><div class="testimonial-text">VİZYON AI sayesinde 2 ayda ilk SaaS ürünümü çıkardım. Aylık 15,000 TL gelir.</div><div class="testimonial-author"><div class="author-avatar">AK</div><div><div class="author-name">Ahmet Kaya</div><div class="author-title">Indie Hacker</div></div></div></div>
-      <div class="testimonial"><div class="stars">★★★★★</div><div class="testimonial-text">"Dolar kaç" dedim, anında güncel kuru getirdi. Web arama mükemmel çalışıyor!</div><div class="testimonial-author"><div class="author-avatar">FD</div><div><div class="author-name">Fatma Demir</div><div class="author-title">CTO</div></div></div></div>
-      <div class="testimonial"><div class="stars">★★★★★</div><div class="testimonial-text">Freelance işlerimi VİZYON AI ile kodluyorum, ayda 25,000 TL kazanıyorum.</div><div class="testimonial-author"><div class="author-avatar">ME</div><div><div class="author-name">Muhammed Eymen</div><div class="author-title">Freelancer</div></div></div></div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-grid">
-      <div class="footer-brand"><div class="logo-text" style="font-size:22px;">VİZYON 2027</div><p style="margin-top:10px;">Dünyanın en güçlü yapay zeka ekosistemi.</p></div>
-      <div class="footer-col"><h4>Platform</h4><ul><li><a href="#">VİZYON AI</a></li><li><a href="#">Kod Editörü</a></li><li><a href="#">API</a></li></ul></div>
-      <div class="footer-col"><h4>Kaynaklar</h4><ul><li><a href="#">Dokümantasyon</a></li><li><a href="#">Topluluk</a></li><li><a href="#">Blog</a></li></ul></div>
-      <div class="footer-col"><h4>Şirket</h4><ul><li><a href="#">Hakkımızda</a></li><li><a href="#">Kariyer</a></li><li><a href="#">İletişim</a></li></ul></div>
-    </div>
-    <div class="footer-bottom"><div class="footer-copy">© 2027 Vizyon2027. <span>Muhammed Eymen</span> güvencesiyle.</div><div class="footer-badges"><span class="badge live">● Sistem Aktif</span><span class="badge">v13.0</span></div></div>
-    <div class="support-footer"><a href="mailto:turkmenmuhammedeymen@gmail.com" class="support-link">📧 DESTEK & İLETİŞİM</a></div>
-  </footer>
-</div>
-
-<!-- ============================================================ -->
-<!-- DASHBOARD (Giriş yapınca SİM SİYAH TAM EKRAN) -->
-<!-- ============================================================ -->
-<div id="dashboardArea" style="display: none;">
-  <div class="dashboard-container">
-    <div class="dashboard-header">
-      <div class="logo"><div class="logo-icon">✨</div><div class="logo-text">VİZYON 2027</div></div>
-      <div class="user-info">
-        <span id="dashboardUserName"></span>
-        <span id="userRoleBadge" class="badge"></span>
-        <button class="btn-secondary" id="profileBtn">👤 Profil</button>
-        <button class="logout-btn" id="dashboardLogoutBtn">Çıkış</button>
+    <section class="hero">
+      <div class="hero-badge">
+        <div class="blink"></div>VİZYON AI | Dünyanın En Güçlü Yapay Zekası
       </div>
-    </div>
-    <div class="dashboard-grid">
-      <!-- VİZYON AI ASİSTAN -->
-      <div class="dashboard-card">
-        <h3>🤖 VİZYON AI ASİSTAN</h3>
-        <div id="dashboardAiMessages" class="ai-chat-messages"><div class="ai-message bot">Merhaba! Size nasıl yardımcı olabilirim?</div></div>
-        <div class="ai-input-area">
-          <input type="text" id="dashboardAiInput" placeholder="AI'ya sor..." class="glow-input">
-          <button class="btn-primary" id="dashboardAiSendBtn">Gönder</button>
-          <input type="file" id="dashboardFileInput" style="display:none">
-          <button class="file-upload-btn" onclick="document.getElementById('dashboardFileInput').click()">📎</button>
+      <h1 class="hero-title">
+        <span class="line1">VİZYON AI</span>
+        <span class="line2">SINIRSIZ YETENEK</span>
+        <span class="line3">Her dilde kod · Web arama · Dosya analiz · Takım Çalışması</span>
+      </h1>
+      <p class="hero-sub">⚡ VİZYON AI ile her dili konuş, her kodu yaz, takımınla çalış, projelerini
+        yönet.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="openVizyonAI()">⚡ VİZYON AI'ı Başlat</button>
+        <button class="btn-secondary"
+          onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Daha Fazla
+          →</button>
+      </div>
+      <div class="stats-bar">
+        <div class="stat-item"><span class="stat-num" id="counter1">0</span><div
+            class="stat-label">Aktif Kullanıcı</div></div>
+        <div class="stat-item"><span class="stat-num" id="counter2">0</span><div
+            class="stat-label">AI Sorgusu</div></div>
+        <div class="stat-item"><span class="stat-num" id="counter3">0</span><div
+            class="stat-label">Proje Tamamlandı</div></div>
+      </div>
+      <div class="scroll-indicator">
+        <div class="scroll-mouse">
+          <div class="scroll-wheel"></div>
+        </div>
+        <span>Aşağı kaydır</span>
+      </div>
+    </section>
+
+    <!-- EDITOR PREVIEW -->
+    <div class="editor-preview">
+      <div class="editor-window">
+        <div class="editor-titlebar">
+          <div class="editor-dot red"></div>
+          <div class="editor-dot yellow"></div>
+          <div class="editor-dot green"></div>
+          <span class="editor-filename">vizyon2027/ai_core.py</span>
+        </div>
+        <div class="editor-body">
+          <div class="code-line"><span class="ln">1</span><span class="code"><span class="cm"># VİZYON AI
+                — Süper Yapay Zeka</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code"><span class="kw">from</span>
+              vizyon_ai <span class="kw">import</span> <span class="fn">SuperAI</span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code"></span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code">ai = <span
+                class="fn">SuperAI</span>()</div>
+          <div class="code-line"><span class="ln">5</span><span class="code">ai.<span
+                class="fn">birleştir</span>(<span class="str">"GPT-4o"</span>, <span
+                class="str">"Claude"</span>, <span class="str">"Gemini"</span>, <span
+                class="str">"DeepSeek"</span>)</div>
+          <div class="code-line"><span class="ln">6</span><span class="code">cevap = ai.<span
+                class="fn">kod_yaz</span>(<span class="str">"Python'da hesap makinesi"</span>)</div>
+          <div class="code-line"><span class="ln">7</span><span class="code"><span
+                class="fn">print</span>(cevap) <span class="cm"># Tam çalışan kod gelir!</span></div>
         </div>
       </div>
-      
-      <!-- PROJELER -->
-      <div class="dashboard-card">
-        <h3>📁 PROJELERİM</h3>
-        <div class="neon-stats">
-          <div class="neon-stat"><span class="number" id="projectCount">0</span><span class="label">Toplam</span></div>
-          <div class="neon-stat"><span class="number" id="favCount">0</span><span class="label">Favori</span></div>
-          <div class="neon-stat"><span class="number" id="archiveCount">0</span><span class="label">Arşiv</span></div>
+    </div>
+
+    <!-- FEATURES -->
+    <section class="features" id="features">
+      <div class="section-header">
+        <div class="section-tag">// özellikler</div>
+        <h2 class="section-title">VİZYON AI <span class="hl">Gücü</span></h2>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <div class="feature-title">7 Model Tek Çatı</div>
+          <p class="feature-desc">GPT-4o, Claude, Gemini, DeepSeek, Llama, Mistral hepsi birleşti.</p>
         </div>
-        <button class="btn-primary-small" id="newProjectBtn" style="margin-bottom:12px">+ Yeni Proje</button>
-        <div id="projectsList" class="project-list"></div>
-      </div>
-      
-      <!-- GELEN KUTUSU -->
-      <div class="dashboard-card">
-        <h3>📬 GELEN KUTUSU</h3>
-        <div id="inboxList" class="inbox-list"></div>
-        <div style="margin-top:16px"><h4>🎁 HEDİYE PAKETLERİ</h4><div id="giftsList" class="inbox-list"></div></div>
-      </div>
-      
-      <!-- GRUP SİSTEMİ -->
-      <div class="dashboard-card" id="groupSection" style="display:none">
-        <h3>👥 GRUP</h3>
-        <div id="groupInfo"></div>
-        <div id="groupChatMessages" class="group-chat"></div>
-        <div class="group-chat-input">
-          <input type="text" id="groupChatInput" placeholder="Gruba mesaj yaz...">
-          <button class="btn-primary-small" onclick="sendGroupMessage()">Gönder</button>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-title">Anlık Kod Üretimi</div>
+          <p class="feature-desc">Python, React, HTML, SQL, Docker her dilde çalışan kod.</p>
         </div>
-        <div style="margin-top:12px"><h4>📁 GRUP PROJELERİ</h4><div id="groupProjectsList" class="project-list"></div><div style="margin-top:8px; display:flex; gap:8px"><input type="text" id="newGroupProjectName" placeholder="Yeni proje adı" class="glow-input" style="flex:1"><button class="btn-primary-small" onclick="addGroupProject()">Ekle</button></div></div>
+        <div class="feature-card">
+          <div class="feature-icon">🌐</div>
+          <div class="feature-title">Canlı Web Arama</div>
+          <p class="feature-desc">SerpApi ile dolar kuru, haberler, anlık bilgiler.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">👥</div>
+          <div class="feature-title">Takım Çalışması</div>
+          <p class="feature-desc">Takım kur, üye ekle, ortak projeler ve takım sohbeti.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💰</div>
+          <div class="feature-title">SaaS & Freelance</div>
+          <p class="feature-desc">Para kazandıran iş fikirleri, kariyer yol haritası.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔧</div>
+          <div class="feature-title">Hata Düzeltme</div>
+          <p class="feature-desc">Kodunu yapıştır, hatayı bul, düzelt, çalıştır.</p>
+        </div>
       </div>
-      
-      <div class="dashboard-card" id="noGroupSection">
-        <h3>👥 GRUP</h3>
-        <p style="color:var(--text3); margin-bottom:16px">Henüz bir grubun yok. Grup kur veya davet al!</p>
-        <div style="display:flex; gap:12px; flex-wrap:wrap"><input type="text" id="newGroupName" placeholder="Grup adı" class="glow-input" style="flex:1"><button class="btn-primary" onclick="createGroup()">Grup Kur (₺899/ay)</button></div>
-        <div style="margin-top:16px"><h4>📨 BEKLEYEN DAVETLER</h4><div id="groupInvitesList" class="inbox-list"></div></div>
+    </section>
+
+    <!-- AI SECTION -->
+    <section class="ai-section" id="ai">
+      <div class="section-header">
+        <div class="section-tag">// yapay zeka</div>
+        <h2 class="section-title">Tüm AI Modelleri<br><span class="hl">Tek Yerde</span></h2>
       </div>
-      
-      <!-- ADMIN PANELİ -->
-      <div class="dashboard-card" id="adminPanel" style="display:none">
-        <h3>⚙️ YÖNETİM PANELİ</h3>
-        <div id="adminRoleInfo" style="color:var(--accent2); margin-bottom:12px"></div>
-        <div><h4>👥 TÜM KULLANICILAR</h4><input type="text" id="userSearch" placeholder="Kullanıcı ara..." class="glow-input" style="width:100%; margin-bottom:12px"><div id="adminUsersList" class="user-list" style="max-height:300px; overflow-y:auto"></div></div>
+      <div class="ai-showcase">
+        <div class="ai-left">
+          <h3 class="ai-title">Kod yaz,<br><em>anlık öğren,</em><br>büyü.</h3>
+          <p class="ai-desc">Dünyanın en güçlü AI modellerini tek platformda birleştirdik.</p>
+          <div class="model-row"><span class="mbadge a" onclick="openVizyonAI()">⚡ VİZYON AI</span><span
+              class="mbadge a">GPT-4o</span><span class="mbadge b">Claude</span><span
+              class="mbadge c">Gemini</span><span class="mbadge a">DeepSeek</span><span
+              class="mbadge b">Llama</span><span class="mbadge c">Mistral</span></div>
+          <button class="btn-primary" onclick="openVizyonAI()">⚡ VİZYON AI ile Kod Yaz →</button>
+        </div>
+        <div class="ai-right">
+          <div class="ai-chat-msg user">
+            <div class="role">// kullanıcı</div>Python ile REST API nasıl yazarım?
+          </div>
+          <div class="ai-chat-msg bot">
+            <div class="role">⚡ VİZYON AI</div>FastAPI ile şöyle yapılır:
+            <div class="ai-chat-code">from fastapi import FastAPI\napp = FastAPI()\n\n@app.get("/")\ndef
+              root():\n return {"message": "VİZYON AI"}\n\n# uvicorn main:app --reload</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TECH STACK -->
+    <div class="tech-section">
+      <div class="tech-scroll">
+        <div class="tech-item"><i class="fas fa-code tech-dot"></i>Python</div>
+        <div class="tech-item"><i class="fas fa-code tech-dot"></i>JavaScript</div>
+        <div class="tech-item"><i class="fas fa-code tech-dot"></i>TypeScript</div>
+        <div class="tech-item"><i class="fab fa-react tech-dot"></i>React</div>
+        <div class="tech-item"><i class="fab fa-node-js tech-dot"></i>Next.js</div>
+        <div class="tech-item"><i class="fas fa-bolt tech-dot"></i>FastAPI</div>
+        <div class="tech-item"><i class="fab fa-docker tech-dot"></i>Docker</div>
+        <div class="tech-item"><i class="fas fa-database tech-dot"></i>PostgreSQL</div>
+        <div class="tech-item"><i class="fas fa-memory tech-dot"></i>Redis</div>
+        <div class="tech-item"><i class="fas fa-chart-line tech-dot"></i>GraphQL</div>
+        <div class="tech-item"><i class="fas fa-brain tech-dot"></i>TensorFlow</div>
+        <div class="tech-item"><i class="fas fa-fire tech-dot"></i>PyTorch</div>
+        <div class="tech-item"><i class="fas fa-code tech-dot"></i>Python</div>
+        <div class="tech-item"><i class="fas fa-code tech-dot"></i>JavaScript</div>
+        <div class="tech-item"><i class="fas fa-code tech-dot"></i>TypeScript</div>
+        <div class="tech-item"><i class="fab fa-react tech-dot"></i>React</div>
+        <div class="tech-item"><i class="fab fa-node-js tech-dot"></i>Next.js</div>
+        <div class="tech-item"><i class="fas fa-bolt tech-dot"></i>FastAPI</div>
+        <div class="tech-item"><i class="fab fa-docker tech-dot"></i>Docker</div>
+        <div class="tech-item"><i class="fas fa-database tech-dot"></i>PostgreSQL</div>
+        <div class="tech-item"><i class="fas fa-memory tech-dot"></i>Redis</div>
+        <div class="tech-item"><i class="fas fa-chart-line tech-dot"></i>GraphQL</div>
+        <div class="tech-item"><i class="fas fa-brain tech-dot"></i>TensorFlow</div>
+        <div class="tech-item"><i class="fas fa-fire tech-dot"></i>PyTorch</div>
+      </div>
+    </div>
+
+    <!-- PRICING -->
+    <section class="pricing" id="pricing">
+      <div class="section-header">
+        <div class="section-tag">// fiyatlandırma</div>
+        <h2 class="section-title">Sıfırdan Başla,<br><span class="hl">Büyü</span></h2>
+      </div>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <div class="price-tier">Ücretsiz</div>
+          <div class="price-amount">₺0<span>/ay</span></div>
+          <ul class="price-features">
+            <li>20 AI sorgusu / gün</li>
+            <li>3 proje limiti</li>
+            <li>Demo web arama</li>
+            <li>Topluluk desteği</li>
+          </ul>
+          <button class="btn-price" onclick="openModal('register')">Ücretsiz Başla</button>
+        </div>
+        <div class="price-card featured">
+          <div class="price-badge">En Popüler</div>
+          <div class="price-tier">Pro Geliştirici</div>
+          <div class="price-amount">₺299<span>/ay</span></div>
+          <ul class="price-features">
+            <li>2000 AI sorgu/gün</li>
+            <li>Sınırsız proje</li>
+            <li>Canlı web arama</li>
+            <li>Dosya yükleme</li>
+            <li>Öncelikli destek</li>
+          </ul>
+          <button class="btn-price" onclick="buyPackage('pro')">Pro'ya Geç</button>
+        </div>
+        <div class="price-card">
+          <div class="price-tier">Takım</div>
+          <div class="price-amount">₺899<span>/ay</span></div>
+          <ul class="price-features">
+            <li>Sınırsız AI sorgu</li>
+            <li>100 takım üyesi</li>
+            <li>Takım masası ve sohbet</li>
+            <li>Ortak projeler</li>
+            <li>API erişimi</li>
+          </ul>
+          <button class="btn-price" onclick="buyPackage('team')">Takım Kur</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="testimonials">
+      <div class="section-header">
+        <div class="section-tag">// kullanıcılar</div>
+        <h2 class="section-title">Gerçek <span class="hl">Sonuçlar</span></h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial">
+          <div class="stars">★★★★★</div>
+          <div class="testimonial-text">VİZYON AI sayesinde 2 ayda ilk SaaS ürünümü çıkardım. Aylık 15,000 TL
+            gelir.</div>
+          <div class="testimonial-author">
+            <div class="author-avatar">AK</div>
+            <div>
+              <div class="author-name">Ahmet Kaya</div>
+              <div class="author-title">Indie Hacker</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <div class="stars">★★★★★</div>
+          <div class="testimonial-text">"Dolar kaç" dedim, anında güncel kuru getirdi. Web arama mükemmel
+            çalışıyor!</div>
+          <div class="testimonial-author">
+            <div class="author-avatar">FD</div>
+            <div>
+              <div class="author-name">Fatma Demir</div>
+              <div class="author-title">CTO</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <div class="stars">★★★★★</div>
+          <div class="testimonial-text">Freelance işlerimi VİZYON AI ile kodluyorum, ayda 25,000 TL
+            kazanıyorum.</div>
+          <div class="testimonial-author">
+            <div class="author-avatar">ME</div>
+            <div>
+              <div class="author-name">Muhammed Eymen</div>
+              <div class="author-title">Freelancer</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo-text" style="font-size: 22px;">VİZYON 2027</div>
+          <p style="margin-top: 10px;">Dünyanın en güçlü yapay zeka ekosistemi.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="#">VİZYON AI</a></li>
+            <li><a href="#">Kod Editörü</a></li>
+            <li><a href="#">API</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Kaynaklar</h4>
+          <ul>
+            <li><a href="#">Dokümantasyon</a></li>
+            <li><a href="#">Topluluk</a></li>
+            <li><a href="#">Blog</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Şirket</h4>
+          <ul>
+            <li><a href="#">Hakkımızda</a></li>
+            <li><a href="#">Kariyer</a></li>
+            <li><a href="#">İletişim</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-copy">© 2027 Vizyon2027. <span>Muhammed Eymen</span> güvencesiyle.</div>
+        <div class="footer-badges"><span class="badge live">● Sistem Aktif</span><span
+            class="badge">v13.0</span></div>
+      </div>
+      <div class="support-footer"><a href="mailto:turkmenmuhammedeymen@gmail.com" class="support-link">📧
+          DESTEK & İLETİŞİM</a></div>
+    </footer>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- DASHBOARD (Giriş yapınca SİM SİYAH TAM EKRAN) -->
+  <!-- ============================================================ -->
+  <div id="dashboardArea" style="display: none;">
+    <div class="dashboard-container">
+      <div class="dashboard-header">
+        <div class="logo">
+          <div class="logo-icon">✨</div>
+          <div class="logo-text">VİZYON 2027</div>
+        </div>
+        <div class="user-info">
+          <span id="dashboardUserName"></span>
+          <span id="userRoleBadge" class="badge"></span>
+          <button class="btn-secondary" id="profileBtn">👤 Profil</button>
+          <button class="logout-btn" id="dashboardLogoutBtn">Çıkış</button>
+        </div>
+      </div>
+      <div class="dashboard-grid">
+        <!-- VİZYON AI ASİSTAN -->
+        <div class="dashboard-card">
+          <h3>🤖 VİZYON AI ASİSTAN</h3>
+          <div id="dashboardAiMessages" class="ai-chat-messages">
+            <div class="ai-message bot">Merhaba! Size nasıl yardımcı olabilirim?</div>
+          </div>
+          <div class="ai-input-area">
+            <input type="text" id="dashboardAiInput" placeholder="AI'ya sor..." class="glow-input">
+            <button class="btn-primary" id="dashboardAiSendBtn">Gönder</button>
+            <input type="file" id="dashboardFileInput" style="display:none">
+            <button class="file-upload-btn"
+              onclick="document.getElementById('dashboardFileInput').click()">📎</button>
+          </div>
+        </div>
+
+        <!-- PROJELER -->
+        <div class="dashboard-card">
+          <h3>📁 PROJELERİM</h3>
+          <div class="neon-stats">
+            <div class="neon-stat"><span class="number" id="projectCount">0</span><span
+                class="label">Toplam</span></div>
+            <div class="neon-stat"><span class="number" id="favCount">0</span><span
+                class="label">Favori</span></div>
+            <div class="neon-stat"><span class="number" id="archiveCount">0</span><span
+                class="label">Arşiv</span></div>
+          </div>
+          <button class="btn-primary-small" id="newProjectBtn" style="margin-bottom:12px">+ Yeni Proje</button>
+          <div id="projectsList" class="project-list"></div>
+        </div>
+
+        <!-- GELEN KUTUSU -->
+        <div class="dashboard-card">
+          <h3>📬 GELEN KUTUSU</h3>
+          <div id="inboxList" class="inbox-list"></div>
+          <div style="margin-top:16px">
+            <h4>🎁 HEDİYE PAKETLERİ</h4>
+            <div id="giftsList" class="inbox-list"></div>
+          </div>
+        </div>
+
+        <!-- GRUP SİSTEMİ -->
+        <div class="dashboard-card" id="groupSection" style="display:none">
+          <h3>👥 GRUP</h3>
+          <div id="groupInfo"></div>
+          <div id="groupChatMessages" class="group-chat"></div>
+          <div class="group-chat-input">
+            <input type="text" id="groupChatInput" placeholder="Gruba mesaj yaz...">
+            <button class="btn-primary-small" onclick="sendGroupMessage()">Gönder</button>
+          </div>
+          <div style="margin-top:12px">
+            <h4>📁 GRUP PROJELERİ</h4>
+            <div id="groupProjectsList" class="project-list"></div>
+            <div style="margin-top:8px; display:flex; gap:8px">
+              <input type="text" id="newGroupProjectName" placeholder="Yeni proje adı" class="glow-input"
+                style="flex:1">
+              <button class="btn-primary-small" onclick="addGroupProject()">Ekle</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-card" id="noGroupSection">
+          <h3>👥 GRUP</h3>
+          <p style="color:var(--text3); margin-bottom:16px">Henüz bir grubun yok. Grup kur veya davet al!</p>
+          <div style="display:flex; gap:12px; flex-wrap:wrap">
+            <input type="text" id="newGroupName" placeholder="Grup adı" class="glow-input" style="flex:1">
+            <button class="btn-primary" onclick="createGroup()">Grup Kur (₺899/ay)</button>
+          </div>
+          <div style="margin-top:16px">
+            <h4>📨 BEKLEYEN DAVETLER</h4>
+            <div id="groupInvitesList" class="inbox-list"></div>
+          </div>
+        </div>
+
+        <!-- ADMIN PANELİ -->
+        <div class="dashboard-card" id="adminPanel" style="display:none">
+          <h3>⚙️ YÖNETİM PANELİ</h3>
+          <div id="adminRoleInfo" style="color:var(--accent2); margin-bottom:12px"></div>
+          <div>
+            <h4>👥 TÜM KULLANICILAR</h4>
+            <input type="text" id="userSearch" placeholder="Kullanıcı ara..." class="glow-input"
+              style="width:100%; margin-bottom:12px">
+            <div id="adminUsersList" class="user-list" style="max-height:300px; overflow-y:auto"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- ============================================================ -->
-<!-- MODALLAR -->
-<!-- ============================================================ -->
-<div class="modal-overlay" id="authModal" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
-    <div class="modal-header"><h3 id="modalTitle">Hesap Oluştur</h3><button class="modal-close" onclick="closeModal()">×</button></div>
-    <div class="modal-tabs"><button class="modal-tab" id="tabLogin" onclick="switchTab('login')">Giriş</button><button class="modal-tab active" id="tabRegister" onclick="switchTab('register')">Kayıt</button><button class="modal-tab" id="tabVerify" onclick="switchTab('verify')">Doğrula</button></div>
-    <div class="modal-body">
-      <div id="formRegister">
-        <div class="form-row"><input id="rName" placeholder="Ad" class="form-input"><input id="rSurname" placeholder="Soyad" class="form-input"></div>
-        <input id="rEmail" placeholder="E-posta" class="form-input">
-        <input id="rPass" type="password" placeholder="Şifre (8+)" class="form-input">
-        <input id="rPass2" type="password" placeholder="Şifre Tekrar" class="form-input">
-        <button class="btn-submit" onclick="handleRegister()">Kayıt Ol</button>
+  <!-- ============================================================ -->
+  <!-- MODALLAR -->
+  <!-- ============================================================ -->
+  <div class="modal-overlay" id="authModal" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Hesap Oluştur</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
       </div>
-      <div id="formLogin" style="display:none;">
-        <input id="lEmail" placeholder="E-posta" class="form-input">
-        <input id="lPass" type="password" placeholder="Şifre" class="form-input">
-        <button class="btn-submit" onclick="handleLogin()">Giriş Yap</button>
+      <div class="modal-tabs">
+        <button class="modal-tab" id="tabLogin" onclick="switchTab('login')">Giriş</button>
+        <button class="modal-tab active" id="tabRegister" onclick="switchTab('register')">Kayıt</button>
+        <button class="modal-tab" id="tabVerify" onclick="switchTab('verify')">Doğrula</button>
       </div>
-      <div id="formVerify" style="display:none;">
-        <input id="verifyEmail" placeholder="E-posta" class="form-input">
-        <input id="verifyCode" placeholder="Doğrulama Kodu" class="form-input">
-        <button class="btn-submit" onclick="verifyAccount()">Doğrula</button>
+      <div class="modal-body">
+        <div id="formRegister">
+          <div class="form-row"><input id="rName" placeholder="Ad" class="form-input"><input id="rSurname"
+              placeholder="Soyad" class="form-input"></div>
+          <input id="rEmail" placeholder="E-posta" class="form-input">
+          <input id="rPass" type="password" placeholder="Şifre (8+)" class="form-input">
+          <input id="rPass2" type="password" placeholder="Şifre Tekrar" class="form-input">
+          <button class="btn-submit" onclick="handleRegister()">Kayıt Ol</button>
+        </div>
+        <div id="formLogin" style="display:none;">
+          <input id="lEmail" placeholder="E-posta" class="form-input">
+          <input id="lPass" type="password" placeholder="Şifre" class="form-input">
+          <button class="btn-submit" onclick="handleLogin()">Giriş Yap</button>
+        </div>
+        <div id="formVerify" style="display:none;">
+          <input id="verifyEmail" placeholder="E-posta" class="form-input">
+          <input id="verifyCode" placeholder="Doğrulama Kodu" class="form-input">
+          <button class="btn-submit" onclick="verifyAccount()">Doğrula</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<div id="authPanelOverlay" class="auth-panel-overlay">
-  <div class="auth-panel"><h3 id="authRoleTitle">🔐 YÖNETİM GİRİŞİ</h3><input type="password" id="authPassword" placeholder="Şifre"><div class="auth-buttons"><button class="btn-primary" onclick="submitAuth()">Giriş</button><button class="btn-secondary" onclick="closeAuthPanel()">İptal</button></div></div>
-</div>
-
-<div class="download-menu">
-  <button class="download-btn" onclick="toggleDownloadMenu()">📱</button>
-  <div class="download-options" id="downloadMenu">
-    <a onclick="downloadApp('android')">📱 Android</a>
-    <a onclick="downloadApp('windows')">💻 Windows</a>
-    <a onclick="downloadApp('mac')">🍎 MacOS</a>
-    <a onclick="downloadApp('ios')">📲 iOS</a>
-    <a onclick="downloadApp('linux')">🐧 Linux</a>
-    <a onclick="downloadWebApp()">🌐 PWA</a>
+  <div id="authPanelOverlay" class="auth-panel-overlay">
+    <div class="auth-panel">
+      <h3 id="authRoleTitle">🔐 YÖNETİM GİRİŞİ</h3>
+      <input type="password" id="authPassword" placeholder="Şifre">
+      <div class="auth-buttons">
+        <button class="btn-primary" onclick="submitAuth()">Giriş</button>
+        <button class="btn-secondary" onclick="closeAuthPanel()">İptal</button>
+      </div>
+    </div>
   </div>
-</div>
 
-<div class="ai-widget"><div class="ai-panel" id="aiPanel"><div class="ai-panel-header" style="padding:16px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between"><span class="ai-panel-title">⚡ VİZYON AI</span><span class="ai-status">Aktif</span></div><div class="ai-messages" id="aiMessages"><div class="ai-msg bot">Merhaba! Ben VİZYON AI.</div></div><div class="ai-suggestions"><div class="ai-suggestion" onclick="quickAsk('Python hesap makinesi yaz')">🐍 Python</div><div class="ai-suggestion" onclick="quickAsk('React todo app yap')">⚛️ React</div><div class="ai-suggestion" onclick="quickAsk('dolar kaç')">💰 Dolar</div><div class="ai-suggestion" onclick="quickAsk('bugün haberler')">📰 Haber</div></div><div class="ai-input-area"><input class="ai-input" id="aiInput" placeholder="Her dilde sorabilirsin..." onkeypress="if(event.key==='Enter')sendAiMessage()"><button class="ai-send" onclick="sendAiMessage()">→</button></div></div><button class="ai-widget-btn" onclick="toggleAiPanel()">⚡</button></div>
-
-<div id="vizyonAIPanel" style="display:none;position:fixed;inset:0;z-index:10000;background:#050a0f;flex-direction:column">
-  <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 25px;background:#0d1a26;border-bottom:2px solid var(--accent)">
-    <div style="display:flex;align-items:center;gap:15px"><div class="logo-icon" style="width:40px;height:40px;font-size:20px">✨</div><span style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;background:linear-gradient(45deg,var(--accent),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent">VİZYON AI</span></div>
-    <button onclick="closeVizyonAI()" style="background:transparent;border:1px solid var(--danger);color:var(--danger);padding:8px 20px;border-radius:30px">✕ Kapat</button>
+  <div class="download-menu">
+    <button class="download-btn" onclick="toggleDownloadMenu()">📱</button>
+    <div class="download-options" id="downloadMenu">
+      <a onclick="downloadApp('android')">📱 Android</a>
+      <a onclick="downloadApp('windows')">💻 Windows</a>
+      <a onclick="downloadApp('mac')">🍎 MacOS</a>
+      <a onclick="downloadApp('ios')">📲 iOS</a>
+      <a onclick="downloadApp('linux')">🐧 Linux</a>
+      <a onclick="downloadWebApp()">🌐 PWA</a>
+    </div>
   </div>
-  <div id="vizyonAIChat" style="flex:1;overflow-y:auto;padding:25px;display:flex;flex-direction:column;gap:15px;max-width:900px;width:100%;margin:0 auto"><div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Dünyanın en gelişmiş kodlama asistanıyım.</div></div>
-  <div style="display:flex;gap:10px;padding:0 20px 10px;max-width:900px;width:100%;margin:0 auto;flex-wrap:wrap"><button class="ai-suggestion" onclick="quickAICode('Python hesap makinesi yaz')">🐍 Python</button><button class="ai-suggestion" onclick="quickAICode('React todo app yap')">⚛️ React</button><button class="ai-suggestion" onclick="quickAICode('dolar kaç')">💰 Dolar</button><button class="ai-suggestion" onclick="quickAICode('bugün haberler')">📰 Haberler</button></div>
-  <div style="display:flex;gap:10px;padding:0 20px 20px;max-width:900px;width:100%;margin:0 auto"><input type="file" id="fileInput" accept=".txt,.py,.js,.html,.css,.json,.pdf,.jpg,.png" style="display:none" onchange="handleFileUpload(this)"><button class="file-upload-btn" onclick="document.getElementById('fileInput').click()">📎 Dosya Yükle</button><textarea id="vizyonAIInput" style="flex:1;background:#0d1a26;border:1px solid var(--border);color:var(--text);padding:12px;border-radius:16px;font-family:'Fira Code',monospace;font-size:13px;resize:none;height:50px" placeholder='Her dilde yazabilirsin...' onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendVizyonAIAdvanced()}"></textarea><button onclick="sendVizyonAIAdvanced()" style="background:linear-gradient(135deg,var(--accent),var(--purple));color:var(--bg);border:none;padding:0 25px;border-radius:40px;font-weight:700">⚡ Gönder</button></div>
-</div>
 
-<script>
-// ============================================================
-// 🔥 KONFİGÜRASYON (DOĞRU URL)
-// ============================================================
-const WORKER_URL = 'https://dxfwxknohzkdhzyytwdt.supabase.co/functions/v1/smooth-function';
-const SUPABASE_URL = 'https://dxfwxknohzkdhzyytwdt.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_Us1HLOwQoLT5978dZ3Oy-Q_-v0WrLsl';
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <div class="ai-widget">
+    <div class="ai-panel" id="aiPanel">
+      <div class="ai-panel-header"
+        style="padding:16px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between">
+        <span class="ai-panel-title">⚡ VİZYON AI</span>
+        <span class="ai-status">Aktif</span>
+      </div>
+      <div class="ai-messages" id="aiMessages">
+        <div class="ai-msg bot">Merhaba! Ben VİZYON AI.</div>
+      </div>
+      <div class="ai-suggestions">
+        <div class="ai-suggestion" onclick="quickAsk('Python hesap makinesi yaz')">🐍 Python</div>
+        <div class="ai-suggestion" onclick="quickAsk('React todo app yap')">⚛️ React</div>
+        <div class="ai-suggestion" onclick="quickAsk('dolar kaç')">💰 Dolar</div>
+        <div class="ai-suggestion" onclick="quickAsk('bugün haberler')">📰 Haber</div>
+      </div>
+      <div class="ai-input-area">
+        <input class="ai-input" id="aiInput" placeholder="Her dilde sorabilirsin..."
+          onkeypress="if(event.key==='Enter')sendAiMessage()">
+        <button class="ai-send" onclick="sendAiMessage()">→</button>
+      </div>
+    </div>
+    <button class="ai-widget-btn" onclick="toggleAiPanel()">⚡</button>
+  </div>
 
-const ADMIN_PASSWORDS = {
-    FOUNDER: btoa("Eymen11Amele44"),
-    ADMIN: btoa("ibrm4411"),
-    BETA: btoa("4402")
-};
+  <div id="vizyonAIPanel" style="display:none;position:fixed;inset:0;z-index:10000;background:#050a0f;flex-direction:column">
+    <div
+      style="display:flex;justify-content:space-between;align-items:center;padding:15px 25px;background:#0d1a26;border-bottom:2px solid var(--accent)">
+      <div style="display:flex;align-items:center;gap:15px">
+        <div class="logo-icon" style="width:40px;height:40px;font-size:20px">✨</div>
+        <span
+          style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;background:linear-gradient(45deg,var(--accent),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent">VİZYON
+          AI</span>
+      </div>
+      <button onclick="closeVizyonAI()"
+        style="background:transparent;border:1px solid var(--danger);color:var(--danger);padding:8px 20px;border-radius:30px">✕
+        Kapat</button>
+    </div>
+    <div id="vizyonAIChat"
+      style="flex:1;overflow-y:auto;padding:25px;display:flex;flex-direction:column;gap:15px;max-width:900px;width:100%;margin:0 auto">
+      <div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Dünyanın en gelişmiş kodlama asistanıyım.</div>
+    </div>
+    <div style="display:flex;gap:10px;padding:0 20px 10px;max-width:900px;width:100%;margin:0 auto;flex-wrap:wrap">
+      <button class="ai-suggestion" onclick="quickAICode('Python hesap makinesi yaz')">🐍 Python</button>
+      <button class="ai-suggestion" onclick="quickAICode('React todo app yap')">⚛️ React</button>
+      <button class="ai-suggestion" onclick="quickAICode('dolar kaç')">💰 Dolar</button>
+      <button class="ai-suggestion" onclick="quickAICode('bugün haberler')">📰 Haberler</button>
+    </div>
+    <div style="display:flex;gap:10px;padding:0 20px 20px;max-width:900px;width:100%;margin:0 auto">
+      <input type="file" id="fileInput" accept=".txt,.py,.js,.html,.css,.json,.pdf,.jpg,.png" style="display:none"
+        onchange="handleFileUpload(this)">
+      <button class="file-upload-btn" onclick="document.getElementById('fileInput').click()">📎 Dosya Yükle</button>
+      <textarea id="vizyonAIInput"
+        style="flex:1;background:#0d1a26;border:1px solid var(--border);color:var(--text);padding:12px;border-radius:16px;font-family:'Fira Code',monospace;font-size:13px;resize:none;height:50px"
+        placeholder='Her dilde yazabilirsin...'
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendVizyonAIAdvanced()}"></textarea>
+      <button onclick="sendVizyonAIAdvanced()"
+        style="background:linear-gradient(135deg,var(--accent),var(--purple));color:var(--bg);border:none;padding:0 25px;border-radius:40px;font-weight:700">⚡
+        Gönder</button>
+    </div>
+  </div>
 
-let currentUser = null;
-let dailyQueries = parseInt(localStorage.getItem('v27_queries') || '20');
-let pendingAdminRole = null;
-let _allUsers = [];
-let uploadedFileContent = null;
+  <script>
+    // ============================================================
+    // 🔥 KONFİGÜRASYON
+    // ============================================================
+    const WORKER_URL = 'https://dxfwxknohzkdhzyytwdt.supabase.co/functions/v1/smooth-function';
+    const SUPABASE_URL = 'https://dxfwxknohzkdhzyytwdt.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_Us1HLOwQoLT5978dZ3Oy-Q_-v0WrLsl';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ============================================================
-// API ÇAĞRILARI (EDGE FUNCTIONS ÜZERİNDEN)
-// ============================================================
-async function callSuperAI(prompt) {
-    try {
+    const ADMIN_PASSWORDS = {
+      FOUNDER: btoa("Eymen11Amele44"),
+      ADMIN: btoa("ibrm4411"),
+      BETA: btoa("4402")
+    };
+
+    let currentUser = null;
+    let dailyQueries = parseInt(localStorage.getItem('v27_queries') || '20');
+    let pendingAdminRole = null;
+    let _allUsers = [];
+    let uploadedFileContent = null;
+
+    // ============================================================
+    // API ÇAĞRILARI (EDGE FUNCTIONS ÜZERİNDEN)
+    // ============================================================
+    async function callSuperAI(prompt) {
+      try {
         const res = await fetch(`${WORKER_URL}/super-ai`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt })
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
         });
         const data = await res.json();
         return data.response || 'Yanıt alınamadı.';
-    } catch(e) {
+      } catch (e) {
         console.error('Super AI hatası:', e);
         return fallbackAI(prompt);
+      }
     }
-}
 
-async function webSearch(query) {
-    try {
+    async function webSearch(query) {
+      try {
         const res = await fetch(`${WORKER_URL}/search`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query })
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query })
         });
         const data = await res.json();
         return data.response || 'Sonuç bulunamadı.';
-    } catch(e) {
+      } catch (e) {
         console.error('Web arama hatası:', e);
         return null;
+      }
     }
-}
 
-async function sendEmail(to, subject, html) {
-    try {
+    async function sendEmail(to, subject, html) {
+      try {
         const res = await fetch(`${WORKER_URL}/send-email`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ to, subject, html })
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to, subject, html })
         });
         const data = await res.json();
         return data.response;
-    } catch(e) {
+      } catch (e) {
         console.error('Mail hatası:', e);
         return null;
+      }
     }
-}
 
-function fallbackAI(prompt) {
-    const p = prompt.toLowerCase();
-    if(p.includes('python') && p.includes('hesap')) {
+    function fallbackAI(prompt) {
+      const p = prompt.toLowerCase();
+      if (p.includes('python') && p.includes('hesap')) {
         return `🐍 Python Hesap Makinesi:\n\`\`\`python\ndef hesap_makinesi():\n    sayi1 = float(input("Birinci sayı: "))\n    islem = input("İşlem (+, -, *, /): ")\n    sayi2 = float(input("İkinci sayı: "))\n    if islem == '+': print(f"Sonuç: {sayi1 + sayi2}")\n    elif islem == '-': print(f"Sonuç: {sayi1 - sayi2}")\n    elif islem == '*': print(f"Sonuç: {sayi1 * sayi2}")\n    elif islem == '/':\n        if sayi2 != 0: print(f"Sonuç: {sayi1 / sayi2}")\n        else: print("Hata: Sıfıra bölme!")\n    else: print("Geçersiz işlem!")\nhesap_makinesi()\n\`\`\``;
-    }
-    if(p.includes('react')) {
+      }
+      if (p.includes('react')) {
         return `⚛️ React Bileşeni:\n\`\`\`jsx\nfunction App() { return <h1>VİZYON AI</h1>; }\nexport default App;\n\`\`\``;
-    }
-    if(p.includes('dolar')) {
+      }
+      if (p.includes('dolar')) {
         return `💰 <strong>Güncel Dolar Kuru:</strong><br>USD/TRY: 34.25 TL<br>EUR/TRY: 37.12 TL`;
+      }
+      return `🧠 VİZYON AI hazır!\n\n📌 Örnek: "Python hesap makinesi yaz", "React todo app yap", "dolar kaç"`;
     }
-    return `🧠 VİZYON AI hazır!\n\n📌 Örnek: "Python hesap makinesi yaz", "React todo app yap", "dolar kaç"`;
-}
 
-// ============================================================
-// KAYIT / GİRİş / DOĞRULAMA
-// ============================================================
-async function handleRegister() {
-    const name = document.getElementById('rName')?.value.trim();
-    const surname = document.getElementById('rSurname')?.value.trim();
-    const email = document.getElementById('rEmail')?.value.trim();
-    const p1 = document.getElementById('rPass')?.value;
-    const p2 = document.getElementById('rPass2')?.value;
-    if(!name){ alert('Ad gerekli!'); return; }
-    if(!email || !email.includes('@')){ alert('Geçerli e-posta girin!'); return; }
-    if(p1.length < 8){ alert('Şifre en az 8 karakter!'); return; }
-    if(p1 !== p2){ alert('Şifreler eşleşmiyor!'); return; }
-    
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const expires = new Date();
-    expires.setMinutes(expires.getMinutes() + 15);
-    
-    const { error } = await supabaseClient.from('users').insert([{
+    // ============================================================
+    // KAYIT / GİRİŞ / DOĞRULAMA
+    // ============================================================
+    async function handleRegister() {
+      const name = document.getElementById('rName')?.value.trim();
+      const surname = document.getElementById('rSurname')?.value.trim();
+      const email = document.getElementById('rEmail')?.value.trim();
+      const p1 = document.getElementById('rPass')?.value;
+      const p2 = document.getElementById('rPass2')?.value;
+      if (!name) { alert('Ad gerekli!'); return; }
+      if (!email || !email.includes('@')) { alert('Geçerli e-posta girin!'); return; }
+      if (p1.length < 8) { alert('Şifre en az 8 karakter!'); return; }
+      if (p1 !== p2) { alert('Şifreler eşleşmiyor!'); return; }
+
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const expires = new Date();
+      expires.setMinutes(expires.getMinutes() + 15);
+
+      const { error } = await supabaseClient.from('users').insert([{
         name: name + ' ' + surname, email: email, plan: 'free', password_hash: btoa(p1),
         created_at: new Date(), is_verified: false, verification_code: code, verification_code_expires: expires
-    }]);
-    if(error){ alert('Hata: ' + error.message); return; }
-    
-    await sendEmail(email, 'Doğrulama Kodu - Vizyon 2027', `<h1>Hoş geldin ${name}!</h1><p>Doğrulama kodunuz: <strong style="font-size:24px;color:#00d4ff;">${code}</strong></p><p>15 dakika geçerlidir.</p>`);
-    alert('✅ Kayıt başarılı! Mail adresinize doğrulama kodu gönderildi.');
-    switchTab('verify');
-    document.getElementById('verifyEmail').value = email;
-}
+      }]);
+      if (error) { alert('Hata: ' + error.message); return; }
 
-async function verifyAccount() {
-    const email = document.getElementById('verifyEmail')?.value.trim();
-    const code = document.getElementById('verifyCode')?.value.trim();
-    if(!email || !code){ alert('E-posta ve kodu girin!'); return; }
-    const { data: user } = await supabaseClient.from('users').select('*').eq('email', email).single();
-    if(!user){ alert('Kullanıcı bulunamadı!'); return; }
-    if(user.is_verified){ alert('Zaten doğrulanmış! Giriş yapabilirsiniz.'); switchTab('login'); return; }
-    if(user.verification_code !== code){ alert('Kod hatalı!'); return; }
-    if(new Date(user.verification_code_expires) < new Date()){ alert('Kod süresi doldu!'); return; }
-    await supabaseClient.from('users').update({ is_verified: true, verification_code: null }).eq('id', user.id);
-    alert('✅ Hesap doğrulandı! Şimdi giriş yapabilirsiniz.');
-    switchTab('login');
-}
+      await sendEmail(email, 'Doğrulama Kodu - Vizyon 2027', `<h1>Hoş geldin ${name}!</h1><p>Doğrulama kodunuz: <strong style="font-size:24px;color:#00d4ff;">${code}</strong></p><p>15 dakika geçerlidir.</p>`);
+      alert('✅ Kayıt başarılı! Mail adresinize doğrulama kodu gönderildi.');
+      switchTab('verify');
+      document.getElementById('verifyEmail').value = email;
+    }
 
-async function handleLogin() {
-    const email = document.getElementById('lEmail')?.value.trim();
-    const pass = document.getElementById('lPass')?.value;
-    if(!email || !pass){ alert('Tüm alanları doldurun!'); return; }
-    const { data, error } = await supabaseClient.from('users').select('*').eq('email', email).single();
-    if(error || !data){ alert('Hatalı giriş!'); return; }
-    if(data.password_hash !== btoa(pass)){ alert('Şifre hatalı!'); return; }
-    if(!data.is_verified){ 
+    async function verifyAccount() {
+      const email = document.getElementById('verifyEmail')?.value.trim();
+      const code = document.getElementById('verifyCode')?.value.trim();
+      if (!email || !code) { alert('E-posta ve kodu girin!'); return; }
+      const { data: user } = await supabaseClient.from('users').select('*').eq('email', email).single();
+      if (!user) { alert('Kullanıcı bulunamadı!'); return; }
+      if (user.is_verified) { alert('Zaten doğrulanmış! Giriş yapabilirsiniz.'); switchTab('login'); return; }
+      if (user.verification_code !== code) { alert('Kod hatalı!'); return; }
+      if (new Date(user.verification_code_expires) < new Date()) { alert('Kod süresi doldu!'); return; }
+      await supabaseClient.from('users').update({ is_verified: true, verification_code: null }).eq('id', user.id);
+      alert('✅ Hesap doğrulandı! Şimdi giriş yapabilirsiniz.');
+      switchTab('login');
+    }
+
+    async function handleLogin() {
+      const email = document.getElementById('lEmail')?.value.trim();
+      const pass = document.getElementById('lPass')?.value;
+      if (!email || !pass) { alert('Tüm alanları doldurun!'); return; }
+      const { data, error } = await supabaseClient.from('users').select('*').eq('email', email).single();
+      if (error || !data) { alert('Hatalı giriş!'); return; }
+      if (data.password_hash !== btoa(pass)) { alert('Şifre hatalı!'); return; }
+      if (!data.is_verified) {
         alert('❌ Hesabınız doğrulanmamış! Lütfen e-posta adresinize gönderilen doğrulama kodunu girin.');
         switchTab('verify');
         document.getElementById('verifyEmail').value = email;
         return;
+      }
+      if (data.is_banned) { alert('Hesabınız yasaklanmıştır!'); return; }
+      currentUser = data;
+      localStorage.setItem('v27_user', JSON.stringify(data));
+      closeModal();
+      showDashboard();
     }
-    if(data.is_banned){ alert('Hesabınız yasaklanmıştır!'); return; }
-    currentUser = data;
-    localStorage.setItem('v27_user', JSON.stringify(data));
-    closeModal();
-    showDashboard();
-}
 
-function handleLogout() { localStorage.clear(); location.reload(); }
+    function handleLogout() { localStorage.clear(); location.reload(); }
 
-// ============================================================
-// DASHBOARD GÖSTER
-// ============================================================
-function showDashboard() {
-    document.getElementById('mainSite').style.display = 'none';
-    document.getElementById('dashboardArea').style.display = 'block';
-    document.getElementById('dashboardUserName').innerHTML = currentUser.name;
-    let roleText = currentUser.role === 'founder' ? '👑 KURUCU' : (currentUser.role === 'admin' ? '⚙️ ADMIN' : (currentUser.is_beta ? '🔬 BETA' : '👤 KULLANICI'));
-    document.getElementById('userRoleBadge').innerHTML = roleText;
-    
-    if(currentUser.role === 'founder' || currentUser.role === 'admin') {
+    // ============================================================
+    // DASHBOARD GÖSTER
+    // ============================================================
+    function showDashboard() {
+      document.getElementById('mainSite').style.display = 'none';
+      document.getElementById('dashboardArea').style.display = 'block';
+      document.getElementById('dashboardUserName').innerHTML = currentUser.name;
+      let roleText = currentUser.role === 'founder' ? '👑 KURUCU' : (currentUser.role === 'admin' ? '⚙️ ADMIN' : (currentUser.is_beta ? '🔬 BETA' : '👤 KULLANICI'));
+      document.getElementById('userRoleBadge').innerHTML = roleText;
+
+      if (currentUser.role === 'founder' || currentUser.role === 'admin') {
         document.getElementById('adminPanel').style.display = 'block';
         document.getElementById('adminRoleInfo').innerHTML = currentUser.role === 'founder' ? '👑 KURUCU YETKİLERİNİZ AKTİF' : '⚙️ ADMIN YETKİLERİNİZ AKTİF';
         loadAdminUsers();
+      }
+      checkUserGroup();
+      loadProjects();
+      loadInbox();
+      loadGifts();
     }
-    checkUserGroup();
-    loadProjects();
-    loadInbox();
-    loadGifts();
-}
 
-// ============================================================
-// GRUP SİSTEMİ
-// ============================================================
-async function checkUserGroup() {
-    if(currentUser.group_id) {
+    // ============================================================
+    // GRUP SİSTEMİ
+    // ============================================================
+    async function checkUserGroup() {
+      if (currentUser.group_id) {
         const { data: group } = await supabaseClient.from('groups').select('*').eq('id', currentUser.group_id).single();
-        if(group) {
-            document.getElementById('groupSection').style.display = 'block';
-            document.getElementById('noGroupSection').style.display = 'none';
-            document.getElementById('groupInfo').innerHTML = `<strong>${group.name}</strong> - Kurucu: ${group.owner_email}<br>Üyeler: ${group.members?.length || 1}/100`;
-            loadGroupChat();
-            loadGroupProjects();
+        if (group) {
+          document.getElementById('groupSection').style.display = 'block';
+          document.getElementById('noGroupSection').style.display = 'none';
+          document.getElementById('groupInfo').innerHTML = `<strong>${group.name}</strong> - Kurucu: ${group.owner_email}<br>Üyeler: ${group.members?.length || 1}/100`;
+          loadGroupChat();
+          loadGroupProjects();
         }
-    } else {
+      } else {
         document.getElementById('groupSection').style.display = 'none';
         document.getElementById('noGroupSection').style.display = 'block';
         loadGroupInvites();
+      }
     }
-}
 
-async function createGroup() {
-    const groupName = document.getElementById('newGroupName').value.trim();
-    if(!groupName) { alert('Grup adı girin!'); return; }
-    if(confirm('Grup paketi ₺899/ay - Satın al?')) {
+    async function createGroup() {
+      const groupName = document.getElementById('newGroupName').value.trim();
+      if (!groupName) { alert('Grup adı girin!'); return; }
+      if (confirm('Grup paketi ₺899/ay - Satın al?')) {
         const { data } = await supabaseClient.from('groups').insert([{
-            name: groupName, owner_email: currentUser.email, members: [currentUser.email],
-            projects: [], chat_messages: [], created_at: new Date()
+          name: groupName, owner_email: currentUser.email, members: [currentUser.email],
+          projects: [], chat_messages: [], created_at: new Date()
         }]).select();
-        if(data) {
-            await supabaseClient.from('users').update({ group_id: data[0].id, plan: 'team' }).eq('id', currentUser.id);
-            currentUser.group_id = data[0].id;
-            currentUser.plan = 'team';
-            localStorage.setItem('v27_user', JSON.stringify(currentUser));
-            alert('✅ Grup oluşturuldu! Sayfa yenileniyor...');
-            location.reload();
+        if (data) {
+          await supabaseClient.from('users').update({ group_id: data[0].id, plan: 'team' }).eq('id', currentUser.id);
+          currentUser.group_id = data[0].id;
+          currentUser.plan = 'team';
+          localStorage.setItem('v27_user', JSON.stringify(currentUser));
+          alert('✅ Grup oluşturuldu! Sayfa yenileniyor...');
+          location.reload();
         }
+      }
     }
-}
 
-async function loadGroupChat() {
-    const { data: group } = await supabaseClient.from('groups').select('chat_messages').eq('id', currentUser.group_id).single();
-    const container = document.getElementById('groupChatMessages');
-    if(group && group.chat_messages) {
+    async function loadGroupChat() {
+      const { data: group } = await supabaseClient.from('groups').select('chat_messages').eq('id', currentUser.group_id).single();
+      const container = document.getElementById('groupChatMessages');
+      if (group && group.chat_messages) {
         container.innerHTML = group.chat_messages.map(m => `<div class="group-chat-message"><strong>${m.user}</strong>: ${m.message}<br><span style="font-size:10px;color:var(--text3)">${m.time}</span></div>`).join('');
+      }
     }
-}
 
-async function sendGroupMessage() {
-    const msg = document.getElementById('groupChatInput').value.trim();
-    if(!msg) return;
-    const { data: group } = await supabaseClient.from('groups').select('chat_messages').eq('id', currentUser.group_id).single();
-    let msgs = group?.chat_messages || [];
-    msgs.push({ user: currentUser.name, message: msg, time: new Date().toLocaleTimeString() });
-    await supabaseClient.from('groups').update({ chat_messages: msgs }).eq('id', currentUser.group_id);
-    document.getElementById('groupChatInput').value = '';
-    loadGroupChat();
-}
+    async function sendGroupMessage() {
+      const msg = document.getElementById('groupChatInput').value.trim();
+      if (!msg) return;
+      const { data: group } = await supabaseClient.from('groups').select('chat_messages').eq('id', currentUser.group_id).single();
+      let msgs = group?.chat_messages || [];
+      msgs.push({ user: currentUser.name, message: msg, time: new Date().toLocaleTimeString() });
+      await supabaseClient.from('groups').update({ chat_messages: msgs }).eq('id', currentUser.group_id);
+      document.getElementById('groupChatInput').value = '';
+      loadGroupChat();
+    }
 
-async function loadGroupProjects() {
-    const { data: group } = await supabaseClient.from('groups').select('projects').eq('id', currentUser.group_id).single();
-    const container = document.getElementById('groupProjectsList');
-    if(group && group.projects) {
+    async function loadGroupProjects() {
+      const { data: group } = await supabaseClient.from('groups').select('projects').eq('id', currentUser.group_id).single();
+      const container = document.getElementById('groupProjectsList');
+      if (group && group.projects) {
         container.innerHTML = group.projects.map(p => `<div class="project-item">📁 ${p.name} <span style="font-size:10px;color:var(--text3)">${p.created_by}</span></div>`).join('');
+      }
     }
-}
 
-async function addGroupProject() {
-    const name = document.getElementById('newGroupProjectName').value.trim();
-    if(!name) return;
-    const { data: group } = await supabaseClient.from('groups').select('projects').eq('id', currentUser.group_id).single();
-    let projects = group?.projects || [];
-    projects.push({ name, created_by: currentUser.email, created_at: new Date() });
-    await supabaseClient.from('groups').update({ projects }).eq('id', currentUser.group_id);
-    document.getElementById('newGroupProjectName').value = '';
-    loadGroupProjects();
-}
+    async function addGroupProject() {
+      const name = document.getElementById('newGroupProjectName').value.trim();
+      if (!name) return;
+      const { data: group } = await supabaseClient.from('groups').select('projects').eq('id', currentUser.group_id).single();
+      let projects = group?.projects || [];
+      projects.push({ name, created_by: currentUser.email, created_at: new Date() });
+      await supabaseClient.from('groups').update({ projects }).eq('id', currentUser.group_id);
+      document.getElementById('newGroupProjectName').value = '';
+      loadGroupProjects();
+    }
 
-async function loadGroupInvites() {
-    const { data: invites } = await supabaseClient.from('group_invites').select('*').eq('invited_email', currentUser.email).eq('status', 'pending');
-    const container = document.getElementById('groupInvitesList');
-    container.innerHTML = (invites || []).map(i => `<div class="project-item">🎯 <strong>${i.inviter_email}</strong> sizi "${i.group_name}" grubuna davet etti! <button onclick="acceptGroupInvite('${i.id}','${i.group_id}')" class="btn-primary-small">Kabul Et</button><button onclick="rejectGroupInvite('${i.id}')" class="btn-primary-small" style="background:#ff4757">Reddet</button></div>`).join('');
-}
+    async function loadGroupInvites() {
+      const { data: invites } = await supabaseClient.from('group_invites').select('*').eq('invited_email', currentUser.email).eq('status', 'pending');
+      const container = document.getElementById('groupInvitesList');
+      container.innerHTML = (invites || []).map(i => `<div class="project-item">🎯 <strong>${i.inviter_email}</strong> sizi "${i.group_name}" grubuna davet etti! <button onclick="acceptGroupInvite('${i.id}','${i.group_id}')" class="btn-primary-small">Kabul Et</button><button onclick="rejectGroupInvite('${i.id}')" class="btn-primary-small" style="background:#ff4757">Reddet</button></div>`).join('');
+    }
 
-async function acceptGroupInvite(inviteId, groupId) {
-    await supabaseClient.from('users').update({ group_id: groupId }).eq('id', currentUser.id);
-    await supabaseClient.from('group_invites').update({ status: 'accepted' }).eq('id', inviteId);
-    currentUser.group_id = groupId;
-    localStorage.setItem('v27_user', JSON.stringify(currentUser));
-    alert('✅ Gruba katıldınız! Sayfa yenileniyor...');
-    location.reload();
-}
-async function rejectGroupInvite(inviteId) { await supabaseClient.from('group_invites').update({ status: 'rejected' }).eq('id', inviteId); loadGroupInvites(); }
+    async function acceptGroupInvite(inviteId, groupId) {
+      await supabaseClient.from('users').update({ group_id: groupId }).eq('id', currentUser.id);
+      await supabaseClient.from('group_invites').update({ status: 'accepted' }).eq('id', inviteId);
+      currentUser.group_id = groupId;
+      localStorage.setItem('v27_user', JSON.stringify(currentUser));
+      alert('✅ Gruba katıldınız! Sayfa yenileniyor...');
+      location.reload();
+    }
+    async function rejectGroupInvite(inviteId) { await supabaseClient.from('group_invites').update({ status: 'rejected' }).eq('id', inviteId); loadGroupInvites(); }
 
-// ============================================================
-// PROJE YÖNETİMİ
-// ============================================================
-async function loadProjects() {
-    let { data: proj } = await supabaseClient.from('projects').select('*').eq('user_email', currentUser.email).order('created_at', { ascending: false });
-    if(!proj) proj = [];
-    document.getElementById('projectsList').innerHTML = proj.map(p => `<div class="project-item"><span>${p.name}</span><div><button onclick="toggleFavorite(${p.id})" class="btn-primary-small">⭐</button><button onclick="archiveProject(${p.id})" class="btn-primary-small">🗄️</button><button onclick="deleteProject(${p.id})" class="btn-primary-small" style="background:#ff4757">🗑️</button></div></div>`).join('');
-    document.getElementById('projectCount').innerHTML = proj.length;
-    document.getElementById('favCount').innerHTML = proj.filter(p => p.is_favorite).length;
-    document.getElementById('archiveCount').innerHTML = proj.filter(p => p.is_archived).length;
-}
+    // ============================================================
+    // PROJE YÖNETİMİ
+    // ============================================================
+    async function loadProjects() {
+      let { data: proj } = await supabaseClient.from('projects').select('*').eq('user_email', currentUser.email).order('created_at', { ascending: false });
+      if (!proj) proj = [];
+      document.getElementById('projectsList').innerHTML = proj.map(p => `<div class="project-item"><span>${p.name}</span><div><button onclick="toggleFavorite(${p.id})" class="btn-primary-small">⭐</button><button onclick="archiveProject(${p.id})" class="btn-primary-small">🗄️</button><button onclick="deleteProject(${p.id})" class="btn-primary-small" style="background:#ff4757">🗑️</button></div></div>`).join('');
+      document.getElementById('projectCount').innerHTML = proj.length;
+      document.getElementById('favCount').innerHTML = proj.filter(p => p.is_favorite).length;
+      document.getElementById('archiveCount').innerHTML = proj.filter(p => p.is_archived).length;
+    }
 
-document.getElementById('newProjectBtn')?.addEventListener('click', async () => {
-    let name = prompt("Proje adı:");
-    if(name) await supabaseClient.from('projects').insert([{ user_email: currentUser.email, name, content: '', created_at: new Date() }]);
-    loadProjects();
-});
-async function toggleFavorite(id) { let { data: p } = await supabaseClient.from('projects').select('is_favorite').eq('id', id).single(); await supabaseClient.from('projects').update({ is_favorite: !p.is_favorite }).eq('id', id); loadProjects(); }
-async function archiveProject(id) { await supabaseClient.from('projects').update({ is_archived: true }).eq('id', id); loadProjects(); }
-async function deleteProject(id) { if(confirm("Sil?")) await supabaseClient.from('projects').delete().eq('id', id); loadProjects(); }
+    document.getElementById('newProjectBtn')?.addEventListener('click', async () => {
+      let name = prompt("Proje adı:");
+      if (name) await supabaseClient.from('projects').insert([{ user_email: currentUser.email, name, content: '', created_at: new Date() }]);
+      loadProjects();
+    });
+    async function toggleFavorite(id) { let { data: p } = await supabaseClient.from('projects').select('is_favorite').eq('id', id).single(); await supabaseClient.from('projects').update({ is_favorite: !p.is_favorite }).eq('id', id); loadProjects(); }
+    async function archiveProject(id) { await supabaseClient.from('projects').update({ is_archived: true }).eq('id', id); loadProjects(); }
+    async function deleteProject(id) { if (confirm("Sil?")) await supabaseClient.from('projects').delete().eq('id', id); loadProjects(); }
 
-// ============================================================
-// GELEN KUTUSU VE HEDİYELER
-// ============================================================
-async function loadInbox() {
-    let { data: messages } = await supabaseClient.from('inbox').select('*').eq('receiver_email', currentUser.email).order('created_at', { ascending: false });
-    const container = document.getElementById('inboxList');
-    if(messages && messages.length) {
+    // ============================================================
+    // GELEN KUTUSU VE HEDİYELER
+    // ============================================================
+    async function loadInbox() {
+      let { data: messages } = await supabaseClient.from('inbox').select('*').eq('receiver_email', currentUser.email).order('created_at', { ascending: false });
+      const container = document.getElementById('inboxList');
+      if (messages && messages.length) {
         container.innerHTML = messages.map(m => `<div class="project-item">📧 <strong>${m.sender_email}</strong>: ${m.message}</div>`).join('');
-    } else {
+      } else {
         container.innerHTML = '<div class="project-item">📭 Henüz mesaj yok.</div>';
+      }
     }
-}
 
-async function loadGifts() {
-    let { data: gifts } = await supabaseClient.from('gift_requests').select('*').eq('receiver_email', currentUser.email).eq('status', 'pending');
-    const container = document.getElementById('giftsList');
-    if(gifts && gifts.length) {
+    async function loadGifts() {
+      let { data: gifts } = await supabaseClient.from('gift_requests').select('*').eq('receiver_email', currentUser.email).eq('status', 'pending');
+      const container = document.getElementById('giftsList');
+      if (gifts && gifts.length) {
         container.innerHTML = gifts.map(g => `<div class="project-item">🎁 <strong>${g.sender_email}</strong> size ${g.package} paketi hediye etti! <button onclick="acceptGift('${g.id}','${g.package}')" class="btn-primary-small">Kabul Et</button><button onclick="rejectGift('${g.id}')" class="btn-primary-small" style="background:#ff4757">Reddet</button></div>`).join('');
-    } else {
+      } else {
         container.innerHTML = '<div class="project-item">🎁 Hediye yok.</div>';
+      }
     }
-}
-async function acceptGift(id, pkg) { await supabaseClient.from('users').update({ plan: pkg }).eq('email', currentUser.email); await supabaseClient.from('gift_requests').update({ status: 'accepted' }).eq('id', id); alert("Paket eklendi!"); location.reload(); }
-async function rejectGift(id) { await supabaseClient.from('gift_requests').update({ status: 'rejected' }).eq('id', id); loadGifts(); }
+    async function acceptGift(id, pkg) { await supabaseClient.from('users').update({ plan: pkg }).eq('email', currentUser.email); await supabaseClient.from('gift_requests').update({ status: 'accepted' }).eq('id', id); alert("Paket eklendi!"); location.reload(); }
+    async function rejectGift(id) { await supabaseClient.from('gift_requests').update({ status: 'rejected' }).eq('id', id); loadGifts(); }
 
-// ============================================================
-// ADMIN PANELİ
-// ============================================================
-async function loadAdminUsers() {
-    let { data: users } = await supabaseClient.from('users').select('*');
-    document.getElementById('adminUsersList').innerHTML = users.map(u => `<div class="user-item"><div><strong>${u.name}</strong><br>${u.email}<br>Plan: ${u.plan}<br>Rol: ${u.role || 'user'}</div><div class="user-actions"><button onclick="banUser('${u.email}')">🔨 Banla</button><button onclick="promoteToAdmin('${u.email}')">👑 Admin Yap</button><button onclick="promoteToBeta('${u.email}')">🔬 Beta Yap</button><button onclick="demoteUser('${u.email}')">📉 Rütbe Düşür</button><button onclick="sendGiftToUser('${u.email}')">🎁 Hediye</button></div></div>`).join('');
-}
-async function banUser(email) { await supabaseClient.from('users').update({ is_banned: true }).eq('email', email); loadAdminUsers(); alert(`✅ ${email} yasaklandı!`); }
-async function promoteToAdmin(email) { await supabaseClient.from('users').update({ role: 'admin' }).eq('email', email); loadAdminUsers(); alert(`✅ ${email} admin yapıldı!`); }
-async function promoteToBeta(email) { await supabaseClient.from('users').update({ is_beta: true }).eq('email', email); loadAdminUsers(); alert(`✅ ${email} beta kullanıcı yapıldı!`); }
-async function demoteUser(email) { await supabaseClient.from('users').update({ role: 'user', is_beta: false }).eq('email', email); loadAdminUsers(); alert(`✅ ${email} rütbesi düşürüldü!`); }
-async function sendGiftToUser(email) {
-    let packageType = prompt('Hediye paketi (pro/team):');
-    if(packageType) await supabaseClient.from('gift_requests').insert([{ sender_email: currentUser.email, receiver_email: email, package: packageType, status: 'pending', created_at: new Date() }]);
-    alert('✅ Hediye gönderildi!');
-}
+    // ============================================================
+    // ADMIN PANELİ
+    // ============================================================
+    async function loadAdminUsers() {
+      let { data: users } = await supabaseClient.from('users').select('*');
+      document.getElementById('adminUsersList').innerHTML = users.map(u => `<div class="user-item"><div><strong>${u.name}</strong><br>${u.email}<br>Plan: ${u.plan}<br>Rol: ${u.role || 'user'}</div><div class="user-actions"><button onclick="banUser('${u.email}')">🔨 Banla</button><button onclick="promoteToAdmin('${u.email}')">👑 Admin Yap</button><button onclick="promoteToBeta('${u.email}')">🔬 Beta Yap</button><button onclick="demoteUser('${u.email}')">📉 Rütbe Düşür</button><button onclick="sendGiftToUser('${u.email}')">🎁 Hediye</button></div></div>`).join('');
+    }
+    async function banUser(email) { await supabaseClient.from('users').update({ is_banned: true }).eq('email', email); loadAdminUsers(); alert(`✅ ${email} yasaklandı!`); }
+    async function promoteToAdmin(email) { await supabaseClient.from('users').update({ role: 'admin' }).eq('email', email); loadAdminUsers(); alert(`✅ ${email} admin yapıldı!`); }
+    async function promoteToBeta(email) { await supabaseClient.from('users').update({ is_beta: true }).eq('email', email); loadAdminUsers(); alert(`✅ ${email} beta kullanıcı yapıldı!`); }
+    async function demoteUser(email) { await supabaseClient.from('users').update({ role: 'user', is_beta: false }).eq('email', email); loadAdminUsers(); alert(`✅ ${email} rütbesi düşürüldü!`); }
+    async function sendGiftToUser(email) {
+      let packageType = prompt('Hediye paketi (pro/team):');
+      if (packageType) await supabaseClient.from('gift_requests').insert([{ sender_email: currentUser.email, receiver_email: email, package: packageType, status: 'pending', created_at: new Date() }]);
+      alert('✅ Hediye gönderildi!');
+    }
 
-// ============================================================
-// AI CHAT DASHBOARD
-// ============================================================
-document.getElementById('dashboardAiSendBtn')?.addEventListener('click', async () => {
-    let inp = document.getElementById('dashboardAiInput'), msg = inp.value.trim();
-    if(!msg || !useQuery()) return;
-    let container = document.getElementById('dashboardAiMessages');
-    container.innerHTML += `<div class="ai-message user">${msg}</div>`;
-    inp.value = '';
-    let isSearch = msg.toLowerCase().includes('dolar') || msg.toLowerCase().includes('haber');
-    let response = isSearch ? (await webSearch(msg)) || "Sonuç yok" : await callSuperAI(msg);
-    container.innerHTML += `<div class="ai-message bot">${response}</div>`;
-    container.scrollTop = container.scrollHeight;
-});
+    // ============================================================
+    // AI CHAT DASHBOARD
+    // ============================================================
+    document.getElementById('dashboardAiSendBtn')?.addEventListener('click', async () => {
+      let inp = document.getElementById('dashboardAiInput'), msg = inp.value.trim();
+      if (!msg || !useQuery()) return;
+      let container = document.getElementById('dashboardAiMessages');
+      container.innerHTML += `<div class="ai-message user">${msg}</div>`;
+      inp.value = '';
+      let isSearch = msg.toLowerCase().includes('dolar') || msg.toLowerCase().includes('haber');
+      let response = isSearch ? (await webSearch(msg)) || "Sonuç yok" : await callSuperAI(msg);
+      container.innerHTML += `<div class="ai-message bot">${response}</div>`;
+      container.scrollTop = container.scrollHeight;
+    });
 
-document.getElementById('dashboardFileInput')?.addEventListener('change', async (e) => {
-    let file = e.target.files[0];
-    if(!file) return;
-    let reader = new FileReader();
-    reader.onload = async function(ev) {
+    document.getElementById('dashboardFileInput')?.addEventListener('change', async (e) => {
+      let file = e.target.files[0];
+      if (!file) return;
+      let reader = new FileReader();
+      reader.onload = async function (ev) {
         let content = ev.target.result;
         let container = document.getElementById('dashboardAiMessages');
-        container.innerHTML += `<div class="ai-message bot">📄 Dosya "${file.name}" yüklendi. İçerik: ${content.substring(0,500)}...</div>`;
+        container.innerHTML += `<div class="ai-message bot">📄 Dosya "${file.name}" yüklendi. İçerik: ${content.substring(0, 500)}...</div>`;
         container.scrollTop = container.scrollHeight;
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-});
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    });
 
-// ============================================================
-// PROFİL
-// ============================================================
-function openProfileModal() {
-    document.getElementById('profileModal').classList.add('open');
-    document.getElementById('profileContent').innerHTML = `<p><strong>Ad:</strong> ${currentUser.name}</p><p><strong>Email:</strong> ${currentUser.email}</p><p><strong>Plan:</strong> ${currentUser.plan}</p><p><strong>Rol:</strong> ${currentUser.role || 'Kullanıcı'}</p><p><strong>Kalan Sorgu:</strong> ${document.getElementById('remainingQueries').innerText}</p>`;
-}
-function closeProfileModal() { document.getElementById('profileModal').classList.remove('open'); }
-async function changePassword() { let newPass = prompt("Yeni şifre (min 8 karakter):"); if(!newPass || newPass.length < 8) return; await supabaseClient.from('users').update({ password_hash: btoa(newPass) }).eq('id', currentUser.id); alert("✅ Şifre değiştirildi!"); }
-async function deleteOwnAccount() {
-    let confirmPass = prompt("Hesabınızı silmek için şifrenizi girin:");
-    if(!confirmPass || btoa(confirmPass) !== currentUser.password_hash){ alert("Şifre hatalı!"); return; }
-    let code = Math.floor(100000 + Math.random() * 900000).toString();
-    await sendEmail(currentUser.email, 'Hesap Silme Onayı', `<h1>Onay kodunuz: ${code}</h1>`);
-    let entered = prompt("Mail adresinize gönderilen 6 haneli kodu girin:");
-    if(entered !== code){ alert("Kod hatalı!"); return; }
-    await supabaseClient.from('users').delete().eq('id', currentUser.id);
-    alert("Hesabınız kalıcı olarak silindi.");
-    handleLogout();
-}
-document.getElementById('profileBtn')?.addEventListener('click', openProfileModal);
-document.getElementById('dashboardLogoutBtn')?.addEventListener('click', handleLogout);
+    // ============================================================
+    // PROFİL
+    // ============================================================
+    function openProfileModal() {
+      document.getElementById('profileModal').classList.add('open');
+      document.getElementById('profileContent').innerHTML = `<p><strong>Ad:</strong> ${currentUser.name}</p><p><strong>Email:</strong> ${currentUser.email}</p><p><strong>Plan:</strong> ${currentUser.plan}</p><p><strong>Rol:</strong> ${currentUser.role || 'Kullanıcı'}</p><p><strong>Kalan Sorgu:</strong> ${document.getElementById('remainingQueries').innerText}</p>`;
+    }
+    function closeProfileModal() { document.getElementById('profileModal').classList.remove('open'); }
+    async function changePassword() { let newPass = prompt("Yeni şifre (min 8 karakter):"); if (!newPass || newPass.length < 8) return; await supabaseClient.from('users').update({ password_hash: btoa(newPass) }).eq('id', currentUser.id); alert("✅ Şifre değiştirildi!"); }
+    async function deleteOwnAccount() {
+      let confirmPass = prompt("Hesabınızı silmek için şifrenizi girin:");
+      if (!confirmPass || btoa(confirmPass) !== currentUser.password_hash) { alert("Şifre hatalı!"); return; }
+      let code = Math.floor(100000 + Math.random() * 900000).toString();
+      await sendEmail(currentUser.email, 'Hesap Silme Onayı', `<h1>Onay kodunuz: ${code}</h1>`);
+      let entered = prompt("Mail adresinize gönderilen 6 haneli kodu girin:");
+      if (entered !== code) { alert("Kod hatalı!"); return; }
+      await supabaseClient.from('users').delete().eq('id', currentUser.id);
+      alert("Hesabınız kalıcı olarak silindi.");
+      handleLogout();
+    }
+    document.getElementById('profileBtn')?.addEventListener('click', openProfileModal);
+    document.getElementById('dashboardLogoutBtn')?.addEventListener('click', handleLogout);
 
-// ============================================================
-// PAKET SATIN ALMA
-// ============================================================
-function buyPackage(pkg) {
-    if(!currentUser){ alert('Giriş yapın!'); return; }
-    if(confirm(`${pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takım Paketi (₺899/ay)'} satın al?`)){
+    // ============================================================
+    // PAKET SATIN ALMA
+    // ============================================================
+    function buyPackage(pkg) {
+      if (!currentUser) { alert('Giriş yapın!'); return; }
+      if (confirm(`${pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takım Paketi (₺899/ay)'} satın al?`)) {
         supabaseClient.from('users').update({ plan: pkg }).eq('id', currentUser.id);
         alert('✅ Paket alındı! Sayfa yenileniyor...');
         location.reload();
+      }
     }
-}
 
-// ============================================================
-// MODAL VE DİĞER FONKSİYONLAR
-// ============================================================
-function openModal(t){ document.getElementById('authModal').classList.add('open'); switchTab(t); }
-function closeModal(){ document.getElementById('authModal').classList.remove('open'); }
-function switchTab(tab) {
-    const fLogin = document.getElementById('formLogin');
-    const fReg = document.getElementById('formRegister');
-    const fVerify = document.getElementById('formVerify');
-    const tLogin = document.getElementById('tabLogin');
-    const tReg = document.getElementById('tabRegister');
-    const tVerify = document.getElementById('tabVerify');
-    if(fLogin) fLogin.style.display = tab === 'login' ? 'block' : 'none';
-    if(fReg) fReg.style.display = tab === 'register' ? 'block' : 'none';
-    if(fVerify) fVerify.style.display = tab === 'verify' ? 'block' : 'none';
-    if(tLogin) tLogin.classList.toggle('active', tab === 'login');
-    if(tReg) tReg.classList.toggle('active', tab === 'register');
-    if(tVerify) tVerify.classList.toggle('active', tab === 'verify');
-    const modalTitle = document.getElementById('modalTitle');
-    if(modalTitle) modalTitle.textContent = tab === 'login' ? 'Giriş Yap' : (tab === 'register' ? 'Hesap Oluştur' : 'Doğrulama');
-}
-function showAuthPanel(role) { pendingAdminRole = role; document.getElementById('authPanelOverlay').classList.add('open'); document.getElementById('authPassword').value = ''; }
-function closeAuthPanel() { document.getElementById('authPanelOverlay').classList.remove('open'); }
-function submitAuth() { 
-    const enteredPass = document.getElementById('authPassword').value;
-    if((pendingAdminRole === 'FOUNDER' && btoa(enteredPass) === ADMIN_PASSWORDS.FOUNDER) ||
-       (pendingAdminRole === 'ADMIN' && btoa(enteredPass) === ADMIN_PASSWORDS.ADMIN) ||
-       (pendingAdminRole === 'BETA' && btoa(enteredPass) === ADMIN_PASSWORDS.BETA)) { 
-        closeAuthPanel(); 
+    // ============================================================
+    // MODAL VE DİĞER FONKSİYONLAR
+    // ============================================================
+    function openModal(t) { document.getElementById('authModal').classList.add('open'); switchTab(t); }
+    function closeModal() { document.getElementById('authModal').classList.remove('open'); }
+    function switchTab(tab) {
+      const fLogin = document.getElementById('formLogin');
+      const fReg = document.getElementById('formRegister');
+      const fVerify = document.getElementById('formVerify');
+      const tLogin = document.getElementById('tabLogin');
+      const tReg = document.getElementById('tabRegister');
+      const tVerify = document.getElementById('tabVerify');
+      if (fLogin) fLogin.style.display = tab === 'login' ? 'block' : 'none';
+      if (fReg) fReg.style.display = tab === 'register' ? 'block' : 'none';
+      if (fVerify) fVerify.style.display = tab === 'verify' ? 'block' : 'none';
+      if (tLogin) tLogin.classList.toggle('active', tab === 'login');
+      if (tReg) tReg.classList.toggle('active', tab === 'register');
+      if (tVerify) tVerify.classList.toggle('active', tab === 'verify');
+      const modalTitle = document.getElementById('modalTitle');
+      if (modalTitle) modalTitle.textContent = tab === 'login' ? 'Giriş Yap' : (tab === 'register' ? 'Hesap Oluştur' : 'Doğrulama');
+    }
+    function showAuthPanel(role) { pendingAdminRole = role; document.getElementById('authPanelOverlay').classList.add('open'); document.getElementById('authPassword').value = ''; }
+    function closeAuthPanel() { document.getElementById('authPanelOverlay').classList.remove('open'); }
+    function submitAuth() {
+      const enteredPass = document.getElementById('authPassword').value;
+      if ((pendingAdminRole === 'FOUNDER' && btoa(enteredPass) === ADMIN_PASSWORDS.FOUNDER) ||
+        (pendingAdminRole === 'ADMIN' && btoa(enteredPass) === ADMIN_PASSWORDS.ADMIN) ||
+        (pendingAdminRole === 'BETA' && btoa(enteredPass) === ADMIN_PASSWORDS.BETA)) {
+        closeAuthPanel();
         alert('✅ Yetki doğrulandı!');
-        if(currentUser) {
-            if(pendingAdminRole === 'FOUNDER') currentUser.role = 'founder';
-            if(pendingAdminRole === 'ADMIN') currentUser.role = 'admin';
-            if(pendingAdminRole === 'BETA') currentUser.is_beta = true;
-            localStorage.setItem('v27_user', JSON.stringify(currentUser));
-            if(currentUser.role === 'founder' || currentUser.role === 'admin') {
-                document.getElementById('adminPanel').style.display = 'block';
-                loadAdminUsers();
-            }
-            showDashboard();
+        if (currentUser) {
+          if (pendingAdminRole === 'FOUNDER') currentUser.role = 'founder';
+          if (pendingAdminRole === 'ADMIN') currentUser.role = 'admin';
+          if (pendingAdminRole === 'BETA') currentUser.is_beta = true;
+          localStorage.setItem('v27_user', JSON.stringify(currentUser));
+          if (currentUser.role === 'founder' || currentUser.role === 'admin') {
+            document.getElementById('adminPanel').style.display = 'block';
+            loadAdminUsers();
+          }
+          showDashboard();
         }
-    } else alert("❌ Şifre hatalı!"); 
-}
+      } else alert("❌ Şifre hatalı!");
+    }
 
-function initCursor() {
-    const cursor = document.getElementById('customCursor');
-    const ring = document.getElementById('customCursorRing');
-    if(!cursor || !ring) return;
-    let mx=0,my=0,rx=0,ry=0;
-    document.addEventListener('mousemove',(e)=>{ mx=e.clientX; my=e.clientY; cursor.style.left=(mx-8)+'px'; cursor.style.top=(my-8)+'px'; });
-    function animate(){ rx+=(mx-rx-20)*0.12; ry+=(my-ry-20)*0.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animate); }
-    animate();
-}
-async function initCounters() {
-    try {
+    function initCursor() {
+      const cursor = document.getElementById('customCursor');
+      const ring = document.getElementById('customCursorRing');
+      if (!cursor || !ring) return;
+      let mx = 0, my = 0, rx = 0, ry = 0;
+      document.addEventListener('mousemove', (e) => {
+        mx = e.clientX;
+        my = e.clientY;
+        cursor.style.left = (mx - 8) + 'px';
+        cursor.style.top = (my - 8) + 'px';
+      });
+      function animate() {
+        rx += (mx - rx - 20) * 0.12;
+        ry += (my - ry - 20) * 0.12;
+        ring.style.left = rx + 'px';
+        ring.style.top = ry + 'px';
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+    async function initCounters() {
+      try {
         const { count } = await supabaseClient.from('users').select('*', { count: 'exact', head: true });
         const c1 = document.getElementById('counter1');
-        if(c1) c1.innerText = (count || 0).toLocaleString('tr-TR');
-    } catch(e) { console.log('Kullanıcı sayısı alınamadı:', e); }
-    const c2 = document.getElementById('counter2');
-    const c3 = document.getElementById('counter3');
-    if(c2) c2.innerText = '0';
-    if(c3) c3.innerText = '0';
-}
-function updateUI() {
-    if(currentUser){
-        document.getElementById('loginBtn').style.display='none';
-        document.getElementById('registerBtn').style.display='none';
-        document.getElementById('logoutBtn').style.display='block';
+        if (c1) c1.innerText = (count || 0).toLocaleString('tr-TR');
+      } catch (e) { console.log('Kullanıcı sayısı alınamadı:', e); }
+      const c2 = document.getElementById('counter2');
+      const c3 = document.getElementById('counter3');
+      if (c2) c2.innerText = '0';
+      if (c3) c3.innerText = '0';
+    }
+    function updateUI() {
+      if (currentUser) {
+        document.getElementById('loginBtn').style.display = 'none';
+        document.getElementById('registerBtn').style.display = 'none';
+        document.getElementById('logoutBtn').style.display = 'block';
         const plan = currentUser.plan || 'free';
         let txt = plan === 'team' ? '👥 Takım - Sınırsız' : (plan === 'pro' ? '⭐ Pro - 2000/gün' : '🆓 Ücretsiz - 20/gün');
         document.getElementById('queryLimitBadge').innerHTML = `🔍 ${txt} | Kalan: <span>${plan === 'team' ? '∞' : (plan === 'pro' ? '2000' : dailyQueries)}</span>`;
-    } else {
-        document.getElementById('loginBtn').style.display='block';
-        document.getElementById('registerBtn').style.display='block';
-        document.getElementById('logoutBtn').style.display='none';
+      } else {
+        document.getElementById('loginBtn').style.display = 'block';
+        document.getElementById('registerBtn').style.display = 'block';
+        document.getElementById('logoutBtn').style.display = 'none';
         document.getElementById('queryLimitBadge').innerHTML = `🔍 Ücretsiz - 20/gün | Kalan: <span>${dailyQueries}</span>`;
+      }
     }
-}
-function useQuery() {
-    if(!currentUser){
-        if(dailyQueries <= 0){ alert("⚠️ Günlük sorgu limitiniz (20) doldu!"); return false; }
+    function useQuery() {
+      if (!currentUser) {
+        if (dailyQueries <= 0) { alert("⚠️ Günlük sorgu limitiniz (20) doldu!"); return false; }
         dailyQueries--; localStorage.setItem('v27_queries', dailyQueries); updateUI(); return true;
+      }
+      if (currentUser.plan === 'team' || currentUser.role === 'admin' || currentUser.role === 'founder') return true;
+      if (currentUser.plan === 'pro') {
+        let used = parseInt(localStorage.getItem('v27_pro_used') || 0);
+        if (used >= 2000) { alert("⚠️ Pro limitiniz (2000) doldu!"); return false; }
+        localStorage.setItem('v27_pro_used', used + 1); updateUI(); return true;
+      }
+      if (dailyQueries <= 0) { alert("⚠️ Günlük sorgu limitiniz (20) doldu!"); return false; }
+      dailyQueries--; localStorage.setItem('v27_queries', dailyQueries); updateUI(); return true;
     }
-    if(currentUser.plan === 'team' || currentUser.role === 'admin' || currentUser.role === 'founder') return true;
-    if(currentUser.plan === 'pro') {
-        let used = parseInt(localStorage.getItem('v27_pro_used')||0);
-        if(used >= 2000){ alert("⚠️ Pro limitiniz (2000) doldu!"); return false; }
-        localStorage.setItem('v27_pro_used', used+1); updateUI(); return true;
-    }
-    if(dailyQueries <= 0){ alert("⚠️ Günlük sorgu limitiniz (20) doldu!"); return false; }
-    dailyQueries--; localStorage.setItem('v27_queries', dailyQueries); updateUI(); return true;
-}
-function checkAndReset() {
-    let today = new Date().toDateString();
-    let lastDate = localStorage.getItem('v27_last_date') || '';
-    if(lastDate !== today){
-        localStorage.setItem('v27_queries','20');
-        localStorage.setItem('v27_pro_used','0');
-        localStorage.setItem('v27_last_date',today);
+    function checkAndReset() {
+      let today = new Date().toDateString();
+      let lastDate = localStorage.getItem('v27_last_date') || '';
+      if (lastDate !== today) {
+        localStorage.setItem('v27_queries', '20');
+        localStorage.setItem('v27_pro_used', '0');
+        localStorage.setItem('v27_last_date', today);
         dailyQueries = 20;
         updateUI();
+      }
     }
-}
-function toggleAiPanel() { document.getElementById('aiPanel').classList.toggle('open'); }
-function quickAsk(t) { document.getElementById('aiInput').value = t; sendAiMessage(); }
-function sendAiMessage() {
-    const inp = document.getElementById('aiInput'), msg = inp.value.trim();
-    if(!msg) return;
-    const msgs = document.getElementById('aiMessages');
-    msgs.innerHTML += `<div class="ai-msg user">${msg}</div>`;
-    inp.value = '';
-    setTimeout(() => { msgs.innerHTML += `<div class="ai-msg bot">⚡ Tam ekran AI panelini açmak için ⚡ butonuna tıklayın.</div>`; msgs.scrollTop = msgs.scrollHeight; }, 500);
-}
-function toggleDownloadMenu() { document.getElementById('downloadMenu').classList.toggle('open'); }
-function downloadApp(p) { alert(`📱 ${p.toUpperCase()} yakında!`); }
-function downloadWebApp() { alert('🌐 PWA kurulumu için Chrome menü'); }
+    function toggleAiPanel() { document.getElementById('aiPanel').classList.toggle('open'); }
+    function quickAsk(t) { document.getElementById('aiInput').value = t; sendAiMessage(); }
+    function sendAiMessage() {
+      const inp = document.getElementById('aiInput'), msg = inp.value.trim();
+      if (!msg) return;
+      const msgs = document.getElementById('aiMessages');
+      msgs.innerHTML += `<div class="ai-msg user">${msg}</div>`;
+      inp.value = '';
+      setTimeout(() => {
+        msgs.innerHTML += `<div class="ai-msg bot">⚡ Tam ekran AI panelini açmak için ⚡ butonuna tıklayın.</div>`;
+        msgs.scrollTop = msgs.scrollHeight;
+      }, 500);
+    }
+    function toggleDownloadMenu() { document.getElementById('downloadMenu').classList.toggle('open'); }
+    function downloadApp(p) { alert(`📱 ${p.toUpperCase()} yakında!`); }
+    function downloadWebApp() { alert('🌐 PWA kurulumu için Chrome menü'); }
 
-function handleFileUpload(input) {
-    let file = input.files[0];
-    if(!file) return;
-    let chat = document.getElementById('vizyonAIChat');
-    chat.innerHTML += `<div class="ai-msg user">📎 Dosya yüklendi: ${file.name} (${(file.size/1024).toFixed(1)} KB)</div>`;
-    let reader = new FileReader();
-    reader.onload = function(e) {
+    function handleFileUpload(input) {
+      let file = input.files[0];
+      if (!file) return;
+      let chat = document.getElementById('vizyonAIChat');
+      chat.innerHTML += `<div class="ai-msg user">📎 Dosya yüklendi: ${file.name} (${(file.size / 1024).toFixed(1)} KB)</div>`;
+      let reader = new FileReader();
+      reader.onload = function (e) {
         uploadedFileContent = e.target.result;
         let preview = '';
-        if(file.type.startsWith('image')) preview = `<img src="${e.target.result}" style="max-width:100%;margin-top:10px;border-radius:8px;">`;
-        else preview = `<div style="background:#030810;padding:10px;border-radius:8px;margin-top:10px;font-family:monospace;font-size:11px;max-height:150px;overflow:auto;">${uploadedFileContent.substring(0,500)}${uploadedFileContent.length > 500 ? '...' : ''}</div>`;
-        chat.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: Dosyan başarıyla yüklendi!<br><br>📄 <strong>${file.name}</strong><br>📏 Boyut: ${(file.size/1024).toFixed(1)} KB${preview}<br><br>Bu dosya üzerinde ne yapmamı istersin?</div>`;
+        if (file.type.startsWith('image')) preview = `<img src="${e.target.result}" style="max-width:100%;margin-top:10px;border-radius:8px;">`;
+        else preview = `<div style="background:#030810;padding:10px;border-radius:8px;margin-top:10px;font-family:monospace;font-size:11px;max-height:150px;overflow:auto;">${uploadedFileContent.substring(0, 500)}${uploadedFileContent.length > 500 ? '...' : ''}</div>`;
+        chat.innerHTML += `<div class="ai-msg bot">🧠 VİZYON AI: Dosyan başarıyla yüklendi!<br><br>📄 <strong>${file.name}</strong><br>📏 Boyut: ${(file.size / 1024).toFixed(1)} KB${preview}<br><br>Bu dosya üzerinde ne yapmamı istersin?</div>`;
         chat.scrollTop = chat.scrollHeight;
-    };
-    if(file.type.startsWith('text') || file.name.endsWith('.py') || file.name.endsWith('.js') || file.name.endsWith('.html') || file.name.endsWith('.json') || file.name.endsWith('.css')) reader.readAsText(file);
-    else reader.readAsDataURL(file);
-    input.value = '';
-}
-function openVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'flex'; document.getElementById('vizyonAIInput').focus(); }
-function closeVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'none'; }
-function quickAICode(cmd) { document.getElementById('vizyonAIInput').value = cmd; sendVizyonAIAdvanced(); }
-async function sendVizyonAIAdvanced() {
-    let input = document.getElementById('vizyonAIInput'), msg = input.value.trim();
-    if(!msg && !uploadedFileContent) return;
-    let chat = document.getElementById('vizyonAIChat');
-    chat.innerHTML += `<div class="ai-msg user">${msg}</div>`;
-    input.value = '';
-    let typingId = 'typing-' + Date.now();
-    chat.innerHTML += `<div class="ai-msg bot" id="${typingId}">🧠 Düşünüyor...</div>`;
-    chat.scrollTop = chat.scrollHeight;
-    let isSearch = msg.toLowerCase().includes('dolar') || msg.toLowerCase().includes('haber');
-    setTimeout(async () => {
+      };
+      if (file.type.startsWith('text') || file.name.endsWith('.py') || file.name.endsWith('.js') || file.name.endsWith('.html') || file.name.endsWith('.json') || file.name.endsWith('.css')) reader.readAsText(file);
+      else reader.readAsDataURL(file);
+      input.value = '';
+    }
+    function openVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'flex'; document.getElementById('vizyonAIInput').focus(); }
+    function closeVizyonAI() { document.getElementById('vizyonAIPanel').style.display = 'none'; }
+    function quickAICode(cmd) { document.getElementById('vizyonAIInput').value = cmd; sendVizyonAIAdvanced(); }
+    async function sendVizyonAIAdvanced() {
+      let input = document.getElementById('vizyonAIInput'), msg = input.value.trim();
+      if (!msg && !uploadedFileContent) return;
+      let chat = document.getElementById('vizyonAIChat');
+      chat.innerHTML += `<div class="ai-msg user">${msg}</div>`;
+      input.value = '';
+      let typingId = 'typing-' + Date.now();
+      chat.innerHTML += `<div class="ai-msg bot" id="${typingId}">🧠 Düşünüyor...</div>`;
+      chat.scrollTop = chat.scrollHeight;
+      let isSearch = msg.toLowerCase().includes('dolar') || msg.toLowerCase().includes('haber');
+      setTimeout(async () => {
         document.getElementById(typingId)?.remove();
         let response = isSearch ? (await webSearch(msg)) || `🔍 "${msg}" için sonuç bulunamadı.` : await callSuperAI(msg);
         chat.innerHTML += `<div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>:<br><br>${response}</div>`;
         chat.scrollTop = chat.scrollHeight;
         uploadedFileContent = null;
-    }, 800);
-}
-async function loadTeamData() {
-    if(!currentUser?.team_id) return;
-    const { data: team } = await supabaseClient.from('teams').select('*').eq('id', currentUser.team_id).single();
-    if(team){
+      }, 800);
+    }
+    async function loadTeamData() {
+      if (!currentUser?.team_id) return;
+      const { data: team } = await supabaseClient.from('teams').select('*').eq('id', currentUser.team_id).single();
+      if (team) {
         document.getElementById('memberCount').innerText = team.members?.length || 0;
         document.getElementById('teamMembersList').innerHTML = (team.members || []).map(m => `<div class="user-item">👤 ${m}</div>`).join('');
         document.getElementById('teamProjectsList').innerHTML = (team.projects || []).map(p => `<div class="project-item">📁 ${p.name}</div>`).join('');
+      }
     }
-}
-function inviteToTeam() {
-    const email = document.getElementById('inviteEmail').value.trim();
-    if(!email) return;
-    if(!currentUser?.team_id){ alert('Önce takım kur!'); return; }
-    supabaseClient.from('team_invites').insert([{ team_id: currentUser.team_id, invited_email: email, inviter_email: currentUser.email, created_at: new Date() }]);
-    alert(`📨 ${email} adresine davet gönderildi!`);
-    document.getElementById('inviteEmail').value = '';
-}
-function addTeamProject() {
-    const name = document.getElementById('newProjectName').value.trim();
-    if(!name) return;
-    if(!currentUser?.team_id){ alert('Önce takım kur!'); return; }
-    supabaseClient.from('teams').select('projects').eq('id', currentUser.team_id).single().then(res => {
+    function inviteToTeam() {
+      const email = document.getElementById('inviteEmail').value.trim();
+      if (!email) return;
+      if (!currentUser?.team_id) { alert('Önce takım kur!'); return; }
+      supabaseClient.from('team_invites').insert([{ team_id: currentUser.team_id, invited_email: email, inviter_email: currentUser.email, created_at: new Date() }]);
+      alert(`📨 ${email} adresine davet gönderildi!`);
+      document.getElementById('inviteEmail').value = '';
+    }
+    function addTeamProject() {
+      const name = document.getElementById('newProjectName').value.trim();
+      if (!name) return;
+      if (!currentUser?.team_id) { alert('Önce takım kur!'); return; }
+      supabaseClient.from('teams').select('projects').eq('id', currentUser.team_id).single().then(res => {
         let projects = res.data?.projects || [];
         projects.push({ name, created_by: currentUser.email, created_at: new Date() });
         supabaseClient.from('teams').update({ projects }).eq('id', currentUser.team_id);
         document.getElementById('newProjectName').value = '';
         loadTeamData();
-    });
-}
-function sendTeamMessage() {
-    const msg = document.getElementById('teamChatInput').value.trim();
-    if(!msg) return;
-    if(!currentUser?.team_id) return;
-    supabaseClient.from('teams').select('chat_messages').eq('id', currentUser.team_id).single().then(res => {
+      });
+    }
+    function sendTeamMessage() {
+      const msg = document.getElementById('teamChatInput').value.trim();
+      if (!msg) return;
+      if (!currentUser?.team_id) return;
+      supabaseClient.from('teams').select('chat_messages').eq('id', currentUser.team_id).single().then(res => {
         let msgs = res.data?.chat_messages || [];
         msgs.push({ user: currentUser.name, message: msg, time: new Date().toLocaleTimeString() });
         supabaseClient.from('teams').update({ chat_messages: msgs }).eq('id', currentUser.team_id);
         document.getElementById('teamChatInput').value = '';
         loadTeamData();
-    });
-}
-
-const profileModalDiv = document.createElement('div');
-profileModalDiv.id = 'profileModal';
-profileModalDiv.className = 'modal-overlay';
-profileModalDiv.innerHTML = `<div class="modal"><div class="modal-header"><h3>👤 Profil</h3><button class="modal-close" onclick="closeProfileModal()">×</button></div><div class="modal-body"><div id="profileContent"></div><button class="btn-primary" onclick="changePassword()">Şifre Değiştir</button><button class="btn-primary" onclick="deleteOwnAccount()" style="background:#ff4757;margin-top:10px">🗑️ Hesabımı Sil</button></div></div>`;
-document.body.appendChild(profileModalDiv);
-
-window.onload = () => {
-    checkAndReset();
-    const saved = localStorage.getItem('v27_user');
-    if(saved) { currentUser = JSON.parse(saved); if(currentUser) showDashboard(); else document.getElementById('mainSite').style.display = 'block'; }
-    else document.getElementById('mainSite').style.display = 'block';
-    initCursor();
-    initCounters();
-    updateUI();
-    
-    const particleContainer = document.getElementById('particles');
-    if(particleContainer) {
-        for(let i = 0; i < 50; i++) {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            p.style.cssText = `left:${Math.random()*100}%;animation-duration:${5+Math.random()*15}s;animation-delay:${-Math.random()*20}s;`;
-            if(Math.random() > 0.8) p.style.background = 'var(--accent2)';
-            particleContainer.appendChild(p);
-        }
+      });
     }
-    
-    window.addEventListener('scroll', () => {
+
+    const profileModalDiv = document.createElement('div');
+    profileModalDiv.id = 'profileModal';
+    profileModalDiv.className = 'modal-overlay';
+    profileModalDiv.innerHTML = `<div class="modal"><div class="modal-header"><h3>👤 Profil</h3><button class="modal-close" onclick="closeProfileModal()">×</button></div><div class="modal-body"><div id="profileContent"></div><button class="btn-primary" onclick="changePassword()">Şifre Değiştir</button><button class="btn-primary" onclick="deleteOwnAccount()" style="background:#ff4757;margin-top:10px">🗑️ Hesabımı Sil</button></div></div>`;
+    document.body.appendChild(profileModalDiv);
+
+    window.onload = () => {
+      checkAndReset();
+      const saved = localStorage.getItem('v27_user');
+      if (saved) {
+        currentUser = JSON.parse(saved);
+        if (currentUser) showDashboard();
+        else document.getElementById('mainSite').style.display = 'block';
+      } else {
+        document.getElementById('mainSite').style.display = 'block';
+      }
+      initCursor();
+      initCounters();
+      updateUI();
+
+      const particleContainer = document.getElementById('particles');
+      if (particleContainer) {
+        for (let i = 0; i < 50; i++) {
+          const p = document.createElement('div');
+          p.className = 'particle';
+          p.style.cssText = `left:${Math.random() * 100}%;animation-duration:${5 + Math.random() * 15}s;animation-delay:${-Math.random() * 20}s;`;
+          if (Math.random() > 0.8) p.style.background = 'var(--accent2)';
+          particleContainer.appendChild(p);
+        }
+      }
+
+      window.addEventListener('scroll', () => {
         const doc = document.documentElement;
         const scrollTop = window.scrollY || doc.scrollTop;
         const scrollHeight = doc.scrollHeight - doc.clientHeight;
         const progress = (scrollTop / scrollHeight) * 100;
         const bar = document.getElementById('progressBar');
-        if(bar) bar.style.width = progress + '%';
-    });
-    
-    const names = ['Ahmet K.', 'Fatma D.', 'Burak Y.', 'Zeynep A.', 'Emre S.', 'Selin M.'];
-    setInterval(() => {
+        if (bar) bar.style.width = progress + '%';
+      });
+
+      const names = ['Ahmet K.', 'Fatma D.', 'Burak Y.', 'Zeynep A.', 'Emre S.', 'Selin M.'];
+      setInterval(() => {
         const name = names[Math.floor(Math.random() * names.length)];
         const n = document.getElementById('notification');
-        if(n) {
-            n.innerHTML = `<span>🟢 ${name}</span> platformumuza katıldı!`;
-            n.classList.add('show');
-            setTimeout(() => n.classList.remove('show'), 4000);
+        if (n) {
+          n.innerHTML = `<span>🟢 ${name}</span> platformumuza katıldı!`;
+          n.classList.add('show');
+          setTimeout(() => n.classList.remove('show'), 4000);
         }
-    }, 15000);
-};
-</script>
+      }, 15000);
+    };
+  </script>
 </body>
+
 </html>
