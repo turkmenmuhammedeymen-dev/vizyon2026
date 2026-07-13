@@ -3612,9 +3612,9 @@ async function loadComments() {
         const comments = await Parse.Cloud.run('getComments');
         const container = document.getElementById('commentsList');
         if (!comments || comments.length === 0) {
-            container.innerHTML = `<div class="comment-item" style="border-left-color: var
+            container.innerHTML = '<div class="comment-item" style="border-left-color: var
 
-(--accent2); text-align: center; color: var(--text3);">🌟 Ilk yorumu sen yap!</div>`;
+(--accent2); text-align: center; color: var(--text3);">🌟 Ilk yorumu sen yap!</div>';
             return;
         }
         const roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 
@@ -3648,11 +3648,11 @@ text3)'};">${roleLabels[c.user_role] || '👤 KULLANICI'}</span>
         `).join('');
     } catch(e) {
         console.error('Yorumlar yuklenemedi:', e);
-        document.getElementById('commentsList').innerHTML = `<div class="comment-item" 
+        document.getElementById('commentsList').innerHTML = '<div class="comment-item" 
 
 style="border-left-color: var(--danger); text-align: center; color: var(--danger);">⚠️ 
 
-Yorumlar yuklenemedi: ${e.message}</div>`;
+Yorumlar yuklenemedi: ' + e.message + '</div>';
     }
 }
 
