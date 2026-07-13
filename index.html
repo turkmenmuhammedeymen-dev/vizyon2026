@@ -2816,9 +2816,7 @@ async function callAllAIModels(prompt) {
         return await Parse.Cloud.run('superAI', { prompt: prompt });
     } catch(e) {
         console.error('AI hatası:', e);
-        return '🧠 VİZYON AI: "' + prompt + '" hakkında yardımcı olabilirim. Detaylı yanıt 
-
-için lütfen daha spesifik bir soru sorun.';
+        return '🧠 VİZYON AI: "' + prompt + '" hakkında yardımcı olabilirim. Detaylı yanıt için lütfen daha spesifik bir soru sorun.';
     }
 }
 
@@ -2839,15 +2837,11 @@ window.sendDashboardAI = async function() {
     var msg = inp.value.trim();
     if (!msg) return;
     var container = document.getElementById('dashboardAiMessages');
-    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + 
-
-'</div>';
+    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + '</div>';
     inp.value = '';
     container.scrollTop = container.scrollHeight;
     var response;
-    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') 
-
-!== -1) {
+    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') !== -1) {
         response = await webSearch(msg);
     } else {
         response = await callAllAIModels(msg);
@@ -2929,17 +2923,9 @@ function openProfileModal() {
     document.getElementById('profileContent').innerHTML =
         '<p><strong>Ad:</strong> ' + currentUser.get('name') + '</p>' +
         '<p><strong>E-posta:</strong> ' + currentUser.get('email') + '</p>' +
-        '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : 
-
-(currentUser.get('plan') === 'team' ? '👥 Takım' : '🆓 Ücretsiz')) + '</p>' +
-        '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : 
-
-(currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 
-
-Beta' : '👤 Kullanıcı'))) + '</p>' +
-        '<p><strong>Üyelik:</strong> ' + new Date(currentUser.get
-
-('createdAt')).toLocaleDateString('tr-TR') + '</p>';
+        '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : (currentUser.get('plan') === 'team' ? '👥 Takım' : '🆓 Ücretsiz')) + '</p>' +
+        '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : (currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 Beta' : '👤 Kullanıcı'))) + '</p>' +
+        '<p><strong>Üyelik:</strong> ' + new Date(currentUser.get('createdAt')).toLocaleDateString('tr-TR') + '</p>';
     document.getElementById('profileModal').classList.add('open');
 }
 
@@ -2982,9 +2968,7 @@ async function buyPackage(pkg) {
         showNotification('Önce giriş yapın!', 'error');
         return;
     }
-    if (confirm((pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takım Paketi (₺899/ay)') + ' satın 
-
-al?')) {
+    if (confirm((pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takım Paketi (₺899/ay)') + ' satın al?')) {
         try {
             currentUser.set('plan', pkg);
             await currentUser.save();
@@ -3034,19 +3018,7 @@ async function loadUserList() {
         var container = document.getElementById('userList');
         if (!container) return;
         container.innerHTML = users.map(function(u) {
-            return '<div class="user-item"><span class="user-email">' + u.get('email') + 
-
-'</span><span class="user-role">' + (u.get('role') || 'user') + '</span><div class="user-
-
-actions"><button class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email') + 
-
-'\')">Admin Yap</button><button class="btn-user" onclick="setUserRole(\'' + u.get('email') 
-
-+ '\',\'user\')">Kullanıcı Yap</button><button class="btn-ban" onclick="banUserEmail(\'' + 
-
-u.get('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' 
-
-+ u.get('email') + '\')">🎁</button></div></div>';
+            return '<div class="user-item"><span class="user-email">' + u.get('email') + '</span><span class="user-role">' + (u.get('role') || 'user') + '</span><div class="user-actions"><button class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email') + '\')">Admin Yap</button><button class="btn-user" onclick="setUserRole(\'' + u.get('email') + '\',\'user\')">Kullanıcı Yap</button><button class="btn-ban" onclick="banUserEmail(\'' + u.get('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' + u.get('email') + '\')">🎁</button></div></div>';
         }).join('');
     } catch(e) {
         console.error('Kullanıcı listesi yüklenirken hata:', e);
@@ -3068,9 +3040,7 @@ async function assignAdminEmail(email) {
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
-        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lütfen şifrenizi 
-
-belirlemek için "Admin Şifre Belirle" butonuna tıklayın.');
+        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lütfen şifrenizi belirlemek için "Admin Şifre Belirle" butonuna tıklayın.');
         await inbox.save(null, { useMasterKey: true });
         showNotification(email + ' admin yapıldı!', 'success');
         await loadUserList();
@@ -3134,9 +3104,7 @@ async function giftUserEmail(email, pkg) {
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
-        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takım Paketi') + ' 
-
-hediye edildi!');
+        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takım Paketi') + ' hediye edildi!');
         await inbox.save(null, { useMasterKey: true });
         showNotification(email + ' adresine ' + pkg + ' paketi hediye edildi!', 'success');
         await loadUserList();
@@ -3194,9 +3162,7 @@ async function updateCounters() {
         } catch(e) {
             document.getElementById('counter3').innerHTML = '0';
         }
-        document.getElementById('counter2').innerHTML = (Math.floor(Math.random() * 100000) 
-
-+ 50000).toLocaleString();
+        document.getElementById('counter2').innerHTML = (Math.floor(Math.random() * 100000) + 50000).toLocaleString();
     } catch(e) {
         console.error('Sayaçlar güncellenirken hata:', e);
     }
@@ -3209,18 +3175,10 @@ function openModal(type) {
 }
 
 function switchTab(tab) {
-    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 
-
-'none';
-    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 
-
-'none';
-    document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 
-
-'none';
-    document.querySelectorAll('.modal-tab').forEach(function(el) { el.classList.remove
-
-('active'); });
+    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none';
+    document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 'none';
+    document.querySelectorAll('.modal-tab').forEach(function(el) { el.classList.remove('active'); });
     var tabs = document.querySelectorAll('.modal-tab');
     if (tab === 'login') tabs[0].classList.add('active');
     else if (tab === 'register') tabs[1].classList.add('active');
@@ -3272,9 +3230,7 @@ if (particlesContainer) {
     for (var i = 0; i < 60; i++) {
         var p = document.createElement('div');
         p.className = 'particle';
-        p.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + 
-
-Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';
+        p.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';
         particlesContainer.appendChild(p);
     }
 }
@@ -3302,13 +3258,9 @@ if (cursor && ring) {
         requestAnimationFrame(animate);
     }
     animate();
-    document.querySelectorAll('button, a, .btn, .secret-btn, .support-link').forEach
-
-(function(btn) {
+    document.querySelectorAll('button, a, .btn, .secret-btn, .support-link').forEach(function(btn) {
         btn.addEventListener('mouseenter', function() { cursor.classList.add('hover'); });
-        btn.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); 
-
-});
+        btn.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); });
     });
 }
 
@@ -3346,9 +3298,7 @@ window.onload = async function() {
         }
     }
     await updateCounters();
-    showNotification('✨ VİZYON 2027 Sistemi Aktif! (Back4App + Cloud Code ile)', 
-
-'success');
+    showNotification('✨ VİZYON 2027 Sistemi Aktif! (Back4App + Cloud Code ile)', 'success');
 };
     </script>
 
