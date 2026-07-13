@@ -2210,24 +2210,58 @@ yazabilirsin... (Python, JavaScript, React, SQL...)" rows="2" onkeydown="if
     <!-- ============================================================ -->
     <script>
         // ============================================================
-// 1. JS - BACK4APP KONFIGÜRASYONU (API ANAHTARLARI YOK)
+// 1. JS - BACK4APP DİNAMİK KONFİG (Cloud Code'dan al)
 // ============================================================
-
-// ========== BACK4APP KONFİGÜRASYONU ==========
-const BACK4APP_APP_ID = "ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8";
-const BACK4APP_JS_KEY = "cd1HeGMPKUu8xxE8Q11FMvkzvG6lz7QbJ0rPVpSf";
-const BACK4APP_SERVER_URL = "https://parseapi.back4app.com";
-
-Parse.initialize(BACK4APP_APP_ID, BACK4APP_JS_KEY);
-Parse.serverURL = BACK4APP_SERVER_URL;
 
 // ========== DEĞİŞKENLER ==========
 let currentUser = null;
 let currentRole = null;
 let dailyQueries = parseInt(localStorage.getItem('v27_queries') || '20');
 let lastDate = localStorage.getItem('v27_last_date') || '';
+let parseInitialized = false;
 
-// ========== BİLDİRİM FONKSİYONU ==========
+// ========== BACK4APP'İ BAŞLAT ==========
+async function initBack4App() {
+    if (parseInitialized) return;
+    try {
+        const response = await fetch
+
+('https://parseapi.back4app.com/functions/getBack4AppConfig', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        if (!data.result) throw new Error('Config alınamadı');
+        const { appId, jsKey, serverUrl } = data.result;
+        
+        // Parse SDK'yı dinamik yükle
+        await loadParseSDK();
+        Parse.initialize(appId, jsKey);
+        Parse.serverURL = serverUrl;
+        parseInitialized = true;
+        console.log('✅ Back4App başarıyla başlatıldı (Config ile)');
+    } catch(e) {
+        console.error('Back4App başlatılamadı:', e);
+        // Güvenli fallback yok! Kullanıcıya hata göster
+        showNotification('❌ Back4App bağlantı hatası! Lütfen daha sonra tekrar deneyin.', 
+
+'error');
+    }
+}
+
+// ========== PARSE SDK'YI YÜKLE ==========
+function loadParseSDK() {
+    return new Promise((resolve, reject) => {
+        if (typeof Parse !== 'undefined') { resolve(); return; }
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/parse@5.0.0/dist/parse.min.js';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+}
+
+// ========== BİLDİRİM ==========
 function showNotification(msg, type) {
     let n = document.getElementById('notification');
     if (!n) {
@@ -2247,7 +2281,7 @@ function closeModal(id) {
     if (modal) modal.classList.remove('open');
 }
 
-// ========== SORGU LİMİTİ ==========
+// ========== SORGU LİMİTİ (LocalStorage geçici, Cloud Code asıl) ==========
 function checkAndReset() {
     const today = new Date().toDateString();
     if (lastDate !== today) {
@@ -2259,19 +2293,19 @@ function checkAndReset() {
     if (el) el.innerHTML = dailyQueries;
 }
 
-function useQuery() {
-    // Admin, Founder, Beta için SINIRSIZ
+async function useQuery() {
     if (currentUser) {
-        const role = currentUser.get('role');
-        if (role === 'admin' || role === 'founder' || role === 'beta') {
+        try {
+            const result = await Parse.Cloud.run('useQuery');
+            const el = document.getElementById('remainingQueries');
+            if (el) el.innerHTML = result.remaining;
             return true;
-        }
-        const plan = currentUser.get('plan');
-        if (plan === 'pro' || plan === 'team') {
-            return true;
+        } catch(e) {
+            showNotification(e.message, 'error');
+            return false;
         }
     }
-    // Normal kullanıcı için limit kontrolü
+    // Giriş yapmamış kullanıcı için localStorage limiti
     if (dailyQueries <= 0) {
         showNotification('Günlük sorgu limitiniz doldu!', 'error');
         return false;
@@ -2794,110 +2828,18 @@ Mesajlar yüklenemedi.</div>';
     <!-- ============================================================ -->
     <script>
         // ============================================================
-// 3. JS - TAKIM SİSTEMİ VE AI (CLOUD CODE)
+// 3. JS - TAKIM VE AI (Cloud Code ile)
 // ============================================================
 
-// ========== TAKIM SİSTEMİ ==========
-async function loadTeamInfo() {
-    if (!currentUser) return;
-    var teamId = currentUser.get('teamId');
-    if (!teamId) {
-        document.getElementById('teamInfo').innerHTML = '<p>Bir takıma üye değilsiniz. Takım oluşturun veya davet bekleyin.</p>';
-        document.getElementById('teamMembersList').innerHTML = '';
-        document.getElementById('teamChatMessages').innerHTML = '';
-        return;
-    }
-    try {
-        var Team = Parse.Object.extend('Team');
-        var query = new Parse.Query(Team);
-        var team = await query.get(teamId);
-        var Member = Parse.Object.extend('TeamMember');
-        var memberQuery = new Parse.Query(Member);
-        memberQuery.equalTo('team_id', teamId);
-        var members = await memberQuery.find();
-        var Message = Parse.Object.extend('TeamMessage');
-        var msgQuery = new Parse.Query(Message);
-        msgQuery.equalTo('team_id', teamId);
-        msgQuery.ascending('createdAt');
-        var messages = await msgQuery.find();
-        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + '</h4><p>Üye sayısı: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
-        document.getElementById('teamMembersList').innerHTML = members.map(function(m) {
-            return '<div class="team-member-item">👤 ' + m.get('user_email') + (m.get('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>';
-        }).join('');
-        var chatContainer = document.getElementById('teamChatMessages');
-        var userEmail = currentUser.get('email');
-        chatContainer.innerHTML = messages.map(function(m) {
-            return '<div class="ai-message ' + (m.get('user_email') === userEmail ? 'user' : 'bot') + '"><strong>' + (m.get('user_email') === userEmail ? 'Ben' : m.get('user_email').split('@')[0]) + '</strong>: ' + m.get('message') + '</div>';
-        }).join('') || '<div>Henüz mesaj yok</div>';
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-    } catch(e) { console.error('Takım bilgisi yüklenirken hata:', e); }
-}
-
-async function createTeam() {
-    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
-    var name = prompt('Takım adı:');
-    if (!name) return;
-    try {
-        var Team = Parse.Object.extend('Team');
-        var team = new Team();
-        team.set('name', name);
-        team.set('owner_email', currentUser.get('email'));
-        await team.save();
-        var Member = Parse.Object.extend('TeamMember');
-        var member = new Member();
-        member.set('team_id', team.id);
-        member.set('user_email', currentUser.get('email'));
-        await member.save();
-        currentUser.set('teamId', team.id);
-        await currentUser.save();
-        await loadTeamInfo();
-        showNotification('"' + name + '" takımı oluşturuldu!', 'success');
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
-}
-
-async function inviteToTeam() {
-    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
-    var teamId = currentUser.get('teamId');
-    if (!teamId) { showNotification('Önce takım oluşturun!', 'error'); return; }
-    var email = document.getElementById('inviteEmail').value.trim();
-    if (!email) { showNotification('E-posta adresi girin!', 'error'); return; }
-    try {
-        var Inbox = Parse.Object.extend('Inbox');
-        var inbox = new Inbox();
-        inbox.set('sender_email', currentUser.get('email'));
-        inbox.set('receiver_email', email);
-        inbox.set('message', currentUser.get('name') + ' sizi takıma davet etti! Takım ID: ' + teamId);
-        await inbox.save();
-        showNotification('Davet gönderildi: ' + email, 'success');
-        document.getElementById('inviteEmail').value = '';
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
-}
-
-async function sendTeamMessage() {
-    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
-    var teamId = currentUser.get('teamId');
-    if (!teamId) { showNotification('Takımınız yok!', 'error'); return; }
-    var msg = document.getElementById('teamChatInput').value.trim();
-    if (!msg) return;
-    try {
-        var Message = Parse.Object.extend('TeamMessage');
-        var message = new Message();
-        message.set('team_id', teamId);
-        message.set('user_email', currentUser.get('email'));
-        message.set('message', msg);
-        await message.save();
-        document.getElementById('teamChatInput').value = '';
-        await loadTeamInfo();
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
-}
-
-// ========== YAPAY ZEKA (CLOUD CODE) – DÜZELTİLDİ ==========
+// ========== YAPAY ZEKA (Cloud Code) ==========
 async function callAllAIModels(prompt) {
     try {
         return await Parse.Cloud.run('superAI', { prompt: prompt });
     } catch(e) {
         console.error('AI hatası:', e);
-        return 'VİZYON AI: ' + prompt + ' hakkında yardımcı olabilirim. Detaylı yanıt için lütfen daha spesifik bir soru sorun.';
+        return '🧠 VİZYON AI: "' + prompt + '" hakkında yardımcı olabilirim. Detaylı yanıt 
+
+için lütfen daha spesifik bir soru sorun.';
     }
 }
 
@@ -2913,16 +2855,20 @@ async function webSearch(query) {
 
 // ========== AI CHAT FONKSİYONLARI ==========
 window.sendDashboardAI = async function() {
-    if (!useQuery()) return;
+    if (!await useQuery()) return;
     var inp = document.getElementById('dashboardAiInput');
     var msg = inp.value.trim();
     if (!msg) return;
     var container = document.getElementById('dashboardAiMessages');
-    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + '</div>';
+    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + 
+
+'</div>';
     inp.value = '';
     container.scrollTop = container.scrollHeight;
     var response;
-    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') !== -1) {
+    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') 
+
+!== -1) {
         response = await webSearch(msg);
     } else {
         response = await callAllAIModels(msg);
@@ -2940,7 +2886,7 @@ function closeFullAIPanel() {
 }
 
 async function sendFullAI() {
-    if (!useQuery()) return;
+    if (!await useQuery()) return;
     var inp = document.getElementById('fullAIInput');
     var msg = inp.value.trim();
     if (!msg) return;
@@ -2954,7 +2900,7 @@ async function sendFullAI() {
     } else {
         response = await callAllAIModels(msg);
     }
-    chat.innerHTML += '<div class="ai-msg bot">' + response + '</div>';
+    chat.innerHTML += '<div class="ai-msg bot">🧠 ' + response + '</div>';
     chat.scrollTop = chat.scrollHeight;
 }
 
@@ -2968,7 +2914,7 @@ function quickAsk(q) {
 }
 
 async function sendAiMessage() {
-    if (!useQuery()) return;
+    if (!await useQuery()) return;
     var inp = document.getElementById('aiInput');
     var msg = inp.value.trim();
     if (!msg) return;
@@ -3004,9 +2950,17 @@ function openProfileModal() {
     document.getElementById('profileContent').innerHTML =
         '<p><strong>Ad:</strong> ' + currentUser.get('name') + '</p>' +
         '<p><strong>E-posta:</strong> ' + currentUser.get('email') + '</p>' +
-        '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : (currentUser.get('plan') === 'team' ? '👥 Takım' : '🆓 Ücretsiz')) + '</p>' +
-        '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : (currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 Beta' : '👤 Kullanıcı'))) + '</p>' +
-        '<p><strong>Üyelik:</strong> ' + new Date(currentUser.get('createdAt')).toLocaleDateString('tr-TR') + '</p>';
+        '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : 
+
+(currentUser.get('plan') === 'team' ? '👥 Takım' : '🆓 Ücretsiz')) + '</p>' +
+        '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : 
+
+(currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 
+
+Beta' : '👤 Kullanıcı'))) + '</p>' +
+        '<p><strong>Üyelik:</strong> ' + new Date(currentUser.get
+
+('createdAt')).toLocaleDateString('tr-TR') + '</p>';
     document.getElementById('profileModal').classList.add('open');
 }
 
@@ -3049,7 +3003,9 @@ async function buyPackage(pkg) {
         showNotification('Önce giriş yapın!', 'error');
         return;
     }
-    if (confirm((pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takım Paketi (₺899/ay)') + ' satın al?')) {
+    if (confirm((pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takım Paketi (₺899/ay)') + ' satın 
+
+al?')) {
         try {
             currentUser.set('plan', pkg);
             await currentUser.save();
@@ -3099,7 +3055,19 @@ async function loadUserList() {
         var container = document.getElementById('userList');
         if (!container) return;
         container.innerHTML = users.map(function(u) {
-            return '<div class="user-item"><span class="user-email">' + u.get('email') + '</span><span class="user-role">' + (u.get('role') || 'user') + '</span><div class="user-actions"><button class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email') + '\')">Admin Yap</button><button class="btn-user" onclick="setUserRole(\'' + u.get('email') + '\',\'user\')">Kullanıcı Yap</button><button class="btn-ban" onclick="banUserEmail(\'' + u.get('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' + u.get('email') + '\')">🎁</button></div></div>';
+            return '<div class="user-item"><span class="user-email">' + u.get('email') + 
+
+'</span><span class="user-role">' + (u.get('role') || 'user') + '</span><div class="user-
+
+actions"><button class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email') + 
+
+'\')">Admin Yap</button><button class="btn-user" onclick="setUserRole(\'' + u.get('email') 
+
++ '\',\'user\')">Kullanıcı Yap</button><button class="btn-ban" onclick="banUserEmail(\'' + 
+
+u.get('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' 
+
++ u.get('email') + '\')">🎁</button></div></div>';
         }).join('');
     } catch(e) {
         console.error('Kullanıcı listesi yüklenirken hata:', e);
@@ -3121,7 +3089,9 @@ async function assignAdminEmail(email) {
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
-        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lütfen şifrenizi belirlemek için "Admin Şifre Belirle" butonuna tıklayın.');
+        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lütfen şifrenizi 
+
+belirlemek için "Admin Şifre Belirle" butonuna tıklayın.');
         await inbox.save(null, { useMasterKey: true });
         showNotification(email + ' admin yapıldı!', 'success');
         await loadUserList();
@@ -3185,7 +3155,9 @@ async function giftUserEmail(email, pkg) {
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
-        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takım Paketi') + ' hediye edildi!');
+        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takım Paketi') + ' 
+
+hediye edildi!');
         await inbox.save(null, { useMasterKey: true });
         showNotification(email + ' adresine ' + pkg + ' paketi hediye edildi!', 'success');
         await loadUserList();
@@ -3243,7 +3215,9 @@ async function updateCounters() {
         } catch(e) {
             document.getElementById('counter3').innerHTML = '0';
         }
-        document.getElementById('counter2').innerHTML = (Math.floor(Math.random() * 100000) + 50000).toLocaleString();
+        document.getElementById('counter2').innerHTML = (Math.floor(Math.random() * 100000) 
+
++ 50000).toLocaleString();
     } catch(e) {
         console.error('Sayaçlar güncellenirken hata:', e);
     }
@@ -3256,10 +3230,18 @@ function openModal(type) {
 }
 
 function switchTab(tab) {
-    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none';
-    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none';
-    document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 'none';
-    document.querySelectorAll('.modal-tab').forEach(function(el) { el.classList.remove('active'); });
+    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 
+
+'none';
+    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 
+
+'none';
+    document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 
+
+'none';
+    document.querySelectorAll('.modal-tab').forEach(function(el) { el.classList.remove
+
+('active'); });
     var tabs = document.querySelectorAll('.modal-tab');
     if (tab === 'login') tabs[0].classList.add('active');
     else if (tab === 'register') tabs[1].classList.add('active');
@@ -3311,7 +3293,9 @@ if (particlesContainer) {
     for (var i = 0; i < 60; i++) {
         var p = document.createElement('div');
         p.className = 'particle';
-        p.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';
+        p.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + 
+
+Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';
         particlesContainer.appendChild(p);
     }
 }
@@ -3339,16 +3323,36 @@ if (cursor && ring) {
         requestAnimationFrame(animate);
     }
     animate();
-    document.querySelectorAll('button, a, .btn, .secret-btn, .support-link').forEach(function(btn) {
+    document.querySelectorAll('button, a, .btn, .secret-btn, .support-link').forEach
+
+(function(btn) {
         btn.addEventListener('mouseenter', function() { cursor.classList.add('hover'); });
-        btn.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); });
+        btn.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); 
+
+});
     });
 }
 
-// ========== SAYFA YÜKLENİNCE ==========
+// ========== SAYFA YÜKLENİNCE (GÜNCELLENMİŞ) ==========
 window.onload = async function() {
+    // Önce Back4App'i başlat (JS-1'de tanımlı)
+    if (typeof initBack4App === 'function') {
+        await initBack4App();
+    } else {
+        console.error('initBack4App fonksiyonu bulunamadı!');
+        showNotification('❌ Back4App bağlantısı kurulamadı! Sayfayı yenileyin.', 'error');
+        return;
+    }
+    
+    // Parse yüklendiyse devam et
+    if (typeof Parse === 'undefined' || !parseInitialized) {
+        showNotification('❌ Back4App bağlantısı kurulamadı! Sayfayı yenileyin.', 'error');
+        return;
+    }
+    
     await initData();
     checkAndReset();
+    
     var saved = localStorage.getItem('vizyon_user');
     if (saved) {
         try {
@@ -3363,7 +3367,9 @@ window.onload = async function() {
         }
     }
     await updateCounters();
-    showNotification('✨ VİZYON 2027 Sistemi Aktif! (Back4App + Cloud Code ile)', 'success');
+    showNotification('✨ VİZYON 2027 Sistemi Aktif! (Back4App + Cloud Code ile)', 
+
+'success');
 };
     </script>
 
