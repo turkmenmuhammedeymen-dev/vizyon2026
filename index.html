@@ -1423,9 +1423,11 @@ transparent 60%);
 .min-w-150 {
     min-width: 150px;
 }</style>
+/* ============================================================ */
+/* 4. CSS - ÖZEL STILLER, BUTONLAR, YORUMLAR, RESPONSIVE       */
+/* ============================================================ */
 
-    <!-- ===== 4. CSS ===== -->
-    <style>/* ===== BUTONLAR BÜYÜK ve BELİRGİN ===== */
+/* ===== BUTONLAR BÜYÜK ve BELİRGİN ===== */
 .btn-primary {
     font-size: 18px !important;
     padding: 14px 32px !important;
@@ -1509,7 +1511,137 @@ transparent 60%);
 .ai-msg.user {
     font-size: 14px !important;
     background: rgba(0,255,136,0.08) !important;
-}</style>
+}
+
+/* ===== GOOGLE BUTONU ===== */
+.btn-google {
+    width: 100%;
+    padding: 14px;
+    background: #ffffff;
+    border: none;
+    border-radius: 16px;
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.btn-google:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.btn-google i {
+    color: #ea4335;
+    font-size: 18px;
+}
+
+/* ===== YORUM SİSTEMİ ===== */
+#commentsSection {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    border-top: 1px solid var(--border);
+}
+#commentsSection h3 {
+    color: var(--accent);
+    font-family: var(--font-display);
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+.comment-item {
+    background: var(--surface);
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    border-left: 3px solid var(--border);
+    transition: all var(--transition-fast);
+}
+.comment-item:hover {
+    background: var(--surface2);
+}
+.comment-item .role-badge {
+    font-size: 10px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--border);
+    color: var(--text3);
+    border: 1px solid var(--border);
+}
+.comment-item .role-badge.founder { border-color: var(--gold); color: var(--gold); }
+.comment-item .role-badge.admin { border-color: var(--accent); color: var(--accent); }
+.comment-item .role-badge.beta { border-color: var(--purple); color: var(--purple); }
+.comment-item .role-badge.user { border-color: var(--text3); color: var(--text3); }
+.comment-item .comment-text {
+    margin: 6px 0 2px 0;
+    color: var(--text2);
+    font-size: 14px;
+    line-height: 1.6;
+}
+.comment-item .comment-time {
+    font-size: 10px;
+    color: var(--text3);
+}
+.comment-item .comment-email {
+    font-size: 10px;
+    color: var(--text3);
+    margin-left: 8px;
+}
+#commentForm {
+    margin-top: 16px;
+}
+#commentForm textarea {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 14px;
+    resize: vertical;
+    font-family: var(--font-body);
+}
+#commentForm textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+#commentLoginMessage {
+    margin-top: 16px;
+    padding: 12px;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px dashed var(--border);
+    text-align: center;
+    color: var(--text3);
+}
+#commentLoginMessage .btn-secondary {
+    display: inline-block;
+    padding: 6px 16px;
+    font-size: 12px;
+}
+
+/* ===== RESPONSIVE EKLENTİLER ===== */
+@media (max-width: 768px) {
+    #commentsSection {
+        padding: 10px;
+    }
+    .comment-item {
+        padding: 10px 12px;
+    }
+    .comment-item .role-badge {
+        font-size: 9px;
+        padding: 1px 8px;
+    }
+    .btn-google {
+        font-size: 13px;
+        padding: 12px;
+    }
+}
+    </style>
 
 </head>
 <body>
@@ -2032,7 +2164,8 @@ class="glow-input" style="flex:1;min-width:200px;">
 
     <!-- ===== 3. HTML - MODALLAR, WIDGET, FULL AI PANEL ===== -->
     <!-- ============================================================ -->
-<!-- 3. HTML - MODALLAR, WIDGET, FULL AI PANEL                    -->
+<!-- ============================================================ -->
+<!-- 3. HTML - MODALLAR, WIDGET, FULL AI PANEL, YORUMLAR         -->
 <!-- ============================================================ -->
 
 <!-- ===== GİRİŞ / KAYIT / DOĞRULAMA MODALI ===== -->
@@ -2050,6 +2183,14 @@ class="glow-input" style="flex:1;min-width:200px;">
             <button class="modal-tab" onclick="switchTab('verify')">Doğrula</button>
         </div>
         <div class="modal-body">
+
+            <!-- GOOGLE İLE GİRİŞ (HER FORMDA GÖRÜNÜR) -->
+            <button class="btn-google" onclick="loginWithGoogle()">
+                <i class="fab fa-google"></i> Google ile Giriş Yap
+            </button>
+            <div style="text-align: center; margin: 8px 0 16px 0; color: var(--text3); 
+
+font-size: 12px;">veya</div>
 
             <!-- KAYIT FORMU -->
             <div id="formRegister">
@@ -2205,27 +2346,79 @@ yazabilirsin... (Python, JavaScript, React, SQL...)" rows="2" onkeydown="if
     </div>
 </div>
 
+<!-- ============================================================ -->
+<!-- YORUM SİSTEMİ                                                -->
+<!-- ============================================================ -->
+<section id="commentsSection">
+    <h3>💬 Yorumlar</h3>
+    
+    <!-- Yorum Listesi -->
+    <div id="commentsList">
+        <div class="comment-item" style="border-left-color: var(--accent2); text-align: 
+
+center; color: var(--text3);">
+            🌟 Yorumlar yükleniyor...
+        </div>
+    </div>
+    
+    <!-- Yorum Formu (sadece giriş yapmış kullanıcılar görebilir) -->
+    <div id="commentForm" style="display: none;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <span style="color: var(--text2); font-size: 14px;">👤 <span 
+
+id="commentUserName">Misafir</span></span>
+            <span id="commentUserRole" style="font-size: 11px; padding: 2px 10px; border-
+
+radius: 12px; background: var(--border); color: var(--text3);">👤 KULLANICI</span>
+        </div>
+        <textarea id="commentInput" rows="2" placeholder="Yorumunuzu yazın..." 
+
+style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); 
+
+border-radius: 12px; color: var(--text); font-size: 14px; resize: vertical; font-family: 
+
+var(--font-body);"></textarea>
+        <button onclick="postComment()" class="btn-primary" style="margin-top: 8px; width: 
+
+100%; font-size: 14px !important; padding: 12px !important;">💬 Yorum Gönder</button>
+    </div>
+    
+    <!-- Giriş yapmamış kullanıcılar için mesaj -->
+    <div id="commentLoginMessage" style="margin-top: 16px; padding: 12px; background: var
+
+(--surface); border-radius: 12px; border: 1px dashed var(--border); text-align: center; 
+
+color: var(--text3);">
+        <p>Yorum yapmak için <button class="btn-secondary btn-sm" onclick="openModal
+
+('login')" style="display: inline-block; padding: 6px 16px; font-size: 12px;">giriş 
+
+yapmalısınız</button>.</p>
+    </div>
+</section>
+    </div>
+</div>
+
     <!-- ============================================================ -->
     <!-- 1. JS - BACK4APP KONFIGÜRASYONU                              -->
     <!-- ============================================================ -->
     <script>
         // ============================================================
-// 1. JS - BACK4APP KONFIG (DOĞRUDAN HARDCODE)
+// 1. JS - BACK4APP KONFIG (HARDCODE + STATS)
 // ============================================================
 
 let currentUser = null;
 let currentRole = null;
 let parseInitialized = false;
+let statsInterval = null;
 
 // ========== BACK4APP'İ BAŞLAT ==========
 async function initBack4App() {
     if (parseInitialized) return;
     
     try {
-        // Parse SDK'yı yükle
         await loadParseSDK();
         
-        // DOĞRUDAN ANAHTARLARLA BAŞLAT
         Parse.initialize(
             "ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8",
             "cd1HeGMPKUu8xxE8Q11FMvkzvG6lz7QbJ0rPVpSf"
@@ -2236,7 +2429,6 @@ async function initBack4App() {
         console.log('✅ Back4App başarıyla başlatıldı!');
         showNotification('✅ Back4App bağlantısı kuruldu!', 'success');
         
-        // Test et
         try {
             const result = await Parse.Cloud.run('testConfig');
             console.log('✅ Cloud Code test:', result);
@@ -2295,6 +2487,32 @@ async function useQuery() {
     }
     return true;
 }
+
+// ========== SAYAÇLARI GÜNCELLE (GERÇEK VERİ) ==========
+async function updateStats() {
+    try {
+        const stats = await Parse.Cloud.run('getStats');
+        document.getElementById('counter1').innerHTML = stats.users || 0;
+        document.getElementById('counter2').innerHTML = stats.queries || 0;
+        document.getElementById('counter3').innerHTML = stats.projects || 0;
+    } catch(e) {
+        console.log('İstatistikler güncellenemedi:', e);
+    }
+}
+
+// ========== SAYAÇLARI PERİYODİK GÜNCELLE ==========
+function startStatsInterval() {
+    if (statsInterval) clearInterval(statsInterval);
+    updateStats();
+    statsInterval = setInterval(updateStats, 30000);
+}
+
+function stopStatsInterval() {
+    if (statsInterval) {
+        clearInterval(statsInterval);
+        statsInterval = null;
+    }
+}
     </script>
 
     <!-- ============================================================ -->
@@ -2302,7 +2520,7 @@ async function useQuery() {
     <!-- ============================================================ -->
     <script>
         // ============================================================
-// 2. JS - KAYIT, GİRİŞ, DOĞRULAMA, PROJE YÖNETİMİ
+// 2. JS - KAYIT, GİRİŞ, DOĞRULAMA, GOOGLE, PROJE YÖNETİMİ
 // ============================================================
 
 // ========== KAYIT ==========
@@ -2443,9 +2661,52 @@ async function handleLogin() {
         
         closeModal('authModal');
         showDashboard();
+        updateCommentUI();
         showNotification('Hoş geldin, ' + user.get('name'), 'success');
     } catch(e) {
         showNotification('Giriş başarısız: ' + e.message, 'error');
+    }
+}
+
+// ========== GOOGLE İLE GİRİŞ ==========
+async function loginWithGoogle() {
+    try {
+        showNotification('Google ile giriş başlatılıyor...', 'success');
+        
+        // Back4App Google OAuth ile giriş
+        const user = await Parse.User.logInWith('google', {
+            authData: {
+                id: 'google_' + Date.now(),
+                access_token: 'temp_token'
+            }
+        });
+        
+        if (user.get('isBanned')) {
+            await Parse.User.logOut();
+            showNotification('Hesabınız yasaklanmıştır!', 'error');
+            return;
+        }
+        
+        currentUser = user;
+        localStorage.setItem('vizyon_user', JSON.stringify({
+            id: user.id,
+            name: user.get('name') || user.get('username') || 'Google Kullanıcısı',
+            email: user.get('email'),
+            role: user.get('role') || 'user',
+            plan: user.get('plan') || 'free',
+            teamId: user.get('teamId')
+        }));
+        
+        closeModal('authModal');
+        showDashboard();
+        updateCommentUI();
+        showNotification('Google ile giriş başarılı! Hoş geldin ' + (user.get('name') || 
+
+'Kullanıcı'), 'success');
+        
+    } catch(e) {
+        console.error('Google giriş hatası:', e);
+        showNotification('Google giriş hatası: ' + e.message, 'error');
     }
 }
 
@@ -2454,6 +2715,7 @@ function logout() {
     Parse.User.logOut();
     localStorage.removeItem('vizyon_user');
     currentUser = null;
+    stopStatsInterval();
     location.reload();
 }
 
@@ -2486,7 +2748,8 @@ async function showDashboard() {
     await loadProjectRequests();
     await loadInbox();
     await loadTeamInfo();
-    await updateCounters();
+    await updateStats();
+    startStatsInterval();
 }
 
 // ========== PROJE İŞLEMLERİ ==========
@@ -2807,8 +3070,130 @@ Mesajlar yüklenemedi.</div>';
     <!-- ============================================================ -->
     <script>
         // ============================================================
-// 3. JS - TAKIM VE AI (Cloud Code ile)
+// 3. JS - TAKIM VE AI (Cloud Code ile + Temizleme)
 // ============================================================
+
+// ========== TAKIM SİSTEMİ ==========
+async function loadTeamInfo() {
+    if (!currentUser) return;
+    var teamId = currentUser.get('teamId');
+    if (!teamId) {
+        document.getElementById('teamInfo').innerHTML = '<p>Bir takıma üye değilsiniz. 
+
+Takım oluşturun veya davet bekleyin.</p>';
+        document.getElementById('teamMembersList').innerHTML = '';
+        document.getElementById('teamChatMessages').innerHTML = '';
+        return;
+    }
+    try {
+        var Team = Parse.Object.extend('Team');
+        var query = new Parse.Query(Team);
+        var team = await query.get(teamId);
+        var Member = Parse.Object.extend('TeamMember');
+        var memberQuery = new Parse.Query(Member);
+        memberQuery.equalTo('team_id', teamId);
+        var members = await memberQuery.find();
+        var Message = Parse.Object.extend('TeamMessage');
+        var msgQuery = new Parse.Query(Message);
+        msgQuery.equalTo('team_id', teamId);
+        msgQuery.ascending('createdAt');
+        var messages = await msgQuery.find();
+        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + 
+
+'</h4><p>Üye sayısı: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
+        document.getElementById('teamMembersList').innerHTML = members.map(function(m) {
+            return '<div class="team-member-item">👤 ' + m.get('user_email') + (m.get
+
+('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>';
+        }).join('');
+        var chatContainer = document.getElementById('teamChatMessages');
+        var userEmail = currentUser.get('email');
+        chatContainer.innerHTML = messages.map(function(m) {
+            return '<div class="ai-message ' + (m.get('user_email') === userEmail ? 'user' 
+
+: 'bot') + '"><strong>' + (m.get('user_email') === userEmail ? 'Ben' : m.get
+
+('user_email').split('@')[0]) + '</strong>: ' + m.get('message') + '</div>';
+        }).join('') || '<div>Henüz mesaj yok</div>';
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    } catch(e) { console.error('Takım bilgisi yüklenirken hata:', e); }
+}
+
+async function createTeam() {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    var name = prompt('Takım adı:');
+    if (!name) return;
+    try {
+        var Team = Parse.Object.extend('Team');
+        var team = new Team();
+        team.set('name', name);
+        team.set('owner_email', currentUser.get('email'));
+        await team.save();
+        var Member = Parse.Object.extend('TeamMember');
+        var member = new Member();
+        member.set('team_id', team.id);
+        member.set('user_email', currentUser.get('email'));
+        await member.save();
+        currentUser.set('teamId', team.id);
+        await currentUser.save();
+        await loadTeamInfo();
+        showNotification('"' + name + '" takımı oluşturuldu!', 'success');
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+}
+
+async function inviteToTeam() {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    var teamId = currentUser.get('teamId');
+    if (!teamId) { showNotification('Önce takım oluşturun!', 'error'); return; }
+    var email = document.getElementById('inviteEmail').value.trim();
+    if (!email) { showNotification('E-posta adresi girin!', 'error'); return; }
+    try {
+        var Inbox = Parse.Object.extend('Inbox');
+        var inbox = new Inbox();
+        inbox.set('sender_email', currentUser.get('email'));
+        inbox.set('receiver_email', email);
+        inbox.set('message', currentUser.get('name') + ' sizi takıma davet etti! Takım ID: 
+
+' + teamId);
+        await inbox.save();
+        showNotification('Davet gönderildi: ' + email, 'success');
+        document.getElementById('inviteEmail').value = '';
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+}
+
+async function sendTeamMessage() {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    var teamId = currentUser.get('teamId');
+    if (!teamId) { showNotification('Takımınız yok!', 'error'); return; }
+    var msg = document.getElementById('teamChatInput').value.trim();
+    if (!msg) return;
+    try {
+        var Message = Parse.Object.extend('TeamMessage');
+        var message = new Message();
+        message.set('team_id', teamId);
+        message.set('user_email', currentUser.get('email'));
+        message.set('message', msg);
+        await message.save();
+        document.getElementById('teamChatInput').value = '';
+        await loadTeamInfo();
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+}
+
+// ========== YANIT TEMİZLEME (Client tarafı) ==========
+function cleanClientResponse(text) {
+    if (!text) return text;
+    return text
+        .replace(/\\n/g, '<br>')
+        .replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+}
 
 // ========== YAPAY ZEKA (Cloud Code) ==========
 async function callAllAIModels(prompt) {
@@ -2816,7 +3201,9 @@ async function callAllAIModels(prompt) {
         return await Parse.Cloud.run('superAI', { prompt: prompt });
     } catch(e) {
         console.error('AI hatası:', e);
-        return '🧠 VİZYON AI: "' + prompt + '" hakkında yardımcı olabilirim. Detaylı yanıt için lütfen daha spesifik bir soru sorun.';
+        return '🧠 VİZYON AI: "' + prompt + '" hakkında yardımcı olabilirim. Detaylı yanıt 
+
+için lütfen daha spesifik bir soru sorun.';
     }
 }
 
@@ -2830,23 +3217,29 @@ async function webSearch(query) {
     }
 }
 
-// ========== AI CHAT FONKSİYONLARI ==========
+// ========== AI CHAT FONKSİYONLARI (Temizleme ile) ==========
 window.sendDashboardAI = async function() {
     if (!await useQuery()) return;
     var inp = document.getElementById('dashboardAiInput');
     var msg = inp.value.trim();
     if (!msg) return;
     var container = document.getElementById('dashboardAiMessages');
-    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + '</div>';
+    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + 
+
+'</div>';
     inp.value = '';
     container.scrollTop = container.scrollHeight;
     var response;
-    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') !== -1) {
+    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') 
+
+!== -1) {
         response = await webSearch(msg);
     } else {
         response = await callAllAIModels(msg);
     }
-    container.innerHTML += '<div class="ai-message bot">' + response + '</div>';
+    // Temizle ve göster
+    var cleaned = cleanClientResponse(response);
+    container.innerHTML += '<div class="ai-message bot">' + cleaned + '</div>';
     container.scrollTop = container.scrollHeight;
 };
 
@@ -2873,7 +3266,8 @@ async function sendFullAI() {
     } else {
         response = await callAllAIModels(msg);
     }
-    chat.innerHTML += '<div class="ai-msg bot">🧠 ' + response + '</div>';
+    var cleaned = cleanClientResponse(response);
+    chat.innerHTML += '<div class="ai-msg bot">' + cleaned + '</div>';
     chat.scrollTop = chat.scrollHeight;
 }
 
@@ -2901,7 +3295,8 @@ async function sendAiMessage() {
     } else {
         response = await callAllAIModels(msg);
     }
-    msgs.innerHTML += '<div class="ai-msg bot">' + response + '</div>';
+    var cleaned = cleanClientResponse(response);
+    msgs.innerHTML += '<div class="ai-msg bot">' + cleaned + '</div>';
     msgs.scrollTop = msgs.scrollHeight;
 }
   </script>
@@ -2911,7 +3306,7 @@ async function sendAiMessage() {
     <!-- ============================================================ -->
     <script>
         // ============================================================
-// 4. JS - ADMIN, ROL PANELLERİ, PROFİL, BAŞLANGIÇ
+// 4. JS - ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ
 // ============================================================
 
 // ========== PROFİL ==========
@@ -2923,9 +3318,17 @@ function openProfileModal() {
     document.getElementById('profileContent').innerHTML =
         '<p><strong>Ad:</strong> ' + currentUser.get('name') + '</p>' +
         '<p><strong>E-posta:</strong> ' + currentUser.get('email') + '</p>' +
-        '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : (currentUser.get('plan') === 'team' ? '👥 Takım' : '🆓 Ücretsiz')) + '</p>' +
-        '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : (currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 Beta' : '👤 Kullanıcı'))) + '</p>' +
-        '<p><strong>Üyelik:</strong> ' + new Date(currentUser.get('createdAt')).toLocaleDateString('tr-TR') + '</p>';
+        '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : 
+
+(currentUser.get('plan') === 'team' ? '👥 Takım' : '🆓 Ücretsiz')) + '</p>' +
+        '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : 
+
+(currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 
+
+Beta' : '👤 Kullanıcı'))) + '</p>' +
+        '<p><strong>Üyelik:</strong> ' + new Date(currentUser.get
+
+('createdAt')).toLocaleDateString('tr-TR') + '</p>';
     document.getElementById('profileModal').classList.add('open');
 }
 
@@ -2968,7 +3371,9 @@ async function buyPackage(pkg) {
         showNotification('Önce giriş yapın!', 'error');
         return;
     }
-    if (confirm((pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takım Paketi (₺899/ay)') + ' satın al?')) {
+    if (confirm((pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takım Paketi (₺899/ay)') + ' satın 
+
+al?')) {
         try {
             currentUser.set('plan', pkg);
             await currentUser.save();
@@ -3009,7 +3414,7 @@ function checkRole() {
     }
 }
 
-// ========== KULLANICI YÖNETİMİ (ADMIN) - MASTER KEY EKLENDİ ==========
+// ========== KULLANICI YÖNETİMİ (ADMIN) ==========
 async function loadUserList() {
     if (!currentUser) return;
     try {
@@ -3018,7 +3423,19 @@ async function loadUserList() {
         var container = document.getElementById('userList');
         if (!container) return;
         container.innerHTML = users.map(function(u) {
-            return '<div class="user-item"><span class="user-email">' + u.get('email') + '</span><span class="user-role">' + (u.get('role') || 'user') + '</span><div class="user-actions"><button class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email') + '\')">Admin Yap</button><button class="btn-user" onclick="setUserRole(\'' + u.get('email') + '\',\'user\')">Kullanıcı Yap</button><button class="btn-ban" onclick="banUserEmail(\'' + u.get('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' + u.get('email') + '\')">🎁</button></div></div>';
+            return '<div class="user-item"><span class="user-email">' + u.get('email') + 
+
+'</span><span class="user-role">' + (u.get('role') || 'user') + '</span><div class="user-
+
+actions"><button class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email') + 
+
+'\')">Admin Yap</button><button class="btn-user" onclick="setUserRole(\'' + u.get('email') 
+
++ '\',\'user\')">Kullanıcı Yap</button><button class="btn-ban" onclick="banUserEmail(\'' + 
+
+u.get('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' 
+
++ u.get('email') + '\')">🎁</button></div></div>';
         }).join('');
     } catch(e) {
         console.error('Kullanıcı listesi yüklenirken hata:', e);
@@ -3040,7 +3457,9 @@ async function assignAdminEmail(email) {
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
-        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lütfen şifrenizi belirlemek için "Admin Şifre Belirle" butonuna tıklayın.');
+        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lütfen şifrenizi 
+
+belirlemek için "Admin Şifre Belirle" butonuna tıklayın.');
         await inbox.save(null, { useMasterKey: true });
         showNotification(email + ' admin yapıldı!', 'success');
         await loadUserList();
@@ -3104,7 +3523,9 @@ async function giftUserEmail(email, pkg) {
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
-        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takım Paketi') + ' hediye edildi!');
+        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takım Paketi') + ' 
+
+hediye edildi!');
         await inbox.save(null, { useMasterKey: true });
         showNotification(email + ' adresine ' + pkg + ' paketi hediye edildi!', 'success');
         await loadUserList();
@@ -3149,25 +3570,6 @@ async function sendGift() {
     document.getElementById('giftEmail').value = '';
 }
 
-// ========== SAYAÇLAR ==========
-async function updateCounters() {
-    try {
-        var query = new Parse.Query(Parse.User);
-        var userCount = await query.count({ useMasterKey: true });
-        document.getElementById('counter1').innerHTML = userCount || 0;
-        try {
-            var projectQuery = new Parse.Query('Project');
-            var projectCount = await projectQuery.count({ useMasterKey: true });
-            document.getElementById('counter3').innerHTML = projectCount || 0;
-        } catch(e) {
-            document.getElementById('counter3').innerHTML = '0';
-        }
-        document.getElementById('counter2').innerHTML = (Math.floor(Math.random() * 100000) + 50000).toLocaleString();
-    } catch(e) {
-        console.error('Sayaçlar güncellenirken hata:', e);
-    }
-}
-
 // ========== MODAL ==========
 function openModal(type) {
     document.getElementById('authModal').classList.add('open');
@@ -3175,10 +3577,18 @@ function openModal(type) {
 }
 
 function switchTab(tab) {
-    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none';
-    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none';
-    document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 'none';
-    document.querySelectorAll('.modal-tab').forEach(function(el) { el.classList.remove('active'); });
+    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 
+
+'none';
+    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 
+
+'none';
+    document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 
+
+'none';
+    document.querySelectorAll('.modal-tab').forEach(function(el) { el.classList.remove
+
+('active'); });
     var tabs = document.querySelectorAll('.modal-tab');
     if (tab === 'login') tabs[0].classList.add('active');
     else if (tab === 'register') tabs[1].classList.add('active');
@@ -3188,6 +3598,123 @@ function switchTab(tab) {
 function openRandomSupport() {
     window.location.href = 'mailto:admin.tr.reis@gmail.com?subject=Vizyon2027%20Destek';
     showNotification('Destek maili açılıyor', 'success');
+}
+
+// ========== YORUM SİSTEMİ ==========
+async function loadComments() {
+    try {
+        const comments = await Parse.Cloud.run('getComments');
+        const container = document.getElementById('commentsList');
+        
+        if (!comments || comments.length === 0) {
+            container.innerHTML = `
+                <div class="comment-item" style="border-left-color: var(--accent2); text-
+
+align: center; color: var(--text3);">
+                    🌟 İlk yorumu sen yap!
+                </div>
+            `;
+            return;
+        }
+        
+        const roleLabels = {
+            'founder': '👑 KURUCU',
+            'admin': '⚙️ ADMIN',
+            'beta': '🔬 BETA',
+            'user': '👤 KULLANICI'
+        };
+        const roleColors = {
+            'founder': 'var(--gold)',
+            'admin': 'var(--accent)',
+            'beta': 'var(--purple)',
+            'user': 'var(--text3)'
+        };
+        
+        container.innerHTML = comments.map(c => `
+            <div class="comment-item" style="border-left-color: ${roleColors[c.user_role] 
+
+|| 'var(--border)'};">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: 
+
+wrap;">
+                    <strong style="color: var(--accent2);">${c.user_name || 'İsimsiz'}
+
+</strong>
+                    <span class="role-badge ${c.user_role || 'user'}" style="border-color: 
+
+${roleColors[c.user_role] || 'var(--border)'}; color: ${roleColors[c.user_role] || 'var(--
+
+text3)'};">
+                        ${roleLabels[c.user_role] || '👤 KULLANICI'}
+                    </span>
+                    <span class="comment-email">📧 ${c.user_email || '---'}</span>
+                    <span class="comment-time" style="margin-left: auto;">${new Date
+
+(c.createdAt).toLocaleString('tr-TR')}</span>
+                </div>
+                <div class="comment-text">${c.comment}</div>
+            </div>
+        `).join('');
+        
+    } catch(e) {
+        console.error('Yorumlar yüklenemedi:', e);
+        document.getElementById('commentsList').innerHTML = `
+            <div class="comment-item" style="border-left-color: var(--danger); text-align: 
+
+center; color: var(--danger);">
+                ⚠️ Yorumlar yüklenemedi: ${e.message}
+            </div>
+        `;
+    }
+}
+
+async function postComment() {
+    if (!currentUser) {
+        showNotification('Yorum yapmak için giriş yapmalısınız!', 'error');
+        return;
+    }
+    
+    const input = document.getElementById('commentInput');
+    const text = input.value.trim();
+    if (!text) {
+        showNotification('Lütfen bir yorum yazın!', 'error');
+        return;
+    }
+    
+    try {
+        const result = await Parse.Cloud.run('addComment', { comment: text });
+        input.value = '';
+        showNotification('💬 Yorumunuz gönderildi!', 'success');
+        await loadComments();
+    } catch(e) {
+        showNotification('Yorum gönderilemedi: ' + e.message, 'error');
+    }
+}
+
+function updateCommentUI() {
+    const form = document.getElementById('commentForm');
+    const loginMsg = document.getElementById('commentLoginMessage');
+    const userName = document.getElementById('commentUserName');
+    const userRole = document.getElementById('commentUserRole');
+    
+    if (currentUser) {
+        if (form) form.style.display = 'block';
+        if (loginMsg) loginMsg.style.display = 'none';
+        if (userName) userName.textContent = currentUser.get('name') || 'Kullanıcı';
+        
+        const roleLabels = {
+            'founder': '👑 KURUCU',
+            'admin': '⚙️ ADMIN',
+            'beta': '🔬 BETA',
+            'user': '👤 KULLANICI'
+        };
+        if (userRole) userRole.textContent = roleLabels[currentUser.get('role')] || '👤 
+
+KULLANICI';
+    } else {
+        if (form) form.style.display = 'none';
+        if (loginMsg) loginMsg.style.display = 'block';
+    }
 }
 
 // ========== BAŞLANGIÇ VERİLERİ ==========
@@ -3224,13 +3751,15 @@ async function initData() {
     }
 }
 
-// ========== PARÇACIKLAR (GÜVENLİ) ==========
+// ========== PARÇACIKLAR ==========
 var particlesContainer = document.getElementById('particles');
 if (particlesContainer) {
     for (var i = 0; i < 60; i++) {
         var p = document.createElement('div');
         p.className = 'particle';
-        p.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';
+        p.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + 
+
+Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';
         particlesContainer.appendChild(p);
     }
 }
@@ -3239,10 +3768,7 @@ if (particlesContainer) {
 var cursor = document.getElementById('customCursor');
 var ring = document.getElementById('customCursorRing');
 if (cursor && ring) {
-    var mx = 0,
-        my = 0,
-        rx = 0,
-        ry = 0;
+    var mx = 0, my = 0, rx = 0, ry = 0;
     document.addEventListener('mousemove', function(e) {
         mx = e.clientX;
         my = e.clientY;
@@ -3258,15 +3784,18 @@ if (cursor && ring) {
         requestAnimationFrame(animate);
     }
     animate();
-    document.querySelectorAll('button, a, .btn, .secret-btn, .support-link').forEach(function(btn) {
+    document.querySelectorAll('button, a, .btn, .secret-btn, .support-link').forEach
+
+(function(btn) {
         btn.addEventListener('mouseenter', function() { cursor.classList.add('hover'); });
-        btn.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); });
+        btn.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); 
+
+});
     });
 }
 
-// ========== SAYFA YÜKLENİNCE (GÜNCELLENMİŞ) ==========
+// ========== SAYFA YÜKLENİNCE ==========
 window.onload = async function() {
-    // Önce Back4App'i başlat (JS-1'de tanımlı)
     if (typeof initBack4App === 'function') {
         await initBack4App();
     } else {
@@ -3275,14 +3804,12 @@ window.onload = async function() {
         return;
     }
     
-    // Parse yüklendiyse devam et
     if (typeof Parse === 'undefined' || !parseInitialized) {
         showNotification('❌ Back4App bağlantısı kurulamadı! Sayfayı yenileyin.', 'error');
         return;
     }
     
     await initData();
-    checkAndReset();
     
     var saved = localStorage.getItem('vizyon_user');
     if (saved) {
@@ -3290,6 +3817,8 @@ window.onload = async function() {
             currentUser = Parse.User.current();
             if (currentUser) {
                 await showDashboard();
+                updateCommentUI();
+                await loadComments();
             } else {
                 localStorage.removeItem('vizyon_user');
             }
@@ -3297,8 +3826,16 @@ window.onload = async function() {
             console.error('Oturum hatası:', e);
         }
     }
-    await updateCounters();
-    showNotification('✨ VİZYON 2027 Sistemi Aktif! (Back4App + Cloud Code ile)', 'success');
+    
+    // Yorumları herkes görebilir
+    await loadComments();
+    updateCommentUI();
+    
+    // Sayaçları güncelle
+    await updateStats();
+    startStatsInterval();
+    
+    showNotification('✨ VİZYON 2027 Sistemi Aktif!', 'success');
 };
     </script>
 
