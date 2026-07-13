@@ -2712,148 +2712,88 @@ Mesajlar yüklenemedi.</div>';
     <!-- 3. JS - TAKIM, AI (CLOUD CODE)                               -->
     <!-- ============================================================ -->
     <script>
-        // // ============================================================
+        // ============================================================
 // 3. JS - TAKIM SİSTEMİ VE AI (CLOUD CODE)
 // ============================================================
 
 // ========== TAKIM SİSTEMİ ==========
 async function loadTeamInfo() {
-    // Kullanıcı kontrolü
     if (!currentUser) return;
-    
     const teamId = currentUser.get('teamId');
     if (!teamId) {
-        document.getElementById('teamInfo').innerHTML = '<p>Bir takıma üye değilsiniz. 
-
-Takım oluşturun veya davet bekleyin.</p>';
+        document.getElementById('teamInfo').innerHTML = '<p>Bir takıma üye değilsiniz. Takım oluşturun veya davet bekleyin.</p>';
         document.getElementById('teamMembersList').innerHTML = '';
         document.getElementById('teamChatMessages').innerHTML = '';
         return;
     }
-    
     try {
         const Team = Parse.Object.extend('Team');
         const query = new Parse.Query(Team);
         const team = await query.get(teamId);
-        
         const Member = Parse.Object.extend('TeamMember');
         const memberQuery = new Parse.Query(Member);
         memberQuery.equalTo('team_id', teamId);
         const members = await memberQuery.find();
-        
         const Message = Parse.Object.extend('TeamMessage');
         const msgQuery = new Parse.Query(Message);
         msgQuery.equalTo('team_id', teamId);
         msgQuery.ascending('createdAt');
         const messages = await msgQuery.find();
-        
-        document.getElementById('teamInfo').innerHTML = `
-            <h4>🏢 ${team.get('name')}</h4>
-            <p>Üye sayısı: ${members.length} | Sahip: ${team.get('owner_email')}</p>
-        `;
-        
-        document.getElementById('teamMembersList').innerHTML = members.map(m =>
-            `<div class="team-member-item">👤 ${m.get('user_email')} ${m.get('user_email') 
-
-=== team.get('owner_email') ? '(Sahip)' : ''}</div>`
-        ).join('');
-        
+        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + '</h4><p>Üye sayısı: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
+        document.getElementById('teamMembersList').innerHTML = members.map(m => '<div class="team-member-item">👤 ' + m.get('user_email') + (m.get('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>').join('');
         const chatContainer = document.getElementById('teamChatMessages');
         const userEmail = currentUser.get('email');
-        chatContainer.innerHTML = messages.map(m =>
-            `<div class="ai-message ${m.get('user_email') === userEmail ? 'user' : 'bot'}">
-                <strong>${m.get('user_email') === userEmail ? 'Ben' : m.get
-
-('user_email').split('@')[0]}</strong>: ${m.get('message')}
-            </div>`
-        ).join('') || '<div>Henüz mesaj yok</div>';
+        chatContainer.innerHTML = messages.map(m => '<div class="ai-message ' + (m.get('user_email') === userEmail ? 'user' : 'bot') + '"><strong>' + (m.get('user_email') === userEmail ? 'Ben' : m.get('user_email').split('@')[0]) + '</strong>: ' + m.get('message') + '</div>').join('') || '<div>Henüz mesaj yok</div>';
         chatContainer.scrollTop = chatContainer.scrollHeight;
-    } catch(e) {
-        console.error('Takım bilgisi yüklenirken hata:', e);
-    }
+    } catch(e) { console.error('Takım bilgisi yüklenirken hata:', e); }
 }
 
 async function createTeam() {
-    if (!currentUser) {
-        showNotification('Önce giriş yapın!', 'error');
-        return;
-    }
-    
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
     const name = prompt('Takım adı:');
     if (!name) return;
-    
     try {
         const Team = Parse.Object.extend('Team');
         const team = new Team();
         team.set('name', name);
         team.set('owner_email', currentUser.get('email'));
         await team.save();
-        
         const Member = Parse.Object.extend('TeamMember');
         const member = new Member();
         member.set('team_id', team.id);
         member.set('user_email', currentUser.get('email'));
         await member.save();
-        
         currentUser.set('teamId', team.id);
         await currentUser.save();
-        
         await loadTeamInfo();
-        showNotification(`"${name}" takımı oluşturuldu!`, 'success');
-    } catch(e) {
-        showNotification('Hata: ' + e.message, 'error');
-    }
+        showNotification('"' + name + '" takımı oluşturuldu!', 'success');
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 }
 
 async function inviteToTeam() {
-    if (!currentUser) {
-        showNotification('Önce giriş yapın!', 'error');
-        return;
-    }
-    
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
     const teamId = currentUser.get('teamId');
-    if (!teamId) {
-        showNotification('Önce takım oluşturun!', 'error');
-        return;
-    }
-    
+    if (!teamId) { showNotification('Önce takım oluşturun!', 'error'); return; }
     const email = document.getElementById('inviteEmail').value.trim();
-    if (!email) {
-        showNotification('E-posta adresi girin!', 'error');
-        return;
-    }
-    
+    if (!email) { showNotification('E-posta adresi girin!', 'error'); return; }
     try {
         const Inbox = Parse.Object.extend('Inbox');
         const inbox = new Inbox();
         inbox.set('sender_email', currentUser.get('email'));
         inbox.set('receiver_email', email);
-        inbox.set('message', `${currentUser.get('name')} sizi takıma davet etti! Takım ID: 
-
-${teamId}`);
+        inbox.set('message', currentUser.get('name') + ' sizi takıma davet etti! Takım ID: ' + teamId);
         await inbox.save();
-        showNotification(`Davet gönderildi: ${email}`, 'success');
+        showNotification('Davet gönderildi: ' + email, 'success');
         document.getElementById('inviteEmail').value = '';
-    } catch(e) {
-        showNotification('Hata: ' + e.message, 'error');
-    }
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 }
 
 async function sendTeamMessage() {
-    if (!currentUser) {
-        showNotification('Önce giriş yapın!', 'error');
-        return;
-    }
-    
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
     const teamId = currentUser.get('teamId');
-    if (!teamId) {
-        showNotification('Takımınız yok!', 'error');
-        return;
-    }
-    
+    if (!teamId) { showNotification('Takımınız yok!', 'error'); return; }
     const msg = document.getElementById('teamChatInput').value.trim();
     if (!msg) return;
-    
     try {
         const Message = Parse.Object.extend('TeamMessage');
         const message = new Message();
@@ -2863,104 +2803,85 @@ async function sendTeamMessage() {
         await message.save();
         document.getElementById('teamChatInput').value = '';
         await loadTeamInfo();
-    } catch(e) {
-        showNotification('Hata: ' + e.message, 'error');
-    }
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 }
 
-// ========== YAPAY ZEKA (CLOUD CODE ÜZERİNDEN) ==========
+// ========== YAPAY ZEKA (CLOUD CODE) ==========
 async function callAllAIModels(prompt) {
     try {
-        const result = await Parse.Cloud.run('superAI', { prompt });
-        return result;
+        return await Parse.Cloud.run('superAI', { prompt: prompt });
     } catch(e) {
         console.error('AI hatası:', e);
         return fallbackAI(prompt);
     }
 }
 
-// ===== DÜZELTİLMİŞ FALLBACK (template literal ile) =====
+// ===== DÜZELTİLMİŞ FALLBACK (KAÇIŞ KARAKTERLERİ YOK) =====
 function fallbackAI(p) {
-    const q = p.toLowerCase();
+    var q = p.toLowerCase();
     if (q.includes('python') && (q.includes('hesap') || q.includes('calculator'))) {
-        return `\`\`\`python
-def hesap_makinesi():
-    sayi1 = float(input('Birinci sayı: '))
-    islem = input('İşlem (+,-,*,/): ')
-    sayi2 = float(input('İkinci sayı: '))
-    if islem == '+': print(f'Sonuç: {sayi1 + sayi2}')
-    elif islem == '-': print(f'Sonuç: {sayi1 - sayi2}')
-    elif islem == '*': print(f'Sonuç: {sayi1 * sayi2}')
-    elif islem == '/':
-        if sayi2 != 0: print(f'Sonuç: {sayi1 / sayi2}')
-        else: print('Hata: Sıfıra bölme!')
-    else: print('Geçersiz işlem!')
-hesap_makinesi()
-\`\`\``;
+        return '```python\n' +
+               'def hesap_makinesi():\n' +
+               '    sayi1 = float(input("Birinci sayı: "))\n' +
+               '    islem = input("İşlem (+,-,*,/): ")\n' +
+               '    sayi2 = float(input("İkinci sayı: "))\n' +
+               '    if islem == "+": print(f"Sonuç: {sayi1 + sayi2}")\n' +
+               '    elif islem == "-": print(f"Sonuç: {sayi1 - sayi2}")\n' +
+               '    elif islem == "*": print(f"Sonuç: {sayi1 * sayi2}")\n' +
+               '    elif islem == "/":\n' +
+               '        if sayi2 != 0: print(f"Sonuç: {sayi1 / sayi2}")\n' +
+               '        else: print("Hata: Sıfıra bölme!")\n' +
+               '    else: print("Geçersiz işlem!")\n' +
+               'hesap_makinesi()\n' +
+               '```';
     }
     if (q.includes('react')) {
-        return `\`\`\`jsx
-function App() {
-  const [count, setCount] = React.useState(0);
-  return (
-    <div>
-      <h1>VİZYON AI</h1>
-      <button onClick={() => setCount(count + 1)}>
-        Tıklandı: {count}
-      </button>
-    </div>
-  );
-}
-export default App;
-\`\`\``;
+        return '```jsx\n' +
+               'function App() {\n' +
+               '  const [count, setCount] = React.useState(0);\n' +
+               '  return (\n' +
+               '    <div>\n' +
+               '      <h1>VİZYON AI</h1>\n' +
+               '      <button onClick={() => setCount(count + 1)}>\n' +
+               '        Tıklandı: {count}\n' +
+               '      </button>\n' +
+               '    </div>\n' +
+               '  );\n' +
+               '}\n' +
+               'export default App;\n' +
+               '```';
     }
     if (q.includes('dolar')) {
-        return "💰 <strong>Güncel Döviz Kurları:</strong><br>USD/TRY: 34.25 TL<br>EUR/TRY: 
-
-37.12 TL<br>GBP/TRY: 43.50 TL";
+        return '💰 <strong>Güncel Döviz Kurları:</strong><br>USD/TRY: 34.25 TL<br>EUR/TRY: 37.12 TL<br>GBP/TRY: 43.50 TL';
     }
     if (q.includes('haber')) {
-        return "📰 <strong>Bugünün Öne Çıkan Haberleri:</strong><br>• Yapay zeka 
-
-düzenlemeleri gündemde<br>• Teknoloji zirvesi başladı<br>• Yeni nesil çipler tanıtıldı";
+        return '📰 <strong>Bugünün Öne Çıkan Haberleri:</strong><br>• Yapay zeka düzenlemeleri gündemde<br>• Teknoloji zirvesi başladı<br>• Yeni nesil çipler tanıtıldı';
     }
-    return `🧠 <strong>VİZYON AI</strong>: "${p}" hakkında yardımcı olabilirim. Detaylı 
-
-yanıt için lütfen daha spesifik bir soru sorun.`;
+    return '🧠 <strong>VİZYON AI</strong>: "' + p + '" hakkında yardımcı olabilirim. Detaylı yanıt için lütfen daha spesifik bir soru sorun.';
 }
 
 // ===== WEB ARAMA (Cloud Code) =====
 async function webSearch(query) {
     try {
-        const result = await Parse.Cloud.run('webSearch', { query });
-        return result || `"${query}" için sonuç bulunamadı.`;
+        var result = await Parse.Cloud.run('webSearch', { query: query });
+        return result || '"' + query + '" için sonuç bulunamadı.';
     } catch(e) {
-        console.error('Web arama hatası:', e);
-        return `"${query}" için arama yapılamadı.`;
+        return '"' + query + '" için arama yapılamadı.';
     }
 }
 
 // ========== AI CHAT FONKSİYONLARI ==========
-window.sendDashboardAI = async () => {
+window.sendDashboardAI = async function() {
     if (!useQuery()) return;
-    const inp = document.getElementById('dashboardAiInput');
-    const msg = inp.value.trim();
+    var inp = document.getElementById('dashboardAiInput');
+    var msg = inp.value.trim();
     if (!msg) return;
-    
-    const container = document.getElementById('dashboardAiMessages');
-    container.innerHTML += `<div class="ai-message user">${msg.replace(/</g, '&lt;')}
-
-</div>`;
+    var container = document.getElementById('dashboardAiMessages');
+    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + '</div>';
     inp.value = '';
     container.scrollTop = container.scrollHeight;
-    
-    let response = (msg.includes('dolar') || msg.includes('haber') || msg.includes
-
-('arama'))
-        ? await webSearch(msg)
-        : await callAllAIModels(msg);
-    
-    container.innerHTML += `<div class="ai-message bot">${response}</div>`;
+    var response = (msg.includes('dolar') || msg.includes('haber') || msg.includes('arama')) ? await webSearch(msg) : await callAllAIModels(msg);
+    container.innerHTML += '<div class="ai-message bot">' + response + '</div>';
     container.scrollTop = container.scrollHeight;
 };
 
@@ -2974,20 +2895,15 @@ function closeFullAIPanel() {
 
 async function sendFullAI() {
     if (!useQuery()) return;
-    const inp = document.getElementById('fullAIInput');
-    const msg = inp.value.trim();
+    var inp = document.getElementById('fullAIInput');
+    var msg = inp.value.trim();
     if (!msg) return;
-    
-    const chat = document.getElementById('fullAIChat');
-    chat.innerHTML += `<div class="ai-msg user">${msg.replace(/</g, '&lt;')}</div>`;
+    var chat = document.getElementById('fullAIChat');
+    chat.innerHTML += '<div class="ai-msg user">' + msg.replace(/</g, '&lt;') + '</div>';
     inp.value = '';
     chat.scrollTop = chat.scrollHeight;
-    
-    let response = (msg.includes('dolar') || msg.includes('haber'))
-        ? await webSearch(msg)
-        : await callAllAIModels(msg);
-    
-    chat.innerHTML += `<div class="ai-msg bot">🧠 ${response}</div>`;
+    var response = (msg.includes('dolar') || msg.includes('haber')) ? await webSearch(msg) : await callAllAIModels(msg);
+    chat.innerHTML += '<div class="ai-msg bot">🧠 ' + response + '</div>';
     chat.scrollTop = chat.scrollHeight;
 }
 
@@ -3002,20 +2918,15 @@ function quickAsk(q) {
 
 async function sendAiMessage() {
     if (!useQuery()) return;
-    const inp = document.getElementById('aiInput');
-    const msg = inp.value.trim();
+    var inp = document.getElementById('aiInput');
+    var msg = inp.value.trim();
     if (!msg) return;
-    
-    const msgs = document.getElementById('aiMessages');
-    msgs.innerHTML += `<div class="ai-msg user">${msg.replace(/</g, '&lt;')}</div>`;
+    var msgs = document.getElementById('aiMessages');
+    msgs.innerHTML += '<div class="ai-msg user">' + msg.replace(/</g, '&lt;') + '</div>';
     inp.value = '';
     msgs.scrollTop = msgs.scrollHeight;
-    
-    let response = (msg.includes('dolar') || msg.includes('haber'))
-        ? await webSearch(msg)
-        : await callAllAIModels(msg);
-    
-    msgs.innerHTML += `<div class="ai-msg bot">${response}</div>`;
+    var response = (msg.includes('dolar') || msg.includes('haber')) ? await webSearch(msg) : await callAllAIModels(msg);
+    msgs.innerHTML += '<div class="ai-msg bot">' + response + '</div>';
     msgs.scrollTop = msgs.scrollHeight;
 }
     </script>
