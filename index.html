@@ -2719,47 +2719,61 @@ Mesajlar yüklenemedi.</div>';
 // ========== TAKIM SİSTEMİ ==========
 async function loadTeamInfo() {
     if (!currentUser) return;
-    const teamId = currentUser.get('teamId');
+    var teamId = currentUser.get('teamId');
     if (!teamId) {
-        document.getElementById('teamInfo').innerHTML = '<p>Bir takıma üye değilsiniz. Takım oluşturun veya davet bekleyin.</p>';
+        document.getElementById('teamInfo').innerHTML = '<p>Bir takıma üye değilsiniz. 
+
+Takım oluşturun veya davet bekleyin.</p>';
         document.getElementById('teamMembersList').innerHTML = '';
         document.getElementById('teamChatMessages').innerHTML = '';
         return;
     }
     try {
-        const Team = Parse.Object.extend('Team');
-        const query = new Parse.Query(Team);
-        const team = await query.get(teamId);
-        const Member = Parse.Object.extend('TeamMember');
-        const memberQuery = new Parse.Query(Member);
+        var Team = Parse.Object.extend('Team');
+        var query = new Parse.Query(Team);
+        var team = await query.get(teamId);
+        var Member = Parse.Object.extend('TeamMember');
+        var memberQuery = new Parse.Query(Member);
         memberQuery.equalTo('team_id', teamId);
-        const members = await memberQuery.find();
-        const Message = Parse.Object.extend('TeamMessage');
-        const msgQuery = new Parse.Query(Message);
+        var members = await memberQuery.find();
+        var Message = Parse.Object.extend('TeamMessage');
+        var msgQuery = new Parse.Query(Message);
         msgQuery.equalTo('team_id', teamId);
         msgQuery.ascending('createdAt');
-        const messages = await msgQuery.find();
-        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + '</h4><p>Üye sayısı: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
-        document.getElementById('teamMembersList').innerHTML = members.map(m => '<div class="team-member-item">👤 ' + m.get('user_email') + (m.get('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>').join('');
-        const chatContainer = document.getElementById('teamChatMessages');
-        const userEmail = currentUser.get('email');
-        chatContainer.innerHTML = messages.map(m => '<div class="ai-message ' + (m.get('user_email') === userEmail ? 'user' : 'bot') + '"><strong>' + (m.get('user_email') === userEmail ? 'Ben' : m.get('user_email').split('@')[0]) + '</strong>: ' + m.get('message') + '</div>').join('') || '<div>Henüz mesaj yok</div>';
+        var messages = await msgQuery.find();
+        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + 
+
+'</h4><p>Üye sayısı: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
+        document.getElementById('teamMembersList').innerHTML = members.map(function(m) {
+            return '<div class="team-member-item">👤 ' + m.get('user_email') + (m.get
+
+('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>';
+        }).join('');
+        var chatContainer = document.getElementById('teamChatMessages');
+        var userEmail = currentUser.get('email');
+        chatContainer.innerHTML = messages.map(function(m) {
+            return '<div class="ai-message ' + (m.get('user_email') === userEmail ? 'user' 
+
+: 'bot') + '"><strong>' + (m.get('user_email') === userEmail ? 'Ben' : m.get
+
+('user_email').split('@')[0]) + '</strong>: ' + m.get('message') + '</div>';
+        }).join('') || '<div>Henüz mesaj yok</div>';
         chatContainer.scrollTop = chatContainer.scrollHeight;
     } catch(e) { console.error('Takım bilgisi yüklenirken hata:', e); }
 }
 
 async function createTeam() {
     if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
-    const name = prompt('Takım adı:');
+    var name = prompt('Takım adı:');
     if (!name) return;
     try {
-        const Team = Parse.Object.extend('Team');
-        const team = new Team();
+        var Team = Parse.Object.extend('Team');
+        var team = new Team();
         team.set('name', name);
         team.set('owner_email', currentUser.get('email'));
         await team.save();
-        const Member = Parse.Object.extend('TeamMember');
-        const member = new Member();
+        var Member = Parse.Object.extend('TeamMember');
+        var member = new Member();
         member.set('team_id', team.id);
         member.set('user_email', currentUser.get('email'));
         await member.save();
@@ -2772,16 +2786,18 @@ async function createTeam() {
 
 async function inviteToTeam() {
     if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
-    const teamId = currentUser.get('teamId');
+    var teamId = currentUser.get('teamId');
     if (!teamId) { showNotification('Önce takım oluşturun!', 'error'); return; }
-    const email = document.getElementById('inviteEmail').value.trim();
+    var email = document.getElementById('inviteEmail').value.trim();
     if (!email) { showNotification('E-posta adresi girin!', 'error'); return; }
     try {
-        const Inbox = Parse.Object.extend('Inbox');
-        const inbox = new Inbox();
+        var Inbox = Parse.Object.extend('Inbox');
+        var inbox = new Inbox();
         inbox.set('sender_email', currentUser.get('email'));
         inbox.set('receiver_email', email);
-        inbox.set('message', currentUser.get('name') + ' sizi takıma davet etti! Takım ID: ' + teamId);
+        inbox.set('message', currentUser.get('name') + ' sizi takıma davet etti! Takım ID: 
+
+' + teamId);
         await inbox.save();
         showNotification('Davet gönderildi: ' + email, 'success');
         document.getElementById('inviteEmail').value = '';
@@ -2790,13 +2806,13 @@ async function inviteToTeam() {
 
 async function sendTeamMessage() {
     if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
-    const teamId = currentUser.get('teamId');
+    var teamId = currentUser.get('teamId');
     if (!teamId) { showNotification('Takımınız yok!', 'error'); return; }
-    const msg = document.getElementById('teamChatInput').value.trim();
+    var msg = document.getElementById('teamChatInput').value.trim();
     if (!msg) return;
     try {
-        const Message = Parse.Object.extend('TeamMessage');
-        const message = new Message();
+        var Message = Parse.Object.extend('TeamMessage');
+        var message = new Message();
         message.set('team_id', teamId);
         message.set('user_email', currentUser.get('email'));
         message.set('message', msg);
@@ -2816,26 +2832,34 @@ async function callAllAIModels(prompt) {
     }
 }
 
-// ===== DÜZELTİLMİŞ FALLBACK (KAÇIŞ KARAKTERLERİ YOK) =====
+// ===== DÜZELTİLMİŞ FALLBACK (SADECE NORMAL STRING BİRLEŞTİRME) =====
 function fallbackAI(p) {
     var q = p.toLowerCase();
-    if (q.includes('python') && (q.includes('hesap') || q.includes('calculator'))) {
+    if (q.indexOf('python') !== -1 && (q.indexOf('hesap') !== -1 || q.indexOf('calculator') 
+
+!== -1)) {
         return '```python\n' +
                'def hesap_makinesi():\n' +
                '    sayi1 = float(input("Birinci sayı: "))\n' +
                '    islem = input("İşlem (+,-,*,/): ")\n' +
                '    sayi2 = float(input("İkinci sayı: "))\n' +
-               '    if islem == "+": print(f"Sonuç: {sayi1 + sayi2}")\n' +
-               '    elif islem == "-": print(f"Sonuç: {sayi1 - sayi2}")\n' +
-               '    elif islem == "*": print(f"Sonuç: {sayi1 * sayi2}")\n' +
+               '    if islem == "+":\n' +
+               '        print(f"Sonuç: {sayi1 + sayi2}")\n' +
+               '    elif islem == "-":\n' +
+               '        print(f"Sonuç: {sayi1 - sayi2}")\n' +
+               '    elif islem == "*":\n' +
+               '        print(f"Sonuç: {sayi1 * sayi2}")\n' +
                '    elif islem == "/":\n' +
-               '        if sayi2 != 0: print(f"Sonuç: {sayi1 / sayi2}")\n' +
-               '        else: print("Hata: Sıfıra bölme!")\n' +
-               '    else: print("Geçersiz işlem!")\n' +
+               '        if sayi2 != 0:\n' +
+               '            print(f"Sonuç: {sayi1 / sayi2}")\n' +
+               '        else:\n' +
+               '            print("Hata: Sıfıra bölme!")\n' +
+               '    else:\n' +
+               '        print("Geçersiz işlem!")\n' +
                'hesap_makinesi()\n' +
                '```';
     }
-    if (q.includes('react')) {
+    if (q.indexOf('react') !== -1) {
         return '```jsx\n' +
                'function App() {\n' +
                '  const [count, setCount] = React.useState(0);\n' +
@@ -2851,13 +2875,19 @@ function fallbackAI(p) {
                'export default App;\n' +
                '```';
     }
-    if (q.includes('dolar')) {
-        return '💰 <strong>Güncel Döviz Kurları:</strong><br>USD/TRY: 34.25 TL<br>EUR/TRY: 37.12 TL<br>GBP/TRY: 43.50 TL';
+    if (q.indexOf('dolar') !== -1) {
+        return '💰 <strong>Güncel Döviz Kurları:</strong><br>USD/TRY: 34.25 TL<br>EUR/TRY: 
+
+37.12 TL<br>GBP/TRY: 43.50 TL';
     }
-    if (q.includes('haber')) {
-        return '📰 <strong>Bugünün Öne Çıkan Haberleri:</strong><br>• Yapay zeka düzenlemeleri gündemde<br>• Teknoloji zirvesi başladı<br>• Yeni nesil çipler tanıtıldı';
+    if (q.indexOf('haber') !== -1) {
+        return '📰 <strong>Bugünün Öne Çıkan Haberleri:</strong><br>• Yapay zeka 
+
+düzenlemeleri gündemde<br>• Teknoloji zirvesi başladı<br>• Yeni nesil çipler tanıtıldı';
     }
-    return '🧠 <strong>VİZYON AI</strong>: "' + p + '" hakkında yardımcı olabilirim. Detaylı yanıt için lütfen daha spesifik bir soru sorun.';
+    return '🧠 <strong>VİZYON AI</strong>: "' + p + '" hakkında yardımcı olabilirim. Detaylı 
+
+yanıt için lütfen daha spesifik bir soru sorun.';
 }
 
 // ===== WEB ARAMA (Cloud Code) =====
@@ -2877,10 +2907,19 @@ window.sendDashboardAI = async function() {
     var msg = inp.value.trim();
     if (!msg) return;
     var container = document.getElementById('dashboardAiMessages');
-    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + '</div>';
+    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + 
+
+'</div>';
     inp.value = '';
     container.scrollTop = container.scrollHeight;
-    var response = (msg.includes('dolar') || msg.includes('haber') || msg.includes('arama')) ? await webSearch(msg) : await callAllAIModels(msg);
+    var response;
+    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') 
+
+!== -1) {
+        response = await webSearch(msg);
+    } else {
+        response = await callAllAIModels(msg);
+    }
     container.innerHTML += '<div class="ai-message bot">' + response + '</div>';
     container.scrollTop = container.scrollHeight;
 };
@@ -2902,7 +2941,12 @@ async function sendFullAI() {
     chat.innerHTML += '<div class="ai-msg user">' + msg.replace(/</g, '&lt;') + '</div>';
     inp.value = '';
     chat.scrollTop = chat.scrollHeight;
-    var response = (msg.includes('dolar') || msg.includes('haber')) ? await webSearch(msg) : await callAllAIModels(msg);
+    var response;
+    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1) {
+        response = await webSearch(msg);
+    } else {
+        response = await callAllAIModels(msg);
+    }
     chat.innerHTML += '<div class="ai-msg bot">🧠 ' + response + '</div>';
     chat.scrollTop = chat.scrollHeight;
 }
@@ -2925,11 +2969,15 @@ async function sendAiMessage() {
     msgs.innerHTML += '<div class="ai-msg user">' + msg.replace(/</g, '&lt;') + '</div>';
     inp.value = '';
     msgs.scrollTop = msgs.scrollHeight;
-    var response = (msg.includes('dolar') || msg.includes('haber')) ? await webSearch(msg) : await callAllAIModels(msg);
+    var response;
+    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1) {
+        response = await webSearch(msg);
+    } else {
+        response = await callAllAIModels(msg);
+    }
     msgs.innerHTML += '<div class="ai-msg bot">' + response + '</div>';
     msgs.scrollTop = msgs.scrollHeight;
-}
-    </script>
+}   </script>
 
     <!-- ============================================================ -->
     <!-- 4. JS - ADMIN, ROL PANELLERİ, PROFİL, BAŞLANGIÇ             -->
