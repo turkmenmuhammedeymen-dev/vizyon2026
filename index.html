@@ -1425,7 +1425,91 @@ transparent 60%);
 }</style>
 
     <!-- ===== 4. CSS ===== -->
-    <style>/* 4. CSS - EK RESPONSIVE DÜZELTMELER (İSTEĞE BAĞLI) */</style>
+    <style>/* ===== BUTONLAR BÜYÜK ve BELİRGİN ===== */
+.btn-primary {
+    font-size: 18px !important;
+    padding: 14px 32px !important;
+    background: linear-gradient(135deg, #00d4ff, #a855f7) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 60px !important;
+    box-shadow: 0 0 20px rgba(0,212,255,0.4) !important;
+}
+.btn-primary:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 30px rgba(0,212,255,0.6) !important;
+}
+
+.btn-secondary {
+    font-size: 18px !important;
+    padding: 14px 32px !important;
+    border: 2px solid #00d4ff !important;
+    color: #00d4ff !important;
+    background: transparent !important;
+    border-radius: 60px !important;
+}
+.btn-secondary:hover {
+    background: rgba(0,212,255,0.1) !important;
+    box-shadow: 0 0 20px rgba(0,212,255,0.3) !important;
+}
+
+/* ===== HERO BUTONLARI ===== */
+.hero-actions .btn-primary,
+.hero-actions .btn-secondary {
+    font-size: 20px !important;
+    padding: 16px 40px !important;
+}
+
+/* ===== "Daha Fazla →" yazısı ===== */
+.btn-secondary {
+    color: #00d4ff !important;
+    font-weight: 700 !important;
+}
+
+/* ===== HERO BAŞLIK ===== */
+.hero-title .line1 {
+    font-size: clamp(56px, 10vw, 110px) !important;
+    text-shadow: 0 0 40px rgba(0,212,255,0.5) !important;
+}
+.hero-title .line2 {
+    font-size: clamp(48px, 8vw, 90px) !important;
+    -webkit-text-stroke: 3px #00d4ff !important;
+}
+.hero-title .line3 {
+    font-size: clamp(20px, 3vw, 36px) !important;
+    color: #00ff88 !important;
+    text-shadow: 0 0 20px rgba(0,255,136,0.3) !important;
+}
+
+/* ===== AI WIDGET (SAĞ ALT) ===== */
+.ai-widget-btn {
+    width: 64px !important;
+    height: 64px !important;
+    font-size: 28px !important;
+    background: linear-gradient(135deg, #00d4ff, #a855f7) !important;
+    box-shadow: 0 0 40px rgba(0,212,255,0.5) !important;
+}
+.ai-widget-btn:hover {
+    transform: scale(1.1) !important;
+    box-shadow: 0 0 60px rgba(0,212,255,0.8) !important;
+}
+
+/* ===== AI PANEL ===== */
+.ai-panel {
+    width: 420px !important;
+    background: rgba(13,26,38,0.95) !important;
+    backdrop-filter: blur(16px) !important;
+    border: 1px solid #00d4ff !important;
+    border-radius: 24px !important;
+}
+.ai-msg.bot {
+    font-size: 14px !important;
+    background: rgba(0,212,255,0.08) !important;
+}
+.ai-msg.user {
+    font-size: 14px !important;
+    background: rgba(0,255,136,0.08) !important;
+}</style>
 
 </head>
 <body>
@@ -2718,9 +2802,7 @@ async function loadTeamInfo() {
     if (!currentUser) return;
     var teamId = currentUser.get('teamId');
     if (!teamId) {
-        document.getElementById('teamInfo').innerHTML = '<p>Bir takıma üye değilsiniz. 
-
-Takım oluşturun veya davet bekleyin.</p>';
+        document.getElementById('teamInfo').innerHTML = '<p>Bir takıma üye değilsiniz. Takım oluşturun veya davet bekleyin.</p>';
         document.getElementById('teamMembersList').innerHTML = '';
         document.getElementById('teamChatMessages').innerHTML = '';
         return;
@@ -2738,22 +2820,14 @@ Takım oluşturun veya davet bekleyin.</p>';
         msgQuery.equalTo('team_id', teamId);
         msgQuery.ascending('createdAt');
         var messages = await msgQuery.find();
-        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + 
-
-'</h4><p>Üye sayısı: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
+        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + '</h4><p>Üye sayısı: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
         document.getElementById('teamMembersList').innerHTML = members.map(function(m) {
-            return '<div class="team-member-item">👤 ' + m.get('user_email') + (m.get
-
-('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>';
+            return '<div class="team-member-item">👤 ' + m.get('user_email') + (m.get('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>';
         }).join('');
         var chatContainer = document.getElementById('teamChatMessages');
         var userEmail = currentUser.get('email');
         chatContainer.innerHTML = messages.map(function(m) {
-            return '<div class="ai-message ' + (m.get('user_email') === userEmail ? 'user' 
-
-: 'bot') + '"><strong>' + (m.get('user_email') === userEmail ? 'Ben' : m.get
-
-('user_email').split('@')[0]) + '</strong>: ' + m.get('message') + '</div>';
+            return '<div class="ai-message ' + (m.get('user_email') === userEmail ? 'user' : 'bot') + '"><strong>' + (m.get('user_email') === userEmail ? 'Ben' : m.get('user_email').split('@')[0]) + '</strong>: ' + m.get('message') + '</div>';
         }).join('') || '<div>Henüz mesaj yok</div>';
         chatContainer.scrollTop = chatContainer.scrollHeight;
     } catch(e) { console.error('Takım bilgisi yüklenirken hata:', e); }
@@ -2792,9 +2866,7 @@ async function inviteToTeam() {
         var inbox = new Inbox();
         inbox.set('sender_email', currentUser.get('email'));
         inbox.set('receiver_email', email);
-        inbox.set('message', currentUser.get('name') + ' sizi takıma davet etti! Takım ID: 
-
-' + teamId);
+        inbox.set('message', currentUser.get('name') + ' sizi takıma davet etti! Takım ID: ' + teamId);
         await inbox.save();
         showNotification('Davet gönderildi: ' + email, 'success');
         document.getElementById('inviteEmail').value = '';
@@ -2825,9 +2897,7 @@ async function callAllAIModels(prompt) {
         return await Parse.Cloud.run('superAI', { prompt: prompt });
     } catch(e) {
         console.error('AI hatası:', e);
-        return 'VİZYON AI: ' + prompt + ' hakkında yardımcı olabilirim. Detaylı yanıt için 
-
-lütfen daha spesifik bir soru sorun.';
+        return 'VİZYON AI: ' + prompt + ' hakkında yardımcı olabilirim. Detaylı yanıt için lütfen daha spesifik bir soru sorun.';
     }
 }
 
@@ -2848,15 +2918,11 @@ window.sendDashboardAI = async function() {
     var msg = inp.value.trim();
     if (!msg) return;
     var container = document.getElementById('dashboardAiMessages');
-    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + 
-
-'</div>';
+    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + '</div>';
     inp.value = '';
     container.scrollTop = container.scrollHeight;
     var response;
-    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') 
-
-!== -1) {
+    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') !== -1) {
         response = await webSearch(msg);
     } else {
         response = await callAllAIModels(msg);
@@ -2938,17 +3004,9 @@ function openProfileModal() {
     document.getElementById('profileContent').innerHTML =
         '<p><strong>Ad:</strong> ' + currentUser.get('name') + '</p>' +
         '<p><strong>E-posta:</strong> ' + currentUser.get('email') + '</p>' +
-        '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : 
-
-(currentUser.get('plan') === 'team' ? '👥 Takım' : '🆓 Ücretsiz')) + '</p>' +
-        '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : 
-
-(currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 
-
-Beta' : '👤 Kullanıcı'))) + '</p>' +
-        '<p><strong>Üyelik:</strong> ' + new Date(currentUser.get
-
-('createdAt')).toLocaleDateString('tr-TR') + '</p>';
+        '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : (currentUser.get('plan') === 'team' ? '👥 Takım' : '🆓 Ücretsiz')) + '</p>' +
+        '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : (currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 Beta' : '👤 Kullanıcı'))) + '</p>' +
+        '<p><strong>Üyelik:</strong> ' + new Date(currentUser.get('createdAt')).toLocaleDateString('tr-TR') + '</p>';
     document.getElementById('profileModal').classList.add('open');
 }
 
@@ -2991,9 +3049,7 @@ async function buyPackage(pkg) {
         showNotification('Önce giriş yapın!', 'error');
         return;
     }
-    if (confirm((pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takım Paketi (₺899/ay)') + ' satın 
-
-al?')) {
+    if (confirm((pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takım Paketi (₺899/ay)') + ' satın al?')) {
         try {
             currentUser.set('plan', pkg);
             await currentUser.save();
@@ -3043,19 +3099,7 @@ async function loadUserList() {
         var container = document.getElementById('userList');
         if (!container) return;
         container.innerHTML = users.map(function(u) {
-            return '<div class="user-item"><span class="user-email">' + u.get('email') + 
-
-'</span><span class="user-role">' + (u.get('role') || 'user') + '</span><div class="user-
-
-actions"><button class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email') + 
-
-'\')">Admin Yap</button><button class="btn-user" onclick="setUserRole(\'' + u.get('email') 
-
-+ '\',\'user\')">Kullanıcı Yap</button><button class="btn-ban" onclick="banUserEmail(\'' + 
-
-u.get('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' 
-
-+ u.get('email') + '\')">🎁</button></div></div>';
+            return '<div class="user-item"><span class="user-email">' + u.get('email') + '</span><span class="user-role">' + (u.get('role') || 'user') + '</span><div class="user-actions"><button class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email') + '\')">Admin Yap</button><button class="btn-user" onclick="setUserRole(\'' + u.get('email') + '\',\'user\')">Kullanıcı Yap</button><button class="btn-ban" onclick="banUserEmail(\'' + u.get('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' + u.get('email') + '\')">🎁</button></div></div>';
         }).join('');
     } catch(e) {
         console.error('Kullanıcı listesi yüklenirken hata:', e);
@@ -3077,9 +3121,7 @@ async function assignAdminEmail(email) {
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
-        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lütfen şifrenizi 
-
-belirlemek için "Admin Şifre Belirle" butonuna tıklayın.');
+        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lütfen şifrenizi belirlemek için "Admin Şifre Belirle" butonuna tıklayın.');
         await inbox.save(null, { useMasterKey: true });
         showNotification(email + ' admin yapıldı!', 'success');
         await loadUserList();
@@ -3143,9 +3185,7 @@ async function giftUserEmail(email, pkg) {
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
-        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takım Paketi') + ' 
-
-hediye edildi!');
+        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takım Paketi') + ' hediye edildi!');
         await inbox.save(null, { useMasterKey: true });
         showNotification(email + ' adresine ' + pkg + ' paketi hediye edildi!', 'success');
         await loadUserList();
@@ -3203,9 +3243,7 @@ async function updateCounters() {
         } catch(e) {
             document.getElementById('counter3').innerHTML = '0';
         }
-        document.getElementById('counter2').innerHTML = (Math.floor(Math.random() * 100000) 
-
-+ 50000).toLocaleString();
+        document.getElementById('counter2').innerHTML = (Math.floor(Math.random() * 100000) + 50000).toLocaleString();
     } catch(e) {
         console.error('Sayaçlar güncellenirken hata:', e);
     }
@@ -3218,18 +3256,10 @@ function openModal(type) {
 }
 
 function switchTab(tab) {
-    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 
-
-'none';
-    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 
-
-'none';
-    document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 
-
-'none';
-    document.querySelectorAll('.modal-tab').forEach(function(el) { el.classList.remove
-
-('active'); });
+    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none';
+    document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 'none';
+    document.querySelectorAll('.modal-tab').forEach(function(el) { el.classList.remove('active'); });
     var tabs = document.querySelectorAll('.modal-tab');
     if (tab === 'login') tabs[0].classList.add('active');
     else if (tab === 'register') tabs[1].classList.add('active');
@@ -3281,9 +3311,7 @@ if (particlesContainer) {
     for (var i = 0; i < 60; i++) {
         var p = document.createElement('div');
         p.className = 'particle';
-        p.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + 
-
-Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';
+        p.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';
         particlesContainer.appendChild(p);
     }
 }
@@ -3311,13 +3339,9 @@ if (cursor && ring) {
         requestAnimationFrame(animate);
     }
     animate();
-    document.querySelectorAll('button, a, .btn, .secret-btn, .support-link').forEach
-
-(function(btn) {
+    document.querySelectorAll('button, a, .btn, .secret-btn, .support-link').forEach(function(btn) {
         btn.addEventListener('mouseenter', function() { cursor.classList.add('hover'); });
-        btn.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); 
-
-});
+        btn.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); });
     });
 }
 
@@ -3339,9 +3363,7 @@ window.onload = async function() {
         }
     }
     await updateCounters();
-    showNotification('✨ VİZYON 2027 Sistemi Aktif! (Back4App + Cloud Code ile)', 
-
-'success');
+    showNotification('✨ VİZYON 2027 Sistemi Aktif! (Back4App + Cloud Code ile)', 'success');
 };
     </script>
 
