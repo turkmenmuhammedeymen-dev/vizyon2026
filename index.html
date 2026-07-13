@@ -2210,42 +2210,43 @@ yazabilirsin... (Python, JavaScript, React, SQL...)" rows="2" onkeydown="if
     <!-- ============================================================ -->
     <script>
         // ============================================================
-// 1. JS - BACK4APP DİNAMİK KONFİG (Cloud Code'dan al)
+// 1. JS - BACK4APP KONFIG (DOĞRUDAN HARDCODE)
 // ============================================================
 
-// ========== DEĞİŞKENLER ==========
 let currentUser = null;
 let currentRole = null;
-let dailyQueries = parseInt(localStorage.getItem('v27_queries') || '20');
-let lastDate = localStorage.getItem('v27_last_date') || '';
 let parseInitialized = false;
 
 // ========== BACK4APP'İ BAŞLAT ==========
 async function initBack4App() {
     if (parseInitialized) return;
+    
     try {
-        const response = await fetch
-
-('https://parseapi.back4app.com/functions/getBack4AppConfig', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        const data = await response.json();
-        if (!data.result) throw new Error('Config alınamadı');
-        const { appId, jsKey, serverUrl } = data.result;
-        
-        // Parse SDK'yı dinamik yükle
+        // Parse SDK'yı yükle
         await loadParseSDK();
-        Parse.initialize(appId, jsKey);
-        Parse.serverURL = serverUrl;
+        
+        // DOĞRUDAN ANAHTARLARLA BAŞLAT
+        Parse.initialize(
+            "ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8",
+            "cd1HeGMPKUu8xxE8Q11FMvkzvG6lz7QbJ0rPVpSf"
+        );
+        Parse.serverURL = "https://parseapi.back4app.com";
         parseInitialized = true;
-        console.log('✅ Back4App başarıyla başlatıldı (Config ile)');
+        
+        console.log('✅ Back4App başarıyla başlatıldı!');
+        showNotification('✅ Back4App bağlantısı kuruldu!', 'success');
+        
+        // Test et
+        try {
+            const result = await Parse.Cloud.run('testConfig');
+            console.log('✅ Cloud Code test:', result);
+        } catch(e) {
+            console.log('⚠️ Cloud Code test başarısız:', e);
+        }
+        
     } catch(e) {
-        console.error('Back4App başlatılamadı:', e);
-        // Güvenli fallback yok! Kullanıcıya hata göster
-        showNotification('❌ Back4App bağlantı hatası! Lütfen daha sonra tekrar deneyin.', 
-
-'error');
+        console.error('Back4App hatası:', e);
+        showNotification('❌ Back4App bağlantı hatası!', 'error');
     }
 }
 
@@ -2281,39 +2282,17 @@ function closeModal(id) {
     if (modal) modal.classList.remove('open');
 }
 
-// ========== SORGU LİMİTİ (LocalStorage geçici, Cloud Code asıl) ==========
-function checkAndReset() {
-    const today = new Date().toDateString();
-    if (lastDate !== today) {
-        localStorage.setItem('v27_queries', '20');
-        localStorage.setItem('v27_last_date', today);
-        dailyQueries = 20;
-    }
-    const el = document.getElementById('remainingQueries');
-    if (el) el.innerHTML = dailyQueries;
-}
-
+// ========== SORGU LİMİTİ ==========
 async function useQuery() {
     if (currentUser) {
         try {
-            const result = await Parse.Cloud.run('useQuery');
-            const el = document.getElementById('remainingQueries');
-            if (el) el.innerHTML = result.remaining;
+            await Parse.Cloud.run('useQuery');
             return true;
         } catch(e) {
             showNotification(e.message, 'error');
             return false;
         }
     }
-    // Giriş yapmamış kullanıcı için localStorage limiti
-    if (dailyQueries <= 0) {
-        showNotification('Günlük sorgu limitiniz doldu!', 'error');
-        return false;
-    }
-    dailyQueries--;
-    localStorage.setItem('v27_queries', dailyQueries);
-    const el = document.getElementById('remainingQueries');
-    if (el) el.innerHTML = dailyQueries;
     return true;
 }
     </script>
