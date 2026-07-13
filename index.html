@@ -2576,7 +2576,7 @@ async function handleRegister() {
     const p1 = document.getElementById('rPass').value;
     const p2 = document.getElementById('rPass2').value;
     if (!name || !email || p1.length < 8 || p1 !== p2) {
-        showNotification('Tüm alanları doldurun, şifreler aynı ve min 8 karakter', 
+        showNotification('Tum alanlari doldurun, sifreler ayni ve min 8 karakter', 
 
 'error');
         return;
@@ -2598,17 +2598,17 @@ async function handleRegister() {
         try {
             await Parse.Cloud.run('sendEmail', {
                 to: email,
-                subject: 'Doğrulama Kodu - Vizyon 2027',
-                html: '<h1>Hoş geldin ' + name + '!</h1><p>Doğrulama kodunuz: <strong 
+                subject: 'Dogrulama Kodu - Vizyon 2027',
+                html: '<h1>Hos geldin ' + name + '!</h1><p>Dogrulama kodunuz: <strong 
 
 style="font-size:24px;color:#00d4ff;">' + code + '</strong></p><p>15 dakika 
 
-geçerlidir.</p><p>Vizyon 2027 ekibi</p>'
+gecerlidir.</p><p>Vizyon 2027 ekibi</p>'
             });
         } catch(e) {
-            console.log('Mail gönderilemedi:', e);
+            console.log('Mail gonderilemedi:', e);
         }
-        showNotification('Kayıt başarılı! Doğrulama kodunuz mail adresinize gönderildi.', 
+        showNotification('Kayit basarili! Dogrulama kodunuz mail adresinize gonderildi.', 
 
 'success');
         switchTab('verify');
@@ -2622,7 +2622,7 @@ async function verifyAccount() {
     const email = document.getElementById('verifyEmail').value.trim();
     const code = document.getElementById('verifyCode').value.trim();
     if (!email || !code) {
-        showNotification('Tüm alanları doldurun!', 'error');
+        showNotification('Tum alanlari doldurun!', 'error');
         return;
     }
     try {
@@ -2630,22 +2630,22 @@ async function verifyAccount() {
         query.equalTo('email', email);
         const user = await query.first();
         if (!user) {
-            showNotification('Kullanıcı bulunamadı!', 'error');
+            showNotification('Kullanici bulunamadi!', 'error');
             return;
         }
         if (user.get('verificationCode') !== code) {
-            showNotification('Geçersiz kod!', 'error');
+            showNotification('Gecersiz kod!', 'error');
             return;
         }
         if (new Date(user.get('verificationCodeExpires')) < new Date()) {
-            showNotification('Kod süresi doldu! Lütfen yeniden kayıt olun.', 'error');
+            showNotification('Kod suresi doldu! Lutfen yeniden kayit olun.', 'error');
             return;
         }
         user.set('isVerified', true);
         user.set('verificationCode', null);
         user.set('verificationCodeExpires', null);
         await user.save();
-        showNotification('Hesap doğrulandı! Giriş yapabilirsiniz.', 'success');
+        showNotification('Hesap dogrulandi! Giris yapabilirsiniz.', 'success');
         switchTab('login');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
@@ -2656,19 +2656,19 @@ async function handleLogin() {
     const email = document.getElementById('lEmail').value.trim();
     const pass = document.getElementById('lPass').value;
     if (!email || !pass) {
-        showNotification('Tüm alanları doldurun!', 'error');
+        showNotification('Tum alanlari doldurun!', 'error');
         return;
     }
     try {
         const user = await Parse.User.logIn(email, pass);
         if (user.get('isBanned')) {
             await Parse.User.logOut();
-            showNotification('Hesabınız yasaklanmıştır!', 'error');
+            showNotification('Hesabiniz yasaklanmistir!', 'error');
             return;
         }
         if (!user.get('isVerified')) {
             await Parse.User.logOut();
-            showNotification('Hesap doğrulanmamış! Lütfen doğrulama kodunu girin.', 
+            showNotification('Hesap dogrulanmamis! Lutfen dogrulama kodunu girin.', 
 
 'error');
             switchTab('verify');
@@ -2687,27 +2687,27 @@ async function handleLogin() {
         closeModal('authModal');
         showDashboard();
         updateCommentUI();
-        showNotification('Hoş geldin, ' + user.get('name'), 'success');
+        showNotification('Hos geldin, ' + user.get('name'), 'success');
     } catch(e) {
-        showNotification('Giriş başarısız: ' + e.message, 'error');
+        showNotification('Giris basarisiz: ' + e.message, 'error');
     }
 }
 
 async function loginWithGoogle() {
     try {
-        showNotification('Google ile giriş başlatılıyor...', 'success');
+        showNotification('Google ile giris baslatiliyor...', 'success');
         const user = await Parse.User.logInWith('google', {
             authData: { id: 'google_' + Date.now(), access_token: 'temp_token' }
         });
         if (user.get('isBanned')) {
             await Parse.User.logOut();
-            showNotification('Hesabınız yasaklanmıştır!', 'error');
+            showNotification('Hesabiniz yasaklanmistir!', 'error');
             return;
         }
         currentUser = user;
         localStorage.setItem('vizyon_user', JSON.stringify({
             id: user.id,
-            name: user.get('name') || user.get('username') || 'Google Kullanıcısı',
+            name: user.get('name') || user.get('username') || 'Google Kullanicisi',
             email: user.get('email'),
             role: user.get('role') || 'user',
             plan: user.get('plan') || 'free',
@@ -2716,12 +2716,12 @@ async function loginWithGoogle() {
         closeModal('authModal');
         showDashboard();
         updateCommentUI();
-        showNotification('Google ile giriş başarılı! Hoş geldin ' + (user.get('name') || 
+        showNotification('Google ile giris basarili! Hos geldin ' + (user.get('name') || 
 
-'Kullanıcı'), 'success');
+'Kullanici'), 'success');
     } catch(e) {
-        console.error('Google giriş hatası:', e);
-        showNotification('Google giriş hatası: ' + e.message, 'error');
+        console.error('Google giris hatasi:', e);
+        showNotification('Google giris hatasi: ' + e.message, 'error');
     }
 }
 
@@ -2738,7 +2738,7 @@ async function showDashboard() {
     document.getElementById('dashboardArea').style.display = 'block';
     const name = currentUser.get('name');
     const role = currentUser.get('role');
-    document.getElementById('dashboardUserName').innerHTML = name || 'Kullanıcı';
+    document.getElementById('dashboardUserName').innerHTML = name || 'Kullanici';
     document.getElementById('userRoleBadge').innerHTML =
         role === 'founder' ? '👑 KURUCU' :
         role === 'admin' ? '⚙️ ADMIN' :
@@ -2773,30 +2773,30 @@ async function loadProjects() {
         const container = document.getElementById('projectsList');
         if (!container) return;
         if (projects.length === 0) {
-            container.innerHTML = '<div class="project-item">Henüz proje yok.</div>';
+            container.innerHTML = '<div class="project-item">Henuz proje yok.</div>';
         } else {
             container.innerHTML = projects.map(p => `
                 <div class="project-item">
                     <span>📄 ${p.get('name').substring(0, 30)}</span>
                     <div class="project-actions">
-                        <span onclick="editProject('${p.id}')" title="Düzenle">✏️</span>
+                        <span onclick="editProject('${p.id}')" title="Duzenle">✏️</span>
                         <span onclick="deleteProject('${p.id}')" title="Sil">🗑️</span>
                         <span onclick="favoriteProject('${p.id}')" title="Favori">⭐</span>
-                        <span onclick="archiveProject('${p.id}')" title="Arşivle">🗄️</span>
+                        <span onclick="archiveProject('${p.id}')" title="Arsivle">🗄️</span>
                     </div>
                 </div>
             `).join('');
         }
     } catch(e) {
-        console.error('Projeler yüklenirken hata:', e);
+        console.error('Projeler yuklenirken hata:', e);
         document.getElementById('projectsList').innerHTML = '<div class="project-item">⚠️ 
 
-Projeler yüklenemedi.</div>';
+Projeler yuklenemedi.</div>';
     }
 }
 
 async function newProject() {
-    const name = prompt('Proje adı:');
+    const name = prompt('Proje adi:');
     if (!name || !name.trim()) return;
     try {
         const Project = Parse.Object.extend('Project');
@@ -2808,14 +2808,14 @@ async function newProject() {
         project.set('is_trashed', false);
         await project.save();
         await loadProjects();
-        showNotification('Proje oluşturuldu!', 'success');
+        showNotification('Proje olusturuldu!', 'success');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 }
 
 async function editProject(id) {
-    const newName = prompt('Yeni proje adı:');
+    const newName = prompt('Yeni proje adi:');
     if (!newName || !newName.trim()) return;
     try {
         const query = new Parse.Query('Project');
@@ -2823,14 +2823,14 @@ async function editProject(id) {
         project.set('name', newName.trim());
         await project.save();
         await loadProjects();
-        showNotification('Proje güncellendi!', 'success');
+        showNotification('Proje guncellendi!', 'success');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 }
 
 async function deleteProject(id) {
-    if (!confirm('Projeyi silmek istediğinize emin misiniz?')) return;
+    if (!confirm('Projeyi silmek istediginize emin misiniz?')) return;
     try {
         const query = new Parse.Query('Project');
         const project = await query.get(id);
@@ -2854,7 +2854,7 @@ async function favoriteProject(id) {
         await loadFavorites();
         showNotification(project.get('is_favorite') ? '⭐ Favorilere eklendi!' : '⭐ 
 
-Favorilerden çıkarıldı!', 'success');
+Favorilerden cikarildi!', 'success');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -2868,7 +2868,7 @@ async function archiveProject(id) {
         await project.save();
         await loadProjects();
         await loadArchive();
-        showNotification('🗄️ Proje arşivlendi!', 'success');
+        showNotification('🗄️ Proje arsivlendi!', 'success');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -2882,7 +2882,7 @@ async function unarchiveProject(id) {
         await project.save();
         await loadProjects();
         await loadArchive();
-        showNotification('📤 Proje arşivden çıkarıldı!', 'success');
+        showNotification('📤 Proje arsivden cikarildi!', 'success');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -2896,7 +2896,7 @@ async function restoreProject(id) {
         await project.save();
         await loadProjects();
         await loadTrash();
-        showNotification('↩️ Proje geri yüklendi!', 'success');
+        showNotification('↩️ Proje geri yuklendi!', 'success');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -2913,7 +2913,7 @@ async function loadFavorites() {
         const container = document.getElementById('favList');
         if (!container) return;
         if (projects.length === 0) {
-            container.innerHTML = '<div class="project-item">Henüz favori proje 
+            container.innerHTML = '<div class="project-item">Henuz favori proje 
 
 yok.</div>';
         } else {
@@ -2923,13 +2923,13 @@ yok.</div>';
                     <div class="project-actions">
                         <span onclick="favoriteProject('${p.id}')" title="Favoriden 
 
-çıkar">★</span>
+cikar">★</span>
                     </div>
                 </div>
             `).join('');
         }
     } catch(e) {
-        console.error('Favoriler yüklenirken hata:', e);
+        console.error('Favoriler yuklenirken hata:', e);
     }
 }
 
@@ -2944,22 +2944,22 @@ async function loadArchive() {
         const container = document.getElementById('archiveList');
         if (!container) return;
         if (projects.length === 0) {
-            container.innerHTML = '<div class="project-item">Arşivde proje yok.</div>';
+            container.innerHTML = '<div class="project-item">Arsivde proje yok.</div>';
         } else {
             container.innerHTML = projects.map(p => `
                 <div class="project-item">
                     <span>🗄️ ${p.get('name').substring(0, 25)}</span>
                     <div class="project-actions">
-                        <span onclick="unarchiveProject('${p.id}')" title="Arşivden 
+                        <span onclick="unarchiveProject('${p.id}')" title="Arsivden 
 
-çıkar">📤</span>
+cikar">📤</span>
                         <span onclick="deleteProject('${p.id}')" title="Sil">🗑️</span>
                     </div>
                 </div>
             `).join('');
         }
     } catch(e) {
-        console.error('Arşiv yüklenirken hata:', e);
+        console.error('Arsiv yuklenirken hata:', e);
     }
 }
 
@@ -2973,7 +2973,7 @@ async function loadTrash() {
         const container = document.getElementById('trashList');
         if (!container) return;
         if (projects.length === 0) {
-            container.innerHTML = '<div class="project-item">Çöp kutusu boş.</div>';
+            container.innerHTML = '<div class="project-item">Cop kutusu bos.</div>';
         } else {
             container.innerHTML = projects.map(p => `
                 <div class="project-item">
@@ -2981,8 +2981,8 @@ async function loadTrash() {
                     <div class="project-actions">
                         <span onclick="restoreProject('${p.id}')" title="Geri 
 
-yükle">↩️</span>
-                        <span onclick="deleteProject('${p.id}')" title="Kalıcı 
+yukle">↩️</span>
+                        <span onclick="deleteProject('${p.id}')" title="Kalici 
 
 sil">🔥</span>
                     </div>
@@ -2990,7 +2990,7 @@ sil">🔥</span>
             `).join('');
         }
     } catch(e) {
-        console.error('Çöp kutusu yüklenirken hata:', e);
+        console.error('Cop kutusu yuklenirken hata:', e);
     }
 }
 
@@ -3004,7 +3004,7 @@ async function loadProjectRequests() {
         const container = document.getElementById('projectRequestsList');
         if (!container) return;
         if (requests.length === 0) {
-            container.innerHTML = '<div class="project-item">Henüz proje talebiniz 
+            container.innerHTML = '<div class="project-item">Henuz proje talebiniz 
 
 yok.</div>';
         } else {
@@ -3018,7 +3018,7 @@ yok.</div>';
             `).join('');
         }
     } catch(e) {
-        console.error('Proje talepleri yüklenirken hata:', e);
+        console.error('Proje talepleri yuklenirken hata:', e);
     }
 }
 
@@ -3032,7 +3032,7 @@ async function loadInbox() {
         const container = document.getElementById('inboxList');
         if (!container) return;
         if (messages.length === 0) {
-            container.innerHTML = '<div class="inbox-item">📭 Mesaj kutusu boş.</div>';
+            container.innerHTML = '<div class="inbox-item">📭 Mesaj kutusu bos.</div>';
         } else {
             container.innerHTML = messages.map(m => `
                 <div class="inbox-item">
@@ -3045,10 +3045,10 @@ Date(m.get('createdAt')).toLocaleString('tr-TR')}</div>
             `).join('');
         }
     } catch(e) {
-        console.error('Mesajlar yüklenirken hata:', e);
+        console.error('Mesajlar yuklenirken hata:', e);
         document.getElementById('inboxList').innerHTML = '<div class="inbox-item">⚠️ 
 
-Mesajlar yüklenemedi.</div>';
+Mesajlar yuklenemedi.</div>';
     }
 }
     </script>
@@ -3065,9 +3065,9 @@ async function loadTeamInfo() {
     if (!currentUser) return;
     var teamId = currentUser.get('teamId');
     if (!teamId) {
-        document.getElementById('teamInfo').innerHTML = '<p>Bir takıma üye değilsiniz. 
+        document.getElementById('teamInfo').innerHTML = '<p>Bir takima uye degilsiniz. 
 
-Takım oluşturun veya davet bekleyin.</p>';
+Takim olusturun veya davet bekleyin.</p>';
         document.getElementById('teamMembersList').innerHTML = '';
         document.getElementById('teamChatMessages').innerHTML = '';
         return;
@@ -3087,7 +3087,7 @@ Takım oluşturun veya davet bekleyin.</p>';
         var messages = await msgQuery.find();
         document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + 
 
-'</h4><p>Üye sayısı: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
+'</h4><p>Uye sayisi: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
         document.getElementById('teamMembersList').innerHTML = members.map(function(m) {
             return '<div class="team-member-item">👤 ' + m.get('user_email') + (m.get
 
@@ -3101,14 +3101,14 @@ Takım oluşturun veya davet bekleyin.</p>';
 : 'bot') + '"><strong>' + (m.get('user_email') === userEmail ? 'Ben' : m.get
 
 ('user_email').split('@')[0]) + '</strong>: ' + m.get('message') + '</div>';
-        }).join('') || '<div>Henüz mesaj yok</div>';
+        }).join('') || '<div>Henuz mesaj yok</div>';
         chatContainer.scrollTop = chatContainer.scrollHeight;
-    } catch(e) { console.error('Takım bilgisi yüklenirken hata:', e); }
+    } catch(e) { console.error('Takim bilgisi yuklenirken hata:', e); }
 }
 
 async function createTeam() {
-    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
-    var name = prompt('Takım adı:');
+    if (!currentUser) { showNotification('Once giris yapin!', 'error'); return; }
+    var name = prompt('Takim adi:');
     if (!name) return;
     try {
         var Team = Parse.Object.extend('Team');
@@ -3124,14 +3124,14 @@ async function createTeam() {
         currentUser.set('teamId', team.id);
         await currentUser.save();
         await loadTeamInfo();
-        showNotification('"' + name + '" takımı oluşturuldu!', 'success');
+        showNotification('"' + name + '" takimi olusturuldu!', 'success');
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 }
 
 async function inviteToTeam() {
-    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    if (!currentUser) { showNotification('Once giris yapin!', 'error'); return; }
     var teamId = currentUser.get('teamId');
-    if (!teamId) { showNotification('Önce takım oluşturun!', 'error'); return; }
+    if (!teamId) { showNotification('Once takim olusturun!', 'error'); return; }
     var email = document.getElementById('inviteEmail').value.trim();
     if (!email) { showNotification('E-posta adresi girin!', 'error'); return; }
     try {
@@ -3139,19 +3139,19 @@ async function inviteToTeam() {
         var inbox = new Inbox();
         inbox.set('sender_email', currentUser.get('email'));
         inbox.set('receiver_email', email);
-        inbox.set('message', currentUser.get('name') + ' sizi takıma davet etti! Takım ID: 
+        inbox.set('message', currentUser.get('name') + ' sizi takima davet etti! Takim ID: 
 
 ' + teamId);
         await inbox.save();
-        showNotification('Davet gönderildi: ' + email, 'success');
+        showNotification('Davet gonderildi: ' + email, 'success');
         document.getElementById('inviteEmail').value = '';
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 }
 
 async function sendTeamMessage() {
-    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    if (!currentUser) { showNotification('Once giris yapin!', 'error'); return; }
     var teamId = currentUser.get('teamId');
-    if (!teamId) { showNotification('Takımınız yok!', 'error'); return; }
+    if (!teamId) { showNotification('Takiminiz yok!', 'error'); return; }
     var msg = document.getElementById('teamChatInput').value.trim();
     if (!msg) return;
     try {
@@ -3185,19 +3185,19 @@ async function callAllAIModels(prompt) {
     try {
         return await Parse.Cloud.run('superAI', { prompt: prompt });
     } catch(e) {
-        console.error('AI hatası:', e);
-        return '🧠 VİZYON AI: "' + prompt + '" hakkında yardımcı olabilirim. Detaylı yanıt 
+        console.error('AI hatasi:', e);
+        return '🧠 VIZYON AI: "' + prompt + '" hakkinda yardimci olabilirim. Detayli yanit 
 
-için lütfen daha spesifik bir soru sorun.';
+icin lutfen daha spesifik bir soru sorun.';
     }
 }
 
 async function webSearch(query) {
     try {
         var result = await Parse.Cloud.run('webSearch', { query: query });
-        return result || '"' + query + '" için sonuç bulunamadı.';
+        return result || '"' + query + '" icin sonuc bulunamadi.';
     } catch(e) {
-        return '"' + query + '" için arama yapılamadı.';
+        return '"' + query + '" icin arama yapilamadi.';
     }
 }
 
