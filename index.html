@@ -2710,7 +2710,7 @@ Mesajlar yüklenemedi.</div>';
     <!-- ============================================================ -->
     <script>
         // ============================================================
-// 3. JS - TAKIM SİSTEMİ VE AI (CLOUD CODE)
+// 3. JS - TAKIM SİSTEMİ VE AI (CLOUD CODE) - DÜZELTİLDİ
 // ============================================================
 
 // ========== TAKIM SİSTEMİ ==========
@@ -2718,9 +2718,7 @@ async function loadTeamInfo() {
     if (!currentUser) return;
     var teamId = currentUser.get('teamId');
     if (!teamId) {
-        document.getElementById('teamInfo').innerHTML = '<p>Bir takıma üye değilsiniz. 
-
-Takım oluşturun veya davet bekleyin.</p>';
+        document.getElementById('teamInfo').innerHTML = '<p>Bir takıma üye değilsiniz. Takım oluşturun veya davet bekleyin.</p>';
         document.getElementById('teamMembersList').innerHTML = '';
         document.getElementById('teamChatMessages').innerHTML = '';
         return;
@@ -2738,22 +2736,14 @@ Takım oluşturun veya davet bekleyin.</p>';
         msgQuery.equalTo('team_id', teamId);
         msgQuery.ascending('createdAt');
         var messages = await msgQuery.find();
-        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + 
-
-'</h4><p>Üye sayısı: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
+        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + '</h4><p>Üye sayısı: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
         document.getElementById('teamMembersList').innerHTML = members.map(function(m) {
-            return '<div class="team-member-item">👤 ' + m.get('user_email') + (m.get
-
-('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>';
+            return '<div class="team-member-item">👤 ' + m.get('user_email') + (m.get('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>';
         }).join('');
         var chatContainer = document.getElementById('teamChatMessages');
         var userEmail = currentUser.get('email');
         chatContainer.innerHTML = messages.map(function(m) {
-            return '<div class="ai-message ' + (m.get('user_email') === userEmail ? 'user' 
-
-: 'bot') + '"><strong>' + (m.get('user_email') === userEmail ? 'Ben' : m.get
-
-('user_email').split('@')[0]) + '</strong>: ' + m.get('message') + '</div>';
+            return '<div class="ai-message ' + (m.get('user_email') === userEmail ? 'user' : 'bot') + '"><strong>' + (m.get('user_email') === userEmail ? 'Ben' : m.get('user_email').split('@')[0]) + '</strong>: ' + m.get('message') + '</div>';
         }).join('') || '<div>Henüz mesaj yok</div>';
         chatContainer.scrollTop = chatContainer.scrollHeight;
     } catch(e) { console.error('Takım bilgisi yüklenirken hata:', e); }
@@ -2792,9 +2782,7 @@ async function inviteToTeam() {
         var inbox = new Inbox();
         inbox.set('sender_email', currentUser.get('email'));
         inbox.set('receiver_email', email);
-        inbox.set('message', currentUser.get('name') + ' sizi takıma davet etti! Takım ID: 
-
-' + teamId);
+        inbox.set('message', currentUser.get('name') + ' sizi takıma davet etti! Takım ID: ' + teamId);
         await inbox.save();
         showNotification('Davet gönderildi: ' + email, 'success');
         document.getElementById('inviteEmail').value = '';
@@ -2819,15 +2807,13 @@ async function sendTeamMessage() {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 }
 
-// ========== YAPAY ZEKA (CLOUD CODE) ==========
+// ========== YAPAY ZEKA (CLOUD CODE) – DÜZELTİLDİ ==========
 async function callAllAIModels(prompt) {
     try {
         return await Parse.Cloud.run('superAI', { prompt: prompt });
     } catch(e) {
         console.error('AI hatası:', e);
-        return '🧠 VİZYON AI: "' + prompt + '" hakkında yardımcı olabilirim. Detaylı yanıt 
-
-için lütfen daha spesifik bir soru sorun.';
+        return 'VİZYON AI: ' + prompt + ' hakkında yardımcı olabilirim. Detaylı yanıt için lütfen daha spesifik bir soru sorun.';
     }
 }
 
@@ -2848,15 +2834,11 @@ window.sendDashboardAI = async function() {
     var msg = inp.value.trim();
     if (!msg) return;
     var container = document.getElementById('dashboardAiMessages');
-    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + 
-
-'</div>';
+    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + '</div>';
     inp.value = '';
     container.scrollTop = container.scrollHeight;
     var response;
-    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') 
-
-!== -1) {
+    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') !== -1) {
         response = await webSearch(msg);
     } else {
         response = await callAllAIModels(msg);
@@ -2888,7 +2870,7 @@ async function sendFullAI() {
     } else {
         response = await callAllAIModels(msg);
     }
-    chat.innerHTML += '<div class="ai-msg bot">🧠 ' + response + '</div>';
+    chat.innerHTML += '<div class="ai-msg bot">' + response + '</div>';
     chat.scrollTop = chat.scrollHeight;
 }
 
