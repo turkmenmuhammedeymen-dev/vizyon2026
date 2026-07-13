@@ -2472,37 +2472,29 @@ let currentRole = null;
 let parseInitialized = false;
 let statsInterval = null;
 
-// ========== BACK4APP'İ BAŞLAT ==========
 async function initBack4App() {
     if (parseInitialized) return;
-    
     try {
         await loadParseSDK();
-        
-        Parse.initialize(
-            "ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8",
-            "cd1HeGMPKUu8xxE8Q11FMvkzvG6lz7QbJ0rPVpSf"
-        );
+        Parse.initialize("ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8", 
+
+"cd1HeGMPKUu8xxE8Q11FMvkzvG6lz7QbJ0rPVpSf");
         Parse.serverURL = "https://parseapi.back4app.com";
         parseInitialized = true;
-        
-        console.log('✅ Back4App başarıyla başlatıldı!');
+        console.log('✅ Back4App başlatıldı');
         showNotification('✅ Back4App bağlantısı kuruldu!', 'success');
-        
         try {
             const result = await Parse.Cloud.run('testConfig');
             console.log('✅ Cloud Code test:', result);
         } catch(e) {
             console.log('⚠️ Cloud Code test başarısız:', e);
         }
-        
     } catch(e) {
         console.error('Back4App hatası:', e);
         showNotification('❌ Back4App bağlantı hatası!', 'error');
     }
 }
 
-// ========== PARSE SDK'YI YÜKLE ==========
 function loadParseSDK() {
     return new Promise((resolve, reject) => {
         if (typeof Parse !== 'undefined') { resolve(); return; }
@@ -2514,7 +2506,6 @@ function loadParseSDK() {
     });
 }
 
-// ========== BİLDİRİM ==========
 function showNotification(msg, type) {
     let n = document.getElementById('notification');
     if (!n) {
@@ -2528,13 +2519,11 @@ function showNotification(msg, type) {
     setTimeout(() => n.classList.remove('show'), 4000);
 }
 
-// ========== MODAL KAPATMA ==========
 function closeModal(id) {
     const modal = document.getElementById(id);
     if (modal) modal.classList.remove('open');
 }
 
-// ========== SORGU LİMİTİ ==========
 async function useQuery() {
     if (currentUser) {
         try {
@@ -2548,7 +2537,6 @@ async function useQuery() {
     return true;
 }
 
-// ========== SAYAÇLARI GÜNCELLE (GERÇEK VERİ) ==========
 async function updateStats() {
     try {
         const stats = await Parse.Cloud.run('getStats');
@@ -2560,7 +2548,6 @@ async function updateStats() {
     }
 }
 
-// ========== SAYAÇLARI PERİYODİK GÜNCELLE ==========
 function startStatsInterval() {
     if (statsInterval) clearInterval(statsInterval);
     updateStats();
@@ -2580,23 +2567,20 @@ function stopStatsInterval() {
     <!-- ============================================================ -->
     <script>
         // ============================================================
-// JS-2: KAYIT, GİRİŞ, DOĞRULAMA, GOOGLE, PROJE YÖNETİMİ
+// JS-2: KAYIT, GİRİŞ, GOOGLE, PROJE YÖNETİMİ
 // ============================================================
 
-// ========== KAYIT ==========
 async function handleRegister() {
     const name = document.getElementById('rName').value.trim();
     const email = document.getElementById('rEmail').value.trim();
     const p1 = document.getElementById('rPass').value;
     const p2 = document.getElementById('rPass2').value;
-    
     if (!name || !email || p1.length < 8 || p1 !== p2) {
         showNotification('Tüm alanları doldurun, şifreler aynı ve min 8 karakter', 
 
 'error');
         return;
     }
-    
     try {
         const user = new Parse.User();
         user.set('username', email);
@@ -2607,13 +2591,10 @@ async function handleRegister() {
         user.set('plan', 'free');
         user.set('isVerified', false);
         user.set('isBanned', false);
-        
         const code = Math.floor(100000 + Math.random() * 900000).toString();
         user.set('verificationCode', code);
         user.set('verificationCodeExpires', new Date(Date.now() + 15 * 60000));
-        
         await user.signUp();
-        
         try {
             await Parse.Cloud.run('sendEmail', {
                 to: email,
@@ -2627,7 +2608,6 @@ geçerlidir.</p><p>Vizyon 2027 ekibi</p>'
         } catch(e) {
             console.log('Mail gönderilemedi:', e);
         }
-        
         showNotification('Kayıt başarılı! Doğrulama kodunuz mail adresinize gönderildi.', 
 
 'success');
@@ -2638,41 +2618,33 @@ geçerlidir.</p><p>Vizyon 2027 ekibi</p>'
     }
 }
 
-// ========== DOĞRULAMA ==========
 async function verifyAccount() {
     const email = document.getElementById('verifyEmail').value.trim();
     const code = document.getElementById('verifyCode').value.trim();
-    
     if (!email || !code) {
         showNotification('Tüm alanları doldurun!', 'error');
         return;
     }
-    
     try {
         const query = new Parse.Query(Parse.User);
         query.equalTo('email', email);
         const user = await query.first();
-        
         if (!user) {
             showNotification('Kullanıcı bulunamadı!', 'error');
             return;
         }
-        
         if (user.get('verificationCode') !== code) {
             showNotification('Geçersiz kod!', 'error');
             return;
         }
-        
         if (new Date(user.get('verificationCodeExpires')) < new Date()) {
             showNotification('Kod süresi doldu! Lütfen yeniden kayıt olun.', 'error');
             return;
         }
-        
         user.set('isVerified', true);
         user.set('verificationCode', null);
         user.set('verificationCodeExpires', null);
         await user.save();
-        
         showNotification('Hesap doğrulandı! Giriş yapabilirsiniz.', 'success');
         switchTab('login');
     } catch(e) {
@@ -2680,25 +2652,20 @@ async function verifyAccount() {
     }
 }
 
-// ========== GİRİŞ ==========
 async function handleLogin() {
     const email = document.getElementById('lEmail').value.trim();
     const pass = document.getElementById('lPass').value;
-    
     if (!email || !pass) {
         showNotification('Tüm alanları doldurun!', 'error');
         return;
     }
-    
     try {
         const user = await Parse.User.logIn(email, pass);
-        
         if (user.get('isBanned')) {
             await Parse.User.logOut();
             showNotification('Hesabınız yasaklanmıştır!', 'error');
             return;
         }
-        
         if (!user.get('isVerified')) {
             await Parse.User.logOut();
             showNotification('Hesap doğrulanmamış! Lütfen doğrulama kodunu girin.', 
@@ -2708,7 +2675,6 @@ async function handleLogin() {
             document.getElementById('verifyEmail').value = email;
             return;
         }
-        
         currentUser = user;
         localStorage.setItem('vizyon_user', JSON.stringify({
             id: user.id,
@@ -2718,7 +2684,6 @@ async function handleLogin() {
             plan: user.get('plan'),
             teamId: user.get('teamId')
         }));
-        
         closeModal('authModal');
         showDashboard();
         updateCommentUI();
@@ -2728,24 +2693,17 @@ async function handleLogin() {
     }
 }
 
-// ========== GOOGLE İLE GİRİŞ ==========
 async function loginWithGoogle() {
     try {
         showNotification('Google ile giriş başlatılıyor...', 'success');
-        
         const user = await Parse.User.logInWith('google', {
-            authData: {
-                id: 'google_' + Date.now(),
-                access_token: 'temp_token'
-            }
+            authData: { id: 'google_' + Date.now(), access_token: 'temp_token' }
         });
-        
         if (user.get('isBanned')) {
             await Parse.User.logOut();
             showNotification('Hesabınız yasaklanmıştır!', 'error');
             return;
         }
-        
         currentUser = user;
         localStorage.setItem('vizyon_user', JSON.stringify({
             id: user.id,
@@ -2755,21 +2713,18 @@ async function loginWithGoogle() {
             plan: user.get('plan') || 'free',
             teamId: user.get('teamId')
         }));
-        
         closeModal('authModal');
         showDashboard();
         updateCommentUI();
         showNotification('Google ile giriş başarılı! Hoş geldin ' + (user.get('name') || 
 
 'Kullanıcı'), 'success');
-        
     } catch(e) {
         console.error('Google giriş hatası:', e);
         showNotification('Google giriş hatası: ' + e.message, 'error');
     }
 }
 
-// ========== ÇIKIŞ ==========
 function logout() {
     Parse.User.logOut();
     localStorage.removeItem('vizyon_user');
@@ -2778,28 +2733,23 @@ function logout() {
     location.reload();
 }
 
-// ========== DASHBOARD ==========
 async function showDashboard() {
     document.getElementById('mainSite').style.display = 'none';
     document.getElementById('dashboardArea').style.display = 'block';
-    
     const name = currentUser.get('name');
     const role = currentUser.get('role');
-    
     document.getElementById('dashboardUserName').innerHTML = name || 'Kullanıcı';
     document.getElementById('userRoleBadge').innerHTML =
         role === 'founder' ? '👑 KURUCU' :
         role === 'admin' ? '⚙️ ADMIN' :
         role === 'beta' ? '🔬 BETA' :
         '👤 KULLANICI';
-    
     if (role === 'admin' || role === 'founder') {
         document.getElementById('adminPanelCard').style.display = 'block';
         await loadUserList();
     } else {
         document.getElementById('adminPanelCard').style.display = 'none';
     }
-    
     await loadProjects();
     await loadFavorites();
     await loadArchive();
@@ -2811,7 +2761,6 @@ async function showDashboard() {
     startStatsInterval();
 }
 
-// ========== PROJE İŞLEMLERİ ==========
 async function loadProjects() {
     try {
         const Project = Parse.Object.extend('Project');
@@ -2821,10 +2770,8 @@ async function loadProjects() {
         query.equalTo('is_trashed', false);
         query.descending('createdAt');
         const projects = await query.find();
-        
         const container = document.getElementById('projectsList');
         if (!container) return;
-        
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Henüz proje yok.</div>';
         } else {
@@ -2851,7 +2798,6 @@ Projeler yüklenemedi.</div>';
 async function newProject() {
     const name = prompt('Proje adı:');
     if (!name || !name.trim()) return;
-    
     try {
         const Project = Parse.Object.extend('Project');
         const project = new Project();
@@ -2871,7 +2817,6 @@ async function newProject() {
 async function editProject(id) {
     const newName = prompt('Yeni proje adı:');
     if (!newName || !newName.trim()) return;
-    
     try {
         const query = new Parse.Query('Project');
         const project = await query.get(id);
@@ -2886,7 +2831,6 @@ async function editProject(id) {
 
 async function deleteProject(id) {
     if (!confirm('Projeyi silmek istediğinize emin misiniz?')) return;
-    
     try {
         const query = new Parse.Query('Project');
         const project = await query.get(id);
@@ -2958,7 +2902,6 @@ async function restoreProject(id) {
     }
 }
 
-// ========== FAVORİLER ==========
 async function loadFavorites() {
     try {
         const Project = Parse.Object.extend('Project');
@@ -2967,10 +2910,8 @@ async function loadFavorites() {
         query.equalTo('is_favorite', true);
         query.equalTo('is_trashed', false);
         const projects = await query.find();
-        
         const container = document.getElementById('favList');
         if (!container) return;
-        
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Henüz favori proje 
 
@@ -2992,7 +2933,6 @@ yok.</div>';
     }
 }
 
-// ========== ARŞİV ==========
 async function loadArchive() {
     try {
         const Project = Parse.Object.extend('Project');
@@ -3001,10 +2941,8 @@ async function loadArchive() {
         query.equalTo('is_archived', true);
         query.equalTo('is_trashed', false);
         const projects = await query.find();
-        
         const container = document.getElementById('archiveList');
         if (!container) return;
-        
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Arşivde proje yok.</div>';
         } else {
@@ -3025,7 +2963,6 @@ async function loadArchive() {
     }
 }
 
-// ========== ÇÖP KUTUSU ==========
 async function loadTrash() {
     try {
         const Project = Parse.Object.extend('Project');
@@ -3033,10 +2970,8 @@ async function loadTrash() {
         query.equalTo('user_email', currentUser.get('email'));
         query.equalTo('is_trashed', true);
         const projects = await query.find();
-        
         const container = document.getElementById('trashList');
         if (!container) return;
-        
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Çöp kutusu boş.</div>';
         } else {
@@ -3059,7 +2994,6 @@ sil">🔥</span>
     }
 }
 
-// ========== PROJE TALEPLERİ ==========
 async function loadProjectRequests() {
     try {
         const Request = Parse.Object.extend('ProjectRequest');
@@ -3067,10 +3001,8 @@ async function loadProjectRequests() {
         query.equalTo('user_email', currentUser.get('email'));
         query.descending('createdAt');
         const requests = await query.find();
-        
         const container = document.getElementById('projectRequestsList');
         if (!container) return;
-        
         if (requests.length === 0) {
             container.innerHTML = '<div class="project-item">Henüz proje talebiniz 
 
@@ -3090,7 +3022,6 @@ yok.</div>';
     }
 }
 
-// ========== GELEN KUTUSU ==========
 async function loadInbox() {
     try {
         const Inbox = Parse.Object.extend('Inbox');
@@ -3098,10 +3029,8 @@ async function loadInbox() {
         query.equalTo('receiver_email', currentUser.get('email'));
         query.descending('createdAt');
         const messages = await query.find();
-        
         const container = document.getElementById('inboxList');
         if (!container) return;
-        
         if (messages.length === 0) {
             container.innerHTML = '<div class="inbox-item">📭 Mesaj kutusu boş.</div>';
         } else {
@@ -3132,7 +3061,6 @@ Mesajlar yüklenemedi.</div>';
 // JS-3: TAKIM VE AI (Cloud Code ile + Temizleme)
 // ============================================================
 
-// ========== TAKIM SİSTEMİ ==========
 async function loadTeamInfo() {
     if (!currentUser) return;
     var teamId = currentUser.get('teamId');
@@ -3238,7 +3166,6 @@ async function sendTeamMessage() {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 }
 
-// ========== YANIT TEMİZLEME (Client tarafı) ==========
 function cleanClientResponse(text) {
     if (!text) return text;
     return text
@@ -3254,7 +3181,6 @@ function cleanClientResponse(text) {
         .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
 }
 
-// ========== YAPAY ZEKA (Cloud Code) ==========
 async function callAllAIModels(prompt) {
     try {
         return await Parse.Cloud.run('superAI', { prompt: prompt });
@@ -3266,7 +3192,6 @@ için lütfen daha spesifik bir soru sorun.';
     }
 }
 
-// ===== WEB ARAMA (Cloud Code) =====
 async function webSearch(query) {
     try {
         var result = await Parse.Cloud.run('webSearch', { query: query });
@@ -3276,7 +3201,6 @@ async function webSearch(query) {
     }
 }
 
-// ========== AI CHAT FONKSİYONLARI (Temizleme ile) ==========
 window.sendDashboardAI = async function() {
     if (!await useQuery()) return;
     var inp = document.getElementById('dashboardAiInput');
@@ -3367,7 +3291,6 @@ async function sendAiMessage() {
 // JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ
 // ============================================================
 
-// ========== PROFİL ==========
 function openProfileModal() {
     if (!currentUser) {
         showNotification('Önce giriş yapın!', 'error');
@@ -3443,7 +3366,6 @@ al?')) {
     }
 }
 
-// ========== ADMIN/FOUNDER/BETA PANELLERİ ==========
 function openRolePanel(role) {
     currentRole = role;
     document.getElementById('roleTitle').innerHTML =
@@ -3472,7 +3394,6 @@ function checkRole() {
     }
 }
 
-// ========== KULLANICI YÖNETİMİ (ADMIN) ==========
 async function loadUserList() {
     if (!currentUser) return;
     try {
@@ -3592,7 +3513,6 @@ hediye edildi!');
     }
 }
 
-// ========== ADMIN ATAMA (ARAYÜZ) ==========
 async function assignAdmin() {
     if (!currentUser) {
         showNotification('Önce giriş yapın!', 'error');
@@ -3628,7 +3548,45 @@ async function sendGift() {
     document.getElementById('giftEmail').value = '';
 }
 
-// ========== MODAL ==========
+// ========== ADMIN ŞİFRE BELİRLEME ==========
+async function setAdminPassword() {
+    const email = document.getElementById('adminEmail').value.trim();
+    const pass = document.getElementById('adminPass').value;
+    const pass2 = document.getElementById('adminPass2').value;
+    
+    if (!email || pass.length < 8 || pass !== pass2) {
+        showNotification('Tüm alanları doldurun, şifreler aynı ve min 8 karakter', 
+
+'error');
+        return;
+    }
+    
+    try {
+        const query = new Parse.Query(Parse.User);
+        query.equalTo('email', email);
+        const user = await query.first({ useMasterKey: true });
+        
+        if (!user) {
+            showNotification('Kullanıcı bulunamadı!', 'error');
+            return;
+        }
+        
+        user.set('password', pass);
+        await user.save(null, { useMasterKey: true });
+        
+        showNotification('✅ Şifre başarıyla güncellendi!', 'success');
+        closeModal('adminPasswordModal');
+        
+        // Form alanlarını temizle
+        document.getElementById('adminEmail').value = '';
+        document.getElementById('adminPass').value = '';
+        document.getElementById('adminPass2').value = '';
+        
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
 function openModal(type) {
     document.getElementById('authModal').classList.add('open');
     switchTab(type);
@@ -3658,36 +3616,22 @@ function openRandomSupport() {
     showNotification('Destek maili açılıyor', 'success');
 }
 
-// ========== YORUM SİSTEMİ ==========
 async function loadComments() {
     try {
         const comments = await Parse.Cloud.run('getComments');
         const container = document.getElementById('commentsList');
-        
         if (!comments || comments.length === 0) {
-            container.innerHTML = `
-                <div class="comment-item" style="border-left-color: var(--accent2); text-
+            container.innerHTML = `<div class="comment-item" style="border-left-color: var
 
-align: center; color: var(--text3);">
-                    🌟 İlk yorumu sen yap!
-                </div>
-            `;
+(--accent2); text-align: center; color: var(--text3);">🌟 İlk yorumu sen yap!</div>`;
             return;
         }
-        
-        const roleLabels = {
-            'founder': '👑 KURUCU',
-            'admin': '⚙️ ADMIN',
-            'beta': '🔬 BETA',
-            'user': '👤 KULLANICI'
-        };
-        const roleColors = {
-            'founder': 'var(--gold)',
-            'admin': 'var(--accent)',
-            'beta': 'var(--purple)',
-            'user': 'var(--text3)'
-        };
-        
+        const roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 
+
+'user': '👤 KULLANICI' };
+        const roleColors = { 'founder': 'var(--gold)', 'admin': 'var(--accent)', 'beta': 
+
+'var(--purple)', 'user': 'var(--text3)' };
         container.innerHTML = comments.map(c => `
             <div class="comment-item" style="border-left-color: ${roleColors[c.user_role] 
 
@@ -3702,9 +3646,7 @@ wrap;">
 
 ${roleColors[c.user_role] || 'var(--border)'}; color: ${roleColors[c.user_role] || 'var(--
 
-text3)'};">
-                        ${roleLabels[c.user_role] || '👤 KULLANICI'}
-                    </span>
+text3)'};">${roleLabels[c.user_role] || '👤 KULLANICI'}</span>
                     <span class="comment-email">📧 ${c.user_email || '---'}</span>
                     <span class="comment-time" style="margin-left: auto;">${new Date
 
@@ -3713,16 +3655,13 @@ text3)'};">
                 <div class="comment-text">${c.comment}</div>
             </div>
         `).join('');
-        
     } catch(e) {
         console.error('Yorumlar yüklenemedi:', e);
-        document.getElementById('commentsList').innerHTML = `
-            <div class="comment-item" style="border-left-color: var(--danger); text-align: 
+        document.getElementById('commentsList').innerHTML = `<div class="comment-item" 
 
-center; color: var(--danger);">
-                ⚠️ Yorumlar yüklenemedi: ${e.message}
-            </div>
-        `;
+style="border-left-color: var(--danger); text-align: center; color: var(--danger);">⚠️ 
+
+Yorumlar yüklenemedi: ${e.message}</div>`;
     }
 }
 
@@ -3731,16 +3670,14 @@ async function postComment() {
         showNotification('Yorum yapmak için giriş yapmalısınız!', 'error');
         return;
     }
-    
     const input = document.getElementById('commentInput');
     const text = input.value.trim();
     if (!text) {
         showNotification('Lütfen bir yorum yazın!', 'error');
         return;
     }
-    
     try {
-        const result = await Parse.Cloud.run('addComment', { comment: text });
+        await Parse.Cloud.run('addComment', { comment: text });
         input.value = '';
         showNotification('💬 Yorumunuz gönderildi!', 'success');
         await loadComments();
@@ -3754,18 +3691,13 @@ function updateCommentUI() {
     const loginMsg = document.getElementById('commentLoginMessage');
     const userName = document.getElementById('commentUserName');
     const userRole = document.getElementById('commentUserRole');
-    
     if (currentUser) {
         if (form) form.style.display = 'block';
         if (loginMsg) loginMsg.style.display = 'none';
         if (userName) userName.textContent = currentUser.get('name') || 'Kullanıcı';
-        
-        const roleLabels = {
-            'founder': '👑 KURUCU',
-            'admin': '⚙️ ADMIN',
-            'beta': '🔬 BETA',
-            'user': '👤 KULLANICI'
-        };
+        const roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 
+
+'user': '👤 KULLANICI' };
         if (userRole) userRole.textContent = roleLabels[currentUser.get('role')] || '👤 
 
 KULLANICI';
@@ -3775,7 +3707,6 @@ KULLANICI';
     }
 }
 
-// ========== BAŞLANGIÇ VERİLERİ ==========
 async function initData() {
     try {
         var query = new Parse.Query(Parse.User);
@@ -3791,7 +3722,6 @@ async function initData() {
             admin1.set('isVerified', true);
             admin1.set('isBanned', false);
             await admin1.signUp();
-
             var admin2 = new Parse.User();
             admin2.set('username', 'iy5971828@gmail.com');
             admin2.set('email', 'iy5971828@gmail.com');
@@ -3809,7 +3739,6 @@ async function initData() {
     }
 }
 
-// ========== PARÇACIKLAR ==========
 var particlesContainer = document.getElementById('particles');
 if (particlesContainer) {
     for (var i = 0; i < 60; i++) {
@@ -3822,7 +3751,6 @@ Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';
     }
 }
 
-// ========== İMLEÇ ==========
 var cursor = document.getElementById('customCursor');
 var ring = document.getElementById('customCursorRing');
 if (cursor && ring) {
@@ -3833,7 +3761,6 @@ if (cursor && ring) {
         cursor.style.left = (mx - 6) + 'px';
         cursor.style.top = (my - 6) + 'px';
     });
-
     function animate() {
         rx += (mx - rx - 18) * 0.12;
         ry += (my - ry - 18) * 0.12;
@@ -3852,7 +3779,6 @@ if (cursor && ring) {
     });
 }
 
-// ========== SAYFA YÜKLENİNCE ==========
 window.onload = async function() {
     if (typeof initBack4App === 'function') {
         await initBack4App();
@@ -3861,14 +3787,11 @@ window.onload = async function() {
         showNotification('❌ Back4App bağlantısı kurulamadı! Sayfayı yenileyin.', 'error');
         return;
     }
-    
     if (typeof Parse === 'undefined' || !parseInitialized) {
         showNotification('❌ Back4App bağlantısı kurulamadı! Sayfayı yenileyin.', 'error');
         return;
     }
-    
     await initData();
-    
     var saved = localStorage.getItem('vizyon_user');
     if (saved) {
         try {
@@ -3884,15 +3807,10 @@ window.onload = async function() {
             console.error('Oturum hatası:', e);
         }
     }
-    
-    // Yorumları herkes görebilir
     await loadComments();
     updateCommentUI();
-    
-    // Sayaçları güncelle
     await updateStats();
     startStatsInterval();
-    
     showNotification('✨ VİZYON 2027 Sistemi Aktif!', 'success');
 };
     </script>
