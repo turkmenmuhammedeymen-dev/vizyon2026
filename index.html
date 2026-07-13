@@ -2832,62 +2832,12 @@ async function callAllAIModels(prompt) {
     }
 }
 
-// ===== DÜZELTİLMİŞ FALLBACK (SADECE NORMAL STRING BİRLEŞTİRME) =====
+// ===== EN SADE HATALI FALLBACK (SADECE DÜZ METİN) =====
 function fallbackAI(p) {
-    var q = p.toLowerCase();
-    if (q.indexOf('python') !== -1 && (q.indexOf('hesap') !== -1 || q.indexOf('calculator') 
+    // Bu fonksiyon sadece Cloud Code çalışmadığında devreye girer
+    return '🧠 VİZYON AI: "' + p + '" hakkında yardımcı olabilirim. Detaylı yanıt için 
 
-!== -1)) {
-        return '```python\n' +
-               'def hesap_makinesi():\n' +
-               '    sayi1 = float(input("Birinci sayı: "))\n' +
-               '    islem = input("İşlem (+,-,*,/): ")\n' +
-               '    sayi2 = float(input("İkinci sayı: "))\n' +
-               '    if islem == "+":\n' +
-               '        print(f"Sonuç: {sayi1 + sayi2}")\n' +
-               '    elif islem == "-":\n' +
-               '        print(f"Sonuç: {sayi1 - sayi2}")\n' +
-               '    elif islem == "*":\n' +
-               '        print(f"Sonuç: {sayi1 * sayi2}")\n' +
-               '    elif islem == "/":\n' +
-               '        if sayi2 != 0:\n' +
-               '            print(f"Sonuç: {sayi1 / sayi2}")\n' +
-               '        else:\n' +
-               '            print("Hata: Sıfıra bölme!")\n' +
-               '    else:\n' +
-               '        print("Geçersiz işlem!")\n' +
-               'hesap_makinesi()\n' +
-               '```';
-    }
-    if (q.indexOf('react') !== -1) {
-        return '```jsx\n' +
-               'function App() {\n' +
-               '  const [count, setCount] = React.useState(0);\n' +
-               '  return (\n' +
-               '    <div>\n' +
-               '      <h1>VİZYON AI</h1>\n' +
-               '      <button onClick={() => setCount(count + 1)}>\n' +
-               '        Tıklandı: {count}\n' +
-               '      </button>\n' +
-               '    </div>\n' +
-               '  );\n' +
-               '}\n' +
-               'export default App;\n' +
-               '```';
-    }
-    if (q.indexOf('dolar') !== -1) {
-        return '💰 <strong>Güncel Döviz Kurları:</strong><br>USD/TRY: 34.25 TL<br>EUR/TRY: 
-
-37.12 TL<br>GBP/TRY: 43.50 TL';
-    }
-    if (q.indexOf('haber') !== -1) {
-        return '📰 <strong>Bugünün Öne Çıkan Haberleri:</strong><br>• Yapay zeka 
-
-düzenlemeleri gündemde<br>• Teknoloji zirvesi başladı<br>• Yeni nesil çipler tanıtıldı';
-    }
-    return '🧠 <strong>VİZYON AI</strong>: "' + p + '" hakkında yardımcı olabilirim. Detaylı 
-
-yanıt için lütfen daha spesifik bir soru sorun.';
+lütfen daha spesifik bir soru sorun.';
 }
 
 // ===== WEB ARAMA (Cloud Code) =====
