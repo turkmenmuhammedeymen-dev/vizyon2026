@@ -2472,15 +2472,13 @@ async function initBack4App() {
     if (parseInitialized) return;
     try {
         await loadParseSDK();
-        Parse.initialize("ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8", 
-
-"cd1HeGMPKUu8xxE8Q11FMvkzvG6lz7QbJ0rPVpSf");
+        Parse.initialize("ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8", "cd1HeGMPKUu8xxE8Q11FMvkzvG6lz7QbJ0rPVpSf");
         Parse.serverURL = "https://parseapi.back4app.com";
         parseInitialized = true;
         console.log('Back4App baslatildi');
         showNotification('Back4App baglantisi kuruldu!', 'success');
         try {
-            const result = await Parse.Cloud.run('testConfig');
+            var result = await Parse.Cloud.run('testConfig');
             console.log('Cloud Code test:', result);
         } catch(e) {
             console.log('Cloud Code test basarisiz:', e);
@@ -2503,7 +2501,7 @@ function loadParseSDK() {
 }
 
 function showNotification(msg, type) {
-    let n = document.getElementById('notification');
+    var n = document.getElementById('notification');
     if (!n) {
         n = document.createElement('div');
         n.id = 'notification';
@@ -2512,11 +2510,11 @@ function showNotification(msg, type) {
     }
     n.innerHTML = (type === 'error' ? '❌ ' : '✅ ') + msg;
     n.className = 'notification show' + (type === 'error' ? ' error' : '');
-    setTimeout(() => n.classList.remove('show'), 4000);
+    setTimeout(function() { n.classList.remove('show'); }, 4000);
 }
 
 function closeModal(id) {
-    const modal = document.getElementById(id);
+    var modal = document.getElementById(id);
     if (modal) modal.classList.remove('open');
 }
 
@@ -2535,7 +2533,7 @@ async function useQuery() {
 
 async function updateStats() {
     try {
-        const stats = await Parse.Cloud.run('getStats');
+        var stats = await Parse.Cloud.run('getStats');
         document.getElementById('counter1').innerHTML = stats.users || 0;
         document.getElementById('counter2').innerHTML = stats.queries || 0;
         document.getElementById('counter3').innerHTML = stats.projects || 0;
@@ -2568,13 +2566,11 @@ function stopStatsInterval() {
     var p1 = document.getElementById('rPass').value;
     var p2 = document.getElementById('rPass2').value;
     if (!name || !email || p1.length < 8 || p1 !== p2) {
-        showNotification('Tum alanlari doldurun, sifreler ayni ve min 8 karakter', 
-
-'error');
+        showNotification('Tum alanlari doldurun, sifreler ayni ve min 8 karakter', 'error');
         return;
     }
     try {
-        const user = new Parse.User();
+        var user = new Parse.User();
         user.set('username', email);
         user.set('email', email);
         user.set('password', p1);
@@ -2591,18 +2587,12 @@ function stopStatsInterval() {
             await Parse.Cloud.run('sendEmail', {
                 to: email,
                 subject: 'Dogrulama Kodu - Vizyon 2027',
-                html: '<h1>Hos geldin ' + name + '!</h1><p>Dogrulama kodunuz: <strong 
-
-style="font-size:24px;color:#00d4ff;">' + code + '</strong></p><p>15 dakika 
-
-gecerlidir.</p><p>Vizyon 2027 ekibi</p>'
+                html: '<h1>Hos geldin ' + name + '!</h1><p>Dogrulama kodunuz: <strong style="font-size:24px;color:#00d4ff;">' + code + '</strong></p><p>15 dakika gecerlidir.</p><p>Vizyon 2027 ekibi</p>'
             });
         } catch(e) {
             console.log('Mail gonderilemedi:', e);
         }
-        showNotification('Kayit basarili! Dogrulama kodunuz mail adresinize gonderildi.', 
-
-'success');
+        showNotification('Kayit basarili! Dogrulama kodunuz mail adresinize gonderildi.', 'success');
         switchTab('verify');
         document.getElementById('verifyEmail').value = email;
     } catch(e) {
@@ -2611,16 +2601,16 @@ gecerlidir.</p><p>Vizyon 2027 ekibi</p>'
 }
 
 async function verifyAccount() {
-    const email = document.getElementById('verifyEmail').value.trim();
-    const code = document.getElementById('verifyCode').value.trim();
+    var email = document.getElementById('verifyEmail').value.trim();
+    var code = document.getElementById('verifyCode').value.trim();
     if (!email || !code) {
         showNotification('Tum alanlari doldurun!', 'error');
         return;
     }
     try {
-        const query = new Parse.Query(Parse.User);
+        var query = new Parse.Query(Parse.User);
         query.equalTo('email', email);
-        const user = await query.first();
+        var user = await query.first();
         if (!user) {
             showNotification('Kullanici bulunamadi!', 'error');
             return;
@@ -2645,14 +2635,14 @@ async function verifyAccount() {
 }
 
 async function handleLogin() {
-    const email = document.getElementById('lEmail').value.trim();
-    const pass = document.getElementById('lPass').value;
+    var email = document.getElementById('lEmail').value.trim();
+    var pass = document.getElementById('lPass').value;
     if (!email || !pass) {
         showNotification('Tum alanlari doldurun!', 'error');
         return;
     }
     try {
-        const user = await Parse.User.logIn(email, pass);
+        var user = await Parse.User.logIn(email, pass);
         if (user.get('isBanned')) {
             await Parse.User.logOut();
             showNotification('Hesabiniz yasaklanmistir!', 'error');
@@ -2660,9 +2650,7 @@ async function handleLogin() {
         }
         if (!user.get('isVerified')) {
             await Parse.User.logOut();
-            showNotification('Hesap dogrulanmamis! Lutfen dogrulama kodunu girin.', 
-
-'error');
+            showNotification('Hesap dogrulanmamis! Lutfen dogrulama kodunu girin.', 'error');
             switchTab('verify');
             document.getElementById('verifyEmail').value = email;
             return;
@@ -2688,7 +2676,7 @@ async function handleLogin() {
 async function loginWithGoogle() {
     try {
         showNotification('Google ile giris baslatiliyor...', 'success');
-        const user = await Parse.User.logInWith('google', {
+        var user = await Parse.User.logInWith('google', {
             authData: { id: 'google_' + Date.now(), access_token: 'temp_token' }
         });
         if (user.get('isBanned')) {
@@ -2708,9 +2696,7 @@ async function loginWithGoogle() {
         closeModal('authModal');
         showDashboard();
         updateCommentUI();
-        showNotification('Google ile giris basarili! Hos geldin ' + (user.get('name') || 
-
-'Kullanici'), 'success');
+        showNotification('Google ile giris basarili! Hos geldin ' + (user.get('name') || 'Kullanici'), 'success');
     } catch(e) {
         console.error('Google giris hatasi:', e);
         showNotification('Google giris hatasi: ' + e.message, 'error');
@@ -2728,8 +2714,8 @@ function logout() {
 async function showDashboard() {
     document.getElementById('mainSite').style.display = 'none';
     document.getElementById('dashboardArea').style.display = 'block';
-    const name = currentUser.get('name');
-    const role = currentUser.get('role');
+    var name = currentUser.get('name');
+    var role = currentUser.get('role');
     document.getElementById('dashboardUserName').innerHTML = name || 'Kullanici';
     document.getElementById('userRoleBadge').innerHTML =
         role === 'founder' ? '👑 KURUCU' :
@@ -2755,44 +2741,34 @@ async function showDashboard() {
 
 async function loadProjects() {
     try {
-        const Project = Parse.Object.extend('Project');
-        const query = new Parse.Query(Project);
+        var Project = Parse.Object.extend('Project');
+        var query = new Parse.Query(Project);
         query.equalTo('user_email', currentUser.get('email'));
         query.equalTo('is_archived', false);
         query.equalTo('is_trashed', false);
         query.descending('createdAt');
-        const projects = await query.find();
-        const container = document.getElementById('projectsList');
+        var projects = await query.find();
+        var container = document.getElementById('projectsList');
         if (!container) return;
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Henuz proje yok.</div>';
         } else {
-            container.innerHTML = projects.map(p => `
-                <div class="project-item">
-                    <span>📄 ${p.get('name').substring(0, 30)}</span>
-                    <div class="project-actions">
-                        <span onclick="editProject('${p.id}')" title="Duzenle">✏️</span>
-                        <span onclick="deleteProject('${p.id}')" title="Sil">🗑️</span>
-                        <span onclick="favoriteProject('${p.id}')" title="Favori">⭐</span>
-                        <span onclick="archiveProject('${p.id}')" title="Arsivle">🗄️</span>
-                    </div>
-                </div>
-            `).join('');
+            container.innerHTML = projects.map(function(p) {
+                return '<div class="project-item"><span>📄 ' + p.get('name').substring(0, 30) + '</span><div class="project-actions"><span onclick="editProject(\'' + p.id + '\')" title="Duzenle">✏️</span><span onclick="deleteProject(\'' + p.id + '\')" title="Sil">🗑️</span><span onclick="favoriteProject(\'' + p.id + '\')" title="Favori">⭐</span><span onclick="archiveProject(\'' + p.id + '\')" title="Arsivle">🗄️</span></div></div>';
+            }).join('');
         }
     } catch(e) {
         console.error('Projeler yuklenirken hata:', e);
-        document.getElementById('projectsList').innerHTML = '<div class="project-item">⚠️ 
-
-Projeler yuklenemedi.</div>';
+        document.getElementById('projectsList').innerHTML = '<div class="project-item">⚠️ Projeler yuklenemedi.</div>';
     }
 }
 
 async function newProject() {
-    const name = prompt('Proje adi:');
+    var name = prompt('Proje adi:');
     if (!name || !name.trim()) return;
     try {
-        const Project = Parse.Object.extend('Project');
-        const project = new Project();
+        var Project = Parse.Object.extend('Project');
+        var project = new Project();
         project.set('user_email', currentUser.get('email'));
         project.set('name', name.trim());
         project.set('is_favorite', false);
@@ -2807,11 +2783,11 @@ async function newProject() {
 }
 
 async function editProject(id) {
-    const newName = prompt('Yeni proje adi:');
+    var newName = prompt('Yeni proje adi:');
     if (!newName || !newName.trim()) return;
     try {
-        const query = new Parse.Query('Project');
-        const project = await query.get(id);
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
         project.set('name', newName.trim());
         await project.save();
         await loadProjects();
@@ -2824,8 +2800,8 @@ async function editProject(id) {
 async function deleteProject(id) {
     if (!confirm('Projeyi silmek istediginize emin misiniz?')) return;
     try {
-        const query = new Parse.Query('Project');
-        const project = await query.get(id);
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
         await project.destroy();
         await loadProjects();
         await loadArchive();
@@ -2838,15 +2814,13 @@ async function deleteProject(id) {
 
 async function favoriteProject(id) {
     try {
-        const query = new Parse.Query('Project');
-        const project = await query.get(id);
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
         project.set('is_favorite', !project.get('is_favorite'));
         await project.save();
         await loadProjects();
         await loadFavorites();
-        showNotification(project.get('is_favorite') ? '⭐ Favorilere eklendi!' : '⭐ 
-
-Favorilerden cikarildi!', 'success');
+        showNotification(project.get('is_favorite') ? '⭐ Favorilere eklendi!' : '⭐ Favorilerden cikarildi!', 'success');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -2854,8 +2828,8 @@ Favorilerden cikarildi!', 'success');
 
 async function archiveProject(id) {
     try {
-        const query = new Parse.Query('Project');
-        const project = await query.get(id);
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
         project.set('is_archived', true);
         await project.save();
         await loadProjects();
@@ -2868,8 +2842,8 @@ async function archiveProject(id) {
 
 async function unarchiveProject(id) {
     try {
-        const query = new Parse.Query('Project');
-        const project = await query.get(id);
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
         project.set('is_archived', false);
         await project.save();
         await loadProjects();
@@ -2882,8 +2856,8 @@ async function unarchiveProject(id) {
 
 async function restoreProject(id) {
     try {
-        const query = new Parse.Query('Project');
-        const project = await query.get(id);
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
         project.set('is_trashed', false);
         await project.save();
         await loadProjects();
@@ -2896,29 +2870,20 @@ async function restoreProject(id) {
 
 async function loadFavorites() {
     try {
-        const Project = Parse.Object.extend('Project');
-        const query = new Parse.Query(Project);
+        var Project = Parse.Object.extend('Project');
+        var query = new Parse.Query(Project);
         query.equalTo('user_email', currentUser.get('email'));
         query.equalTo('is_favorite', true);
         query.equalTo('is_trashed', false);
-        const projects = await query.find();
-        const container = document.getElementById('favList');
+        var projects = await query.find();
+        var container = document.getElementById('favList');
         if (!container) return;
         if (projects.length === 0) {
-            container.innerHTML = '<div class="project-item">Henuz favori proje 
-
-yok.</div>';
+            container.innerHTML = '<div class="project-item">Henuz favori proje yok.</div>';
         } else {
-            container.innerHTML = projects.map(p => `
-                <div class="project-item">
-                    <span>⭐ ${p.get('name').substring(0, 25)}</span>
-                    <div class="project-actions">
-                        <span onclick="favoriteProject('${p.id}')" title="Favoriden 
-
-cikar">★</span>
-                    </div>
-                </div>
-            `).join('');
+            container.innerHTML = projects.map(function(p) {
+                return '<div class="project-item"><span>⭐ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="favoriteProject(\'' + p.id + '\')" title="Favoriden cikar">★</span></div></div>';
+            }).join('');
         }
     } catch(e) {
         console.error('Favoriler yuklenirken hata:', e);
@@ -2927,28 +2892,20 @@ cikar">★</span>
 
 async function loadArchive() {
     try {
-        const Project = Parse.Object.extend('Project');
-        const query = new Parse.Query(Project);
+        var Project = Parse.Object.extend('Project');
+        var query = new Parse.Query(Project);
         query.equalTo('user_email', currentUser.get('email'));
         query.equalTo('is_archived', true);
         query.equalTo('is_trashed', false);
-        const projects = await query.find();
-        const container = document.getElementById('archiveList');
+        var projects = await query.find();
+        var container = document.getElementById('archiveList');
         if (!container) return;
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Arsivde proje yok.</div>';
         } else {
-            container.innerHTML = projects.map(p => `
-                <div class="project-item">
-                    <span>🗄️ ${p.get('name').substring(0, 25)}</span>
-                    <div class="project-actions">
-                        <span onclick="unarchiveProject('${p.id}')" title="Arsivden 
-
-cikar">📤</span>
-                        <span onclick="deleteProject('${p.id}')" title="Sil">🗑️</span>
-                    </div>
-                </div>
-            `).join('');
+            container.innerHTML = projects.map(function(p) {
+                return '<div class="project-item"><span>🗄️ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="unarchiveProject(\'' + p.id + '\')" title="Arsivden cikar">📤</span><span onclick="deleteProject(\'' + p.id + '\')" title="Sil">🗑️</span></div></div>';
+            }).join('');
         }
     } catch(e) {
         console.error('Arsiv yuklenirken hata:', e);
@@ -2957,29 +2914,19 @@ cikar">📤</span>
 
 async function loadTrash() {
     try {
-        const Project = Parse.Object.extend('Project');
-        const query = new Parse.Query(Project);
+        var Project = Parse.Object.extend('Project');
+        var query = new Parse.Query(Project);
         query.equalTo('user_email', currentUser.get('email'));
         query.equalTo('is_trashed', true);
-        const projects = await query.find();
-        const container = document.getElementById('trashList');
+        var projects = await query.find();
+        var container = document.getElementById('trashList');
         if (!container) return;
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Cop kutusu bos.</div>';
         } else {
-            container.innerHTML = projects.map(p => `
-                <div class="project-item">
-                    <span>🗑️ ${p.get('name').substring(0, 25)}</span>
-                    <div class="project-actions">
-                        <span onclick="restoreProject('${p.id}')" title="Geri 
-
-yukle">↩️</span>
-                        <span onclick="deleteProject('${p.id}')" title="Kalici 
-
-sil">🔥</span>
-                    </div>
-                </div>
-            `).join('');
+            container.innerHTML = projects.map(function(p) {
+                return '<div class="project-item"><span>🗑️ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="restoreProject(\'' + p.id + '\')" title="Geri yukle">↩️</span><span onclick="deleteProject(\'' + p.id + '\')" title="Kalici sil">🔥</span></div></div>';
+            }).join('');
         }
     } catch(e) {
         console.error('Cop kutusu yuklenirken hata:', e);
@@ -2988,26 +2935,19 @@ sil">🔥</span>
 
 async function loadProjectRequests() {
     try {
-        const Request = Parse.Object.extend('ProjectRequest');
-        const query = new Parse.Query(Request);
+        var Request = Parse.Object.extend('ProjectRequest');
+        var query = new Parse.Query(Request);
         query.equalTo('user_email', currentUser.get('email'));
         query.descending('createdAt');
-        const requests = await query.find();
-        const container = document.getElementById('projectRequestsList');
+        var requests = await query.find();
+        var container = document.getElementById('projectRequestsList');
         if (!container) return;
         if (requests.length === 0) {
-            container.innerHTML = '<div class="project-item">Henuz proje talebiniz 
-
-yok.</div>';
+            container.innerHTML = '<div class="project-item">Henuz proje talebiniz yok.</div>';
         } else {
-            container.innerHTML = requests.map(r => `
-                <div class="project-item">
-                    <span>📨 ${r.get('name').substring(0, 25)}</span>
-                    <span style="font-size:10px;color:var(--text3);">${r.get('status') || 
-
-'Beklemede'}</span>
-                </div>
-            `).join('');
+            container.innerHTML = requests.map(function(r) {
+                return '<div class="project-item"><span>📨 ' + r.get('name').substring(0, 25) + '</span><span style="font-size:10px;color:var(--text3);">' + (r.get('status') || 'Beklemede') + '</span></div>';
+            }).join('');
         }
     } catch(e) {
         console.error('Proje talepleri yuklenirken hata:', e);
@@ -3016,31 +2956,23 @@ yok.</div>';
 
 async function loadInbox() {
     try {
-        const Inbox = Parse.Object.extend('Inbox');
-        const query = new Parse.Query(Inbox);
+        var Inbox = Parse.Object.extend('Inbox');
+        var query = new Parse.Query(Inbox);
         query.equalTo('receiver_email', currentUser.get('email'));
         query.descending('createdAt');
-        const messages = await query.find();
-        const container = document.getElementById('inboxList');
+        var messages = await query.find();
+        var container = document.getElementById('inboxList');
         if (!container) return;
         if (messages.length === 0) {
             container.innerHTML = '<div class="inbox-item">📭 Mesaj kutusu bos.</div>';
         } else {
-            container.innerHTML = messages.map(m => `
-                <div class="inbox-item">
-                    <div class="inbox-sender">📧 ${m.get('sender_email')}</div>
-                    <div class="inbox-message">${m.get('message')}</div>
-                    <div style="font-size:10px;color:var(--text3);margin-top:4px;">${new 
-
-Date(m.get('createdAt')).toLocaleString('tr-TR')}</div>
-                </div>
-            `).join('');
+            container.innerHTML = messages.map(function(m) {
+                return '<div class="inbox-item"><div class="inbox-sender">📧 ' + m.get('sender_email') + '</div><div class="inbox-message">' + m.get('message') + '</div><div style="font-size:10px;color:var(--text3);margin-top:4px;">' + new Date(m.get('createdAt')).toLocaleString('tr-TR') + '</div></div>';
+            }).join('');
         }
     } catch(e) {
         console.error('Mesajlar yuklenirken hata:', e);
-        document.getElementById('inboxList').innerHTML = '<div class="inbox-item">⚠️ 
-
-Mesajlar yuklenemedi.</div>';
+        document.getElementById('inboxList').innerHTML = '<div class="inbox-item">⚠️ Mesajlar yuklenemedi.</div>';
     }
 }
     </script>
@@ -3051,11 +2983,9 @@ Mesajlar yuklenemedi.</div>';
     <script>
         async function loadTeamInfo() {
     if (!currentUser) return;
-    var Team Id = currentUser.get('teamId');
+    var teamId = currentUser.get('teamId');
     if (!teamId) {
-        document.getElementById('teamInfo').innerHTML = '<p>Bir takima uye degilsiniz. 
-
-Takim olusturun veya davet bekleyin.</p>';
+        document.getElementById('teamInfo').innerHTML = '<p>Bir takima uye degilsiniz. Takim olusturun veya davet bekleyin.</p>';
         document.getElementById('teamMembersList').innerHTML = '';
         document.getElementById('teamChatMessages').innerHTML = '';
         return;
@@ -3073,22 +3003,14 @@ Takim olusturun veya davet bekleyin.</p>';
         msgQuery.equalTo('team_id', teamId);
         msgQuery.ascending('createdAt');
         var messages = await msgQuery.find();
-        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + 
-
-'</h4><p>Uye sayisi: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
+        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + '</h4><p>Uye sayisi: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
         document.getElementById('teamMembersList').innerHTML = members.map(function(m) {
-            return '<div class="team-member-item">👤 ' + m.get('user_email') + (m.get
-
-('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>';
+            return '<div class="team-member-item">👤 ' + m.get('user_email') + (m.get('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>';
         }).join('');
         var chatContainer = document.getElementById('teamChatMessages');
         var userEmail = currentUser.get('email');
         chatContainer.innerHTML = messages.map(function(m) {
-            return '<div class="ai-message ' + (m.get('user_email') === userEmail ? 'user' 
-
-: 'bot') + '"><strong>' + (m.get('user_email') === userEmail ? 'Ben' : m.get
-
-('user_email').split('@')[0]) + '</strong>: ' + m.get('message') + '</div>';
+            return '<div class="ai-message ' + (m.get('user_email') === userEmail ? 'user' : 'bot') + '"><strong>' + (m.get('user_email') === userEmail ? 'Ben' : m.get('user_email').split('@')[0]) + '</strong>: ' + m.get('message') + '</div>';
         }).join('') || '<div>Henuz mesaj yok</div>';
         chatContainer.scrollTop = chatContainer.scrollHeight;
     } catch(e) { console.error('Takim bilgisi yuklenirken hata:', e); }
@@ -3127,9 +3049,7 @@ async function inviteToTeam() {
         var inbox = new Inbox();
         inbox.set('sender_email', currentUser.get('email'));
         inbox.set('receiver_email', email);
-        inbox.set('message', currentUser.get('name') + ' sizi takima davet etti! Takim ID: 
-
-' + teamId);
+        inbox.set('message', currentUser.get('name') + ' sizi takima davet etti! Takim ID: ' + teamId);
         await inbox.save();
         showNotification('Davet gonderildi: ' + email, 'success');
         document.getElementById('inviteEmail').value = '';
@@ -3174,9 +3094,7 @@ async function callAllAIModels(prompt) {
         return await Parse.Cloud.run('superAI', { prompt: prompt });
     } catch(e) {
         console.error('AI hatasi:', e);
-        return '🧠 VIZYON AI: "' + prompt + '" hakkinda yardimci olabilirim. Detayli yanit 
-
-icin lutfen daha spesifik bir soru sorun.';
+        return '🧠 VIZYON AI: "' + prompt + '" hakkinda yardimci olabilirim. Detayli yanit icin lutfen daha spesifik bir soru sorun.';
     }
 }
 
@@ -3195,15 +3113,11 @@ window.sendDashboardAI = async function() {
     var msg = inp.value.trim();
     if (!msg) return;
     var container = document.getElementById('dashboardAiMessages');
-    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + 
-
-'</div>';
+    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + '</div>';
     inp.value = '';
     container.scrollTop = container.scrollHeight;
     var response;
-    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') 
-
-!== -1) {
+    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') !== -1) {
         response = await webSearch(msg);
     } else {
         response = await callAllAIModels(msg);
@@ -3283,17 +3197,9 @@ async function sendAiMessage() {
     document.getElementById('profileContent').innerHTML =
         '<p><strong>Ad:</strong> ' + currentUser.get('name') + '</p>' +
         '<p><strong>E-posta:</strong> ' + currentUser.get('email') + '</p>' +
-        '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : 
-
-(currentUser.get('plan') === 'team' ? '👥 Takim' : '🆓 Ucretsiz')) + '</p>' +
-        '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : 
-
-(currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 
-
-Beta' : '👤 Kullanici'))) + '</p>' +
-        '<p><strong>Uyelik:</strong> ' + new Date(currentUser.get
-
-('createdAt')).toLocaleDateString('tr-TR') + '</p>';
+        '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : (currentUser.get('plan') === 'team' ? '👥 Takim' : '🆓 Ucretsiz')) + '</p>' +
+        '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : (currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 Beta' : '👤 Kullanici'))) + '</p>' +
+        '<p><strong>Uyelik:</strong> ' + new Date(currentUser.get('createdAt')).toLocaleDateString('tr-TR') + '</p>';
     document.getElementById('profileModal').classList.add('open');
 }
 
@@ -3336,9 +3242,7 @@ async function buyPackage(pkg) {
         showNotification('Once giris yapin!', 'error');
         return;
     }
-    if (confirm((pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takim Paketi (₺899/ay)') + ' satin 
-
-al?')) {
+    if (confirm((pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takim Paketi (₺899/ay)') + ' satin al?')) {
         try {
             currentUser.set('plan', pkg);
             await currentUser.save();
@@ -3386,19 +3290,7 @@ async function loadUserList() {
         var container = document.getElementById('userList');
         if (!container) return;
         container.innerHTML = users.map(function(u) {
-            return '<div class="user-item"><span class="user-email">' + u.get('email') + 
-
-'</span><span class="user-role">' + (u.get('role') || 'user') + '</span><div class="user-
-
-actions"><button class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email') + 
-
-'\')">Admin Yap</button><button class="btn-user" onclick="setUserRole(\'' + u.get('email') 
-
-+ '\',\'user\')">Kullanici Yap</button><button class="btn-ban" onclick="banUserEmail(\'' + 
-
-u.get('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' 
-
-+ u.get('email') + '\')">🎁</button></div></div>';
+            return '<div class="user-item"><span class="user-email">' + u.get('email') + '</span><span class="user-role">' + (u.get('role') || 'user') + '</span><div class="user-actions"><button class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email') + '\')">Admin Yap</button><button class="btn-user" onclick="setUserRole(\'' + u.get('email') + '\',\'user\')">Kullanici Yap</button><button class="btn-ban" onclick="banUserEmail(\'' + u.get('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' + u.get('email') + '\')">🎁</button></div></div>';
         }).join('');
     } catch(e) {
         console.error('Kullanici listesi yuklenirken hata:', e);
@@ -3420,9 +3312,7 @@ async function assignAdminEmail(email) {
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
-        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lutfen sifrenizi 
-
-belirlemek icin "Admin Sifre Belirle" butonuna tiklayin.');
+        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lutfen sifrenizi belirlemek icin "Admin Sifre Belirle" butonuna tiklayin.');
         await inbox.save(null, { useMasterKey: true });
         showNotification(email + ' admin yapildi!', 'success');
         await loadUserList();
@@ -3486,9 +3376,7 @@ async function giftUserEmail(email, pkg) {
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
-        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takim Paketi') + ' 
-
-hediye edildi!');
+        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takim Paketi') + ' hediye edildi!');
         await inbox.save(null, { useMasterKey: true });
         showNotification(email + ' adresine ' + pkg + ' paketi hediye edildi!', 'success');
         await loadUserList();
@@ -3533,19 +3421,17 @@ async function sendGift() {
 }
 
 async function setAdminPassword() {
-    const email = document.getElementById('adminEmail').value.trim();
-    const pass = document.getElementById('adminPass').value;
-    const pass2 = document.getElementById('adminPass2').value;
+    var email = document.getElementById('adminEmail').value.trim();
+    var pass = document.getElementById('adminPass').value;
+    var pass2 = document.getElementById('adminPass2').value;
     if (!email || pass.length < 8 || pass !== pass2) {
-        showNotification('Tum alanlari doldurun, sifreler ayni ve min 8 karakter', 
-
-'error');
+        showNotification('Tum alanlari doldurun, sifreler ayni ve min 8 karakter', 'error');
         return;
     }
     try {
-        const query = new Parse.Query(Parse.User);
+        var query = new Parse.Query(Parse.User);
         query.equalTo('email', email);
-        const user = await query.first({ useMasterKey: true });
+        var user = await query.first({ useMasterKey: true });
         if (!user) {
             showNotification('Kullanici bulunamadi!', 'error');
             return;
@@ -3568,18 +3454,10 @@ function openModal(type) {
 }
 
 function switchTab(tab) {
-    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 
-
-'none';
-    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 
-
-'none';
-    document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 
-
-'none';
-    document.querySelectorAll('.modal-tab').forEach(function(el) { el.classList.remove
-
-('active'); });
+    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none';
+    document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 'none';
+    document.querySelectorAll('.modal-tab').forEach(function(el) { el.classList.remove('active'); });
     var tabs = document.querySelectorAll('.modal-tab');
     if (tab === 'login') tabs[0].classList.add('active');
     else if (tab === 'register') tabs[1].classList.add('active');
@@ -3593,50 +3471,20 @@ function openRandomSupport() {
 
 async function loadComments() {
     try {
-        const comments = await Parse.Cloud.run('getComments');
-        const container = document.getElementById('commentsList');
+        var comments = await Parse.Cloud.run('getComments');
+        var container = document.getElementById('commentsList');
         if (!comments || comments.length === 0) {
-            container.innerHTML = '<div class="comment-item" style="border-left-color: var
-
-(--accent2); text-align: center; color: var(--text3);">🌟 Ilk yorumu sen yap!</div>';
+            container.innerHTML = '<div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">🌟 Ilk yorumu sen yap!</div>';
             return;
         }
-        const roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 
-
-'user': '👤 KULLANICI' };
-        const roleColors = { 'founder': 'var(--gold)', 'admin': 'var(--accent)', 'beta': 
-
-'var(--purple)', 'user': 'var(--text3)' };
-        container.innerHTML = comments.map(c => `
-            <div class="comment-item" style="border-left-color: ${roleColors[c.user_role] 
-
-|| 'var(--border)'};">
-                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: 
-
-wrap;">
-                    <strong style="color: var(--accent2);">${c.user_name || 'Isimsiz'}
-
-</strong>
-                    <span class="role-badge ${c.user_role || 'user'}" style="border-color: 
-
-${roleColors[c.user_role] || 'var(--border)'}; color: ${roleColors[c.user_role] || 'var(--
-
-text3)'};">${roleLabels[c.user_role] || '👤 KULLANICI'}</span>
-                    <span class="comment-email">📧 ${c.user_email || '---'}</span>
-                    <span class="comment-time" style="margin-left: auto;">${new Date
-
-(c.createdAt).toLocaleString('tr-TR')}</span>
-                </div>
-                <div class="comment-text">${c.comment}</div>
-            </div>
-        `).join('');
+        var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 'user': '👤 KULLANICI' };
+        var roleColors = { 'founder': 'var(--gold)', 'admin': 'var(--accent)', 'beta': 'var(--purple)', 'user': 'var(--text3)' };
+        container.innerHTML = comments.map(function(c) {
+            return '<div class="comment-item" style="border-left-color: ' + (roleColors[c.user_role] || 'var(--border)') + ';"><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"><strong style="color: var(--accent2);">' + (c.user_name || 'Isimsiz') + '</strong><span class="role-badge ' + (c.user_role || 'user') + '" style="border-color: ' + (roleColors[c.user_role] || 'var(--border)') + '; color: ' + (roleColors[c.user_role] || 'var(--text3)') + ';">' + (roleLabels[c.user_role] || '👤 KULLANICI') + '</span><span class="comment-email">📧 ' + (c.user_email || '---') + '</span><span class="comment-time" style="margin-left: auto;">' + new Date(c.createdAt).toLocaleString('tr-TR') + '</span></div><div class="comment-text">' + c.comment + '</div></div>';
+        }).join('');
     } catch(e) {
         console.error('Yorumlar yuklenemedi:', e);
-        document.getElementById('commentsList').innerHTML = '<div class="comment-item" 
-
-style="border-left-color: var(--danger); text-align: center; color: var(--danger);">⚠️ 
-
-Yorumlar yuklenemedi: ' + e.message + '</div>';
+        document.getElementById('commentsList').innerHTML = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);">⚠️ Yorumlar yuklenemedi: ' + e.message + '</div>';
     }
 }
 
@@ -3645,8 +3493,8 @@ async function postComment() {
         showNotification('Yorum yapmak icin giris yapmalisiniz!', 'error');
         return;
     }
-    const input = document.getElementById('commentInput');
-    const text = input.value.trim();
+    var input = document.getElementById('commentInput');
+    var text = input.value.trim();
     if (!text) {
         showNotification('Lutfen bir yorum yazin!', 'error');
         return;
@@ -3662,20 +3510,16 @@ async function postComment() {
 }
 
 function updateCommentUI() {
-    const form = document.getElementById('commentForm');
-    const loginMsg = document.getElementById('commentLoginMessage');
-    const userName = document.getElementById('commentUserName');
-    const userRole = document.getElementById('commentUserRole');
+    var form = document.getElementById('commentForm');
+    var loginMsg = document.getElementById('commentLoginMessage');
+    var userName = document.getElementById('commentUserName');
+    var userRole = document.getElementById('commentUserRole');
     if (currentUser) {
         if (form) form.style.display = 'block';
         if (loginMsg) loginMsg.style.display = 'none';
         if (userName) userName.textContent = currentUser.get('name') || 'Kullanici';
-        const roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 
-
-'user': '👤 KULLANICI' };
-        if (userRole) userRole.textContent = roleLabels[currentUser.get('role')] || '👤 
-
-KULLANICI';
+        var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 'user': '👤 KULLANICI' };
+        if (userRole) userRole.textContent = roleLabels[currentUser.get('role')] || '👤 KULLANICI';
     } else {
         if (form) form.style.display = 'none';
         if (loginMsg) loginMsg.style.display = 'block';
@@ -3719,9 +3563,7 @@ if (particlesContainer) {
     for (var i = 0; i < 60; i++) {
         var p = document.createElement('div');
         p.className = 'particle';
-        p.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + 
-
-Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';
+        p.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';
         particlesContainer.appendChild(p);
     }
 }
@@ -3744,13 +3586,9 @@ if (cursor && ring) {
         requestAnimationFrame(animate);
     }
     animate();
-    document.querySelectorAll('button, a, .btn, .secret-btn, .support-link').forEach
-
-(function(btn) {
+    document.querySelectorAll('button, a, .btn, .secret-btn, .support-link').forEach(function(btn) {
         btn.addEventListener('mouseenter', function() { cursor.classList.add('hover'); });
-        btn.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); 
-
-});
+        btn.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); });
     });
 }
 
