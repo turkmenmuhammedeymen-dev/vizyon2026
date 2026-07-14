@@ -3374,7 +3374,7 @@ async function loadUserList() {
     if (!currentUser) return;
     try {
         var query = new Parse.Query(Parse.User);
-        var users = await query.find();
+        var users = await query.find({ useMasterKey: true });
         var container = document.getElementById('userList');
         if (!container) return;
         container.innerHTML = users.map(function(u) {
@@ -3675,7 +3675,7 @@ KULLANICI';
 async function initData() {
     try {
         var query = new Parse.Query(Parse.User);
-        var userCount = await query.count();
+        var userCount = await query.count({ useMasterKey: true });
         if (userCount === 0) {
             var admin1 = new Parse.User();
             admin1.set('username', 'admin.tr.reis@gmail.com');
