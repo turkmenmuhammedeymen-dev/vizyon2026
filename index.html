@@ -2463,14 +2463,10 @@ yapmalısınız</button>.</p>
     <!-- JS-1: BACK4APP KONFIG (HARDCODE + STATS)                     -->
     <!-- ============================================================ -->
     <script>
-        // ============================================================
-// JS-1: BACK4APP KONFIG (HARDCODE + STATS)
-// ============================================================
-
-let currentUser = null;
-let currentRole = null;
-let parseInitialized = false;
-let statsInterval = null;
+var currentUser = null;
+var currentRole = null;
+var parseInitialized = false;
+var statsInterval = null;
 
 async function initBack4App() {
     if (parseInitialized) return;
@@ -2498,7 +2494,7 @@ async function initBack4App() {
 function loadParseSDK() {
     return new Promise((resolve, reject) => {
         if (typeof Parse !== 'undefined') { resolve(); return; }
-        const script = document.createElement('script');
+        var script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/parse@5.0.0/dist/parse.min.js';
         script.onload = resolve;
         script.onerror = reject;
@@ -2566,15 +2562,11 @@ function stopStatsInterval() {
     <!-- JS-2: KAYIT, GİRİŞ, DOĞRULAMA, GOOGLE, PROJE YÖNETİMİ      -->
     <!-- ============================================================ -->
     <script>
-        // ============================================================
-// JS-2: KAYIT, GIRIS, GOOGLE, PROJE YONETIMI
-// ============================================================
-
-async function handleRegister() {
-    const name = document.getElementById('rName').value.trim();
-    const email = document.getElementById('rEmail').value.trim();
-    const p1 = document.getElementById('rPass').value;
-    const p2 = document.getElementById('rPass2').value;
+        async function handleRegister() {
+    var name = document.getElementById('rName').value.trim();
+    var email = document.getElementById('rEmail').value.trim();
+    var p1 = document.getElementById('rPass').value;
+    var p2 = document.getElementById('rPass2').value;
     if (!name || !email || p1.length < 8 || p1 !== p2) {
         showNotification('Tum alanlari doldurun, sifreler ayni ve min 8 karakter', 
 
@@ -2591,7 +2583,7 @@ async function handleRegister() {
         user.set('plan', 'free');
         user.set('isVerified', false);
         user.set('isBanned', false);
-        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        var code = Math.floor(100000 + Math.random() * 900000).toString();
         user.set('verificationCode', code);
         user.set('verificationCodeExpires', new Date(Date.now() + 15 * 60000));
         await user.signUp();
@@ -3057,13 +3049,9 @@ Mesajlar yuklenemedi.</div>';
     <!-- JS-3: TAKIM VE AI (Cloud Code ile + Temizleme)              -->
     <!-- ============================================================ -->
     <script>
-        // ============================================================
-// JS-3: TAKIM VE AI (Cloud Code ile + Temizleme)
-// ============================================================
-
-async function loadTeamInfo() {
+        async function loadTeamInfo() {
     if (!currentUser) return;
-    var teamId = currentUser.get('teamId');
+    var Team Id = currentUser.get('teamId');
     if (!teamId) {
         document.getElementById('teamInfo').innerHTML = '<p>Bir takima uye degilsiniz. 
 
@@ -3287,11 +3275,7 @@ async function sendAiMessage() {
     <!-- JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ                    -->
     <!-- ============================================================ -->
     <script>
-        // ============================================================
-// JS-4: ADMIN, PROFIL, YORUMLAR, BASLANGIC
-// ============================================================
-
-function openProfileModal() {
+        function openProfileModal() {
     if (!currentUser) {
         showNotification('Once giris yapin!', 'error');
         return;
