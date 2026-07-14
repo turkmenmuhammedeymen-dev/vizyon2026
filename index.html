@@ -2582,20 +2582,23 @@ function stopStatsInterval() {
     <!-- ============================================================ -->
     <script>
         // ============================================================
-// JS-2: KAYIT, GIRIS, GOOGLE, PROJE YONETIMI
+// JS-2: KAYIT, GİRİŞ, GOOGLE, PROJE YÖNETİMİ
 // ============================================================
 
+// ========== KAYIT ==========
 async function handleRegister() {
     var name = document.getElementById('rName').value.trim();
     var email = document.getElementById('rEmail').value.trim();
     var p1 = document.getElementById('rPass').value;
     var p2 = document.getElementById('rPass2').value;
+    
     if (!name || !email || p1.length < 8 || p1 !== p2) {
-        showNotification('Tum alanlari doldurun, sifreler ayni ve min 8 karakter', 
+        showNotification('Tüm alanları doldurun, şifreler aynı ve min 8 karakter', 
 
 'error');
         return;
     }
+    
     try {
         var user = new Parse.User();
         user.set('username', email);
@@ -2606,90 +2609,120 @@ async function handleRegister() {
         user.set('plan', 'free');
         user.set('isVerified', false);
         user.set('isBanned', false);
+        
         var code = Math.floor(100000 + Math.random() * 900000).toString();
         user.set('verificationCode', code);
         user.set('verificationCodeExpires', new Date(Date.now() + 15 * 60000));
+        
         await user.signUp();
+        
+        // Mail göndermeyi dene
         try {
-            await Parse.Cloud.run('sendEmail', {
+            var mailResult = await Parse.Cloud.run('sendEmail', {
                 to: email,
-                subject: 'Dogrulama Kodu - Vizyon 2027',
-                html: '<h1>Hos geldin ' + name + '!</h1><p>Dogrulama kodunuz: <strong 
+                subject: 'Doğrulama Kodu - Vizyon 2027',
+                html: '<h1>Hoş geldin ' + name + '!</h1><p>Doğrulama kodunuz: <strong 
 
 style="font-size:24px;color:#00d4ff;">' + code + '</strong></p><p>15 dakika 
 
-gecerlidir.</p><p>Vizyon 2027 ekibi</p>'
+geçerlidir.</p><p>Vizyon 2027 ekibi</p>'
             });
-        } catch(e) {
-            console.log('Mail gonderilemedi:', e);
-        }
-        showNotification('Kayit basarili! Dogrulama kodunuz mail adresinize gonderildi.', 
+            console.log('Mail sonucu:', mailResult);
+            if (mailResult && mailResult.success) {
+                showNotification('Kayıt başarılı! Doğrulama kodu mail adresinize 
 
-'success');
+gönderildi.', 'success');
+            } else {
+                showNotification('Kayıt başarılı ama mail gönderilemedi. Kod: ' + code, 
+
+'warning');
+            }
+        } catch(mailError) {
+            console.error('Mail gönderme hatası:', mailError);
+            showNotification('Kayıt başarılı! Doğrulama kodunuz: ' + code + ' (Mail 
+
+gönderilemedi)', 'warning');
+        }
+        
         switchTab('verify');
         document.getElementById('verifyEmail').value = email;
+        
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 }
 
+// ========== DOĞRULAMA ==========
 async function verifyAccount() {
     var email = document.getElementById('verifyEmail').value.trim();
     var code = document.getElementById('verifyCode').value.trim();
+    
     if (!email || !code) {
-        showNotification('Tum alanlari doldurun!', 'error');
+        showNotification('Tüm alanları doldurun!', 'error');
         return;
     }
+    
     try {
         var query = new Parse.Query(Parse.User);
         query.equalTo('email', email);
         var user = await query.first();
+        
         if (!user) {
-            showNotification('Kullanici bulunamadi!', 'error');
+            showNotification('Kullanıcı bulunamadı!', 'error');
             return;
         }
+        
         if (user.get('verificationCode') !== code) {
-            showNotification('Gecersiz kod!', 'error');
+            showNotification('Geçersiz kod!', 'error');
             return;
         }
+        
         if (new Date(user.get('verificationCodeExpires')) < new Date()) {
-            showNotification('Kod suresi doldu! Lutfen yeniden kayit olun.', 'error');
+            showNotification('Kod süresi doldu! Lütfen yeniden kayıt olun.', 'error');
             return;
         }
+        
         user.set('isVerified', true);
         user.set('verificationCode', null);
         user.set('verificationCodeExpires', null);
         await user.save();
-        showNotification('Hesap dogrulandi! Giris yapabilirsiniz.', 'success');
+        
+        showNotification('Hesap doğrulandı! Giriş yapabilirsiniz.', 'success');
         switchTab('login');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 }
 
+// ========== GİRİŞ ==========
 async function handleLogin() {
     var email = document.getElementById('lEmail').value.trim();
     var pass = document.getElementById('lPass').value;
+    
     if (!email || !pass) {
-        showNotification('Tum alanlari doldurun!', 'error');
+        showNotification('Tüm alanları doldurun!', 'error');
         return;
     }
+    
     try {
         var user = await Parse.User.logIn(email, pass);
+        
         if (user.get('isBanned')) {
             await Parse.User.logOut();
-            showNotification('Hesabiniz yasaklanmistir!', 'error');
+            showNotification('Hesabınız yasaklanmıştır!', 'error');
             return;
         }
+        
         if (!user.get('isVerified')) {
             await Parse.User.logOut();
-            showNotification('Hesap dogrulanmamis! Lutfen dogrulama kodunu girin.', 
+            showNotification('Hesap doğrulanmamış! Lütfen doğrulama kodunu girin.', 
 
 'error');
             switchTab('verify');
             document.getElementById('verifyEmail').value = email;
             return;
         }
+        
         currentUser = user;
         localStorage.setItem('vizyon_user', JSON.stringify({
             id: user.id,
@@ -2699,19 +2732,20 @@ async function handleLogin() {
             plan: user.get('plan'),
             teamId: user.get('teamId')
         }));
+        
         closeModal('authModal');
         showDashboard();
         updateCommentUI();
-        showNotification('Hos geldin, ' + user.get('name'), 'success');
+        showNotification('Hoş geldin, ' + user.get('name'), 'success');
     } catch(e) {
-        showNotification('Giris basarisiz: ' + e.message, 'error');
+        showNotification('Giriş başarısız: ' + e.message, 'error');
     }
 }
 
-// ========== GOOGLE İLE GİRİŞ (GÜNCELLENMİŞ) ==========
+// ========== GOOGLE İLE GİRİŞ (DÜZELTİLMİŞ) ==========
 async function loginWithGoogle() {
     try {
-        showNotification('Google ile giris baslatiliyor...', 'success');
+        showNotification('Google ile giriş başlatılıyor...', 'success');
         
         // Google OAuth ile giriş yap
         var user = await Parse.User.logInWith('google', {
@@ -2723,14 +2757,14 @@ async function loginWithGoogle() {
         
         if (user.get('isBanned')) {
             await Parse.User.logOut();
-            showNotification('Hesabiniz yasaklanmistir!', 'error');
+            showNotification('Hesabınız yasaklanmıştır!', 'error');
             return;
         }
         
         currentUser = user;
         localStorage.setItem('vizyon_user', JSON.stringify({
             id: user.id,
-            name: user.get('name') || user.get('username') || 'Google Kullanicisi',
+            name: user.get('name') || user.get('username') || 'Google Kullanıcısı',
             email: user.get('email'),
             role: user.get('role') || 'user',
             plan: user.get('plan') || 'free',
@@ -2740,16 +2774,30 @@ async function loginWithGoogle() {
         closeModal('authModal');
         showDashboard();
         updateCommentUI();
-        showNotification('Google ile giris basarili! Hos geldin ' + (user.get('name') || 
+        showNotification('Google ile giriş başarılı! Hoş geldin ' + (user.get('name') || 
 
-'Kullanici'), 'success');
+'Kullanıcı'), 'success');
         
     } catch(e) {
-        console.error('Google giris hatasi:', e);
-        showNotification('Google giris hatasi: ' + e.message, 'error');
+        console.error('Google giriş hatası:', e);
+        
+        // Hata detayını göster
+        var errorMsg = e.message || 'Bilinmeyen hata';
+        if (errorMsg.indexOf('id token is invalid') !== -1) {
+            showNotification('Google giriş hatası: Kimlik doğrulama başarısız. Lütfen 
+
+Back4App Google ayarlarını kontrol edin.', 'error');
+        } else if (errorMsg.indexOf('user is not allowed') !== -1) {
+            showNotification('Google giriş hatası: Bu hesap yasaklanmış veya izin 
+
+verilmemiş.', 'error');
+        } else {
+            showNotification('Google giriş hatası: ' + errorMsg, 'error');
+        }
     }
 }
 
+// ========== ÇIKIŞ ==========
 function logout() {
     Parse.User.logOut();
     localStorage.removeItem('vizyon_user');
@@ -2758,23 +2806,28 @@ function logout() {
     location.reload();
 }
 
+// ========== DASHBOARD ==========
 async function showDashboard() {
     document.getElementById('mainSite').style.display = 'none';
     document.getElementById('dashboardArea').style.display = 'block';
+    
     var name = currentUser.get('name');
     var role = currentUser.get('role');
-    document.getElementById('dashboardUserName').innerHTML = name || 'Kullanici';
+    
+    document.getElementById('dashboardUserName').innerHTML = name || 'Kullanıcı';
     document.getElementById('userRoleBadge').innerHTML =
         role === 'founder' ? '👑 KURUCU' :
         role === 'admin' ? '⚙️ ADMIN' :
         role === 'beta' ? '🔬 BETA' :
         '👤 KULLANICI';
+    
     if (role === 'admin' || role === 'founder') {
         document.getElementById('adminPanelCard').style.display = 'block';
         await loadUserList();
     } else {
         document.getElementById('adminPanelCard').style.display = 'none';
     }
+    
     await loadProjects();
     await loadFavorites();
     await loadArchive();
@@ -2786,6 +2839,7 @@ async function showDashboard() {
     startStatsInterval();
 }
 
+// ========== PROJE İŞLEMLERİ ==========
 async function loadProjects() {
     try {
         var Project = Parse.Object.extend('Project');
@@ -2797,8 +2851,9 @@ async function loadProjects() {
         var projects = await query.find();
         var container = document.getElementById('projectsList');
         if (!container) return;
+        
         if (projects.length === 0) {
-            container.innerHTML = '<div class="project-item">Henuz proje yok.</div>';
+            container.innerHTML = '<div class="project-item">Henüz proje yok.</div>';
         } else {
             var html = '';
             for (var i = 0; i < projects.length; i++) {
@@ -2807,27 +2862,28 @@ async function loadProjects() {
 
 30) + '</span><div class="project-actions"><span onclick="editProject(\'' + p.id + '\')" 
 
-title="Duzenle">✏️</span><span onclick="deleteProject(\'' + p.id + '\')" 
+title="Düzenle">✏️</span><span onclick="deleteProject(\'' + p.id + '\')" 
 
 title="Sil">🗑️</span><span onclick="favoriteProject(\'' + p.id + '\')" 
 
 title="Favori">⭐</span><span onclick="archiveProject(\'' + p.id + '\')" 
 
-title="Arsivle">🗄️</span></div></div>';
+title="Arşivle">🗄️</span></div></div>';
             }
             container.innerHTML = html;
         }
     } catch(e) {
-        console.error('Projeler yuklenirken hata:', e);
+        console.error('Projeler yüklenirken hata:', e);
         document.getElementById('projectsList').innerHTML = '<div class="project-item">⚠️ 
 
-Projeler yuklenemedi.</div>';
+Projeler yüklenemedi.</div>';
     }
 }
 
 async function newProject() {
-    var name = prompt('Proje adi:');
+    var name = prompt('Proje adı:');
     if (!name || !name.trim()) return;
+    
     try {
         var Project = Parse.Object.extend('Project');
         var project = new Project();
@@ -2838,29 +2894,31 @@ async function newProject() {
         project.set('is_trashed', false);
         await project.save();
         await loadProjects();
-        showNotification('Proje olusturuldu!', 'success');
+        showNotification('Proje oluşturuldu!', 'success');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 }
 
 async function editProject(id) {
-    var newName = prompt('Yeni proje adi:');
+    var newName = prompt('Yeni proje adı:');
     if (!newName || !newName.trim()) return;
+    
     try {
         var query = new Parse.Query('Project');
         var project = await query.get(id);
         project.set('name', newName.trim());
         await project.save();
         await loadProjects();
-        showNotification('Proje guncellendi!', 'success');
+        showNotification('Proje güncellendi!', 'success');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 }
 
 async function deleteProject(id) {
-    if (!confirm('Projeyi silmek istediginize emin misiniz?')) return;
+    if (!confirm('Projeyi silmek istediğinize emin misiniz?')) return;
+    
     try {
         var query = new Parse.Query('Project');
         var project = await query.get(id);
@@ -2884,7 +2942,7 @@ async function favoriteProject(id) {
         await loadFavorites();
         showNotification(project.get('is_favorite') ? '⭐ Favorilere eklendi!' : '⭐ 
 
-Favorilerden cikarildi!', 'success');
+Favorilerden çıkarıldı!', 'success');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -2898,7 +2956,7 @@ async function archiveProject(id) {
         await project.save();
         await loadProjects();
         await loadArchive();
-        showNotification('🗄️ Proje arsivlendi!', 'success');
+        showNotification('🗄️ Proje arşivlendi!', 'success');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -2912,7 +2970,7 @@ async function unarchiveProject(id) {
         await project.save();
         await loadProjects();
         await loadArchive();
-        showNotification('📤 Proje arsivden cikarildi!', 'success');
+        showNotification('📤 Proje arşivden çıkarıldı!', 'success');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -2926,12 +2984,13 @@ async function restoreProject(id) {
         await project.save();
         await loadProjects();
         await loadTrash();
-        showNotification('↩️ Proje geri yuklendi!', 'success');
+        showNotification('↩️ Proje geri yüklendi!', 'success');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 }
 
+// ========== FAVORİLER ==========
 async function loadFavorites() {
     try {
         var Project = Parse.Object.extend('Project');
@@ -2942,8 +3001,9 @@ async function loadFavorites() {
         var projects = await query.find();
         var container = document.getElementById('favList');
         if (!container) return;
+        
         if (projects.length === 0) {
-            container.innerHTML = '<div class="project-item">Henuz favori proje 
+            container.innerHTML = '<div class="project-item">Henüz favori proje 
 
 yok.</div>';
         } else {
@@ -2954,15 +3014,16 @@ yok.</div>';
 
 25) + '</span><div class="project-actions"><span onclick="favoriteProject(\'' + p.id + 
 
-'\')" title="Favoriden cikar">★</span></div></div>';
+'\')" title="Favoriden çıkar">★</span></div></div>';
             }
             container.innerHTML = html;
         }
     } catch(e) {
-        console.error('Favoriler yuklenirken hata:', e);
+        console.error('Favoriler yüklenirken hata:', e);
     }
 }
 
+// ========== ARŞİV ==========
 async function loadArchive() {
     try {
         var Project = Parse.Object.extend('Project');
@@ -2973,8 +3034,9 @@ async function loadArchive() {
         var projects = await query.find();
         var container = document.getElementById('archiveList');
         if (!container) return;
+        
         if (projects.length === 0) {
-            container.innerHTML = '<div class="project-item">Arsivde proje yok.</div>';
+            container.innerHTML = '<div class="project-item">Arşivde proje yok.</div>';
         } else {
             var html = '';
             for (var i = 0; i < projects.length; i++) {
@@ -2983,17 +3045,18 @@ async function loadArchive() {
 
 25) + '</span><div class="project-actions"><span onclick="unarchiveProject(\'' + p.id + 
 
-'\')" title="Arsivden cikar">📤</span><span onclick="deleteProject(\'' + p.id + '\')" 
+'\')" title="Arşivden çıkar">📤</span><span onclick="deleteProject(\'' + p.id + '\')" 
 
 title="Sil">🗑️</span></div></div>';
             }
             container.innerHTML = html;
         }
     } catch(e) {
-        console.error('Arsiv yuklenirken hata:', e);
+        console.error('Arşiv yüklenirken hata:', e);
     }
 }
 
+// ========== ÇÖP KUTUSU ==========
 async function loadTrash() {
     try {
         var Project = Parse.Object.extend('Project');
@@ -3003,8 +3066,9 @@ async function loadTrash() {
         var projects = await query.find();
         var container = document.getElementById('trashList');
         if (!container) return;
+        
         if (projects.length === 0) {
-            container.innerHTML = '<div class="project-item">Cop kutusu bos.</div>';
+            container.innerHTML = '<div class="project-item">Çöp kutusu boş.</div>';
         } else {
             var html = '';
             for (var i = 0; i < projects.length; i++) {
@@ -3013,17 +3077,18 @@ async function loadTrash() {
 
 25) + '</span><div class="project-actions"><span onclick="restoreProject(\'' + p.id + '\')" 
 
-title="Geri yukle">↩️</span><span onclick="deleteProject(\'' + p.id + '\')" title="Kalici 
+title="Geri yükle">↩️</span><span onclick="deleteProject(\'' + p.id + '\')" title="Kalıcı 
 
 sil">🔥</span></div></div>';
             }
             container.innerHTML = html;
         }
     } catch(e) {
-        console.error('Cop kutusu yuklenirken hata:', e);
+        console.error('Çöp kutusu yüklenirken hata:', e);
     }
 }
 
+// ========== PROJE TALEPLERİ ==========
 async function loadProjectRequests() {
     try {
         var Request = Parse.Object.extend('ProjectRequest');
@@ -3033,8 +3098,9 @@ async function loadProjectRequests() {
         var requests = await query.find();
         var container = document.getElementById('projectRequestsList');
         if (!container) return;
+        
         if (requests.length === 0) {
-            container.innerHTML = '<div class="project-item">Henuz proje talebiniz 
+            container.innerHTML = '<div class="project-item">Henüz proje talebiniz 
 
 yok.</div>';
         } else {
@@ -3050,10 +3116,11 @@ yok.</div>';
             container.innerHTML = html;
         }
     } catch(e) {
-        console.error('Proje talepleri yuklenirken hata:', e);
+        console.error('Proje talepleri yüklenirken hata:', e);
     }
 }
 
+// ========== GELEN KUTUSU ==========
 async function loadInbox() {
     try {
         var Inbox = Parse.Object.extend('Inbox');
@@ -3063,8 +3130,9 @@ async function loadInbox() {
         var messages = await query.find();
         var container = document.getElementById('inboxList');
         if (!container) return;
+        
         if (messages.length === 0) {
-            container.innerHTML = '<div class="inbox-item">📭 Mesaj kutusu bos.</div>';
+            container.innerHTML = '<div class="inbox-item">📭 Mesaj kutusu boş.</div>';
         } else {
             var html = '';
             for (var i = 0; i < messages.length; i++) {
@@ -3080,10 +3148,10 @@ style="font-size:10px;color:var(--text3);margin-top:4px;">' + new Date(m.get
             container.innerHTML = html;
         }
     } catch(e) {
-        console.error('Mesajlar yuklenirken hata:', e);
+        console.error('Mesajlar yüklenirken hata:', e);
         document.getElementById('inboxList').innerHTML = '<div class="inbox-item">⚠️ 
 
-Mesajlar yuklenemedi.</div>';
+Mesajlar yüklenemedi.</div>';
     }
 }
     </script>
