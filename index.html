@@ -2492,7 +2492,7 @@ async function initBack4App() {
 }
 
 function loadParseSDK() {
-    return new Promise((resolve, reject) => {
+    return new Promise(function(resolve, reject) {
         if (typeof Parse !== 'undefined') { resolve(); return; }
         var script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/parse@5.0.0/dist/parse.min.js';
@@ -2767,8 +2767,10 @@ async function loadProjects() {
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Henuz proje yok.</div>';
         } else {
-            container.innerHTML = projects.map(function(p) {
-                return '<div class="project-item"><span>📄 ' + p.get('name').substring(0, 
+            var html = '';
+            for (var i = 0; i < projects.length; i++) {
+                var p = projects[i];
+                html += '<div class="project-item"><span>📄 ' + p.get('name').substring(0, 
 
 30) + '</span><div class="project-actions"><span onclick="editProject(\'' + p.id + '\')" 
 
@@ -2779,7 +2781,8 @@ title="Sil">🗑️</span><span onclick="favoriteProject(\'' + p.id + '\')"
 title="Favori">⭐</span><span onclick="archiveProject(\'' + p.id + '\')" 
 
 title="Arsivle">🗄️</span></div></div>';
-            }).join('');
+            }
+            container.innerHTML = html;
         }
     } catch(e) {
         console.error('Projeler yuklenirken hata:', e);
@@ -2911,13 +2914,16 @@ async function loadFavorites() {
 
 yok.</div>';
         } else {
-            container.innerHTML = projects.map(function(p) {
-                return '<div class="project-item"><span>⭐ ' + p.get('name').substring(0, 
+            var html = '';
+            for (var i = 0; i < projects.length; i++) {
+                var p = projects[i];
+                html += '<div class="project-item"><span>⭐ ' + p.get('name').substring(0, 
 
 25) + '</span><div class="project-actions"><span onclick="favoriteProject(\'' + p.id + 
 
 '\')" title="Favoriden cikar">★</span></div></div>';
-            }).join('');
+            }
+            container.innerHTML = html;
         }
     } catch(e) {
         console.error('Favoriler yuklenirken hata:', e);
@@ -2937,15 +2943,18 @@ async function loadArchive() {
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Arsivde proje yok.</div>';
         } else {
-            container.innerHTML = projects.map(function(p) {
-                return '<div class="project-item"><span>🗄️ ' + p.get('name').substring(0, 
+            var html = '';
+            for (var i = 0; i < projects.length; i++) {
+                var p = projects[i];
+                html += '<div class="project-item"><span>🗄️ ' + p.get('name').substring(0, 
 
 25) + '</span><div class="project-actions"><span onclick="unarchiveProject(\'' + p.id + 
 
 '\')" title="Arsivden cikar">📤</span><span onclick="deleteProject(\'' + p.id + '\')" 
 
 title="Sil">🗑️</span></div></div>';
-            }).join('');
+            }
+            container.innerHTML = html;
         }
     } catch(e) {
         console.error('Arsiv yuklenirken hata:', e);
@@ -2964,15 +2973,18 @@ async function loadTrash() {
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Cop kutusu bos.</div>';
         } else {
-            container.innerHTML = projects.map(function(p) {
-                return '<div class="project-item"><span>🗑️ ' + p.get('name').substring(0, 
+            var html = '';
+            for (var i = 0; i < projects.length; i++) {
+                var p = projects[i];
+                html += '<div class="project-item"><span>🗑️ ' + p.get('name').substring(0, 
 
 25) + '</span><div class="project-actions"><span onclick="restoreProject(\'' + p.id + '\')" 
 
 title="Geri yukle">↩️</span><span onclick="deleteProject(\'' + p.id + '\')" title="Kalici 
 
 sil">🔥</span></div></div>';
-            }).join('');
+            }
+            container.innerHTML = html;
         }
     } catch(e) {
         console.error('Cop kutusu yuklenirken hata:', e);
@@ -2993,13 +3005,16 @@ async function loadProjectRequests() {
 
 yok.</div>';
         } else {
-            container.innerHTML = requests.map(function(r) {
-                return '<div class="project-item"><span>📨 ' + r.get('name').substring(0, 
+            var html = '';
+            for (var i = 0; i < requests.length; i++) {
+                var r = requests[i];
+                html += '<div class="project-item"><span>📨 ' + r.get('name').substring(0, 
 
 25) + '</span><span style="font-size:10px;color:var(--text3);">' + (r.get('status') || 
 
 'Beklemede') + '</span></div>';
-            }).join('');
+            }
+            container.innerHTML = html;
         }
     } catch(e) {
         console.error('Proje talepleri yuklenirken hata:', e);
@@ -3018,15 +3033,18 @@ async function loadInbox() {
         if (messages.length === 0) {
             container.innerHTML = '<div class="inbox-item">📭 Mesaj kutusu bos.</div>';
         } else {
-            container.innerHTML = messages.map(function(m) {
-                return '<div class="inbox-item"><div class="inbox-sender">📧 ' + m.get
+            var html = '';
+            for (var i = 0; i < messages.length; i++) {
+                var m = messages[i];
+                html += '<div class="inbox-item"><div class="inbox-sender">📧 ' + m.get
 
 ('sender_email') + '</div><div class="inbox-message">' + m.get('message') + '</div><div 
 
 style="font-size:10px;color:var(--text3);margin-top:4px;">' + new Date(m.get
 
 ('createdAt')).toLocaleString('tr-TR') + '</div></div>';
-            }).join('');
+            }
+            container.innerHTML = html;
         }
     } catch(e) {
         console.error('Mesajlar yuklenirken hata:', e);
@@ -3068,20 +3086,28 @@ Takim olusturun veya davet bekleyin.</p>';
         document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + 
 
 '</h4><p>Uye sayisi: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
-        document.getElementById('teamMembersList').innerHTML = members.map(function(m) {
-            return '<div class="team-member-item">👤 ' + m.get('user_email') + (m.get
+        var membersHtml = '';
+        for (var i = 0; i < members.length; i++) {
+            var m = members[i];
+            membersHtml += '<div class="team-member-item">👤 ' + m.get('user_email') + 
 
-('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>';
-        }).join('');
+(m.get('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>';
+        }
+        document.getElementById('teamMembersList').innerHTML = membersHtml;
         var chatContainer = document.getElementById('teamChatMessages');
         var userEmail = currentUser.get('email');
-        chatContainer.innerHTML = messages.map(function(m) {
-            return '<div class="ai-message ' + (m.get('user_email') === userEmail ? 'user' 
+        var chatHtml = '';
+        for (var j = 0; j < messages.length; j++) {
+            var msg = messages[j];
+            var cls = (msg.get('user_email') === userEmail) ? 'user' : 'bot';
+            var name = (msg.get('user_email') === userEmail) ? 'Ben' : msg.get
 
-: 'bot') + '"><strong>' + (m.get('user_email') === userEmail ? 'Ben' : m.get
+('user_email').split('@')[0];
+            chatHtml += '<div class="ai-message ' + cls + '"><strong>' + name + '</strong>: 
 
-('user_email').split('@')[0]) + '</strong>: ' + m.get('message') + '</div>';
-        }).join('') || '<div>Henuz mesaj yok</div>';
+' + msg.get('message') + '</div>';
+        }
+        chatContainer.innerHTML = chatHtml || '<div>Henuz mesaj yok</div>';
         chatContainer.scrollTop = chatContainer.scrollHeight;
     } catch(e) { console.error('Takim bilgisi yuklenirken hata:', e); }
 }
@@ -3377,8 +3403,10 @@ async function loadUserList() {
         var users = await query.find({ useMasterKey: true });
         var container = document.getElementById('userList');
         if (!container) return;
-        container.innerHTML = users.map(function(u) {
-            return '<div class="user-item"><span class="user-email">' + u.get('email') + 
+        var html = '';
+        for (var i = 0; i < users.length; i++) {
+            var u = users[i];
+            html += '<div class="user-item"><span class="user-email">' + u.get('email') + 
 
 '</span><span class="user-role">' + (u.get('role') || 'user') + '</span><div class="user-
 
@@ -3391,7 +3419,8 @@ actions"><button class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email'
 u.get('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' 
 
 + u.get('email') + '\')">🎁</button></div></div>';
-        }).join('');
+        }
+        container.innerHTML = html;
     } catch(e) {
         console.error('Kullanici listesi yuklenirken hata:', e);
     }
@@ -3569,10 +3598,10 @@ function switchTab(tab) {
     document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 
 
 'none';
-    document.querySelectorAll('.modal-tab').forEach(function(el) { el.classList.remove
-
-('active'); });
     var tabs = document.querySelectorAll('.modal-tab');
+    for (var i = 0; i < tabs.length; i++) {
+        tabs[i].classList.remove('active');
+    }
     if (tab === 'login') tabs[0].classList.add('active');
     else if (tab === 'register') tabs[1].classList.add('active');
     else if (tab === 'verify') tabs[2].classList.add('active');
@@ -3599,27 +3628,28 @@ async function loadComments() {
         var roleColors = { 'founder': 'var(--gold)', 'admin': 'var(--accent)', 'beta': 
 
 'var(--purple)', 'user': 'var(--text3)' };
-        container.innerHTML = comments.map(function(c) {
-            return '<div class="comment-item" style="border-left-color: ' + (roleColors
+        var html = '';
+        for (var i = 0; i < comments.length; i++) {
+            var c = comments[i];
+            var color = roleColors[c.user_role] || 'var(--border)';
+            var label = roleLabels[c.user_role] || '👤 KULLANICI';
+            html += '<div class="comment-item" style="border-left-color: ' + color + 
 
-[c.user_role] || 'var(--border)') + ';"><div style="display: flex; align-items: center; 
+';"><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"><strong 
 
-gap: 8px; flex-wrap: wrap;"><strong style="color: var(--accent2);">' + (c.user_name || 
+style="color: var(--accent2);">' + (c.user_name || 'Isimsiz') + '</strong><span 
 
-'Isimsiz') + '</strong><span class="role-badge ' + (c.user_role || 'user') + '" 
+class="role-badge ' + (c.user_role || 'user') + '" style="border-color: ' + color + '; 
 
-style="border-color: ' + (roleColors[c.user_role] || 'var(--border)') + '; color: ' + 
+color: ' + color + ';">' + label + '</span><span class="comment-email">📧 ' + (c.user_email 
 
-(roleColors[c.user_role] || 'var(--text3)') + ';">' + (roleLabels[c.user_role] || '👤 
-
-KULLANICI') + '</span><span class="comment-email">📧 ' + (c.user_email || '---') + 
-
-'</span><span class="comment-time" style="margin-left: auto;">' + new Date
+|| '---') + '</span><span class="comment-time" style="margin-left: auto;">' + new Date
 
 (c.createdAt).toLocaleString('tr-TR') + '</span></div><div class="comment-text">' + 
 
 c.comment + '</div></div>';
-        }).join('');
+        }
+        container.innerHTML = html;
     } catch(e) {
         console.error('Yorumlar yuklenemedi:', e);
         document.getElementById('commentsList').innerHTML = '<div class="comment-item" 
@@ -3734,14 +3764,17 @@ if (cursor && ring) {
         requestAnimationFrame(animate);
     }
     animate();
-    document.querySelectorAll('button, a, .btn, .secret-btn, .support-link').forEach
-
-(function(btn) {
-        btn.addEventListener('mouseenter', function() { cursor.classList.add('hover'); });
-        btn.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); 
+    var btns = document.querySelectorAll('button, a, .btn, .secret-btn, .support-link');
+    for (var i = 0; i < btns.length; i++) {
+        (function(btn) {
+            btn.addEventListener('mouseenter', function() { cursor.classList.add('hover'); 
 
 });
-    });
+            btn.addEventListener('mouseleave', function() { cursor.classList.remove
+
+('hover'); });
+        })(btns[i]);
+    }
 }
 
 window.onload = async function() {
