@@ -2463,6 +2463,10 @@ yapmalısınız</button>.</p>
     <!-- JS-1: BACK4APP KONFIG (HARDCODE + STATS)                     -->
     <!-- ============================================================ -->
     <script>
+// ============================================================
+// JS-1: BACK4APP KONFIG + GERÇEK SAYAÇLAR
+// ============================================================
+
 var currentUser = null;
 var currentRole = null;
 var parseInitialized = false;
@@ -2472,7 +2476,9 @@ async function initBack4App() {
     if (parseInitialized) return;
     try {
         await loadParseSDK();
-        Parse.initialize("ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8", "cd1HeGMPKUu8xxE8Q11FMvkzvG6lz7QbJ0rPVpSf");
+        Parse.initialize("ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8", 
+
+"cd1HeGMPKUu8xxE8Q11FMvkzvG6lz7QbJ0rPVpSf");
         Parse.serverURL = "https://parseapi.back4app.com";
         parseInitialized = true;
         console.log('Back4App baslatildi');
@@ -2531,14 +2537,29 @@ async function useQuery() {
     return true;
 }
 
+// ========== GERÇEK SAYAÇLAR ==========
 async function updateStats() {
     try {
-        var stats = await Parse.Cloud.run('getStats');
-        document.getElementById('counter1').innerHTML = stats.users || 0;
-        document.getElementById('counter2').innerHTML = stats.queries || 0;
-        document.getElementById('counter3').innerHTML = stats.projects || 0;
+        // Gerçek kullanıcı sayısı
+        var userQuery = new Parse.Query(Parse.User);
+        var userCount = await userQuery.count({ useMasterKey: true });
+        document.getElementById('counter1').innerHTML = userCount || 0;
+        
+        // Gerçek proje sayısı
+        var projectQuery = new Parse.Query('Project');
+        var projectCount = await projectQuery.count({ useMasterKey: true });
+        document.getElementById('counter3').innerHTML = projectCount || 0;
+        
+        // Gerçek sorgu sayısı
+        var queryQuery = new Parse.Query('QueryStat');
+        var totalQueries = await queryQuery.count({ useMasterKey: true });
+        document.getElementById('counter2').innerHTML = totalQueries || 0;
+        
     } catch(e) {
-        console.log('Istatistikler guncellenemedi:', e);
+        console.log('İstatistikler güncellenemedi:', e);
+        document.getElementById('counter1').innerHTML = '0';
+        document.getElementById('counter2').innerHTML = '0';
+        document.getElementById('counter3').innerHTML = '0';
     }
 }
 
@@ -2570,7 +2591,9 @@ async function handleRegister() {
     var p1 = document.getElementById('rPass').value;
     var p2 = document.getElementById('rPass2').value;
     if (!name || !email || p1.length < 8 || p1 !== p2) {
-        showNotification('Tum alanlari doldurun, sifreler ayni ve min 8 karakter', 'error');
+        showNotification('Tum alanlari doldurun, sifreler ayni ve min 8 karakter', 
+
+'error');
         return;
     }
     try {
@@ -2591,12 +2614,18 @@ async function handleRegister() {
             await Parse.Cloud.run('sendEmail', {
                 to: email,
                 subject: 'Dogrulama Kodu - Vizyon 2027',
-                html: '<h1>Hos geldin ' + name + '!</h1><p>Dogrulama kodunuz: <strong style="font-size:24px;color:#00d4ff;">' + code + '</strong></p><p>15 dakika gecerlidir.</p><p>Vizyon 2027 ekibi</p>'
+                html: '<h1>Hos geldin ' + name + '!</h1><p>Dogrulama kodunuz: <strong 
+
+style="font-size:24px;color:#00d4ff;">' + code + '</strong></p><p>15 dakika 
+
+gecerlidir.</p><p>Vizyon 2027 ekibi</p>'
             });
         } catch(e) {
             console.log('Mail gonderilemedi:', e);
         }
-        showNotification('Kayit basarili! Dogrulama kodunuz mail adresinize gonderildi.', 'success');
+        showNotification('Kayit basarili! Dogrulama kodunuz mail adresinize gonderildi.', 
+
+'success');
         switchTab('verify');
         document.getElementById('verifyEmail').value = email;
     } catch(e) {
@@ -2654,7 +2683,9 @@ async function handleLogin() {
         }
         if (!user.get('isVerified')) {
             await Parse.User.logOut();
-            showNotification('Hesap dogrulanmamis! Lutfen dogrulama kodunu girin.', 'error');
+            showNotification('Hesap dogrulanmamis! Lutfen dogrulama kodunu girin.', 
+
+'error');
             switchTab('verify');
             document.getElementById('verifyEmail').value = email;
             return;
@@ -2709,7 +2740,9 @@ async function loginWithGoogle() {
         closeModal('authModal');
         showDashboard();
         updateCommentUI();
-        showNotification('Google ile giris basarili! Hos geldin ' + (user.get('name') || 'Kullanici'), 'success');
+        showNotification('Google ile giris basarili! Hos geldin ' + (user.get('name') || 
+
+'Kullanici'), 'success');
         
     } catch(e) {
         console.error('Google giris hatasi:', e);
@@ -2770,13 +2803,25 @@ async function loadProjects() {
             var html = '';
             for (var i = 0; i < projects.length; i++) {
                 var p = projects[i];
-                html += '<div class="project-item"><span>📄 ' + p.get('name').substring(0, 30) + '</span><div class="project-actions"><span onclick="editProject(\'' + p.id + '\')" title="Duzenle">✏️</span><span onclick="deleteProject(\'' + p.id + '\')" title="Sil">🗑️</span><span onclick="favoriteProject(\'' + p.id + '\')" title="Favori">⭐</span><span onclick="archiveProject(\'' + p.id + '\')" title="Arsivle">🗄️</span></div></div>';
+                html += '<div class="project-item"><span>📄 ' + p.get('name').substring(0, 
+
+30) + '</span><div class="project-actions"><span onclick="editProject(\'' + p.id + '\')" 
+
+title="Duzenle">✏️</span><span onclick="deleteProject(\'' + p.id + '\')" 
+
+title="Sil">🗑️</span><span onclick="favoriteProject(\'' + p.id + '\')" 
+
+title="Favori">⭐</span><span onclick="archiveProject(\'' + p.id + '\')" 
+
+title="Arsivle">🗄️</span></div></div>';
             }
             container.innerHTML = html;
         }
     } catch(e) {
         console.error('Projeler yuklenirken hata:', e);
-        document.getElementById('projectsList').innerHTML = '<div class="project-item">⚠️ Projeler yuklenemedi.</div>';
+        document.getElementById('projectsList').innerHTML = '<div class="project-item">⚠️ 
+
+Projeler yuklenemedi.</div>';
     }
 }
 
@@ -2837,7 +2882,9 @@ async function favoriteProject(id) {
         await project.save();
         await loadProjects();
         await loadFavorites();
-        showNotification(project.get('is_favorite') ? '⭐ Favorilere eklendi!' : '⭐ Favorilerden cikarildi!', 'success');
+        showNotification(project.get('is_favorite') ? '⭐ Favorilere eklendi!' : '⭐ 
+
+Favorilerden cikarildi!', 'success');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -2896,12 +2943,18 @@ async function loadFavorites() {
         var container = document.getElementById('favList');
         if (!container) return;
         if (projects.length === 0) {
-            container.innerHTML = '<div class="project-item">Henuz favori proje yok.</div>';
+            container.innerHTML = '<div class="project-item">Henuz favori proje 
+
+yok.</div>';
         } else {
             var html = '';
             for (var i = 0; i < projects.length; i++) {
                 var p = projects[i];
-                html += '<div class="project-item"><span>⭐ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="favoriteProject(\'' + p.id + '\')" title="Favoriden cikar">★</span></div></div>';
+                html += '<div class="project-item"><span>⭐ ' + p.get('name').substring(0, 
+
+25) + '</span><div class="project-actions"><span onclick="favoriteProject(\'' + p.id + 
+
+'\')" title="Favoriden cikar">★</span></div></div>';
             }
             container.innerHTML = html;
         }
@@ -2926,7 +2979,13 @@ async function loadArchive() {
             var html = '';
             for (var i = 0; i < projects.length; i++) {
                 var p = projects[i];
-                html += '<div class="project-item"><span>🗄️ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="unarchiveProject(\'' + p.id + '\')" title="Arsivden cikar">📤</span><span onclick="deleteProject(\'' + p.id + '\')" title="Sil">🗑️</span></div></div>';
+                html += '<div class="project-item"><span>🗄️ ' + p.get('name').substring(0, 
+
+25) + '</span><div class="project-actions"><span onclick="unarchiveProject(\'' + p.id + 
+
+'\')" title="Arsivden cikar">📤</span><span onclick="deleteProject(\'' + p.id + '\')" 
+
+title="Sil">🗑️</span></div></div>';
             }
             container.innerHTML = html;
         }
@@ -2950,7 +3009,13 @@ async function loadTrash() {
             var html = '';
             for (var i = 0; i < projects.length; i++) {
                 var p = projects[i];
-                html += '<div class="project-item"><span>🗑️ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="restoreProject(\'' + p.id + '\')" title="Geri yukle">↩️</span><span onclick="deleteProject(\'' + p.id + '\')" title="Kalici sil">🔥</span></div></div>';
+                html += '<div class="project-item"><span>🗑️ ' + p.get('name').substring(0, 
+
+25) + '</span><div class="project-actions"><span onclick="restoreProject(\'' + p.id + '\')" 
+
+title="Geri yukle">↩️</span><span onclick="deleteProject(\'' + p.id + '\')" title="Kalici 
+
+sil">🔥</span></div></div>';
             }
             container.innerHTML = html;
         }
@@ -2969,12 +3034,18 @@ async function loadProjectRequests() {
         var container = document.getElementById('projectRequestsList');
         if (!container) return;
         if (requests.length === 0) {
-            container.innerHTML = '<div class="project-item">Henuz proje talebiniz yok.</div>';
+            container.innerHTML = '<div class="project-item">Henuz proje talebiniz 
+
+yok.</div>';
         } else {
             var html = '';
             for (var i = 0; i < requests.length; i++) {
                 var r = requests[i];
-                html += '<div class="project-item"><span>📨 ' + r.get('name').substring(0, 25) + '</span><span style="font-size:10px;color:var(--text3);">' + (r.get('status') || 'Beklemede') + '</span></div>';
+                html += '<div class="project-item"><span>📨 ' + r.get('name').substring(0, 
+
+25) + '</span><span style="font-size:10px;color:var(--text3);">' + (r.get('status') || 
+
+'Beklemede') + '</span></div>';
             }
             container.innerHTML = html;
         }
@@ -2998,13 +3069,21 @@ async function loadInbox() {
             var html = '';
             for (var i = 0; i < messages.length; i++) {
                 var m = messages[i];
-                html += '<div class="inbox-item"><div class="inbox-sender">📧 ' + m.get('sender_email') + '</div><div class="inbox-message">' + m.get('message') + '</div><div style="font-size:10px;color:var(--text3);margin-top:4px;">' + new Date(m.get('createdAt')).toLocaleString('tr-TR') + '</div></div>';
+                html += '<div class="inbox-item"><div class="inbox-sender">📧 ' + m.get
+
+('sender_email') + '</div><div class="inbox-message">' + m.get('message') + '</div><div 
+
+style="font-size:10px;color:var(--text3);margin-top:4px;">' + new Date(m.get
+
+('createdAt')).toLocaleString('tr-TR') + '</div></div>';
             }
             container.innerHTML = html;
         }
     } catch(e) {
         console.error('Mesajlar yuklenirken hata:', e);
-        document.getElementById('inboxList').innerHTML = '<div class="inbox-item">⚠️ Mesajlar yuklenemedi.</div>';
+        document.getElementById('inboxList').innerHTML = '<div class="inbox-item">⚠️ 
+
+Mesajlar yuklenemedi.</div>';
     }
 }
     </script>
@@ -3017,7 +3096,9 @@ async function loadInbox() {
     if (!currentUser) return;
     var teamId = currentUser.get('teamId');
     if (!teamId) {
-        document.getElementById('teamInfo').innerHTML = '<p>Bir takima uye degilsiniz. Takim olusturun veya davet bekleyin.</p>';
+        document.getElementById('teamInfo').innerHTML = '<p>Bir takima uye degilsiniz. 
+
+Takim olusturun veya davet bekleyin.</p>';
         document.getElementById('teamMembersList').innerHTML = '';
         document.getElementById('teamChatMessages').innerHTML = '';
         return;
@@ -3035,11 +3116,15 @@ async function loadInbox() {
         msgQuery.equalTo('team_id', teamId);
         msgQuery.ascending('createdAt');
         var messages = await msgQuery.find();
-        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + '</h4><p>Uye sayisi: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
+        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + 
+
+'</h4><p>Uye sayisi: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
         var membersHtml = '';
         for (var i = 0; i < members.length; i++) {
             var m = members[i];
-            membersHtml += '<div class="team-member-item">👤 ' + m.get('user_email') + (m.get('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>';
+            membersHtml += '<div class="team-member-item">👤 ' + m.get('user_email') + 
+
+(m.get('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>';
         }
         document.getElementById('teamMembersList').innerHTML = membersHtml;
         var chatContainer = document.getElementById('teamChatMessages');
@@ -3048,8 +3133,12 @@ async function loadInbox() {
         for (var j = 0; j < messages.length; j++) {
             var msg = messages[j];
             var cls = (msg.get('user_email') === userEmail) ? 'user' : 'bot';
-            var name = (msg.get('user_email') === userEmail) ? 'Ben' : msg.get('user_email').split('@')[0];
-            chatHtml += '<div class="ai-message ' + cls + '"><strong>' + name + '</strong>: ' + msg.get('message') + '</div>';
+            var name = (msg.get('user_email') === userEmail) ? 'Ben' : msg.get
+
+('user_email').split('@')[0];
+            chatHtml += '<div class="ai-message ' + cls + '"><strong>' + name + '</strong>: 
+
+' + msg.get('message') + '</div>';
         }
         chatContainer.innerHTML = chatHtml || '<div>Henuz mesaj yok</div>';
         chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -3089,7 +3178,9 @@ async function inviteToTeam() {
         var inbox = new Inbox();
         inbox.set('sender_email', currentUser.get('email'));
         inbox.set('receiver_email', email);
-        inbox.set('message', currentUser.get('name') + ' sizi takima davet etti! Takim ID: ' + teamId);
+        inbox.set('message', currentUser.get('name') + ' sizi takima davet etti! Takim ID: 
+
+' + teamId);
         await inbox.save();
         showNotification('Davet gonderildi: ' + email, 'success');
         document.getElementById('inviteEmail').value = '';
@@ -3134,7 +3225,9 @@ async function callAllAIModels(prompt) {
         return await Parse.Cloud.run('superAI', { prompt: prompt });
     } catch(e) {
         console.error('AI hatasi:', e);
-        return '🧠 VIZYON AI: "' + prompt + '" hakkinda yardimci olabilirim. Detayli yanit icin lutfen daha spesifik bir soru sorun.';
+        return '🧠 VIZYON AI: "' + prompt + '" hakkinda yardimci olabilirim. Detayli yanit 
+
+icin lutfen daha spesifik bir soru sorun.';
     }
 }
 
@@ -3153,11 +3246,15 @@ window.sendDashboardAI = async function() {
     var msg = inp.value.trim();
     if (!msg) return;
     var container = document.getElementById('dashboardAiMessages');
-    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + '</div>';
+    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + 
+
+'</div>';
     inp.value = '';
     container.scrollTop = container.scrollHeight;
     var response;
-    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') !== -1) {
+    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') 
+
+!== -1) {
         response = await webSearch(msg);
     } else {
         response = await callAllAIModels(msg);
@@ -3237,9 +3334,17 @@ async function sendAiMessage() {
     document.getElementById('profileContent').innerHTML =
         '<p><strong>Ad:</strong> ' + currentUser.get('name') + '</p>' +
         '<p><strong>E-posta:</strong> ' + currentUser.get('email') + '</p>' +
-        '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : (currentUser.get('plan') === 'team' ? '👥 Takim' : '🆓 Ucretsiz')) + '</p>' +
-        '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : (currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 Beta' : '👤 Kullanici'))) + '</p>' +
-        '<p><strong>Uyelik:</strong> ' + new Date(currentUser.get('createdAt')).toLocaleDateString('tr-TR') + '</p>';
+        '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : 
+
+(currentUser.get('plan') === 'team' ? '👥 Takim' : '🆓 Ucretsiz')) + '</p>' +
+        '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : 
+
+(currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 
+
+Beta' : '👤 Kullanici'))) + '</p>' +
+        '<p><strong>Uyelik:</strong> ' + new Date(currentUser.get
+
+('createdAt')).toLocaleDateString('tr-TR') + '</p>';
     document.getElementById('profileModal').classList.add('open');
 }
 
@@ -3282,7 +3387,9 @@ async function buyPackage(pkg) {
         showNotification('Once giris yapin!', 'error');
         return;
     }
-    if (confirm((pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takim Paketi (₺899/ay)') + ' satin al?')) {
+    if (confirm((pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takim Paketi (₺899/ay)') + ' satin 
+
+al?')) {
         try {
             currentUser.set('plan', pkg);
             await currentUser.save();
@@ -3332,7 +3439,19 @@ async function loadUserList() {
         var html = '';
         for (var i = 0; i < users.length; i++) {
             var u = users[i];
-            html += '<div class="user-item"><span class="user-email">' + u.get('email') + '</span><span class="user-role">' + (u.get('role') || 'user') + '</span><div class="user-actions"><button class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email') + '\')">Admin Yap</button><button class="btn-user" onclick="setUserRole(\'' + u.get('email') + '\',\'user\')">Kullanici Yap</button><button class="btn-ban" onclick="banUserEmail(\'' + u.get('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' + u.get('email') + '\')">🎁</button></div></div>';
+            html += '<div class="user-item"><span class="user-email">' + u.get('email') + 
+
+'</span><span class="user-role">' + (u.get('role') || 'user') + '</span><div class="user-
+
+actions"><button class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email') + 
+
+'\')">Admin Yap</button><button class="btn-user" onclick="setUserRole(\'' + u.get('email') 
+
++ '\',\'user\')">Kullanici Yap</button><button class="btn-ban" onclick="banUserEmail(\'' + 
+
+u.get('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' 
+
++ u.get('email') + '\')">🎁</button></div></div>';
         }
         container.innerHTML = html;
     } catch(e) {
@@ -3355,7 +3474,9 @@ async function assignAdminEmail(email) {
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
-        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lutfen sifrenizi belirlemek icin "Admin Sifre Belirle" butonuna tiklayin.');
+        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lutfen sifrenizi 
+
+belirlemek icin "Admin Sifre Belirle" butonuna tiklayin.');
         await inbox.save(null, { useMasterKey: true });
         showNotification(email + ' admin yapildi!', 'success');
         await loadUserList();
@@ -3419,7 +3540,9 @@ async function giftUserEmail(email, pkg) {
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
-        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takim Paketi') + ' hediye edildi!');
+        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takim Paketi') + ' 
+
+hediye edildi!');
         await inbox.save(null, { useMasterKey: true });
         showNotification(email + ' adresine ' + pkg + ' paketi hediye edildi!', 'success');
         await loadUserList();
@@ -3468,7 +3591,9 @@ async function setAdminPassword() {
     var pass = document.getElementById('adminPass').value;
     var pass2 = document.getElementById('adminPass2').value;
     if (!email || pass.length < 8 || pass !== pass2) {
-        showNotification('Tum alanlari doldurun, sifreler ayni ve min 8 karakter', 'error');
+        showNotification('Tum alanlari doldurun, sifreler ayni ve min 8 karakter', 
+
+'error');
         return;
     }
     try {
@@ -3497,9 +3622,15 @@ function openModal(type) {
 }
 
 function switchTab(tab) {
-    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none';
-    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none';
-    document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 'none';
+    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 
+
+'none';
+    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 
+
+'none';
+    document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 
+
+'none';
     var tabs = document.querySelectorAll('.modal-tab');
     for (var i = 0; i < tabs.length; i++) {
         tabs[i].classList.remove('active');
@@ -3519,22 +3650,46 @@ async function loadComments() {
         var comments = await Parse.Cloud.run('getComments');
         var container = document.getElementById('commentsList');
         if (!comments || comments.length === 0) {
-            container.innerHTML = '<div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">🌟 Ilk yorumu sen yap!</div>';
+            container.innerHTML = '<div class="comment-item" style="border-left-color: var
+
+(--accent2); text-align: center; color: var(--text3);">🌟 Ilk yorumu sen yap!</div>';
             return;
         }
-        var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 'user': '👤 KULLANICI' };
-        var roleColors = { 'founder': 'var(--gold)', 'admin': 'var(--accent)', 'beta': 'var(--purple)', 'user': 'var(--text3)' };
+        var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 
+
+'user': '👤 KULLANICI' };
+        var roleColors = { 'founder': 'var(--gold)', 'admin': 'var(--accent)', 'beta': 
+
+'var(--purple)', 'user': 'var(--text3)' };
         var html = '';
         for (var i = 0; i < comments.length; i++) {
             var c = comments[i];
             var color = roleColors[c.user_role] || 'var(--border)';
             var label = roleLabels[c.user_role] || '👤 KULLANICI';
-            html += '<div class="comment-item" style="border-left-color: ' + color + ';"><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"><strong style="color: var(--accent2);">' + (c.user_name || 'Isimsiz') + '</strong><span class="role-badge ' + (c.user_role || 'user') + '" style="border-color: ' + color + '; color: ' + color + ';">' + label + '</span><span class="comment-email">📧 ' + (c.user_email || '---') + '</span><span class="comment-time" style="margin-left: auto;">' + new Date(c.createdAt).toLocaleString('tr-TR') + '</span></div><div class="comment-text">' + c.comment + '</div></div>';
+            html += '<div class="comment-item" style="border-left-color: ' + color + 
+
+';"><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"><strong 
+
+style="color: var(--accent2);">' + (c.user_name || 'Isimsiz') + '</strong><span 
+
+class="role-badge ' + (c.user_role || 'user') + '" style="border-color: ' + color + '; 
+
+color: ' + color + ';">' + label + '</span><span class="comment-email">📧 ' + (c.user_email 
+
+|| '---') + '</span><span class="comment-time" style="margin-left: auto;">' + new Date
+
+(c.createdAt).toLocaleString('tr-TR') + '</span></div><div class="comment-text">' + 
+
+c.comment + '</div></div>';
         }
         container.innerHTML = html;
     } catch(e) {
         console.error('Yorumlar yuklenemedi:', e);
-        document.getElementById('commentsList').innerHTML = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);">⚠️ Yorumlar yuklenemedi: ' + e.message + '</div>';
+        document.getElementById('commentsList').innerHTML = '<div class="comment-item" 
+
+style="border-left-color: var(--danger); text-align: center; color: var(--danger);">⚠️ 
+
+Yorumlar yuklenemedi: ' + e.message + '</div>';
     }
 }
 
@@ -3568,8 +3723,12 @@ function updateCommentUI() {
         if (form) form.style.display = 'block';
         if (loginMsg) loginMsg.style.display = 'none';
         if (userName) userName.textContent = currentUser.get('name') || 'Kullanici';
-        var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 'user': '👤 KULLANICI' };
-        if (userRole) userRole.textContent = roleLabels[currentUser.get('role')] || '👤 KULLANICI';
+        var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 
+
+'user': '👤 KULLANICI' };
+        if (userRole) userRole.textContent = roleLabels[currentUser.get('role')] || '👤 
+
+KULLANICI';
     } else {
         if (form) form.style.display = 'none';
         if (loginMsg) loginMsg.style.display = 'block';
@@ -3613,7 +3772,9 @@ if (particlesContainer) {
     for (var i = 0; i < 60; i++) {
         var p = document.createElement('div');
         p.className = 'particle';
-        p.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';
+        p.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + 
+
+Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';
         particlesContainer.appendChild(p);
     }
 }
@@ -3639,8 +3800,12 @@ if (cursor && ring) {
     var btns = document.querySelectorAll('button, a, .btn, .secret-btn, .support-link');
     for (var i = 0; i < btns.length; i++) {
         (function(btn) {
-            btn.addEventListener('mouseenter', function() { cursor.classList.add('hover'); });
-            btn.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); });
+            btn.addEventListener('mouseenter', function() { cursor.classList.add('hover'); 
+
+});
+            btn.addEventListener('mouseleave', function() { cursor.classList.remove
+
+('hover'); });
         })(btns[i]);
     }
 }
