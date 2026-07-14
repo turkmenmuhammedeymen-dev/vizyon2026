@@ -2628,6 +2628,7 @@ geçerlidir.</p><p>Vizyon 2027 ekibi</p>'
             });
         } catch(e) {
             console.log('Mail gönderilemedi:', e);
+            showNotification('Kayıt başarılı! Doğrulama kodunuz: ' + code, 'warning');
         }
         
         showNotification('Kayıt başarılı! Doğrulama kodunuz mail adresinize gönderildi.', 
@@ -2730,11 +2731,12 @@ async function handleLogin() {
     }
 }
 
-// ========== GOOGLE İLE GİRİŞ ==========
+// ========== GOOGLE İLE GİRİŞ (GÜNCELLENMİŞ) ==========
 window.loginWithGoogle = async function() {
     try {
         showNotification('Google ile giriş başlatılıyor...', 'success');
         
+        // Google OAuth ile giriş yap
         var user = await Parse.User.logInWith('google', {
             authData: {
                 id: 'google_' + Date.now(),
@@ -2767,7 +2769,23 @@ window.loginWithGoogle = async function() {
         
     } catch(e) {
         console.error('Google giriş hatası:', e);
-        showNotification('Google giriş hatası: ' + e.message, 'error');
+        
+        var errorMsg = e.message || 'Bilinmeyen hata';
+        if (errorMsg.indexOf('id token is invalid') !== -1 || errorMsg.indexOf('invalid') 
+
+!== -1) {
+            showNotification('❌ Google giriş hatası: Google hesabı doğrulanamadı. Lütfen 
+
+Back4App Dashboard → App Settings → Authentication → Google bölümünü kontrol edin.', 
+
+'error');
+        } else if (errorMsg.indexOf('network') !== -1) {
+            showNotification('Google giriş hatası: Ağ bağlantısı sorunu. Lütfen internet 
+
+bağlantınızı kontrol edin.', 'error');
+        } else {
+            showNotification('Google giriş hatası: ' + errorMsg, 'error');
+        }
     }
 };
 
