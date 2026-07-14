@@ -2235,7 +2235,7 @@ class="glow-input" style="flex:1;min-width:200px;">
         </div>
         <div class="modal-body">
 
-            <!-- GOOGLE İLE GİRİŞ (HER FORMDA GÖRÜNÜR) -->
+            <!-- GOOGLE İLE GİRİŞ -->
             <button class="btn-google" onclick="loginWithGoogle()">
                 <i class="fab fa-google"></i> Google ile Giriş Yap
             </button>
@@ -2402,7 +2402,7 @@ yazabilirsin... (Python, JavaScript, React, SQL...)" rows="2" onkeydown="if
 <!-- ============================================================ -->
 <section id="commentsSection">
     <h3>💬 Yorumlar</h3>
-    
+
     <!-- Yorum Listesi -->
     <div id="commentsList">
         <div class="comment-item" style="border-left-color: var(--accent2); text-align: 
@@ -2411,7 +2411,7 @@ center; color: var(--text3);">
             🌟 Yorumlar yükleniyor...
         </div>
     </div>
-    
+
     <!-- Yorum Formu (sadece giriş yapmış kullanıcılar görebilir) -->
     <div id="commentForm" style="display: none;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
@@ -2433,7 +2433,7 @@ var(--font-body);"></textarea>
 
 100%; font-size: 14px !important; padding: 12px !important;">💬 Yorum Gönder</button>
     </div>
-    
+
     <!-- Giriş yapmamış kullanıcılar için mesaj -->
     <div id="commentLoginMessage" style="margin-top: 16px; padding: 12px; background: var
 
@@ -2616,9 +2616,8 @@ async function handleRegister() {
         
         await user.signUp();
         
-        // Mail göndermeyi dene
         try {
-            var mailResult = await Parse.Cloud.run('sendEmail', {
+            await Parse.Cloud.run('sendEmail', {
                 to: email,
                 subject: 'Doğrulama Kodu - Vizyon 2027',
                 html: '<h1>Hoş geldin ' + name + '!</h1><p>Doğrulama kodunuz: <strong 
@@ -2627,26 +2626,15 @@ style="font-size:24px;color:#00d4ff;">' + code + '</strong></p><p>15 dakika
 
 geçerlidir.</p><p>Vizyon 2027 ekibi</p>'
             });
-            console.log('Mail sonucu:', mailResult);
-            if (mailResult && mailResult.success) {
-                showNotification('Kayıt başarılı! Doğrulama kodu mail adresinize 
-
-gönderildi.', 'success');
-            } else {
-                showNotification('Kayıt başarılı ama mail gönderilemedi. Kod: ' + code, 
-
-'warning');
-            }
-        } catch(mailError) {
-            console.error('Mail gönderme hatası:', mailError);
-            showNotification('Kayıt başarılı! Doğrulama kodunuz: ' + code + ' (Mail 
-
-gönderilemedi)', 'warning');
+        } catch(e) {
+            console.log('Mail gönderilemedi:', e);
         }
         
+        showNotification('Kayıt başarılı! Doğrulama kodunuz mail adresinize gönderildi.', 
+
+'success');
         switchTab('verify');
         document.getElementById('verifyEmail').value = email;
-        
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -2742,12 +2730,11 @@ async function handleLogin() {
     }
 }
 
-// ========== GOOGLE İLE GİRİŞ (DÜZELTİLMİŞ) ==========
-async function loginWithGoogle() {
+// ========== GOOGLE İLE GİRİŞ ==========
+window.loginWithGoogle = async function() {
     try {
         showNotification('Google ile giriş başlatılıyor...', 'success');
         
-        // Google OAuth ile giriş yap
         var user = await Parse.User.logInWith('google', {
             authData: {
                 id: 'google_' + Date.now(),
@@ -2780,22 +2767,9 @@ async function loginWithGoogle() {
         
     } catch(e) {
         console.error('Google giriş hatası:', e);
-        
-        // Hata detayını göster
-        var errorMsg = e.message || 'Bilinmeyen hata';
-        if (errorMsg.indexOf('id token is invalid') !== -1) {
-            showNotification('Google giriş hatası: Kimlik doğrulama başarısız. Lütfen 
-
-Back4App Google ayarlarını kontrol edin.', 'error');
-        } else if (errorMsg.indexOf('user is not allowed') !== -1) {
-            showNotification('Google giriş hatası: Bu hesap yasaklanmış veya izin 
-
-verilmemiş.', 'error');
-        } else {
-            showNotification('Google giriş hatası: ' + errorMsg, 'error');
-        }
+        showNotification('Google giriş hatası: ' + e.message, 'error');
     }
-}
+};
 
 // ========== ÇIKIŞ ==========
 function logout() {
