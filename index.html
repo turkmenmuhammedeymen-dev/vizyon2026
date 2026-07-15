@@ -2389,7 +2389,7 @@ class="glow-input" style="flex:1;min-width:200px;">
     <!-- JS-1: BACK4APP KONFIG (HARDCODE + STATS)                     -->
     <!-- ============================================================ -->
     <script>
-// ============================================================
+ // ============================================================
 // JS-1: BACK4APP KONFIG + GERÇEK SAYAÇLAR
 // ============================================================
 
@@ -2407,12 +2407,7 @@ async function initBack4App() {
         parseInitialized = true;
         console.log('Back4App baslatildi');
         showNotification('Back4App baglantisi kuruldu!', 'success');
-        try {
-            var result = await Parse.Cloud.run('testConfig');
-            console.log('Cloud Code test:', result);
-        } catch(e) {
-            console.log('Cloud Code test basarisiz:', e);
-        }
+        // Cloud Code testi kaldırıldı (istemci tarafında çalışmaz)
     } catch(e) {
         console.error('Back4App hatasi:', e);
         showNotification('Back4App baglanti hatasi!', 'error');
@@ -2461,22 +2456,19 @@ async function useQuery() {
     return true;
 }
 
-// ========== GERÇEK SAYAÇLAR ==========
+// ========== GERÇEK SAYAÇLAR (Master Key KALDIRILDI) ==========
 async function updateStats() {
     try {
-        // Gerçek kullanıcı sayısı
         var userQuery = new Parse.Query(Parse.User);
-        var userCount = await userQuery.count({ useMasterKey: true });
+        var userCount = await userQuery.count();
         document.getElementById('counter1').innerHTML = userCount || 0;
         
-        // Gerçek proje sayısı
         var projectQuery = new Parse.Query('Project');
-        var projectCount = await projectQuery.count({ useMasterKey: true });
+        var projectCount = await projectQuery.count();
         document.getElementById('counter3').innerHTML = projectCount || 0;
         
-        // Gerçek sorgu sayısı
         var queryQuery = new Parse.Query('QueryStat');
-        var totalQueries = await queryQuery.count({ useMasterKey: true });
+        var totalQueries = await queryQuery.count();
         document.getElementById('counter2').innerHTML = totalQueries || 0;
         
     } catch(e) {
@@ -3226,7 +3218,11 @@ async function sendAiMessage() {
     <!-- JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ                    -->
     <!-- ============================================================ -->
     <script>
-        function openProfileModal() {
+        // ============================================================
+// JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ
+// ============================================================
+
+function openProfileModal() {
     if (!currentUser) {
         showNotification('Once giris yapin!', 'error');
         return;
@@ -3323,7 +3319,7 @@ async function loadUserList() {
     if (!currentUser) return;
     try {
         var query = new Parse.Query(Parse.User);
-        var users = await query.find({ useMasterKey: true });
+        var users = await query.find();
         var container = document.getElementById('userList');
         if (!container) return;
         var html = '';
@@ -3341,19 +3337,19 @@ async function assignAdminEmail(email) {
     try {
         var query = new Parse.Query(Parse.User);
         query.equalTo('email', email);
-        var user = await query.first({ useMasterKey: true });
+        var user = await query.first();
         if (!user) {
             showNotification('Kullanici bulunamadi!', 'error');
             return;
         }
         user.set('role', 'admin');
-        await user.save(null, { useMasterKey: true });
+        await user.save();
         var Inbox = Parse.Object.extend('Inbox');
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
         inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lutfen sifrenizi belirlemek icin "Admin Sifre Belirle" butonuna tiklayin.');
-        await inbox.save(null, { useMasterKey: true });
+        await inbox.save();
         showNotification(email + ' admin yapildi!', 'success');
         await loadUserList();
     } catch(e) {
@@ -3365,13 +3361,13 @@ async function setUserRole(email, role) {
     try {
         var query = new Parse.Query(Parse.User);
         query.equalTo('email', email);
-        var user = await query.first({ useMasterKey: true });
+        var user = await query.first();
         if (!user) {
             showNotification('Kullanici bulunamadi!', 'error');
             return;
         }
         user.set('role', role);
-        await user.save(null, { useMasterKey: true });
+        await user.save();
         showNotification(email + ' rolu ' + role + ' olarak degistirildi!', 'success');
         await loadUserList();
     } catch(e) {
@@ -3383,13 +3379,13 @@ async function banUserEmail(email) {
     try {
         var query = new Parse.Query(Parse.User);
         query.equalTo('email', email);
-        var user = await query.first({ useMasterKey: true });
+        var user = await query.first();
         if (!user) {
             showNotification('Kullanici bulunamadi!', 'error');
             return;
         }
         user.set('isBanned', true);
-        await user.save(null, { useMasterKey: true });
+        await user.save();
         showNotification(email + ' yasaklandi!', 'success');
         await loadUserList();
     } catch(e) {
@@ -3401,7 +3397,7 @@ async function giftUserEmail(email, pkg) {
     try {
         var query = new Parse.Query(Parse.User);
         query.equalTo('email', email);
-        var user = await query.first({ useMasterKey: true });
+        var user = await query.first();
         if (!user) {
             showNotification('Kullanici bulunamadi!', 'error');
             return;
@@ -3411,13 +3407,13 @@ async function giftUserEmail(email, pkg) {
         gift.set('sender_email', currentUser?.get('email') || 'system@vizyon2027.com');
         gift.set('receiver_email', email);
         gift.set('package', pkg);
-        await gift.save(null, { useMasterKey: true });
+        await gift.save();
         var Inbox = Parse.Object.extend('Inbox');
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
         inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takim Paketi') + ' hediye edildi!');
-        await inbox.save(null, { useMasterKey: true });
+        await inbox.save();
         showNotification(email + ' adresine ' + pkg + ' paketi hediye edildi!', 'success');
         await loadUserList();
     } catch(e) {
@@ -3471,13 +3467,13 @@ async function setAdminPassword() {
     try {
         var query = new Parse.Query(Parse.User);
         query.equalTo('email', email);
-        var user = await query.first({ useMasterKey: true });
+        var user = await query.first();
         if (!user) {
             showNotification('Kullanici bulunamadi!', 'error');
             return;
         }
         user.set('password', pass);
-        await user.save(null, { useMasterKey: true });
+        await user.save();
         showNotification('✅ Sifre basariyla guncellendi!', 'success');
         closeModal('adminPasswordModal');
         document.getElementById('adminEmail').value = '';
@@ -3506,12 +3502,10 @@ function switchTab(tab) {
     else if (tab === 'verify') tabs[2].classList.add('active');
 }
 
-// ⬇️⬇️⬇️ DEĞİŞEN KISIM BURASI ⬇️⬇️⬇️
 function openRandomSupport() {
     window.location.href = 'mailto:vizyon2027.info@gmail.com?subject=Vizyon2027%20Destek';
     showNotification('Destek maili aciliyor', 'success');
 }
-// ⬆️⬆️⬆️ DEĞİŞEN KISIM BURASI ⬆️⬆️⬆️
 
 async function loadComments() {
     try {
@@ -3533,7 +3527,7 @@ async function loadComments() {
         container.innerHTML = html;
     } catch(e) {
         console.error('Yorumlar yuklenemedi:', e);
-        document.getElementById('commentsList').innerHTML = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);">⚠️ Yorumlar yuklenemedi: ' + e.message + '</div>';
+        document.getElementById('commentsList').innerHTML = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);;">⚠️ Yorumlar yuklenemedi: ' + e.message + '</div>';
     }
 }
 
@@ -3578,7 +3572,7 @@ function updateCommentUI() {
 async function initData() {
     try {
         var query = new Parse.Query(Parse.User);
-        var userCount = await query.count({ useMasterKey: true });
+        var userCount = await query.count();
         if (userCount === 0) {
             var admin1 = new Parse.User();
             admin1.set('username', 'admin.tr.reis@gmail.com');
