@@ -61,89 +61,217 @@ family=Inter:wght@300;400;600;700;800&family=Syne:wght@400;600;700;800&family=Fi
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--text); font-family: var(--font-body); overflow-x: hidden; min-height: 100vh; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-body); overflow-
+
+x: hidden; min-height: 100vh; }
 
 /* ===== ÖZEL İMLEÇ ===== */
-.custom-cursor { width: 12px; height: 12px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 99999; box-shadow: 0 0 15px var(--accent); transition: width 0.1s, height 0.1s; }
-.custom-cursor.hover { width: 24px; height: 24px; background: rgba(0,212,255,0.3); backdrop-filter: blur(2px); }
-.custom-cursor-ring { width: 36px; height: 36px; border: 2px solid var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 99998; transition: 0.08s linear; opacity: 0.7; }
+.custom-cursor { width: 12px; height: 12px; background: var(--accent); border-radius: 50%; 
+
+position: fixed; pointer-events: none; z-index: 99999; box-shadow: 0 0 15px var(--accent); 
+
+transition: width 0.1s, height 0.1s; }
+.custom-cursor.hover { width: 24px; height: 24px; background: rgba(0,212,255,0.3); 
+
+backdrop-filter: blur(2px); }
+.custom-cursor-ring { width: 36px; height: 36px; border: 2px solid var(--accent); border-
+
+radius: 50%; position: fixed; pointer-events: none; z-index: 99998; transition: 0.08s 
+
+linear; opacity: 0.7; }
 
 /* ===== PARÇACIKLAR ===== */
-.particles { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
-.particle { position: absolute; width: 2px; height: 2px; background: var(--accent); border-radius: 50%; animation: float-up linear infinite; opacity: 0; }
+.particles { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; 
+
+}
+.particle { position: absolute; width: 2px; height: 2px; background: var(--accent); 
+
+border-radius: 50%; animation: float-up linear infinite; opacity: 0; }
 .particle:nth-child(odd) { background: var(--accent2); width: 3px; height: 3px; }
 .particle:nth-child(3n) { background: var(--purple); width: 4px; height: 4px; }
-@keyframes float-up { 0% { transform: translateY(100vh); opacity: 0; } 10% { opacity: 0.8; } 90% { opacity: 0.4; } 100% { transform: translateY(-100px); opacity: 0; } }
+@keyframes float-up { 0% { transform: translateY(100vh); opacity: 0; } 10% { opacity: 0.8; 
+
+} 90% { opacity: 0.4; } 100% { transform: translateY(-100px); opacity: 0; } }
 
 /* ===== İLERLEME ÇUBUĞU ===== */
-.progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2), var(--purple)); z-index: 200; transition: width 0.1s; }
+.progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient
+
+(90deg, var(--accent), var(--accent2), var(--purple)); z-index: 200; transition: width 
+
+0.1s; }
 
 /* ===== BİLDİRİM ===== */
-.notification { position: fixed; bottom: 32px; left: 32px; padding: 14px 20px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent2); border-radius: 12px; z-index: 600; transform: translateY(100px); opacity: 0; transition: all 0.4s ease; backdrop-filter: blur(12px); max-width: 360px; font-size: 13px; color: var(--text2); box-shadow: var(--shadow-lg); font-family: var(--font-body); }
+.notification { position: fixed; bottom: 32px; left: 32px; padding: 14px 20px; background: 
+
+var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent2); 
+
+border-radius: 12px; z-index: 600; transform: translateY(100px); opacity: 0; transition: 
+
+all 0.4s ease; backdrop-filter: blur(12px); max-width: 360px; font-size: 13px; color: var
+
+(--text2); box-shadow: var(--shadow-lg); font-family: var(--font-body); }
 .notification.show { transform: translateY(0); opacity: 1; }
 .notification.error { border-left-color: var(--danger); }
 .notification.warning { border-left-color: var(--warning); }
 
 /* ===== SORGU LİMİTİ ROZETİ ===== */
-.query-limit-badge { position: fixed; bottom: 100px; left: 20px; background: rgba(0,212,255,0.12); border: 1px solid var(--accent); border-radius: 40px; padding: 8px 18px; font-size: 11px; font-family: var(--font-body); z-index: 100; backdrop-filter: blur(12px); letter-spacing: 0.5px; }
+.query-limit-badge { position: fixed; bottom: 100px; left: 20px; background: rgba
+
+(0,212,255,0.12); border: 1px solid var(--accent); border-radius: 40px; padding: 8px 18px; 
+
+font-size: 11px; font-family: var(--font-body); z-index: 100; backdrop-filter: blur(12px); 
+
+letter-spacing: 0.5px; }
 
 /* ===== NAVBAR ===== */
-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 48px; height: 80px; border-bottom: 1px solid rgba(0,212,255,0.12); background: rgba(5,10,15,0.85); backdrop-filter: blur(24px); position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
+nav { display: flex; align-items: center; justify-content: space-between; padding: 0 48px; 
+
+height: 80px; border-bottom: 1px solid rgba(0,212,255,0.12); background: rgba
+
+(5,10,15,0.85); backdrop-filter: blur(24px); position: fixed; top: 0; left: 0; right: 0; 
+
+z-index: 100; }
 .logo { display: flex; align-items: center; gap: 12px; }
-.logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, var(--accent), var(--purple), var(--accent3)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; animation: logoPulse 2s infinite; }
-@keyframes logoPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.7); } 50% { box-shadow: 0 0 0 15px rgba(0,212,255,0); } }
-.logo-text { font-family: var(--font-display); font-size: 24px; font-weight: 800; background: linear-gradient(45deg, var(--accent), var(--purple)); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: -0.5px; }
+.logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, var(--accent), 
+
+var(--purple), var(--accent3)); border-radius: 50%; display: flex; align-items: center; 
+
+justify-content: center; font-size: 24px; animation: logoPulse 2s infinite; }
+@keyframes logoPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.7); } 50% { box-
+
+shadow: 0 0 0 15px rgba(0,212,255,0); } }
+.logo-text { font-family: var(--font-display); font-size: 24px; font-weight: 800; 
+
+background: linear-gradient(45deg, var(--accent), var(--purple)); -webkit-background-clip: 
+
+text; background-clip: text; color: transparent; letter-spacing: -0.5px; }
 .nav-links { display: flex; gap: 40px; list-style: none; }
-.nav-links a { color: var(--text2); text-decoration: none; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; transition: color var(--transition-fast); cursor: pointer; }
+.nav-links a { color: var(--text2); text-decoration: none; font-size: 13px; font-weight: 
+
+500; text-transform: uppercase; letter-spacing: 1px; transition: color var(--transition-
+
+fast); cursor: pointer; }
 .nav-links a:hover { color: var(--accent); }
 .button-group { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 .secret-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
 
 /* ===== BUTONLAR ===== */
-.btn { padding: 10px 24px; border-radius: 40px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all var(--transition-fast); border: none; font-family: var(--font-body); }
-.btn-primary { background: linear-gradient(135deg, var(--accent), var(--purple)); color: var(--bg); }
-.btn-primary:hover { transform: scale(1.02); box-shadow: var(--shadow-glow); }
-.btn-secondary { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
-.btn-secondary:hover { background: rgba(0,212,255,0.1); box-shadow: var(--shadow-glow); }
-.btn-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
-.btn-danger:hover { background: rgba(255,71,87,0.15); border-color: var(--danger-hover); }
-.btn-success { background: linear-gradient(135deg, var(--accent2), #00cc66); color: var(--bg); }
-.btn-sm { padding: 6px 16px; font-size: 11px; }
-.btn-price { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--border); color: var(--text2); cursor: pointer; font-size: 13px; font-weight: 600; text-transform: uppercase; border-radius: 40px; transition: all var(--transition-fast); }
-.btn-price:hover { border-color: var(--accent); color: var(--accent); }
-.price-card.featured .btn-price { background: linear-gradient(135deg, var(--accent), var(--purple)); color: var(--bg); border: none; }
+.btn { padding: 10px 24px; border-radius: 40px; font-size: 13px; font-weight: 600; cursor: 
 
-.nav-cta { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 8px 20px; border-radius: 40px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all var(--transition-fast); }
+pointer; transition: all var(--transition-fast); border: none; font-family: var(--font-
+
+body); }
+.btn-primary { background: linear-gradient(135deg, var(--accent), var(--purple)); color: 
+
+var(--bg); }
+.btn-primary:hover { transform: scale(1.02); box-shadow: var(--shadow-glow); }
+.btn-secondary { background: transparent; border: 1px solid var(--accent); color: var(--
+
+accent); }
+.btn-secondary:hover { background: rgba(0,212,255,0.1); box-shadow: var(--shadow-glow); }
+.btn-danger { background: transparent; border: 1px solid var(--danger); color: var(--
+
+danger); }
+.btn-danger:hover { background: rgba(255,71,87,0.15); border-color: var(--danger-hover); }
+.btn-success { background: linear-gradient(135deg, var(--accent2), #00cc66); color: var(--
+
+bg); }
+.btn-sm { padding: 6px 16px; font-size: 11px; }
+.btn-price { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--
+
+border); color: var(--text2); cursor: pointer; font-size: 13px; font-weight: 600; text-
+
+transform: uppercase; border-radius: 40px; transition: all var(--transition-fast); }
+.btn-price:hover { border-color: var(--accent); color: var(--accent); }
+.price-card.featured .btn-price { background: linear-gradient(135deg, var(--accent), var
+
+(--purple)); color: var(--bg); border: none; }
+
+.nav-cta { background: transparent; border: 1px solid var(--accent); color: var(--accent); 
+
+padding: 8px 20px; border-radius: 40px; font-size: 13px; font-weight: 600; cursor: pointer; 
+
+transition: all var(--transition-fast); }
 .nav-cta:hover { background: rgba(0,212,255,0.1); box-shadow: var(--shadow-glow); }
-.secret-btn { background: rgba(0,212,255,0.08); border: 1px solid var(--border); color: var(--text3); font-size: 10px; padding: 6px 14px; border-radius: 30px; cursor: pointer; transition: all var(--transition-fast); }
+.secret-btn { background: rgba(0,212,255,0.08); border: 1px solid var(--border); color: 
+
+var(--text3); font-size: 10px; padding: 6px 14px; border-radius: 30px; cursor: pointer; 
+
+transition: all var(--transition-fast); }
 .secret-btn:hover { border-color: var(--accent); color: var(--accent); }
-.logout-btn { background: rgba(255,71,87,0.12); border: 1px solid var(--danger); color: var(--danger); padding: 8px 20px; border-radius: 40px; cursor: pointer; transition: all var(--transition-fast); }
+.logout-btn { background: rgba(255,71,87,0.12); border: 1px solid var(--danger); color: 
+
+var(--danger); padding: 8px 20px; border-radius: 40px; cursor: pointer; transition: all 
+
+var(--transition-fast); }
 .logout-btn:hover { background: rgba(255,71,87,0.25); }
 
 /* ===== HERO ===== */
-.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 140px 48px 80px; position: relative; z-index: 10; }
-.hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; border: 1px solid rgba(0,212,255,0.3); border-radius: 40px; font-size: 12px; color: var(--accent); margin-bottom: 32px; backdrop-filter: blur(8px); }
-.hero-badge .blink { width: 8px; height: 8px; background: var(--accent2); border-radius: 50%; animation: blink 1s step-end infinite; }
+.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; 
+
+justify-content: center; text-align: center; padding: 140px 48px 80px; position: relative; 
+
+z-index: 10; }
+.hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; 
+
+border: 1px solid rgba(0,212,255,0.3); border-radius: 40px; font-size: 12px; color: var(--
+
+accent); margin-bottom: 32px; backdrop-filter: blur(8px); }
+.hero-badge .blink { width: 8px; height: 8px; background: var(--accent2); border-radius: 
+
+50%; animation: blink 1s step-end infinite; }
 @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
-.hero-title { font-family: var(--font-display); font-size: clamp(48px, 8vw, 96px); font-weight: 800; line-height: 0.95; margin-bottom: 24px; }
-.hero-title .line1 { color: var(--text); display: block; text-shadow: 0 0 30px rgba(0,212,255,0.3); }
-.hero-title .line2 { display: block; -webkit-text-stroke: 2px var(--accent); color: transparent; }
-.hero-title .line3 { display: block; color: var(--accent2); font-size: 0.55em; margin-top: 8px; letter-spacing: 2px; }
-.hero-sub { max-width: 600px; font-size: 16px; line-height: 1.8; color: var(--text2); margin-bottom: 48px; }
-.hero-actions { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 60px; }
+.hero-title { font-family: var(--font-display); font-size: clamp(48px, 8vw, 96px); font-
+
+weight: 800; line-height: 0.95; margin-bottom: 24px; }
+.hero-title .line1 { color: var(--text); display: block; text-shadow: 0 0 30px rgba
+
+(0,212,255,0.3); }
+.hero-title .line2 { display: block; -webkit-text-stroke: 2px var(--accent); color: 
+
+transparent; }
+.hero-title .line3 { display: block; color: var(--accent2); font-size: 0.55em; margin-top: 
+
+8px; letter-spacing: 2px; }
+.hero-sub { max-width: 600px; font-size: 16px; line-height: 1.8; color: var(--text2); 
+
+margin-bottom: 48px; }
+.hero-actions { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; 
+
+margin-bottom: 60px; }
 
 /* ===== STATS ===== */
-.stats-bar { display: flex; justify-content: center; gap: 0; margin-top: 20px; border: 1px solid var(--border); background: rgba(13,26,38,0.5); backdrop-filter: blur(12px); max-width: 800px; margin-left: auto; margin-right: auto; border-radius: 60px; overflow: hidden; }
-.stat-item { flex: 1; padding: 24px 32px; text-align: center; border-right: 1px solid var(--border); }
+.stats-bar { display: flex; justify-content: center; gap: 0; margin-top: 20px; border: 1px 
+
+solid var(--border); background: rgba(13,26,38,0.5); backdrop-filter: blur(12px); max-
+
+width: 800px; margin-left: auto; margin-right: auto; border-radius: 60px; overflow: hidden; 
+
+}
+.stat-item { flex: 1; padding: 24px 32px; text-align: center; border-right: 1px solid var
+
+(--border); }
 .stat-item:last-child { border-right: none; }
-.stat-num { font-family: var(--font-display); font-size: 36px; font-weight: 800; color: var(--accent); display: block; text-shadow: 0 0 15px rgba(0,212,255,0.3); }
-.stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text3); margin-top: 6px; }
+.stat-num { font-family: var(--font-display); font-size: 36px; font-weight: 800; color: 
+
+var(--accent); display: block; text-shadow: 0 0 15px rgba(0,212,255,0.3); }
+.stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var
+
+(--text3); margin-top: 6px; }
 
 /* ===== SCROLL INDICATOR ===== */
-.scroll-indicator { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: 0.5; }
-.scroll-mouse { width: 26px; height: 40px; border: 1.5px solid var(--text3); border-radius: 14px; display: flex; justify-content: center; padding-top: 6px; }
-.scroll-wheel { width: 2px; height: 8px; background: var(--text3); border-radius: 2px; animation: scrollAnim 1.5s ease infinite; }
-@keyframes scrollAnim { from { transform: translateY(0); opacity: 1; } to { transform: translateY(10px); opacity: 0; } }
+.scroll-indicator { position: absolute; bottom: 40px; left: 50%; transform: translateX(-
+
+50%); display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: 0.5; }
+.scroll-mouse { width: 26px; height: 40px; border: 1.5px solid var(--text3); border-radius: 
+
+14px; display: flex; justify-content: center; padding-top: 6px; }
+.scroll-wheel { width: 2px; height: 8px; background: var(--text3); border-radius: 2px; 
+
+animation: scrollAnim 1.5s ease infinite; }
+@keyframes scrollAnim { from { transform: translateY(0); opacity: 1; } to { transform: 
+
+translateY(10px); opacity: 0; } }
 
 /* ===== RESPONSIVE - TELEFON UYUMLULUĞU ===== */
 @media (max-width: 768px) {
@@ -159,9 +287,13 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
     .hero-title .line2 { font-size: 28px !important; }
     .hero-title .line3 { font-size: 14px !important; }
     .hero-sub { font-size: 14px; padding: 0 10px; }
-    .hero-actions .btn-primary, .hero-actions .btn-secondary { font-size: 14px !important; padding: 12px 24px !important; }
+    .hero-actions .btn-primary, .hero-actions .btn-secondary { font-size: 14px !important; 
+
+padding: 12px 24px !important; }
     .stats-bar { flex-wrap: wrap; border-radius: 16px; }
-    .stat-item { flex: 1 1 50%; padding: 16px; border-right: none; border-bottom: 1px solid var(--border); }
+    .stat-item { flex: 1 1 50%; padding: 16px; border-right: none; border-bottom: 1px solid 
+
+var(--border); }
     .stat-item:last-child { border-bottom: none; }
     .stat-num { font-size: 24px; }
     .features { padding: 40px 16px; }
@@ -173,7 +305,9 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
     .pricing-grid { grid-template-columns: 1fr; }
     .price-card { padding: 24px 20px; }
     .price-amount { font-size: 36px; }
-    .dashboard-grid, .dashboard-grid-2col { grid-template-columns: 1fr !important; padding: 12px !important; }
+    .dashboard-grid, .dashboard-grid-2col { grid-template-columns: 1fr !important; padding: 
+
+12px !important; }
     .dashboard-header { flex-direction: column; gap: 8px; padding: 12px 16px; }
     .dashboard-card { padding: 16px; }
     .dashboard-card h3 { font-size: 16px; }
@@ -189,7 +323,11 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
     .vizyon-ai-input { font-size: 13px; padding: 10px 14px; }
     #commentsSection { padding: 10px; }
     .comment-item { padding: 10px 12px; }
-    #rolePanelUI { width: 90% !important; height: 60% !important; max-width: none !important; max-height: none !important; bottom: 10px !important; right: 10px !important; left: 10px !important; }
+    #rolePanelUI { width: 90% !important; height: 60% !important; max-width: none !
+
+important; max-height: none !important; bottom: 10px !important; right: 10px !important; 
+
+left: 10px !important; }
 }
 
 @media (max-width: 480px) {
@@ -649,7 +787,9 @@ footer {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 120% 60% at 50% 0%, rgba(0,212,255,0.04) 0%, transparent 60%);
+    background: radial-gradient(ellipse 120% 60% at 50% 0%, rgba(0,212,255,0.04) 0%, 
+
+transparent 60%);
     z-index: -1;
 }
 .dashboard-header {
@@ -2067,7 +2207,9 @@ class="glow-input" style="flex:1;min-width:200px;">
 <!-- ============================================================ -->
 
 <!-- ===== GİRİŞ / KAYIT / DOĞRULAMA MODALI ===== -->
-<div class="modal-overlay" id="authModal" onclick="if(event.target===this) closeModal('authModal')">
+<div class="modal-overlay" id="authModal" onclick="if(event.target===this) closeModal
+
+('authModal')">
     <div class="modal">
         <div class="modal-header">
             <h3>Hesap Oluştur</h3>
@@ -2090,7 +2232,9 @@ class="glow-input" style="flex:1;min-width:200px;">
                 <i class="fab fa-facebook"></i> Facebook ile Giriş Yap
             </button>
 
-            <div style="text-align: center; margin: 8px 0 16px 0; color: var(--text3); font-size: 12px;">veya</div>
+            <div style="text-align: center; margin: 8px 0 16px 0; color: var(--text3); 
+
+font-size: 12px;">veya</div>
 
             <!-- KAYIT FORMU -->
             <div id="formRegister">
@@ -2098,23 +2242,33 @@ class="glow-input" style="flex:1;min-width:200px;">
                     <input id="rName" placeholder="Ad Soyad" class="form-input">
                 </div>
                 <input id="rEmail" placeholder="E-posta" class="form-input">
-                <input id="rPass" type="password" placeholder="Şifre (8+ karakter)" class="form-input">
-                <input id="rPass2" type="password" placeholder="Şifre Tekrar" class="form-input">
-                <button class="btn-primary" onclick="handleRegister()" style="width:100%;">Kayıt Ol</button>
+                <input id="rPass" type="password" placeholder="Şifre (8+ karakter)" 
+
+class="form-input">
+                <input id="rPass2" type="password" placeholder="Şifre Tekrar" class="form-
+
+input">
+                <button class="btn-primary" onclick="handleRegister()" 
+
+style="width:100%;">Kayıt Ol</button>
             </div>
 
             <!-- GİRİŞ FORMU -->
             <div id="formLogin" style="display:none;">
                 <input id="lEmail" placeholder="E-posta" class="form-input">
                 <input id="lPass" type="password" placeholder="Şifre" class="form-input">
-                <button class="btn-primary" onclick="handleLogin()" style="width:100%;">Giriş Yap</button>
+                <button class="btn-primary" onclick="handleLogin()" 
+
+style="width:100%;">Giriş Yap</button>
             </div>
 
             <!-- DOĞRULAMA FORMU -->
             <div id="formVerify" style="display:none;">
                 <input id="verifyEmail" placeholder="E-posta" class="form-input">
                 <input id="verifyCode" placeholder="Doğrulama Kodu" class="form-input">
-                <button class="btn-primary" onclick="verifyAccount()" style="width:100%;">Doğrula</button>
+                <button class="btn-primary" onclick="verifyAccount()" 
+
+style="width:100%;">Doğrula</button>
             </div>
 
         </div>
@@ -2122,37 +2276,61 @@ class="glow-input" style="flex:1;min-width:200px;">
 </div>
 
 <!-- ===== FOUNDER / ADMIN / BETA PANEL MODALI ===== -->
-<div id="rolePanel" class="modal-overlay" onclick="if(event.target===this) closeModal('rolePanel')">
+<div id="rolePanel" class="modal-overlay" onclick="if(event.target===this) closeModal
+
+('rolePanel')">
     <div class="modal">
         <h3 id="roleTitle">🔐 Yönetim Girişi</h3>
         <input type="password" id="rolePassword" class="form-input" placeholder="Şifre">
-        <button class="btn-primary" onclick="checkRole()" style="width:100%;">Giriş</button>
-        <button class="btn-secondary" onclick="closeModal('rolePanel')" style="width:100%;margin-top:12px;">İptal</button>
+        <button class="btn-primary" onclick="checkRole()" 
+
+style="width:100%;">Giriş</button>
+        <button class="btn-secondary" onclick="closeModal('rolePanel')" 
+
+style="width:100%;margin-top:12px;">İptal</button>
     </div>
 </div>
 
 <!-- ===== PROFİL MODALI ===== -->
-<div id="profileModal" class="modal-overlay" onclick="if(event.target===this) closeModal('profileModal')">
+<div id="profileModal" class="modal-overlay" onclick="if(event.target===this) closeModal
+
+('profileModal')">
     <div class="modal">
         <h3>👤 Profil</h3>
         <div id="profileContent"></div>
         <hr style="margin:16px 0;border-color:var(--border);">
-        <button class="btn-primary btn-sm" onclick="changePassword()">Şifre Değiştir</button>
-        <button class="btn-danger btn-sm" onclick="deleteAccount()" style="margin-top:10px;">🗑️ Hesabımı Sil</button>
+        <button class="btn-primary btn-sm" onclick="changePassword()">Şifre 
+
+Değiştir</button>
+        <button class="btn-danger btn-sm" onclick="deleteAccount()" style="margin-
+
+top:10px;">🗑️ Hesabımı Sil</button>
         <hr style="margin:16px 0;border-color:var(--border);">
-        <button class="btn-secondary btn-sm" onclick="closeModal('profileModal')" style="margin-top:10px;">Kapat</button>
+        <button class="btn-secondary btn-sm" onclick="closeModal('profileModal')" 
+
+style="margin-top:10px;">Kapat</button>
     </div>
 </div>
 
 <!-- ===== ADMIN ŞİFRE BELİRLEME MODALI ===== -->
-<div id="adminPasswordModal" class="modal-overlay" onclick="if(event.target===this) closeModal('adminPasswordModal')">
+<div id="adminPasswordModal" class="modal-overlay" onclick="if(event.target===this) 
+
+closeModal('adminPasswordModal')">
     <div class="modal">
         <h3>🔐 Admin Şifre Belirle</h3>
         <input type="email" id="adminEmail" placeholder="E-posta" class="form-input">
-        <input type="password" id="adminPass" placeholder="Yeni Şifre (8+)" class="form-input">
-        <input type="password" id="adminPass2" placeholder="Şifre Tekrar" class="form-input">
-        <button class="btn-primary" onclick="setAdminPassword()" style="width:100%;">Şifre Belirle</button>
-        <button class="btn-secondary" onclick="closeModal('adminPasswordModal')" style="width:100%;margin-top:12px;">İptal</button>
+        <input type="password" id="adminPass" placeholder="Yeni Şifre (8+)" class="form-
+
+input">
+        <input type="password" id="adminPass2" placeholder="Şifre Tekrar" class="form-
+
+input">
+        <button class="btn-primary" onclick="setAdminPassword()" style="width:100%;">Şifre 
+
+Belirle</button>
+        <button class="btn-secondary" onclick="closeModal('adminPasswordModal')" 
+
+style="width:100%;margin-top:12px;">İptal</button>
     </div>
 </div>
 
@@ -2165,13 +2343,19 @@ class="glow-input" style="flex:1;min-width:200px;">
             <div class="ai-msg bot">Merhaba! Ben VİZYON AI.</div>
         </div>
         <div class="ai-suggestions">
-            <div class="ai-suggestion" onclick="quickAsk('Python hesap makinesi yaz')">🐍 Python</div>
-            <div class="ai-suggestion" onclick="quickAsk('React todo app yap')">⚛️ React</div>
+            <div class="ai-suggestion" onclick="quickAsk('Python hesap makinesi yaz')">🐍 
+
+Python</div>
+            <div class="ai-suggestion" onclick="quickAsk('React todo app yap')">⚛️ 
+
+React</div>
             <div class="ai-suggestion" onclick="quickAsk('dolar kaç')">💰 Dolar</div>
             <div class="ai-suggestion" onclick="quickAsk('bugün haberler')">📰 Haber</div>
         </div>
         <div class="ai-input-area">
-            <input class="ai-input" id="aiInput" placeholder="Her dilde sorabilirsin..." onkeypress="if(event.key==='Enter') sendAiMessage();">
+            <input class="ai-input" id="aiInput" placeholder="Her dilde sorabilirsin..." 
+
+onkeypress="if(event.key==='Enter') sendAiMessage();">
             <button class="ai-send" onclick="sendAiMessage()">→</button>
         </div>
     </div>
@@ -2189,25 +2373,71 @@ class="glow-input" style="flex:1;min-width:200px;">
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
             <span style="color:var(--text3); font-size:12px;">⚡ 7 Model</span>
-            <button class="btn-secondary btn-sm" onclick="closeFullAIPanel()">✕ Kapat</button>
+            <button class="btn-secondary btn-sm" onclick="closeFullAIPanel()">✕ 
+
+Kapat</button>
         </div>
     </div>
     <div id="fullAIChat" class="vizyon-ai-chat">
-        <div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Size nasıl yardımcı olabilirim? Dosya yükleyebilir, kod yazabilir veya soru sorabilirsiniz.</div>
+        <div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Size nasıl yardımcı 
+
+olabilirim? Dosya yükleyebilir, kod yazabilir veya soru sorabilirsiniz.</div>
     </div>
     <div class="vizyon-ai-input-area">
-        <textarea id="fullAIInput" class="vizyon-ai-input" placeholder="Her dilde yazabilirsin... (Python, JavaScript, React, SQL...)" rows="2" onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendFullAI(); }"></textarea>
+        <textarea id="fullAIInput" class="vizyon-ai-input" placeholder="Her dilde 
+
+yazabilirsin... (Python, JavaScript, React, SQL...)" rows="2" onkeydown="if
+
+(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendFullAI(); 
+
+}"></textarea>
         <div style="display:flex; gap:8px; position:relative;">
             <!-- ➕ ARTI BUTONU - Dosya yükleme menüsü -->
-            <button class="btn-secondary" onclick="toggleFileMenu()" style="padding:10px 16px; font-size:18px;">➕</button>
+            <button class="btn-secondary" onclick="toggleFileMenu()" style="padding:10px 
+
+16px; font-size:18px;">➕</button>
             <!-- Dosya menüsü -->
-            <div id="fileMenu" style="display:none; position:absolute; bottom:70px; right:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:8px; z-index:10001; min-width:180px; box-shadow:0 8px 32px rgba(0,0,0,0.5);">
-                <button onclick="openCamera()" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📷 Fotoğraf Çek</button>
-                <button onclick="document.getElementById('fullFileInput').click(); toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📁 Galeriden Seç</button>
-                <button onclick="document.getElementById('fullFileInput').click(); toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📄 Dosya Yükle</button>
+            <div id="fileMenu" style="display:none; position:absolute; bottom:70px; 
+
+right:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; 
+
+padding:8px; z-index:10001; min-width:180px; box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+                <button onclick="openCamera()" style="display:block; width:100%; 
+
+padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-
+
+align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" 
+
+onmouseover="this.style.background='var(--surface2)'" 
+
+onmouseout="this.style.background='transparent'">📷 Fotoğraf Çek</button>
+                <button onclick="document.getElementById('fullFileInput').click(); 
+
+toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; 
+
+border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-
+
+radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--
+
+surface2)'" onmouseout="this.style.background='transparent'">📁 Galeriden Seç</button>
+                <button onclick="document.getElementById('fullFileInput').click(); 
+
+toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; 
+
+border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-
+
+radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--
+
+surface2)'" onmouseout="this.style.background='transparent'">📄 Dosya Yükle</button>
             </div>
-            <input type="file" id="fullFileInput" style="display:none;" accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip,.png,.jpg,.jpeg,.gif,.bmp,.svg,.webp" onchange="uploadFullFile(this)">
-            <button class="btn-primary" onclick="sendFullAI()" style="padding:10px 20px;">⚡ Gönder</button>
+            <input type="file" id="fullFileInput" style="display:none;" 
+
+accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip,.png,.jpg,.jpeg,.gif,
+
+.bmp,.svg,.webp" onchange="uploadFullFile(this)">
+            <button class="btn-primary" onclick="sendFullAI()" style="padding:10px 20px;">⚡ 
+
+Gönder</button>
         </div>
     </div>
 </div>
@@ -2220,7 +2450,9 @@ class="glow-input" style="flex:1;min-width:200px;">
 
     <!-- Yorum Listesi -->
     <div id="commentsList">
-        <div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">
+        <div class="comment-item" style="border-left-color: var(--accent2); text-align: 
+
+center; color: var(--text3);">
             🌟 Yorumlar yükleniyor...
         </div>
     </div>
@@ -2228,16 +2460,36 @@ class="glow-input" style="flex:1;min-width:200px;">
     <!-- Yorum Formu (sadece giriş yapmış kullanıcılar görebilir) -->
     <div id="commentForm" style="display: none;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-            <span style="color: var(--text2); font-size: 14px;">👤 <span id="commentUserName">Misafir</span></span>
-            <span id="commentUserRole" style="font-size: 11px; padding: 2px 10px; border-radius: 12px; background: var(--border); color: var(--text3);">👤 KULLANICI</span>
+            <span style="color: var(--text2); font-size: 14px;">👤 <span 
+
+id="commentUserName">Misafir</span></span>
+            <span id="commentUserRole" style="font-size: 11px; padding: 2px 10px; border-
+
+radius: 12px; background: var(--border); color: var(--text3);">👤 KULLANICI</span>
         </div>
-        <textarea id="commentInput" rows="2" placeholder="Yorumunuzu yazın..." style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; resize: vertical; font-family: var(--font-body);"></textarea>
-        <button onclick="postComment()" class="btn-primary" style="margin-top: 8px; width: 100%; font-size: 14px !important; padding: 12px !important;">💬 Yorum Gönder</button>
+        <textarea id="commentInput" rows="2" placeholder="Yorumunuzu yazın..." 
+
+style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); 
+
+border-radius: 12px; color: var(--text); font-size: 14px; resize: vertical; font-family: 
+
+var(--font-body);"></textarea>
+        <button onclick="postComment()" class="btn-primary" style="margin-top: 8px; width: 
+
+100%; font-size: 14px !important; padding: 12px !important;">💬 Yorum Gönder</button>
     </div>
 
     <!-- Giriş yapmamış kullanıcılar için mesaj -->
-    <div id="commentLoginMessage" style="margin-top: 16px; padding: 12px; background: var(--surface); border-radius: 12px; border: 1px dashed var(--border); text-align: center; color: var(--text3);">
-        <p>Yorum yapmak için <button class="btn-secondary btn-sm" onclick="openModal('login')" style="display: inline-block; padding: 6px 16px; font-size: 12px;">giriş yapmalısınız</button>.</p>
+    <div id="commentLoginMessage" style="margin-top: 16px; padding: 12px; background: var
+
+(--surface); border-radius: 12px; border: 1px dashed var(--border); text-align: center; 
+
+color: var(--text3);">
+        <p>Yorum yapmak için <button class="btn-secondary btn-sm" onclick="openModal
+
+('login')" style="display: inline-block; padding: 6px 16px; font-size: 12px;">giriş 
+
+yapmalısınız</button>.</p>
     </div>
 </section>
     <!-- GİRİŞ / KAYIT / DOĞRULAMA MODALI -->
@@ -2270,7 +2522,9 @@ async function initBack4App() {
     if (parseInitialized) return;
     try {
         await loadParseSDK();
-        Parse.initialize("ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8", "mur4DtLsGOsQhykTnFVNGxYOeNbvjPbAkl6xPQGp");
+        Parse.initialize("ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8", 
+
+"mur4DtLsGOsQhykTnFVNGxYOeNbvjPbAkl6xPQGp");
         Parse.serverURL = "https://parseapi.back4app.com";
         parseInitialized = true;
         console.log('Back4App baslatildi');
@@ -2402,7 +2656,9 @@ async function handleRegister() {
     var p2 = document.getElementById('rPass2').value;
     
     if (!name || !email || p1.length < 8 || p1 !== p2) {
-        showNotification('Tüm alanları doldurun, şifreler aynı ve min 8 karakter', 'error');
+        showNotification('Tüm alanları doldurun, şifreler aynı ve min 8 karakter', 
+
+'error');
         return;
     }
     
@@ -2427,14 +2683,20 @@ async function handleRegister() {
             await Parse.Cloud.run('sendEmail', {
                 to: email,
                 subject: 'Doğrulama Kodu - Vizyon 2027',
-                html: '<h1>Hoş geldin ' + name + '!</h1><p>Doğrulama kodunuz: <strong style="font-size:24px;color:#00d4ff;">' + code + '</strong></p><p>15 dakika geçerlidir.</p><p>Vizyon 2027 ekibi</p>'
+                html: '<h1>Hoş geldin ' + name + '!</h1><p>Doğrulama kodunuz: <strong 
+
+style="font-size:24px;color:#00d4ff;">' + code + '</strong></p><p>15 dakika 
+
+geçerlidir.</p><p>Vizyon 2027 ekibi</p>'
             });
         } catch(e) {
             console.log('Mail gönderilemedi:', e);
             showNotification('Kayıt başarılı! Doğrulama kodunuz: ' + code, 'warning');
         }
         
-        showNotification('Kayıt başarılı! Doğrulama kodunuz mail adresinize gönderildi.', 'success');
+        showNotification('Kayıt başarılı! Doğrulama kodunuz mail adresinize gönderildi.', 
+
+'success');
         switchTab('verify');
         document.getElementById('verifyEmail').value = email;
     } catch(e) {
@@ -2505,7 +2767,9 @@ async function handleLogin() {
         
         if (!user.get('isVerified')) {
             await Parse.User.logOut();
-            showNotification('Hesap doğrulanmamış! Lütfen doğrulama kodunu girin.', 'error');
+            showNotification('Hesap doğrulanmamış! Lütfen doğrulama kodunu girin.', 
+
+'error');
             switchTab('verify');
             document.getElementById('verifyEmail').value = email;
             return;
@@ -2561,16 +2825,26 @@ window.loginWithGoogle = async function() {
         closeModal('authModal');
         showDashboard();
         updateCommentUI();
-        showNotification('Google ile giriş başarılı! Hoş geldin ' + (user.get('name') || 'Kullanıcı'), 'success');
+        showNotification('Google ile giriş başarılı! Hoş geldin ' + (user.get('name') || 
+
+'Kullanıcı'), 'success');
         
     } catch(e) {
         console.error('Google giriş hatası:', e);
         
         var errorMsg = e.message || 'Bilinmeyen hata';
-        if (errorMsg.indexOf('id token is invalid') !== -1 || errorMsg.indexOf('invalid') !== -1) {
-            showNotification('❌ Google giriş hatası: Back4App Dashboard → App Settings → Authentication → Google bölümünden Google Authentication\'ı aktifleştirin ve Client ID/Secret ekleyin.', 'error');
+        if (errorMsg.indexOf('id token is invalid') !== -1 || errorMsg.indexOf('invalid') 
+
+!== -1) {
+            showNotification('❌ Google giriş hatası: Back4App Dashboard → App Settings → 
+
+Authentication → Google bölümünden Google Authentication\'ı aktifleştirin ve Client 
+
+ID/Secret ekleyin.', 'error');
         } else if (errorMsg.indexOf('network') !== -1) {
-            showNotification('Google giriş hatası: Ağ bağlantısı sorunu. Lütfen internet bağlantınızı kontrol edin.', 'error');
+            showNotification('Google giriş hatası: Ağ bağlantısı sorunu. Lütfen internet 
+
+bağlantınızı kontrol edin.', 'error');
         } else {
             showNotification('Google giriş hatası: ' + errorMsg, 'error');
         }
@@ -2608,16 +2882,24 @@ window.loginWithFacebook = async function() {
         closeModal('authModal');
         showDashboard();
         updateCommentUI();
-        showNotification('Facebook ile giriş başarılı! Hoş geldin ' + (user.get('name') || 'Kullanıcı'), 'success');
+        showNotification('Facebook ile giriş başarılı! Hoş geldin ' + (user.get('name') || 
+
+'Kullanıcı'), 'success');
         
     } catch(e) {
         console.error('Facebook giriş hatası:', e);
         
         var errorMsg = e.message || 'Bilinmeyen hata';
         if (errorMsg.indexOf('invalid') !== -1) {
-            showNotification('❌ Facebook giriş hatası: Back4App Dashboard → App Settings → Authentication → Facebook bölümünden Facebook Authentication\'ı aktifleştirin ve App ID/Secret ekleyin.', 'error');
+            showNotification('❌ Facebook giriş hatası: Back4App Dashboard → App Settings → 
+
+Authentication → Facebook bölümünden Facebook Authentication\'ı aktifleştirin ve App 
+
+ID/Secret ekleyin.', 'error');
         } else if (errorMsg.indexOf('network') !== -1) {
-            showNotification('Facebook giriş hatası: Ağ bağlantısı sorunu. Lütfen internet bağlantınızı kontrol edin.', 'error');
+            showNotification('Facebook giriş hatası: Ağ bağlantısı sorunu. Lütfen internet 
+
+bağlantınızı kontrol edin.', 'error');
         } else {
             showNotification('Facebook giriş hatası: ' + errorMsg, 'error');
         }
@@ -2685,13 +2967,25 @@ async function loadProjects() {
             var html = '';
             for (var i = 0; i < projects.length; i++) {
                 var p = projects[i];
-                html += '<div class="project-item"><span>📄 ' + p.get('name').substring(0, 30) + '</span><div class="project-actions"><span onclick="editProject(\'' + p.id + '\')" title="Düzenle">✏️</span><span onclick="deleteProject(\'' + p.id + '\')" title="Sil">🗑️</span><span onclick="favoriteProject(\'' + p.id + '\')" title="Favori">⭐</span><span onclick="archiveProject(\'' + p.id + '\')" title="Arşivle">🗄️</span></div></div>';
+                html += '<div class="project-item"><span>📄 ' + p.get('name').substring(0, 
+
+30) + '</span><div class="project-actions"><span onclick="editProject(\'' + p.id + '\')" 
+
+title="Düzenle">✏️</span><span onclick="deleteProject(\'' + p.id + '\')" 
+
+title="Sil">🗑️</span><span onclick="favoriteProject(\'' + p.id + '\')" 
+
+title="Favori">⭐</span><span onclick="archiveProject(\'' + p.id + '\')" 
+
+title="Arşivle">🗄️</span></div></div>';
             }
             container.innerHTML = html;
         }
     } catch(e) {
         console.error('Projeler yüklenirken hata:', e);
-        document.getElementById('projectsList').innerHTML = '<div class="project-item">⚠️ Projeler yüklenemedi.</div>';
+        document.getElementById('projectsList').innerHTML = '<div class="project-item">⚠️ 
+
+Projeler yüklenemedi.</div>';
     }
 }
 
@@ -2755,7 +3049,9 @@ async function favoriteProject(id) {
         await project.save();
         await loadProjects();
         await loadFavorites();
-        showNotification(project.get('is_favorite') ? '⭐ Favorilere eklendi!' : '⭐ Favorilerden çıkarıldı!', 'success');
+        showNotification(project.get('is_favorite') ? '⭐ Favorilere eklendi!' : '⭐ 
+
+Favorilerden çıkarıldı!', 'success');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -2816,12 +3112,18 @@ async function loadFavorites() {
         if (!container) return;
         
         if (projects.length === 0) {
-            container.innerHTML = '<div class="project-item">Henüz favori proje yok.</div>';
+            container.innerHTML = '<div class="project-item">Henüz favori proje 
+
+yok.</div>';
         } else {
             var html = '';
             for (var i = 0; i < projects.length; i++) {
                 var p = projects[i];
-                html += '<div class="project-item"><span>⭐ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="favoriteProject(\'' + p.id + '\')" title="Favoriden çıkar">★</span></div></div>';
+                html += '<div class="project-item"><span>⭐ ' + p.get('name').substring(0, 
+
+25) + '</span><div class="project-actions"><span onclick="favoriteProject(\'' + p.id + 
+
+'\')" title="Favoriden çıkar">★</span></div></div>';
             }
             container.innerHTML = html;
         }
@@ -2848,7 +3150,13 @@ async function loadArchive() {
             var html = '';
             for (var i = 0; i < projects.length; i++) {
                 var p = projects[i];
-                html += '<div class="project-item"><span>🗄️ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="unarchiveProject(\'' + p.id + '\')" title="Arşivden çıkar">📤</span><span onclick="deleteProject(\'' + p.id + '\')" title="Sil">🗑️</span></div></div>';
+                html += '<div class="project-item"><span>🗄️ ' + p.get('name').substring(0, 
+
+25) + '</span><div class="project-actions"><span onclick="unarchiveProject(\'' + p.id + 
+
+'\')" title="Arşivden çıkar">📤</span><span onclick="deleteProject(\'' + p.id + '\')" 
+
+title="Sil">🗑️</span></div></div>';
             }
             container.innerHTML = html;
         }
@@ -2874,7 +3182,13 @@ async function loadTrash() {
             var html = '';
             for (var i = 0; i < projects.length; i++) {
                 var p = projects[i];
-                html += '<div class="project-item"><span>🗑️ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="restoreProject(\'' + p.id + '\')" title="Geri yükle">↩️</span><span onclick="deleteProject(\'' + p.id + '\')" title="Kalıcı sil">🔥</span></div></div>';
+                html += '<div class="project-item"><span>🗑️ ' + p.get('name').substring(0, 
+
+25) + '</span><div class="project-actions"><span onclick="restoreProject(\'' + p.id + '\')" 
+
+title="Geri yükle">↩️</span><span onclick="deleteProject(\'' + p.id + '\')" title="Kalıcı 
+
+sil">🔥</span></div></div>';
             }
             container.innerHTML = html;
         }
@@ -2895,12 +3209,18 @@ async function loadProjectRequests() {
         if (!container) return;
         
         if (requests.length === 0) {
-            container.innerHTML = '<div class="project-item">Henüz proje talebiniz yok.</div>';
+            container.innerHTML = '<div class="project-item">Henüz proje talebiniz 
+
+yok.</div>';
         } else {
             var html = '';
             for (var i = 0; i < requests.length; i++) {
                 var r = requests[i];
-                html += '<div class="project-item"><span>📨 ' + r.get('name').substring(0, 25) + '</span><span style="font-size:10px;color:var(--text3);">' + (r.get('status') || 'Beklemede') + '</span></div>';
+                html += '<div class="project-item"><span>📨 ' + r.get('name').substring(0, 
+
+25) + '</span><span style="font-size:10px;color:var(--text3);">' + (r.get('status') || 
+
+'Beklemede') + '</span></div>';
             }
             container.innerHTML = html;
         }
@@ -2926,13 +3246,21 @@ async function loadInbox() {
             var html = '';
             for (var i = 0; i < messages.length; i++) {
                 var m = messages[i];
-                html += '<div class="inbox-item"><div class="inbox-sender">📧 ' + m.get('sender_email') + '</div><div class="inbox-message">' + m.get('message') + '</div><div style="font-size:10px;color:var(--text3);margin-top:4px;">' + new Date(m.get('createdAt')).toLocaleString('tr-TR') + '</div></div>';
+                html += '<div class="inbox-item"><div class="inbox-sender">📧 ' + m.get
+
+('sender_email') + '</div><div class="inbox-message">' + m.get('message') + '</div><div 
+
+style="font-size:10px;color:var(--text3);margin-top:4px;">' + new Date(m.get
+
+('createdAt')).toLocaleString('tr-TR') + '</div></div>';
             }
             container.innerHTML = html;
         }
     } catch(e) {
         console.error('Mesajlar yüklenirken hata:', e);
-        document.getElementById('inboxList').innerHTML = '<div class="inbox-item">⚠️ Mesajlar yüklenemedi.</div>';
+        document.getElementById('inboxList').innerHTML = '<div class="inbox-item">⚠️ 
+
+Mesajlar yüklenemedi.</div>';
     }
 }
     </script>
@@ -2949,7 +3277,9 @@ async function loadTeamInfo() {
     if (!currentUser) return;
     var teamId = currentUser.get('teamId');
     if (!teamId) {
-        document.getElementById('teamInfo').innerHTML = '<p>Bir takima uye degilsiniz. Takim olusturun veya davet bekleyin.</p>';
+        document.getElementById('teamInfo').innerHTML = '<p>Bir takima uye degilsiniz. 
+
+Takim olusturun veya davet bekleyin.</p>';
         document.getElementById('teamMembersList').innerHTML = '';
         document.getElementById('teamChatMessages').innerHTML = '';
         return;
@@ -2967,11 +3297,15 @@ async function loadTeamInfo() {
         msgQuery.equalTo('team_id', teamId);
         msgQuery.ascending('createdAt');
         var messages = await msgQuery.find();
-        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + '</h4><p>Uye sayisi: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
+        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + 
+
+'</h4><p>Uye sayisi: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
         var membersHtml = '';
         for (var i = 0; i < members.length; i++) {
             var m = members[i];
-            membersHtml += '<div class="team-member-item">👤 ' + m.get('user_email') + (m.get('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>';
+            membersHtml += '<div class="team-member-item">👤 ' + m.get('user_email') + 
+
+(m.get('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>';
         }
         document.getElementById('teamMembersList').innerHTML = membersHtml;
         var chatContainer = document.getElementById('teamChatMessages');
@@ -2980,8 +3314,12 @@ async function loadTeamInfo() {
         for (var j = 0; j < messages.length; j++) {
             var msg = messages[j];
             var cls = (msg.get('user_email') === userEmail) ? 'user' : 'bot';
-            var name = (msg.get('user_email') === userEmail) ? 'Ben' : msg.get('user_email').split('@')[0];
-            chatHtml += '<div class="ai-message ' + cls + '"><strong>' + name + '</strong>: ' + msg.get('message') + '</div>';
+            var name = (msg.get('user_email') === userEmail) ? 'Ben' : msg.get
+
+('user_email').split('@')[0];
+            chatHtml += '<div class="ai-message ' + cls + '"><strong>' + name + '</strong>: 
+
+' + msg.get('message') + '</div>';
         }
         chatContainer.innerHTML = chatHtml || '<div>Henuz mesaj yok</div>';
         chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -3021,7 +3359,9 @@ async function inviteToTeam() {
         var inbox = new Inbox();
         inbox.set('sender_email', currentUser.get('email'));
         inbox.set('receiver_email', email);
-        inbox.set('message', currentUser.get('name') + ' sizi takima davet etti! Takim ID: ' + teamId);
+        inbox.set('message', currentUser.get('name') + ' sizi takima davet etti! Takim ID: 
+
+' + teamId);
         await inbox.save();
         showNotification('Davet gonderildi: ' + email, 'success');
         document.getElementById('inviteEmail').value = '';
@@ -3050,17 +3390,28 @@ async function sendTeamMessage() {
 function cleanClientResponse(text) {
     if (!text) return text;
     
-    // 1. Önce kod bloklarını işaretle
+    // 1. Önce kod bloklarını işaretle (``` ile başlayanlar)
     var withCopy = text.replace(/```(\w+)?\n([\s\S]*?)```/g, function(match, lang, code) {
-        return '<div class="code-block"><pre><code class="language-' + (lang || '') + '">' + code + '</code></pre><button class="copy-btn" onclick="copyCode(this)">📋 Kopyala</button></div>';
+        return '<div class="code-block"><pre><code class="language-' + (lang || '') + '">' 
+
++ code + '</code></pre><button class="copy-btn" onclick="copyCode(this)">📋 
+
+Kopyala</button></div>';
     });
     
-    // 2. Eğer yukarıdaki regex çalışmadıysa (tek satırlık kodlar için)
-    // Tek backtick ile yazılan kodları işaretle
-    withCopy = withCopy.replace(/`([^`]+)`/g, '<code>$1</code>');
-    
-    // 3. Eğer ``` olmadan kod varsa (örnek: "şu kodu yaz: print('merhaba')")
-    // Bunlar için özel bir şey yapmıyoruz, normal metin olarak kalıyor
+    // 2. Eğer hiç kod bloğu yoksa, normal metin olarak döndür
+    if (withCopy === text) {
+        return text
+            .replace(/\\n/g, '<br>')
+            .replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+    }
     
     return withCopy
         .replace(/\\n/g, '<br>')
@@ -3159,7 +3510,9 @@ async function callAllAIModels(prompt) {
         return await Parse.Cloud.run('superAI', { prompt: prompt });
     } catch(e) {
         console.error('AI hatasi:', e);
-        return '🧠 VIZYON AI: "' + prompt + '" hakkinda yardimci olabilirim. Detayli yanit icin lutfen daha spesifik bir soru sorun.';
+        return '🧠 VIZYON AI: "' + prompt + '" hakkinda yardimci olabilirim. Detayli yanit 
+
+icin lutfen daha spesifik bir soru sorun.';
     }
 }
 
@@ -3179,11 +3532,15 @@ window.sendDashboardAI = async function() {
     var msg = inp.value.trim();
     if (!msg) return;
     var container = document.getElementById('dashboardAiMessages');
-    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + '</div>';
+    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + 
+
+'</div>';
     inp.value = '';
     container.scrollTop = container.scrollHeight;
     var response;
-    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') !== -1) {
+    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') 
+
+!== -1) {
         response = await webSearch(msg);
     } else {
         response = await callAllAIModels(msg);
@@ -3212,7 +3569,9 @@ async function sendFullAI() {
     inp.value = '';
     chat.scrollTop = chat.scrollHeight;
     var response;
-    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('hava') !== -1) {
+    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('hava') 
+
+!== -1) {
         response = await webSearch(msg);
     } else {
         response = await callAllAIModels(msg);
@@ -3280,12 +3639,18 @@ async function uploadFullFile(input) {
                 fileMsg += '📋 Tür: ' + (fileType || 'Bilinmiyor') + '\n\n';
                 
                 if (fileType && fileType.startsWith('image/')) {
-                    fileMsg += '🖼️ Bu bir görsel dosyası. Lütfen görseli analiz et ve içeriğini detaylıca açıkla.';
+                    fileMsg += '🖼️ Bu bir görsel dosyası. Lütfen görseli analiz et ve 
+
+içeriğini detaylıca açıkla.';
                     fileMsg += '\n\n(Görsel verisi: ' + content.substring(0, 200) + '...)';
                 } else if (fileType === 'application/pdf') {
-                    fileMsg += '📄 Bu bir PDF dosyası. Lütfen içeriğini analiz et ve özetle.';
+                    fileMsg += '📄 Bu bir PDF dosyası. Lütfen içeriğini analiz et ve 
+
+özetle.';
                 } else {
-                    fileMsg += '📝 İçeriği analiz et ve özetle:\n\n' + content.substring(0, 2000);
+                    fileMsg += '📝 İçeriği analiz et ve özetle:\n\n' + content.substring(0, 
+
+2000);
                 }
                 inputArea.value = fileMsg;
                 sendFullAI();
@@ -3314,7 +3679,7 @@ async function uploadFullFile(input) {
             background: #0a0a0a;
             border-radius: 8px;
             margin: 8px 0;
-            padding: 12px 12px 12px 12px;
+            padding: 12px;
             border: 1px solid rgba(0,212,255,0.1);
         }
         .code-block pre {
@@ -3353,6 +3718,12 @@ async function uploadFullFile(input) {
         .copy-btn:active {
             transform: scale(0.95);
         }
+        .ai-message.bot .code-block {
+            background: #0d1a26;
+        }
+        .ai-message.bot .code-block code {
+            color: #ccdeee;
+        }
     `;
     document.head.appendChild(style);
 })();
@@ -3385,9 +3756,17 @@ function openProfileModal() {
     document.getElementById('profileContent').innerHTML =
         '<p><strong>Ad:</strong> ' + currentUser.get('name') + '</p>' +
         '<p><strong>E-posta:</strong> ' + currentUser.get('email') + '</p>' +
-        '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : (currentUser.get('plan') === 'team' ? '👥 Takim' : '🆓 Ucretsiz')) + '</p>' +
-        '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : (currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 Beta' : '👤 Kullanici'))) + '</p>' +
-        '<p><strong>Uyelik:</strong> ' + new Date(currentUser.get('createdAt')).toLocaleDateString('tr-TR') + '</p>';
+        '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : 
+
+(currentUser.get('plan') === 'team' ? '👥 Takim' : '🆓 Ucretsiz')) + '</p>' +
+        '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : 
+
+(currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 
+
+Beta' : '👤 Kullanici'))) + '</p>' +
+        '<p><strong>Uyelik:</strong> ' + new Date(currentUser.get
+
+('createdAt')).toLocaleDateString('tr-TR') + '</p>';
     document.getElementById('profileModal').classList.add('open');
 }
 
@@ -3430,7 +3809,9 @@ async function buyPackage(pkg) {
         showNotification('Once giris yapin!', 'error');
         return;
     }
-    if (confirm((pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takim Paketi (₺899/ay)') + ' satin al?')) {
+    if (confirm((pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takim Paketi (₺899/ay)') + ' satin 
+
+al?')) {
         try {
             currentUser.set('plan', pkg);
             await currentUser.save();
@@ -3481,7 +3862,19 @@ async function loadUserList() {
         for (var i = 0; i < users.length; i++) {
             var u = users[i];
             var role = u.get('role') || 'user';
-            html += '<div class="user-item"><span class="user-email">' + u.get('email') + '</span><span class="user-role">' + role + '</span><div class="user-actions"><button class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email') + '\')">Admin Yap</button><button class="btn-user" onclick="setUserRole(\'' + u.get('email') + '\',\'user\')">Kullanici Yap</button><button class="btn-ban" onclick="banUserEmail(\'' + u.get('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' + u.get('email') + '\')">🎁</button></div></div>';
+            html += '<div class="user-item"><span class="user-email">' + u.get('email') + 
+
+'</span><span class="user-role">' + role + '</span><div class="user-actions"><button 
+
+class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email') + '\')">Admin 
+
+Yap</button><button class="btn-user" onclick="setUserRole(\'' + u.get('email') + '\',
+
+\'user\')">Kullanici Yap</button><button class="btn-ban" onclick="banUserEmail(\'' + u.get
+
+('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' + 
+
+u.get('email') + '\')">🎁</button></div></div>';
         }
         container.innerHTML = html;
     } catch(e) {
@@ -3504,7 +3897,9 @@ async function assignAdminEmail(email) {
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
-        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lutfen sifrenizi belirlemek icin "Admin Sifre Belirle" butonuna tiklayin.');
+        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lutfen sifrenizi 
+
+belirlemek icin "Admin Sifre Belirle" butonuna tiklayin.');
         await inbox.save();
         showNotification(email + ' admin yapildi!', 'success');
         await loadUserList();
@@ -3568,7 +3963,9 @@ async function giftUserEmail(email, pkg) {
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
-        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takim Paketi') + ' hediye edildi!');
+        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takim Paketi') + ' 
+
+hediye edildi!');
         await inbox.save();
         showNotification(email + ' adresine ' + pkg + ' paketi hediye edildi!', 'success');
         await loadUserList();
@@ -3617,7 +4014,9 @@ async function setAdminPassword() {
     var pass = document.getElementById('adminPass').value;
     var pass2 = document.getElementById('adminPass2').value;
     if (!email || pass.length < 8 || pass !== pass2) {
-        showNotification('Tum alanlari doldurun, sifreler ayni ve min 8 karakter', 'error');
+        showNotification('Tum alanlari doldurun, sifreler ayni ve min 8 karakter', 
+
+'error');
         return;
     }
     try {
@@ -3646,9 +4045,15 @@ function openModal(type) {
 }
 
 function switchTab(tab) {
-    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none';
-    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none';
-    document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 'none';
+    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 
+
+'none';
+    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 
+
+'none';
+    document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 
+
+'none';
     var tabs = document.querySelectorAll('.modal-tab');
     for (var i = 0; i < tabs.length; i++) {
         tabs[i].classList.remove('active');
@@ -3668,22 +4073,46 @@ async function loadComments() {
         var comments = await Parse.Cloud.run('getComments');
         var container = document.getElementById('commentsList');
         if (!comments || comments.length === 0) {
-            container.innerHTML = '<div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">🌟 Ilk yorumu sen yap!</div>';
+            container.innerHTML = '<div class="comment-item" style="border-left-color: var
+
+(--accent2); text-align: center; color: var(--text3);">🌟 Ilk yorumu sen yap!</div>';
             return;
         }
-        var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 'user': '👤 KULLANICI' };
-        var roleColors = { 'founder': 'var(--gold)', 'admin': 'var(--accent)', 'beta': 'var(--purple)', 'user': 'var(--text3)' };
+        var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 
+
+'user': '👤 KULLANICI' };
+        var roleColors = { 'founder': 'var(--gold)', 'admin': 'var(--accent)', 'beta': 
+
+'var(--purple)', 'user': 'var(--text3)' };
         var html = '';
         for (var i = 0; i < comments.length; i++) {
             var c = comments[i];
             var color = roleColors[c.user_role] || 'var(--border)';
             var label = roleLabels[c.user_role] || '👤 KULLANICI';
-            html += '<div class="comment-item" style="border-left-color: ' + color + ';"><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"><strong style="color: var(--accent2);">' + (c.user_name || 'Isimsiz') + '</strong><span class="role-badge ' + (c.user_role || 'user') + '" style="border-color: ' + color + '; color: ' + color + ';">' + label + '</span><span class="comment-email">📧 ' + (c.user_email || '---') + '</span><span class="comment-time" style="margin-left: auto;">' + new Date(c.createdAt).toLocaleString('tr-TR') + '</span></div><div class="comment-text">' + c.comment + '</div></div>';
+            html += '<div class="comment-item" style="border-left-color: ' + color + 
+
+';"><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"><strong 
+
+style="color: var(--accent2);">' + (c.user_name || 'Isimsiz') + '</strong><span 
+
+class="role-badge ' + (c.user_role || 'user') + '" style="border-color: ' + color + '; 
+
+color: ' + color + ';">' + label + '</span><span class="comment-email">📧 ' + (c.user_email 
+
+|| '---') + '</span><span class="comment-time" style="margin-left: auto;">' + new Date
+
+(c.createdAt).toLocaleString('tr-TR') + '</span></div><div class="comment-text">' + 
+
+c.comment + '</div></div>';
         }
         container.innerHTML = html;
     } catch(e) {
         console.error('Yorumlar yuklenemedi:', e);
-        document.getElementById('commentsList').innerHTML = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);;">⚠️ Yorumlar yuklenemedi: ' + e.message + '</div>';
+        document.getElementById('commentsList').innerHTML = '<div class="comment-item" 
+
+style="border-left-color: var(--danger); text-align: center; color: var(--danger);;">⚠️ 
+
+Yorumlar yuklenemedi: ' + e.message + '</div>';
     }
 }
 
@@ -3717,8 +4146,12 @@ function updateCommentUI() {
         if (form) form.style.display = 'block';
         if (loginMsg) loginMsg.style.display = 'none';
         if (userName) userName.textContent = currentUser.get('name') || 'Kullanici';
-        var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 'user': '👤 KULLANICI' };
-        if (userRole) userRole.textContent = roleLabels[currentUser.get('role')] || '👤 KULLANICI';
+        var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 
+
+'user': '👤 KULLANICI' };
+        if (userRole) userRole.textContent = roleLabels[currentUser.get('role')] || '👤 
+
+KULLANICI';
     } else {
         if (form) form.style.display = 'none';
         if (loginMsg) loginMsg.style.display = 'block';
@@ -3731,7 +4164,9 @@ if (particlesContainer) {
     for (var i = 0; i < 60; i++) {
         var p = document.createElement('div');
         p.className = 'particle';
-        p.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';
+        p.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + 
+
+Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';
         particlesContainer.appendChild(p);
     }
 }
@@ -3758,8 +4193,12 @@ if (cursor && ring) {
     var btns = document.querySelectorAll('button, a, .btn, .secret-btn, .support-link');
     for (var i = 0; i < btns.length; i++) {
         (function(btn) {
-            btn.addEventListener('mouseenter', function() { cursor.classList.add('hover'); });
-            btn.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); });
+            btn.addEventListener('mouseenter', function() { cursor.classList.add('hover'); 
+
+});
+            btn.addEventListener('mouseleave', function() { cursor.classList.remove
+
+('hover'); });
         })(btns[i]);
     }
 }
@@ -3791,7 +4230,9 @@ window.onload = async function() {
                     await loadComments();
                     
                     // SADECE ADMIN/FOUNDER ise admin kontrolü
-                    if (currentUser.get('role') === 'admin' || currentUser.get('role') === 'founder') {
+                    if (currentUser.get('role') === 'admin' || currentUser.get('role') === 
+
+'founder') {
                         try {
                             await Parse.Cloud.run('initAdminUsers');
                             console.log('✅ Admin hesaplar kontrol edildi');
