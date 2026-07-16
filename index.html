@@ -1155,7 +1155,7 @@ footer {
     font-weight: 600;
 }
 
-/* ========== VİZYON AI FULL PANEL ========== */
+/* ========== VİZYON AI FULL PANEL (MODERN) ========== */
 .vizyon-ai-panel {
     display: none;
     position: fixed;
@@ -1197,6 +1197,7 @@ footer {
     max-width: 900px;
     width: 100%;
     margin: 0 auto;
+    align-items: center;
 }
 .vizyon-ai-input {
     flex: 1;
@@ -1208,6 +1209,8 @@ footer {
     font-family: var(--font-code);
     font-size: 13px;
     resize: none;
+    min-height: 60px;
+    transition: border-color 0.3s;
 }
 .vizyon-ai-input:focus {
     outline: none;
@@ -2184,14 +2187,21 @@ class="glow-input" style="flex:1;min-width:200px;">
             <div class="logo-icon">✨</div>
             <div class="logo-text">VİZYON AI</div>
         </div>
-        <button class="btn-secondary btn-sm" onclick="closeFullAIPanel()">✕ Kapat</button>
+        <div style="display:flex; gap:8px; align-items:center;">
+            <span style="color:var(--text3); font-size:12px;">⚡ 7 Model</span>
+            <button class="btn-secondary btn-sm" onclick="closeFullAIPanel()">✕ Kapat</button>
+        </div>
     </div>
     <div id="fullAIChat" class="vizyon-ai-chat">
-        <div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Size nasıl yardımcı olabilirim?</div>
+        <div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Size nasıl yardımcı olabilirim? Dosya yükleyebilir, kod yazabilir veya soru sorabilirsiniz.</div>
     </div>
     <div class="vizyon-ai-input-area">
         <textarea id="fullAIInput" class="vizyon-ai-input" placeholder="Her dilde yazabilirsin... (Python, JavaScript, React, SQL...)" rows="2" onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendFullAI(); }"></textarea>
-        <button class="btn-primary" onclick="sendFullAI()">⚡ Gönder</button>
+        <div style="display:flex; gap:8px;">
+            <button class="btn-secondary" onclick="document.getElementById('fullFileInput').click()" style="padding:10px 16px; font-size:18px;">📎</button>
+            <input type="file" id="fullFileInput" style="display:none;" accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip" onchange="uploadFullFile(this)">
+            <button class="btn-primary" onclick="sendFullAI()" style="padding:10px 20px;">⚡ Gönder</button>
+        </div>
     </div>
 </div>
 
@@ -2924,7 +2934,11 @@ async function loadInbox() {
     <!-- JS-3: TAKIM VE AI (Cloud Code ile + Temizleme)              -->
     <!-- ============================================================ -->
     <script>
-        async function loadTeamInfo() {
+        // ============================================================
+// JS-3: TAKIM VE AI (Cloud Code ile + Dosya Yükleme)
+// ============================================================
+
+async function loadTeamInfo() {
     if (!currentUser) return;
     var teamId = currentUser.get('teamId');
     if (!teamId) {
@@ -3133,6 +3147,38 @@ async function sendAiMessage() {
     var cleaned = cleanClientResponse(response);
     msgs.innerHTML += '<div class="ai-msg bot">' + cleaned + '</div>';
     msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ========== DOSYA YÜKLEME (FULL PANEL) ==========
+async function uploadFullFile(input) {
+    var file = input.files[0];
+    if (!file) return;
+    
+    showNotification('Dosya yükleniyor...', 'success');
+    
+    try {
+        var parseFile = new Parse.File(file.name, file);
+        await parseFile.save();
+        var url = parseFile.url();
+        
+        showNotification('✅ Dosya yüklendi! AI analiz ediyor...', 'success');
+        
+        var reader = new FileReader();
+        reader.onload = async function(event) {
+            var content = event.target.result;
+            var inputArea = document.getElementById('fullAIInput');
+            if (inputArea) {
+                inputArea.value = '📄 Dosya: ' + file.name + '\n\nİçeriği analiz et ve özetle:\n\n' + content.substring(0, 1500);
+                sendFullAI();
+            }
+        };
+        reader.readAsText(file);
+        
+    } catch(e) {
+        console.error('Dosya yükleme hatası:', e);
+        showNotification('❌ Dosya yüklenemedi: ' + e.message, 'error');
+    }
+    input.value = '';
 }
     </script>
 
