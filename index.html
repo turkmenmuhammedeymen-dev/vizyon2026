@@ -3046,13 +3046,22 @@ async function sendTeamMessage() {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 }
 
-// ========== YANIT TEMİZLEME + KOPYALA BUTONU ==========
+// ========== YANIT TEMİZLEME + KOD BLOĞU + KOPYALA ==========
 function cleanClientResponse(text) {
     if (!text) return text;
-    // Kod bloklarını işaretle ve kopyala butonu ekle
+    
+    // 1. Önce kod bloklarını işaretle
     var withCopy = text.replace(/```(\w+)?\n([\s\S]*?)```/g, function(match, lang, code) {
         return '<div class="code-block"><pre><code class="language-' + (lang || '') + '">' + code + '</code></pre><button class="copy-btn" onclick="copyCode(this)">📋 Kopyala</button></div>';
     });
+    
+    // 2. Eğer yukarıdaki regex çalışmadıysa (tek satırlık kodlar için)
+    // Tek backtick ile yazılan kodları işaretle
+    withCopy = withCopy.replace(/`([^`]+)`/g, '<code>$1</code>');
+    
+    // 3. Eğer ``` olmadan kod varsa (örnek: "şu kodu yaz: print('merhaba')")
+    // Bunlar için özel bir şey yapmıyoruz, normal metin olarak kalıyor
+    
     return withCopy
         .replace(/\\n/g, '<br>')
         .replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
@@ -3062,19 +3071,21 @@ function cleanClientResponse(text) {
         .replace(/&quot;/g, '"')
         .replace(/&#39;/g, "'")
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/`([^`]+)`/g, '<code>$1</code>');
+        .replace(/\*(.*?)\*/g, '<em>$1</em>');
 }
 
 // ========== KOPYALAMA FONKSİYONU ==========
 function copyCode(btn) {
     var codeBlock = btn.parentElement.querySelector('code');
-    if (!codeBlock) return;
+    if (!codeBlock) {
+        console.error('Kod bloğu bulunamadı!');
+        return;
+    }
     var code = codeBlock.textContent;
+    var originalText = btn.innerHTML;
     
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(code).then(function() {
-            var originalText = btn.innerHTML;
             btn.innerHTML = '✅ Kopyalandı!';
             btn.style.borderColor = '#00ff88';
             btn.style.color = '#00ff88';
@@ -3084,7 +3095,7 @@ function copyCode(btn) {
                 btn.style.color = '';
             }, 2000);
         }).catch(function(err) {
-            console.error('Kopyalama hatası:', err);
+            console.error('Clipboard hatası:', err);
             fallbackCopy(code, btn);
         });
     } else {
@@ -3135,7 +3146,6 @@ function openCamera() {
     input.capture = 'environment';
     input.onchange = function(e) {
         if (e.target.files && e.target.files[0]) {
-            // Dosya yükleme işlemini başlat
             var fakeEvent = { target: { files: e.target.files } };
             uploadFullFile(fakeEvent.target);
         }
@@ -3246,7 +3256,6 @@ async function uploadFullFile(input) {
     var file = input.files[0];
     if (!file) return;
     
-    // Menüyü kapat
     var menu = document.getElementById('fileMenu');
     if (menu) menu.style.display = 'none';
     
@@ -3264,7 +3273,6 @@ async function uploadFullFile(input) {
             var content = event.target.result;
             var inputArea = document.getElementById('fullAIInput');
             if (inputArea) {
-                // Dosya türüne göre mesaj oluştur
                 var fileType = file.type;
                 var fileSize = (file.size / 1024).toFixed(1);
                 var fileMsg = '📄 Dosya: ' + file.name + '\n';
@@ -3273,7 +3281,6 @@ async function uploadFullFile(input) {
                 
                 if (fileType && fileType.startsWith('image/')) {
                     fileMsg += '🖼️ Bu bir görsel dosyası. Lütfen görseli analiz et ve içeriğini detaylıca açıkla.';
-                    // Görsel için base64 ekle
                     fileMsg += '\n\n(Görsel verisi: ' + content.substring(0, 200) + '...)';
                 } else if (fileType === 'application/pdf') {
                     fileMsg += '📄 Bu bir PDF dosyası. Lütfen içeriğini analiz et ve özetle.';
@@ -3285,12 +3292,9 @@ async function uploadFullFile(input) {
             }
         };
         
-        // Dosya türüne göre oku
         if (file.type && file.type.startsWith('image/')) {
-            // Görsel dosyası için base64 oku
             reader.readAsDataURL(file);
         } else {
-            // Metin dosyası için text oku
             reader.readAsText(file);
         }
         
@@ -3301,7 +3305,7 @@ async function uploadFullFile(input) {
     input.value = '';
 }
 
-// ========== CSS (Kopyala Butonu Stili) ==========
+// ========== KOPYALA BUTONU STİLLERİ ==========
 (function addCopyButtonStyles() {
     var style = document.createElement('style');
     style.textContent = `
