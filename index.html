@@ -78,8 +78,27 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
 /* ===== İLERLEME ÇUBUĞU ===== */
 .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2), var(--purple)); z-index: 200; transition: width 0.1s; }
 
-/* ===== BİLDİRİM ===== */
-.notification { position: fixed; bottom: 32px; left: 32px; padding: 14px 20px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent2); border-radius: 12px; z-index: 600; transform: translateY(100px); opacity: 0; transition: all 0.4s ease; backdrop-filter: blur(12px); max-width: 360px; font-size: 13px; color: var(--text2); box-shadow: var(--shadow-lg); font-family: var(--font-body); }
+/* ===== BİLDİRİM (z-index ARTIRILDI) ===== */
+.notification {
+    position: fixed;
+    bottom: 32px;
+    left: 32px;
+    padding: 14px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent2);
+    border-radius: 12px;
+    z-index: 999999;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.4s ease;
+    backdrop-filter: blur(12px);
+    max-width: 360px;
+    font-size: 13px;
+    color: var(--text2);
+    box-shadow: var(--shadow-lg);
+    font-family: var(--font-body);
+}
 .notification.show { transform: translateY(0); opacity: 1; }
 .notification.error { border-left-color: var(--danger); }
 .notification.warning { border-left-color: var(--warning); }
@@ -951,13 +970,13 @@ footer {
     color: var(--bg);
 }
 
-/* ========== MODAL ========== */
+/* ========== MODAL (z-index ARTIRILDI) ========== */
 .modal-overlay {
     display: none;
     position: fixed;
     inset: 0;
     background: rgba(5,10,15,0.96);
-    z-index: 2000;
+    z-index: 99999;
     backdrop-filter: blur(12px);
     align-items: center;
     justify-content: center;
@@ -2312,19 +2331,25 @@ function closeModal(id) {
     if (modal) modal.classList.remove('open');
 }
 
-// ========== OTOMATİK OTURUM KONTROLÜ ==========
+// ========== OTOMATİK OTURUM KONTROLÜ (GÜNCELLENMİŞ) ==========
 async function checkSession() {
     try {
         var user = Parse.User.current();
         if (user) {
-            await user.fetch();
-            return true;
+            try {
+                await user.fetch();
+                return true;
+            } catch(e) {
+                console.log('Oturum geçersiz, çıkış yapılıyor...');
+                await Parse.User.logOut();
+                localStorage.removeItem('vizyon_user');
+                currentUser = null;
+                return false;
+            }
         }
         return false;
     } catch(e) {
-        console.log('Oturum geçersiz, çıkış yapılıyor...');
-        await Parse.User.logOut();
-        localStorage.removeItem('vizyon_user');
+        console.log('Oturum kontrol hatası:', e);
         return false;
     }
 }
@@ -2565,7 +2590,6 @@ window.loginWithGoogle = async function() {
         
     } catch(e) {
         console.error('Google giriş hatası:', e);
-        
         var errorMsg = e.message || 'Bilinmeyen hata';
         if (errorMsg.indexOf('id token is invalid') !== -1 || errorMsg.indexOf('invalid') !== -1) {
             showNotification('❌ Google giriş hatası: Back4App Dashboard → App Settings → Authentication → Google bölümünden Google Authentication\'ı aktifleştirin ve Client ID/Secret ekleyin.', 'error');
@@ -2612,7 +2636,6 @@ window.loginWithFacebook = async function() {
         
     } catch(e) {
         console.error('Facebook giriş hatası:', e);
-        
         var errorMsg = e.message || 'Bilinmeyen hata';
         if (errorMsg.indexOf('invalid') !== -1) {
             showNotification('❌ Facebook giriş hatası: Back4App Dashboard → App Settings → Authentication → Facebook bölümünden Facebook Authentication\'ı aktifleştirin ve App ID/Secret ekleyin.', 'error');
@@ -2934,6 +2957,24 @@ async function loadInbox() {
         console.error('Mesajlar yüklenirken hata:', e);
         document.getElementById('inboxList').innerHTML = '<div class="inbox-item">⚠️ Mesajlar yüklenemedi.</div>';
     }
+}
+
+// ========== OTOMATİK YÖNLENDİRME (Kayıt/Giriş/Doğrulama) ==========
+function switchTab(tab) {
+    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none';
+    document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 'none';
+    var tabs = document.querySelectorAll('.modal-tab');
+    for (var i = 0; i < tabs.length; i++) {
+        tabs[i].classList.remove('active');
+    }
+    if (tab === 'login') tabs[0].classList.add('active');
+    else if (tab === 'register') tabs[1].classList.add('active');
+    else if (tab === 'verify') tabs[2].classList.add('active');
+    
+    // Modal'ı otomatik aç
+    var modal = document.getElementById('authModal');
+    if (modal) modal.classList.add('open');
 }
     </script>
 
