@@ -3472,6 +3472,7 @@ function checkRole() {
         (currentRole === 'BETA' && pass === '4402');
     if (valid) {
         closeModal('rolePanel');
+        // Tam ekran AI panelini aç
         openFullAIPanel();
         document.querySelector('.vizyon-ai-header .logo-text').innerHTML =
             currentRole === 'FOUNDER' ? '👑 FOUNDER AI' :
@@ -3676,6 +3677,40 @@ function openRandomSupport() {
     showNotification('Destek maili aciliyor', 'success');
 }
 
+// ========== SOHBET GEÇMİŞİNİ YÜKLE ==========
+async function loadChatHistory() {
+    if (!currentUser) return;
+    try {
+        var result = await Parse.Cloud.run('getChatHistory');
+        if (result.success && result.messages && result.messages.length > 0) {
+            // Sohbet geçmişini AI paneline yükle
+            var chat = document.getElementById('fullAIChat');
+            if (chat) {
+                chat.innerHTML = '';
+                for (var i = 0; i < result.messages.length; i++) {
+                    var msg = result.messages[i];
+                    var cls = msg.role === 'user' ? 'user' : 'bot';
+                    chat.innerHTML += '<div class="ai-msg ' + cls + '">' + msg.content + '</div>';
+                }
+                chat.scrollTop = chat.scrollHeight;
+            }
+        }
+    } catch(e) {
+        console.log('Sohbet geçmişi yüklenemedi:', e.message);
+    }
+}
+
+// ========== SOHBET GEÇMİŞİNİ KAYDET ==========
+async function saveChatHistory(messages) {
+    if (!currentUser) return;
+    try {
+        await Parse.Cloud.run('saveChatHistory', { messages: messages });
+    } catch(e) {
+        console.log('Sohbet geçmişi kaydedilemedi:', e.message);
+    }
+}
+
+// ========== YORUMLAR ==========
 async function loadComments() {
     try {
         var comments = await Parse.Cloud.run('getComments');
@@ -3802,6 +3837,8 @@ window.onload = async function() {
                     await showDashboard();
                     updateCommentUI();
                     await loadComments();
+                    // Sohbet geçmişini yükle (giriş yapmış herkes)
+                    await loadChatHistory();
                     
                     // SADECE ADMIN/FOUNDER ise admin kontrolü
                     if (currentUser.get('role') === 'admin' || currentUser.get('role') === 'founder') {
