@@ -2419,8 +2419,20 @@ function stopStatsInterval() {
 // JS-2: KAYIT, GİRİŞ, GOOGLE, FACEBOOK, PROJE YÖNETİMİ
 // ============================================================
 
-// ========== KAYIT ==========
+// ========== KAYIT (OTURUM KONTROLLÜ) ==========
 async function handleRegister() {
+    // Önce oturumu kontrol et, açık ise çıkış yap
+    if (currentUser) {
+        try {
+            await Parse.User.logOut();
+            currentUser = null;
+            localStorage.removeItem('vizyon_user');
+            console.log('✅ Önceki oturum kapatıldı');
+        } catch(e) {
+            console.log('Çıkış hatası:', e);
+        }
+    }
+    
     var name = document.getElementById('rName').value.trim();
     var email = document.getElementById('rEmail').value.trim();
     var p1 = document.getElementById('rPass').value;
