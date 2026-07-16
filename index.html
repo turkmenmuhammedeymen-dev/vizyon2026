@@ -2197,9 +2197,16 @@ class="glow-input" style="flex:1;min-width:200px;">
     </div>
     <div class="vizyon-ai-input-area">
         <textarea id="fullAIInput" class="vizyon-ai-input" placeholder="Her dilde yazabilirsin... (Python, JavaScript, React, SQL...)" rows="2" onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendFullAI(); }"></textarea>
-        <div style="display:flex; gap:8px;">
-            <button class="btn-secondary" onclick="document.getElementById('fullFileInput').click()" style="padding:10px 16px; font-size:18px;">📎</button>
-            <input type="file" id="fullFileInput" style="display:none;" accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip" onchange="uploadFullFile(this)">
+        <div style="display:flex; gap:8px; position:relative;">
+            <!-- ➕ ARTI BUTONU - Dosya yükleme menüsü -->
+            <button class="btn-secondary" onclick="toggleFileMenu()" style="padding:10px 16px; font-size:18px;">➕</button>
+            <!-- Dosya menüsü -->
+            <div id="fileMenu" style="display:none; position:absolute; bottom:70px; right:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:8px; z-index:10001; min-width:180px; box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+                <button onclick="openCamera()" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📷 Fotoğraf Çek</button>
+                <button onclick="document.getElementById('fullFileInput').click(); toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📁 Galeriden Seç</button>
+                <button onclick="document.getElementById('fullFileInput').click(); toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📄 Dosya Yükle</button>
+            </div>
+            <input type="file" id="fullFileInput" style="display:none;" accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip,.png,.jpg,.jpeg,.gif,.bmp,.svg,.webp" onchange="uploadFullFile(this)">
             <button class="btn-primary" onclick="sendFullAI()" style="padding:10px 20px;">⚡ Gönder</button>
         </div>
     </div>
@@ -2935,7 +2942,7 @@ async function loadInbox() {
     <!-- ============================================================ -->
     <script>
         // ============================================================
-// JS-3: TAKIM VE AI (Cloud Code ile + Dosya Yükleme)
+// JS-3: TAKIM VE AI (Cloud Code ile + Dosya Yükleme + Kopyala)
 // ============================================================
 
 async function loadTeamInfo() {
@@ -3039,9 +3046,14 @@ async function sendTeamMessage() {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 }
 
+// ========== YANIT TEMİZLEME + KOPYALA BUTONU ==========
 function cleanClientResponse(text) {
     if (!text) return text;
-    return text
+    // Kod bloklarını işaretle ve kopyala butonu ekle
+    var withCopy = text.replace(/```(\w+)?\n([\s\S]*?)```/g, function(match, lang, code) {
+        return '<div class="code-block"><pre><code class="language-' + (lang || '') + '">' + code + '</code></pre><button class="copy-btn" onclick="copyCode(this)">📋 Kopyala</button></div>';
+    });
+    return withCopy
         .replace(/\\n/g, '<br>')
         .replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
         .replace(/&lt;/g, '<')
@@ -3051,9 +3063,87 @@ function cleanClientResponse(text) {
         .replace(/&#39;/g, "'")
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+        .replace(/`([^`]+)`/g, '<code>$1</code>');
 }
 
+// ========== KOPYALAMA FONKSİYONU ==========
+function copyCode(btn) {
+    var codeBlock = btn.parentElement.querySelector('code');
+    if (!codeBlock) return;
+    var code = codeBlock.textContent;
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(function() {
+            var originalText = btn.innerHTML;
+            btn.innerHTML = '✅ Kopyalandı!';
+            btn.style.borderColor = '#00ff88';
+            btn.style.color = '#00ff88';
+            setTimeout(function() {
+                btn.innerHTML = originalText;
+                btn.style.borderColor = '';
+                btn.style.color = '';
+            }, 2000);
+        }).catch(function(err) {
+            console.error('Kopyalama hatası:', err);
+            fallbackCopy(code, btn);
+        });
+    } else {
+        fallbackCopy(code, btn);
+    }
+}
+
+function fallbackCopy(code, btn) {
+    var textarea = document.createElement('textarea');
+    textarea.value = code;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        var originalText = btn.innerHTML;
+        btn.innerHTML = '✅ Kopyalandı!';
+        btn.style.borderColor = '#00ff88';
+        btn.style.color = '#00ff88';
+        setTimeout(function() {
+            btn.innerHTML = originalText;
+            btn.style.borderColor = '';
+            btn.style.color = '';
+        }, 2000);
+    } catch(e) {
+        console.error('Kopyalama hatası:', e);
+        alert('Kopyalanamadı. Lütfen manuel kopyalayın.');
+    }
+    document.body.removeChild(textarea);
+}
+
+// ========== DOSYA MENÜSÜ ==========
+function toggleFileMenu() {
+    var menu = document.getElementById('fileMenu');
+    if (menu) {
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+// ========== KAMERA ==========
+function openCamera() {
+    document.getElementById('fileMenu').style.display = 'none';
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.capture = 'environment';
+    input.onchange = function(e) {
+        if (e.target.files && e.target.files[0]) {
+            // Dosya yükleme işlemini başlat
+            var fakeEvent = { target: { files: e.target.files } };
+            uploadFullFile(fakeEvent.target);
+        }
+    };
+    input.click();
+}
+
+// ========== AI MODELLERİ ==========
 async function callAllAIModels(prompt) {
     try {
         return await Parse.Cloud.run('superAI', { prompt: prompt });
@@ -3072,6 +3162,7 @@ async function webSearch(query) {
     }
 }
 
+// ========== DASHBOARD AI ==========
 window.sendDashboardAI = async function() {
     if (!await useQuery()) return;
     var inp = document.getElementById('dashboardAiInput');
@@ -3092,6 +3183,7 @@ window.sendDashboardAI = async function() {
     container.scrollTop = container.scrollHeight;
 };
 
+// ========== FULL PANEL ==========
 function openFullAIPanel() {
     document.getElementById('fullAIPanel').style.display = 'flex';
 }
@@ -3110,7 +3202,7 @@ async function sendFullAI() {
     inp.value = '';
     chat.scrollTop = chat.scrollHeight;
     var response;
-    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1) {
+    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('hava') !== -1) {
         response = await webSearch(msg);
     } else {
         response = await callAllAIModels(msg);
@@ -3154,7 +3246,11 @@ async function uploadFullFile(input) {
     var file = input.files[0];
     if (!file) return;
     
-    showNotification('Dosya yükleniyor...', 'success');
+    // Menüyü kapat
+    var menu = document.getElementById('fileMenu');
+    if (menu) menu.style.display = 'none';
+    
+    showNotification('📤 Dosya yükleniyor: ' + file.name, 'success');
     
     try {
         var parseFile = new Parse.File(file.name, file);
@@ -3168,11 +3264,35 @@ async function uploadFullFile(input) {
             var content = event.target.result;
             var inputArea = document.getElementById('fullAIInput');
             if (inputArea) {
-                inputArea.value = '📄 Dosya: ' + file.name + '\n\nİçeriği analiz et ve özetle:\n\n' + content.substring(0, 1500);
+                // Dosya türüne göre mesaj oluştur
+                var fileType = file.type;
+                var fileSize = (file.size / 1024).toFixed(1);
+                var fileMsg = '📄 Dosya: ' + file.name + '\n';
+                fileMsg += '📁 Boyut: ' + fileSize + ' KB\n';
+                fileMsg += '📋 Tür: ' + (fileType || 'Bilinmiyor') + '\n\n';
+                
+                if (fileType && fileType.startsWith('image/')) {
+                    fileMsg += '🖼️ Bu bir görsel dosyası. Lütfen görseli analiz et ve içeriğini detaylıca açıkla.';
+                    // Görsel için base64 ekle
+                    fileMsg += '\n\n(Görsel verisi: ' + content.substring(0, 200) + '...)';
+                } else if (fileType === 'application/pdf') {
+                    fileMsg += '📄 Bu bir PDF dosyası. Lütfen içeriğini analiz et ve özetle.';
+                } else {
+                    fileMsg += '📝 İçeriği analiz et ve özetle:\n\n' + content.substring(0, 2000);
+                }
+                inputArea.value = fileMsg;
                 sendFullAI();
             }
         };
-        reader.readAsText(file);
+        
+        // Dosya türüne göre oku
+        if (file.type && file.type.startsWith('image/')) {
+            // Görsel dosyası için base64 oku
+            reader.readAsDataURL(file);
+        } else {
+            // Metin dosyası için text oku
+            reader.readAsText(file);
+        }
         
     } catch(e) {
         console.error('Dosya yükleme hatası:', e);
@@ -3180,6 +3300,69 @@ async function uploadFullFile(input) {
     }
     input.value = '';
 }
+
+// ========== CSS (Kopyala Butonu Stili) ==========
+(function addCopyButtonStyles() {
+    var style = document.createElement('style');
+    style.textContent = `
+        .code-block {
+            position: relative;
+            background: #0a0a0a;
+            border-radius: 8px;
+            margin: 8px 0;
+            padding: 12px 12px 12px 12px;
+            border: 1px solid rgba(0,212,255,0.1);
+        }
+        .code-block pre {
+            margin: 0;
+            padding: 0;
+            overflow-x: auto;
+            padding-right: 70px;
+        }
+        .code-block code {
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            color: #e0e0e0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0,212,255,0.12);
+            border: 1px solid rgba(0,212,255,0.2);
+            color: var(--text3);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+        }
+        .copy-btn:hover {
+            background: rgba(0,212,255,0.25);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+    `;
+    document.head.appendChild(style);
+})();
+
+// ========== DOSYA MENÜSÜ DIŞINA TIKLAYINCA KAPAT ==========
+document.addEventListener('click', function(e) {
+    var menu = document.getElementById('fileMenu');
+    var btn = document.querySelector('[onclick="toggleFileMenu()"]');
+    if (menu && menu.style.display !== 'none') {
+        if (!menu.contains(e.target) && !btn.contains(e.target)) {
+            menu.style.display = 'none';
+        }
+    }
+});
     </script>
 
     <!-- ============================================================ -->
