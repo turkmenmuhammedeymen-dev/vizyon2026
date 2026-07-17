@@ -78,7 +78,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
 /* ===== İLERLEME ÇUBUĞU ===== */
 .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2), var(--purple)); z-index: 200; transition: width 0.1s; }
 
-/* ===== BİLDİRİM ===== */
+/* ===== BİLDİRİM (z-index ARTIRILDI) ===== */
 .notification {
     position: fixed;
     bottom: 32px;
@@ -410,9 +410,15 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
     transition: all var(--transition-fast);
 }
 .mbadge:hover { transform: scale(1.05); }
-.mbadge.a { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,0.06); }
-.mbadge.b { border-color: var(--accent2); color: var(--accent2); background: rgba(0,255,136,0.06); }
-.mbadge.c { border-color: var(--purple); color: var(--purple); background: rgba(168,85,247,0.06); }
+.mbadge.a { border-color: var(--accent); color: var(--accent); background: rgba
+
+(0,212,255,0.06); }
+.mbadge.b { border-color: var(--accent2); color: var(--accent2); background: rgba
+
+(0,255,136,0.06); }
+.mbadge.c { border-color: var(--purple); color: var(--purple); background: rgba
+
+(168,85,247,0.06); }
 .ai-chat-msg {
     padding: 20px;
     border-left: 3px solid;
@@ -774,6 +780,7 @@ footer {
     opacity: 0.4;
     margin-top: 6px;
 }
+
 .ai-input-area {
     display: flex;
     gap: 12px;
@@ -1167,7 +1174,7 @@ footer {
     font-weight: 600;
 }
 
-/* ========== VİZYON AI FULL PANEL (MODERN - ŞIKLAŞTIRILDI) ========== */
+/* ========== VİZYON AI FULL PANEL (MODERN) ========== */
 .vizyon-ai-panel {
     display: none;
     position: fixed;
@@ -1175,24 +1182,17 @@ footer {
     z-index: 10000;
     background: var(--bg);
     flex-direction: column;
-    background: linear-gradient(145deg, #050a0f 0%, #0d1a26 100%);
 }
 .vizyon-ai-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 16px 24px;
-    background: rgba(13,26,38,0.85);
-    backdrop-filter: blur(16px);
-    border-bottom: 2px solid rgba(0,212,255,0.3);
-    box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+    background: var(--surface);
+    border-bottom: 2px solid var(--accent);
 }
 .vizyon-ai-header .logo-text {
     font-size: 20px;
-    background: linear-gradient(45deg, var(--accent), var(--purple));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
 }
 .vizyon-ai-chat {
     flex: 1;
@@ -1204,22 +1204,10 @@ footer {
     max-width: 900px;
     width: 100%;
     margin: 0 auto;
-    background: radial-gradient(ellipse at 50% 0%, rgba(0,212,255,0.03) 0%, transparent 70%);
 }
 .vizyon-ai-chat .ai-msg {
     font-size: 14px;
     max-width: 90%;
-    animation: messageSlide 0.4s ease;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
-}
-.vizyon-ai-chat .ai-msg.user {
-    background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(168,85,247,0.15));
-    border: 1px solid rgba(0,212,255,0.15);
-}
-.vizyon-ai-chat .ai-msg.bot {
-    background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(0,212,255,0.06));
-    border: 1px solid rgba(0,255,136,0.08);
-    border-left: 3px solid var(--accent2);
 }
 .vizyon-ai-input-area {
     display: flex;
@@ -1229,14 +1217,11 @@ footer {
     width: 100%;
     margin: 0 auto;
     align-items: center;
-    background: rgba(13,26,38,0.6);
-    backdrop-filter: blur(12px);
-    border-top: 1px solid rgba(0,212,255,0.1);
 }
 .vizyon-ai-input {
     flex: 1;
-    background: rgba(5,10,15,0.8);
-    border: 1px solid rgba(0,212,255,0.15);
+    background: var(--surface);
+    border: 1px solid var(--border);
     color: var(--text);
     padding: 14px 18px;
     border-radius: 20px;
@@ -1244,68 +1229,11 @@ footer {
     font-size: 13px;
     resize: none;
     min-height: 60px;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    transition: border-color 0.3s;
 }
 .vizyon-ai-input:focus {
     outline: none;
     border-color: var(--accent);
-    box-shadow: 0 0 20px rgba(0,212,255,0.1);
-}
-.vizyon-ai-input::placeholder {
-    color: var(--text3);
-    opacity: 0.6;
-}
-
-/* ========== KOPYALA BUTONU STİLLERİ ========== */
-.code-block {
-    position: relative;
-    background: #0a0a0a;
-    border-radius: 8px;
-    margin: 8px 0;
-    padding: 12px;
-    border: 1px solid rgba(0,212,255,0.1);
-}
-.code-block pre {
-    margin: 0;
-    padding: 0;
-    overflow-x: auto;
-    padding-right: 70px;
-}
-.code-block code {
-    font-family: 'Fira Code', monospace;
-    font-size: 13px;
-    color: #e0e0e0;
-    white-space: pre-wrap;
-    word-break: break-word;
-}
-.code-block .copy-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: rgba(0,212,255,0.12);
-    border: 1px solid rgba(0,212,255,0.2);
-    color: var(--text3);
-    padding: 4px 12px;
-    border-radius: 6px;
-    font-size: 11px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
-}
-.code-block .copy-btn:hover {
-    background: rgba(0,212,255,0.25);
-    border-color: var(--accent);
-    color: var(--accent);
-}
-.code-block .copy-btn:active {
-    transform: scale(0.95);
-}
-.ai-message.bot .code-block {
-    background: #0d1a26;
-}
-.ai-message.bot .code-block code {
-    color: #ccdeee;
 }
 
 /* ========== PROFİL ========== */
@@ -1640,19 +1568,33 @@ footer {
             <div class="logo-text">VİZYON 2027</div>
         </div>
         <ul class="nav-links">
-            <li><a onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Özellikler</a></li>
-            <li><a onclick="document.getElementById('ai').scrollIntoView({behavior:'smooth'})">Yapay Zeka</a></li>
-            <li><a onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Fiyatlar</a></li>
+            <li><a onclick="document.getElementById('features').scrollIntoView
+
+({behavior:'smooth'})">Özellikler</a></li>
+            <li><a onclick="document.getElementById('ai').scrollIntoView
+
+({behavior:'smooth'})">Yapay Zeka</a></li>
+            <li><a onclick="document.getElementById('pricing').scrollIntoView
+
+({behavior:'smooth'})">Fiyatlar</a></li>
         </ul>
         <div class="button-group">
             <div class="secret-buttons">
-                <button class="secret-btn" onclick="openRolePanel('FOUNDER')">👑 FOUNDER</button>
-                <button class="secret-btn" onclick="openRolePanel('ADMIN')">⚙️ ADMIN</button>
+                <button class="secret-btn" onclick="openRolePanel('FOUNDER')">👑 
+
+FOUNDER</button>
+                <button class="secret-btn" onclick="openRolePanel('ADMIN')">⚙️ 
+
+ADMIN</button>
                 <button class="secret-btn" onclick="openRolePanel('BETA')">🔬 BETA</button>
             </div>
             <button class="nav-cta" onclick="openModal('login')">Giriş Yap</button>
-            <button class="btn-primary" onclick="openModal('register')">Ücretsiz Başla</button>
-            <button class="logout-btn" onclick="logout()" style="display:none">🚪 Çıkış</button>
+            <button class="btn-primary" onclick="openModal('register')">Ücretsiz 
+
+Başla</button>
+            <button class="logout-btn" onclick="logout()" style="display:none">🚪 
+
+Çıkış</button>
         </div>
     </nav>
 
@@ -1665,12 +1607,20 @@ footer {
         <h1 class="hero-title">
             <span class="line1">VİZYON AI</span>
             <span class="line2">SINIRSIZ YETENEK</span>
-            <span class="line3">Her dilde kod · Web arama · Dosya analiz · Takım Çalışması</span>
+            <span class="line3">Her dilde kod · Web arama · Dosya analiz · Takım 
+
+Çalışması</span>
         </h1>
-        <p class="hero-sub">⚡ VİZYON AI ile her dili konuş, her kodu yaz, takımınla çalış, projelerini yönet.</p>
+        <p class="hero-sub">⚡ VİZYON AI ile her dili konuş, her kodu yaz, takımınla çalış, 
+
+projelerini yönet.</p>
         <div class="hero-actions">
-            <button class="btn-primary" onclick="openFullAIPanel()">⚡ VİZYON AI'ı Başlat</button>
-            <button class="btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Daha Fazla →</button>
+            <button class="btn-primary" onclick="openFullAIPanel()">⚡ VİZYON AI'ı 
+
+Başlat</button>
+            <button class="btn-secondary" onclick="document.getElementById
+
+('features').scrollIntoView({behavior:'smooth'})">Daha Fazla →</button>
         </div>
         <div class="stats-bar">
             <div class="stat-item">
@@ -1702,13 +1652,35 @@ footer {
                 <span class="editor-filename">vizyon2027/ai_core.py</span>
             </div>
             <div class="editor-body">
-                <div class="code-line"><span class="ln">1</span><span class="code"><span class="cm"># VİZYON AI — Süper Yapay Zeka</span></span></div>
-                <div class="code-line"><span class="ln">2</span><span class="code"><span class="kw">from</span> vizyon_ai <span class="kw">import</span> <span class="fn">SuperAI</span></div>
-                <div class="code-line"><span class="ln">3</span><span class="code"></span></div>
-                <div class="code-line"><span class="ln">4</span><span class="code">ai = <span class="fn">SuperAI</span>()</div>
-                <div class="code-line"><span class="ln">5</span><span class="code">ai.<span class="fn">birleştir</span>(<span class="str">"GPT-4o"</span>, <span class="str">"Claude"</span>, <span class="str">"Gemini"</span>, <span class="str">"DeepSeek"</span>)</div>
-                <div class="code-line"><span class="ln">6</span><span class="code">cevap = ai.<span class="fn">kod_yaz</span>(<span class="str">"Python'da hesap makinesi"</span>)</div>
-                <div class="code-line"><span class="ln">7</span><span class="code"><span class="fn">print</span>(cevap)  <span class="cm"># Tam çalışan kod gelir!</span></div>
+                <div class="code-line"><span class="ln">1</span><span class="code"><span 
+
+class="cm"># VİZYON AI — Süper Yapay Zeka</span></span></div>
+                <div class="code-line"><span class="ln">2</span><span class="code"><span 
+
+class="kw">from</span> vizyon_ai <span class="kw">import</span> <span 
+
+class="fn">SuperAI</span></div>
+                <div class="code-line"><span class="ln">3</span><span 
+
+class="code"></span></div>
+                <div class="code-line"><span class="ln">4</span><span class="code">ai = 
+
+<span class="fn">SuperAI</span>()</div>
+                <div class="code-line"><span class="ln">5</span><span class="code">ai.<span 
+
+class="fn">birleştir</span>(<span class="str">"GPT-4o"</span>, <span 
+
+class="str">"Claude"</span>, <span class="str">"Gemini"</span>, <span 
+
+class="str">"DeepSeek"</span>)</div>
+                <div class="code-line"><span class="ln">6</span><span class="code">cevap = 
+
+ai.<span class="fn">kod_yaz</span>(<span class="str">"Python'da hesap makinesi"</span>)
+
+</div>
+                <div class="code-line"><span class="ln">7</span><span class="code"><span 
+
+class="fn">print</span>(cevap)  <span class="cm"># Tam çalışan kod gelir!</span></div>
             </div>
         </div>
     </div>
@@ -1723,27 +1695,37 @@ footer {
             <div class="feature-card">
                 <div class="feature-icon">🤖</div>
                 <div class="feature-title">7 Model Tek Çatı</div>
-                <p class="feature-desc">GPT-4o, Claude, Gemini, DeepSeek, Llama, Mistral hepsi birleşti.</p>
+                <p class="feature-desc">GPT-4o, Claude, Gemini, DeepSeek, Llama, Mistral 
+
+hepsi birleşti.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">⚡</div>
                 <div class="feature-title">Anlık Kod Üretimi</div>
-                <p class="feature-desc">Python, React, HTML, SQL, Docker her dilde çalışan kod.</p>
+                <p class="feature-desc">Python, React, HTML, SQL, Docker her dilde çalışan 
+
+kod.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🌐</div>
                 <div class="feature-title">Canlı Web Arama</div>
-                <p class="feature-desc">SerpApi ile dolar kuru, haberler, anlık bilgiler.</p>
+                <p class="feature-desc">SerpApi ile dolar kuru, haberler, anlık 
+
+bilgiler.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">👥</div>
                 <div class="feature-title">Takım Çalışması</div>
-                <p class="feature-desc">Takım kur, üye ekle, ortak projeler ve takım sohbeti.</p>
+                <p class="feature-desc">Takım kur, üye ekle, ortak projeler ve takım 
+
+sohbeti.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">💰</div>
                 <div class="feature-title">SaaS & Freelance</div>
-                <p class="feature-desc">Para kazandıran iş fikirleri, kariyer yol haritası.</p>
+                <p class="feature-desc">Para kazandıran iş fikirleri, kariyer yol 
+
+haritası.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🔧</div>
@@ -1757,12 +1739,16 @@ footer {
     <section class="ai-section" id="ai">
         <div class="section-header">
             <div class="section-tag">// yapay zeka</div>
-            <h2 class="section-title">Tüm AI Modelleri<br><span class="hl">Tek Yerde</span></h2>
+            <h2 class="section-title">Tüm AI Modelleri<br><span class="hl">Tek 
+
+Yerde</span></h2>
         </div>
         <div class="ai-showcase">
             <div class="ai-left">
                 <h3 class="ai-title">Kod yaz,<br><em>anlık öğren,</em><br>büyü.</h3>
-                <p class="ai-desc">Dünyanın en güçlü AI modellerini tek platformda birleştirdik.</p>
+                <p class="ai-desc">Dünyanın en güçlü AI modellerini tek platformda 
+
+birleştirdik.</p>
                 <div class="model-row">
                     <span class="mbadge a" onclick="openFullAIPanel()">⚡ VİZYON AI</span>
                     <span class="mbadge a">Groq</span>
@@ -1772,7 +1758,9 @@ footer {
                     <span class="mbadge b">Cohere</span>
                     <span class="mbadge c">Cerebras</span>
                 </div>
-                <button class="btn-primary" onclick="openFullAIPanel()">⚡ VİZYON AI ile Kod Yaz →</button>
+                <button class="btn-primary" onclick="openFullAIPanel()">⚡ VİZYON AI ile Kod 
+
+Yaz →</button>
             </div>
             <div class="ai-right">
                 <div class="ai-chat-msg user">
@@ -1782,7 +1770,11 @@ footer {
                 <div class="ai-chat-msg bot">
                     <div class="role">⚡ VİZYON AI</div>
                     FastAPI ile şöyle yapılır:
-                    <div class="ai-chat-code">from fastapi import FastAPI\napp = FastAPI()\n\n@app.get("/")\ndef root():\n    return {"message": "VİZYON AI"}\n\n# uvicorn main:app --reload</div>
+                    <div class="ai-chat-code">from fastapi import FastAPI\napp = FastAPI
+
+()\n\n@app.get("/")\ndef root():\n    return {"message": "VİZYON AI"}\n\n# uvicorn main:app 
+
+--reload</div>
                 </div>
             </div>
         </div>
@@ -1820,7 +1812,9 @@ footer {
                     <li>Demo web arama</li>
                     <li>Topluluk desteği</li>
                 </ul>
-                <button class="btn-price" onclick="openModal('register')">Ücretsiz Başla</button>
+                <button class="btn-price" onclick="openModal('register')">Ücretsiz 
+
+Başla</button>
             </div>
             <div class="price-card featured">
                 <div class="price-badge">En Popüler</div>
@@ -1883,7 +1877,9 @@ footer {
             </div>
         </div>
         <div class="footer-bottom">
-            <div class="footer-copy">© 2027 Vizyon2027. <span>Vizyon Ekibi</span> güvencesiyle.</div>
+            <div class="footer-copy">© 2027 Vizyon2027. <span>Vizyon Ekibi</span> 
+
+güvencesiyle.</div>
             <div class="footer-badges">
                 <span class="badge live">● Sistem Aktif</span>
                 <span class="badge">v24.0</span>
@@ -1895,6 +1891,15 @@ footer {
     </footer>
 
 </div>
+        <!-- NAVBAR -->
+        <!-- HERO -->
+        <!-- EDITOR PREVIEW -->
+        <!-- FEATURES -->
+        <!-- AI SHOWCASE -->
+        <!-- TECH STACK -->
+        <!-- PRICING -->
+        <!-- FOOTER -->
+    </div>
 
     <!-- ============================================================ -->
     <!-- HTML-2: DASHBOARD (GİRİŞ YAPINCA AÇILIR)                     -->
@@ -2474,7 +2479,7 @@ async function handleRegister() {
     }
 }
 
-// ========== DOĞRULAMA (Cloud Code ile) ==========
+// ========== DOĞRULAMA ==========
 async function verifyAccount() {
     var email = document.getElementById('verifyEmail').value.trim();
     var code = document.getElementById('verifyCode').value.trim();
@@ -2485,18 +2490,32 @@ async function verifyAccount() {
     }
     
     try {
-        // Cloud Code ile doğrula (Master Key kullanır)
-        var result = await Parse.Cloud.run('verifyUser', {
-            email: email,
-            code: code
-        });
+        var query = new Parse.Query(Parse.User);
+        query.equalTo('email', email);
+        var user = await query.first();
         
-        if (result.success) {
-            showNotification('✅ Hesap doğrulandı! Giriş yapabilirsiniz.', 'success');
-            switchTab('login');
-        } else {
-            showNotification('❌ ' + result.error, 'error');
+        if (!user) {
+            showNotification('Kullanıcı bulunamadı!', 'error');
+            return;
         }
+        
+        if (user.get('verificationCode') !== code) {
+            showNotification('Geçersiz kod!', 'error');
+            return;
+        }
+        
+        if (new Date(user.get('verificationCodeExpires')) < new Date()) {
+            showNotification('Kod süresi doldu! Lütfen yeniden kayıt olun.', 'error');
+            return;
+        }
+        
+        user.set('isVerified', true);
+        user.set('verificationCode', null);
+        user.set('verificationCodeExpires', null);
+        await user.save();
+        
+        showNotification('Hesap doğrulandı! Giriş yapabilirsiniz.', 'success');
+        switchTab('login');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -2952,7 +2971,7 @@ async function loadInbox() {
     }
 }
 
-// ========== OTOMATİK YÖNLENDİRME ==========
+// ========== OTOMATİK YÖNLENDİRME (Kayıt/Giriş/Doğrulama) ==========
 function switchTab(tab) {
     document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none';
     document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none';
@@ -2965,6 +2984,7 @@ function switchTab(tab) {
     else if (tab === 'register') tabs[1].classList.add('active');
     else if (tab === 'verify') tabs[2].classList.add('active');
     
+    // Modal'ı otomatik aç
     var modal = document.getElementById('authModal');
     if (modal) modal.classList.add('open');
 }
@@ -3083,12 +3103,12 @@ async function sendTeamMessage() {
 function cleanClientResponse(text) {
     if (!text) return text;
     
-    // Kod bloklarını işaretle (``` ile başlayanlar)
+    // 1. Önce kod bloklarını işaretle (``` ile başlayanlar)
     var withCopy = text.replace(/```(\w+)?\n([\s\S]*?)```/g, function(match, lang, code) {
         return '<div class="code-block"><pre><code class="language-' + (lang || '') + '">' + code + '</code></pre><button class="copy-btn" onclick="copyCode(this)">📋 Kopyala</button></div>';
     });
     
-    // Eğer hiç kod bloğu yoksa, normal metin olarak döndür
+    // 2. Eğer hiç kod bloğu yoksa, normal metin olarak döndür
     if (withCopy === text) {
         return text
             .replace(/\\n/g, '<br>')
@@ -3177,30 +3197,9 @@ function toggleFileMenu() {
     }
 }
 
-// ========== KAMERA (İZİN KONTROLLÜ) ==========
+// ========== KAMERA ==========
 function openCamera() {
-    var menu = document.getElementById('fileMenu');
-    if (menu) menu.style.display = 'none';
-    
-    if (navigator.permissions && navigator.permissions.query) {
-        navigator.permissions.query({ name: 'camera' }).then(function(result) {
-            if (result.state === 'denied') {
-                showNotification('❌ Kamera erişimi reddedildi. Lütfen tarayıcı ayarlarından izin verin.', 'error');
-                return;
-            } else if (result.state === 'prompt') {
-                openCameraInput();
-            } else if (result.state === 'granted') {
-                openCameraInput();
-            }
-        }).catch(function() {
-            openCameraInput();
-        });
-    } else {
-        openCameraInput();
-    }
-}
-
-function openCameraInput() {
+    document.getElementById('fileMenu').style.display = 'none';
     var input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
@@ -3312,7 +3311,7 @@ async function sendAiMessage() {
     msgs.scrollTop = msgs.scrollHeight;
 }
 
-// ========== DOSYA YÜKLEME (GÜNCELLENMİŞ) ==========
+// ========== DOSYA YÜKLEME (FULL PANEL) ==========
 async function uploadFullFile(input) {
     var file = input.files[0];
     if (!file) return;
@@ -3320,14 +3319,10 @@ async function uploadFullFile(input) {
     var menu = document.getElementById('fileMenu');
     if (menu) menu.style.display = 'none';
     
-    var fileType = file.type;
-    var fileName = file.name;
-    var fileSize = (file.size / 1024).toFixed(1);
-    
-    showNotification('📤 Dosya yükleniyor: ' + fileName, 'success');
+    showNotification('📤 Dosya yükleniyor: ' + file.name, 'success');
     
     try {
-        var parseFile = new Parse.File(fileName, file);
+        var parseFile = new Parse.File(file.name, file);
         await parseFile.save();
         var url = parseFile.url();
         
@@ -3338,7 +3333,9 @@ async function uploadFullFile(input) {
             var content = event.target.result;
             var inputArea = document.getElementById('fullAIInput');
             if (inputArea) {
-                var fileMsg = '📄 Dosya: ' + fileName + '\n';
+                var fileType = file.type;
+                var fileSize = (file.size / 1024).toFixed(1);
+                var fileMsg = '📄 Dosya: ' + file.name + '\n';
                 fileMsg += '📁 Boyut: ' + fileSize + ' KB\n';
                 fileMsg += '📋 Tür: ' + (fileType || 'Bilinmiyor') + '\n\n';
                 
@@ -3347,8 +3344,6 @@ async function uploadFullFile(input) {
                     fileMsg += '\n\n(Görsel verisi: ' + content.substring(0, 200) + '...)';
                 } else if (fileType === 'application/pdf') {
                     fileMsg += '📄 Bu bir PDF dosyası. Lütfen içeriğini analiz et ve özetle.';
-                } else if (fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || fileType === 'application/msword') {
-                    fileMsg += '📝 Bu bir Word dosyası. Lütfen içeriğini analiz et ve özetle.';
                 } else {
                     fileMsg += '📝 İçeriği analiz et ve özetle:\n\n' + content.substring(0, 2000);
                 }
@@ -3370,15 +3365,63 @@ async function uploadFullFile(input) {
     input.value = '';
 }
 
-// ========== SOHBET GEÇMİŞİNİ KAYDET ==========
-async function saveChatHistory(messages) {
-    if (!currentUser) return;
-    try {
-        await Parse.Cloud.run('saveChatHistory', { messages: messages });
-    } catch(e) {
-        console.log('Sohbet geçmişi kaydedilemedi:', e.message);
-    }
-}
+// ========== KOPYALA BUTONU STİLLERİ ==========
+(function addCopyButtonStyles() {
+    var style = document.createElement('style');
+    style.textContent = `
+        .code-block {
+            position: relative;
+            background: #0a0a0a;
+            border-radius: 8px;
+            margin: 8px 0;
+            padding: 12px;
+            border: 1px solid rgba(0,212,255,0.1);
+        }
+        .code-block pre {
+            margin: 0;
+            padding: 0;
+            overflow-x: auto;
+            padding-right: 70px;
+        }
+        .code-block code {
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            color: #e0e0e0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0,212,255,0.12);
+            border: 1px solid rgba(0,212,255,0.2);
+            color: var(--text3);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+        }
+        .copy-btn:hover {
+            background: rgba(0,212,255,0.25);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+        .ai-message.bot .code-block {
+            background: #0d1a26;
+        }
+        .ai-message.bot .code-block code {
+            color: #ccdeee;
+        }
+    `;
+    document.head.appendChild(style);
+})();
 
 // ========== DOSYA MENÜSÜ DIŞINA TIKLAYINCA KAPAT ==========
 document.addEventListener('click', function(e) {
@@ -3482,6 +3525,7 @@ function checkRole() {
         (currentRole === 'BETA' && pass === '4402');
     if (valid) {
         closeModal('rolePanel');
+        // Tam ekran AI panelini aç
         openFullAIPanel();
         document.querySelector('.vizyon-ai-header .logo-text').innerHTML =
             currentRole === 'FOUNDER' ? '👑 FOUNDER AI' :
@@ -3679,14 +3723,44 @@ function switchTab(tab) {
     if (tab === 'login') tabs[0].classList.add('active');
     else if (tab === 'register') tabs[1].classList.add('active');
     else if (tab === 'verify') tabs[2].classList.add('active');
-    
-    var modal = document.getElementById('authModal');
-    if (modal) modal.classList.add('open');
 }
 
 function openRandomSupport() {
     window.location.href = 'mailto:vizyon2027.info@gmail.com?subject=Vizyon2027%20Destek';
     showNotification('Destek maili aciliyor', 'success');
+}
+
+// ========== SOHBET GEÇMİŞİNİ YÜKLE ==========
+async function loadChatHistory() {
+    if (!currentUser) return;
+    try {
+        var result = await Parse.Cloud.run('getChatHistory');
+        if (result.success && result.messages && result.messages.length > 0) {
+            // Sohbet geçmişini AI paneline yükle
+            var chat = document.getElementById('fullAIChat');
+            if (chat) {
+                chat.innerHTML = '';
+                for (var i = 0; i < result.messages.length; i++) {
+                    var msg = result.messages[i];
+                    var cls = msg.role === 'user' ? 'user' : 'bot';
+                    chat.innerHTML += '<div class="ai-msg ' + cls + '">' + msg.content + '</div>';
+                }
+                chat.scrollTop = chat.scrollHeight;
+            }
+        }
+    } catch(e) {
+        console.log('Sohbet geçmişi yüklenemedi:', e.message);
+    }
+}
+
+// ========== SOHBET GEÇMİŞİNİ KAYDET ==========
+async function saveChatHistory(messages) {
+    if (!currentUser) return;
+    try {
+        await Parse.Cloud.run('saveChatHistory', { messages: messages });
+    } catch(e) {
+        console.log('Sohbet geçmişi kaydedilemedi:', e.message);
+    }
 }
 
 // ========== YORUMLAR ==========
@@ -3749,28 +3823,6 @@ function updateCommentUI() {
     } else {
         if (form) form.style.display = 'none';
         if (loginMsg) loginMsg.style.display = 'block';
-    }
-}
-
-// ========== SOHBET GEÇMİŞİNİ YÜKLE ==========
-async function loadChatHistory() {
-    if (!currentUser) return;
-    try {
-        var result = await Parse.Cloud.run('getChatHistory');
-        if (result.success && result.messages && result.messages.length > 0) {
-            var chat = document.getElementById('fullAIChat');
-            if (chat) {
-                chat.innerHTML = '';
-                for (var i = 0; i < result.messages.length; i++) {
-                    var msg = result.messages[i];
-                    var cls = msg.role === 'user' ? 'user' : 'bot';
-                    chat.innerHTML += '<div class="ai-msg ' + cls + '">' + msg.content + '</div>';
-                }
-                chat.scrollTop = chat.scrollHeight;
-            }
-        }
-    } catch(e) {
-        console.log('Sohbet geçmişi yüklenemedi:', e.message);
     }
 }
 
@@ -3841,6 +3893,7 @@ window.onload = async function() {
                     // Sohbet geçmişini yükle (giriş yapmış herkes)
                     await loadChatHistory();
                     
+                    // SADECE ADMIN/FOUNDER ise admin kontrolü
                     if (currentUser.get('role') === 'admin' || currentUser.get('role') === 'founder') {
                         try {
                             await Parse.Cloud.run('initAdminUsers');
@@ -3866,6 +3919,7 @@ window.onload = async function() {
         }
     }
     
+    // Giriş yapılmışsa yorumları yükle
     if (currentUser) {
         await loadComments();
         updateCommentUI();
