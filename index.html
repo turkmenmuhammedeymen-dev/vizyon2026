@@ -1174,62 +1174,89 @@ footer {
     font-weight: 600;
 }
 
-/* ========== VİZYON AI FULL PANEL (MODERN) ========== */
+/* ========== VİZYON AI FULL PANEL (ÇEYREK EKRAN) ========== */
 .vizyon-ai-panel {
     display: none;
     position: fixed;
-    inset: 0;
-    z-index: 10000;
-    background: var(--bg);
+    bottom: 20px;
+    right: 20px;
+    width: 35%;
+    max-width: 480px;
+    height: 60%;
+    max-height: 500px;
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: 20px;
     flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.8);
+    backdrop-filter: blur(16px);
+    z-index: 10000;
 }
 .vizyon-ai-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 24px;
-    background: var(--surface);
-    border-bottom: 2px solid var(--accent);
+    padding: 12px 16px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.vizyon-ai-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.vizyon-ai-header .logo-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
 }
 .vizyon-ai-header .logo-text {
-    font-size: 20px;
+    font-size: 16px;
 }
 .vizyon-ai-chat {
     flex: 1;
     overflow-y: auto;
-    padding: 24px;
+    padding: 12px 16px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    max-width: 900px;
-    width: 100%;
-    margin: 0 auto;
+    gap: 8px;
 }
 .vizyon-ai-chat .ai-msg {
-    font-size: 14px;
+    padding: 10px 14px;
+    font-size: 13px;
     max-width: 90%;
+    border-radius: 12px;
+}
+.vizyon-ai-chat .ai-msg.bot {
+    background: rgba(0,255,136,0.06);
+    border-left: 3px solid var(--accent2);
+    border: 1px solid rgba(0,255,136,0.08);
+}
+.vizyon-ai-chat .ai-msg.user {
+    background: rgba(0,212,255,0.15);
+    border: 1px solid rgba(0,212,255,0.15);
 }
 .vizyon-ai-input-area {
     display: flex;
-    gap: 12px;
-    padding: 20px;
-    max-width: 900px;
-    width: 100%;
-    margin: 0 auto;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.3);
     align-items: center;
+    flex-shrink: 0;
 }
 .vizyon-ai-input {
     flex: 1;
-    background: var(--surface);
+    background: var(--bg);
     border: 1px solid var(--border);
     color: var(--text);
-    padding: 14px 18px;
-    border-radius: 20px;
-    font-family: var(--font-code);
-    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 12px;
     resize: none;
-    min-height: 60px;
-    transition: border-color 0.3s;
+    font-family: var(--font-code);
 }
 .vizyon-ai-input:focus {
     outline: none;
@@ -3477,15 +3504,31 @@ async function changePassword() {
     }
 }
 
+// ========== HESAP SİLME (MAİL GÖNDERME EKLENDİ) ==========
 async function deleteAccount() {
     if (!currentUser) {
         showNotification('Once giris yapin!', 'error');
         return;
     }
     if (!confirm('Hesap silinecek, emin misiniz?')) return;
+
+    // 1. Doğrulama maili gönder
+    try {
+        await Parse.Cloud.run('sendEmail', {
+            to: currentUser.get('email'),
+            subject: 'Hesap Silme Onayı - Vizyon 2027',
+            html: '<h1>Hesabınız silindi</h1><p>Sayın ' + currentUser.get('name') + ',</p><p>Hesabınız başarıyla silinmiştir.</p><p>Tekrar görüşmek üzere!</p>'
+        });
+        console.log('✅ Silme onay maili gönderildi.');
+    } catch(e) {
+        console.log('Mail gönderilemedi:', e);
+    }
+
+    // 2. Kullanıcıyı sil
     try {
         await currentUser.destroy();
         logout();
+        showNotification('Hesabınız silindi.', 'success');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -3525,7 +3568,6 @@ function checkRole() {
         (currentRole === 'BETA' && pass === '4402');
     if (valid) {
         closeModal('rolePanel');
-        // Tam ekran AI panelini aç
         openFullAIPanel();
         document.querySelector('.vizyon-ai-header .logo-text').innerHTML =
             currentRole === 'FOUNDER' ? '👑 FOUNDER AI' :
@@ -3736,7 +3778,6 @@ async function loadChatHistory() {
     try {
         var result = await Parse.Cloud.run('getChatHistory');
         if (result.success && result.messages && result.messages.length > 0) {
-            // Sohbet geçmişini AI paneline yükle
             var chat = document.getElementById('fullAIChat');
             if (chat) {
                 chat.innerHTML = '';
@@ -3865,6 +3906,54 @@ if (cursor && ring) {
     }
 }
 
+// ========== DASHBOARD (openFullAIPanel EKLENDİ) ==========
+async function showDashboard() {
+    document.getElementById('mainSite').style.display = 'none';
+    document.getElementById('dashboardArea').style.display = 'block';
+    
+    var name = currentUser.get('name');
+    var role = currentUser.get('role');
+    
+    document.getElementById('dashboardUserName').innerHTML = name || 'Kullanıcı';
+    document.getElementById('userRoleBadge').innerHTML =
+        role === 'founder' ? '👑 KURUCU' :
+        role === 'admin' ? '⚙️ ADMIN' :
+        role === 'beta' ? '🔬 BETA' :
+        '👤 KULLANICI';
+    
+    if (role === 'admin' || role === 'founder') {
+        document.getElementById('adminPanelCard').style.display = 'block';
+        await loadUserList();
+    } else {
+        document.getElementById('adminPanelCard').style.display = 'none';
+    }
+    
+    await loadProjects();
+    await loadFavorites();
+    await loadArchive();
+    await loadTrash();
+    await loadProjectRequests();
+    await loadInbox();
+    await loadTeamInfo();
+    await updateStats();
+    startStatsInterval();
+
+    // ========== YENİ: AI PANELİNİ AÇ (Çeyrek ekran) ==========
+    openFullAIPanel();
+}
+
+// ========== ÇIKIŞ (closeFullAIPanel EKLENDİ) ==========
+function logout() {
+    // ========== YENİ: AI PANELİNİ KAPAT ==========
+    closeFullAIPanel();
+
+    Parse.User.logOut();
+    localStorage.removeItem('vizyon_user');
+    currentUser = null;
+    stopStatsInterval();
+    location.reload();
+}
+
 // ========== SAYFA YÜKLENİNCE ==========
 window.onload = async function() {
     if (typeof initBack4App === 'function') {
@@ -3890,10 +3979,8 @@ window.onload = async function() {
                     await showDashboard();
                     updateCommentUI();
                     await loadComments();
-                    // Sohbet geçmişini yükle (giriş yapmış herkes)
                     await loadChatHistory();
                     
-                    // SADECE ADMIN/FOUNDER ise admin kontrolü
                     if (currentUser.get('role') === 'admin' || currentUser.get('role') === 'founder') {
                         try {
                             await Parse.Cloud.run('initAdminUsers');
@@ -3919,7 +4006,6 @@ window.onload = async function() {
         }
     }
     
-    // Giriş yapılmışsa yorumları yükle
     if (currentUser) {
         await loadComments();
         updateCommentUI();
