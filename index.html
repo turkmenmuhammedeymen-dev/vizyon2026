@@ -1193,6 +1193,17 @@ footer {
     backdrop-filter: blur(16px);
     z-index: 10000;
 }
+/* ========== TAM EKRAN MODU (ANA SAYFA BUTONU İÇİN) ========== */
+.vizyon-ai-panel.fullscreen {
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    border: none;
+}
 .vizyon-ai-header {
     display: flex;
     justify-content: space-between;
@@ -1595,33 +1606,19 @@ footer {
             <div class="logo-text">VİZYON 2027</div>
         </div>
         <ul class="nav-links">
-            <li><a onclick="document.getElementById('features').scrollIntoView
-
-({behavior:'smooth'})">Özellikler</a></li>
-            <li><a onclick="document.getElementById('ai').scrollIntoView
-
-({behavior:'smooth'})">Yapay Zeka</a></li>
-            <li><a onclick="document.getElementById('pricing').scrollIntoView
-
-({behavior:'smooth'})">Fiyatlar</a></li>
+            <li><a onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Özellikler</a></li>
+            <li><a onclick="document.getElementById('ai').scrollIntoView({behavior:'smooth'})">Yapay Zeka</a></li>
+            <li><a onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Fiyatlar</a></li>
         </ul>
         <div class="button-group">
             <div class="secret-buttons">
-                <button class="secret-btn" onclick="openRolePanel('FOUNDER')">👑 
-
-FOUNDER</button>
-                <button class="secret-btn" onclick="openRolePanel('ADMIN')">⚙️ 
-
-ADMIN</button>
+                <button class="secret-btn" onclick="openRolePanel('FOUNDER')">👑 FOUNDER</button>
+                <button class="secret-btn" onclick="openRolePanel('ADMIN')">⚙️ ADMIN</button>
                 <button class="secret-btn" onclick="openRolePanel('BETA')">🔬 BETA</button>
             </div>
             <button class="nav-cta" onclick="openModal('login')">Giriş Yap</button>
-            <button class="btn-primary" onclick="openModal('register')">Ücretsiz 
-
-Başla</button>
-            <button class="logout-btn" onclick="logout()" style="display:none">🚪 
-
-Çıkış</button>
+            <button class="btn-primary" onclick="openModal('register')">Ücretsiz Başla</button>
+            <button class="logout-btn" onclick="logout()" style="display:none">🚪 Çıkış</button>
         </div>
     </nav>
 
@@ -1634,20 +1631,13 @@ Başla</button>
         <h1 class="hero-title">
             <span class="line1">VİZYON AI</span>
             <span class="line2">SINIRSIZ YETENEK</span>
-            <span class="line3">Her dilde kod · Web arama · Dosya analiz · Takım 
-
-Çalışması</span>
+            <span class="line3">Her dilde kod · Web arama · Dosya analiz · Takım Çalışması</span>
         </h1>
-        <p class="hero-sub">⚡ VİZYON AI ile her dili konuş, her kodu yaz, takımınla çalış, 
-
-projelerini yönet.</p>
+        <p class="hero-sub">⚡ VİZYON AI ile her dili konuş, her kodu yaz, takımınla çalış, projelerini yönet.</p>
         <div class="hero-actions">
-            <button class="btn-primary" onclick="openFullAIPanel()">⚡ VİZYON AI'ı 
-
-Başlat</button>
-            <button class="btn-secondary" onclick="document.getElementById
-
-('features').scrollIntoView({behavior:'smooth'})">Daha Fazla →</button>
+            <!-- ⬇️ TAM EKRAN AÇMAK İÇİN true PARAMETRESİ EKLENDİ -->
+            <button class="btn-primary" onclick="openFullAIPanel(true)">⚡ VİZYON AI'ı Başlat</button>
+            <button class="btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Daha Fazla →</button>
         </div>
         <div class="stats-bar">
             <div class="stat-item">
@@ -1679,35 +1669,13 @@ Başlat</button>
                 <span class="editor-filename">vizyon2027/ai_core.py</span>
             </div>
             <div class="editor-body">
-                <div class="code-line"><span class="ln">1</span><span class="code"><span 
-
-class="cm"># VİZYON AI — Süper Yapay Zeka</span></span></div>
-                <div class="code-line"><span class="ln">2</span><span class="code"><span 
-
-class="kw">from</span> vizyon_ai <span class="kw">import</span> <span 
-
-class="fn">SuperAI</span></div>
-                <div class="code-line"><span class="ln">3</span><span 
-
-class="code"></span></div>
-                <div class="code-line"><span class="ln">4</span><span class="code">ai = 
-
-<span class="fn">SuperAI</span>()</div>
-                <div class="code-line"><span class="ln">5</span><span class="code">ai.<span 
-
-class="fn">birleştir</span>(<span class="str">"GPT-4o"</span>, <span 
-
-class="str">"Claude"</span>, <span class="str">"Gemini"</span>, <span 
-
-class="str">"DeepSeek"</span>)</div>
-                <div class="code-line"><span class="ln">6</span><span class="code">cevap = 
-
-ai.<span class="fn">kod_yaz</span>(<span class="str">"Python'da hesap makinesi"</span>)
-
-</div>
-                <div class="code-line"><span class="ln">7</span><span class="code"><span 
-
-class="fn">print</span>(cevap)  <span class="cm"># Tam çalışan kod gelir!</span></div>
+                <div class="code-line"><span class="ln">1</span><span class="code"><span class="cm"># VİZYON AI — Süper Yapay Zeka</span></span></div>
+                <div class="code-line"><span class="ln">2</span><span class="code"><span class="kw">from</span> vizyon_ai <span class="kw">import</span> <span class="fn">SuperAI</span></div>
+                <div class="code-line"><span class="ln">3</span><span class="code"></span></div>
+                <div class="code-line"><span class="ln">4</span><span class="code">ai = <span class="fn">SuperAI</span>()</div>
+                <div class="code-line"><span class="ln">5</span><span class="code">ai.<span class="fn">birleştir</span>(<span class="str">"GPT-4o"</span>, <span class="str">"Claude"</span>, <span class="str">"Gemini"</span>, <span class="str">"DeepSeek"</span>)</div>
+                <div class="code-line"><span class="ln">6</span><span class="code">cevap = ai.<span class="fn">kod_yaz</span>(<span class="str">"Python'da hesap makinesi"</span>)</div>
+                <div class="code-line"><span class="ln">7</span><span class="code"><span class="fn">print</span>(cevap)  <span class="cm"># Tam çalışan kod gelir!</span></div>
             </div>
         </div>
     </div>
@@ -1722,37 +1690,27 @@ class="fn">print</span>(cevap)  <span class="cm"># Tam çalışan kod gelir!</sp
             <div class="feature-card">
                 <div class="feature-icon">🤖</div>
                 <div class="feature-title">7 Model Tek Çatı</div>
-                <p class="feature-desc">GPT-4o, Claude, Gemini, DeepSeek, Llama, Mistral 
-
-hepsi birleşti.</p>
+                <p class="feature-desc">GPT-4o, Claude, Gemini, DeepSeek, Llama, Mistral hepsi birleşti.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">⚡</div>
                 <div class="feature-title">Anlık Kod Üretimi</div>
-                <p class="feature-desc">Python, React, HTML, SQL, Docker her dilde çalışan 
-
-kod.</p>
+                <p class="feature-desc">Python, React, HTML, SQL, Docker her dilde çalışan kod.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🌐</div>
                 <div class="feature-title">Canlı Web Arama</div>
-                <p class="feature-desc">SerpApi ile dolar kuru, haberler, anlık 
-
-bilgiler.</p>
+                <p class="feature-desc">SerpApi ile dolar kuru, haberler, anlık bilgiler.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">👥</div>
                 <div class="feature-title">Takım Çalışması</div>
-                <p class="feature-desc">Takım kur, üye ekle, ortak projeler ve takım 
-
-sohbeti.</p>
+                <p class="feature-desc">Takım kur, üye ekle, ortak projeler ve takım sohbeti.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">💰</div>
                 <div class="feature-title">SaaS & Freelance</div>
-                <p class="feature-desc">Para kazandıran iş fikirleri, kariyer yol 
-
-haritası.</p>
+                <p class="feature-desc">Para kazandıran iş fikirleri, kariyer yol haritası.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🔧</div>
@@ -1766,18 +1724,14 @@ haritası.</p>
     <section class="ai-section" id="ai">
         <div class="section-header">
             <div class="section-tag">// yapay zeka</div>
-            <h2 class="section-title">Tüm AI Modelleri<br><span class="hl">Tek 
-
-Yerde</span></h2>
+            <h2 class="section-title">Tüm AI Modelleri<br><span class="hl">Tek Yerde</span></h2>
         </div>
         <div class="ai-showcase">
             <div class="ai-left">
                 <h3 class="ai-title">Kod yaz,<br><em>anlık öğren,</em><br>büyü.</h3>
-                <p class="ai-desc">Dünyanın en güçlü AI modellerini tek platformda 
-
-birleştirdik.</p>
+                <p class="ai-desc">Dünyanın en güçlü AI modellerini tek platformda birleştirdik.</p>
                 <div class="model-row">
-                    <span class="mbadge a" onclick="openFullAIPanel()">⚡ VİZYON AI</span>
+                    <span class="mbadge a" onclick="openFullAIPanel(true)">⚡ VİZYON AI</span>
                     <span class="mbadge a">Groq</span>
                     <span class="mbadge b">DeepSeek</span>
                     <span class="mbadge c">OpenRouter</span>
@@ -1785,9 +1739,8 @@ birleştirdik.</p>
                     <span class="mbadge b">Cohere</span>
                     <span class="mbadge c">Cerebras</span>
                 </div>
-                <button class="btn-primary" onclick="openFullAIPanel()">⚡ VİZYON AI ile Kod 
-
-Yaz →</button>
+                <!-- ⬇️ TAM EKRAN AÇMAK İÇİN true PARAMETRESİ EKLENDİ -->
+                <button class="btn-primary" onclick="openFullAIPanel(true)">⚡ VİZYON AI ile Kod Yaz →</button>
             </div>
             <div class="ai-right">
                 <div class="ai-chat-msg user">
@@ -1797,11 +1750,7 @@ Yaz →</button>
                 <div class="ai-chat-msg bot">
                     <div class="role">⚡ VİZYON AI</div>
                     FastAPI ile şöyle yapılır:
-                    <div class="ai-chat-code">from fastapi import FastAPI\napp = FastAPI
-
-()\n\n@app.get("/")\ndef root():\n    return {"message": "VİZYON AI"}\n\n# uvicorn main:app 
-
---reload</div>
+                    <div class="ai-chat-code">from fastapi import FastAPI\napp = FastAPI()\n\n@app.get("/")\ndef root():\n    return {"message": "VİZYON AI"}\n\n# uvicorn main:app --reload</div>
                 </div>
             </div>
         </div>
@@ -1839,9 +1788,7 @@ Yaz →</button>
                     <li>Demo web arama</li>
                     <li>Topluluk desteği</li>
                 </ul>
-                <button class="btn-price" onclick="openModal('register')">Ücretsiz 
-
-Başla</button>
+                <button class="btn-price" onclick="openModal('register')">Ücretsiz Başla</button>
             </div>
             <div class="price-card featured">
                 <div class="price-badge">En Popüler</div>
@@ -1904,9 +1851,7 @@ Başla</button>
             </div>
         </div>
         <div class="footer-bottom">
-            <div class="footer-copy">© 2027 Vizyon2027. <span>Vizyon Ekibi</span> 
-
-güvencesiyle.</div>
+            <div class="footer-copy">© 2027 Vizyon2027. <span>Vizyon Ekibi</span> güvencesiyle.</div>
             <div class="footer-badges">
                 <span class="badge live">● Sistem Aktif</span>
                 <span class="badge">v24.0</span>
@@ -1916,6 +1861,8 @@ güvencesiyle.</div>
             <a class="support-link" onclick="openRandomSupport()">📧 DESTEK & İLETİŞİM</a>
         </div>
     </footer>
+
+</div>
 
 </div>
         <!-- NAVBAR -->
@@ -2225,7 +2172,7 @@ class="glow-input" style="flex:1;min-width:200px;">
 </div>
 
 <!-- ============================================================ -->
-<!-- VİZYON AI FULL PANEL (TAM EKRAN)                             -->
+<!-- VİZYON AI FULL PANEL (ÇEYREK / TAM EKRAN)                    -->
 <!-- ============================================================ -->
 <div id="fullAIPanel" class="vizyon-ai-panel">
     <div class="vizyon-ai-header">
@@ -2235,7 +2182,7 @@ class="glow-input" style="flex:1;min-width:200px;">
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
             <span style="color:var(--text3); font-size:12px;">⚡ 7 Model</span>
-            <button class="btn-secondary btn-sm" onclick="closeFullAIPanel()">✕ Kapat</button>
+            <!-- ⬇️ KAPATMA BUTONU KALDIRILDI (sadece çıkış ile kapanacak) -->
         </div>
     </div>
     <div id="fullAIChat" class="vizyon-ai-chat">
@@ -2442,6 +2389,10 @@ function stopStatsInterval() {
     <!-- JS-2: KAYIT, GİRİŞ, DOĞRULAMA, GOOGLE, PROJE YÖNETİMİ      -->
     <!-- ============================================================ -->
     <script>
+            <!-- ============================================================ -->
+    <!-- JS-2: KAYIT, GİRİŞ, DOĞRULAMA, GOOGLE, PROJE YÖNETİMİ      -->
+    <!-- ============================================================ -->
+    <script>
         // ============================================================
 // JS-2: KAYIT, GİRİŞ, GOOGLE, FACEBOOK, PROJE YÖNETİMİ
 // ============================================================
@@ -2506,7 +2457,7 @@ async function handleRegister() {
     }
 }
 
-// ========== DOĞRULAMA ==========
+// ========== DOĞRULAMA (Cloud Code ile, Master Key kullanır) ==========
 async function verifyAccount() {
     var email = document.getElementById('verifyEmail').value.trim();
     var code = document.getElementById('verifyCode').value.trim();
@@ -2517,32 +2468,18 @@ async function verifyAccount() {
     }
     
     try {
-        var query = new Parse.Query(Parse.User);
-        query.equalTo('email', email);
-        var user = await query.first();
+        // ✅ Cloud Code üzerinden doğrula (Master Key kullanır, CLP'yi bypass eder)
+        var result = await Parse.Cloud.run('verifyUser', {
+            email: email,
+            code: code
+        });
         
-        if (!user) {
-            showNotification('Kullanıcı bulunamadı!', 'error');
-            return;
+        if (result.success) {
+            showNotification('✅ Hesap doğrulandı! Giriş yapabilirsiniz.', 'success');
+            switchTab('login');
+        } else {
+            showNotification('❌ ' + result.error, 'error');
         }
-        
-        if (user.get('verificationCode') !== code) {
-            showNotification('Geçersiz kod!', 'error');
-            return;
-        }
-        
-        if (new Date(user.get('verificationCodeExpires')) < new Date()) {
-            showNotification('Kod süresi doldu! Lütfen yeniden kayıt olun.', 'error');
-            return;
-        }
-        
-        user.set('isVerified', true);
-        user.set('verificationCode', null);
-        user.set('verificationCodeExpires', null);
-        await user.save();
-        
-        showNotification('Hesap doğrulandı! Giriş yapabilirsiniz.', 'success');
-        switchTab('login');
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -3016,6 +2953,7 @@ function switchTab(tab) {
     if (modal) modal.classList.add('open');
 }
     </script>
+    </script>
 
     <!-- ============================================================ -->
     <!-- JS-3: TAKIM VE AI (Cloud Code ile + Temizleme)              -->
@@ -3130,12 +3068,10 @@ async function sendTeamMessage() {
 function cleanClientResponse(text) {
     if (!text) return text;
     
-    // 1. Önce kod bloklarını işaretle (``` ile başlayanlar)
     var withCopy = text.replace(/```(\w+)?\n([\s\S]*?)```/g, function(match, lang, code) {
         return '<div class="code-block"><pre><code class="language-' + (lang || '') + '">' + code + '</code></pre><button class="copy-btn" onclick="copyCode(this)">📋 Kopyala</button></div>';
     });
     
-    // 2. Eğer hiç kod bloğu yoksa, normal metin olarak döndür
     if (withCopy === text) {
         return text
             .replace(/\\n/g, '<br>')
@@ -3161,7 +3097,6 @@ function cleanClientResponse(text) {
         .replace(/\*(.*?)\*/g, '<em>$1</em>');
 }
 
-// ========== KOPYALAMA FONKSİYONU ==========
 function copyCode(btn) {
     var codeBlock = btn.parentElement.querySelector('code');
     if (!codeBlock) {
@@ -3216,7 +3151,6 @@ function fallbackCopy(code, btn) {
     document.body.removeChild(textarea);
 }
 
-// ========== DOSYA MENÜSÜ ==========
 function toggleFileMenu() {
     var menu = document.getElementById('fileMenu');
     if (menu) {
@@ -3224,7 +3158,6 @@ function toggleFileMenu() {
     }
 }
 
-// ========== KAMERA ==========
 function openCamera() {
     document.getElementById('fileMenu').style.display = 'none';
     var input = document.createElement('input');
@@ -3240,7 +3173,6 @@ function openCamera() {
     input.click();
 }
 
-// ========== AI MODELLERİ ==========
 async function callAllAIModels(prompt) {
     try {
         return await Parse.Cloud.run('superAI', { prompt: prompt });
@@ -3259,7 +3191,6 @@ async function webSearch(query) {
     }
 }
 
-// ========== DASHBOARD AI ==========
 window.sendDashboardAI = async function() {
     if (!await useQuery()) return;
     var inp = document.getElementById('dashboardAiInput');
@@ -3280,13 +3211,25 @@ window.sendDashboardAI = async function() {
     container.scrollTop = container.scrollHeight;
 };
 
-// ========== FULL PANEL ==========
-function openFullAIPanel() {
-    document.getElementById('fullAIPanel').style.display = 'flex';
+// ========== AI PANELİ AÇ/KAPA (ÇEYREK / TAM EKRAN) ==========
+function openFullAIPanel(fullscreen) {
+    var panel = document.getElementById('fullAIPanel');
+    if (panel) {
+        if (fullscreen) {
+            panel.classList.add('fullscreen');
+        } else {
+            panel.classList.remove('fullscreen');
+        }
+        panel.style.display = 'flex';
+    }
 }
 
 function closeFullAIPanel() {
-    document.getElementById('fullAIPanel').style.display = 'none';
+    var panel = document.getElementById('fullAIPanel');
+    if (panel) {
+        panel.style.display = 'none';
+        panel.classList.remove('fullscreen');
+    }
 }
 
 async function sendFullAI() {
@@ -3338,7 +3281,6 @@ async function sendAiMessage() {
     msgs.scrollTop = msgs.scrollHeight;
 }
 
-// ========== DOSYA YÜKLEME (FULL PANEL) ==========
 async function uploadFullFile(input) {
     var file = input.files[0];
     if (!file) return;
@@ -3362,9 +3304,7 @@ async function uploadFullFile(input) {
             if (inputArea) {
                 var fileType = file.type;
                 var fileSize = (file.size / 1024).toFixed(1);
-                var fileMsg = '📄 Dosya: ' + file.name + '\n';
-                fileMsg += '📁 Boyut: ' + fileSize + ' KB\n';
-                fileMsg += '📋 Tür: ' + (fileType || 'Bilinmiyor') + '\n\n';
+                var fileMsg = '📄 Dosya: ' + file.name + '\n📁 Boyut: ' + fileSize + ' KB\n📋 Tür: ' + (fileType || 'Bilinmiyor') + '\n\n';
                 
                 if (fileType && fileType.startsWith('image/')) {
                     fileMsg += '🖼️ Bu bir görsel dosyası. Lütfen görseli analiz et ve içeriğini detaylıca açıkla.';
@@ -3450,7 +3390,6 @@ async function uploadFullFile(input) {
     document.head.appendChild(style);
 })();
 
-// ========== DOSYA MENÜSÜ DIŞINA TIKLAYINCA KAPAT ==========
 document.addEventListener('click', function(e) {
     var menu = document.getElementById('fileMenu');
     var btn = document.querySelector('[onclick="toggleFileMenu()"]');
@@ -3467,7 +3406,7 @@ document.addEventListener('click', function(e) {
     <!-- ============================================================ -->
     <script>
         // ============================================================
-// JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ (FULL - GÜNCEL)
+// JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ
 // ============================================================
 
 function openProfileModal() {
@@ -3480,7 +3419,10 @@ function openProfileModal() {
         '<p><strong>E-posta:</strong> ' + currentUser.get('email') + '</p>' +
         '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : (currentUser.get('plan') === 'team' ? '👥 Takim' : '🆓 Ucretsiz')) + '</p>' +
         '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : (currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 Beta' : '👤 Kullanici'))) + '</p>' +
-        '<p><strong>Uyelik:</strong> ' + new Date(currentUser.get('createdAt')).toLocaleDateString('tr-TR') + '</p>';
+        '<p><strong>Uyelik:</strong> ' + new Date(currentUser.get('createdAt')).toLocaleDateString('tr-TR') + '</p>' +
+        // ========== HESAP SİL BUTONU EN ALTA EKLENDİ ==========
+        '<hr style="margin:16px 0;border-color:var(--border);">' +
+        '<button class="btn-danger btn-sm" onclick="deleteAccount()" style="margin-top:10px;">🗑️ Hesabımı Sil</button>';
     document.getElementById('profileModal').classList.add('open');
 }
 
@@ -3504,7 +3446,7 @@ async function changePassword() {
     }
 }
 
-// ========== HESAP SİLME (MAİL GÖNDERME EKLENDİ) ==========
+// ========== HESAP SİL (MAIL GÖNDERME EKLENDİ) ==========
 async function deleteAccount() {
     if (!currentUser) {
         showNotification('Once giris yapin!', 'error');
@@ -3568,7 +3510,7 @@ function checkRole() {
         (currentRole === 'BETA' && pass === '4402');
     if (valid) {
         closeModal('rolePanel');
-        openFullAIPanel();
+        openFullAIPanel(false); // çeyrek ekran
         document.querySelector('.vizyon-ai-header .logo-text').innerHTML =
             currentRole === 'FOUNDER' ? '👑 FOUNDER AI' :
             currentRole === 'ADMIN' ? '⚙️ ADMIN AI' :
@@ -3906,7 +3848,7 @@ if (cursor && ring) {
     }
 }
 
-// ========== DASHBOARD (openFullAIPanel EKLENDİ) ==========
+// ========== DASHBOARD ==========
 async function showDashboard() {
     document.getElementById('mainSite').style.display = 'none';
     document.getElementById('dashboardArea').style.display = 'block';
@@ -3938,15 +3880,13 @@ async function showDashboard() {
     await updateStats();
     startStatsInterval();
 
-    // ========== YENİ: AI PANELİNİ AÇ (Çeyrek ekran) ==========
-    openFullAIPanel();
+    // ========== ÇEYREK EKRAN AI PANELİNİ AÇ ==========
+    openFullAIPanel(false);
 }
 
-// ========== ÇIKIŞ (closeFullAIPanel EKLENDİ) ==========
+// ========== ÇIKIŞ (AI panelini kapat) ==========
 function logout() {
-    // ========== YENİ: AI PANELİNİ KAPAT ==========
     closeFullAIPanel();
-
     Parse.User.logOut();
     localStorage.removeItem('vizyon_user');
     currentUser = null;
