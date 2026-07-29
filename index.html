@@ -109,9 +109,46 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
 /* ===== NAVBAR ===== */
 nav { display: flex; align-items: center; justify-content: space-between; padding: 0 48px; height: 80px; border-bottom: 1px solid rgba(0,212,255,0.12); background: rgba(5,10,15,0.85); backdrop-filter: blur(24px); position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
 .logo { display: flex; align-items: center; gap: 12px; }
-.logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, var(--accent), var(--purple), var(--accent3)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; animation: logoPulse 2s infinite; }
+
+/* ===== YENİ ŞATAFATLI LOGO ===== */
+.logo-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #00d4ff, #a855f7, #ff6b35);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    animation: logoPulse 2s infinite, logoSpin 8s linear infinite;
+    box-shadow: 0 0 30px rgba(0,212,255,0.6);
+    color: #fff;
+    text-shadow: 0 0 20px rgba(0,212,255,0.8);
+}
+@keyframes logoSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.logo-text {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 800;
+    background: linear-gradient(45deg, #00d4ff, #a855f7, #ff6b35, #00d4ff);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradientMove 4s ease infinite;
+    text-shadow: 0 0 40px rgba(0,212,255,0.3);
+}
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+/* ===== LOGO ANİMASYONU (ESKİ) ===== */
 @keyframes logoPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.7); } 50% { box-shadow: 0 0 0 15px rgba(0,212,255,0); } }
-.logo-text { font-family: var(--font-display); font-size: 24px; font-weight: 800; background: linear-gradient(45deg, var(--accent), var(--purple)); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: -0.5px; }
+
 .nav-links { display: flex; gap: 40px; list-style: none; }
 .nav-links a { color: var(--text2); text-decoration: none; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; transition: color var(--transition-fast); cursor: pointer; }
 .nav-links a:hover { color: var(--accent); }
@@ -1399,6 +1436,12 @@ footer {
     position: relative;
 }
 
+/* ========== YORUMLAR AI PANELİNİN ÜSTÜNDE KALSIN ========== */
+#commentsSection {
+    position: relative;
+    z-index: 10001 !important;
+}
+
  <style>
 
 <!-- ============================================================ -->
@@ -1661,10 +1704,11 @@ footer {
     .vizyon-ai-panel.halfscreen {
         bottom: 5% !important;
         right: 5% !important;
-        width: 90% !important;
-        max-width: 90% !important;
-        height: 80% !important;
-        max-height: 80% !important;
+        width: 95% !important;
+        max-width: 95% !important;
+        height: 70% !important;
+        max-height: 70% !important;
+        border-radius: 16px !important;
     }
     .vizyon-ai-header .logo-text {
         font-size: 14px !important;
@@ -1684,16 +1728,16 @@ footer {
     }
     .modal {
         width: 95% !important;
-        padding: 20px !important;
-        max-height: 80vh !important;
+        padding: 16px !important;
+        max-height: 90vh !important;
         overflow-y: auto !important;
     }
     .modal-header h3 {
-        font-size: 18px !important;
+        font-size: 16px !important;
     }
     .form-input {
-        font-size: 13px !important;
-        padding: 10px 14px !important;
+        font-size: 12px !important;
+        padding: 8px 12px !important;
     }
     nav {
         padding: 0 12px !important;
@@ -1714,18 +1758,18 @@ footer {
         padding: 4px 10px !important;
     }
     .hero-title .line1 {
-        font-size: 28px !important;
+        font-size: 24px !important;
     }
     .hero-title .line2 {
-        font-size: 22px !important;
+        font-size: 20px !important;
     }
     .hero-title .line3 {
-        font-size: 14px !important;
+        font-size: 12px !important;
     }
     .hero-actions .btn-primary,
     .hero-actions .btn-secondary {
         font-size: 14px !important;
-        padding: 10px 20px !important;
+        padding: 8px 16px !important;
     }
     .stats-bar {
         flex-wrap: wrap !important;
@@ -1741,7 +1785,10 @@ footer {
         border-bottom: none !important;
     }
     .stat-num {
-        font-size: 22px !important;
+        font-size: 18px !important;
+    }
+    .stat-label {
+        font-size: 9px !important;
     }
     .ai-widget-btn {
         width: 48px !important;
@@ -1757,10 +1804,10 @@ footer {
         height: 220px !important;
     }
     #commentsSection {
-        padding: 10px !important;
+        padding: 8px !important;
     }
     .comment-item {
-        padding: 10px 12px !important;
+        padding: 8px 10px !important;
     }
     .comment-item .role-badge {
         font-size: 8px !important;
@@ -1771,9 +1818,15 @@ footer {
         font-size: 12px !important;
         padding: 10px !important;
     }
-    /* Sorgu limiti rozeti */
     .query-limit-badge {
-        font-size: 9px !important;
+        font-size: 8px !important;
+        padding: 2px 8px !important;
+    }
+    .dashboard-header .user-info span {
+        font-size: 12px !important;
+    }
+    .dashboard-header .btn-sm {
+        font-size: 10px !important;
         padding: 4px 10px !important;
     }
 }
@@ -2024,7 +2077,7 @@ footer {
         </div>
     </section>
 
-    <!-- ===== FOOTER ===== -->
+    <!-- ===== FOOTER (linkler düzeltildi) ===== -->
     <footer>
         <div class="footer-grid">
             <div class="footer-brand">
@@ -2034,25 +2087,25 @@ footer {
             <div class="footer-col">
                 <h4>Platform</h4>
                 <ul>
-                    <li><a href="#">VİZYON AI</a></li>
-                    <li><a href="#">Kod Editörü</a></li>
-                    <li><a href="#">API</a></li>
+                    <li><a href="javascript:void(0)">VİZYON AI</a></li>
+                    <li><a href="javascript:void(0)">Kod Editörü</a></li>
+                    <li><a href="javascript:void(0)">API</a></li>
                 </ul>
             </div>
             <div class="footer-col">
                 <h4>Kaynaklar</h4>
                 <ul>
-                    <li><a href="#">Dokümantasyon</a></li>
-                    <li><a href="#">Topluluk</a></li>
-                    <li><a href="#">Blog</a></li>
+                    <li><a href="javascript:void(0)">Dokümantasyon</a></li>
+                    <li><a href="javascript:void(0)">Topluluk</a></li>
+                    <li><a href="javascript:void(0)">Blog</a></li>
                 </ul>
             </div>
             <div class="footer-col">
                 <h4>Şirket</h4>
                 <ul>
-                    <li><a href="#">Hakkımızda</a></li>
-                    <li><a href="#">Kariyer</a></li>
-                    <li><a href="#">İletişim</a></li>
+                    <li><a href="javascript:void(0)">Hakkımızda</a></li>
+                    <li><a href="javascript:void(0)">Kariyer</a></li>
+                    <li><a href="javascript:void(0)">İletişim</a></li>
                 </ul>
             </div>
         </div>
@@ -4130,7 +4183,7 @@ async function toggleChatHistory() {
     }
 }
 
-// ========== YORUMLAR ==========
+// ========== YORUMLAR (Silme Butonlu) ==========
 async function loadComments() {
     try {
         var comments = await Parse.Cloud.run('getComments');
@@ -4142,16 +4195,46 @@ async function loadComments() {
         var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 'user': '👤 KULLANICI' };
         var roleColors = { 'founder': 'var(--gold)', 'admin': 'var(--accent)', 'beta': 'var(--purple)', 'user': 'var(--text3)' };
         var html = '';
+        var currentUserEmail = currentUser ? currentUser.get('email') : null;
+        var currentUserRole = currentUser ? currentUser.get('role') : null;
         for (var i = 0; i < comments.length; i++) {
             var c = comments[i];
             var color = roleColors[c.user_role] || 'var(--border)';
             var label = roleLabels[c.user_role] || '👤 KULLANICI';
-            html += '<div class="comment-item" style="border-left-color: ' + color + ';"><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"><strong style="color: var(--accent2);">' + (c.user_name || 'İsimsiz') + '</strong><span class="role-badge ' + (c.user_role || 'user') + '" style="border-color: ' + color + '; color: ' + color + ';">' + label + '</span><span class="comment-email">📧 ' + (c.user_email || '---') + '</span><span class="comment-time" style="margin-left: auto;">' + new Date(c.createdAt).toLocaleString('tr-TR') + '</span></div><div class="comment-text">' + c.comment + '</div></div>';
+            var canDelete = (currentUserEmail === c.user_email) || (currentUserRole === 'admin' || currentUserRole === 'founder');
+            html += '<div class="comment-item" style="border-left-color: ' + color + ';">';
+            html += '<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">';
+            html += '<strong style="color: var(--accent2);">' + (c.user_name || 'İsimsiz') + '</strong>';
+            html += '<span class="role-badge ' + (c.user_role || 'user') + '" style="border-color: ' + color + '; color: ' + color + ';">' + label + '</span>';
+            html += '<span class="comment-email">📧 ' + (c.user_email || '---') + '</span>';
+            html += '<span class="comment-time" style="margin-left: auto;">' + new Date(c.createdAt).toLocaleString('tr-TR') + '</span>';
+            if (canDelete) {
+                html += '<button class="btn-danger btn-sm" onclick="deleteComment(\'' + c.id + '\')" style="padding:2px 8px; font-size:10px;">🗑️</button>';
+            }
+            html += '</div>';
+            html += '<div class="comment-text">' + c.comment + '</div>';
+            html += '</div>';
         }
         container.innerHTML = html;
     } catch (e) {
         console.error('Yorumlar yüklenemedi:', e);
         document.getElementById('commentsList').innerHTML = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);;">⚠️ Yorumlar yüklenemedi: ' + e.message + '</div>';
+    }
+}
+
+// ========== YORUM SİLME FONKSİYONU ==========
+async function deleteComment(commentId) {
+    if (!currentUser) {
+        showNotification('Önce giriş yapın!', 'error');
+        return;
+    }
+    if (!confirm('Bu yorumu silmek istediğinize emin misiniz?')) return;
+    try {
+        await Parse.Cloud.run('deleteComment', { commentId: commentId });
+        showNotification('✅ Yorum silindi!', 'success');
+        await loadComments(); // Listeyi yenile
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
     }
 }
 
@@ -4300,7 +4383,7 @@ function logout() {
     showNotification('Çıkış yapıldı.', 'success');
 }
 
-// ========== SAYFA YÜKLENİNCE ==========
+// ========== SAYFA YÜKLENİNCE (sohbet geçmişi otomatik yüklenmez) ==========
 window.onload = async function () {
     if (typeof initBack4App === 'function') {
         await initBack4App();
@@ -4323,7 +4406,7 @@ window.onload = async function () {
                     showDashboard();
                     updateCommentUI();
                     await loadComments();
-                    // Sohbet geçmişini otomatik yükleme (manuel butonla)
+                    // ❌ Sohbet geçmişi OTOMATİK YÜKLENMEZ (sadece butonla)
                     if (currentUser.get('role') === 'admin' || currentUser.get('role') === 'founder') {
                         try {
                             await Parse.Cloud.run('initAdminUsers');
