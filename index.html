@@ -2326,7 +2326,7 @@ footer {
         <!-- AI paneli burada tam ekran olarak açılacak -->
     </div>
 </div>
-</section>
+
     <!-- GİRİŞ / KAYIT / DOĞRULAMA MODALI -->
     <!-- FOUNDER / ADMIN / BETA PANEL MODALI -->
     <!-- PROFİL MODALI -->
@@ -2480,20 +2480,15 @@ function stopStatsInterval() {
     </script>
 
     <!-- ============================================================ -->
-    <!-- JS-2: KAYIT, GİRİŞ, DOĞRULAMA, GOOGLE, PROJE YÖNETİMİ      -->
-    <!-- ============================================================ -->
-    <script>
-            <!-- ============================================================ -->
-    <!-- JS-2: KAYIT, GİRİŞ, DOĞRULAMA, GOOGLE, PROJE YÖNETİMİ      -->
-    <!-- ============================================================ -->
-    <script>
-        // ============================================================
+<!-- JS-2: KAYIT, GİRİŞ, DOĞRULAMA, GOOGLE, FACEBOOK, PROJE YÖNETİMİ -->
+<!-- ============================================================ -->
+<script>
+// ============================================================
 // JS-2: KAYIT, GİRİŞ, DOĞRULAMA, GOOGLE, FACEBOOK, PROJE YÖNETİMİ
 // ============================================================
 
 // ========== KAYIT (OTURUM KONTROLLÜ) ==========
 async function handleRegister() {
-    // Önce oturumu kontrol et, açık ise çıkış yap
     if (currentUser) {
         try {
             await Parse.User.logOut();
@@ -2544,14 +2539,14 @@ async function handleRegister() {
         }
         
         showNotification('Kayıt başarılı! Doğrulama kodunuz mail adresinize gönderildi.', 'success');
-        switchTab('verify');
+        switchTab('verify'); // JS-4'teki switchTab kullanılır
         document.getElementById('verifyEmail').value = email;
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 }
 
-// ========== DOĞRULAMA (Cloud Code ile, Master Key kullanır) ==========
+// ========== DOĞRULAMA (Cloud Code ile) ==========
 async function verifyAccount() {
     var email = document.getElementById('verifyEmail').value.trim();
     var code = document.getElementById('verifyCode').value.trim();
@@ -3028,30 +3023,16 @@ async function loadInbox() {
     }
 }
 
-// ========== OTOMATİK YÖNLENDİRME (Kayıt/Giriş/Doğrulama) ==========
-function switchTab(tab) {
-    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none';
-    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none';
-    document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 'none';
-    var tabs = document.querySelectorAll('.modal-tab');
-    for (var i = 0; i < tabs.length; i++) {
-        tabs[i].classList.remove('active');
-    }
-    if (tab === 'login') tabs[0].classList.add('active');
-    else if (tab === 'register') tabs[1].classList.add('active');
-    else if (tab === 'verify') tabs[2].classList.add('active');
+// NOT: switchTab ve openModal burada tanımlanmaz, JS-4'teki kullanılır.
+
+</script>
     
-    // Modal'ı otomatik aç
-    var modal = document.getElementById('authModal');
-    if (modal) modal.classList.add('open');
-}
-    </script>
 
     <!-- ============================================================ -->
-    <!-- JS-3: TAKIM VE AI (Cloud Code ile + Temizleme)              -->
-    <!-- ============================================================ -->
-    <script>
-        // ================================================================
+<!-- JS-3: TAKIM VE AI (Cloud Code + Dosya Yükleme + Kopyala + 3D/Görsel) -->
+<!-- ============================================================ -->
+<script>
+// ================================================================
 // JS-3: TAKIM VE AI (Cloud Code + Dosya Yükleme + Kopyala + 3D/Görsel)
 // ================================================================
 
@@ -3634,13 +3615,14 @@ document.addEventListener('click', function (e) {
         }
     }
 });
-    </script>
+</script> 
 
-    <!-- ============================================================ -->
-    <!-- JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ                    -->
-    <!-- ============================================================ -->
-    <script>
-        // ================================================================
+
+<!-- ============================================================ -->
+<!-- JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ                    -->
+<!-- ============================================================ -->
+<script>
+// ================================================================
 // JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ
 // ================================================================
 
@@ -3920,22 +3902,45 @@ async function setAdminPassword() {
     }
 }
 
+// ========== MODAL AÇMA/KAPAMA ==========
 function openModal(type) {
-    document.getElementById('authModal').classList.add('open');
+    var modal = document.getElementById('authModal');
+    if (!modal) {
+        console.error('authModal elementi bulunamadı!');
+        return;
+    }
+    modal.classList.add('open');
     switchTab(type);
 }
 
 function switchTab(tab) {
-    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none';
-    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none';
-    document.getElementById('formVerify').style.display = tab === 'verify' ? 'block' : 'none';
+    var loginForm = document.getElementById('formLogin');
+    var registerForm = document.getElementById('formRegister');
+    var verifyForm = document.getElementById('formVerify');
     var tabs = document.querySelectorAll('.modal-tab');
+    
+    // Tüm formları gizle
+    if (loginForm) loginForm.style.display = 'none';
+    if (registerForm) registerForm.style.display = 'none';
+    if (verifyForm) verifyForm.style.display = 'none';
+    
+    // Tüm tabları aktiflikten çıkar
     for (var i = 0; i < tabs.length; i++) {
         tabs[i].classList.remove('active');
     }
-    if (tab === 'login') tabs[0].classList.add('active');
-    else if (tab === 'register') tabs[1].classList.add('active');
-    else if (tab === 'verify') tabs[2].classList.add('active');
+    
+    if (tab === 'login') {
+        if (loginForm) loginForm.style.display = 'block';
+        if (tabs[0]) tabs[0].classList.add('active');
+    } else if (tab === 'register') {
+        if (registerForm) registerForm.style.display = 'block';
+        if (tabs[1]) tabs[1].classList.add('active');
+    } else if (tab === 'verify') {
+        if (verifyForm) verifyForm.style.display = 'block';
+        if (tabs[2]) tabs[2].classList.add('active');
+    }
+    
+    // Modal'ı açık tut
     var modal = document.getElementById('authModal');
     if (modal) modal.classList.add('open');
 }
@@ -4189,7 +4194,4 @@ window.onload = async function () {
     startStatsInterval();
     showNotification('✨ VİZYON 2027 Sistemi Aktif!', 'success');
 };
-    </script>
-
-</body>
-</html>
+</script>
