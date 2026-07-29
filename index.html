@@ -672,7 +672,6 @@ footer {
     color: var(--bg);
 }
  <style>
-
 <!-- ============================================================ -->
 <!-- CSS-3: DASHBOARD, MODALLAR, WIDGET, FULL PANEL              -->
 <!-- ============================================================ -->
@@ -1106,6 +1105,10 @@ footer {
     right: 32px;
     z-index: 500;
 }
+/* ===== DASHBOARD'DA YILDIRIM BUTONU GİZLENSİN ===== */
+#dashboardArea .ai-widget {
+    display: none !important;
+}
 .ai-widget-btn {
     width: 56px;
     height: 56px;
@@ -1204,15 +1207,15 @@ footer {
     font-weight: 600;
 }
 
-/* ========== VİZYON AI FULL PANEL (TAM EKRAN) ========== */
+/* ========== VİZYON AI FULL PANEL (user-panel içinde) ========== */
 .vizyon-ai-panel {
     display: none;
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 35%;
-    max-width: 480px;
-    height: 60%;
+    position: relative;
+    bottom: auto;
+    right: auto;
+    width: 100%;
+    max-width: 100%;
+    height: 420px;
     max-height: 500px;
     background: var(--surface);
     border: 1px solid var(--accent);
@@ -1221,10 +1224,12 @@ footer {
     overflow: hidden;
     box-shadow: 0 8px 40px rgba(0,0,0,0.8);
     backdrop-filter: blur(16px);
-    z-index: 10000;
+    z-index: 10002 !important;
+    margin-top: 20px;
 }
-/* ========== TAM EKRAN MODU ========== */
+/* ========== TAM EKRAN MODU (FOUNDER/ADMIN PANELİ İÇİN) ========== */
 .vizyon-ai-panel.fullscreen {
+    position: fixed;
     bottom: 0;
     right: 0;
     width: 100%;
@@ -1233,9 +1238,11 @@ footer {
     max-height: 100%;
     border-radius: 0;
     border: none;
+    margin-top: 0;
 }
-/* ========== YARIM EKRAN MODU (ÜYE DASHBOARD İÇİN) ========== */
+/* ========== YARIM EKRAN MODU (KULLANILMIYOR - SADECE FOUNDER/ADMIN İÇİN) ========== */
 .vizyon-ai-panel.halfscreen {
+    position: fixed;
     bottom: 10%;
     right: 10%;
     width: 80%;
@@ -1244,6 +1251,7 @@ footer {
     max-height: 580px;
     border-radius: 20px;
     border: 1px solid var(--accent);
+    margin-top: 0;
 }
 .vizyon-ai-panel.fullscreen #fullscreenCloseBtn,
 .vizyon-ai-panel.halfscreen #fullscreenCloseBtn {
@@ -1436,13 +1444,12 @@ footer {
     position: relative;
 }
 
-/* ========== YORUMLAR AI PANELİNİN ÜSTÜNDE KALSIN ========== */
+/* ========== YORUMLAR ========== */
 #commentsSection {
     position: relative;
-    z-index: 10001 !important;
+    z-index: 999;
 }
-
- <style>
+</style>
 
 <!-- ============================================================ -->
 <!-- CSS-4: ÖZEL STILLER, BUTONLAR, YORUMLAR, RESPONSIVE         -->
@@ -2152,10 +2159,8 @@ footer {
         <div class="user-info" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
             <span id="dashboardUserName" style="font-size:18px;font-weight:600;"></span>
             <span id="userRoleBadge" class="badge"></span>
-            <!-- ===== SORGU LİMİTİ ROZETİ (DASHBOARD) ===== -->
             <span id="dashQueryLimitBadge" class="query-limit-badge" style="position:relative;bottom:auto;left:auto;display:inline-block;padding:4px 12px;font-size:11px;">🔋 100 sorgu kaldı</span>
             <button class="btn-secondary btn-sm" onclick="openProfileModal()">👤 Profil</button>
-            <!-- ===== SOHBET GEÇMİŞİ BUTONU ===== -->
             <button class="btn-secondary btn-sm" onclick="toggleChatHistory()">📜 Geçmiş</button>
             <button class="logout-btn btn-sm" onclick="logout()">Çıkış</button>
         </div>
@@ -2235,8 +2240,6 @@ footer {
         </div>
 
         <!-- ===== YENİ EKLENEN KARTLAR ===== -->
-
-        <!-- Görsel Üretme Kartı -->
         <div class="dashboard-card">
             <h3>🖼️ Görsel Üret (AI)</h3>
             <input id="imagePrompt" class="glow-input" placeholder="Görsel açıklaması yazın..." style="width:100%; margin-bottom:10px;">
@@ -2244,7 +2247,6 @@ footer {
             <div id="imageResults" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; max-height:200px; overflow-y:auto;"></div>
         </div>
 
-        <!-- 3D Model Üretme Kartı -->
         <div class="dashboard-card">
             <h3>🧊 3D Model Üret</h3>
             <input id="threeDPrompt" class="glow-input" placeholder="3D nesne açıklaması yazın..." style="width:100%; margin-bottom:10px;">
@@ -2258,13 +2260,11 @@ footer {
     <div id="adminPanelCard" class="dashboard-card full-width" style="display:none;">
         <h3>⚙️ YÖNETİM PANELİ</h3>
         
-        <!-- Kullanıcı Listesi -->
         <div style="margin-bottom:16px;">
             <h4>👥 Kullanıcı Listesi</h4>
             <div id="userList" class="user-list"></div>
         </div>
 
-        <!-- Admin Atama -->
         <div style="margin-bottom:16px;">
             <h4>🎯 Admin Atama</h4>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -2273,7 +2273,6 @@ footer {
             </div>
         </div>
 
-        <!-- Hediye Gönder -->
         <div style="margin-bottom:16px;">
             <h4>🎁 Hediye Gönder</h4>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -2286,7 +2285,6 @@ footer {
             </div>
         </div>
 
-        <!-- Kullanıcı Engelleme -->
         <div>
             <h4>🔒 Kullanıcı Engelle</h4>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -2294,6 +2292,69 @@ footer {
                 <button class="btn-danger btn-sm" onclick="banUser()">Yasakla</button>
             </div>
         </div>
+    </div>
+
+    <!-- ===== YORUM SİSTEMİ ===== -->
+    <section id="commentsSection">
+        <h3>💬 Yorumlar</h3>
+
+        <div id="commentsList">
+            <div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">
+                🌟 Yorumlar yükleniyor...
+            </div>
+        </div>
+
+        <div id="commentForm" style="display: none;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span style="color: var(--text2); font-size: 14px;">👤 <span id="commentUserName">Misafir</span></span>
+                <span id="commentUserRole" style="font-size: 11px; padding: 2px 10px; border-radius: 12px; background: var(--border); color: var(--text3);">👤 KULLANICI</span>
+            </div>
+            <textarea id="commentInput" rows="2" placeholder="Yorumunuzu yazın..." style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; resize: vertical; font-family: var(--font-body);"></textarea>
+            <button onclick="postComment()" class="btn-primary" style="margin-top: 8px; width: 100%; font-size: 14px !important; padding: 12px !important;">💬 Yorum Gönder</button>
+        </div>
+
+        <div id="commentLoginMessage" style="margin-top: 16px; padding: 12px; background: var(--surface); border-radius: 12px; border: 1px dashed var(--border); text-align: center; color: var(--text3);">
+            <p>Yorum yapmak için <button class="btn-secondary btn-sm" onclick="openModal('login')" style="display: inline-block; padding: 6px 16px; font-size: 12px;">giriş yapmalısınız</button>.</p>
+        </div>
+    </section>
+
+    <!-- ===== VİZYON AI PANELİ (YORUMLARIN ALTINDA) ===== -->
+    <div id="fullAIPanel" class="vizyon-ai-panel" style="display:flex;">
+        <div class="vizyon-ai-header">
+            <div class="logo">
+                <div class="logo-icon">✨</div>
+                <div class="logo-text">VİZYON AI</div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <span style="color:var(--text3); font-size:12px;">⚡ 7 Model</span>
+                <button class="btn-secondary btn-sm" onclick="closeFullAIPanel()" style="display:inline-block; padding:4px 12px; font-size:10px;" id="fullscreenCloseBtn">✕ Kapat</button>
+            </div>
+        </div>
+        <div id="fullAIChat" class="vizyon-ai-chat">
+            <div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Size nasıl yardımcı olabilirim? Dosya yükleyebilir, kod yazabilir veya soru sorabilirsiniz.</div>
+        </div>
+        <div class="vizyon-ai-input-area">
+            <textarea id="fullAIInput" class="vizyon-ai-input" placeholder="Her dilde yazabilirsin... (Python, JavaScript, React, SQL...)" rows="2" onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendFullAI(); }"></textarea>
+            <div style="display:flex; gap:8px; position:relative;">
+                <button class="btn-secondary" onclick="toggleFileMenu()" style="padding:10px 16px; font-size:18px;">➕</button>
+                <div id="fileMenu" style="display:none; position:absolute; bottom:70px; right:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:8px; z-index:10001; min-width:180px; box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+                    <button onclick="openCamera()" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📷 Fotoğraf Çek</button>
+                    <button onclick="document.getElementById('fullFileInput').click(); toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📁 Galeriden Seç</button>
+                    <button onclick="document.getElementById('fullFileInput').click(); toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📄 Dosya Yükle</button>
+                </div>
+                <input type="file" id="fullFileInput" style="display:none;" accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip,.png,.jpg,.jpeg,.gif,.bmp,.svg,.webp" onchange="uploadFullFile(this)">
+                <button class="btn-primary" onclick="sendFullAI()" style="padding:10px 20px;">⚡ Gönder</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ALT KISIM (Hesap & Ayarlar) ===== -->
+    <div class="dashboard-card full-width" style="margin-top:24px; text-align:center; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; padding:20px;">
+        <button class="btn-danger" onclick="deleteAccount()">🗑️ Hesabımı Sil</button>
+        <button class="btn-secondary" onclick="openSettingsModal()">⚙️ Ayarlar</button>
+    </div>
+
+</div>
     </div>
 
 </div>
@@ -2321,19 +2382,15 @@ footer {
         </div>
         <div class="modal-body">
 
-            <!-- GOOGLE İLE GİRİŞ -->
             <button class="btn-google" onclick="loginWithGoogle()">
                 <i class="fab fa-google"></i> Google ile Giriş Yap
             </button>
-
-            <!-- FACEBOOK İLE GİRİŞ -->
             <button class="btn-facebook" onclick="loginWithFacebook()">
                 <i class="fab fa-facebook"></i> Facebook ile Giriş Yap
             </button>
 
             <div style="text-align: center; margin: 8px 0 16px 0; color: var(--text3); font-size: 12px;">veya</div>
 
-            <!-- KAYIT FORMU -->
             <div id="formRegister">
                 <div class="form-row">
                     <input id="rName" placeholder="Ad Soyad" class="form-input">
@@ -2344,14 +2401,12 @@ footer {
                 <button class="btn-primary" onclick="handleRegister()" style="width:100%;">Kayıt Ol</button>
             </div>
 
-            <!-- GİRİŞ FORMU -->
             <div id="formLogin" style="display:none;">
                 <input id="lEmail" placeholder="E-posta" class="form-input">
                 <input id="lPass" type="password" placeholder="Şifre" class="form-input">
                 <button class="btn-primary" onclick="handleLogin()" style="width:100%;">Giriş Yap</button>
             </div>
 
-            <!-- DOĞRULAMA FORMU -->
             <div id="formVerify" style="display:none;">
                 <input id="verifyEmail" placeholder="E-posta" class="form-input">
                 <input id="verifyCode" placeholder="Doğrulama Kodu" class="form-input">
@@ -2397,6 +2452,18 @@ footer {
     </div>
 </div>
 
+<!-- ===== AYARLAR MODALI ===== -->
+<div id="settingsModal" class="modal-overlay" onclick="if(event.target===this) closeModal('settingsModal')">
+    <div class="modal">
+        <h3>⚙️ Ayarlar</h3>
+        <div style="display:flex; flex-direction:column; gap:16px; margin-top:20px;">
+            <button class="btn-secondary" onclick="changeLanguage()">🌐 Dil Değiştir (TR/EN)</button>
+            <button class="btn-secondary" onclick="shareSite()">📤 Siteyi Paylaş</button>
+        </div>
+        <button class="btn-secondary" onclick="closeModal('settingsModal')" style="margin-top:20px;">Kapat</button>
+    </div>
+</div>
+
 <!-- ============================================================ -->
 <!-- AI WIDGET (SAĞ ALT KÖŞE)                                     -->
 <!-- ============================================================ -->
@@ -2420,66 +2487,7 @@ footer {
 </div>
 
 <!-- ============================================================ -->
-<!-- VİZYON AI FULL PANEL (YARIM EKRAN / TAM EKRAN)              -->
-<!-- ============================================================ -->
-<div id="fullAIPanel" class="vizyon-ai-panel">
-    <div class="vizyon-ai-header">
-        <div class="logo">
-            <div class="logo-icon">✨</div>
-            <div class="logo-text">VİZYON AI</div>
-        </div>
-        <div style="display:flex; gap:8px; align-items:center;">
-            <span style="color:var(--text3); font-size:12px;">⚡ 7 Model</span>
-            <!-- KAPAT BUTONU ÇIKIŞ YAPAR -->
-            <button class="btn-secondary btn-sm" onclick="logout()" style="display:inline-block; padding:4px 12px; font-size:10px;" id="fullscreenCloseBtn">✕ Kapat</button>
-        </div>
-    </div>
-    <div id="fullAIChat" class="vizyon-ai-chat">
-        <div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Size nasıl yardımcı olabilirim? Dosya yükleyebilir, kod yazabilir veya soru sorabilirsiniz.</div>
-    </div>
-    <div class="vizyon-ai-input-area">
-        <textarea id="fullAIInput" class="vizyon-ai-input" placeholder="Her dilde yazabilirsin... (Python, JavaScript, React, SQL...)" rows="2" onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendFullAI(); }"></textarea>
-        <div style="display:flex; gap:8px; position:relative;">
-            <button class="btn-secondary" onclick="toggleFileMenu()" style="padding:10px 16px; font-size:18px;">➕</button>
-            <div id="fileMenu" style="display:none; position:absolute; bottom:70px; right:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:8px; z-index:10001; min-width:180px; box-shadow:0 8px 32px rgba(0,0,0,0.5);">
-                <button onclick="openCamera()" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📷 Fotoğraf Çek</button>
-                <button onclick="document.getElementById('fullFileInput').click(); toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📁 Galeriden Seç</button>
-                <button onclick="document.getElementById('fullFileInput').click(); toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📄 Dosya Yükle</button>
-            </div>
-            <input type="file" id="fullFileInput" style="display:none;" accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip,.png,.jpg,.jpeg,.gif,.bmp,.svg,.webp" onchange="uploadFullFile(this)">
-            <button class="btn-primary" onclick="sendFullAI()" style="padding:10px 20px;">⚡ Gönder</button>
-        </div>
-    </div>
-</div>
-
-<!-- ============================================================ -->
-<!-- YORUM SİSTEMİ                                                -->
-<!-- ============================================================ -->
-<section id="commentsSection">
-    <h3>💬 Yorumlar</h3>
-
-    <div id="commentsList">
-        <div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">
-            🌟 Yorumlar yükleniyor...
-        </div>
-    </div>
-
-    <div id="commentForm" style="display: none;">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-            <span style="color: var(--text2); font-size: 14px;">👤 <span id="commentUserName">Misafir</span></span>
-            <span id="commentUserRole" style="font-size: 11px; padding: 2px 10px; border-radius: 12px; background: var(--border); color: var(--text3);">👤 KULLANICI</span>
-        </div>
-        <textarea id="commentInput" rows="2" placeholder="Yorumunuzu yazın..." style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; resize: vertical; font-family: var(--font-body);"></textarea>
-        <button onclick="postComment()" class="btn-primary" style="margin-top: 8px; width: 100%; font-size: 14px !important; padding: 12px !important;">💬 Yorum Gönder</button>
-    </div>
-
-    <div id="commentLoginMessage" style="margin-top: 16px; padding: 12px; background: var(--surface); border-radius: 12px; border: 1px dashed var(--border); text-align: center; color: var(--text3);">
-        <p>Yorum yapmak için <button class="btn-secondary btn-sm" onclick="openModal('login')" style="display: inline-block; padding: 6px 16px; font-size: 12px;">giriş yapmalısınız</button>.</p>
-    </div>
-</section>
-
-<!-- ============================================================ -->
-<!-- KULLANICI PANELİ (AYRI EKRAN) – ARTIK KULLANILMIYOR          -->
+<!-- KULLANICI PANELİ (AYRI EKRAN) – BURAYA YORUMLAR VE AI PANELİ -->
 <!-- ============================================================ -->
 <div id="userPanel" class="user-panel">
     <div class="user-panel-header">
@@ -2495,7 +2503,67 @@ footer {
         </div>
     </div>
     <div class="user-panel-body">
-        <!-- AI paneli burada tam ekran olarak açılacak -->
+        
+        <!-- ===== YORUM SİSTEMİ ===== -->
+        <section id="commentsSection" style="max-width:800px; margin:0 auto; padding:20px;">
+            <h3>💬 Yorumlar</h3>
+
+            <div id="commentsList">
+                <div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">
+                    🌟 Yorumlar yükleniyor...
+                </div>
+            </div>
+
+            <div id="commentForm" style="display: none;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <span style="color: var(--text2); font-size: 14px;">👤 <span id="commentUserName">Misafir</span></span>
+                    <span id="commentUserRole" style="font-size: 11px; padding: 2px 10px; border-radius: 12px; background: var(--border); color: var(--text3);">👤 KULLANICI</span>
+                </div>
+                <textarea id="commentInput" rows="2" placeholder="Yorumunuzu yazın..." style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; resize: vertical; font-family: var(--font-body);"></textarea>
+                <button onclick="postComment()" class="btn-primary" style="margin-top: 8px; width: 100%; font-size: 14px !important; padding: 12px !important;">💬 Yorum Gönder</button>
+            </div>
+
+            <div id="commentLoginMessage" style="margin-top: 16px; padding: 12px; background: var(--surface); border-radius: 12px; border: 1px dashed var(--border); text-align: center; color: var(--text3);">
+                <p>Yorum yapmak için <button class="btn-secondary btn-sm" onclick="openModal('login')" style="display: inline-block; padding: 6px 16px; font-size: 12px;">giriş yapmalısınız</button>.</p>
+            </div>
+        </section>
+
+        <!-- ===== VİZYON AI PANELİ (YORUMLARIN ALTINDA) ===== -->
+        <div id="fullAIPanel" class="vizyon-ai-panel" style="display:flex; margin-top:20px;">
+            <div class="vizyon-ai-header">
+                <div class="logo">
+                    <div class="logo-icon">✨</div>
+                    <div class="logo-text">VİZYON AI</div>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <span style="color:var(--text3); font-size:12px;">⚡ 7 Model</span>
+                    <button class="btn-secondary btn-sm" onclick="closeFullAIPanel()" style="display:inline-block; padding:4px 12px; font-size:10px;" id="fullscreenCloseBtn">✕ Kapat</button>
+                </div>
+            </div>
+            <div id="fullAIChat" class="vizyon-ai-chat">
+                <div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Size nasıl yardımcı olabilirim? Dosya yükleyebilir, kod yazabilir veya soru sorabilirsiniz.</div>
+            </div>
+            <div class="vizyon-ai-input-area">
+                <textarea id="fullAIInput" class="vizyon-ai-input" placeholder="Her dilde yazabilirsin... (Python, JavaScript, React, SQL...)" rows="2" onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendFullAI(); }"></textarea>
+                <div style="display:flex; gap:8px; position:relative;">
+                    <button class="btn-secondary" onclick="toggleFileMenu()" style="padding:10px 16px; font-size:18px;">➕</button>
+                    <div id="fileMenu" style="display:none; position:absolute; bottom:70px; right:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:8px; z-index:10001; min-width:180px; box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+                        <button onclick="openCamera()" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📷 Fotoğraf Çek</button>
+                        <button onclick="document.getElementById('fullFileInput').click(); toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📁 Galeriden Seç</button>
+                        <button onclick="document.getElementById('fullFileInput').click(); toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📄 Dosya Yükle</button>
+                    </div>
+                    <input type="file" id="fullFileInput" style="display:none;" accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip,.png,.jpg,.jpeg,.gif,.bmp,.svg,.webp" onchange="uploadFullFile(this)">
+                    <button class="btn-primary" onclick="sendFullAI()" style="padding:10px 20px;">⚡ Gönder</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ALT KISIM (Hesap & Ayarlar) ===== -->
+        <div style="max-width:800px; margin:30px auto 20px; text-align:center; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; padding:20px; background:rgba(17,17,17,0.85); border-radius:24px; border:1px solid var(--border);">
+            <button class="btn-danger" onclick="deleteAccount()">🗑️ Hesabımı Sil</button>
+            <button class="btn-secondary" onclick="openSettingsModal()">⚙️ Ayarlar</button>
+        </div>
+
     </div>
 </div>
 
@@ -4156,7 +4224,7 @@ function openRandomSupport() {
     showNotification('Destek maili açılıyor', 'success');
 }
 
-// ========== SOHBET GEÇMİŞİ (TÜM KULLANICILAR İÇİN) ==========
+// ========== SOHBET GEÇMİŞİ ==========
 async function toggleChatHistory() {
     if (!currentUser) {
         showNotification('Önce giriş yapın!', 'error');
@@ -4183,7 +4251,35 @@ async function toggleChatHistory() {
     }
 }
 
-// ========== YORUMLAR (Silme Butonlu) ==========
+// ========== AYARLAR FONKSİYONLARI ==========
+function openSettingsModal() {
+    document.getElementById('settingsModal').classList.add('open');
+}
+
+function changeLanguage() {
+    var currentLang = document.documentElement.lang || 'tr';
+    var newLang = currentLang === 'tr' ? 'en' : 'tr';
+    document.documentElement.lang = newLang;
+    showNotification('Dil değiştirildi: ' + newLang.toUpperCase(), 'success');
+}
+
+function shareSite() {
+    if (navigator.share) {
+        navigator.share({
+            title: 'VİZYON 2027',
+            text: 'Dünyanın en güçlü yapay zeka ekosistemi!',
+            url: window.location.href
+        }).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            showNotification('🔗 Link kopyalandı!', 'success');
+        }).catch(() => {
+            prompt('Linki kopyala:', window.location.href);
+        });
+    }
+}
+
+// ========== YORUMLAR ==========
 async function loadComments() {
     try {
         var comments = await Parse.Cloud.run('getComments');
@@ -4222,7 +4318,6 @@ async function loadComments() {
     }
 }
 
-// ========== YORUM SİLME FONKSİYONU ==========
 async function deleteComment(commentId) {
     if (!currentUser) {
         showNotification('Önce giriş yapın!', 'error');
@@ -4232,7 +4327,7 @@ async function deleteComment(commentId) {
     try {
         await Parse.Cloud.run('deleteComment', { commentId: commentId });
         showNotification('✅ Yorum silindi!', 'success');
-        await loadComments(); // Listeyi yenile
+        await loadComments();
     } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -4315,56 +4410,53 @@ if (cursor && ring) {
     }
 }
 
-// ========== DASHBOARD ==========
+// ========== DASHBOARD (KALDIRILDI, YERİNE userPanel KULLANILACAK) ==========
+// Bu fonksiyon artık kullanılmıyor, showUserPanel() kullanılacak.
 async function showDashboard() {
-    document.getElementById('mainSite').style.display = 'none';
-    document.getElementById('dashboardArea').style.display = 'block';
-    document.getElementById('userPanel').style.display = 'none';
-    var logoutBtn = document.querySelector('.logout-btn');
-    if (logoutBtn) logoutBtn.style.display = 'inline-block';
-    
-    var name = currentUser.get('name');
-    var role = currentUser.get('role');
-    document.getElementById('dashboardUserName').innerHTML = name || 'Kullanıcı';
-    document.getElementById('userRoleBadge').innerHTML =
-        role === 'founder' ? '👑 KURUCU' :
-        role === 'admin' ? '⚙️ ADMIN' :
-        role === 'beta' ? '🔬 BETA' :
-        '👤 KULLANICI';
-    if (role === 'admin' || role === 'founder') {
-        document.getElementById('adminPanelCard').style.display = 'block';
-        await loadUserList();
-    } else {
-        document.getElementById('adminPanelCard').style.display = 'none';
-    }
-    await loadProjects();
-    await loadFavorites();
-    await loadArchive();
-    await loadTrash();
-    await loadProjectRequests();
-    await loadInbox();
-    await loadTeamInfo();
-    await updateStats();
-    startStatsInterval();
-    // Sorgu limiti rozetini güncelle
-    var limitBadge = document.getElementById('dashQueryLimitBadge');
-    if (limitBadge) {
-        var role = currentUser.get('role');
-        var plan = currentUser.get('plan');
-        var limitText = '🔋 100 sorgu kaldı';
-        if (role === 'admin' || role === 'founder' || role === 'beta' || plan === 'team') {
-            limitText = '🔋 Sınırsız sorgu';
-        }
-        limitBadge.textContent = limitText;
-        limitBadge.style.display = 'inline-block';
-    }
-    // Yarım ekran AI panelini aç
-    openFullAIPanel('halfscreen');
+    showUserPanel();
 }
 
-// ========== KULLANICI PANELİ (KULLANILMIYOR) ==========
-function showUserPanel() {
-    showDashboard();
+// ========== KULLANICI PANELİ ==========
+async function showUserPanel() {
+    try {
+        console.log('🔄 Kullanıcı paneli açılıyor...');
+        
+        document.getElementById('mainSite').style.display = 'none';
+        document.getElementById('dashboardArea').style.display = 'none';
+        document.getElementById('userPanel').style.display = 'flex';
+        
+        var logoutBtn = document.querySelector('.logout-btn');
+        if (logoutBtn) logoutBtn.style.display = 'inline-block';
+        
+        var name = currentUser.get('name');
+        var role = currentUser.get('role');
+        document.getElementById('userPanelName').innerHTML = name || 'Kullanıcı';
+        document.getElementById('userPanelRole').innerHTML =
+            role === 'founder' ? '👑 KURUCU' :
+            role === 'admin' ? '⚙️ ADMIN' :
+            role === 'beta' ? '🔬 BETA' :
+            '👤 KULLANICI';
+        
+        // Admin paneli (user panel içinde admin kartı yok, sadece kullanıcı paneli)
+        // Admin işlemleri için ayrı bir panel gerekirse buraya eklenebilir.
+        
+        // Yorumları yükle
+        await loadComments();
+        updateCommentUI();
+        
+        // AI paneli zaten HTML'de yorumların altında duruyor.
+        // Sadece açık olduğundan emin ol
+        var panel = document.getElementById('fullAIPanel');
+        if (panel) {
+            panel.style.display = 'flex';
+            panel.classList.remove('fullscreen', 'halfscreen');
+        }
+        
+        console.log('✅ Kullanıcı paneli açıldı!');
+    } catch(e) {
+        console.error('Kullanıcı paneli hatası:', e);
+        showNotification('Panel yüklenirken hata oluştu: ' + e.message, 'error');
+    }
 }
 
 // ========== ÇIKIŞ ==========
@@ -4383,8 +4475,9 @@ function logout() {
     showNotification('Çıkış yapıldı.', 'success');
 }
 
-// ========== SAYFA YÜKLENİNCE (sohbet geçmişi otomatik yüklenmez) ==========
+// ========== SAYFA YÜKLENİNCE ==========
 window.onload = async function () {
+    console.log('🔄 Sayfa yükleniyor...');
     if (typeof initBack4App === 'function') {
         await initBack4App();
     } else {
@@ -4396,6 +4489,7 @@ window.onload = async function () {
         showNotification('❌ Back4App bağlantısı kurulamadı! Sayfayı yenileyin.', 'error');
         return;
     }
+    
     var saved = localStorage.getItem('vizyon_user');
     if (saved) {
         try {
@@ -4403,10 +4497,8 @@ window.onload = async function () {
             if (currentUser) {
                 try {
                     await currentUser.fetch();
-                    showDashboard();
-                    updateCommentUI();
-                    await loadComments();
-                    // ❌ Sohbet geçmişi OTOMATİK YÜKLENMEZ (sadece butonla)
+                    console.log('✅ Oturum aktif, kullanıcı paneli açılıyor...');
+                    await showUserPanel();
                     if (currentUser.get('role') === 'admin' || currentUser.get('role') === 'founder') {
                         try {
                             await Parse.Cloud.run('initAdminUsers');
@@ -4415,6 +4507,7 @@ window.onload = async function () {
                             console.log('Admin kontrol hatası:', e.message);
                         }
                     }
+                    showNotification('Hoş geldin, ' + currentUser.get('name'), 'success');
                 } catch (e) {
                     console.log('Oturum geçersiz, çıkış yapılıyor...');
                     await Parse.User.logOut();
@@ -4431,12 +4524,15 @@ window.onload = async function () {
             currentUser = null;
         }
     }
-    if (currentUser) {
-        await loadComments();
-        updateCommentUI();
+    
+    if (!currentUser) {
+        document.getElementById('mainSite').style.display = 'block';
+        document.getElementById('dashboardArea').style.display = 'none';
+        document.getElementById('userPanel').style.display = 'none';
     }
+    
     await updateStats();
     startStatsInterval();
     showNotification('✨ VİZYON 2027 Sistemi Aktif!', 'success');
 };
-</script>
+  </script>
