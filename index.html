@@ -647,7 +647,7 @@ footer {
     <!-- CSS-3: DASHBOARD, MODALLAR, WIDGET, FULL PANEL              -->
     <!-- ============================================================ -->
     <style>
-        /* ============================================================ */
+                /* ============================================================ */
 /* 3. CSS - DASHBOARD, MODALLAR, WIDGET, FULL PANEL, SCROLLBAR  */
 /* ============================================================ */
 
@@ -1174,7 +1174,7 @@ footer {
     font-weight: 600;
 }
 
-/* ========== VİZYON AI FULL PANEL (ÇEYREK / TAM / YARIM EKRAN) ========== */
+/* ========== VİZYON AI FULL PANEL (TAM EKRAN) ========== */
 .vizyon-ai-panel {
     display: none;
     position: fixed;
@@ -1193,7 +1193,7 @@ footer {
     backdrop-filter: blur(16px);
     z-index: 10000;
 }
-/* ========== TAM EKRAN MODU (ANA SAYFA BUTONU İÇİN) ========== */
+/* ========== TAM EKRAN MODU ========== */
 .vizyon-ai-panel.fullscreen {
     bottom: 0;
     right: 0;
@@ -1204,7 +1204,7 @@ footer {
     border-radius: 0;
     border: none;
 }
-/* ========== YARIM EKRAN MODU (KULLANICI PANELİ İÇİN) ========== */
+/* ========== YARIM EKRAN MODU (KULLANILMIYOR, SADECE CSS'TE KALDI) ========== */
 .vizyon-ai-panel.halfscreen {
     bottom: 10%;
     right: 25%;
@@ -1215,7 +1215,6 @@ footer {
     border-radius: 20px;
     border: 1px solid var(--accent);
 }
-/* ========== KAPATMA BUTONU FULLSCREEN VE HALFSCREEN'DE GÖRÜNSÜN ========== */
 .vizyon-ai-panel.fullscreen #fullscreenCloseBtn,
 .vizyon-ai-panel.halfscreen #fullscreenCloseBtn {
     display: inline-block !important;
@@ -1365,6 +1364,46 @@ footer {
 }
 #imageResults img:hover {
     transform: scale(1.05);
+}
+
+/* ========== KULLANICI PANELİ (user-panel) ========== */
+.user-panel {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: none;
+    flex-direction: column;
+    z-index: 9999;
+}
+.user-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.user-panel-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.user-panel-header .logo-text {
+    font-size: 22px;
+}
+.user-panel-header .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.user-panel-body {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    position: relative;
 }
     </style>
 
@@ -1622,6 +1661,10 @@ footer {
     }
 }
     </style>
+   
+       <!-- THREE.JS KÜTÜPHANESİ (3D YEDEK İÇİN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
 </head>
 <body>
@@ -1683,7 +1726,7 @@ footer {
         </h1>
         <p class="hero-sub">⚡ VİZYON AI ile her dili konuş, her kodu yaz, takımınla çalış, projelerini yönet.</p>
         <div class="hero-actions">
-            <button class="btn-primary" onclick="openFullAIPanel(true)">⚡ VİZYON AI'ı Başlat</button>
+            <button class="btn-primary" onclick="openFullAIPanel()">⚡ VİZYON AI'ı Başlat</button>
             <button class="btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Daha Fazla →</button>
         </div>
         <div class="stats-bar">
@@ -1778,7 +1821,7 @@ footer {
                 <h3 class="ai-title">Kod yaz,<br><em>anlık öğren,</em><br>büyü.</h3>
                 <p class="ai-desc">Dünyanın en güçlü AI modellerini tek platformda birleştirdik.</p>
                 <div class="model-row">
-                    <span class="mbadge a" onclick="openFullAIPanel(true)">⚡ VİZYON AI</span>
+                    <span class="mbadge a" onclick="openFullAIPanel()">⚡ VİZYON AI</span>
                     <span class="mbadge a">Groq</span>
                     <span class="mbadge b">DeepSeek</span>
                     <span class="mbadge c">OpenRouter</span>
@@ -1786,7 +1829,7 @@ footer {
                     <span class="mbadge b">Cohere</span>
                     <span class="mbadge c">Cerebras</span>
                 </div>
-                <button class="btn-primary" onclick="openFullAIPanel(true)">⚡ VİZYON AI ile Kod Yaz →</button>
+                <button class="btn-primary" onclick="openFullAIPanel()">⚡ VİZYON AI ile Kod Yaz →</button>
             </div>
             <div class="ai-right">
                 <div class="ai-chat-msg user">
@@ -1936,14 +1979,10 @@ footer {
             <div class="logo-icon">✨</div>
             <div class="logo-text">VİZYON 2027</div>
         </div>
-        <div class="user-info" style="display:flex;align-items:center;gap:12px;flex-
-
-wrap:wrap;">
+        <div class="user-info" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
             <span id="dashboardUserName" style="font-size:18px;font-weight:600;"></span>
             <span id="userRoleBadge" class="badge"></span>
-            <button class="btn-secondary btn-sm" onclick="openProfileModal()">👤 
-
-Profil</button>
+            <button class="btn-secondary btn-sm" onclick="openProfileModal()">👤 Profil</button>
             <button class="logout-btn btn-sm" onclick="logout()">Çıkış</button>
         </div>
     </div>
@@ -1956,16 +1995,10 @@ Profil</button>
                 <div class="ai-message bot">Merhaba! Size nasıl yardımcı olabilirim?</div>
             </div>
             <div class="ai-input-area">
-                <input type="text" id="dashboardAiInput" placeholder="AI'ya sor..." 
-
-class="glow-input" style="flex:1;">
+                <input type="text" id="dashboardAiInput" placeholder="AI'ya sor..." class="glow-input" style="flex:1;">
                 <button class="btn-primary" onclick="sendDashboardAI()">Gönder</button>
-                <input type="file" id="dashboardFileInput" style="display:none;" 
-
-accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip">
-                <button class="btn-secondary" onclick="document.getElementById
-
-('dashboardFileInput').click()">📎</button>
+                <input type="file" id="dashboardFileInput" style="display:none;" accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip">
+                <button class="btn-secondary" onclick="document.getElementById('dashboardFileInput').click()">📎</button>
             </div>
         </div>
     </div>
@@ -1977,9 +2010,7 @@ accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip">
         <div class="dashboard-card">
             <h3>📁 Projelerim</h3>
             <div id="projectsList" class="project-list"></div>
-            <button class="btn-primary btn-sm" onclick="newProject()" style="margin-
-
-top:8px;">+ Yeni Proje</button>
+            <button class="btn-primary btn-sm" onclick="newProject()" style="margin-top:8px;">+ Yeni Proje</button>
         </div>
 
         <!-- Favoriler -->
@@ -2019,24 +2050,32 @@ top:8px;">+ Yeni Proje</button>
             <div id="teamMembersList" class="team-list"></div>
             <div id="teamChatMessages" class="team-chat-messages"></div>
             <div class="ai-input-area">
-                <input type="text" id="teamChatInput" placeholder="Takıma mesaj yaz..." 
-
-class="glow-input" style="flex:1;">
-                <button class="btn-primary btn-sm" onclick="sendTeamMessage
-
-()">Gönder</button>
+                <input type="text" id="teamChatInput" placeholder="Takıma mesaj yaz..." class="glow-input" style="flex:1;">
+                <button class="btn-primary btn-sm" onclick="sendTeamMessage()">Gönder</button>
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-                <button class="btn-secondary btn-sm" onclick="createTeam()">+ Takım 
-
-Oluştur</button>
-                <input type="email" id="inviteEmail" placeholder="Davet et (e-posta)" 
-
-class="glow-input" style="flex:1;min-width:150px;">
-                <button class="btn-secondary btn-sm" onclick="inviteToTeam()">Davet 
-
-Gönder</button>
+                <button class="btn-secondary btn-sm" onclick="createTeam()">+ Takım Oluştur</button>
+                <input type="email" id="inviteEmail" placeholder="Davet et (e-posta)" class="glow-input" style="flex:1;min-width:150px;">
+                <button class="btn-secondary btn-sm" onclick="inviteToTeam()">Davet Gönder</button>
             </div>
+        </div>
+
+        <!-- ===== YENİ EKLENEN KARTLAR ===== -->
+
+        <!-- Görsel Üretme Kartı -->
+        <div class="dashboard-card">
+            <h3>🖼️ Görsel Üret (AI)</h3>
+            <input id="imagePrompt" class="glow-input" placeholder="Görsel açıklaması yazın..." style="width:100%; margin-bottom:10px;">
+            <button class="btn-primary btn-sm" onclick="generateImage()" style="width:100%;">🎨 Görsel Oluştur</button>
+            <div id="imageResults" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; max-height:200px; overflow-y:auto;"></div>
+        </div>
+
+        <!-- 3D Model Üretme Kartı -->
+        <div class="dashboard-card">
+            <h3>🧊 3D Model Üret</h3>
+            <input id="threeDPrompt" class="glow-input" placeholder="3D nesne açıklaması yazın..." style="width:100%; margin-bottom:10px;">
+            <button class="btn-3d btn-sm" onclick="generate3D()" style="width:100%;">🧊 3D Oluştur</button>
+            <div id="canvas3d" style="width:100%; height:250px; margin-top:10px; background:#0a0a0a; border-radius:12px; border:1px solid var(--border);"></div>
         </div>
 
     </div>
@@ -2055,12 +2094,8 @@ Gönder</button>
         <div style="margin-bottom:16px;">
             <h4>🎯 Admin Atama</h4>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <input type="email" id="assignAdminEmail" placeholder="Kullanıcı E-posta" 
-
-class="glow-input" style="flex:1;min-width:200px;">
-                <button class="btn-primary btn-sm" onclick="assignAdmin()">Admin 
-
-Yap</button>
+                <input type="email" id="assignAdminEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;">
+                <button class="btn-primary btn-sm" onclick="assignAdmin()">Admin Yap</button>
             </div>
         </div>
 
@@ -2068,9 +2103,7 @@ Yap</button>
         <div style="margin-bottom:16px;">
             <h4>🎁 Hediye Gönder</h4>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <input type="email" id="giftEmail" placeholder="Kullanıcı E-posta" 
-
-class="glow-input" style="flex:1;min-width:200px;">
+                <input type="email" id="giftEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;">
                 <select id="giftPackage" class="glow-input">
                     <option value="pro">🌟 Pro Paket</option>
                     <option value="team">👥 Takım Paketi</option>
@@ -2083,9 +2116,7 @@ class="glow-input" style="flex:1;min-width:200px;">
         <div>
             <h4>🔒 Kullanıcı Engelle</h4>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <input type="email" id="banUserEmail" placeholder="Kullanıcı E-posta" 
-
-class="glow-input" style="flex:1;min-width:200px;">
+                <input type="email" id="banUserEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;">
                 <button class="btn-danger btn-sm" onclick="banUser()">Yasakla</button>
             </div>
         </div>
@@ -2218,7 +2249,7 @@ class="glow-input" style="flex:1;min-width:200px;">
 </div>
 
 <!-- ============================================================ -->
-<!-- VİZYON AI FULL PANEL (ÇEYREK / TAM / YARIM EKRAN)           -->
+<!-- VİZYON AI FULL PANEL (TAM EKRAN)                             -->
 <!-- ============================================================ -->
 <div id="fullAIPanel" class="vizyon-ai-panel">
     <div class="vizyon-ai-header">
@@ -2228,8 +2259,7 @@ class="glow-input" style="flex:1;min-width:200px;">
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
             <span style="color:var(--text3); font-size:12px;">⚡ 7 Model</span>
-            <!-- ⬇️ KAPATMA BUTONU (SADECE FULLSCREEN VE HALFSCREEN'DE GÖRÜNÜR) -->
-            <button class="btn-secondary btn-sm" onclick="closeFullAIPanel()" style="display:none; padding:4px 12px; font-size:10px;" id="fullscreenCloseBtn">✕ Kapat</button>
+            <button class="btn-secondary btn-sm" onclick="closeFullAIPanel()" style="display:inline-block; padding:4px 12px; font-size:10px;" id="fullscreenCloseBtn">✕ Kapat</button>
         </div>
     </div>
     <div id="fullAIChat" class="vizyon-ai-chat">
@@ -2238,9 +2268,7 @@ class="glow-input" style="flex:1;min-width:200px;">
     <div class="vizyon-ai-input-area">
         <textarea id="fullAIInput" class="vizyon-ai-input" placeholder="Her dilde yazabilirsin... (Python, JavaScript, React, SQL...)" rows="2" onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendFullAI(); }"></textarea>
         <div style="display:flex; gap:8px; position:relative;">
-            <!-- ➕ ARTI BUTONU - Dosya yükleme menüsü -->
             <button class="btn-secondary" onclick="toggleFileMenu()" style="padding:10px 16px; font-size:18px;">➕</button>
-            <!-- Dosya menüsü -->
             <div id="fileMenu" style="display:none; position:absolute; bottom:70px; right:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:8px; z-index:10001; min-width:180px; box-shadow:0 8px 32px rgba(0,0,0,0.5);">
                 <button onclick="openCamera()" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📷 Fotoğraf Çek</button>
                 <button onclick="document.getElementById('fullFileInput').click(); toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📁 Galeriden Seç</button>
@@ -2258,14 +2286,12 @@ class="glow-input" style="flex:1;min-width:200px;">
 <section id="commentsSection">
     <h3>💬 Yorumlar</h3>
 
-    <!-- Yorum Listesi -->
     <div id="commentsList">
         <div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">
             🌟 Yorumlar yükleniyor...
         </div>
     </div>
 
-    <!-- Yorum Formu (sadece giriş yapmış kullanıcılar görebilir) -->
     <div id="commentForm" style="display: none;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
             <span style="color: var(--text2); font-size: 14px;">👤 <span id="commentUserName">Misafir</span></span>
@@ -2275,14 +2301,13 @@ class="glow-input" style="flex:1;min-width:200px;">
         <button onclick="postComment()" class="btn-primary" style="margin-top: 8px; width: 100%; font-size: 14px !important; padding: 12px !important;">💬 Yorum Gönder</button>
     </div>
 
-    <!-- Giriş yapmamış kullanıcılar için mesaj -->
     <div id="commentLoginMessage" style="margin-top: 16px; padding: 12px; background: var(--surface); border-radius: 12px; border: 1px dashed var(--border); text-align: center; color: var(--text3);">
         <p>Yorum yapmak için <button class="btn-secondary btn-sm" onclick="openModal('login')" style="display: inline-block; padding: 6px 16px; font-size: 12px;">giriş yapmalısınız</button>.</p>
     </div>
 </section>
 
 <!-- ============================================================ -->
-<!-- KULLANICI PANELİ (AYRI EKRAN) – EKLENDİ                     -->
+<!-- KULLANICI PANELİ (AYRI EKRAN)                               -->
 <!-- ============================================================ -->
 <div id="userPanel" class="user-panel">
     <div class="user-panel-header">
@@ -2298,7 +2323,7 @@ class="glow-input" style="flex:1;min-width:200px;">
         </div>
     </div>
     <div class="user-panel-body">
-        <!-- AI PANELİ BURADA YARIM EKRAN OLARAK GÖRÜNECEK -->
+        <!-- AI paneli burada tam ekran olarak açılacak -->
     </div>
 </div>
 </section>
@@ -3026,15 +3051,15 @@ function switchTab(tab) {
     <!-- JS-3: TAKIM VE AI (Cloud Code ile + Temizleme)              -->
     <!-- ============================================================ -->
     <script>
-        // ============================================================
+        // ================================================================
 // JS-3: TAKIM VE AI (Cloud Code + Dosya Yükleme + Kopyala + 3D/Görsel)
-// ============================================================
+// ================================================================
 
 async function loadTeamInfo() {
     if (!currentUser) return;
     var teamId = currentUser.get('teamId');
     if (!teamId) {
-        document.getElementById('teamInfo').innerHTML = '<p>Bir takima uye degilsiniz. Takim olusturun veya davet bekleyin.</p>';
+        document.getElementById('teamInfo').innerHTML = '<p>Bir takıma üye değilsiniz. Takım oluşturun veya davet bekleyin.</p>';
         document.getElementById('teamMembersList').innerHTML = '';
         document.getElementById('teamChatMessages').innerHTML = '';
         return;
@@ -3052,7 +3077,7 @@ async function loadTeamInfo() {
         msgQuery.equalTo('team_id', teamId);
         msgQuery.ascending('createdAt');
         var messages = await msgQuery.find();
-        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + '</h4><p>Uye sayisi: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
+        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + '</h4><p>Üye sayısı: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
         var membersHtml = '';
         for (var i = 0; i < members.length; i++) {
             var m = members[i];
@@ -3068,14 +3093,14 @@ async function loadTeamInfo() {
             var name = (msg.get('user_email') === userEmail) ? 'Ben' : msg.get('user_email').split('@')[0];
             chatHtml += '<div class="ai-message ' + cls + '"><strong>' + name + '</strong>: ' + msg.get('message') + '</div>';
         }
-        chatContainer.innerHTML = chatHtml || '<div>Henuz mesaj yok</div>';
+        chatContainer.innerHTML = chatHtml || '<div>Henüz mesaj yok</div>';
         chatContainer.scrollTop = chatContainer.scrollHeight;
-    } catch(e) { console.error('Takim bilgisi yuklenirken hata:', e); }
+    } catch (e) { console.error('Takım bilgisi yüklenirken hata:', e); }
 }
 
 async function createTeam() {
-    if (!currentUser) { showNotification('Once giris yapin!', 'error'); return; }
-    var name = prompt('Takim adi:');
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    var name = prompt('Takım adı:');
     if (!name) return;
     try {
         var Team = Parse.Object.extend('Team');
@@ -3091,14 +3116,14 @@ async function createTeam() {
         currentUser.set('teamId', team.id);
         await currentUser.save();
         await loadTeamInfo();
-        showNotification('"' + name + '" takimi olusturuldu!', 'success');
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+        showNotification('"' + name + '" takımı oluşturuldu!', 'success');
+    } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
 }
 
 async function inviteToTeam() {
-    if (!currentUser) { showNotification('Once giris yapin!', 'error'); return; }
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
     var teamId = currentUser.get('teamId');
-    if (!teamId) { showNotification('Once takim olusturun!', 'error'); return; }
+    if (!teamId) { showNotification('Önce takım oluşturun!', 'error'); return; }
     var email = document.getElementById('inviteEmail').value.trim();
     if (!email) { showNotification('E-posta adresi girin!', 'error'); return; }
     try {
@@ -3106,17 +3131,17 @@ async function inviteToTeam() {
         var inbox = new Inbox();
         inbox.set('sender_email', currentUser.get('email'));
         inbox.set('receiver_email', email);
-        inbox.set('message', currentUser.get('name') + ' sizi takima davet etti! Takim ID: ' + teamId);
+        inbox.set('message', currentUser.get('name') + ' sizi takıma davet etti! Takım ID: ' + teamId);
         await inbox.save();
-        showNotification('Davet gonderildi: ' + email, 'success');
+        showNotification('Davet gönderildi: ' + email, 'success');
         document.getElementById('inviteEmail').value = '';
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+    } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
 }
 
 async function sendTeamMessage() {
-    if (!currentUser) { showNotification('Once giris yapin!', 'error'); return; }
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
     var teamId = currentUser.get('teamId');
-    if (!teamId) { showNotification('Takiminiz yok!', 'error'); return; }
+    if (!teamId) { showNotification('Takımınız yok!', 'error'); return; }
     var msg = document.getElementById('teamChatInput').value.trim();
     if (!msg) return;
     try {
@@ -3128,13 +3153,13 @@ async function sendTeamMessage() {
         await message.save();
         document.getElementById('teamChatInput').value = '';
         await loadTeamInfo();
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+    } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
 }
 
 // ========== YANIT TEMİZLEME + KOD BLOĞU + KOPYALA ==========
 function cleanClientResponse(text) {
     if (!text) return text;
-    var withCopy = text.replace(/```(\w+)?\n([\s\S]*?)```/g, function(match, lang, code) {
+    var withCopy = text.replace(/```(\w+)?\n([\s\S]*?)```/g, function (match, lang, code) {
         return '<div class="code-block"><pre><code class="language-' + (lang || '') + '">' + code + '</code></pre><button class="copy-btn" onclick="copyCode(this)">📋 Kopyala</button></div>';
     });
     if (withCopy === text) {
@@ -3167,16 +3192,16 @@ function copyCode(btn) {
     var code = codeBlock.textContent;
     var originalText = btn.innerHTML;
     if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(code).then(function() {
+        navigator.clipboard.writeText(code).then(function () {
             btn.innerHTML = '✅ Kopyalandı!';
             btn.style.borderColor = '#00ff88';
             btn.style.color = '#00ff88';
-            setTimeout(function() {
+            setTimeout(function () {
                 btn.innerHTML = originalText;
                 btn.style.borderColor = '';
                 btn.style.color = '';
             }, 2000);
-        }).catch(function() { fallbackCopy(code, btn); });
+        }).catch(function () { fallbackCopy(code, btn); });
     } else {
         fallbackCopy(code, btn);
     }
@@ -3196,12 +3221,12 @@ function fallbackCopy(code, btn) {
         btn.innerHTML = '✅ Kopyalandı!';
         btn.style.borderColor = '#00ff88';
         btn.style.color = '#00ff88';
-        setTimeout(function() {
+        setTimeout(function () {
             btn.innerHTML = originalText;
             btn.style.borderColor = '';
             btn.style.color = '';
         }, 2000);
-    } catch(e) {
+    } catch (e) {
         alert('Kopyalanamadı. Lütfen manuel kopyalayın.');
     }
     document.body.removeChild(textarea);
@@ -3220,7 +3245,7 @@ function openCamera() {
     input.type = 'file';
     input.accept = 'image/*';
     input.capture = 'environment';
-    input.onchange = function(e) {
+    input.onchange = function (e) {
         if (e.target.files && e.target.files[0]) {
             var fakeEvent = { target: { files: e.target.files } };
             uploadFullFile(fakeEvent.target);
@@ -3232,22 +3257,22 @@ function openCamera() {
 async function callAllAIModels(prompt) {
     try {
         return await Parse.Cloud.run('superAI', { prompt: prompt });
-    } catch(e) {
-        console.error('AI hatasi:', e);
-        return '🧠 VIZYON AI: "' + prompt + '" hakkinda yardimci olabilirim. Detayli yanit icin lutfen daha spesifik bir soru sorun.';
+    } catch (e) {
+        console.error('AI hatası:', e);
+        return '🧠 VİZYON AI: "' + prompt + '" hakkında yardımcı olabilirim. Detaylı yanıt için lütfen daha spesifik bir soru sorun.';
     }
 }
 
 async function webSearch(query) {
     try {
         var result = await Parse.Cloud.run('webSearch', { query: query });
-        return result || '"' + query + '" icin sonuc bulunamadi.';
-    } catch(e) {
-        return '"' + query + '" icin arama yapilamadi.';
+        return result || '"' + query + '" için sonuç bulunamadı.';
+    } catch (e) {
+        return '"' + query + '" için arama yapılamadı.';
     }
 }
 
-window.sendDashboardAI = async function() {
+window.sendDashboardAI = async function () {
     if (!await useQuery()) return;
     var inp = document.getElementById('dashboardAiInput');
     var msg = inp.value.trim();
@@ -3267,17 +3292,15 @@ window.sendDashboardAI = async function() {
     container.scrollTop = container.scrollHeight;
 };
 
-// ========== AI PANELİ AÇ/KAPA (ÇEYREK / TAM / YARIM EKRAN) ==========
-function openFullAIPanel(mode) {
+// ========== AI PANELİ AÇ (SADECE TAM EKRAN) ==========
+function openFullAIPanel() {
     var panel = document.getElementById('fullAIPanel');
     if (!panel) return;
     panel.classList.remove('fullscreen', 'halfscreen');
-    if (mode === 'fullscreen') {
-        panel.classList.add('fullscreen');
-    } else if (mode === 'halfscreen') {
-        panel.classList.add('halfscreen');
-    }
+    panel.classList.add('fullscreen');
     panel.style.display = 'flex';
+    var closeBtn = document.getElementById('fullscreenCloseBtn');
+    if (closeBtn) closeBtn.style.display = 'inline-block';
 }
 
 function closeFullAIPanel() {
@@ -3337,7 +3360,7 @@ async function sendAiMessage() {
     msgs.scrollTop = msgs.scrollHeight;
 }
 
-// ========== DOSYA YÜKLEME (DÜZELTİLDİ) ==========
+// ========== DOSYA YÜKLEME ==========
 async function uploadFullFile(input) {
     var file = input.files[0];
     if (!file) return;
@@ -3350,7 +3373,7 @@ async function uploadFullFile(input) {
         var url = parseFile.url();
         showNotification('✅ Dosya yüklendi! AI analiz ediyor...', 'success');
         var reader = new FileReader();
-        reader.onload = async function(event) {
+        reader.onload = async function (event) {
             var content = event.target.result;
             var inputArea = document.getElementById('fullAIInput');
             if (inputArea) {
@@ -3375,20 +3398,19 @@ async function uploadFullFile(input) {
         } else {
             reader.readAsText(file);
         }
-    } catch(e) {
+    } catch (e) {
         console.error('Dosya yükleme hatası:', e);
         showNotification('❌ Dosya yüklenemedi: ' + e.message, 'error');
     }
     input.value = '';
 }
 
-// ========== GÖRSEL ÜRETME (Cloudflare SDXL) ==========
+// ========== GÖRSEL ÜRETME ==========
 async function generateImage() {
     var prompt = document.getElementById('imagePrompt').value.trim();
     if (!prompt) return showNotification('Lütfen bir açıklama yazın!', 'error');
     showNotification('⏳ Görsel üretiliyor...', 'success');
     try {
-        // Cloudflare Worker URL'nizi buraya yazın (örnek)
         var response = await fetch('https://vizyon-ai.your-worker.workers.dev/generate-image', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -3408,17 +3430,17 @@ async function generateImage() {
         } else {
             showNotification('❌ Görsel üretilemedi: ' + (data.error || 'Bilinmeyen hata'), 'error');
         }
-    } catch(e) {
+    } catch (e) {
         console.error('Görsel üretme hatası:', e);
         showNotification('❌ Görsel üretilemedi: ' + e.message, 'error');
     }
 }
 
-// ========== 3D MODEL ÜRETME (Three.ws) ==========
+// ========== 3D MODEL ÜRETME (Three.ws + Yedek) ==========
 async function generate3D() {
     var prompt = document.getElementById('threeDPrompt').value.trim();
     if (!prompt) return showNotification('Lütfen bir açıklama yazın!', 'error');
-    showNotification('⏳ 3D model oluşturuluyor... Bu işlem 30-60 saniye sürebilir.', 'success');
+    showNotification('⏳ 3D model oluşturuluyor...', 'success');
     try {
         var response = await fetch('https://three.ws/api/forge', {
             method: 'POST',
@@ -3429,26 +3451,58 @@ async function generate3D() {
         if (data.glbUrl) {
             load3DModel(data.glbUrl);
             showNotification('✅ 3D model oluşturuldu!', 'success');
+            return;
         } else {
-            showNotification('❌ 3D model oluşturulamadı: ' + (data.error || 'Bilinmeyen hata'), 'error');
+            throw new Error('Three.ws başarısız, basit şekil oluşturuluyor...');
         }
-    } catch(e) {
-        console.error('3D üretme hatası:', e);
-        showNotification('❌ 3D model oluşturulamadı: ' + e.message, 'error');
+    } catch (e) {
+        console.warn('Three.ws hatası, basit şekil oluşturuluyor:', e.message);
+        createSimple3DShape(prompt);
+        showNotification('🔄 Basit 3D şekil oluşturuldu (Three.ws çalışmadı).', 'warning');
     }
 }
 
-// ========== 3D MODEL GÖSTERME (Three.js) ==========
+// ========== BASİT 3D ŞEKİL OLUŞTUR (YEDEK) ==========
+function createSimple3DShape(prompt) {
+    if (!scene) init3D();
+    if (modelLoaded) {
+        scene.remove(modelLoaded);
+        modelLoaded = null;
+    }
+    var lower = prompt.toLowerCase();
+    var geometry;
+    if (lower.includes('küp') || lower.includes('cube')) {
+        geometry = new THREE.BoxGeometry(1, 1, 1);
+    } else if (lower.includes('küre') || lower.includes('sphere')) {
+        geometry = new THREE.SphereGeometry(0.7, 32, 32);
+    } else if (lower.includes('silindir') || lower.includes('cylinder')) {
+        geometry = new THREE.CylinderGeometry(0.7, 0.7, 1, 32);
+    } else if (lower.includes('piramit') || lower.includes('pyramid')) {
+        geometry = new THREE.ConeGeometry(0.7, 1, 4);
+    } else {
+        geometry = new THREE.TorusGeometry(0.6, 0.2, 16, 32);
+    }
+    var material = new THREE.MeshStandardMaterial({
+        color: 0x00d4ff,
+        metalness: 0.5,
+        roughness: 0.2
+    });
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(0, 0.5, 0);
+    scene.add(mesh);
+    modelLoaded = mesh;
+    camera.position.set(2, 2, 5);
+    camera.lookAt(0, 0, 0);
+}
+
+// ========== 3D SAHNE ==========
 let scene, camera, renderer;
 let modelLoaded = false;
 
 function init3D() {
     var container = document.getElementById('canvas3d');
     if (!container) return;
-    if (scene) {
-        // Sahne zaten başlatılmışsa tekrar başlatma
-        return;
-    }
+    if (scene) return;
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0a0a0a);
     var width = container.clientWidth || 500;
@@ -3460,18 +3514,15 @@ function init3D() {
     renderer.setSize(width, height);
     renderer.shadowMap.enabled = true;
     container.appendChild(renderer.domElement);
-    // Işıklandırma
     var ambientLight = new THREE.AmbientLight(0x404060);
     scene.add(ambientLight);
     var dirLight = new THREE.DirectionalLight(0xffffff, 1);
     dirLight.position.set(5, 10, 7);
     scene.add(dirLight);
-    // Yardımcı grid
     var gridHelper = new THREE.GridHelper(10, 10, 0x00d4ff, 0x1a3350);
     scene.add(gridHelper);
     animate3D();
-    // Pencere boyutu değişince sahneyi güncelle
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', function () {
         var w = container.clientWidth;
         var h = container.clientHeight;
         if (camera && renderer) {
@@ -3492,8 +3543,7 @@ function animate3D() {
 function load3DModel(url) {
     if (!scene) init3D();
     var loader = new THREE.GLTFLoader();
-    loader.load(url, function(gltf) {
-        // Önceki modeli temizle (varsa)
+    loader.load(url, function (gltf) {
         if (modelLoaded) {
             scene.remove(modelLoaded);
         }
@@ -3502,19 +3552,16 @@ function load3DModel(url) {
         model.position.set(0, 0, 0);
         scene.add(model);
         modelLoaded = model;
-        // Kamera ayarla
         camera.position.set(2, 2, 5);
         camera.lookAt(0, 0, 0);
         showNotification('✅ 3D model yüklendi!', 'success');
-    }, undefined, function(error) {
+    }, undefined, function (error) {
         console.error('Model yüklenemedi:', error);
         showNotification('❌ Model yüklenemedi: ' + error.message, 'error');
     });
 }
 
-// Sayfa yüklendiğinde 3D sahneyi başlat
-document.addEventListener('DOMContentLoaded', function() {
-    // 3D alanı varsa başlat
+document.addEventListener('DOMContentLoaded', function () {
     if (document.getElementById('canvas3d')) {
         init3D();
     }
@@ -3578,7 +3625,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.head.appendChild(style);
 })();
 
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
     var menu = document.getElementById('fileMenu');
     var btn = document.querySelector('[onclick="toggleFileMenu()"]');
     if (menu && menu.style.display !== 'none') {
@@ -3593,21 +3640,21 @@ document.addEventListener('click', function(e) {
     <!-- JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ                    -->
     <!-- ============================================================ -->
     <script>
-        // ============================================================
+        // ================================================================
 // JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ
-// ============================================================
+// ================================================================
 
 function openProfileModal() {
     if (!currentUser) {
-        showNotification('Once giris yapin!', 'error');
+        showNotification('Önce giriş yapın!', 'error');
         return;
     }
     document.getElementById('profileContent').innerHTML =
         '<p><strong>Ad:</strong> ' + currentUser.get('name') + '</p>' +
         '<p><strong>E-posta:</strong> ' + currentUser.get('email') + '</p>' +
-        '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : (currentUser.get('plan') === 'team' ? '👥 Takim' : '🆓 Ucretsiz')) + '</p>' +
-        '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : (currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 Beta' : '👤 Kullanici'))) + '</p>' +
-        '<p><strong>Uyelik:</strong> ' + new Date(currentUser.get('createdAt')).toLocaleDateString('tr-TR') + '</p>' +
+        '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : (currentUser.get('plan') === 'team' ? '👥 Takım' : '🆓 Ücretsiz')) + '</p>' +
+        '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : (currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 Beta' : '👤 Kullanıcı'))) + '</p>' +
+        '<p><strong>Üyelik:</strong> ' + new Date(currentUser.get('createdAt')).toLocaleDateString('tr-TR') + '</p>' +
         '<hr style="margin:16px 0;border-color:var(--border);">' +
         '<button class="btn-danger btn-sm" onclick="deleteAccount()" style="margin-top:10px;">🗑️ Hesabımı Sil</button>';
     document.getElementById('profileModal').classList.add('open');
@@ -3615,27 +3662,27 @@ function openProfileModal() {
 
 async function changePassword() {
     if (!currentUser) {
-        showNotification('Once giris yapin!', 'error');
+        showNotification('Önce giriş yapın!', 'error');
         return;
     }
-    var np = prompt('Yeni sifre (en az 8 karakter):');
+    var np = prompt('Yeni şifre (en az 8 karakter):');
     if (!np) return;
     if (np.length < 8) {
-        showNotification('Sifre en az 8 karakter!', 'error');
+        showNotification('Şifre en az 8 karakter!', 'error');
         return;
     }
     try {
         currentUser.set('password', np);
         await currentUser.save();
-        showNotification('Sifre degistirildi!', 'success');
-    } catch(e) {
+        showNotification('Şifre değiştirildi!', 'success');
+    } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 }
 
 async function deleteAccount() {
     if (!currentUser) {
-        showNotification('Once giris yapin!', 'error');
+        showNotification('Önce giriş yapın!', 'error');
         return;
     }
     if (!confirm('Hesap silinecek, emin misiniz?')) return;
@@ -3646,30 +3693,30 @@ async function deleteAccount() {
             html: '<h1>Hesabınız silindi</h1><p>Sayın ' + currentUser.get('name') + ',</p><p>Hesabınız başarıyla silinmiştir.</p><p>Tekrar görüşmek üzere!</p>'
         });
         console.log('✅ Silme onay maili gönderildi.');
-    } catch(e) {
+    } catch (e) {
         console.log('Mail gönderilemedi:', e);
     }
     try {
         await currentUser.destroy();
         logout();
         showNotification('Hesabınız silindi.', 'success');
-    } catch(e) {
+    } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 }
 
 async function buyPackage(pkg) {
     if (!currentUser) {
-        showNotification('Once giris yapin!', 'error');
+        showNotification('Önce giriş yapın!', 'error');
         return;
     }
-    if (confirm((pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takim Paketi (₺899/ay)') + ' satin al?')) {
+    if (confirm((pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takım Paketi (₺899/ay)') + ' satın al?')) {
         try {
             currentUser.set('plan', pkg);
             await currentUser.save();
-            showNotification('Paket alindi!', 'success');
+            showNotification('Paket alındı!', 'success');
             location.reload();
-        } catch(e) {
+        } catch (e) {
             showNotification('Hata: ' + e.message, 'error');
         }
     }
@@ -3678,9 +3725,9 @@ async function buyPackage(pkg) {
 function openRolePanel(role) {
     currentRole = role;
     document.getElementById('roleTitle').innerHTML =
-        role === 'FOUNDER' ? '👑 FOUNDER GIRISI' :
-        role === 'ADMIN' ? '⚙️ ADMIN GIRISI' :
-        '🔬 BETA GIRISI';
+        role === 'FOUNDER' ? '👑 FOUNDER GİRİŞİ' :
+        role === 'ADMIN' ? '⚙️ ADMIN GİRİŞİ' :
+        '🔬 BETA GİRİŞİ';
     document.getElementById('rolePanel').classList.add('open');
 }
 
@@ -3692,14 +3739,14 @@ function checkRole() {
         (currentRole === 'BETA' && pass === '4402');
     if (valid) {
         closeModal('rolePanel');
-        openFullAIPanel('fullscreen');
+        openFullAIPanel();
         document.querySelector('.vizyon-ai-header .logo-text').innerHTML =
             currentRole === 'FOUNDER' ? '👑 FOUNDER AI' :
             currentRole === 'ADMIN' ? '⚙️ ADMIN AI' :
             '🔬 BETA AI';
-        showNotification('Hos geldiniz, ' + currentRole + ' paneli aktif!', 'success');
+        showNotification('Hoş geldiniz, ' + currentRole + ' paneli aktif!', 'success');
     } else {
-        showNotification('Sifre hatali!', 'error');
+        showNotification('Şifre hatalı!', 'error');
     }
 }
 
@@ -3714,11 +3761,11 @@ async function loadUserList() {
         for (var i = 0; i < users.length; i++) {
             var u = users[i];
             var role = u.get('role') || 'user';
-            html += '<div class="user-item"><span class="user-email">' + u.get('email') + '</span><span class="user-role">' + role + '</span><div class="user-actions"><button class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email') + '\')">Admin Yap</button><button class="btn-user" onclick="setUserRole(\'' + u.get('email') + '\',\'user\')">Kullanici Yap</button><button class="btn-ban" onclick="banUserEmail(\'' + u.get('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' + u.get('email') + '\')">🎁</button></div></div>';
+            html += '<div class="user-item"><span class="user-email">' + u.get('email') + '</span><span class="user-role">' + role + '</span><div class="user-actions"><button class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email') + '\')">Admin Yap</button><button class="btn-user" onclick="setUserRole(\'' + u.get('email') + '\',\'user\')">Kullanıcı Yap</button><button class="btn-ban" onclick="banUserEmail(\'' + u.get('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' + u.get('email') + '\')">🎁</button></div></div>';
         }
         container.innerHTML = html;
-    } catch(e) {
-        console.error('Kullanici listesi yuklenirken hata:', e);
+    } catch (e) {
+        console.error('Kullanıcı listesi yüklenirken hata:', e);
     }
 }
 
@@ -3728,7 +3775,7 @@ async function assignAdminEmail(email) {
         query.equalTo('email', email);
         var user = await query.first();
         if (!user) {
-            showNotification('Kullanici bulunamadi!', 'error');
+            showNotification('Kullanıcı bulunamadı!', 'error');
             return;
         }
         user.set('role', 'admin');
@@ -3737,11 +3784,11 @@ async function assignAdminEmail(email) {
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
-        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lutfen sifrenizi belirlemek icin "Admin Sifre Belirle" butonuna tiklayin.');
+        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lütfen şifrenizi belirlemek için "Admin Şifre Belirle" butonuna tıklayın.');
         await inbox.save();
-        showNotification(email + ' admin yapildi!', 'success');
+        showNotification(email + ' admin yapıldı!', 'success');
         await loadUserList();
-    } catch(e) {
+    } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 }
@@ -3752,14 +3799,14 @@ async function setUserRole(email, role) {
         query.equalTo('email', email);
         var user = await query.first();
         if (!user) {
-            showNotification('Kullanici bulunamadi!', 'error');
+            showNotification('Kullanıcı bulunamadı!', 'error');
             return;
         }
         user.set('role', role);
         await user.save();
-        showNotification(email + ' rolu ' + role + ' olarak degistirildi!', 'success');
+        showNotification(email + ' rolü ' + role + ' olarak değiştirildi!', 'success');
         await loadUserList();
-    } catch(e) {
+    } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 }
@@ -3770,14 +3817,14 @@ async function banUserEmail(email) {
         query.equalTo('email', email);
         var user = await query.first();
         if (!user) {
-            showNotification('Kullanici bulunamadi!', 'error');
+            showNotification('Kullanıcı bulunamadı!', 'error');
             return;
         }
         user.set('isBanned', true);
         await user.save();
-        showNotification(email + ' yasaklandi!', 'success');
+        showNotification(email + ' yasaklandı!', 'success');
         await loadUserList();
-    } catch(e) {
+    } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 }
@@ -3788,7 +3835,7 @@ async function giftUserEmail(email, pkg) {
         query.equalTo('email', email);
         var user = await query.first();
         if (!user) {
-            showNotification('Kullanici bulunamadi!', 'error');
+            showNotification('Kullanıcı bulunamadı!', 'error');
             return;
         }
         var Gift = Parse.Object.extend('Gift');
@@ -3801,18 +3848,18 @@ async function giftUserEmail(email, pkg) {
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
-        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takim Paketi') + ' hediye edildi!');
+        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takım Paketi') + ' hediye edildi!');
         await inbox.save();
         showNotification(email + ' adresine ' + pkg + ' paketi hediye edildi!', 'success');
         await loadUserList();
-    } catch(e) {
+    } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 }
 
 async function assignAdmin() {
     if (!currentUser) {
-        showNotification('Once giris yapin!', 'error');
+        showNotification('Önce giriş yapın!', 'error');
         return;
     }
     var email = document.getElementById('assignAdminEmail').value.trim();
@@ -3850,7 +3897,7 @@ async function setAdminPassword() {
     var pass = document.getElementById('adminPass').value;
     var pass2 = document.getElementById('adminPass2').value;
     if (!email || pass.length < 8 || pass !== pass2) {
-        showNotification('Tum alanlari doldurun, sifreler ayni ve min 8 karakter', 'error');
+        showNotification('Tüm alanları doldurun, şifreler aynı ve min 8 karakter', 'error');
         return;
     }
     try {
@@ -3858,17 +3905,17 @@ async function setAdminPassword() {
         query.equalTo('email', email);
         var user = await query.first();
         if (!user) {
-            showNotification('Kullanici bulunamadi!', 'error');
+            showNotification('Kullanıcı bulunamadı!', 'error');
             return;
         }
         user.set('password', pass);
         await user.save();
-        showNotification('✅ Sifre basariyla guncellendi!', 'success');
+        showNotification('✅ Şifre başarıyla güncellendi!', 'success');
         closeModal('adminPasswordModal');
         document.getElementById('adminEmail').value = '';
         document.getElementById('adminPass').value = '';
         document.getElementById('adminPass2').value = '';
-    } catch(e) {
+    } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 }
@@ -3895,10 +3942,10 @@ function switchTab(tab) {
 
 function openRandomSupport() {
     window.location.href = 'mailto:vizyon2027.info@gmail.com?subject=Vizyon2027%20Destek';
-    showNotification('Destek maili aciliyor', 'success');
+    showNotification('Destek maili açılıyor', 'success');
 }
 
-// ========== SOHBET GEÇMİŞİNİ YÜKLE ==========
+// ========== SOHBET GEÇMİŞİ ==========
 async function loadChatHistory() {
     if (!currentUser) return;
     try {
@@ -3915,7 +3962,7 @@ async function loadChatHistory() {
                 chat.scrollTop = chat.scrollHeight;
             }
         }
-    } catch(e) {
+    } catch (e) {
         console.log('Sohbet geçmişi yüklenemedi:', e.message);
     }
 }
@@ -3924,7 +3971,7 @@ async function saveChatHistory(messages) {
     if (!currentUser) return;
     try {
         await Parse.Cloud.run('saveChatHistory', { messages: messages });
-    } catch(e) {
+    } catch (e) {
         console.log('Sohbet geçmişi kaydedilemedi:', e.message);
     }
 }
@@ -3935,7 +3982,7 @@ async function loadComments() {
         var comments = await Parse.Cloud.run('getComments');
         var container = document.getElementById('commentsList');
         if (!comments || comments.length === 0) {
-            container.innerHTML = '<div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">🌟 Ilk yorumu sen yap!</div>';
+            container.innerHTML = '<div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">🌟 İlk yorumu sen yap!</div>';
             return;
         }
         var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 'user': '👤 KULLANICI' };
@@ -3945,33 +3992,33 @@ async function loadComments() {
             var c = comments[i];
             var color = roleColors[c.user_role] || 'var(--border)';
             var label = roleLabels[c.user_role] || '👤 KULLANICI';
-            html += '<div class="comment-item" style="border-left-color: ' + color + ';"><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"><strong style="color: var(--accent2);">' + (c.user_name || 'Isimsiz') + '</strong><span class="role-badge ' + (c.user_role || 'user') + '" style="border-color: ' + color + '; color: ' + color + ';">' + label + '</span><span class="comment-email">📧 ' + (c.user_email || '---') + '</span><span class="comment-time" style="margin-left: auto;">' + new Date(c.createdAt).toLocaleString('tr-TR') + '</span></div><div class="comment-text">' + c.comment + '</div></div>';
+            html += '<div class="comment-item" style="border-left-color: ' + color + ';"><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"><strong style="color: var(--accent2);">' + (c.user_name || 'İsimsiz') + '</strong><span class="role-badge ' + (c.user_role || 'user') + '" style="border-color: ' + color + '; color: ' + color + ';">' + label + '</span><span class="comment-email">📧 ' + (c.user_email || '---') + '</span><span class="comment-time" style="margin-left: auto;">' + new Date(c.createdAt).toLocaleString('tr-TR') + '</span></div><div class="comment-text">' + c.comment + '</div></div>';
         }
         container.innerHTML = html;
-    } catch(e) {
-        console.error('Yorumlar yuklenemedi:', e);
-        document.getElementById('commentsList').innerHTML = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);;">⚠️ Yorumlar yuklenemedi: ' + e.message + '</div>';
+    } catch (e) {
+        console.error('Yorumlar yüklenemedi:', e);
+        document.getElementById('commentsList').innerHTML = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);;">⚠️ Yorumlar yüklenemedi: ' + e.message + '</div>';
     }
 }
 
 async function postComment() {
     if (!currentUser) {
-        showNotification('Yorum yapmak icin giris yapmalisiniz!', 'error');
+        showNotification('Yorum yapmak için giriş yapmalısınız!', 'error');
         return;
     }
     var input = document.getElementById('commentInput');
     var text = input.value.trim();
     if (!text) {
-        showNotification('Lutfen bir yorum yazin!', 'error');
+        showNotification('Lütfen bir yorum yazın!', 'error');
         return;
     }
     try {
         await Parse.Cloud.run('addComment', { comment: text });
         input.value = '';
-        showNotification('💬 Yorumunuz gonderildi!', 'success');
+        showNotification('💬 Yorumunuz gönderildi!', 'success');
         await loadComments();
-    } catch(e) {
-        showNotification('Yorum gonderilemedi: ' + e.message, 'error');
+    } catch (e) {
+        showNotification('Yorum gönderilemedi: ' + e.message, 'error');
     }
 }
 
@@ -3983,7 +4030,7 @@ function updateCommentUI() {
     if (currentUser) {
         if (form) form.style.display = 'block';
         if (loginMsg) loginMsg.style.display = 'none';
-        if (userName) userName.textContent = currentUser.get('name') || 'Kullanici';
+        if (userName) userName.textContent = currentUser.get('name') || 'Kullanıcı';
         var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 'user': '👤 KULLANICI' };
         if (userRole) userRole.textContent = roleLabels[currentUser.get('role')] || '👤 KULLANICI';
     } else {
@@ -4008,7 +4055,7 @@ var cursor = document.getElementById('customCursor');
 var ring = document.getElementById('customCursorRing');
 if (cursor && ring) {
     var mx = 0, my = 0, rx = 0, ry = 0;
-    document.addEventListener('mousemove', function(e) {
+    document.addEventListener('mousemove', function (e) {
         mx = e.clientX;
         my = e.clientY;
         cursor.style.left = (mx - 6) + 'px';
@@ -4024,9 +4071,9 @@ if (cursor && ring) {
     animate();
     var btns = document.querySelectorAll('button, a, .btn, .secret-btn, .support-link');
     for (var i = 0; i < btns.length; i++) {
-        (function(btn) {
-            btn.addEventListener('mouseenter', function() { cursor.classList.add('hover'); });
-            btn.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); });
+        (function (btn) {
+            btn.addEventListener('mouseenter', function () { cursor.classList.add('hover'); });
+            btn.addEventListener('mouseleave', function () { cursor.classList.remove('hover'); });
         })(btns[i]);
     }
 }
@@ -4060,7 +4107,7 @@ async function showDashboard() {
     startStatsInterval();
 }
 
-// ========== KULLANICI PANELİ (AYRI EKRAN) ==========
+// ========== KULLANICI PANELİ ==========
 function showUserPanel() {
     document.getElementById('mainSite').style.display = 'none';
     document.getElementById('dashboardArea').style.display = 'none';
@@ -4073,8 +4120,7 @@ function showUserPanel() {
         role === 'admin' ? '⚙️ ADMIN' :
         role === 'beta' ? '🔬 BETA' :
         '👤 KULLANICI';
-    // AI panelini yarım ekran olarak aç
-    openFullAIPanel('halfscreen');
+    openFullAIPanel();
 }
 
 // ========== ÇIKIŞ ==========
@@ -4088,16 +4134,16 @@ function logout() {
 }
 
 // ========== SAYFA YÜKLENİNCE ==========
-window.onload = async function() {
+window.onload = async function () {
     if (typeof initBack4App === 'function') {
         await initBack4App();
     } else {
-        console.error('initBack4App fonksiyonu bulunamadi!');
-        showNotification('❌ Back4App baglantisi kurulamadi! Sayfayi yenileyin.', 'error');
+        console.error('initBack4App fonksiyonu bulunamadı!');
+        showNotification('❌ Back4App bağlantısı kurulamadı! Sayfayı yenileyin.', 'error');
         return;
     }
     if (typeof Parse === 'undefined' || !parseInitialized) {
-        showNotification('❌ Back4App baglantisi kurulamadi! Sayfayi yenileyin.', 'error');
+        showNotification('❌ Back4App bağlantısı kurulamadı! Sayfayı yenileyin.', 'error');
         return;
     }
     var saved = localStorage.getItem('vizyon_user');
@@ -4115,11 +4161,11 @@ window.onload = async function() {
                         try {
                             await Parse.Cloud.run('initAdminUsers');
                             console.log('✅ Admin hesaplar kontrol edildi');
-                        } catch(e) {
+                        } catch (e) {
                             console.log('Admin kontrol hatası:', e.message);
                         }
                     }
-                } catch(e) {
+                } catch (e) {
                     console.log('Oturum geçersiz, çıkış yapılıyor...');
                     await Parse.User.logOut();
                     localStorage.removeItem('vizyon_user');
@@ -4129,8 +4175,8 @@ window.onload = async function() {
             } else {
                 localStorage.removeItem('vizyon_user');
             }
-        } catch(e) {
-            console.error('Oturum hatasi:', e);
+        } catch (e) {
+            console.error('Oturum hatası:', e);
             localStorage.removeItem('vizyon_user');
             currentUser = null;
         }
@@ -4141,7 +4187,7 @@ window.onload = async function() {
     }
     await updateStats();
     startStatsInterval();
-    showNotification('✨ VIZYON 2027 Sistemi Aktif!', 'success');
+    showNotification('✨ VİZYON 2027 Sistemi Aktif!', 'success');
 };
     </script>
 
