@@ -643,11 +643,7 @@ footer {
 }
     </style>
 
-    <!-- ============================================================ -->
-    <!-- CSS-3: DASHBOARD, MODALLAR, WIDGET, FULL PANEL              -->
-    <!-- ============================================================ -->
-    <style>
-                /* ============================================================ */
+    /* ============================================================ */
 /* 3. CSS - DASHBOARD, MODALLAR, WIDGET, FULL PANEL, SCROLLBAR  */
 /* ============================================================ */
 
@@ -1405,13 +1401,10 @@ footer {
     overflow-y: auto;
     position: relative;
 }
+        
     </style>
 
-    <!-- ============================================================ -->
-    <!-- CSS-4: ÖZEL STILLER, BUTONLAR, YORUMLAR, RESPONSIVE         -->
-    <!-- ============================================================ -->
-    <style>
-        /* ============================================================ */
+    /* ============================================================ */
 /* 4. CSS - ÖZEL STILLER, BUTONLAR, YORUMLAR, RESPONSIVE       */
 /* ============================================================ */
 
@@ -1639,25 +1632,141 @@ footer {
     font-size: 12px;
 }
 
-/* ===== RESPONSIVE EKLENTİLER ===== */
+/* ====================================================== */
+/* ========== TELEFON UYUMLULUĞU (EK KURALLAR) ========= */
+/* ====================================================== */
 @media (max-width: 768px) {
+    /* Dashboard kartları tek sütun */
+    .dashboard-grid,
+    .dashboard-grid-2col {
+        grid-template-columns: 1fr !important;
+        padding: 10px !important;
+        gap: 12px !important;
+    }
+    .dashboard-card {
+        padding: 16px !important;
+    }
+    .dashboard-card h3 {
+        font-size: 16px !important;
+    }
+    /* AI paneli tam ekran */
+    .vizyon-ai-panel.fullscreen {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        border-radius: 0 !important;
+        bottom: 0 !important;
+        right: 0 !important;
+    }
+    .vizyon-ai-header .logo-text {
+        font-size: 14px !important;
+    }
+    .vizyon-ai-input {
+        font-size: 12px !important;
+        padding: 8px 10px !important;
+    }
+    .vizyon-ai-input-area {
+        flex-direction: column !important;
+        gap: 6px !important;
+        padding: 8px !important;
+    }
+    .vizyon-ai-chat .ai-msg {
+        font-size: 12px !important;
+        padding: 8px 12px !important;
+    }
+    /* Modal */
+    .modal {
+        width: 95% !important;
+        padding: 20px !important;
+        max-height: 80vh !important;
+        overflow-y: auto !important;
+    }
+    .modal-header h3 {
+        font-size: 18px !important;
+    }
+    .form-input {
+        font-size: 13px !important;
+        padding: 10px 14px !important;
+    }
+    /* Navbar */
+    nav {
+        padding: 0 12px !important;
+        height: 56px !important;
+        flex-wrap: wrap !important;
+    }
+    .nav-links {
+        gap: 8px !important;
+    }
+    .nav-links a {
+        font-size: 9px !important;
+    }
+    .logo-text {
+        font-size: 16px !important;
+    }
+    .button-group .btn {
+        font-size: 10px !important;
+        padding: 4px 10px !important;
+    }
+    .hero-title .line1 {
+        font-size: 28px !important;
+    }
+    .hero-title .line2 {
+        font-size: 22px !important;
+    }
+    .hero-title .line3 {
+        font-size: 14px !important;
+    }
+    .hero-actions .btn-primary,
+    .hero-actions .btn-secondary {
+        font-size: 14px !important;
+        padding: 10px 20px !important;
+    }
+    .stats-bar {
+        flex-wrap: wrap !important;
+        border-radius: 16px !important;
+    }
+    .stat-item {
+        flex: 1 1 50% !important;
+        padding: 12px !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border) !important;
+    }
+    .stat-item:last-child {
+        border-bottom: none !important;
+    }
+    .stat-num {
+        font-size: 22px !important;
+    }
+    /* AI widget */
+    .ai-widget-btn {
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 20px !important;
+    }
+    .ai-panel {
+        width: calc(100vw - 20px) !important;
+        right: 10px !important;
+        bottom: 70px !important;
+    }
+    .ai-messages {
+        height: 220px !important;
+    }
+    /* Yorumlar */
     #commentsSection {
-        padding: 10px;
+        padding: 10px !important;
     }
     .comment-item {
-        padding: 10px 12px;
+        padding: 10px 12px !important;
     }
     .comment-item .role-badge {
-        font-size: 9px;
-        padding: 1px 8px;
+        font-size: 8px !important;
+        padding: 1px 6px !important;
     }
-    .btn-google {
-        font-size: 13px;
-        padding: 12px;
-    }
+    .btn-google,
     .btn-facebook {
-        font-size: 13px;
-        padding: 12px;
+        font-size: 12px !important;
+        padding: 10px !important;
     }
 }
     </style>
@@ -2130,9 +2239,6 @@ footer {
     </div>
 
     <!-- ============================================================ -->
-    <!-- HTML-3: MODALLAR, WIDGET, FULL PANEL, YORUMLAR              -->
-    <!-- ============================================================ -->
-    <!-- ============================================================ -->
 <!-- HTML-3: MODALLAR, WIDGET, FULL PANEL, YORUMLAR              -->
 <!-- ============================================================ -->
 
@@ -2259,7 +2365,8 @@ footer {
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
             <span style="color:var(--text3); font-size:12px;">⚡ 7 Model</span>
-            <button class="btn-secondary btn-sm" onclick="closeFullAIPanel()" style="display:inline-block; padding:4px 12px; font-size:10px;" id="fullscreenCloseBtn">✕ Kapat</button>
+            <!-- ⬇️ KAPAT BUTONU ÇIKIŞ YAPAR -->
+            <button class="btn-secondary btn-sm" onclick="logout()" style="display:inline-block; padding:4px 12px; font-size:10px;" id="fullscreenCloseBtn">✕ Kapat</button>
         </div>
     </div>
     <div id="fullAIChat" class="vizyon-ai-chat">
@@ -2307,7 +2414,7 @@ footer {
 </section>
 
 <!-- ============================================================ -->
-<!-- KULLANICI PANELİ (AYRI EKRAN)                               -->
+<!-- KULLANICI PANELİ (AYRI EKRAN) – ARTIK KULLANILMIYOR          -->
 <!-- ============================================================ -->
 <div id="userPanel" class="user-panel">
     <div class="user-panel-header">
@@ -3277,13 +3384,14 @@ window.sendDashboardAI = async function () {
 function openFullAIPanel() {
     var panel = document.getElementById('fullAIPanel');
     if (!panel) return;
-    panel.classList.remove('fullscreen', 'halfscreen');
+    panel.classList.remove('halfscreen');
     panel.classList.add('fullscreen');
     panel.style.display = 'flex';
     var closeBtn = document.getElementById('fullscreenCloseBtn');
     if (closeBtn) closeBtn.style.display = 'inline-block';
 }
 
+// ========== AI PANELİ KAPAT (SADECE PANELİ GİZLER) ==========
 function closeFullAIPanel() {
     var panel = document.getElementById('fullAIPanel');
     if (panel) {
@@ -3615,7 +3723,9 @@ document.addEventListener('click', function (e) {
         }
     }
 });
-</script> 
+</script>
+
+ 
 
 
 <!-- ============================================================ -->
@@ -4087,6 +4197,11 @@ if (cursor && ring) {
 async function showDashboard() {
     document.getElementById('mainSite').style.display = 'none';
     document.getElementById('dashboardArea').style.display = 'block';
+    document.getElementById('userPanel').style.display = 'none';
+    // Navbar'daki logout butonunu göster
+    var logoutBtn = document.querySelector('.logout-btn');
+    if (logoutBtn) logoutBtn.style.display = 'inline-block';
+    
     var name = currentUser.get('name');
     var role = currentUser.get('role');
     document.getElementById('dashboardUserName').innerHTML = name || 'Kullanıcı';
@@ -4110,32 +4225,32 @@ async function showDashboard() {
     await loadTeamInfo();
     await updateStats();
     startStatsInterval();
+    openFullAIPanel();
 }
 
-// ========== KULLANICI PANELİ ==========
+// ========== KULLANICI PANELİ (KULLANILMIYOR) ==========
 function showUserPanel() {
-    document.getElementById('mainSite').style.display = 'none';
-    document.getElementById('dashboardArea').style.display = 'none';
-    document.getElementById('userPanel').style.display = 'flex';
-    var name = currentUser.get('name');
-    var role = currentUser.get('role');
-    document.getElementById('userPanelName').innerHTML = name || 'Kullanıcı';
-    document.getElementById('userPanelRole').innerHTML =
-        role === 'founder' ? '👑 KURUCU' :
-        role === 'admin' ? '⚙️ ADMIN' :
-        role === 'beta' ? '🔬 BETA' :
-        '👤 KULLANICI';
-    openFullAIPanel();
+    // Artık kullanılmıyor, direkt showDashboard'a yönlendir
+    showDashboard();
 }
 
 // ========== ÇIKIŞ ==========
 function logout() {
+    // AI panelini kapat
     closeFullAIPanel();
+    // Çıkış yap
     Parse.User.logOut();
     localStorage.removeItem('vizyon_user');
     currentUser = null;
     stopStatsInterval();
-    location.reload();
+    // Ana sayfayı göster, dashboard ve userPanel'i gizle
+    document.getElementById('mainSite').style.display = 'block';
+    document.getElementById('dashboardArea').style.display = 'none';
+    document.getElementById('userPanel').style.display = 'none';
+    // Navbar'daki logout butonunu gizle
+    var logoutBtn = document.querySelector('.logout-btn');
+    if (logoutBtn) logoutBtn.style.display = 'none';
+    showNotification('Çıkış yapıldı.', 'success');
 }
 
 // ========== SAYFA YÜKLENİNCE ==========
@@ -4158,7 +4273,7 @@ window.onload = async function () {
             if (currentUser) {
                 try {
                     await currentUser.fetch();
-                    showUserPanel();
+                    showDashboard();
                     updateCommentUI();
                     await loadComments();
                     await loadChatHistory();
