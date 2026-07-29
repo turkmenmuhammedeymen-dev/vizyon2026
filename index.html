@@ -1,1 +1,4359 @@
-ŞU ANDA SİSTEMİ GÜNCELLİYORUZ KISA BİR SÜRE BEKLEYİP SAYFAYI YENİLEYİN
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vizyon 2027 | VİZYON AI</title>
+
+    <!-- ========== HARİCİ KÜTÜPHANELER ========== -->
+    <script src="https://cdn.jsdelivr.net/npm/parse@5.0.0/dist/parse.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0
+
+-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?
+
+family=Inter:wght@300;400;600;700;800&family=Syne:wght@400;600;700;800&family=Fira
+
++Code:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- ============================================================ -->
+    <!-- ===================== CSS BÖLÜMLERİ ========================= -->
+    <!-- ============================================================ -->
+
+    <!-- ============================================================ -->
+    <!-- CSS-1: DEĞİŞKENLER, GENEL, NAVBAR, HERO, STATS, SCROLL      -->
+    <!-- ============================================================ -->
+    <style>
+        /* ============================================================ */
+/* 1. CSS - DEĞİŞKENLER, GENEL, NAVBAR, HERO, STATS, SCROLL     */
+/* ============================================================ */
+
+:root {
+    --bg: #050a0f;
+    --bg2: #0a111a;
+    --surface: #0d1a26;
+    --surface2: #112233;
+    --border: #1a3350;
+    --accent: #00d4ff;
+    --accent2: #00ff88;
+    --accent3: #ff6b35;
+    --gold: #ffd700;
+    --text: #ffffff;
+    --text2: #ccdeee;
+    --text3: #8ab4cc;
+    --danger: #ff4757;
+    --danger-hover: #ff6b7c;
+    --purple: #a855f7;
+    --purple-hover: #c084fc;
+    --success: #00ff88;
+    --warning: #ffb700;
+    --font-display: 'Syne', sans-serif;
+    --font-code: 'Fira Code', monospace;
+    --font-body: 'Inter', sans-serif;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+    --shadow-glow: 0 0 20px rgba(0,212,255,0.3);
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.25s ease;
+    --transition-slow: 0.4s ease;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-body); overflow-x: hidden; min-height: 100vh; }
+
+/* ===== ÖZEL İMLEÇ ===== */
+.custom-cursor { width: 12px; height: 12px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 99999; box-shadow: 0 0 15px var(--accent); transition: width 0.1s, height 0.1s; }
+.custom-cursor.hover { width: 24px; height: 24px; background: rgba(0,212,255,0.3); backdrop-filter: blur(2px); }
+.custom-cursor-ring { width: 36px; height: 36px; border: 2px solid var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 99998; transition: 0.08s linear; opacity: 0.7; }
+
+/* ===== PARÇACIKLAR ===== */
+.particles { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.particle { position: absolute; width: 2px; height: 2px; background: var(--accent); border-radius: 50%; animation: float-up linear infinite; opacity: 0; }
+.particle:nth-child(odd) { background: var(--accent2); width: 3px; height: 3px; }
+.particle:nth-child(3n) { background: var(--purple); width: 4px; height: 4px; }
+@keyframes float-up { 0% { transform: translateY(100vh); opacity: 0; } 10% { opacity: 0.8; } 90% { opacity: 0.4; } 100% { transform: translateY(-100px); opacity: 0; } }
+
+/* ===== İLERLEME ÇUBUĞU ===== */
+.progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2), var(--purple)); z-index: 200; transition: width 0.1s; }
+
+/* ===== BİLDİRİM (z-index ARTIRILDI) ===== */
+.notification {
+    position: fixed;
+    bottom: 32px;
+    left: 32px;
+    padding: 14px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent2);
+    border-radius: 12px;
+    z-index: 999999;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.4s ease;
+    backdrop-filter: blur(12px);
+    max-width: 360px;
+    font-size: 13px;
+    color: var(--text2);
+    box-shadow: var(--shadow-lg);
+    font-family: var(--font-body);
+}
+.notification.show { transform: translateY(0); opacity: 1; }
+.notification.error { border-left-color: var(--danger); }
+.notification.warning { border-left-color: var(--warning); }
+
+/* ===== SORGU LİMİTİ ROZETİ ===== */
+.query-limit-badge { position: fixed; bottom: 100px; left: 20px; background: rgba(0,212,255,0.12); border: 1px solid var(--accent); border-radius: 40px; padding: 8px 18px; font-size: 11px; font-family: var(--font-body); z-index: 100; backdrop-filter: blur(12px); letter-spacing: 0.5px; }
+
+/* ===== NAVBAR ===== */
+nav { display: flex; align-items: center; justify-content: space-between; padding: 0 48px; height: 80px; border-bottom: 1px solid rgba(0,212,255,0.12); background: rgba(5,10,15,0.85); backdrop-filter: blur(24px); position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, var(--accent), var(--purple), var(--accent3)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; animation: logoPulse 2s infinite; }
+@keyframes logoPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.7); } 50% { box-shadow: 0 0 0 15px rgba(0,212,255,0); } }
+.logo-text { font-family: var(--font-display); font-size: 24px; font-weight: 800; background: linear-gradient(45deg, var(--accent), var(--purple)); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: -0.5px; }
+.nav-links { display: flex; gap: 40px; list-style: none; }
+.nav-links a { color: var(--text2); text-decoration: none; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; transition: color var(--transition-fast); cursor: pointer; }
+.nav-links a:hover { color: var(--accent); }
+.button-group { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.secret-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ===== BUTONLAR ===== */
+.btn { padding: 10px 24px; border-radius: 40px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all var(--transition-fast); border: none; font-family: var(--font-body); }
+.btn-primary { background: linear-gradient(135deg, var(--accent), var(--purple)); color: var(--bg); }
+.btn-primary:hover { transform: scale(1.02); box-shadow: var(--shadow-glow); }
+.btn-secondary { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+.btn-secondary:hover { background: rgba(0,212,255,0.1); box-shadow: var(--shadow-glow); }
+.btn-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+.btn-danger:hover { background: rgba(255,71,87,0.15); border-color: var(--danger-hover); }
+.btn-success { background: linear-gradient(135deg, var(--accent2), #00cc66); color: var(--bg); }
+.btn-sm { padding: 6px 16px; font-size: 11px; }
+.btn-price { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--border); color: var(--text2); cursor: pointer; font-size: 13px; font-weight: 600; text-transform: uppercase; border-radius: 40px; transition: all var(--transition-fast); }
+.btn-price:hover { border-color: var(--accent); color: var(--accent); }
+.price-card.featured .btn-price { background: linear-gradient(135deg, var(--accent), var(--purple)); color: var(--bg); border: none; }
+
+.nav-cta { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 8px 20px; border-radius: 40px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all var(--transition-fast); }
+.nav-cta:hover { background: rgba(0,212,255,0.1); box-shadow: var(--shadow-glow); }
+.secret-btn { background: rgba(0,212,255,0.08); border: 1px solid var(--border); color: var(--text3); font-size: 10px; padding: 6px 14px; border-radius: 30px; cursor: pointer; transition: all var(--transition-fast); }
+.secret-btn:hover { border-color: var(--accent); color: var(--accent); }
+.logout-btn { background: rgba(255,71,87,0.12); border: 1px solid var(--danger); color: var(--danger); padding: 8px 20px; border-radius: 40px; cursor: pointer; transition: all var(--transition-fast); }
+.logout-btn:hover { background: rgba(255,71,87,0.25); }
+
+/* ===== HERO ===== */
+.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 140px 48px 80px; position: relative; z-index: 10; }
+.hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; border: 1px solid rgba(0,212,255,0.3); border-radius: 40px; font-size: 12px; color: var(--accent); margin-bottom: 32px; backdrop-filter: blur(8px); }
+.hero-badge .blink { width: 8px; height: 8px; background: var(--accent2); border-radius: 50%; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+.hero-title { font-family: var(--font-display); font-size: clamp(48px, 8vw, 96px); font-weight: 800; line-height: 0.95; margin-bottom: 24px; }
+.hero-title .line1 { color: var(--text); display: block; text-shadow: 0 0 30px rgba(0,212,255,0.3); }
+.hero-title .line2 { display: block; -webkit-text-stroke: 2px var(--accent); color: transparent; }
+.hero-title .line3 { display: block; color: var(--accent2); font-size: 0.55em; margin-top: 8px; letter-spacing: 2px; }
+.hero-sub { max-width: 600px; font-size: 16px; line-height: 1.8; color: var(--text2); margin-bottom: 48px; }
+.hero-actions { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 60px; }
+
+/* ===== STATS ===== */
+.stats-bar { display: flex; justify-content: center; gap: 0; margin-top: 20px; border: 1px solid var(--border); background: rgba(13,26,38,0.5); backdrop-filter: blur(12px); max-width: 800px; margin-left: auto; margin-right: auto; border-radius: 60px; overflow: hidden; }
+.stat-item { flex: 1; padding: 24px 32px; text-align: center; border-right: 1px solid var(--border); }
+.stat-item:last-child { border-right: none; }
+.stat-num { font-family: var(--font-display); font-size: 36px; font-weight: 800; color: var(--accent); display: block; text-shadow: 0 0 15px rgba(0,212,255,0.3); }
+.stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text3); margin-top: 6px; }
+
+/* ===== SCROLL INDICATOR ===== */
+.scroll-indicator { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: 0.5; }
+.scroll-mouse { width: 26px; height: 40px; border: 1.5px solid var(--text3); border-radius: 14px; display: flex; justify-content: center; padding-top: 6px; }
+.scroll-wheel { width: 2px; height: 8px; background: var(--text3); border-radius: 2px; animation: scrollAnim 1.5s ease infinite; }
+@keyframes scrollAnim { from { transform: translateY(0); opacity: 1; } to { transform: translateY(10px); opacity: 0; } }
+
+/* ===== RESPONSIVE - TELEFON UYUMLULUĞU ===== */
+@media (max-width: 768px) {
+    nav { padding: 0 16px; height: 60px; flex-wrap: wrap; }
+    .logo-text { font-size: 18px; }
+    .nav-links { gap: 12px; }
+    .nav-links a { font-size: 10px; }
+    .button-group { gap: 6px; }
+    .btn { font-size: 11px !important; padding: 6px 12px !important; }
+    .secret-btn { font-size: 8px !important; padding: 4px 8px !important; }
+    .hero { padding: 80px 16px 40px; min-height: auto; }
+    .hero-title .line1 { font-size: 32px !important; }
+    .hero-title .line2 { font-size: 28px !important; }
+    .hero-title .line3 { font-size: 14px !important; }
+    .hero-sub { font-size: 14px; padding: 0 10px; }
+    .hero-actions .btn-primary, .hero-actions .btn-secondary { font-size: 14px !important; padding: 12px 24px !important; }
+    .stats-bar { flex-wrap: wrap; border-radius: 16px; }
+    .stat-item { flex: 1 1 50%; padding: 16px; border-right: none; border-bottom: 1px solid var(--border); }
+    .stat-item:last-child { border-bottom: none; }
+    .stat-num { font-size: 24px; }
+    .features { padding: 40px 16px; }
+    .features-grid { grid-template-columns: 1fr; }
+    .feature-card { padding: 24px 20px; }
+    .ai-showcase { grid-template-columns: 1fr; }
+    .ai-left, .ai-right { padding: 24px; }
+    .pricing { padding: 40px 16px; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .price-card { padding: 24px 20px; }
+    .price-amount { font-size: 36px; }
+    .dashboard-grid, .dashboard-grid-2col { grid-template-columns: 1fr !important; padding: 12px !important; }
+    .dashboard-header { flex-direction: column; gap: 8px; padding: 12px 16px; }
+    .dashboard-card { padding: 16px; }
+    .dashboard-card h3 { font-size: 16px; }
+    .ai-chat-messages { height: 200px; }
+    .ai-input-area { flex-direction: column; }
+    .ai-input-area input { min-width: auto; }
+    .modal { padding: 20px; width: 95vw; }
+    .modal-header h3 { font-size: 18px; }
+    .form-input { padding: 10px 14px; font-size: 13px; }
+    .ai-panel { width: calc(100vw - 20px) !important; right: 10px; bottom: 80px; }
+    .vizyon-ai-panel .vizyon-ai-chat { padding: 16px; }
+    .vizyon-ai-input-area { flex-direction: column; padding: 12px; }
+    .vizyon-ai-input { font-size: 13px; padding: 10px 14px; }
+    #commentsSection { padding: 10px; }
+    .comment-item { padding: 10px 12px; }
+    #rolePanelUI { width: 90% !important; height: 60% !important; max-width: none !important; max-height: none !important; bottom: 10px !important; right: 10px !important; left: 10px !important; }
+}
+
+@media (max-width: 480px) {
+    .nav-links { display: none; }
+    .hero-title .line1 { font-size: 28px !important; }
+    .hero-title .line2 { font-size: 22px !important; }
+    .stat-item { flex: 1 1 100%; }
+    .btn-google, .btn-facebook { font-size: 13px; padding: 12px; }
+}
+    </style>
+
+    <!-- ============================================================ -->
+<!-- CSS-2: FEATURES, AI SHOWCASE, TECH STACK, PRICING, FOOTER   -->
+<!-- ============================================================ -->
+<style>
+/* 2. CSS - FEATURES, AI SHOWCASE, TECH STACK, PRICING, FOOTER  */
+/* ============================================================ */
+
+.editor-preview {
+    margin: 80px auto;
+    max-width: 1000px;
+    padding: 0 20px;
+    position: relative;
+    z-index: 10;
+}
+.editor-window {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.editor-titlebar {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+}
+.editor-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+.editor-dot.red { background: #ff5f56; }
+.editor-dot.yellow { background: #ffbd2e; }
+.editor-dot.green { background: #27c93f; }
+.editor-filename {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--text3);
+    font-family: monospace;
+}
+.editor-body {
+    padding: 28px 32px;
+    font-family: var(--font-code);
+    font-size: 14px;
+    line-height: 1.8;
+}
+.code-line {
+    display: flex;
+    gap: 24px;
+}
+.ln {
+    color: var(--text3);
+    min-width: 30px;
+    text-align: right;
+}
+.code-line .kw { color: var(--purple); }
+.code-line .fn { color: var(--accent2); }
+.code-line .str { color: var(--accent3); }
+.code-line .cm { color: var(--text3); font-style: italic; }
+
+/* ===== FEATURES ===== */
+.features {
+    padding: 80px 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+}
+.section-header {
+    text-align: center;
+    margin-bottom: 64px;
+}
+.section-tag {
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+}
+.section-title {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 5vw, 52px);
+    font-weight: 800;
+}
+.section-title .hl { color: var(--accent); }
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+}
+.feature-card {
+    background: var(--bg);
+    padding: 40px 36px;
+    transition: all var(--transition-normal);
+    cursor: pointer;
+}
+.feature-card:hover {
+    background: var(--surface);
+    transform: translateY(-2px);
+}
+.feature-icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    border: 1px solid var(--border);
+    color: var(--accent);
+    border-radius: 16px;
+}
+.feature-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+.feature-desc {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text2);
+}
+
+/* ===== AI SHOWCASE ===== */
+.ai-section {
+    padding: 80px 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+}
+.ai-showcase {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+}
+.ai-left {
+    background: var(--bg);
+    padding: 48px;
+}
+.ai-right {
+    background: var(--surface);
+    padding: 48px;
+}
+.ai-title {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 4vw, 42px);
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+.ai-title em {
+    color: var(--accent2);
+    font-style: normal;
+}
+.ai-desc {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text2);
+    margin-bottom: 32px;
+}
+.model-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+.mbadge {
+    padding: 8px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    border: 1px solid;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.mbadge:hover { transform: scale(1.05); }
+.mbadge.a { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,0.06); }
+.mbadge.b { border-color: var(--accent2); color: var(--accent2); background: rgba(0,255,136,0.06); }
+.mbadge.c { border-color: var(--purple); color: var(--purple); background: rgba(168,85,247,0.06); }
+.ai-chat-msg {
+    padding: 20px;
+    border-left: 3px solid;
+    font-size: 13px;
+    line-height: 1.7;
+    background: rgba(0,0,0,0.25);
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+.ai-chat-msg.user { border-color: var(--text3); color: var(--text2); }
+.ai-chat-msg.bot { border-color: var(--accent); color: var(--text); }
+.ai-chat-code {
+    background: rgba(0,212,255,0.05);
+    border: 1px solid rgba(0,212,255,0.15);
+    padding: 12px 16px;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--accent2);
+    white-space: pre-wrap;
+    overflow-x: auto;
+    border-radius: 8px;
+    font-family: monospace;
+}
+
+/* ===== TECH STACK ===== */
+.tech-section {
+    padding: 50px 48px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
+}
+.tech-scroll {
+    display: flex;
+    gap: 40px;
+    animation: scrollLeft 25s linear infinite;
+    white-space: nowrap;
+}
+.tech-scroll:hover { animation-play-state: paused; }
+@keyframes scrollLeft {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+.tech-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    border: 1px solid var(--border);
+    color: var(--text3);
+    font-size: 13px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-radius: 40px;
+    transition: all var(--transition-fast);
+}
+.tech-item:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+}
+
+/* ===== PRICING ===== */
+.pricing {
+    padding: 80px 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+}
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+}
+.price-card {
+    background: var(--bg);
+    padding: 40px 36px;
+    position: relative;
+    transition: all var(--transition-normal);
+}
+.price-card:hover { transform: translateY(-4px); }
+.price-card.featured {
+    background: var(--surface);
+    outline: 2px solid var(--accent);
+}
+.price-tier {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 16px;
+}
+.price-amount {
+    font-family: var(--font-display);
+    font-size: 52px;
+    font-weight: 800;
+    color: var(--text);
+}
+.price-amount span {
+    font-size: 16px;
+    color: var(--text3);
+}
+.price-features {
+    list-style: none;
+    margin: 24px 0;
+}
+.price-features li {
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text2);
+}
+.price-features li::before {
+    content: "▸";
+    color: var(--accent2);
+}
+.price-badge {
+    position: absolute;
+    top: -12px;
+    right: 24px;
+    padding: 4px 16px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    color: var(--bg);
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    border-radius: 40px;
+}
+
+/* ===== FOOTER ===== */
+footer {
+    border-top: 1px solid var(--border);
+    padding: 60px 48px 40px;
+    background: var(--bg2);
+    position: relative;
+    z-index: 10;
+}
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 48px;
+    max-width: 1400px;
+    margin: 0 auto 48px;
+}
+.footer-col h4 {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 20px;
+}
+.footer-col ul {
+    list-style: none;
+}
+.footer-col li {
+    margin-bottom: 10px;
+}
+.footer-col a {
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color var(--transition-fast);
+    cursor: pointer;
+}
+.footer-col a:hover { color: var(--accent); }
+.footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.footer-copy {
+    font-size: 12px;
+    color: var(--text3);
+}
+.footer-copy span { color: var(--accent); }
+.badge {
+    padding: 6px 14px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    color: var(--text3);
+    border-radius: 30px;
+}
+.badge.live {
+    border-color: var(--accent2);
+    color: var(--accent2);
+}
+.support-footer {
+    text-align: center;
+    margin-top: 32px;
+}
+.support-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid var(--accent);
+    border-radius: 40px;
+    color: var(--accent);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    font-size: 13px;
+}
+.support-link:hover {
+    background: var(--accent);
+    color: var(--bg);
+}
+ <style>
+
+<!-- ============================================================ -->
+<!-- CSS-3: DASHBOARD, MODALLAR, WIDGET, FULL PANEL              -->
+<!-- ============================================================ -->
+<style>
+/* ============================================================ */
+/* 3. CSS - DASHBOARD, MODALLAR, WIDGET, FULL PANEL, SCROLLBAR  */
+/* ============================================================ */
+
+/* ========== DASHBOARD ========== */
+.dashboard-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #000000;
+    z-index: 10000;
+    overflow-y: auto;
+    padding: 20px;
+    display: none;
+}
+.dashboard-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 120% 60% at 50% 0%, rgba(0,212,255,0.04) 0%, transparent 60%);
+    z-index: -1;
+}
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 32px;
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding: 24px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+.dashboard-grid-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding: 24px;
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+}
+.dashboard-card {
+    background: rgba(17,17,17,0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 24px;
+    transition: all var(--transition-normal);
+}
+.dashboard-card:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-glow);
+}
+.dashboard-card h3 {
+    color: var(--accent);
+    margin-bottom: 20px;
+    font-size: 18px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+}
+.full-width {
+    grid-column: 1 / -1;
+}
+
+/* ========== AI CHAT (DASHBOARD) - MODERN ========== */
+.ai-chat-messages {
+    height: 350px;
+    overflow-y: auto;
+    background: rgba(0,0,0,0.4);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+.ai-message {
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    border-radius: 16px;
+    font-size: 14px;
+    max-width: 85%;
+    word-wrap: break-word;
+    animation: messageSlide 0.3s ease;
+}
+@keyframes messageSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.ai-message.user {
+    background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(168,85,247,0.10));
+    text-align: right;
+    margin-left: auto;
+    border-radius: 16px 16px 4px 16px;
+    border: 1px solid rgba(0,212,255,0.2);
+}
+.ai-message.bot {
+    background: linear-gradient(135deg, rgba(0,255,136,0.06), rgba(0,212,255,0.06));
+    border-left: 3px solid var(--accent2);
+    border-radius: 16px 16px 16px 4px;
+    border: 1px solid rgba(0,255,136,0.1);
+}
+.ai-message.bot code {
+    background: #0a0a0a;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-family: var(--font-code);
+    font-size: 13px;
+    display: block;
+    margin: 6px 0;
+    border: 1px solid rgba(0,212,255,0.1);
+}
+.ai-message .role {
+    font-size: 11px;
+    opacity: 0.6;
+    margin-bottom: 4px;
+}
+.ai-message .timestamp {
+    font-size: 10px;
+    opacity: 0.4;
+    margin-top: 6px;
+}
+
+.ai-input-area {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.ai-input-area input,
+.ai-input-area textarea {
+    flex: 1;
+    min-width: 150px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 16px;
+    border-radius: 40px;
+    font-size: 13px;
+}
+.ai-input-area input:focus,
+.ai-input-area textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+.glow-input {
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    color: var(--text);
+    padding: 10px 16px;
+    border-radius: 40px;
+    font-size: 13px;
+    width: 100%;
+}
+.glow-input:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(0,212,255,0.3);
+}
+.glow-input option {
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* ========== PROJE LİSTESİ ========== */
+.project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+.project-item {
+    background: #0a0a0a;
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 3px solid var(--accent);
+    transition: all var(--transition-fast);
+}
+.project-item:hover {
+    background: #111;
+}
+.project-actions {
+    display: flex;
+    gap: 8px;
+}
+.project-actions span {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity var(--transition-fast);
+    font-size: 14px;
+}
+.project-actions span:hover {
+    opacity: 1;
+}
+
+/* ========== GELEN KUTUSU ========== */
+.inbox-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+.inbox-item {
+    background: #0a0a0a;
+    border-radius: 12px;
+    padding: 12px 16px;
+    border-left: 3px solid var(--accent2);
+}
+.inbox-item .inbox-sender {
+    font-size: 12px;
+    color: var(--text3);
+}
+.inbox-item .inbox-message {
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+/* ========== TAKIM ========== */
+.team-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+.team-member-item {
+    background: #0a0a0a;
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.team-chat-messages {
+    height: 150px;
+    overflow-y: auto;
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+.team-chat-messages .ai-message {
+    font-size: 12px;
+    padding: 8px 12px;
+    max-width: 90%;
+}
+
+/* ========== KULLANICI YÖNETİMİ ========== */
+.user-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+.user-item {
+    background: #0a0a0a;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 3px solid var(--accent);
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.user-item .user-email {
+    font-size: 13px;
+    color: var(--text2);
+    word-break: break-all;
+}
+.user-item .user-role {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    background: rgba(0,212,255,0.1);
+}
+.user-item .user-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.user-item .user-actions button {
+    padding: 4px 10px;
+    font-size: 10px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+.user-item .user-actions button:hover {
+    transform: scale(1.05);
+}
+.user-item .user-actions .btn-ban {
+    background: var(--danger);
+    color: white;
+}
+.user-item .user-actions .btn-admin {
+    background: var(--accent);
+    color: var(--bg);
+}
+.user-item .user-actions .btn-user {
+    background: var(--border);
+    color: var(--text2);
+}
+.user-item .user-actions .btn-gift {
+    background: var(--gold);
+    color: var(--bg);
+}
+
+/* ========== MODAL (z-index ARTIRILDI) ========== */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5,10,15,0.96);
+    z-index: 99999;
+    backdrop-filter: blur(12px);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.modal-overlay.open {
+    display: flex;
+}
+.modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    width: 480px;
+    max-width: 90vw;
+    padding: 32px;
+    animation: modalFadeIn 0.3s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+.modal-header h3 {
+    font-family: var(--font-display);
+    font-size: 24px;
+}
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--text3);
+    cursor: pointer;
+    font-size: 28px;
+    transition: color var(--transition-fast);
+}
+.modal-close:hover {
+    color: var(--danger);
+}
+.modal-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+.modal-tab {
+    flex: 1;
+    padding: 12px;
+    background: none;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all var(--transition-fast);
+}
+.modal-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+.form-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 14px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+}
+.form-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(0,212,255,0.2);
+}
+.form-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+.form-row .form-input {
+    flex: 1;
+    min-width: 120px;
+}
+
+/* ========== AI WIDGET ========== */
+.ai-widget {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 500;
+}
+.ai-widget-btn {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 0 30px rgba(0,212,255,0.4);
+    transition: all var(--transition-fast);
+    color: var(--bg);
+}
+.ai-widget-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 40px rgba(0,212,255,0.6);
+}
+.ai-panel {
+    display: none;
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    width: 360px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.ai-panel.open {
+    display: flex;
+    flex-direction: column;
+}
+.ai-messages {
+    height: 280px;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.ai-msg {
+    padding: 10px 14px;
+    font-size: 12px;
+    line-height: 1.6;
+    max-width: 85%;
+    border-radius: 18px;
+    word-wrap: break-word;
+}
+.ai-msg.bot {
+    background: rgba(0,212,255,0.08);
+    align-self: flex-start;
+    border-left: 2px solid var(--accent);
+}
+.ai-msg.user {
+    background: rgba(0,255,136,0.08);
+    align-self: flex-end;
+    text-align: right;
+}
+.ai-suggestions {
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.ai-suggestion {
+    padding: 6px 14px;
+    font-size: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text3);
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.ai-suggestion:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+.ai-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 30px;
+    font-size: 12px;
+}
+.ai-send {
+    padding: 8px 18px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    border: none;
+    color: var(--bg);
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* ========== VİZYON AI FULL PANEL (TAM EKRAN) ========== */
+.vizyon-ai-panel {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 35%;
+    max-width: 480px;
+    height: 60%;
+    max-height: 500px;
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: 20px;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.8);
+    backdrop-filter: blur(16px);
+    z-index: 10000;
+}
+/* ========== TAM EKRAN MODU ========== */
+.vizyon-ai-panel.fullscreen {
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    border: none;
+}
+/* ========== YARIM EKRAN MODU (ÜYE DASHBOARD İÇİN) ========== */
+.vizyon-ai-panel.halfscreen {
+    bottom: 10%;
+    right: 10%;
+    width: 80%;
+    max-width: 750px;
+    height: 75%;
+    max-height: 580px;
+    border-radius: 20px;
+    border: 1px solid var(--accent);
+}
+.vizyon-ai-panel.fullscreen #fullscreenCloseBtn,
+.vizyon-ai-panel.halfscreen #fullscreenCloseBtn {
+    display: inline-block !important;
+}
+.vizyon-ai-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.vizyon-ai-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.vizyon-ai-header .logo-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+}
+.vizyon-ai-header .logo-text {
+    font-size: 16px;
+}
+.vizyon-ai-chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.vizyon-ai-chat .ai-msg {
+    padding: 10px 14px;
+    font-size: 13px;
+    max-width: 90%;
+    border-radius: 12px;
+}
+.vizyon-ai-chat .ai-msg.bot {
+    background: rgba(0,255,136,0.06);
+    border-left: 3px solid var(--accent2);
+    border: 1px solid rgba(0,255,136,0.08);
+}
+.vizyon-ai-chat .ai-msg.user {
+    background: rgba(0,212,255,0.15);
+    border: 1px solid rgba(0,212,255,0.15);
+}
+.vizyon-ai-input-area {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.3);
+    align-items: center;
+    flex-shrink: 0;
+}
+.vizyon-ai-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    resize: none;
+    font-family: var(--font-code);
+}
+.vizyon-ai-input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* ========== PROFİL ========== */
+#profileContent p {
+    margin: 8px 0;
+    font-size: 14px;
+}
+#profileContent strong {
+    color: var(--accent);
+}
+
+/* ========== SCROLLBAR ========== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg2);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+    transition: all var(--transition-fast);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+}
+
+/* ========== MISC ========== */
+.hidden { display: none !important; }
+.text-center { text-align: center; }
+.mt-8 { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.mt-16 { margin-top: 16px; }
+.mb-12 { margin-bottom: 12px; }
+.mb-16 { margin-bottom: 16px; }
+.flex { display: flex; }
+.flex-wrap { flex-wrap: wrap; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.w-full { width: 100%; }
+.flex-1 { flex: 1; }
+.min-w-150 { min-width: 150px; }
+
+/* ========== 3D GÖSTERİM ALANI ========== */
+#canvas3d {
+    width: 100%;
+    height: 400px;
+    background: #0a0a0a;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-top: 12px;
+    position: relative;
+    overflow: hidden;
+}
+#canvas3d canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+/* ========== 3D ÜRETME BUTONU ========== */
+.btn-3d {
+    background: linear-gradient(135deg, #ff6b35, #ff4757);
+    color: #fff;
+}
+.btn-3d:hover {
+    box-shadow: 0 0 30px rgba(255,107,53,0.5);
+}
+/* ========== GÖRSEL ÜRETME SONUÇLARI ========== */
+#imageResults img {
+    transition: transform 0.3s ease;
+}
+#imageResults img:hover {
+    transform: scale(1.05);
+}
+
+/* ========== KULLANICI PANELİ (user-panel) ========== */
+.user-panel {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: none;
+    flex-direction: column;
+    z-index: 9999;
+}
+.user-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.user-panel-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.user-panel-header .logo-text {
+    font-size: 22px;
+}
+.user-panel-header .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.user-panel-body {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    position: relative;
+}
+
+ <style>
+
+<!-- ============================================================ -->
+<!-- CSS-4: ÖZEL STILLER, BUTONLAR, YORUMLAR, RESPONSIVE         -->
+<!-- ============================================================ -->
+<style>
+/* ============================================================ */
+/* 4. CSS - ÖZEL STILLER, BUTONLAR, YORUMLAR, RESPONSIVE       */
+/* ============================================================ */
+
+/* ===== BUTONLAR BÜYÜK ve BELİRGİN ===== */
+.btn-primary {
+    font-size: 18px !important;
+    padding: 14px 32px !important;
+    background: linear-gradient(135deg, #00d4ff, #a855f7) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 60px !important;
+    box-shadow: 0 0 20px rgba(0,212,255,0.4) !important;
+}
+.btn-primary:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 30px rgba(0,212,255,0.6) !important;
+}
+
+.btn-secondary {
+    font-size: 18px !important;
+    padding: 14px 32px !important;
+    border: 2px solid #00d4ff !important;
+    color: #00d4ff !important;
+    background: transparent !important;
+    border-radius: 60px !important;
+}
+.btn-secondary:hover {
+    background: rgba(0,212,255,0.1) !important;
+    box-shadow: 0 0 20px rgba(0,212,255,0.3) !important;
+}
+
+/* ===== HERO BUTONLARI ===== */
+.hero-actions .btn-primary,
+.hero-actions .btn-secondary {
+    font-size: 20px !important;
+    padding: 16px 40px !important;
+}
+
+/* ===== "Daha Fazla →" yazısı ===== */
+.btn-secondary {
+    color: #00d4ff !important;
+    font-weight: 700 !important;
+}
+
+/* ===== HERO BAŞLIK ===== */
+.hero-title .line1 {
+    font-size: clamp(56px, 10vw, 110px) !important;
+    text-shadow: 0 0 40px rgba(0,212,255,0.5) !important;
+}
+.hero-title .line2 {
+    font-size: clamp(48px, 8vw, 90px) !important;
+    -webkit-text-stroke: 3px #00d4ff !important;
+}
+.hero-title .line3 {
+    font-size: clamp(20px, 3vw, 36px) !important;
+    color: #00ff88 !important;
+    text-shadow: 0 0 20px rgba(0,255,136,0.3) !important;
+}
+
+/* ===== AI WIDGET (SAĞ ALT) ===== */
+.ai-widget-btn {
+    width: 64px !important;
+    height: 64px !important;
+    font-size: 28px !important;
+    background: linear-gradient(135deg, #00d4ff, #a855f7) !important;
+    box-shadow: 0 0 40px rgba(0,212,255,0.5) !important;
+}
+.ai-widget-btn:hover {
+    transform: scale(1.1) !important;
+    box-shadow: 0 0 60px rgba(0,212,255,0.8) !important;
+}
+
+/* ===== AI PANEL ===== */
+.ai-panel {
+    width: 420px !important;
+    background: rgba(13,26,38,0.95) !important;
+    backdrop-filter: blur(16px) !important;
+    border: 1px solid #00d4ff !important;
+    border-radius: 24px !important;
+}
+.ai-msg.bot {
+    font-size: 14px !important;
+    background: rgba(0,212,255,0.08) !important;
+}
+.ai-msg.user {
+    font-size: 14px !important;
+    background: rgba(0,255,136,0.08) !important;
+}
+
+/* ===== GOOGLE BUTONU ===== */
+.btn-google {
+    width: 100%;
+    padding: 14px;
+    background: #ffffff;
+    border: none;
+    border-radius: 16px;
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.btn-google:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.btn-google i {
+    color: #ea4335;
+    font-size: 18px;
+}
+
+/* ===== FACEBOOK BUTONU ===== */
+.btn-facebook {
+    width: 100%;
+    padding: 14px;
+    background: #1877f2;
+    border: none;
+    border-radius: 16px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.btn-facebook:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.btn-facebook i {
+    color: #ffffff;
+    font-size: 18px;
+}
+
+/* ===== YORUM SİSTEMİ ===== */
+#commentsSection {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    border-top: 1px solid var(--border);
+}
+#commentsSection h3 {
+    color: var(--accent);
+    font-family: var(--font-display);
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+.comment-item {
+    background: var(--surface);
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    border-left: 3px solid var(--border);
+    transition: all var(--transition-fast);
+}
+.comment-item:hover {
+    background: var(--surface2);
+}
+.comment-item .role-badge {
+    font-size: 10px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--border);
+    color: var(--text3);
+    border: 1px solid var(--border);
+}
+.comment-item .role-badge.founder { border-color: var(--gold); color: var(--gold); }
+.comment-item .role-badge.admin { border-color: var(--accent); color: var(--accent); }
+.comment-item .role-badge.beta { border-color: var(--purple); color: var(--purple); }
+.comment-item .role-badge.user { border-color: var(--text3); color: var(--text3); }
+.comment-item .comment-text {
+    margin: 6px 0 2px 0;
+    color: var(--text2);
+    font-size: 14px;
+    line-height: 1.6;
+}
+.comment-item .comment-time {
+    font-size: 10px;
+    color: var(--text3);
+}
+.comment-item .comment-email {
+    font-size: 10px;
+    color: var(--text3);
+    margin-left: 8px;
+}
+#commentForm {
+    margin-top: 16px;
+}
+#commentForm textarea {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 14px;
+    resize: vertical;
+    font-family: var(--font-body);
+}
+#commentForm textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+#commentLoginMessage {
+    margin-top: 16px;
+    padding: 12px;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px dashed var(--border);
+    text-align: center;
+    color: var(--text3);
+}
+#commentLoginMessage .btn-secondary {
+    display: inline-block;
+    padding: 6px 16px;
+    font-size: 12px;
+}
+
+/* ====================================================== */
+/* ========== TELEFON UYUMLULUĞU (EK KURALLAR) ========= */
+/* ====================================================== */
+@media (max-width: 768px) {
+    .dashboard-grid,
+    .dashboard-grid-2col {
+        grid-template-columns: 1fr !important;
+        padding: 10px !important;
+        gap: 12px !important;
+    }
+    .dashboard-card {
+        padding: 16px !important;
+    }
+    .dashboard-card h3 {
+        font-size: 16px !important;
+    }
+    .vizyon-ai-panel.fullscreen {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        border-radius: 0 !important;
+        bottom: 0 !important;
+        right: 0 !important;
+    }
+    .vizyon-ai-panel.halfscreen {
+        bottom: 5% !important;
+        right: 5% !important;
+        width: 90% !important;
+        max-width: 90% !important;
+        height: 80% !important;
+        max-height: 80% !important;
+    }
+    .vizyon-ai-header .logo-text {
+        font-size: 14px !important;
+    }
+    .vizyon-ai-input {
+        font-size: 12px !important;
+        padding: 8px 10px !important;
+    }
+    .vizyon-ai-input-area {
+        flex-direction: column !important;
+        gap: 6px !important;
+        padding: 8px !important;
+    }
+    .vizyon-ai-chat .ai-msg {
+        font-size: 12px !important;
+        padding: 8px 12px !important;
+    }
+    .modal {
+        width: 95% !important;
+        padding: 20px !important;
+        max-height: 80vh !important;
+        overflow-y: auto !important;
+    }
+    .modal-header h3 {
+        font-size: 18px !important;
+    }
+    .form-input {
+        font-size: 13px !important;
+        padding: 10px 14px !important;
+    }
+    nav {
+        padding: 0 12px !important;
+        height: 56px !important;
+        flex-wrap: wrap !important;
+    }
+    .nav-links {
+        gap: 8px !important;
+    }
+    .nav-links a {
+        font-size: 9px !important;
+    }
+    .logo-text {
+        font-size: 16px !important;
+    }
+    .button-group .btn {
+        font-size: 10px !important;
+        padding: 4px 10px !important;
+    }
+    .hero-title .line1 {
+        font-size: 28px !important;
+    }
+    .hero-title .line2 {
+        font-size: 22px !important;
+    }
+    .hero-title .line3 {
+        font-size: 14px !important;
+    }
+    .hero-actions .btn-primary,
+    .hero-actions .btn-secondary {
+        font-size: 14px !important;
+        padding: 10px 20px !important;
+    }
+    .stats-bar {
+        flex-wrap: wrap !important;
+        border-radius: 16px !important;
+    }
+    .stat-item {
+        flex: 1 1 50% !important;
+        padding: 12px !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border) !important;
+    }
+    .stat-item:last-child {
+        border-bottom: none !important;
+    }
+    .stat-num {
+        font-size: 22px !important;
+    }
+    .ai-widget-btn {
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 20px !important;
+    }
+    .ai-panel {
+        width: calc(100vw - 20px) !important;
+        right: 10px !important;
+        bottom: 70px !important;
+    }
+    .ai-messages {
+        height: 220px !important;
+    }
+    #commentsSection {
+        padding: 10px !important;
+    }
+    .comment-item {
+        padding: 10px 12px !important;
+    }
+    .comment-item .role-badge {
+        font-size: 8px !important;
+        padding: 1px 6px !important;
+    }
+    .btn-google,
+    .btn-facebook {
+        font-size: 12px !important;
+        padding: 10px !important;
+    }
+    /* Sorgu limiti rozeti */
+    .query-limit-badge {
+        font-size: 9px !important;
+        padding: 4px 10px !important;
+    }
+}
+   
+    </style>
+
+
+       <!-- THREE.JS KÜTÜPHANESİ (3D YEDEK İÇİN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+</head>
+<body>
+
+    <!-- ============================================================ -->
+    <!-- ===================== EKSİK ELEMENTLER ====================== -->
+    <!-- ============================================================ -->
+    <div id="particles"></div>
+    <div id="customCursor" class="custom-cursor"></div>
+    <div id="customCursorRing" class="custom-cursor-ring"></div>
+    <div id="notification" class="notification"></div>
+
+    <!-- ============================================================ -->
+    <!-- ===================== HTML BÖLÜMLERİ ======================== -->
+    <!-- ============================================================ -->
+
+    <!-- ============================================================ -->
+<!-- HTML-1: ANA SAYFA (NAVBAR, HERO, FEATURES, PRICING, FOOTER)  -->
+<!-- ============================================================ -->
+<div id="mainSite">
+
+    <!-- ===== NAVBAR ===== -->
+    <nav>
+        <div class="logo">
+            <div class="logo-icon">✨</div>
+            <div class="logo-text">VİZYON 2027</div>
+        </div>
+        <ul class="nav-links">
+            <li><a onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Özellikler</a></li>
+            <li><a onclick="document.getElementById('ai').scrollIntoView({behavior:'smooth'})">Yapay Zeka</a></li>
+            <li><a onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Fiyatlar</a></li>
+        </ul>
+        <div class="button-group">
+            <div class="secret-buttons">
+                <button class="secret-btn" onclick="openRolePanel('FOUNDER')">👑 FOUNDER</button>
+                <button class="secret-btn" onclick="openRolePanel('ADMIN')">⚙️ ADMIN</button>
+                <button class="secret-btn" onclick="openRolePanel('BETA')">🔬 BETA</button>
+            </div>
+            <button class="nav-cta" onclick="openModal('login')">Giriş Yap</button>
+            <button class="btn-primary" onclick="openModal('register')">Ücretsiz Başla</button>
+            <button class="logout-btn" onclick="logout()" style="display:none">🚪 Çıkış</button>
+            <!-- ===== SORGU LİMİTİ ROZETİ (ANA SAYFA) ===== -->
+            <span id="queryLimitBadge" class="query-limit-badge" style="display:none;">🔋 25 sorgu kaldı</span>
+        </div>
+    </nav>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+        <div class="hero-badge">
+            <div class="blink"></div>
+            VİZYON AI | Dünyanın En Güçlü Yapay Zekası
+        </div>
+        <h1 class="hero-title">
+            <span class="line1">VİZYON AI</span>
+            <span class="line2">SINIRSIZ YETENEK</span>
+            <span class="line3">Her dilde kod · Web arama · Dosya analiz · Takım Çalışması</span>
+        </h1>
+        <p class="hero-sub">⚡ VİZYON AI ile her dili konuş, her kodu yaz, takımınla çalış, projelerini yönet.</p>
+        <div class="hero-actions">
+            <button class="btn-primary" onclick="openFullAIPanel()">⚡ VİZYON AI'ı Başlat</button>
+            <button class="btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Daha Fazla →</button>
+        </div>
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-num" id="counter1">0</span>
+                <div class="stat-label">Aktif Kullanıcı</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num" id="counter2">0</span>
+                <div class="stat-label">AI Sorgusu</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num" id="counter3">0</span>
+                <div class="stat-label">Proje Tamamlandı</div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+            <span>Aşağı kaydır</span>
+        </div>
+    </section>
+
+    <!-- ===== EDITOR PREVIEW ===== -->
+    <div class="editor-preview">
+        <div class="editor-window">
+            <div class="editor-titlebar">
+                <div class="editor-dot red"></div>
+                <div class="editor-dot yellow"></div>
+                <div class="editor-dot green"></div>
+                <span class="editor-filename">vizyon2027/ai_core.py</span>
+            </div>
+            <div class="editor-body">
+                <div class="code-line"><span class="ln">1</span><span class="code"><span class="cm"># VİZYON AI — Süper Yapay Zeka</span></span></div>
+                <div class="code-line"><span class="ln">2</span><span class="code"><span class="kw">from</span> vizyon_ai <span class="kw">import</span> <span class="fn">SuperAI</span></div>
+                <div class="code-line"><span class="ln">3</span><span class="code"></span></div>
+                <div class="code-line"><span class="ln">4</span><span class="code">ai = <span class="fn">SuperAI</span>()</div>
+                <div class="code-line"><span class="ln">5</span><span class="code">ai.<span class="fn">birleştir</span>(<span class="str">"GPT-4o"</span>, <span class="str">"Claude"</span>, <span class="str">"Gemini"</span>, <span class="str">"DeepSeek"</span>)</div>
+                <div class="code-line"><span class="ln">6</span><span class="code">cevap = ai.<span class="fn">kod_yaz</span>(<span class="str">"Python'da hesap makinesi"</span>)</div>
+                <div class="code-line"><span class="ln">7</span><span class="code"><span class="fn">print</span>(cevap)  <span class="cm"># Tam çalışan kod gelir!</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FEATURES ===== -->
+    <section class="features" id="features">
+        <div class="section-header">
+            <div class="section-tag">// özellikler</div>
+            <h2 class="section-title">VİZYON AI <span class="hl">Gücü</span></h2>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <div class="feature-title">7 Model Tek Çatı</div>
+                <p class="feature-desc">GPT-4o, Claude, Gemini, DeepSeek, Llama, Mistral hepsi birleşti.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Anlık Kod Üretimi</div>
+                <p class="feature-desc">Python, React, HTML, SQL, Docker her dilde çalışan kod.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌐</div>
+                <div class="feature-title">Canlı Web Arama</div>
+                <p class="feature-desc">SerpApi ile dolar kuru, haberler, anlık bilgiler.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <div class="feature-title">Takım Çalışması</div>
+                <p class="feature-desc">Takım kur, üye ekle, ortak projeler ve takım sohbeti.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <div class="feature-title">SaaS & Freelance</div>
+                <p class="feature-desc">Para kazandıran iş fikirleri, kariyer yol haritası.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔧</div>
+                <div class="feature-title">Hata Düzeltme</div>
+                <p class="feature-desc">Kodunu yapıştır, hatayı bul, düzelt, çalıştır.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== AI SHOWCASE ===== -->
+    <section class="ai-section" id="ai">
+        <div class="section-header">
+            <div class="section-tag">// yapay zeka</div>
+            <h2 class="section-title">Tüm AI Modelleri<br><span class="hl">Tek Yerde</span></h2>
+        </div>
+        <div class="ai-showcase">
+            <div class="ai-left">
+                <h3 class="ai-title">Kod yaz,<br><em>anlık öğren,</em><br>büyü.</h3>
+                <p class="ai-desc">Dünyanın en güçlü AI modellerini tek platformda birleştirdik.</p>
+                <div class="model-row">
+                    <span class="mbadge a" onclick="openFullAIPanel()">⚡ VİZYON AI</span>
+                    <span class="mbadge a">Groq</span>
+                    <span class="mbadge b">DeepSeek</span>
+                    <span class="mbadge c">OpenRouter</span>
+                    <span class="mbadge a">OpenAI</span>
+                    <span class="mbadge b">Cohere</span>
+                    <span class="mbadge c">Cerebras</span>
+                </div>
+                <button class="btn-primary" onclick="openFullAIPanel()">⚡ VİZYON AI ile Kod Yaz →</button>
+            </div>
+            <div class="ai-right">
+                <div class="ai-chat-msg user">
+                    <div class="role">// kullanıcı</div>
+                    Python ile REST API nasıl yazarım?
+                </div>
+                <div class="ai-chat-msg bot">
+                    <div class="role">⚡ VİZYON AI</div>
+                    FastAPI ile şöyle yapılır:
+                    <div class="ai-chat-code">from fastapi import FastAPI\napp = FastAPI()\n\n@app.get("/")\ndef root():\n    return {"message": "VİZYON AI"}\n\n# uvicorn main:app --reload</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TECH STACK ===== -->
+    <div class="tech-section">
+        <div class="tech-scroll">
+            <div class="tech-item"><i class="fas fa-code"></i>Python</div>
+            <div class="tech-item"><i class="fab fa-react"></i>React</div>
+            <div class="tech-item"><i class="fab fa-node-js"></i>Next.js</div>
+            <div class="tech-item"><i class="fas fa-bolt"></i>FastAPI</div>
+            <div class="tech-item"><i class="fab fa-docker"></i>Docker</div>
+            <div class="tech-item"><i class="fas fa-database"></i>PostgreSQL</div>
+            <div class="tech-item"><i class="fas fa-brain"></i>TensorFlow</div>
+            <div class="tech-item"><i class="fas fa-fire"></i>PyTorch</div>
+            <div class="tech-item"><i class="fas fa-chart-line"></i>GraphQL</div>
+            <div class="tech-item"><i class="fas fa-memory"></i>Redis</div>
+        </div>
+    </div>
+
+    <!-- ===== PRICING ===== -->
+    <section class="pricing" id="pricing">
+        <div class="section-header">
+            <div class="section-tag">// fiyatlandırma</div>
+            <h2 class="section-title">Sıfırdan Başla,<br><span class="hl">Büyü</span></h2>
+        </div>
+        <div class="pricing-grid">
+            <div class="price-card">
+                <div class="price-tier">Ücretsiz</div>
+                <div class="price-amount">₺0<span>/ay</span></div>
+                <ul class="price-features">
+                    <li>20 AI sorgusu / gün</li>
+                    <li>3 proje limiti</li>
+                    <li>Demo web arama</li>
+                    <li>Topluluk desteği</li>
+                </ul>
+                <button class="btn-price" onclick="openModal('register')">Ücretsiz Başla</button>
+            </div>
+            <div class="price-card featured">
+                <div class="price-badge">En Popüler</div>
+                <div class="price-tier">Pro Geliştirici</div>
+                <div class="price-amount">₺299<span>/ay</span></div>
+                <ul class="price-features">
+                    <li>2000 AI sorgu/gün</li>
+                    <li>Sınırsız proje</li>
+                    <li>Canlı web arama</li>
+                    <li>Dosya yükleme</li>
+                    <li>Öncelikli destek</li>
+                </ul>
+                <button class="btn-price" onclick="buyPackage('pro')">Pro'ya Geç</button>
+            </div>
+            <div class="price-card">
+                <div class="price-tier">Takım</div>
+                <div class="price-amount">₺899<span>/ay</span></div>
+                <ul class="price-features">
+                    <li>Sınırsız AI sorgu</li>
+                    <li>100 takım üyesi</li>
+                    <li>Takım masası ve sohbet</li>
+                    <li>Ortak projeler</li>
+                    <li>API erişimi</li>
+                </ul>
+                <button class="btn-price" onclick="buyPackage('team')">Takım Kur</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo-text" style="font-size:22px;">VİZYON 2027</div>
+                <p style="margin-top:10px;">Dünyanın en güçlü yapay zeka ekosistemi.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Platform</h4>
+                <ul>
+                    <li><a href="#">VİZYON AI</a></li>
+                    <li><a href="#">Kod Editörü</a></li>
+                    <li><a href="#">API</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Kaynaklar</h4>
+                <ul>
+                    <li><a href="#">Dokümantasyon</a></li>
+                    <li><a href="#">Topluluk</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Şirket</h4>
+                <ul>
+                    <li><a href="#">Hakkımızda</a></li>
+                    <li><a href="#">Kariyer</a></li>
+                    <li><a href="#">İletişim</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-copy">© 2027 Vizyon2027. <span>Vizyon Ekibi</span> güvencesiyle.</div>
+            <div class="footer-badges">
+                <span class="badge live">● Sistem Aktif</span>
+                <span class="badge">v24.0</span>
+            </div>
+        </div>
+        <div class="support-footer">
+            <a class="support-link" onclick="openRandomSupport()">📧 DESTEK & İLETİŞİM</a>
+        </div>
+    </footer>
+
+</div>
+
+</div>
+        <!-- NAVBAR -->
+        <!-- HERO -->
+        <!-- EDITOR PREVIEW -->
+        <!-- FEATURES -->
+        <!-- AI SHOWCASE -->
+        <!-- TECH STACK -->
+        <!-- PRICING -->
+        <!-- FOOTER -->
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- HTML-2: DASHBOARD (GİRİŞ YAPINCA AÇILIR)                     -->
+    <!-- ============================================================ -->
+    <div id="dashboardArea" class="dashboard-container" style="display:none;">
+        <!-- ============================================================ -->
+<!-- HTML-2: DASHBOARD (GİRİŞ YAPINCA AÇILIR)                     -->
+<!-- ============================================================ -->
+<div id="dashboardArea" class="dashboard-container" style="display:none;">
+
+    <!-- ===== DASHBOARD HEADER ===== -->
+    <div class="dashboard-header">
+        <div class="logo">
+            <div class="logo-icon">✨</div>
+            <div class="logo-text">VİZYON 2027</div>
+        </div>
+        <div class="user-info" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <span id="dashboardUserName" style="font-size:18px;font-weight:600;"></span>
+            <span id="userRoleBadge" class="badge"></span>
+            <!-- ===== SORGU LİMİTİ ROZETİ (DASHBOARD) ===== -->
+            <span id="dashQueryLimitBadge" class="query-limit-badge" style="position:relative;bottom:auto;left:auto;display:inline-block;padding:4px 12px;font-size:11px;">🔋 100 sorgu kaldı</span>
+            <button class="btn-secondary btn-sm" onclick="openProfileModal()">👤 Profil</button>
+            <!-- ===== SOHBET GEÇMİŞİ BUTONU ===== -->
+            <button class="btn-secondary btn-sm" onclick="toggleChatHistory()">📜 Geçmiş</button>
+            <button class="logout-btn btn-sm" onclick="logout()">Çıkış</button>
+        </div>
+    </div>
+
+    <!-- ===== AI ASİSTAN (HERKESTE) ===== -->
+    <div class="dashboard-grid">
+        <div class="dashboard-card full-width">
+            <h3>🤖 VİZYON AI ASİSTAN</h3>
+            <div id="dashboardAiMessages" class="ai-chat-messages">
+                <div class="ai-message bot">Merhaba! Size nasıl yardımcı olabilirim?</div>
+            </div>
+            <div class="ai-input-area">
+                <input type="text" id="dashboardAiInput" placeholder="AI'ya sor..." class="glow-input" style="flex:1;">
+                <button class="btn-primary" onclick="sendDashboardAI()">Gönder</button>
+                <input type="file" id="dashboardFileInput" style="display:none;" accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip">
+                <button class="btn-secondary" onclick="document.getElementById('dashboardFileInput').click()">📎</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== KUTULAR (2 SÜTUN) - HERKESTE GÖRÜNÜR ===== -->
+    <div class="dashboard-grid-2col">
+
+        <!-- Projelerim -->
+        <div class="dashboard-card">
+            <h3>📁 Projelerim</h3>
+            <div id="projectsList" class="project-list"></div>
+            <button class="btn-primary btn-sm" onclick="newProject()" style="margin-top:8px;">+ Yeni Proje</button>
+        </div>
+
+        <!-- Favoriler -->
+        <div class="dashboard-card">
+            <h3>⭐ Favoriler</h3>
+            <div id="favList" class="project-list"></div>
+        </div>
+
+        <!-- Arşiv -->
+        <div class="dashboard-card">
+            <h3>🗄️ Arşiv</h3>
+            <div id="archiveList" class="project-list"></div>
+        </div>
+
+        <!-- Çöp Kutusu -->
+        <div class="dashboard-card">
+            <h3>🗑️ Çöp Kutusu</h3>
+            <div id="trashList" class="project-list"></div>
+        </div>
+
+        <!-- Proje Taleplerim -->
+        <div class="dashboard-card">
+            <h3>📨 Proje Taleplerim</h3>
+            <div id="projectRequestsList" class="project-list"></div>
+        </div>
+
+        <!-- Gelen Kutusu -->
+        <div class="dashboard-card">
+            <h3>📬 Gelen Kutusu</h3>
+            <div id="inboxList" class="inbox-list"></div>
+        </div>
+
+        <!-- Takım Kartı -->
+        <div class="dashboard-card">
+            <h3>👥 Takım</h3>
+            <div id="teamInfo"></div>
+            <div id="teamMembersList" class="team-list"></div>
+            <div id="teamChatMessages" class="team-chat-messages"></div>
+            <div class="ai-input-area">
+                <input type="text" id="teamChatInput" placeholder="Takıma mesaj yaz..." class="glow-input" style="flex:1;">
+                <button class="btn-primary btn-sm" onclick="sendTeamMessage()">Gönder</button>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                <button class="btn-secondary btn-sm" onclick="createTeam()">+ Takım Oluştur</button>
+                <input type="email" id="inviteEmail" placeholder="Davet et (e-posta)" class="glow-input" style="flex:1;min-width:150px;">
+                <button class="btn-secondary btn-sm" onclick="inviteToTeam()">Davet Gönder</button>
+            </div>
+        </div>
+
+        <!-- ===== YENİ EKLENEN KARTLAR ===== -->
+
+        <!-- Görsel Üretme Kartı -->
+        <div class="dashboard-card">
+            <h3>🖼️ Görsel Üret (AI)</h3>
+            <input id="imagePrompt" class="glow-input" placeholder="Görsel açıklaması yazın..." style="width:100%; margin-bottom:10px;">
+            <button class="btn-primary btn-sm" onclick="generateImage()" style="width:100%;">🎨 Görsel Oluştur</button>
+            <div id="imageResults" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; max-height:200px; overflow-y:auto;"></div>
+        </div>
+
+        <!-- 3D Model Üretme Kartı -->
+        <div class="dashboard-card">
+            <h3>🧊 3D Model Üret</h3>
+            <input id="threeDPrompt" class="glow-input" placeholder="3D nesne açıklaması yazın..." style="width:100%; margin-bottom:10px;">
+            <button class="btn-3d btn-sm" onclick="generate3D()" style="width:100%;">🧊 3D Oluştur</button>
+            <div id="canvas3d" style="width:100%; height:250px; margin-top:10px; background:#0a0a0a; border-radius:12px; border:1px solid var(--border);"></div>
+        </div>
+
+    </div>
+
+    <!-- ===== YÖNETİM PANELİ (SADECE ADMIN/FOUNDER) ===== -->
+    <div id="adminPanelCard" class="dashboard-card full-width" style="display:none;">
+        <h3>⚙️ YÖNETİM PANELİ</h3>
+        
+        <!-- Kullanıcı Listesi -->
+        <div style="margin-bottom:16px;">
+            <h4>👥 Kullanıcı Listesi</h4>
+            <div id="userList" class="user-list"></div>
+        </div>
+
+        <!-- Admin Atama -->
+        <div style="margin-bottom:16px;">
+            <h4>🎯 Admin Atama</h4>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <input type="email" id="assignAdminEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;">
+                <button class="btn-primary btn-sm" onclick="assignAdmin()">Admin Yap</button>
+            </div>
+        </div>
+
+        <!-- Hediye Gönder -->
+        <div style="margin-bottom:16px;">
+            <h4>🎁 Hediye Gönder</h4>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <input type="email" id="giftEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;">
+                <select id="giftPackage" class="glow-input">
+                    <option value="pro">🌟 Pro Paket</option>
+                    <option value="team">👥 Takım Paketi</option>
+                </select>
+                <button class="btn-primary btn-sm" onclick="sendGift()">Gönder</button>
+            </div>
+        </div>
+
+        <!-- Kullanıcı Engelleme -->
+        <div>
+            <h4>🔒 Kullanıcı Engelle</h4>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <input type="email" id="banUserEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;">
+                <button class="btn-danger btn-sm" onclick="banUser()">Yasakla</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+        <!-- DASHBOARD HEADER -->
+        <!-- AI ASİSTAN -->
+        <!-- PROJELER, FAVORİLER, ARŞİV, ÇÖP KUTUSU, TALEPLER, GELEN KUTUSU, TAKIM -->
+        <!-- YÖNETİM PANELİ (ADMIN/FOUNDER) -->
+    </div>
+
+    <!-- ============================================================ -->
+<!-- HTML-3: MODALLAR, WIDGET, FULL PANEL, YORUMLAR              -->
+<!-- ============================================================ -->
+
+<!-- ===== GİRİŞ / KAYIT / DOĞRULAMA MODALI ===== -->
+<div class="modal-overlay" id="authModal" onclick="if(event.target===this) closeModal('authModal')">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Hesap Oluştur</h3>
+            <button class="modal-close" onclick="closeModal('authModal')">×</button>
+        </div>
+        <div class="modal-tabs">
+            <button class="modal-tab" onclick="switchTab('login')">Giriş</button>
+            <button class="modal-tab active" onclick="switchTab('register')">Kayıt</button>
+            <button class="modal-tab" onclick="switchTab('verify')">Doğrula</button>
+        </div>
+        <div class="modal-body">
+
+            <!-- GOOGLE İLE GİRİŞ -->
+            <button class="btn-google" onclick="loginWithGoogle()">
+                <i class="fab fa-google"></i> Google ile Giriş Yap
+            </button>
+
+            <!-- FACEBOOK İLE GİRİŞ -->
+            <button class="btn-facebook" onclick="loginWithFacebook()">
+                <i class="fab fa-facebook"></i> Facebook ile Giriş Yap
+            </button>
+
+            <div style="text-align: center; margin: 8px 0 16px 0; color: var(--text3); font-size: 12px;">veya</div>
+
+            <!-- KAYIT FORMU -->
+            <div id="formRegister">
+                <div class="form-row">
+                    <input id="rName" placeholder="Ad Soyad" class="form-input">
+                </div>
+                <input id="rEmail" placeholder="E-posta" class="form-input">
+                <input id="rPass" type="password" placeholder="Şifre (8+ karakter)" class="form-input">
+                <input id="rPass2" type="password" placeholder="Şifre Tekrar" class="form-input">
+                <button class="btn-primary" onclick="handleRegister()" style="width:100%;">Kayıt Ol</button>
+            </div>
+
+            <!-- GİRİŞ FORMU -->
+            <div id="formLogin" style="display:none;">
+                <input id="lEmail" placeholder="E-posta" class="form-input">
+                <input id="lPass" type="password" placeholder="Şifre" class="form-input">
+                <button class="btn-primary" onclick="handleLogin()" style="width:100%;">Giriş Yap</button>
+            </div>
+
+            <!-- DOĞRULAMA FORMU -->
+            <div id="formVerify" style="display:none;">
+                <input id="verifyEmail" placeholder="E-posta" class="form-input">
+                <input id="verifyCode" placeholder="Doğrulama Kodu" class="form-input">
+                <button class="btn-primary" onclick="verifyAccount()" style="width:100%;">Doğrula</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ===== FOUNDER / ADMIN / BETA PANEL MODALI ===== -->
+<div id="rolePanel" class="modal-overlay" onclick="if(event.target===this) closeModal('rolePanel')">
+    <div class="modal">
+        <h3 id="roleTitle">🔐 Yönetim Girişi</h3>
+        <input type="password" id="rolePassword" class="form-input" placeholder="Şifre">
+        <button class="btn-primary" onclick="checkRole()" style="width:100%;">Giriş</button>
+        <button class="btn-secondary" onclick="closeModal('rolePanel')" style="width:100%;margin-top:12px;">İptal</button>
+    </div>
+</div>
+
+<!-- ===== PROFİL MODALI ===== -->
+<div id="profileModal" class="modal-overlay" onclick="if(event.target===this) closeModal('profileModal')">
+    <div class="modal">
+        <h3>👤 Profil</h3>
+        <div id="profileContent"></div>
+        <hr style="margin:16px 0;border-color:var(--border);">
+        <button class="btn-primary btn-sm" onclick="changePassword()">Şifre Değiştir</button>
+        <button class="btn-danger btn-sm" onclick="deleteAccount()" style="margin-top:10px;">🗑️ Hesabımı Sil</button>
+        <hr style="margin:16px 0;border-color:var(--border);">
+        <button class="btn-secondary btn-sm" onclick="closeModal('profileModal')" style="margin-top:10px;">Kapat</button>
+    </div>
+</div>
+
+<!-- ===== ADMIN ŞİFRE BELİRLEME MODALI ===== -->
+<div id="adminPasswordModal" class="modal-overlay" onclick="if(event.target===this) closeModal('adminPasswordModal')">
+    <div class="modal">
+        <h3>🔐 Admin Şifre Belirle</h3>
+        <input type="email" id="adminEmail" placeholder="E-posta" class="form-input">
+        <input type="password" id="adminPass" placeholder="Yeni Şifre (8+)" class="form-input">
+        <input type="password" id="adminPass2" placeholder="Şifre Tekrar" class="form-input">
+        <button class="btn-primary" onclick="setAdminPassword()" style="width:100%;">Şifre Belirle</button>
+        <button class="btn-secondary" onclick="closeModal('adminPasswordModal')" style="width:100%;margin-top:12px;">İptal</button>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- AI WIDGET (SAĞ ALT KÖŞE)                                     -->
+<!-- ============================================================ -->
+<div class="ai-widget">
+    <div class="ai-panel" id="aiPanel">
+        <div class="ai-messages" id="aiMessages">
+            <div class="ai-msg bot">Merhaba! Ben VİZYON AI.</div>
+        </div>
+        <div class="ai-suggestions">
+            <div class="ai-suggestion" onclick="quickAsk('Python hesap makinesi yaz')">🐍 Python</div>
+            <div class="ai-suggestion" onclick="quickAsk('React todo app yap')">⚛️ React</div>
+            <div class="ai-suggestion" onclick="quickAsk('dolar kaç')">💰 Dolar</div>
+            <div class="ai-suggestion" onclick="quickAsk('bugün haberler')">📰 Haber</div>
+        </div>
+        <div class="ai-input-area">
+            <input class="ai-input" id="aiInput" placeholder="Her dilde sorabilirsin..." onkeypress="if(event.key==='Enter') sendAiMessage();">
+            <button class="ai-send" onclick="sendAiMessage()">→</button>
+        </div>
+    </div>
+    <button class="ai-widget-btn" onclick="toggleAiPanel()">⚡</button>
+</div>
+
+<!-- ============================================================ -->
+<!-- VİZYON AI FULL PANEL (YARIM EKRAN / TAM EKRAN)              -->
+<!-- ============================================================ -->
+<div id="fullAIPanel" class="vizyon-ai-panel">
+    <div class="vizyon-ai-header">
+        <div class="logo">
+            <div class="logo-icon">✨</div>
+            <div class="logo-text">VİZYON AI</div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+            <span style="color:var(--text3); font-size:12px;">⚡ 7 Model</span>
+            <!-- KAPAT BUTONU ÇIKIŞ YAPAR -->
+            <button class="btn-secondary btn-sm" onclick="logout()" style="display:inline-block; padding:4px 12px; font-size:10px;" id="fullscreenCloseBtn">✕ Kapat</button>
+        </div>
+    </div>
+    <div id="fullAIChat" class="vizyon-ai-chat">
+        <div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Size nasıl yardımcı olabilirim? Dosya yükleyebilir, kod yazabilir veya soru sorabilirsiniz.</div>
+    </div>
+    <div class="vizyon-ai-input-area">
+        <textarea id="fullAIInput" class="vizyon-ai-input" placeholder="Her dilde yazabilirsin... (Python, JavaScript, React, SQL...)" rows="2" onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendFullAI(); }"></textarea>
+        <div style="display:flex; gap:8px; position:relative;">
+            <button class="btn-secondary" onclick="toggleFileMenu()" style="padding:10px 16px; font-size:18px;">➕</button>
+            <div id="fileMenu" style="display:none; position:absolute; bottom:70px; right:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:8px; z-index:10001; min-width:180px; box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+                <button onclick="openCamera()" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📷 Fotoğraf Çek</button>
+                <button onclick="document.getElementById('fullFileInput').click(); toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📁 Galeriden Seç</button>
+                <button onclick="document.getElementById('fullFileInput').click(); toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📄 Dosya Yükle</button>
+            </div>
+            <input type="file" id="fullFileInput" style="display:none;" accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip,.png,.jpg,.jpeg,.gif,.bmp,.svg,.webp" onchange="uploadFullFile(this)">
+            <button class="btn-primary" onclick="sendFullAI()" style="padding:10px 20px;">⚡ Gönder</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- YORUM SİSTEMİ                                                -->
+<!-- ============================================================ -->
+<section id="commentsSection">
+    <h3>💬 Yorumlar</h3>
+
+    <div id="commentsList">
+        <div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">
+            🌟 Yorumlar yükleniyor...
+        </div>
+    </div>
+
+    <div id="commentForm" style="display: none;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <span style="color: var(--text2); font-size: 14px;">👤 <span id="commentUserName">Misafir</span></span>
+            <span id="commentUserRole" style="font-size: 11px; padding: 2px 10px; border-radius: 12px; background: var(--border); color: var(--text3);">👤 KULLANICI</span>
+        </div>
+        <textarea id="commentInput" rows="2" placeholder="Yorumunuzu yazın..." style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; resize: vertical; font-family: var(--font-body);"></textarea>
+        <button onclick="postComment()" class="btn-primary" style="margin-top: 8px; width: 100%; font-size: 14px !important; padding: 12px !important;">💬 Yorum Gönder</button>
+    </div>
+
+    <div id="commentLoginMessage" style="margin-top: 16px; padding: 12px; background: var(--surface); border-radius: 12px; border: 1px dashed var(--border); text-align: center; color: var(--text3);">
+        <p>Yorum yapmak için <button class="btn-secondary btn-sm" onclick="openModal('login')" style="display: inline-block; padding: 6px 16px; font-size: 12px;">giriş yapmalısınız</button>.</p>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- KULLANICI PANELİ (AYRI EKRAN) – ARTIK KULLANILMIYOR          -->
+<!-- ============================================================ -->
+<div id="userPanel" class="user-panel">
+    <div class="user-panel-header">
+        <div class="logo">
+            <div class="logo-icon">✨</div>
+            <div class="logo-text">VİZYON 2027</div>
+        </div>
+        <div class="user-info">
+            <span id="userPanelName" style="font-size:18px;font-weight:600;"></span>
+            <span id="userPanelRole" class="badge"></span>
+            <button class="btn-secondary btn-sm" onclick="openProfileModal()">👤 Profil</button>
+            <button class="logout-btn btn-sm" onclick="logout()">Çıkış</button>
+        </div>
+    </div>
+    <div class="user-panel-body">
+        <!-- AI paneli burada tam ekran olarak açılacak -->
+    </div>
+</div>
+
+    <!-- GİRİŞ / KAYIT / DOĞRULAMA MODALI -->
+    <!-- FOUNDER / ADMIN / BETA PANEL MODALI -->
+    <!-- PROFİL MODALI -->
+    <!-- ADMIN ŞİFRE BELİRLEME MODALI -->
+    <!-- AI WIDGET (SAĞ ALT KÖŞE) -->
+    <!-- VİZYON AI FULL PANEL (TAM EKRAN) -->
+    <!-- YORUM SİSTEMİ -->
+
+    <!-- ============================================================ -->
+    <!-- ===================== JS BÖLÜMLERİ ========================== -->
+    <!-- ============================================================ -->
+
+    <!-- ============================================================ -->
+<!-- JS-1: BACK4APP KONFIG + GERÇEK SAYAÇLAR + OTOMATİK OTURUM    -->
+<!-- ============================================================ -->
+<script>
+// ============================================================
+// JS-1: BACK4APP KONFIG + GERÇEK SAYAÇLAR + OTOMATİK OTURUM
+// ============================================================
+
+var currentUser = null;
+var currentRole = null;
+var parseInitialized = false;
+var statsInterval = null;
+
+// ========== BACK4APP BAŞLAT ==========
+async function initBack4App() {
+    if (parseInitialized) return;
+    try {
+        await loadParseSDK();
+        Parse.initialize("ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8", "mur4DtLsGOsQhykTnFVNGxYOeNbvjPbAkl6xPQGp");
+        Parse.serverURL = "https://parseapi.back4app.com";
+        parseInitialized = true;
+        console.log('Back4App baslatildi');
+        showNotification('Back4App baglantisi kuruldu!', 'success');
+    } catch(e) {
+        console.error('Back4App hatasi:', e);
+        showNotification('Back4App baglanti hatasi!', 'error');
+    }
+}
+
+function loadParseSDK() {
+    return new Promise(function(resolve, reject) {
+        if (typeof Parse !== 'undefined') { resolve(); return; }
+        var script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/parse@5.0.0/dist/parse.min.js';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+}
+
+// ========== BİLDİRİM ==========
+function showNotification(msg, type) {
+    var n = document.getElementById('notification');
+    if (!n) {
+        n = document.createElement('div');
+        n.id = 'notification';
+        n.className = 'notification';
+        document.body.appendChild(n);
+    }
+    n.innerHTML = (type === 'error' ? '❌ ' : '✅ ') + msg;
+    n.className = 'notification show' + (type === 'error' ? ' error' : '');
+    setTimeout(function() { n.classList.remove('show'); }, 4000);
+}
+
+// ========== MODAL KAPAT ==========
+function closeModal(id) {
+    var modal = document.getElementById(id);
+    if (modal) modal.classList.remove('open');
+}
+
+// ========== OTOMATİK OTURUM KONTROLÜ ==========
+async function checkSession() {
+    try {
+        var user = Parse.User.current();
+        if (user) {
+            try {
+                await user.fetch();
+                return true;
+            } catch(e) {
+                console.log('Oturum geçersiz, çıkış yapılıyor...');
+                await Parse.User.logOut();
+                localStorage.removeItem('vizyon_user');
+                currentUser = null;
+                return false;
+            }
+        }
+        return false;
+    } catch(e) {
+        console.log('Oturum kontrol hatası:', e);
+        return false;
+    }
+}
+
+// ========== SORGU LİMİTİ (GÜNCELLENDİ) ==========
+async function useQuery() {
+    if (currentUser) {
+        try {
+            var result = await Parse.Cloud.run('useQuery');
+            // Rozeti güncelle
+            updateQueryBadge(result);
+            return true;
+        } catch(e) {
+            showNotification(e.message, 'error');
+            return false;
+        }
+    } else {
+        // Misafir kullanıcı için limit 25
+        try {
+            var result = await Parse.Cloud.run('useQuery');
+            updateQueryBadge(result);
+            return true;
+        } catch(e) {
+            showNotification(e.message, 'error');
+            return false;
+        }
+    }
+}
+
+// ========== SORGU LİMİTİ ROZETİ GÜNCELLE ==========
+function updateQueryBadge(result) {
+    var badges = document.querySelectorAll('.query-limit-badge');
+    var isMember = result && result.isMember;
+    var remaining = result ? result.remaining : 'Sınırsız';
+    var limit = result ? result.limit : 25;
+    var text = '';
+    if (remaining === 'Sınırsız') {
+        text = '🔋 Sınırsız sorgu';
+    } else {
+        text = '🔋 ' + remaining + ' sorgu kaldı';
+    }
+    badges.forEach(function(badge) {
+        badge.textContent = text;
+        badge.style.display = 'inline-block';
+    });
+}
+
+// ========== GERÇEK SAYAÇLAR ==========
+async function updateStats() {
+    if (!currentUser) {
+        document.getElementById('counter1').innerHTML = '0';
+        document.getElementById('counter2').innerHTML = '0';
+        document.getElementById('counter3').innerHTML = '0';
+        return;
+    }
+    try {
+        var userQuery = new Parse.Query(Parse.User);
+        var userCount = await userQuery.count();
+        document.getElementById('counter1').innerHTML = userCount || 0;
+        
+        var projectQuery = new Parse.Query('Project');
+        var projectCount = await projectQuery.count();
+        document.getElementById('counter3').innerHTML = projectCount || 0;
+        
+        var queryQuery = new Parse.Query('QueryStat');
+        var totalQueries = await queryQuery.count();
+        document.getElementById('counter2').innerHTML = totalQueries || 0;
+        
+    } catch(e) {
+        console.log('İstatistikler güncellenemedi:', e);
+        document.getElementById('counter1').innerHTML = '0';
+        document.getElementById('counter2').innerHTML = '0';
+        document.getElementById('counter3').innerHTML = '0';
+    }
+}
+
+function startStatsInterval() {
+    if (statsInterval) clearInterval(statsInterval);
+    updateStats();
+    statsInterval = setInterval(updateStats, 30000);
+}
+
+function stopStatsInterval() {
+    if (statsInterval) {
+        clearInterval(statsInterval);
+        statsInterval = null;
+    }
+}
+</script>
+    
+
+    <!-- ============================================================ -->
+<!-- JS-2: KAYIT, GİRİŞ, DOĞRULAMA, GOOGLE, FACEBOOK, PROJE YÖNETİMİ -->
+<!-- ============================================================ -->
+<script>
+// ============================================================
+// JS-2: KAYIT, GİRİŞ, DOĞRULAMA, GOOGLE, FACEBOOK, PROJE YÖNETİMİ
+// ============================================================
+
+// ========== KAYIT (OTURUM KONTROLLÜ) ==========
+async function handleRegister() {
+    if (currentUser) {
+        try {
+            await Parse.User.logOut();
+            currentUser = null;
+            localStorage.removeItem('vizyon_user');
+            console.log('✅ Önceki oturum kapatıldı');
+        } catch(e) {
+            console.log('Çıkış hatası:', e);
+        }
+    }
+    
+    var name = document.getElementById('rName').value.trim();
+    var email = document.getElementById('rEmail').value.trim();
+    var p1 = document.getElementById('rPass').value;
+    var p2 = document.getElementById('rPass2').value;
+    
+    if (!name || !email || p1.length < 8 || p1 !== p2) {
+        showNotification('Tüm alanları doldurun, şifreler aynı ve min 8 karakter', 'error');
+        return;
+    }
+    
+    try {
+        var user = new Parse.User();
+        user.set('username', email);
+        user.set('email', email);
+        user.set('password', p1);
+        user.set('name', name);
+        user.set('role', 'user');
+        user.set('plan', 'free');
+        user.set('isVerified', false);
+        user.set('isBanned', false);
+        
+        var code = Math.floor(100000 + Math.random() * 900000).toString();
+        user.set('verificationCode', code);
+        user.set('verificationCodeExpires', new Date(Date.now() + 15 * 60000));
+        
+        await user.signUp();
+        
+        try {
+            await Parse.Cloud.run('sendEmail', {
+                to: email,
+                subject: 'Doğrulama Kodu - Vizyon 2027',
+                html: '<h1>Hoş geldin ' + name + '!</h1><p>Doğrulama kodunuz: <strong style="font-size:24px;color:#00d4ff;">' + code + '</strong></p><p>15 dakika geçerlidir.</p><p>Vizyon 2027 ekibi</p>'
+            });
+        } catch(e) {
+            console.log('Mail gönderilemedi:', e);
+            showNotification('Kayıt başarılı! Doğrulama kodunuz: ' + code, 'warning');
+        }
+        
+        showNotification('Kayıt başarılı! Doğrulama kodunuz mail adresinize gönderildi.', 'success');
+        switchTab('verify'); // JS-4'teki switchTab kullanılır
+        document.getElementById('verifyEmail').value = email;
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+// ========== DOĞRULAMA (Cloud Code ile) ==========
+async function verifyAccount() {
+    var email = document.getElementById('verifyEmail').value.trim();
+    var code = document.getElementById('verifyCode').value.trim();
+    
+    if (!email || !code) {
+        showNotification('Tüm alanları doldurun!', 'error');
+        return;
+    }
+    
+    try {
+        var result = await Parse.Cloud.run('verifyUser', {
+            email: email,
+            code: code
+        });
+        
+        if (result.success) {
+            showNotification('✅ Hesap doğrulandı! Giriş yapabilirsiniz.', 'success');
+            switchTab('login');
+        } else {
+            showNotification('❌ ' + result.error, 'error');
+        }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+// ========== GİRİŞ ==========
+async function handleLogin() {
+    var email = document.getElementById('lEmail').value.trim();
+    var pass = document.getElementById('lPass').value;
+    
+    if (!email || !pass) {
+        showNotification('Tüm alanları doldurun!', 'error');
+        return;
+    }
+    
+    try {
+        var user = await Parse.User.logIn(email, pass);
+        
+        if (user.get('isBanned')) {
+            await Parse.User.logOut();
+            showNotification('Hesabınız yasaklanmıştır!', 'error');
+            return;
+        }
+        
+        if (!user.get('isVerified')) {
+            await Parse.User.logOut();
+            showNotification('Hesap doğrulanmamış! Lütfen doğrulama kodunu girin.', 'error');
+            switchTab('verify');
+            document.getElementById('verifyEmail').value = email;
+            return;
+        }
+        
+        currentUser = user;
+        localStorage.setItem('vizyon_user', JSON.stringify({
+            id: user.id,
+            name: user.get('name'),
+            email: user.get('email'),
+            role: user.get('role'),
+            plan: user.get('plan'),
+            teamId: user.get('teamId')
+        }));
+        
+        closeModal('authModal');
+        showDashboard();
+        updateCommentUI();
+        showNotification('Hoş geldin, ' + user.get('name'), 'success');
+    } catch(e) {
+        showNotification('Giriş başarısız: ' + e.message, 'error');
+    }
+}
+
+// ========== GOOGLE İLE GİRİŞ ==========
+window.loginWithGoogle = async function() {
+    try {
+        showNotification('Google ile giriş başlatılıyor...', 'success');
+        
+        var user = await Parse.User.logInWith('google', {
+            authData: {
+                id: 'google_' + Date.now(),
+                access_token: 'temp_token'
+            }
+        });
+        
+        if (user.get('isBanned')) {
+            await Parse.User.logOut();
+            showNotification('Hesabınız yasaklanmıştır!', 'error');
+            return;
+        }
+        
+        currentUser = user;
+        localStorage.setItem('vizyon_user', JSON.stringify({
+            id: user.id,
+            name: user.get('name') || user.get('username') || 'Google Kullanıcısı',
+            email: user.get('email'),
+            role: user.get('role') || 'user',
+            plan: user.get('plan') || 'free',
+            teamId: user.get('teamId')
+        }));
+        
+        closeModal('authModal');
+        showDashboard();
+        updateCommentUI();
+        showNotification('Google ile giriş başarılı! Hoş geldin ' + (user.get('name') || 'Kullanıcı'), 'success');
+        
+    } catch(e) {
+        console.error('Google giriş hatası:', e);
+        var errorMsg = e.message || 'Bilinmeyen hata';
+        if (errorMsg.indexOf('id token is invalid') !== -1 || errorMsg.indexOf('invalid') !== -1) {
+            showNotification('❌ Google giriş hatası: Back4App Dashboard → App Settings → Authentication → Google bölümünden Google Authentication\'ı aktifleştirin ve Client ID/Secret ekleyin.', 'error');
+        } else if (errorMsg.indexOf('network') !== -1) {
+            showNotification('Google giriş hatası: Ağ bağlantısı sorunu. Lütfen internet bağlantınızı kontrol edin.', 'error');
+        } else {
+            showNotification('Google giriş hatası: ' + errorMsg, 'error');
+        }
+    }
+};
+
+// ========== FACEBOOK İLE GİRİŞ ==========
+window.loginWithFacebook = async function() {
+    try {
+        showNotification('Facebook ile giriş başlatılıyor...', 'success');
+        
+        var user = await Parse.User.logInWith('facebook', {
+            authData: {
+                id: 'facebook_' + Date.now(),
+                access_token: 'temp_token'
+            }
+        });
+        
+        if (user.get('isBanned')) {
+            await Parse.User.logOut();
+            showNotification('Hesabınız yasaklanmıştır!', 'error');
+            return;
+        }
+        
+        currentUser = user;
+        localStorage.setItem('vizyon_user', JSON.stringify({
+            id: user.id,
+            name: user.get('name') || user.get('username') || 'Facebook Kullanıcısı',
+            email: user.get('email'),
+            role: user.get('role') || 'user',
+            plan: user.get('plan') || 'free',
+            teamId: user.get('teamId')
+        }));
+        
+        closeModal('authModal');
+        showDashboard();
+        updateCommentUI();
+        showNotification('Facebook ile giriş başarılı! Hoş geldin ' + (user.get('name') || 'Kullanıcı'), 'success');
+        
+    } catch(e) {
+        console.error('Facebook giriş hatası:', e);
+        var errorMsg = e.message || 'Bilinmeyen hata';
+        if (errorMsg.indexOf('invalid') !== -1) {
+            showNotification('❌ Facebook giriş hatası: Back4App Dashboard → App Settings → Authentication → Facebook bölümünden Facebook Authentication\'ı aktifleştirin ve App ID/Secret ekleyin.', 'error');
+        } else if (errorMsg.indexOf('network') !== -1) {
+            showNotification('Facebook giriş hatası: Ağ bağlantısı sorunu. Lütfen internet bağlantınızı kontrol edin.', 'error');
+        } else {
+            showNotification('Facebook giriş hatası: ' + errorMsg, 'error');
+        }
+    }
+};
+
+// ========== ÇIKIŞ ==========
+function logout() {
+    Parse.User.logOut();
+    localStorage.removeItem('vizyon_user');
+    currentUser = null;
+    stopStatsInterval();
+    location.reload();
+}
+
+// ========== DASHBOARD ==========
+async function showDashboard() {
+    document.getElementById('mainSite').style.display = 'none';
+    document.getElementById('dashboardArea').style.display = 'block';
+    
+    var name = currentUser.get('name');
+    var role = currentUser.get('role');
+    
+    document.getElementById('dashboardUserName').innerHTML = name || 'Kullanıcı';
+    document.getElementById('userRoleBadge').innerHTML =
+        role === 'founder' ? '👑 KURUCU' :
+        role === 'admin' ? '⚙️ ADMIN' :
+        role === 'beta' ? '🔬 BETA' :
+        '👤 KULLANICI';
+    
+    if (role === 'admin' || role === 'founder') {
+        document.getElementById('adminPanelCard').style.display = 'block';
+        await loadUserList();
+    } else {
+        document.getElementById('adminPanelCard').style.display = 'none';
+    }
+    
+    await loadProjects();
+    await loadFavorites();
+    await loadArchive();
+    await loadTrash();
+    await loadProjectRequests();
+    await loadInbox();
+    await loadTeamInfo();
+    await updateStats();
+    startStatsInterval();
+}
+
+// ========== PROJE İŞLEMLERİ ==========
+async function loadProjects() {
+    try {
+        var Project = Parse.Object.extend('Project');
+        var query = new Parse.Query(Project);
+        query.equalTo('user_email', currentUser.get('email'));
+        query.equalTo('is_archived', false);
+        query.equalTo('is_trashed', false);
+        query.descending('createdAt');
+        var projects = await query.find();
+        var container = document.getElementById('projectsList');
+        if (!container) return;
+        
+        if (projects.length === 0) {
+            container.innerHTML = '<div class="project-item">Henüz proje yok.</div>';
+        } else {
+            var html = '';
+            for (var i = 0; i < projects.length; i++) {
+                var p = projects[i];
+                html += '<div class="project-item"><span>📄 ' + p.get('name').substring(0, 30) + '</span><div class="project-actions"><span onclick="editProject(\'' + p.id + '\')" title="Düzenle">✏️</span><span onclick="deleteProject(\'' + p.id + '\')" title="Sil">🗑️</span><span onclick="favoriteProject(\'' + p.id + '\')" title="Favori">⭐</span><span onclick="archiveProject(\'' + p.id + '\')" title="Arşivle">🗄️</span></div></div>';
+            }
+            container.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('Projeler yüklenirken hata:', e);
+        document.getElementById('projectsList').innerHTML = '<div class="project-item">⚠️ Projeler yüklenemedi.</div>';
+    }
+}
+
+async function newProject() {
+    var name = prompt('Proje adı:');
+    if (!name || !name.trim()) return;
+    
+    try {
+        var Project = Parse.Object.extend('Project');
+        var project = new Project();
+        project.set('user_email', currentUser.get('email'));
+        project.set('name', name.trim());
+        project.set('is_favorite', false);
+        project.set('is_archived', false);
+        project.set('is_trashed', false);
+        await project.save();
+        await loadProjects();
+        showNotification('Proje oluşturuldu!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function editProject(id) {
+    var newName = prompt('Yeni proje adı:');
+    if (!newName || !newName.trim()) return;
+    
+    try {
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
+        project.set('name', newName.trim());
+        await project.save();
+        await loadProjects();
+        showNotification('Proje güncellendi!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function deleteProject(id) {
+    if (!confirm('Projeyi silmek istediğinize emin misiniz?')) return;
+    
+    try {
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
+        await project.destroy();
+        await loadProjects();
+        await loadArchive();
+        await loadTrash();
+        showNotification('Proje silindi!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function favoriteProject(id) {
+    try {
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
+        project.set('is_favorite', !project.get('is_favorite'));
+        await project.save();
+        await loadProjects();
+        await loadFavorites();
+        showNotification(project.get('is_favorite') ? '⭐ Favorilere eklendi!' : '⭐ Favorilerden çıkarıldı!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function archiveProject(id) {
+    try {
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
+        project.set('is_archived', true);
+        await project.save();
+        await loadProjects();
+        await loadArchive();
+        showNotification('🗄️ Proje arşivlendi!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function unarchiveProject(id) {
+    try {
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
+        project.set('is_archived', false);
+        await project.save();
+        await loadProjects();
+        await loadArchive();
+        showNotification('📤 Proje arşivden çıkarıldı!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function restoreProject(id) {
+    try {
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
+        project.set('is_trashed', false);
+        await project.save();
+        await loadProjects();
+        await loadTrash();
+        showNotification('↩️ Proje geri yüklendi!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+// ========== FAVORİLER ==========
+async function loadFavorites() {
+    try {
+        var Project = Parse.Object.extend('Project');
+        var query = new Parse.Query(Project);
+        query.equalTo('user_email', currentUser.get('email'));
+        query.equalTo('is_favorite', true);
+        query.equalTo('is_trashed', false);
+        var projects = await query.find();
+        var container = document.getElementById('favList');
+        if (!container) return;
+        
+        if (projects.length === 0) {
+            container.innerHTML = '<div class="project-item">Henüz favori proje yok.</div>';
+        } else {
+            var html = '';
+            for (var i = 0; i < projects.length; i++) {
+                var p = projects[i];
+                html += '<div class="project-item"><span>⭐ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="favoriteProject(\'' + p.id + '\')" title="Favoriden çıkar">★</span></div></div>';
+            }
+            container.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('Favoriler yüklenirken hata:', e);
+    }
+}
+
+// ========== ARŞİV ==========
+async function loadArchive() {
+    try {
+        var Project = Parse.Object.extend('Project');
+        var query = new Parse.Query(Project);
+        query.equalTo('user_email', currentUser.get('email'));
+        query.equalTo('is_archived', true);
+        query.equalTo('is_trashed', false);
+        var projects = await query.find();
+        var container = document.getElementById('archiveList');
+        if (!container) return;
+        
+        if (projects.length === 0) {
+            container.innerHTML = '<div class="project-item">Arşivde proje yok.</div>';
+        } else {
+            var html = '';
+            for (var i = 0; i < projects.length; i++) {
+                var p = projects[i];
+                html += '<div class="project-item"><span>🗄️ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="unarchiveProject(\'' + p.id + '\')" title="Arşivden çıkar">📤</span><span onclick="deleteProject(\'' + p.id + '\')" title="Sil">🗑️</span></div></div>';
+            }
+            container.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('Arşiv yüklenirken hata:', e);
+    }
+}
+
+// ========== ÇÖP KUTUSU ==========
+async function loadTrash() {
+    try {
+        var Project = Parse.Object.extend('Project');
+        var query = new Parse.Query(Project);
+        query.equalTo('user_email', currentUser.get('email'));
+        query.equalTo('is_trashed', true);
+        var projects = await query.find();
+        var container = document.getElementById('trashList');
+        if (!container) return;
+        
+        if (projects.length === 0) {
+            container.innerHTML = '<div class="project-item">Çöp kutusu boş.</div>';
+        } else {
+            var html = '';
+            for (var i = 0; i < projects.length; i++) {
+                var p = projects[i];
+                html += '<div class="project-item"><span>🗑️ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="restoreProject(\'' + p.id + '\')" title="Geri yükle">↩️</span><span onclick="deleteProject(\'' + p.id + '\')" title="Kalıcı sil">🔥</span></div></div>';
+            }
+            container.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('Çöp kutusu yüklenirken hata:', e);
+    }
+}
+
+// ========== PROJE TALEPLERİ ==========
+async function loadProjectRequests() {
+    try {
+        var Request = Parse.Object.extend('ProjectRequest');
+        var query = new Parse.Query(Request);
+        query.equalTo('user_email', currentUser.get('email'));
+        query.descending('createdAt');
+        var requests = await query.find();
+        var container = document.getElementById('projectRequestsList');
+        if (!container) return;
+        
+        if (requests.length === 0) {
+            container.innerHTML = '<div class="project-item">Henüz proje talebiniz yok.</div>';
+        } else {
+            var html = '';
+            for (var i = 0; i < requests.length; i++) {
+                var r = requests[i];
+                html += '<div class="project-item"><span>📨 ' + r.get('name').substring(0, 25) + '</span><span style="font-size:10px;color:var(--text3);">' + (r.get('status') || 'Beklemede') + '</span></div>';
+            }
+            container.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('Proje talepleri yüklenirken hata:', e);
+    }
+}
+
+// ========== GELEN KUTUSU ==========
+async function loadInbox() {
+    try {
+        var Inbox = Parse.Object.extend('Inbox');
+        var query = new Parse.Query(Inbox);
+        query.equalTo('receiver_email', currentUser.get('email'));
+        query.descending('createdAt');
+        var messages = await query.find();
+        var container = document.getElementById('inboxList');
+        if (!container) return;
+        
+        if (messages.length === 0) {
+            container.innerHTML = '<div class="inbox-item">📭 Mesaj kutusu boş.</div>';
+        } else {
+            var html = '';
+            for (var i = 0; i < messages.length; i++) {
+                var m = messages[i];
+                html += '<div class="inbox-item"><div class="inbox-sender">📧 ' + m.get('sender_email') + '</div><div class="inbox-message">' + m.get('message') + '</div><div style="font-size:10px;color:var(--text3);margin-top:4px;">' + new Date(m.get('createdAt')).toLocaleString('tr-TR') + '</div></div>';
+            }
+            container.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('Mesajlar yüklenirken hata:', e);
+        document.getElementById('inboxList').innerHTML = '<div class="inbox-item">⚠️ Mesajlar yüklenemedi.</div>';
+    }
+}
+
+// NOT: switchTab ve openModal burada tanımlanmaz, JS-4'teki kullanılır.
+
+</script>
+    
+
+    <!-- ============================================================ -->
+<!-- JS-3: TAKIM VE AI (Cloud Code + Dosya Yükleme + Kopyala + 3D/Görsel) -->
+<!-- ============================================================ -->
+<script>
+// ================================================================
+// JS-3: TAKIM VE AI (Cloud Code + Dosya Yükleme + Kopyala + 3D/Görsel)
+// ================================================================
+
+async function loadTeamInfo() {
+    if (!currentUser) return;
+    var teamId = currentUser.get('teamId');
+    if (!teamId) {
+        document.getElementById('teamInfo').innerHTML = '<p>Bir takıma üye değilsiniz. Takım oluşturun veya davet bekleyin.</p>';
+        document.getElementById('teamMembersList').innerHTML = '';
+        document.getElementById('teamChatMessages').innerHTML = '';
+        return;
+    }
+    try {
+        var Team = Parse.Object.extend('Team');
+        var query = new Parse.Query(Team);
+        var team = await query.get(teamId);
+        var Member = Parse.Object.extend('TeamMember');
+        var memberQuery = new Parse.Query(Member);
+        memberQuery.equalTo('team_id', teamId);
+        var members = await memberQuery.find();
+        var Message = Parse.Object.extend('TeamMessage');
+        var msgQuery = new Parse.Query(Message);
+        msgQuery.equalTo('team_id', teamId);
+        msgQuery.ascending('createdAt');
+        var messages = await msgQuery.find();
+        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + '</h4><p>Üye sayısı: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
+        var membersHtml = '';
+        for (var i = 0; i < members.length; i++) {
+            var m = members[i];
+            membersHtml += '<div class="team-member-item">👤 ' + m.get('user_email') + (m.get('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>';
+        }
+        document.getElementById('teamMembersList').innerHTML = membersHtml;
+        var chatContainer = document.getElementById('teamChatMessages');
+        var userEmail = currentUser.get('email');
+        var chatHtml = '';
+        for (var j = 0; j < messages.length; j++) {
+            var msg = messages[j];
+            var cls = (msg.get('user_email') === userEmail) ? 'user' : 'bot';
+            var name = (msg.get('user_email') === userEmail) ? 'Ben' : msg.get('user_email').split('@')[0];
+            chatHtml += '<div class="ai-message ' + cls + '"><strong>' + name + '</strong>: ' + msg.get('message') + '</div>';
+        }
+        chatContainer.innerHTML = chatHtml || '<div>Henüz mesaj yok</div>';
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    } catch (e) { console.error('Takım bilgisi yüklenirken hata:', e); }
+}
+
+async function createTeam() {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    var name = prompt('Takım adı:');
+    if (!name) return;
+    try {
+        var Team = Parse.Object.extend('Team');
+        var team = new Team();
+        team.set('name', name);
+        team.set('owner_email', currentUser.get('email'));
+        await team.save();
+        var Member = Parse.Object.extend('TeamMember');
+        var member = new Member();
+        member.set('team_id', team.id);
+        member.set('user_email', currentUser.get('email'));
+        await member.save();
+        currentUser.set('teamId', team.id);
+        await currentUser.save();
+        await loadTeamInfo();
+        showNotification('"' + name + '" takımı oluşturuldu!', 'success');
+    } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
+}
+
+async function inviteToTeam() {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    var teamId = currentUser.get('teamId');
+    if (!teamId) { showNotification('Önce takım oluşturun!', 'error'); return; }
+    var email = document.getElementById('inviteEmail').value.trim();
+    if (!email) { showNotification('E-posta adresi girin!', 'error'); return; }
+    try {
+        var Inbox = Parse.Object.extend('Inbox');
+        var inbox = new Inbox();
+        inbox.set('sender_email', currentUser.get('email'));
+        inbox.set('receiver_email', email);
+        inbox.set('message', currentUser.get('name') + ' sizi takıma davet etti! Takım ID: ' + teamId);
+        await inbox.save();
+        showNotification('Davet gönderildi: ' + email, 'success');
+        document.getElementById('inviteEmail').value = '';
+    } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
+}
+
+async function sendTeamMessage() {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    var teamId = currentUser.get('teamId');
+    if (!teamId) { showNotification('Takımınız yok!', 'error'); return; }
+    var msg = document.getElementById('teamChatInput').value.trim();
+    if (!msg) return;
+    try {
+        var Message = Parse.Object.extend('TeamMessage');
+        var message = new Message();
+        message.set('team_id', teamId);
+        message.set('user_email', currentUser.get('email'));
+        message.set('message', msg);
+        await message.save();
+        document.getElementById('teamChatInput').value = '';
+        await loadTeamInfo();
+    } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
+}
+
+// ========== YANIT TEMİZLEME + KOD BLOĞU + KOPYALA ==========
+function cleanClientResponse(text) {
+    if (!text) return text;
+    var withCopy = text.replace(/```(\w+)?\n([\s\S]*?)```/g, function (match, lang, code) {
+        return '<div class="code-block"><pre><code class="language-' + (lang || '') + '">' + code + '</code></pre><button class="copy-btn" onclick="copyCode(this)">📋 Kopyala</button></div>';
+    });
+    if (withCopy === text) {
+        return text
+            .replace(/\\n/g, '<br>')
+            .replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+    }
+    return withCopy
+        .replace(/\\n/g, '<br>')
+        .replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>');
+}
+
+function copyCode(btn) {
+    var codeBlock = btn.parentElement.querySelector('code');
+    if (!codeBlock) { return; }
+    var code = codeBlock.textContent;
+    var originalText = btn.innerHTML;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(function () {
+            btn.innerHTML = '✅ Kopyalandı!';
+            btn.style.borderColor = '#00ff88';
+            btn.style.color = '#00ff88';
+            setTimeout(function () {
+                btn.innerHTML = originalText;
+                btn.style.borderColor = '';
+                btn.style.color = '';
+            }, 2000);
+        }).catch(function () { fallbackCopy(code, btn); });
+    } else {
+        fallbackCopy(code, btn);
+    }
+}
+
+function fallbackCopy(code, btn) {
+    var textarea = document.createElement('textarea');
+    textarea.value = code;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        var originalText = btn.innerHTML;
+        btn.innerHTML = '✅ Kopyalandı!';
+        btn.style.borderColor = '#00ff88';
+        btn.style.color = '#00ff88';
+        setTimeout(function () {
+            btn.innerHTML = originalText;
+            btn.style.borderColor = '';
+            btn.style.color = '';
+        }, 2000);
+    } catch (e) {
+        alert('Kopyalanamadı. Lütfen manuel kopyalayın.');
+    }
+    document.body.removeChild(textarea);
+}
+
+function toggleFileMenu() {
+    var menu = document.getElementById('fileMenu');
+    if (menu) {
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+function openCamera() {
+    document.getElementById('fileMenu').style.display = 'none';
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.capture = 'environment';
+    input.onchange = function (e) {
+        if (e.target.files && e.target.files[0]) {
+            var fakeEvent = { target: { files: e.target.files } };
+            uploadFullFile(fakeEvent.target);
+        }
+    };
+    input.click();
+}
+
+async function callAllAIModels(prompt) {
+    try {
+        return await Parse.Cloud.run('superAI', { prompt: prompt });
+    } catch (e) {
+        console.error('AI hatası:', e);
+        return '🧠 VİZYON AI: "' + prompt + '" hakkında yardımcı olabilirim. Detaylı yanıt için lütfen daha spesifik bir soru sorun.';
+    }
+}
+
+async function webSearch(query) {
+    try {
+        var result = await Parse.Cloud.run('webSearch', { query: query });
+        return result || '"' + query + '" için sonuç bulunamadı.';
+    } catch (e) {
+        return '"' + query + '" için arama yapılamadı.';
+    }
+}
+
+window.sendDashboardAI = async function () {
+    if (!await useQuery()) return;
+    var inp = document.getElementById('dashboardAiInput');
+    var msg = inp.value.trim();
+    if (!msg) return;
+    var container = document.getElementById('dashboardAiMessages');
+    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + '</div>';
+    inp.value = '';
+    container.scrollTop = container.scrollHeight;
+    var response;
+    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('arama') !== -1) {
+        response = await webSearch(msg);
+    } else {
+        response = await callAllAIModels(msg);
+    }
+    var cleaned = cleanClientResponse(response);
+    container.innerHTML += '<div class="ai-message bot">' + cleaned + '</div>';
+    container.scrollTop = container.scrollHeight;
+};
+
+// ========== AI PANELİ AÇ (PARAMETRE İLE: 'fullscreen' veya 'halfscreen') ==========
+function openFullAIPanel(mode) {
+    var panel = document.getElementById('fullAIPanel');
+    if (!panel) return;
+    panel.classList.remove('fullscreen', 'halfscreen');
+    if (mode === 'halfscreen') {
+        panel.classList.add('halfscreen');
+    } else {
+        panel.classList.add('fullscreen');
+    }
+    panel.style.display = 'flex';
+    var closeBtn = document.getElementById('fullscreenCloseBtn');
+    if (closeBtn) closeBtn.style.display = 'inline-block';
+}
+
+// ========== AI PANELİ KAPAT (SADECE PANELİ GİZLER) ==========
+function closeFullAIPanel() {
+    var panel = document.getElementById('fullAIPanel');
+    if (panel) {
+        panel.style.display = 'none';
+        panel.classList.remove('fullscreen', 'halfscreen');
+    }
+}
+
+async function sendFullAI() {
+    if (!await useQuery()) return;
+    var inp = document.getElementById('fullAIInput');
+    var msg = inp.value.trim();
+    if (!msg) return;
+    var chat = document.getElementById('fullAIChat');
+    chat.innerHTML += '<div class="ai-msg user">' + msg.replace(/</g, '&lt;') + '</div>';
+    inp.value = '';
+    chat.scrollTop = chat.scrollHeight;
+    var response;
+    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('hava') !== -1) {
+        response = await webSearch(msg);
+    } else {
+        response = await callAllAIModels(msg);
+    }
+    var cleaned = cleanClientResponse(response);
+    chat.innerHTML += '<div class="ai-msg bot">🧠 ' + cleaned + '</div>';
+    chat.scrollTop = chat.scrollHeight;
+}
+
+function toggleAiPanel() {
+    document.getElementById('aiPanel').classList.toggle('open');
+}
+
+function quickAsk(q) {
+    document.getElementById('aiInput').value = q;
+    sendAiMessage();
+}
+
+async function sendAiMessage() {
+    if (!await useQuery()) return;
+    var inp = document.getElementById('aiInput');
+    var msg = inp.value.trim();
+    if (!msg) return;
+    var msgs = document.getElementById('aiMessages');
+    msgs.innerHTML += '<div class="ai-msg user">' + msg.replace(/</g, '&lt;') + '</div>';
+    inp.value = '';
+    msgs.scrollTop = msgs.scrollHeight;
+    var response;
+    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1) {
+        response = await webSearch(msg);
+    } else {
+        response = await callAllAIModels(msg);
+    }
+    var cleaned = cleanClientResponse(response);
+    msgs.innerHTML += '<div class="ai-msg bot">' + cleaned + '</div>';
+    msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ========== DOSYA YÜKLEME ==========
+async function uploadFullFile(input) {
+    var file = input.files[0];
+    if (!file) return;
+    var menu = document.getElementById('fileMenu');
+    if (menu) menu.style.display = 'none';
+    showNotification('📤 Dosya yükleniyor: ' + file.name, 'success');
+    try {
+        var parseFile = new Parse.File(file.name, file);
+        await parseFile.save();
+        var url = parseFile.url();
+        showNotification('✅ Dosya yüklendi! AI analiz ediyor...', 'success');
+        var reader = new FileReader();
+        reader.onload = async function (event) {
+            var content = event.target.result;
+            var inputArea = document.getElementById('fullAIInput');
+            if (inputArea) {
+                var fileType = file.type;
+                var fileSize = (file.size / 1024).toFixed(1);
+                var fileMsg = '📄 Dosya: ' + file.name + '\n📁 Boyut: ' + fileSize + ' KB\n📋 Tür: ' + (fileType || 'Bilinmiyor') + '\n\n';
+                if (fileType && fileType.startsWith('image/')) {
+                    fileMsg += '🖼️ Bu bir görsel dosyası. Lütfen görseli analiz et ve içeriğini detaylıca açıkla.\n\n(Görsel verisi: ' + content.substring(0, 500) + '...)';
+                } else if (fileType === 'application/pdf') {
+                    fileMsg += '📄 Bu bir PDF dosyası. Lütfen içeriğini analiz et ve özetle.\n\nİçerik:\n' + content.substring(0, 2000);
+                } else if (fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || fileType === 'application/msword') {
+                    fileMsg += '📝 Bu bir Word dosyası. Lütfen içeriğini analiz et ve özetle.\n\nİçerik:\n' + content.substring(0, 2000);
+                } else {
+                    fileMsg += '📝 İçeriği analiz et ve özetle:\n\n' + content.substring(0, 2000);
+                }
+                inputArea.value = fileMsg;
+                sendFullAI();
+            }
+        };
+        if (file.type && file.type.startsWith('image/')) {
+            reader.readAsDataURL(file);
+        } else {
+            reader.readAsText(file);
+        }
+    } catch (e) {
+        console.error('Dosya yükleme hatası:', e);
+        showNotification('❌ Dosya yüklenemedi: ' + e.message, 'error');
+    }
+    input.value = '';
+}
+
+// ========== GÖRSEL ÜRETME ==========
+async function generateImage() {
+    var prompt = document.getElementById('imagePrompt').value.trim();
+    if (!prompt) return showNotification('Lütfen bir açıklama yazın!', 'error');
+    showNotification('⏳ Görsel üretiliyor...', 'success');
+    try {
+        var response = await fetch('https://vizyon-ai.your-worker.workers.dev/generate-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: prompt })
+        });
+        var data = await response.json();
+        if (data.image) {
+            var img = document.createElement('img');
+            img.src = 'data:image/png;base64,' + data.image;
+            img.style.width = '200px';
+            img.style.height = '200px';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '8px';
+            img.style.border = '1px solid var(--border)';
+            document.getElementById('imageResults').appendChild(img);
+            showNotification('✅ Görsel üretildi!', 'success');
+        } else {
+            showNotification('❌ Görsel üretilemedi: ' + (data.error || 'Bilinmeyen hata'), 'error');
+        }
+    } catch (e) {
+        console.error('Görsel üretme hatası:', e);
+        showNotification('❌ Görsel üretilemedi: ' + e.message, 'error');
+    }
+}
+
+// ========== 3D MODEL ÜRETME (Three.ws + Yedek) ==========
+async function generate3D() {
+    var prompt = document.getElementById('threeDPrompt').value.trim();
+    if (!prompt) return showNotification('Lütfen bir açıklama yazın!', 'error');
+    showNotification('⏳ 3D model oluşturuluyor...', 'success');
+    try {
+        var response = await fetch('https://three.ws/api/forge', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: prompt })
+        });
+        var data = await response.json();
+        if (data.glbUrl) {
+            load3DModel(data.glbUrl);
+            showNotification('✅ 3D model oluşturuldu!', 'success');
+            return;
+        } else {
+            throw new Error('Three.ws başarısız, basit şekil oluşturuluyor...');
+        }
+    } catch (e) {
+        console.warn('Three.ws hatası, basit şekil oluşturuluyor:', e.message);
+        createSimple3DShape(prompt);
+        showNotification('🔄 Basit 3D şekil oluşturuldu (Three.ws çalışmadı).', 'warning');
+    }
+}
+
+// ========== BASİT 3D ŞEKİL OLUŞTUR (YEDEK) ==========
+function createSimple3DShape(prompt) {
+    if (!scene) init3D();
+    if (modelLoaded) {
+        scene.remove(modelLoaded);
+        modelLoaded = null;
+    }
+    var lower = prompt.toLowerCase();
+    var geometry;
+    if (lower.includes('küp') || lower.includes('cube')) {
+        geometry = new THREE.BoxGeometry(1, 1, 1);
+    } else if (lower.includes('küre') || lower.includes('sphere')) {
+        geometry = new THREE.SphereGeometry(0.7, 32, 32);
+    } else if (lower.includes('silindir') || lower.includes('cylinder')) {
+        geometry = new THREE.CylinderGeometry(0.7, 0.7, 1, 32);
+    } else if (lower.includes('piramit') || lower.includes('pyramid')) {
+        geometry = new THREE.ConeGeometry(0.7, 1, 4);
+    } else {
+        geometry = new THREE.TorusGeometry(0.6, 0.2, 16, 32);
+    }
+    var material = new THREE.MeshStandardMaterial({
+        color: 0x00d4ff,
+        metalness: 0.5,
+        roughness: 0.2
+    });
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(0, 0.5, 0);
+    scene.add(mesh);
+    modelLoaded = mesh;
+    camera.position.set(2, 2, 5);
+    camera.lookAt(0, 0, 0);
+}
+
+// ========== 3D SAHNE ==========
+let scene, camera, renderer;
+let modelLoaded = false;
+
+function init3D() {
+    var container = document.getElementById('canvas3d');
+    if (!container) return;
+    if (scene) return;
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0a0a);
+    var width = container.clientWidth || 500;
+    var height = container.clientHeight || 400;
+    camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+    camera.position.set(2, 2, 5);
+    camera.lookAt(0, 0, 0);
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(width, height);
+    renderer.shadowMap.enabled = true;
+    container.appendChild(renderer.domElement);
+    var ambientLight = new THREE.AmbientLight(0x404060);
+    scene.add(ambientLight);
+    var dirLight = new THREE.DirectionalLight(0xffffff, 1);
+    dirLight.position.set(5, 10, 7);
+    scene.add(dirLight);
+    var gridHelper = new THREE.GridHelper(10, 10, 0x00d4ff, 0x1a3350);
+    scene.add(gridHelper);
+    animate3D();
+    window.addEventListener('resize', function () {
+        var w = container.clientWidth;
+        var h = container.clientHeight;
+        if (camera && renderer) {
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+        }
+    });
+}
+
+function animate3D() {
+    requestAnimationFrame(animate3D);
+    if (renderer && scene && camera) {
+        renderer.render(scene, camera);
+    }
+}
+
+function load3DModel(url) {
+    if (!scene) init3D();
+    var loader = new THREE.GLTFLoader();
+    loader.load(url, function (gltf) {
+        if (modelLoaded) {
+            scene.remove(modelLoaded);
+        }
+        var model = gltf.scene;
+        model.scale.set(1, 1, 1);
+        model.position.set(0, 0, 0);
+        scene.add(model);
+        modelLoaded = model;
+        camera.position.set(2, 2, 5);
+        camera.lookAt(0, 0, 0);
+        showNotification('✅ 3D model yüklendi!', 'success');
+    }, undefined, function (error) {
+        console.error('Model yüklenemedi:', error);
+        showNotification('❌ Model yüklenemedi: ' + error.message, 'error');
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (document.getElementById('canvas3d')) {
+        init3D();
+    }
+});
+
+// ========== KOPYALA BUTONU STİLLERİ ==========
+(function addCopyButtonStyles() {
+    var style = document.createElement('style');
+    style.textContent = `
+        .code-block {
+            position: relative;
+            background: #0a0a0a;
+            border-radius: 8px;
+            margin: 8px 0;
+            padding: 12px;
+            border: 1px solid rgba(0,212,255,0.1);
+        }
+        .code-block pre {
+            margin: 0;
+            padding: 0;
+            overflow-x: auto;
+            padding-right: 70px;
+        }
+        .code-block code {
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            color: #e0e0e0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0,212,255,0.12);
+            border: 1px solid rgba(0,212,255,0.2);
+            color: var(--text3);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+        }
+        .copy-btn:hover {
+            background: rgba(0,212,255,0.25);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+        .ai-message.bot .code-block {
+            background: #0d1a26;
+        }
+        .ai-message.bot .code-block code {
+            color: #ccdeee;
+        }
+    `;
+    document.head.appendChild(style);
+})();
+
+document.addEventListener('click', function (e) {
+    var menu = document.getElementById('fileMenu');
+    var btn = document.querySelector('[onclick="toggleFileMenu()"]');
+    if (menu && menu.style.display !== 'none') {
+        if (!menu.contains(e.target) && !btn.contains(e.target)) {
+            menu.style.display = 'none';
+        }
+    }
+});
+</script>
+
+
+
+ 
+<!-- ============================================================ -->
+<!-- JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ                    -->
+<!-- ============================================================ -->
+<script>
+// ================================================================
+// JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ
+// ================================================================
+
+function openProfileModal() {
+    if (!currentUser) {
+        showNotification('Önce giriş yapın!', 'error');
+        return;
+    }
+    document.getElementById('profileContent').innerHTML =
+        '<p><strong>Ad:</strong> ' + currentUser.get('name') + '</p>' +
+        '<p><strong>E-posta:</strong> ' + currentUser.get('email') + '</p>' +
+        '<p><strong>Plan:</strong> ' + (currentUser.get('plan') === 'pro' ? '🌟 Pro' : (currentUser.get('plan') === 'team' ? '👥 Takım' : '🆓 Ücretsiz')) + '</p>' +
+        '<p><strong>Rol:</strong> ' + (currentUser.get('role') === 'founder' ? '👑 Kurucu' : (currentUser.get('role') === 'admin' ? '⚙️ Admin' : (currentUser.get('role') === 'beta' ? '🔬 Beta' : '👤 Kullanıcı'))) + '</p>' +
+        '<p><strong>Üyelik:</strong> ' + new Date(currentUser.get('createdAt')).toLocaleDateString('tr-TR') + '</p>' +
+        '<hr style="margin:16px 0;border-color:var(--border);">' +
+        '<button class="btn-danger btn-sm" onclick="deleteAccount()" style="margin-top:10px;">🗑️ Hesabımı Sil</button>';
+    document.getElementById('profileModal').classList.add('open');
+}
+
+async function changePassword() {
+    if (!currentUser) {
+        showNotification('Önce giriş yapın!', 'error');
+        return;
+    }
+    var np = prompt('Yeni şifre (en az 8 karakter):');
+    if (!np) return;
+    if (np.length < 8) {
+        showNotification('Şifre en az 8 karakter!', 'error');
+        return;
+    }
+    try {
+        currentUser.set('password', np);
+        await currentUser.save();
+        showNotification('Şifre değiştirildi!', 'success');
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function deleteAccount() {
+    if (!currentUser) {
+        showNotification('Önce giriş yapın!', 'error');
+        return;
+    }
+    if (!confirm('Hesap silinecek, emin misiniz?')) return;
+    try {
+        await Parse.Cloud.run('sendEmail', {
+            to: currentUser.get('email'),
+            subject: 'Hesap Silme Onayı - Vizyon 2027',
+            html: '<h1>Hesabınız silindi</h1><p>Sayın ' + currentUser.get('name') + ',</p><p>Hesabınız başarıyla silinmiştir.</p><p>Tekrar görüşmek üzere!</p>'
+        });
+        console.log('✅ Silme onay maili gönderildi.');
+    } catch (e) {
+        console.log('Mail gönderilemedi:', e);
+    }
+    try {
+        await currentUser.destroy();
+        logout();
+        showNotification('Hesabınız silindi.', 'success');
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function buyPackage(pkg) {
+    if (!currentUser) {
+        showNotification('Önce giriş yapın!', 'error');
+        return;
+    }
+    if (confirm((pkg === 'pro' ? 'Pro Paket (₺299/ay)' : 'Takım Paketi (₺899/ay)') + ' satın al?')) {
+        try {
+            currentUser.set('plan', pkg);
+            await currentUser.save();
+            showNotification('Paket alındı!', 'success');
+            location.reload();
+        } catch (e) {
+            showNotification('Hata: ' + e.message, 'error');
+        }
+    }
+}
+
+function openRolePanel(role) {
+    currentRole = role;
+    document.getElementById('roleTitle').innerHTML =
+        role === 'FOUNDER' ? '👑 FOUNDER GİRİŞİ' :
+        role === 'ADMIN' ? '⚙️ ADMIN GİRİŞİ' :
+        '🔬 BETA GİRİŞİ';
+    document.getElementById('rolePanel').classList.add('open');
+}
+
+function checkRole() {
+    var pass = document.getElementById('rolePassword').value;
+    var valid =
+        (currentRole === 'FOUNDER' && pass === 'Eymen11Amele44') ||
+        (currentRole === 'ADMIN' && pass === 'ibrm4411') ||
+        (currentRole === 'BETA' && pass === '4402');
+    if (valid) {
+        closeModal('rolePanel');
+        openFullAIPanel('fullscreen');
+        document.querySelector('.vizyon-ai-header .logo-text').innerHTML =
+            currentRole === 'FOUNDER' ? '👑 FOUNDER AI' :
+            currentRole === 'ADMIN' ? '⚙️ ADMIN AI' :
+            '🔬 BETA AI';
+        showNotification('Hoş geldiniz, ' + currentRole + ' paneli aktif!', 'success');
+    } else {
+        showNotification('Şifre hatalı!', 'error');
+    }
+}
+
+async function loadUserList() {
+    if (!currentUser) return;
+    try {
+        var query = new Parse.Query(Parse.User);
+        var users = await query.find();
+        var container = document.getElementById('userList');
+        if (!container) return;
+        var html = '';
+        for (var i = 0; i < users.length; i++) {
+            var u = users[i];
+            var role = u.get('role') || 'user';
+            html += '<div class="user-item"><span class="user-email">' + u.get('email') + '</span><span class="user-role">' + role + '</span><div class="user-actions"><button class="btn-admin" onclick="assignAdminEmail(\'' + u.get('email') + '\')">Admin Yap</button><button class="btn-user" onclick="setUserRole(\'' + u.get('email') + '\',\'user\')">Kullanıcı Yap</button><button class="btn-ban" onclick="banUserEmail(\'' + u.get('email') + '\')">Yasakla</button><button class="btn-gift" onclick="giftUserEmail(\'' + u.get('email') + '\')">🎁</button></div></div>';
+        }
+        container.innerHTML = html;
+    } catch (e) {
+        console.error('Kullanıcı listesi yüklenirken hata:', e);
+    }
+}
+
+async function assignAdminEmail(email) {
+    try {
+        var query = new Parse.Query(Parse.User);
+        query.equalTo('email', email);
+        var user = await query.first();
+        if (!user) {
+            showNotification('Kullanıcı bulunamadı!', 'error');
+            return;
+        }
+        user.set('role', 'admin');
+        await user.save();
+        var Inbox = Parse.Object.extend('Inbox');
+        var inbox = new Inbox();
+        inbox.set('sender_email', 'system@vizyon2027.com');
+        inbox.set('receiver_email', email);
+        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lütfen şifrenizi belirlemek için "Admin Şifre Belirle" butonuna tıklayın.');
+        await inbox.save();
+        showNotification(email + ' admin yapıldı!', 'success');
+        await loadUserList();
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function setUserRole(email, role) {
+    try {
+        var query = new Parse.Query(Parse.User);
+        query.equalTo('email', email);
+        var user = await query.first();
+        if (!user) {
+            showNotification('Kullanıcı bulunamadı!', 'error');
+            return;
+        }
+        user.set('role', role);
+        await user.save();
+        showNotification(email + ' rolü ' + role + ' olarak değiştirildi!', 'success');
+        await loadUserList();
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function banUserEmail(email) {
+    try {
+        var query = new Parse.Query(Parse.User);
+        query.equalTo('email', email);
+        var user = await query.first();
+        if (!user) {
+            showNotification('Kullanıcı bulunamadı!', 'error');
+            return;
+        }
+        user.set('isBanned', true);
+        await user.save();
+        showNotification(email + ' yasaklandı!', 'success');
+        await loadUserList();
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function giftUserEmail(email, pkg) {
+    try {
+        var query = new Parse.Query(Parse.User);
+        query.equalTo('email', email);
+        var user = await query.first();
+        if (!user) {
+            showNotification('Kullanıcı bulunamadı!', 'error');
+            return;
+        }
+        var Gift = Parse.Object.extend('Gift');
+        var gift = new Gift();
+        gift.set('sender_email', currentUser?.get('email') || 'system@vizyon2027.com');
+        gift.set('receiver_email', email);
+        gift.set('package', pkg);
+        await gift.save();
+        var Inbox = Parse.Object.extend('Inbox');
+        var inbox = new Inbox();
+        inbox.set('sender_email', 'system@vizyon2027.com');
+        inbox.set('receiver_email', email);
+        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takım Paketi') + ' hediye edildi!');
+        await inbox.save();
+        showNotification(email + ' adresine ' + pkg + ' paketi hediye edildi!', 'success');
+        await loadUserList();
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function assignAdmin() {
+    if (!currentUser) {
+        showNotification('Önce giriş yapın!', 'error');
+        return;
+    }
+    var email = document.getElementById('assignAdminEmail').value.trim();
+    if (!email) {
+        showNotification('E-posta adresi girin!', 'error');
+        return;
+    }
+    await assignAdminEmail(email);
+    document.getElementById('assignAdminEmail').value = '';
+}
+
+async function banUser() {
+    var email = document.getElementById('banUserEmail').value.trim();
+    if (!email) {
+        showNotification('E-posta adresi girin!', 'error');
+        return;
+    }
+    await banUserEmail(email);
+    document.getElementById('banUserEmail').value = '';
+}
+
+async function sendGift() {
+    var email = document.getElementById('giftEmail').value.trim();
+    var pkg = document.getElementById('giftPackage').value;
+    if (!email) {
+        showNotification('E-posta adresi girin!', 'error');
+        return;
+    }
+    await giftUserEmail(email, pkg);
+    document.getElementById('giftEmail').value = '';
+}
+
+async function setAdminPassword() {
+    var email = document.getElementById('adminEmail').value.trim();
+    var pass = document.getElementById('adminPass').value;
+    var pass2 = document.getElementById('adminPass2').value;
+    if (!email || pass.length < 8 || pass !== pass2) {
+        showNotification('Tüm alanları doldurun, şifreler aynı ve min 8 karakter', 'error');
+        return;
+    }
+    try {
+        var query = new Parse.Query(Parse.User);
+        query.equalTo('email', email);
+        var user = await query.first();
+        if (!user) {
+            showNotification('Kullanıcı bulunamadı!', 'error');
+            return;
+        }
+        user.set('password', pass);
+        await user.save();
+        showNotification('✅ Şifre başarıyla güncellendi!', 'success');
+        closeModal('adminPasswordModal');
+        document.getElementById('adminEmail').value = '';
+        document.getElementById('adminPass').value = '';
+        document.getElementById('adminPass2').value = '';
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+// ========== MODAL AÇMA/KAPAMA ==========
+function openModal(type) {
+    var modal = document.getElementById('authModal');
+    if (!modal) {
+        console.error('authModal elementi bulunamadı!');
+        return;
+    }
+    modal.classList.add('open');
+    switchTab(type);
+}
+
+function switchTab(tab) {
+    var loginForm = document.getElementById('formLogin');
+    var registerForm = document.getElementById('formRegister');
+    var verifyForm = document.getElementById('formVerify');
+    var tabs = document.querySelectorAll('.modal-tab');
+    
+    if (loginForm) loginForm.style.display = 'none';
+    if (registerForm) registerForm.style.display = 'none';
+    if (verifyForm) verifyForm.style.display = 'none';
+    
+    for (var i = 0; i < tabs.length; i++) {
+        tabs[i].classList.remove('active');
+    }
+    
+    if (tab === 'login') {
+        if (loginForm) loginForm.style.display = 'block';
+        if (tabs[0]) tabs[0].classList.add('active');
+    } else if (tab === 'register') {
+        if (registerForm) registerForm.style.display = 'block';
+        if (tabs[1]) tabs[1].classList.add('active');
+    } else if (tab === 'verify') {
+        if (verifyForm) verifyForm.style.display = 'block';
+        if (tabs[2]) tabs[2].classList.add('active');
+    }
+    
+    var modal = document.getElementById('authModal');
+    if (modal) modal.classList.add('open');
+}
+
+function openRandomSupport() {
+    window.location.href = 'mailto:vizyon2027.info@gmail.com?subject=Vizyon2027%20Destek';
+    showNotification('Destek maili açılıyor', 'success');
+}
+
+// ========== SOHBET GEÇMİŞİ (TÜM KULLANICILAR İÇİN) ==========
+async function toggleChatHistory() {
+    if (!currentUser) {
+        showNotification('Önce giriş yapın!', 'error');
+        return;
+    }
+    var chat = document.getElementById('fullAIChat');
+    if (!chat) return;
+    try {
+        var result = await Parse.Cloud.run('getChatHistory');
+        if (result.success && result.messages && result.messages.length > 0) {
+            chat.innerHTML = '';
+            for (var i = 0; i < result.messages.length; i++) {
+                var msg = result.messages[i];
+                var cls = msg.role === 'user' ? 'user' : 'bot';
+                chat.innerHTML += '<div class="ai-msg ' + cls + '">' + msg.content + '</div>';
+            }
+            chat.scrollTop = chat.scrollHeight;
+            showNotification('📜 Geçmiş yüklendi (' + result.messages.length + ' mesaj)', 'success');
+        } else {
+            showNotification('📭 Henüz sohbet geçmişi yok.', 'warning');
+        }
+    } catch (e) {
+        showNotification('Geçmiş yüklenemedi: ' + e.message, 'error');
+    }
+}
+
+// ========== YORUMLAR ==========
+async function loadComments() {
+    try {
+        var comments = await Parse.Cloud.run('getComments');
+        var container = document.getElementById('commentsList');
+        if (!comments || comments.length === 0) {
+            container.innerHTML = '<div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">🌟 İlk yorumu sen yap!</div>';
+            return;
+        }
+        var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 'user': '👤 KULLANICI' };
+        var roleColors = { 'founder': 'var(--gold)', 'admin': 'var(--accent)', 'beta': 'var(--purple)', 'user': 'var(--text3)' };
+        var html = '';
+        for (var i = 0; i < comments.length; i++) {
+            var c = comments[i];
+            var color = roleColors[c.user_role] || 'var(--border)';
+            var label = roleLabels[c.user_role] || '👤 KULLANICI';
+            html += '<div class="comment-item" style="border-left-color: ' + color + ';"><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"><strong style="color: var(--accent2);">' + (c.user_name || 'İsimsiz') + '</strong><span class="role-badge ' + (c.user_role || 'user') + '" style="border-color: ' + color + '; color: ' + color + ';">' + label + '</span><span class="comment-email">📧 ' + (c.user_email || '---') + '</span><span class="comment-time" style="margin-left: auto;">' + new Date(c.createdAt).toLocaleString('tr-TR') + '</span></div><div class="comment-text">' + c.comment + '</div></div>';
+        }
+        container.innerHTML = html;
+    } catch (e) {
+        console.error('Yorumlar yüklenemedi:', e);
+        document.getElementById('commentsList').innerHTML = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);;">⚠️ Yorumlar yüklenemedi: ' + e.message + '</div>';
+    }
+}
+
+async function postComment() {
+    if (!currentUser) {
+        showNotification('Yorum yapmak için giriş yapmalısınız!', 'error');
+        return;
+    }
+    var input = document.getElementById('commentInput');
+    var text = input.value.trim();
+    if (!text) {
+        showNotification('Lütfen bir yorum yazın!', 'error');
+        return;
+    }
+    try {
+        await Parse.Cloud.run('addComment', { comment: text });
+        input.value = '';
+        showNotification('💬 Yorumunuz gönderildi!', 'success');
+        await loadComments();
+    } catch (e) {
+        showNotification('Yorum gönderilemedi: ' + e.message, 'error');
+    }
+}
+
+function updateCommentUI() {
+    var form = document.getElementById('commentForm');
+    var loginMsg = document.getElementById('commentLoginMessage');
+    var userName = document.getElementById('commentUserName');
+    var userRole = document.getElementById('commentUserRole');
+    if (currentUser) {
+        if (form) form.style.display = 'block';
+        if (loginMsg) loginMsg.style.display = 'none';
+        if (userName) userName.textContent = currentUser.get('name') || 'Kullanıcı';
+        var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 'user': '👤 KULLANICI' };
+        if (userRole) userRole.textContent = roleLabels[currentUser.get('role')] || '👤 KULLANICI';
+    } else {
+        if (form) form.style.display = 'none';
+        if (loginMsg) loginMsg.style.display = 'block';
+    }
+}
+
+// ========== PARÇACIKLAR ==========
+var particlesContainer = document.getElementById('particles');
+if (particlesContainer) {
+    for (var i = 0; i < 60; i++) {
+        var p = document.createElement('div');
+        p.className = 'particle';
+        p.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';
+        particlesContainer.appendChild(p);
+    }
+}
+
+// ========== ÖZEL İMLEÇ ==========
+var cursor = document.getElementById('customCursor');
+var ring = document.getElementById('customCursorRing');
+if (cursor && ring) {
+    var mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', function (e) {
+        mx = e.clientX;
+        my = e.clientY;
+        cursor.style.left = (mx - 6) + 'px';
+        cursor.style.top = (my - 6) + 'px';
+    });
+    function animate() {
+        rx += (mx - rx - 18) * 0.12;
+        ry += (my - ry - 18) * 0.12;
+        ring.style.left = rx + 'px';
+        ring.style.top = ry + 'px';
+        requestAnimationFrame(animate);
+    }
+    animate();
+    var btns = document.querySelectorAll('button, a, .btn, .secret-btn, .support-link');
+    for (var i = 0; i < btns.length; i++) {
+        (function (btn) {
+            btn.addEventListener('mouseenter', function () { cursor.classList.add('hover'); });
+            btn.addEventListener('mouseleave', function () { cursor.classList.remove('hover'); });
+        })(btns[i]);
+    }
+}
+
+// ========== DASHBOARD ==========
+async function showDashboard() {
+    document.getElementById('mainSite').style.display = 'none';
+    document.getElementById('dashboardArea').style.display = 'block';
+    document.getElementById('userPanel').style.display = 'none';
+    var logoutBtn = document.querySelector('.logout-btn');
+    if (logoutBtn) logoutBtn.style.display = 'inline-block';
+    
+    var name = currentUser.get('name');
+    var role = currentUser.get('role');
+    document.getElementById('dashboardUserName').innerHTML = name || 'Kullanıcı';
+    document.getElementById('userRoleBadge').innerHTML =
+        role === 'founder' ? '👑 KURUCU' :
+        role === 'admin' ? '⚙️ ADMIN' :
+        role === 'beta' ? '🔬 BETA' :
+        '👤 KULLANICI';
+    if (role === 'admin' || role === 'founder') {
+        document.getElementById('adminPanelCard').style.display = 'block';
+        await loadUserList();
+    } else {
+        document.getElementById('adminPanelCard').style.display = 'none';
+    }
+    await loadProjects();
+    await loadFavorites();
+    await loadArchive();
+    await loadTrash();
+    await loadProjectRequests();
+    await loadInbox();
+    await loadTeamInfo();
+    await updateStats();
+    startStatsInterval();
+    // Sorgu limiti rozetini güncelle
+    var limitBadge = document.getElementById('dashQueryLimitBadge');
+    if (limitBadge) {
+        var role = currentUser.get('role');
+        var plan = currentUser.get('plan');
+        var limitText = '🔋 100 sorgu kaldı';
+        if (role === 'admin' || role === 'founder' || role === 'beta' || plan === 'team') {
+            limitText = '🔋 Sınırsız sorgu';
+        }
+        limitBadge.textContent = limitText;
+        limitBadge.style.display = 'inline-block';
+    }
+    // Yarım ekran AI panelini aç
+    openFullAIPanel('halfscreen');
+}
+
+// ========== KULLANICI PANELİ (KULLANILMIYOR) ==========
+function showUserPanel() {
+    showDashboard();
+}
+
+// ========== ÇIKIŞ ==========
+function logout() {
+    closeFullAIPanel();
+    Parse.User.logOut();
+    localStorage.removeItem('vizyon_user');
+    currentUser = null;
+    stopStatsInterval();
+    document.getElementById('mainSite').style.display = 'block';
+    document.getElementById('dashboardArea').style.display = 'none';
+    document.getElementById('userPanel').style.display = 'none';
+    var logoutBtn = document.querySelector('.logout-btn');
+    if (logoutBtn) logoutBtn.style.display = 'none';
+    updateCommentUI();
+    showNotification('Çıkış yapıldı.', 'success');
+}
+
+// ========== SAYFA YÜKLENİNCE ==========
+window.onload = async function () {
+    if (typeof initBack4App === 'function') {
+        await initBack4App();
+    } else {
+        console.error('initBack4App fonksiyonu bulunamadı!');
+        showNotification('❌ Back4App bağlantısı kurulamadı! Sayfayı yenileyin.', 'error');
+        return;
+    }
+    if (typeof Parse === 'undefined' || !parseInitialized) {
+        showNotification('❌ Back4App bağlantısı kurulamadı! Sayfayı yenileyin.', 'error');
+        return;
+    }
+    var saved = localStorage.getItem('vizyon_user');
+    if (saved) {
+        try {
+            currentUser = Parse.User.current();
+            if (currentUser) {
+                try {
+                    await currentUser.fetch();
+                    showDashboard();
+                    updateCommentUI();
+                    await loadComments();
+                    // Sohbet geçmişini otomatik yükleme (manuel butonla)
+                    if (currentUser.get('role') === 'admin' || currentUser.get('role') === 'founder') {
+                        try {
+                            await Parse.Cloud.run('initAdminUsers');
+                            console.log('✅ Admin hesaplar kontrol edildi');
+                        } catch (e) {
+                            console.log('Admin kontrol hatası:', e.message);
+                        }
+                    }
+                } catch (e) {
+                    console.log('Oturum geçersiz, çıkış yapılıyor...');
+                    await Parse.User.logOut();
+                    localStorage.removeItem('vizyon_user');
+                    currentUser = null;
+                    location.reload();
+                }
+            } else {
+                localStorage.removeItem('vizyon_user');
+            }
+        } catch (e) {
+            console.error('Oturum hatası:', e);
+            localStorage.removeItem('vizyon_user');
+            currentUser = null;
+        }
+    }
+    if (currentUser) {
+        await loadComments();
+        updateCommentUI();
+    }
+    await updateStats();
+    startStatsInterval();
+    showNotification('✨ VİZYON 2027 Sistemi Aktif!', 'success');
+};
+</script>
