@@ -2097,7 +2097,17 @@ footer {
         </div>
     </section>
 
-    <!-- ===== FOOTER (linkler düzeltildi) ===== -->
+    <!-- ===== ANA SAYFA YORUMLAR ===== -->
+    <section id="mainCommentsSection" style="max-width:800px; margin:60px auto; padding:20px;">
+        <h3 style="color:var(--accent); font-family:var(--font-display); font-size:24px; margin-bottom:20px;">💬 Topluluk Yorumları</h3>
+        <div id="mainCommentsList">
+            <div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">
+                🌟 Yorumlar yükleniyor...
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
     <footer>
         <div class="footer-grid">
             <div class="footer-brand">
@@ -2411,11 +2421,15 @@ footer {
                 <input id="rEmail" placeholder="E-posta" class="form-input">
                 <div style="display:flex; align-items:center; gap:8px;">
                     <input id="rPass" type="password" placeholder="Şifre (8+ karakter)" class="form-input" style="flex:1;">
-                    <button type="button" onclick="togglePassword('rPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px;">👁️</button>
+                    <button type="button" onclick="togglePassword('rPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px; padding:0 8px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
                 <div style="display:flex; align-items:center; gap:8px;">
                     <input id="rPass2" type="password" placeholder="Şifre Tekrar" class="form-input" style="flex:1;">
-                    <button type="button" onclick="togglePassword('rPass2', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px;">👁️</button>
+                    <button type="button" onclick="togglePassword('rPass2', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px; padding:0 8px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
                 <button class="btn-primary" onclick="handleRegister()" style="width:100%;">Kayıt Ol</button>
             </div>
@@ -2424,7 +2438,9 @@ footer {
                 <input id="lEmail" placeholder="E-posta" class="form-input">
                 <div style="display:flex; align-items:center; gap:8px;">
                     <input id="lPass" type="password" placeholder="Şifre" class="form-input" style="flex:1;">
-                    <button type="button" onclick="togglePassword('lPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px;">👁️</button>
+                    <button type="button" onclick="togglePassword('lPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px; padding:0 8px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
                 <button class="btn-primary" onclick="handleLogin()" style="width:100%;">Giriş Yap</button>
                 <div style="text-align:center; margin-top:12px;">
@@ -2507,11 +2523,15 @@ footer {
                 <input id="resetCode" placeholder="Doğrulama Kodu" class="form-input">
                 <div style="display:flex; align-items:center; gap:8px;">
                     <input id="resetNewPass" type="password" placeholder="Yeni Şifre (8+ karakter)" class="form-input" style="flex:1;">
-                    <button type="button" onclick="togglePassword('resetNewPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px;">👁️</button>
+                    <button type="button" onclick="togglePassword('resetNewPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px; padding:0 8px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
                 <div style="display:flex; align-items:center; gap:8px;">
                     <input id="resetNewPass2" type="password" placeholder="Yeni Şifre Tekrar" class="form-input" style="flex:1;">
-                    <button type="button" onclick="togglePassword('resetNewPass2', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px;">👁️</button>
+                    <button type="button" onclick="togglePassword('resetNewPass2', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px; padding:0 8px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
                 <button class="btn-primary" onclick="resetPasswordWithCode()" style="width:100%;">Şifreyi Sıfırla</button>
             </div>
@@ -3596,14 +3616,47 @@ window.sendDashboardAI = async function () {
     container.scrollTop = container.scrollHeight;
 };
 
-// ========== AI PANELİ AÇ (TAM EKRAN - MİSAFİR VE ÜYE İÇİN) ==========
+// ========== AI PANELİ AÇ (MİSAFİR VE ÜYE DESTEĞİ) ==========
 function openFullAIPanel(mode) {
-    // Önce userPanel içindeki paneli bul (üye ise)
-    var panel = document.querySelector('#userPanel #fullAIPanel');
-    if (!panel) {
-        // Eğer userPanel yoksa (misafir), dashboard'daki paneli bul
-        panel = document.getElementById('fullAIPanel');
+    // ---- MİSAFİR KULLANICI ----
+    if (!currentUser) {
+        // userPanel'i aç ve sadece AI panelini göster
+        var panel = document.querySelector('#userPanel #fullAIPanel');
+        if (panel) {
+            // userPanel'i göster
+            document.getElementById('userPanel').style.display = 'flex';
+            // userPanel içindeki gereksiz kısımları gizle (yorumlar, alt kısım vb.)
+            var body = document.querySelector('#userPanel .user-panel-body');
+            if (body) {
+                var children = body.children;
+                for (var i = 0; i < children.length; i++) {
+                    var child = children[i];
+                    if (child.id !== 'fullAIPanel' && child.id !== 'commentsSection') {
+                        child.style.display = 'none';
+                    } else if (child.id === 'commentsSection') {
+                        // Yorumları da gizleyelim misafir için
+                        child.style.display = 'none';
+                    }
+                }
+                // AI panelini göster
+                panel.style.display = 'flex';
+                panel.classList.add('fullscreen');
+                var closeBtn = panel.querySelector('#fullscreenCloseBtn');
+                if (closeBtn) closeBtn.style.display = 'inline-block';
+            }
+            // Widget'ı gizle
+            var widget = document.querySelector('.ai-widget');
+            if (widget) widget.style.display = 'none';
+            return;
+        } else {
+            showNotification('AI paneli bulunamadı!', 'error');
+            return;
+        }
     }
+
+    // ---- ÜYE KULLANICI ----
+    var panel = document.querySelector('#userPanel #fullAIPanel');
+    if (!panel) panel = document.getElementById('fullAIPanel');
     if (!panel) {
         showNotification('AI paneli bulunamadı!', 'error');
         return;
@@ -3619,17 +3672,51 @@ function openFullAIPanel(mode) {
     if (closeBtn) closeBtn.style.display = 'inline-block';
 }
 
-// ========== AI PANELİ KAPAT ==========
+// ========== AI PANELİ KAPAT (MİSAFİR VE ÜYE) ==========
 function closeFullAIPanel() {
-    var panel = document.getElementById('fullAIPanel');
+    // Önce userPanel içindeki paneli kapat
+    var userPanel = document.getElementById('userPanel');
+    var panel = document.querySelector('#userPanel #fullAIPanel');
     if (panel) {
         panel.style.display = 'none';
         panel.classList.remove('fullscreen', 'halfscreen');
     }
-    var userPanel = document.querySelector('#userPanel #fullAIPanel');
-    if (userPanel) {
-        userPanel.style.display = 'none';
-        userPanel.classList.remove('fullscreen', 'halfscreen');
+    // Eğer misafir ise userPanel'i kapat ve ana sayfayı göster
+    if (!currentUser) {
+        if (userPanel) {
+            userPanel.style.display = 'none';
+            document.getElementById('mainSite').style.display = 'block';
+            // Widget'ı geri göster
+            var widget = document.querySelector('.ai-widget');
+            if (widget) widget.style.display = 'block';
+            // userPanel içindeki gizlediğimiz öğeleri geri getir (onları göstermeye gerek yok, ama display'lerini sıfırla)
+            var body = document.querySelector('#userPanel .user-panel-body');
+            if (body) {
+                var children = body.children;
+                for (var i = 0; i < children.length; i++) {
+                    var child = children[i];
+                    if (child.id !== 'fullAIPanel' && child.id !== 'commentsSection') {
+                        child.style.display = '';
+                    } else if (child.id === 'commentsSection') {
+                        child.style.display = '';
+                    }
+                }
+            }
+        }
+    } else {
+        // Üye ise sadece paneli kapat, userPanel açık kalsın
+        var userPanelElement = document.querySelector('#userPanel #fullAIPanel');
+        if (userPanelElement) {
+            userPanelElement.style.display = 'none';
+            userPanelElement.classList.remove('fullscreen', 'halfscreen');
+        }
+        // Widget'ı zaten gizli, tekrar gösterme
+    }
+    // Ayrıca dashboard'daki paneli de kapat (güvenlik)
+    var dashboardPanel = document.getElementById('fullAIPanel');
+    if (dashboardPanel) {
+        dashboardPanel.style.display = 'none';
+        dashboardPanel.classList.remove('fullscreen', 'halfscreen');
     }
 }
 
@@ -4308,16 +4395,18 @@ function openRandomSupport() {
     showNotification('Destek maili açılıyor', 'success');
 }
 
-// ========== ŞİFRE GÖSTER/GİZLE ==========
+// ========== ŞİFRE GÖSTER/GİZLE (ŞIK ICON) ==========
 function togglePassword(inputId, btn) {
     var input = document.getElementById(inputId);
     if (!input) return;
     if (input.type === 'password') {
         input.type = 'text';
-        btn.innerHTML = '🙈';
+        btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        btn.title = 'Şifreyi Gizle';
     } else {
         input.type = 'password';
-        btn.innerHTML = '👁️';
+        btn.innerHTML = '<i class="fas fa-eye"></i>';
+        btn.title = 'Şifreyi Göster';
     }
 }
 
@@ -4436,53 +4525,70 @@ function shareSite() {
     }
 }
 
-// ========== YORUMLAR (DÜZELTİLDİ - userPanel ÖNCELİKLİ) ==========
+// ========== YORUMLAR (ANA SAYFA + KULLANICI PANELİ) ==========
 async function loadComments() {
     try {
         var comments = await Parse.Cloud.run('getComments');
-        // Önce userPanel içindeki listeyi bul
-        var container = document.querySelector('#userPanel #commentsList');
-        if (!container) {
-            // Eğer userPanel yoksa (misafir veya dashboard), genel olanı bul
-            container = document.getElementById('commentsList');
-        }
-        if (!container) return;
         
-        if (!comments || comments.length === 0) {
-            container.innerHTML = '<div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">🌟 İlk yorumu sen yap!</div>';
-            return;
-        }
-        var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 'user': '👤 KULLANICI' };
-        var roleColors = { 'founder': 'var(--gold)', 'admin': 'var(--accent)', 'beta': 'var(--purple)', 'user': 'var(--text3)' };
-        var html = '';
-        var currentUserEmail = currentUser ? currentUser.get('email') : null;
-        var currentUserRole = currentUser ? currentUser.get('role') : null;
-        for (var i = 0; i < comments.length; i++) {
-            var c = comments[i];
-            var color = roleColors[c.user_role] || 'var(--border)';
-            var label = roleLabels[c.user_role] || '👤 KULLANICI';
-            var canDelete = (currentUserEmail === c.user_email) || (currentUserRole === 'admin' || currentUserRole === 'founder');
-            html += '<div class="comment-item" style="border-left-color: ' + color + ';">';
-            html += '<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">';
-            html += '<strong style="color: var(--accent2);">' + (c.user_name || 'İsimsiz') + '</strong>';
-            html += '<span class="role-badge ' + (c.user_role || 'user') + '" style="border-color: ' + color + '; color: ' + color + ';">' + label + '</span>';
-            html += '<span class="comment-email">📧 ' + (c.user_email || '---') + '</span>';
-            html += '<span class="comment-time" style="margin-left: auto;">' + new Date(c.createdAt).toLocaleString('tr-TR') + '</span>';
-            if (canDelete) {
-                html += '<button class="btn-danger btn-sm" onclick="deleteComment(\'' + c.id + '\')" style="padding:2px 8px; font-size:10px;">🗑️</button>';
+        // Ana sayfadaki listeyi doldur
+        var mainContainer = document.getElementById('mainCommentsList');
+        if (mainContainer) {
+            if (!comments || comments.length === 0) {
+                mainContainer.innerHTML = '<div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">🌟 İlk yorumu sen yap!</div>';
+            } else {
+                mainContainer.innerHTML = buildCommentsHTML(comments);
             }
-            html += '</div>';
-            html += '<div class="comment-text">' + c.comment + '</div>';
-            html += '</div>';
         }
-        container.innerHTML = html;
+        
+        // userPanel içindeki listeyi doldur
+        var userContainer = document.querySelector('#userPanel #commentsList');
+        if (!userContainer) {
+            userContainer = document.getElementById('commentsList');
+        }
+        if (userContainer) {
+            if (!comments || comments.length === 0) {
+                userContainer.innerHTML = '<div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">🌟 İlk yorumu sen yap!</div>';
+            } else {
+                userContainer.innerHTML = buildCommentsHTML(comments);
+            }
+        }
     } catch (e) {
         console.error('Yorumlar yüklenemedi:', e);
-        var container = document.querySelector('#userPanel #commentsList') || document.getElementById('commentsList');
-        if (container) {
-            container.innerHTML = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);;">⚠️ Yorumlar yüklenemedi: ' + e.message + '</div>';
-        }
+        var containers = [document.getElementById('mainCommentsList'), document.querySelector('#userPanel #commentsList'), document.getElementById('commentsList')];
+        containers.forEach(function(container) {
+            if (container) {
+                container.innerHTML = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);;">⚠️ Yorumlar yüklenemedi: ' + e.message + '</div>';
+            }
+        });
     }
+}
+
+// Yorum HTML'ini oluşturan yardımcı fonksiyon
+function buildCommentsHTML(comments) {
+    var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 'user': '👤 KULLANICI' };
+    var roleColors = { 'founder': 'var(--gold)', 'admin': 'var(--accent)', 'beta': 'var(--purple)', 'user': 'var(--text3)' };
+    var html = '';
+    var currentUserEmail = currentUser ? currentUser.get('email') : null;
+    var currentUserRole = currentUser ? currentUser.get('role') : null;
+    for (var i = 0; i < comments.length; i++) {
+        var c = comments[i];
+        var color = roleColors[c.user_role] || 'var(--border)';
+        var label = roleLabels[c.user_role] || '👤 KULLANICI';
+        var canDelete = (currentUserEmail === c.user_email) || (currentUserRole === 'admin' || currentUserRole === 'founder');
+        html += '<div class="comment-item" style="border-left-color: ' + color + ';">';
+        html += '<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">';
+        html += '<strong style="color: var(--accent2);">' + (c.user_name || 'İsimsiz') + '</strong>';
+        html += '<span class="role-badge ' + (c.user_role || 'user') + '" style="border-color: ' + color + '; color: ' + color + ';">' + label + '</span>';
+        html += '<span class="comment-email">📧 ' + (c.user_email || '---') + '</span>';
+        html += '<span class="comment-time" style="margin-left: auto;">' + new Date(c.createdAt).toLocaleString('tr-TR') + '</span>';
+        if (canDelete) {
+            html += '<button class="btn-danger btn-sm" onclick="deleteComment(\'' + c.id + '\')" style="padding:2px 8px; font-size:10px;">🗑️</button>';
+        }
+        html += '</div>';
+        html += '<div class="comment-text">' + c.comment + '</div>';
+        html += '</div>';
+    }
+    return html;
 }
 
 async function deleteComment(commentId) {
@@ -4723,6 +4829,9 @@ window.onload = async function () {
         document.getElementById('dashboardArea').style.display = 'none';
         document.getElementById('userPanel').style.display = 'none';
     }
+    
+    // Ana sayfa yorumlarını yükle
+    await loadComments();
     
     await updateStats();
     startStatsInterval();
