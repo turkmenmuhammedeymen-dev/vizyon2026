@@ -3624,51 +3624,26 @@ window.sendDashboardAI = async function () {
     container.scrollTop = container.scrollHeight;
 };
 
-// ========== AI PANELİ AÇ (MİSAFİR VE ÜYE DESTEĞİ) ==========
+// ========== AI PANELİ AÇ (MİSAFİR VE ÜYE DESTEĞİ - DÜZELTİLDİ) ==========
 function openFullAIPanel(mode) {
-    // ---- MİSAFİR KULLANICI ----
-    if (!currentUser) {
-        // userPanel'i aç ve sadece AI panelini göster
-        var panel = document.querySelector('#userPanel #fullAIPanel');
-        if (panel) {
-            // userPanel'i göster
-            document.getElementById('userPanel').style.display = 'flex';
-            // userPanel içindeki gereksiz kısımları gizle (yorumlar, alt kısım vb.)
-            var body = document.querySelector('#userPanel .user-panel-body');
-            if (body) {
-                var children = body.children;
-                for (var i = 0; i < children.length; i++) {
-                    var child = children[i];
-                    if (child.id !== 'fullAIPanel' && child.id !== 'commentsSection') {
-                        child.style.display = 'none';
-                    } else if (child.id === 'commentsSection') {
-                        // Yorumları da gizleyelim misafir için
-                        child.style.display = 'none';
-                    }
-                }
-                // AI panelini göster
-                panel.style.display = 'flex';
-                panel.classList.add('fullscreen');
-                var closeBtn = panel.querySelector('#fullscreenCloseBtn');
-                if (closeBtn) closeBtn.style.display = 'inline-block';
-            }
-            // Widget'ı gizle
-            var widget = document.querySelector('.ai-widget');
-            if (widget) widget.style.display = 'none';
-            return;
-        } else {
-            showNotification('AI paneli bulunamadı!', 'error');
-            return;
-        }
-    }
-
-    // ---- ÜYE KULLANICI ----
+    // Önce userPanel içindeki paneli ara
     var panel = document.querySelector('#userPanel #fullAIPanel');
-    if (!panel) panel = document.getElementById('fullAIPanel');
+    if (!panel) {
+        // Yoksa genel ID ile al (dashboard içindeki)
+        panel = document.getElementById('fullAIPanel');
+    }
     if (!panel) {
         showNotification('AI paneli bulunamadı!', 'error');
         return;
     }
+
+    // userPanel'i göster (eğer kapalıysa)
+    var userPanel = document.getElementById('userPanel');
+    if (userPanel) {
+        userPanel.style.display = 'flex';
+    }
+
+    // Panel stilini ayarla
     panel.classList.remove('fullscreen', 'halfscreen');
     if (mode === 'halfscreen') {
         panel.classList.add('halfscreen');
@@ -3678,6 +3653,25 @@ function openFullAIPanel(mode) {
     panel.style.display = 'flex';
     var closeBtn = panel.querySelector('#fullscreenCloseBtn');
     if (closeBtn) closeBtn.style.display = 'inline-block';
+
+    // Eğer misafir ise, userPanel içindeki gereksiz kısımları gizle
+    if (!currentUser) {
+        var body = document.querySelector('#userPanel .user-panel-body');
+        if (body) {
+            var children = body.children;
+            for (var i = 0; i < children.length; i++) {
+                var child = children[i];
+                if (child.id !== 'fullAIPanel' && child.id !== 'commentsSection') {
+                    child.style.display = 'none';
+                } else if (child.id === 'commentsSection') {
+                    child.style.display = 'none';
+                }
+            }
+        }
+        // Widget'ı gizle
+        var widget = document.querySelector('.ai-widget');
+        if (widget) widget.style.display = 'none';
+    }
 }
 
 // ========== AI PANELİ KAPAT (MİSAFİR VE ÜYE) ==========
