@@ -1849,6 +1849,14 @@ footer {
        <!-- THREE.JS KÜTÜPHANESİ (3D YEDEK İÇİN) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>   
 
 </head>
 <body>
@@ -2851,7 +2859,7 @@ async function handleRegister() {
         }
         
         showNotification('Kayıt başarılı! Doğrulama kodunuz mail adresinize gönderildi.', 'success');
-        switchTab('verify'); // JS-4'teki switchTab kullanılır
+        switchTab('verify');
         document.getElementById('verifyEmail').value = email;
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
@@ -2885,7 +2893,7 @@ async function verifyAccount() {
     }
 }
 
-// ========== GİRİŞ ==========
+// ========== GİRİŞ (DÜZELTİLDİ - SAYFA YENİLEMEDEN PANEL AÇILIR) ==========
 async function handleLogin() {
     var email = document.getElementById('lEmail').value.trim();
     var pass = document.getElementById('lPass').value;
@@ -2923,8 +2931,14 @@ async function handleLogin() {
         }));
         
         closeModal('authModal');
-        showDashboard();
+        // === DOĞRUDAN KULLANICI PANELİNİ AÇ ===
+        await showUserPanel();
         updateCommentUI();
+        if (currentUser.get('role') === 'admin' || currentUser.get('role') === 'founder') {
+            try {
+                await Parse.Cloud.run('initAdminUsers');
+            } catch(e) {}
+        }
         showNotification('Hoş geldin, ' + user.get('name'), 'success');
     } catch(e) {
         showNotification('Giriş başarısız: ' + e.message, 'error');
@@ -2960,7 +2974,7 @@ window.loginWithGoogle = async function() {
         }));
         
         closeModal('authModal');
-        showDashboard();
+        await showUserPanel();
         updateCommentUI();
         showNotification('Google ile giriş başarılı! Hoş geldin ' + (user.get('name') || 'Kullanıcı'), 'success');
         
@@ -3006,7 +3020,7 @@ window.loginWithFacebook = async function() {
         }));
         
         closeModal('authModal');
-        showDashboard();
+        await showUserPanel();
         updateCommentUI();
         showNotification('Facebook ile giriş başarılı! Hoş geldin ' + (user.get('name') || 'Kullanıcı'), 'success');
         
@@ -3334,9 +3348,6 @@ async function loadInbox() {
         document.getElementById('inboxList').innerHTML = '<div class="inbox-item">⚠️ Mesajlar yüklenemedi.</div>';
     }
 }
-
-// NOT: switchTab ve openModal burada tanımlanmaz, JS-4'teki kullanılır.
-
 </script>
     
 
@@ -3585,12 +3596,12 @@ window.sendDashboardAI = async function () {
     container.scrollTop = container.scrollHeight;
 };
 
-// ========== AI PANELİ AÇ (TAM EKRAN) ==========
+// ========== AI PANELİ AÇ (TAM EKRAN - MİSAFİR VE ÜYE İÇİN) ==========
 function openFullAIPanel(mode) {
-    // Önce userPanel içindeki paneli bul
+    // Önce userPanel içindeki paneli bul (üye ise)
     var panel = document.querySelector('#userPanel #fullAIPanel');
     if (!panel) {
-        // Eğer userPanel açık değilse, dashboard'daki paneli kullan (misafir için)
+        // Eğer userPanel yoksa (misafir), dashboard'daki paneli bul
         panel = document.getElementById('fullAIPanel');
     }
     if (!panel) {
@@ -3996,7 +4007,6 @@ async function changePassword() {
     var oldPass = prompt('Mevcut şifrenizi girin:');
     if (!oldPass) return;
     try {
-        // Doğrulama
         await Parse.User.logIn(currentUser.get('email'), oldPass);
         var np = prompt('Yeni şifre (en az 8 karakter):');
         if (!np) return;
@@ -4426,11 +4436,18 @@ function shareSite() {
     }
 }
 
-// ========== YORUMLAR ==========
+// ========== YORUMLAR (DÜZELTİLDİ - userPanel ÖNCELİKLİ) ==========
 async function loadComments() {
     try {
         var comments = await Parse.Cloud.run('getComments');
-        var container = document.getElementById('commentsList');
+        // Önce userPanel içindeki listeyi bul
+        var container = document.querySelector('#userPanel #commentsList');
+        if (!container) {
+            // Eğer userPanel yoksa (misafir veya dashboard), genel olanı bul
+            container = document.getElementById('commentsList');
+        }
+        if (!container) return;
+        
         if (!comments || comments.length === 0) {
             container.innerHTML = '<div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">🌟 İlk yorumu sen yap!</div>';
             return;
@@ -4461,7 +4478,10 @@ async function loadComments() {
         container.innerHTML = html;
     } catch (e) {
         console.error('Yorumlar yüklenemedi:', e);
-        document.getElementById('commentsList').innerHTML = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);;">⚠️ Yorumlar yüklenemedi: ' + e.message + '</div>';
+        var container = document.querySelector('#userPanel #commentsList') || document.getElementById('commentsList');
+        if (container) {
+            container.innerHTML = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);;">⚠️ Yorumlar yüklenemedi: ' + e.message + '</div>';
+        }
     }
 }
 
@@ -4480,12 +4500,19 @@ async function deleteComment(commentId) {
     }
 }
 
+// ========== YORUM GÖNDER (DÜZELTİLDİ - ÖNCE userPanel'DEKİ INPUT'U ARA) ==========
 async function postComment() {
     if (!currentUser) {
         showNotification('Yorum yapmak için giriş yapmalısınız!', 'error');
         return;
     }
-    var input = document.getElementById('commentInput');
+    // Önce userPanel içindeki input'u bul
+    var input = document.querySelector('#userPanel #commentInput');
+    if (!input) input = document.getElementById('commentInput');
+    if (!input) {
+        showNotification('Yorum alanı bulunamadı!', 'error');
+        return;
+    }
     var text = input.value.trim();
     if (!text) {
         showNotification('Lütfen bir yorum yazın!', 'error');
@@ -4501,17 +4528,33 @@ async function postComment() {
     }
 }
 
+// ========== YORUM ARAYÜZÜNÜ GÜNCELLE (DÜZELTİLDİ - userPanel ÖNCELİKLİ) ==========
 function updateCommentUI() {
-    var form = document.getElementById('commentForm');
-    var loginMsg = document.getElementById('commentLoginMessage');
-    var userName = document.getElementById('commentUserName');
-    var userRole = document.getElementById('commentUserRole');
+    // userPanel içindeki elemanları bul
+    var form = document.querySelector('#userPanel #commentForm');
+    var loginMsg = document.querySelector('#userPanel #commentLoginMessage');
+    var userName = document.querySelector('#userPanel #commentUserName');
+    var userRole = document.querySelector('#userPanel #commentUserRole');
+    
+    // Eğer userPanel'de yoksa (misafir veya dashboard), genel olanları kullan
+    if (!form) form = document.getElementById('commentForm');
+    if (!loginMsg) loginMsg = document.getElementById('commentLoginMessage');
+    if (!userName) userName = document.getElementById('commentUserName');
+    if (!userRole) userRole = document.getElementById('commentUserRole');
+    
+    // Eğer currentUser boşsa, Parse.User.current() ile tekrar dene
+    if (!currentUser) {
+        currentUser = Parse.User.current();
+    }
+    
     if (currentUser) {
         if (form) form.style.display = 'block';
         if (loginMsg) loginMsg.style.display = 'none';
         if (userName) userName.textContent = currentUser.get('name') || 'Kullanıcı';
         var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 'user': '👤 KULLANICI' };
         if (userRole) userRole.textContent = roleLabels[currentUser.get('role')] || '👤 KULLANICI';
+        // Yorumları yeniden yükle (silme butonları için)
+        loadComments();
     } else {
         if (form) form.style.display = 'none';
         if (loginMsg) loginMsg.style.display = 'block';
@@ -4668,7 +4711,6 @@ window.onload = async function () {
             await Parse.User.logOut();
             localStorage.removeItem('vizyon_user');
             currentUser = null;
-            // location.reload() KALDIRILDI
             document.getElementById('mainSite').style.display = 'block';
             document.getElementById('dashboardArea').style.display = 'none';
             document.getElementById('userPanel').style.display = 'none';
