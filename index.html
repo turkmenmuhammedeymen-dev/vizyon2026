@@ -2740,20 +2740,20 @@ async function checkSession() {
     }
 }
 
-// ========== SORGU LİMİTİ (DÜZELTİLDİ - HER ZAMAN TRUE DÖNER) ==========
+// ========== SORGU LİMİTİ (SESSİZ ÇALIŞIR - DÜZELTİLDİ) ==========
 async function useQuery() {
     try {
         var result = await Parse.Cloud.run('useQuery');
         updateQueryBadge(result);
         return true;
     } catch(e) {
-        showNotification('⚠️ Sorgu limiti kontrol edilemedi, devam ediliyor.', 'warning');
+        // Hata durumunda sessizce true döndür, AI çalışsın
         var badges = document.querySelectorAll('.query-limit-badge');
         badges.forEach(function(badge) {
             badge.textContent = '⚠️ Limit bilinmiyor';
             badge.style.display = 'inline-block';
         });
-        return true; // Her durumda true döndür, AI mesajları engellenmesin
+        return true;
     }
 }
 
@@ -2913,7 +2913,7 @@ async function verifyAccount() {
     }
 }
 
-// ========== GİRİŞ (DÜZELTİLDİ - SAYFA YENİLEMEDEN PANEL AÇILIR) ==========
+// ========== GİRİŞ (DÜZELTİLDİ - TAM ÇALIŞIR) ==========
 async function handleLogin() {
     var email = document.getElementById('lEmail').value.trim();
     var pass = document.getElementById('lPass').value;
@@ -2940,6 +2940,7 @@ async function handleLogin() {
             return;
         }
         
+        // === GLOBAL CURRENTUSER'U GÜNCELLE ===
         currentUser = user;
         localStorage.setItem('vizyon_user', JSON.stringify({
             id: user.id,
@@ -2951,16 +2952,21 @@ async function handleLogin() {
         }));
         
         closeModal('authModal');
-        // === DOĞRUDAN KULLANICI PANELİNİ AÇ ===
+        
+        // === PANELİ AÇ ===
         await showUserPanel();
         updateCommentUI();
+        await loadComments(); // Yorumları yeniden yükle
+        
         if (currentUser.get('role') === 'admin' || currentUser.get('role') === 'founder') {
             try {
                 await Parse.Cloud.run('initAdminUsers');
             } catch(e) {}
         }
+        
         showNotification('Hoş geldin, ' + user.get('name'), 'success');
     } catch(e) {
+        console.error('Giriş hatası:', e.message);
         showNotification('Giriş başarısız: ' + e.message, 'error');
     }
 }
@@ -2996,6 +3002,7 @@ window.loginWithGoogle = async function() {
         closeModal('authModal');
         await showUserPanel();
         updateCommentUI();
+        await loadComments();
         showNotification('Google ile giriş başarılı! Hoş geldin ' + (user.get('name') || 'Kullanıcı'), 'success');
         
     } catch(e) {
@@ -3042,6 +3049,7 @@ window.loginWithFacebook = async function() {
         closeModal('authModal');
         await showUserPanel();
         updateCommentUI();
+        await loadComments();
         showNotification('Facebook ile giriş başarılı! Hoş geldin ' + (user.get('name') || 'Kullanıcı'), 'success');
         
     } catch(e) {
@@ -3720,29 +3728,37 @@ function closeFullAIPanel() {
     }
 }
 
-// ========== AI MESAJ GÖNDER (ENTER İLE GÖNDERME DAHİL) ==========
+// ========== AI MESAJ GÖNDER (DÜZELTİLDİ - KESİN ÇALIŞIR) ==========
 async function sendFullAI() {
     if (!await useQuery()) return;
     
+    // Önce userPanel içindeki elementleri dene
     var inp = document.querySelector('#userPanel #fullAIInput');
     var chat = document.querySelector('#userPanel #fullAIChat');
     
-    // Eğer userPanel bulunamazsa (misafir için) eski haline dön
+    // Eğer userPanel'de yoksa, doğrudan ID ile al (ama önce userPanel'dekini al)
     if (!inp) inp = document.getElementById('fullAIInput');
     if (!chat) chat = document.getElementById('fullAIChat');
     
+    // Hala yoksa hata ver
     if (!inp || !chat) {
         showNotification('Sohbet alanı bulunamadı!', 'error');
+        console.error('sendFullAI: inp veya chat bulunamadı!');
         return;
     }
 
     var msg = inp.value.trim();
-    if (!msg) return;
+    if (!msg) {
+        showNotification('Lütfen bir mesaj yazın!', 'warning');
+        return;
+    }
 
+    // Kullanıcı mesajını ekle
     chat.innerHTML += '<div class="ai-msg user">' + msg.replace(/</g, '&lt;') + '</div>';
     inp.value = '';
     chat.scrollTop = chat.scrollHeight;
     
+    // AI yanıtını al
     var response;
     if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('hava') !== -1 || msg.indexOf('arama') !== -1) {
         response = await webSearch(msg);
