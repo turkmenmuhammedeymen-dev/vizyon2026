@@ -691,7 +691,7 @@ footer {
     z-index: 10000;
     overflow-y: auto;
     padding: 20px;
-    display: none;
+    display: none !important; /* TİTREMEYİ ÖNLEMEK İÇİN !important EKLENDİ */
 }
 .dashboard-container::before {
     content: '';
@@ -1448,6 +1448,11 @@ footer {
 #commentsSection {
     position: relative;
     z-index: 999;
+}
+
+/* ========== TİTREMEYİ ÖNLEMEK İÇİN EKSTRA KURAL ========== */
+#dashboardArea {
+    display: none !important;
 }
 </style>
 
@@ -2396,15 +2401,27 @@ footer {
                     <input id="rName" placeholder="Ad Soyad" class="form-input">
                 </div>
                 <input id="rEmail" placeholder="E-posta" class="form-input">
-                <input id="rPass" type="password" placeholder="Şifre (8+ karakter)" class="form-input">
-                <input id="rPass2" type="password" placeholder="Şifre Tekrar" class="form-input">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <input id="rPass" type="password" placeholder="Şifre (8+ karakter)" class="form-input" style="flex:1;">
+                    <button type="button" onclick="togglePassword('rPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px;">👁️</button>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <input id="rPass2" type="password" placeholder="Şifre Tekrar" class="form-input" style="flex:1;">
+                    <button type="button" onclick="togglePassword('rPass2', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px;">👁️</button>
+                </div>
                 <button class="btn-primary" onclick="handleRegister()" style="width:100%;">Kayıt Ol</button>
             </div>
 
             <div id="formLogin" style="display:none;">
                 <input id="lEmail" placeholder="E-posta" class="form-input">
-                <input id="lPass" type="password" placeholder="Şifre" class="form-input">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <input id="lPass" type="password" placeholder="Şifre" class="form-input" style="flex:1;">
+                    <button type="button" onclick="togglePassword('lPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px;">👁️</button>
+                </div>
                 <button class="btn-primary" onclick="handleLogin()" style="width:100%;">Giriş Yap</button>
+                <div style="text-align:center; margin-top:12px;">
+                    <a href="javascript:void(0)" onclick="openResetPasswordModal()" style="color:var(--accent); font-size:13px; text-decoration:underline; cursor:pointer;">Şifremi unuttum</a>
+                </div>
             </div>
 
             <div id="formVerify" style="display:none;">
@@ -2461,6 +2478,37 @@ footer {
             <button class="btn-secondary" onclick="shareSite()">📤 Siteyi Paylaş</button>
         </div>
         <button class="btn-secondary" onclick="closeModal('settingsModal')" style="margin-top:20px;">Kapat</button>
+    </div>
+</div>
+
+<!-- ===== ŞİFREMİ UNUTTUM MODALI ===== -->
+<div id="resetPasswordModal" class="modal-overlay" onclick="if(event.target===this) closeModal('resetPasswordModal')">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>🔑 Şifremi Unuttum</h3>
+            <button class="modal-close" onclick="closeModal('resetPasswordModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div id="resetStep1">
+                <p style="color:var(--text2); margin-bottom:16px;">E-posta adresinize bir doğrulama kodu göndereceğiz.</p>
+                <input id="resetEmail" placeholder="E-posta adresiniz" class="form-input">
+                <button class="btn-primary" onclick="sendVerificationCode()" style="width:100%;">Kod Gönder</button>
+            </div>
+            <div id="resetStep2" style="display:none;">
+                <p style="color:var(--text2); margin-bottom:16px;">E-postanıza gelen kodu girin ve yeni şifrenizi belirleyin.</p>
+                <input id="resetCode" placeholder="Doğrulama Kodu" class="form-input">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <input id="resetNewPass" type="password" placeholder="Yeni Şifre (8+ karakter)" class="form-input" style="flex:1;">
+                    <button type="button" onclick="togglePassword('resetNewPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px;">👁️</button>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <input id="resetNewPass2" type="password" placeholder="Yeni Şifre Tekrar" class="form-input" style="flex:1;">
+                    <button type="button" onclick="togglePassword('resetNewPass2', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px;">👁️</button>
+                </div>
+                <button class="btn-primary" onclick="resetPasswordWithCode()" style="width:100%;">Şifreyi Sıfırla</button>
+            </div>
+            <button class="btn-secondary" onclick="closeModal('resetPasswordModal')" style="width:100%;margin-top:12px;">İptal</button>
+        </div>
     </div>
 </div>
 
@@ -2567,14 +2615,16 @@ footer {
     </div>
 </div>
 
-    <!-- GİRİŞ / KAYIT / DOĞRULAMA MODALI -->
-    <!-- FOUNDER / ADMIN / BETA PANEL MODALI -->
-    <!-- PROFİL MODALI -->
-    <!-- ADMIN ŞİFRE BELİRLEME MODALI -->
-    <!-- AI WIDGET (SAĞ ALT KÖŞE) -->
-    <!-- VİZYON AI FULL PANEL (TAM EKRAN) -->
-    <!-- YORUM SİSTEMİ -->
+<!-- GİRİŞ / KAYIT / DOĞRULAMA MODALI -->
+<!-- FOUNDER / ADMIN / BETA PANEL MODALI -->
+<!-- PROFİL MODALI -->
+<!-- ADMIN ŞİFRE BELİRLEME MODALI -->
+<!-- ŞİFREMİ UNUTTUM MODALI -->
+<!-- AI WIDGET (SAĞ ALT KÖŞE) -->
+<!-- VİZYON AI FULL PANEL (TAM EKRAN) -->
+<!-- YORUM SİSTEMİ -->
 
+   
     <!-- ============================================================ -->
     <!-- ===================== JS BÖLÜMLERİ ========================== -->
     <!-- ============================================================ -->
@@ -2662,28 +2712,20 @@ async function checkSession() {
     }
 }
 
-// ========== SORGU LİMİTİ (GÜNCELLENDİ) ==========
+// ========== SORGU LİMİTİ (DÜZELTİLDİ - HER ZAMAN TRUE DÖNER) ==========
 async function useQuery() {
-    if (currentUser) {
-        try {
-            var result = await Parse.Cloud.run('useQuery');
-            // Rozeti güncelle
-            updateQueryBadge(result);
-            return true;
-        } catch(e) {
-            showNotification(e.message, 'error');
-            return false;
-        }
-    } else {
-        // Misafir kullanıcı için limit 25
-        try {
-            var result = await Parse.Cloud.run('useQuery');
-            updateQueryBadge(result);
-            return true;
-        } catch(e) {
-            showNotification(e.message, 'error');
-            return false;
-        }
+    try {
+        var result = await Parse.Cloud.run('useQuery');
+        updateQueryBadge(result);
+        return true;
+    } catch(e) {
+        showNotification('⚠️ Sorgu limiti kontrol edilemedi, devam ediliyor.', 'warning');
+        var badges = document.querySelectorAll('.query-limit-badge');
+        badges.forEach(function(badge) {
+            badge.textContent = '⚠️ Limit bilinmiyor';
+            badge.style.display = 'inline-block';
+        });
+        return true; // Her durumda true döndür, AI mesajları engellenmesin
     }
 }
 
@@ -3543,10 +3585,18 @@ window.sendDashboardAI = async function () {
     container.scrollTop = container.scrollHeight;
 };
 
-// ========== AI PANELİ AÇ (PARAMETRE İLE: 'fullscreen' veya 'halfscreen') ==========
+// ========== AI PANELİ AÇ (TAM EKRAN) ==========
 function openFullAIPanel(mode) {
-    var panel = document.getElementById('fullAIPanel');
-    if (!panel) return;
+    // Önce userPanel içindeki paneli bul
+    var panel = document.querySelector('#userPanel #fullAIPanel');
+    if (!panel) {
+        // Eğer userPanel açık değilse, dashboard'daki paneli kullan (misafir için)
+        panel = document.getElementById('fullAIPanel');
+    }
+    if (!panel) {
+        showNotification('AI paneli bulunamadı!', 'error');
+        return;
+    }
     panel.classList.remove('fullscreen', 'halfscreen');
     if (mode === 'halfscreen') {
         panel.classList.add('halfscreen');
@@ -3554,30 +3604,49 @@ function openFullAIPanel(mode) {
         panel.classList.add('fullscreen');
     }
     panel.style.display = 'flex';
-    var closeBtn = document.getElementById('fullscreenCloseBtn');
+    var closeBtn = panel.querySelector('#fullscreenCloseBtn');
     if (closeBtn) closeBtn.style.display = 'inline-block';
 }
 
-// ========== AI PANELİ KAPAT (SADECE PANELİ GİZLER) ==========
+// ========== AI PANELİ KAPAT ==========
 function closeFullAIPanel() {
     var panel = document.getElementById('fullAIPanel');
     if (panel) {
         panel.style.display = 'none';
         panel.classList.remove('fullscreen', 'halfscreen');
     }
+    var userPanel = document.querySelector('#userPanel #fullAIPanel');
+    if (userPanel) {
+        userPanel.style.display = 'none';
+        userPanel.classList.remove('fullscreen', 'halfscreen');
+    }
 }
 
+// ========== AI MESAJ GÖNDER (ENTER İLE GÖNDERME DAHİL) ==========
 async function sendFullAI() {
     if (!await useQuery()) return;
-    var inp = document.getElementById('fullAIInput');
+    
+    var inp = document.querySelector('#userPanel #fullAIInput');
+    var chat = document.querySelector('#userPanel #fullAIChat');
+    
+    // Eğer userPanel bulunamazsa (misafir için) eski haline dön
+    if (!inp) inp = document.getElementById('fullAIInput');
+    if (!chat) chat = document.getElementById('fullAIChat');
+    
+    if (!inp || !chat) {
+        showNotification('Sohbet alanı bulunamadı!', 'error');
+        return;
+    }
+
     var msg = inp.value.trim();
     if (!msg) return;
-    var chat = document.getElementById('fullAIChat');
+
     chat.innerHTML += '<div class="ai-msg user">' + msg.replace(/</g, '&lt;') + '</div>';
     inp.value = '';
     chat.scrollTop = chat.scrollHeight;
+    
     var response;
-    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('hava') !== -1) {
+    if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('hava') !== -1 || msg.indexOf('arama') !== -1) {
         response = await webSearch(msg);
     } else {
         response = await callAllAIModels(msg);
@@ -3893,7 +3962,6 @@ document.addEventListener('click', function (e) {
 </script>
 
 
-
  
 <!-- ============================================================ -->
 <!-- JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ                    -->
@@ -3919,26 +3987,32 @@ function openProfileModal() {
     document.getElementById('profileModal').classList.add('open');
 }
 
+// ========== ŞİFRE DEĞİŞTİR (MEVCUT ŞİFRE DOĞRULAMALI) ==========
 async function changePassword() {
     if (!currentUser) {
         showNotification('Önce giriş yapın!', 'error');
         return;
     }
-    var np = prompt('Yeni şifre (en az 8 karakter):');
-    if (!np) return;
-    if (np.length < 8) {
-        showNotification('Şifre en az 8 karakter!', 'error');
-        return;
-    }
+    var oldPass = prompt('Mevcut şifrenizi girin:');
+    if (!oldPass) return;
     try {
+        // Doğrulama
+        await Parse.User.logIn(currentUser.get('email'), oldPass);
+        var np = prompt('Yeni şifre (en az 8 karakter):');
+        if (!np) return;
+        if (np.length < 8) {
+            showNotification('Şifre en az 8 karakter!', 'error');
+            return;
+        }
         currentUser.set('password', np);
         await currentUser.save();
         showNotification('Şifre değiştirildi!', 'success');
     } catch (e) {
-        showNotification('Hata: ' + e.message, 'error');
+        showNotification('Hata: ' + (e.message || 'Şifre doğrulama başarısız'), 'error');
     }
 }
 
+// ========== HESAP SİL ==========
 async function deleteAccount() {
     if (!currentUser) {
         showNotification('Önce giriş yapın!', 'error');
@@ -4224,6 +4298,79 @@ function openRandomSupport() {
     showNotification('Destek maili açılıyor', 'success');
 }
 
+// ========== ŞİFRE GÖSTER/GİZLE ==========
+function togglePassword(inputId, btn) {
+    var input = document.getElementById(inputId);
+    if (!input) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = '🙈';
+    } else {
+        input.type = 'password';
+        btn.innerHTML = '👁️';
+    }
+}
+
+// ========== ŞİFRE SIFIRLAMA ==========
+function openResetPasswordModal() {
+    document.getElementById('resetStep1').style.display = 'block';
+    document.getElementById('resetStep2').style.display = 'none';
+    document.getElementById('resetEmail').value = '';
+    document.getElementById('resetCode').value = '';
+    document.getElementById('resetNewPass').value = '';
+    document.getElementById('resetNewPass2').value = '';
+    document.getElementById('resetPasswordModal').classList.add('open');
+}
+
+async function sendVerificationCode() {
+    var email = document.getElementById('resetEmail').value.trim();
+    if (!email) {
+        showNotification('Lütfen e-posta adresinizi girin.', 'error');
+        return;
+    }
+    try {
+        var result = await Parse.Cloud.run('sendVerificationCode', { email: email });
+        if (result.success) {
+            showNotification('✅ Doğrulama kodu e-postanıza gönderildi.', 'success');
+            document.getElementById('resetStep1').style.display = 'none';
+            document.getElementById('resetStep2').style.display = 'block';
+        } else {
+            showNotification('❌ ' + result.error, 'error');
+        }
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function resetPasswordWithCode() {
+    var email = document.getElementById('resetEmail').value.trim();
+    var code = document.getElementById('resetCode').value.trim();
+    var newPass = document.getElementById('resetNewPass').value;
+    var newPass2 = document.getElementById('resetNewPass2').value;
+    
+    if (!code || newPass.length < 8 || newPass !== newPass2) {
+        showNotification('Kodu girin, şifreler aynı ve min 8 karakter olmalı.', 'error');
+        return;
+    }
+    
+    try {
+        var result = await Parse.Cloud.run('resetPasswordWithCode', {
+            email: email,
+            code: code,
+            newPassword: newPass
+        });
+        if (result.success) {
+            showNotification('✅ Şifreniz başarıyla sıfırlandı! Giriş yapabilirsiniz.', 'success');
+            closeModal('resetPasswordModal');
+            openModal('login');
+        } else {
+            showNotification('❌ ' + result.error, 'error');
+        }
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
 // ========== SOHBET GEÇMİŞİ ==========
 async function toggleChatHistory() {
     if (!currentUser) {
@@ -4410,13 +4557,7 @@ if (cursor && ring) {
     }
 }
 
-// ========== DASHBOARD (KALDIRILDI, YERİNE userPanel KULLANILACAK) ==========
-// Bu fonksiyon artık kullanılmıyor, showUserPanel() kullanılacak.
-async function showDashboard() {
-    showUserPanel();
-}
-
-// ========== KULLANICI PANELİ ==========
+// ========== KULLANICI PANELİ (DÜZELTİLDİ - TİTREME ÖNLENDİ) ==========
 async function showUserPanel() {
     try {
         console.log('🔄 Kullanıcı paneli açılıyor...');
@@ -4437,20 +4578,24 @@ async function showUserPanel() {
             role === 'beta' ? '🔬 BETA' :
             '👤 KULLANICI';
         
-        // Admin paneli (user panel içinde admin kartı yok, sadece kullanıcı paneli)
-        // Admin işlemleri için ayrı bir panel gerekirse buraya eklenebilir.
-        
-        // Yorumları yükle
         await loadComments();
         updateCommentUI();
         
-        // AI paneli zaten HTML'de yorumların altında duruyor.
-        // Sadece açık olduğundan emin ol
-        var panel = document.getElementById('fullAIPanel');
-        if (panel) {
-            panel.style.display = 'flex';
-            panel.classList.remove('fullscreen', 'halfscreen');
+        // Dashboard'daki AI panelini gizle (çakışma olmasın)
+        var dashboardPanel = document.getElementById('fullAIPanel');
+        if (dashboardPanel) {
+            dashboardPanel.style.display = 'none';
         }
+        // userPanel içindeki AI panelini göster
+        var userPanelElement = document.querySelector('#userPanel #fullAIPanel');
+        if (userPanelElement) {
+            userPanelElement.style.display = 'flex';
+            userPanelElement.classList.remove('fullscreen', 'halfscreen');
+        }
+        
+        // === ŞİMŞEK WİDGET'INI GİZLE ===
+        var widget = document.querySelector('.ai-widget');
+        if (widget) widget.style.display = 'none';
         
         console.log('✅ Kullanıcı paneli açıldı!');
     } catch(e) {
@@ -4473,59 +4618,65 @@ function logout() {
     if (logoutBtn) logoutBtn.style.display = 'none';
     updateCommentUI();
     showNotification('Çıkış yapıldı.', 'success');
+    
+    // === ŞİMŞEK WİDGET'INI GERİ GÖSTER ===
+    var widget = document.querySelector('.ai-widget');
+    if (widget) widget.style.display = 'block';
 }
 
-// ========== SAYFA YÜKLENİNCE ==========
+// ========== SAYFA YÜKLENİNCE (RELOAD YOK) ==========
 window.onload = async function () {
     console.log('🔄 Sayfa yükleniyor...');
     if (typeof initBack4App === 'function') {
         await initBack4App();
     } else {
         console.error('initBack4App fonksiyonu bulunamadı!');
-        showNotification('❌ Back4App bağlantısı kurulamadı! Sayfayı yenileyin.', 'error');
+        showNotification('❌ Back4App bağlantısı kurulamadı!', 'error');
         return;
     }
     if (typeof Parse === 'undefined' || !parseInitialized) {
-        showNotification('❌ Back4App bağlantısı kurulamadı! Sayfayı yenileyin.', 'error');
+        showNotification('❌ Back4App bağlantısı kurulamadı!', 'error');
         return;
     }
     
-    var saved = localStorage.getItem('vizyon_user');
-    if (saved) {
+    var user = Parse.User.current();
+    if (user) {
         try {
-            currentUser = Parse.User.current();
-            if (currentUser) {
+            await user.fetch();
+            currentUser = user;
+            localStorage.setItem('vizyon_user', JSON.stringify({
+                id: user.id,
+                name: user.get('name'),
+                email: user.get('email'),
+                role: user.get('role'),
+                plan: user.get('plan'),
+                teamId: user.get('teamId')
+            }));
+            console.log('✅ Oturum aktif, kullanıcı paneli açılıyor...');
+            await showUserPanel();
+            if (currentUser.get('role') === 'admin' || currentUser.get('role') === 'founder') {
                 try {
-                    await currentUser.fetch();
-                    console.log('✅ Oturum aktif, kullanıcı paneli açılıyor...');
-                    await showUserPanel();
-                    if (currentUser.get('role') === 'admin' || currentUser.get('role') === 'founder') {
-                        try {
-                            await Parse.Cloud.run('initAdminUsers');
-                            console.log('✅ Admin hesaplar kontrol edildi');
-                        } catch (e) {
-                            console.log('Admin kontrol hatası:', e.message);
-                        }
-                    }
-                    showNotification('Hoş geldin, ' + currentUser.get('name'), 'success');
+                    await Parse.Cloud.run('initAdminUsers');
+                    console.log('✅ Admin hesaplar kontrol edildi');
                 } catch (e) {
-                    console.log('Oturum geçersiz, çıkış yapılıyor...');
-                    await Parse.User.logOut();
-                    localStorage.removeItem('vizyon_user');
-                    currentUser = null;
-                    location.reload();
+                    console.log('Admin kontrol hatası:', e.message);
                 }
-            } else {
-                localStorage.removeItem('vizyon_user');
             }
+            showNotification('Hoş geldin, ' + currentUser.get('name'), 'success');
         } catch (e) {
-            console.error('Oturum hatası:', e);
+            console.log('Oturum geçersiz, çıkış yapılıyor...', e.message);
+            await Parse.User.logOut();
             localStorage.removeItem('vizyon_user');
             currentUser = null;
+            // location.reload() KALDIRILDI
+            document.getElementById('mainSite').style.display = 'block';
+            document.getElementById('dashboardArea').style.display = 'none';
+            document.getElementById('userPanel').style.display = 'none';
+            showNotification('Oturum süresi doldu, tekrar giriş yapın.', 'warning');
         }
-    }
-    
-    if (!currentUser) {
+    } else {
+        localStorage.removeItem('vizyon_user');
+        currentUser = null;
         document.getElementById('mainSite').style.display = 'block';
         document.getElementById('dashboardArea').style.display = 'none';
         document.getElementById('userPanel').style.display = 'none';
@@ -4535,4 +4686,4 @@ window.onload = async function () {
     startStatsInterval();
     showNotification('✨ VİZYON 2027 Sistemi Aktif!', 'success');
 };
-  </script>
+</script>
