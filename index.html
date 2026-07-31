@@ -1455,10 +1455,6 @@ footer {
     display: none !important;
 }
 
-/* ===== ÜYE PANELİNDE KAPATMA BUTONUNU GİZLE ===== */
-#userPanel #fullscreenCloseBtn {
-    display: none !important;
-}
 </style>
 
 <!-- ============================================================ -->
@@ -3656,8 +3652,16 @@ function openFullAIPanel(mode) {
         panel.classList.add('fullscreen');
     }
     panel.style.display = 'flex';
+    
+    // Kapatma butonunu kontrol et - currentUser varsa gizle, yoksa göster
     var closeBtn = panel.querySelector('#fullscreenCloseBtn');
-    if (closeBtn) closeBtn.style.display = 'inline-block';
+    if (closeBtn) {
+        if (currentUser) {
+            closeBtn.style.display = 'none';
+        } else {
+            closeBtn.style.display = 'inline-block';
+        }
+    }
 
     // Eğer misafir ise, userPanel içindeki gereksiz kısımları gizle
     if (!currentUser) {
@@ -4755,6 +4759,16 @@ async function showUserPanel() {
         if (userPanelElement) {
             userPanelElement.style.display = 'flex';
             userPanelElement.classList.remove('fullscreen', 'halfscreen');
+        }
+        
+        // === KAPATMA BUTONUNU KONTROL ET (ÜYE İSE GİZLE) ===
+        var closeBtn = document.querySelector('#userPanel #fullscreenCloseBtn');
+        if (closeBtn) {
+            if (currentUser) {
+                closeBtn.style.display = 'none';
+            } else {
+                closeBtn.style.display = 'inline-block';
+            }
         }
         
         // === ŞİMŞEK WİDGET'INI GİZLE ===
