@@ -2433,6 +2433,45 @@ footer {
             <div id="inboxList" class="inbox-list"></div>
         </div>
 
+        <!-- ===== YÖNETİM İŞLEMLERİ (SADECE ADMIN/FOUNDER) ===== -->
+        <div class="dashboard-card" id="adminActionsCard" style="display:none; grid-column: span 2;">
+            <h3>⚙️ Yönetim İşlemleri</h3>
+            <div style="display:flex; flex-direction:column; gap:16px;">
+
+                <!-- Hediye Gönder -->
+                <div>
+                    <h4>🎁 Hediye Paketi Gönder</h4>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <input type="email" id="giftEmailInput" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1; min-width:200px;">
+                        <select id="giftPackageSelect" class="glow-input">
+                            <option value="pro">🌟 Pro Paket</option>
+                            <option value="team">👥 Takım Paketi</option>
+                        </select>
+                        <button class="btn-primary btn-sm" onclick="sendGiftByEmail()">Gönder</button>
+                    </div>
+                </div>
+
+                <!-- Beta Ata -->
+                <div>
+                    <h4>🔬 Beta Tester Ata</h4>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <input type="email" id="betaEmailInput" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1; min-width:200px;">
+                        <button class="btn-secondary btn-sm" onclick="assignBetaByEmail()">Beta Yap</button>
+                    </div>
+                </div>
+
+                <!-- Admin Ata (Sadece Founder) -->
+                <div id="adminAssignSection" style="display:none;">
+                    <h4>⚙️ Admin Ata (Sadece Kurucu)</h4>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <input type="email" id="adminEmailInput" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1; min-width:200px;">
+                        <button class="btn-danger btn-sm" onclick="assignAdminByEmail()">Admin Yap</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
         <!-- Takım Kartı -->
         <div class="dashboard-card">
             <h3>👥 Takım</h3>
@@ -2450,7 +2489,7 @@ footer {
             </div>
         </div>
 
-        <!-- ===== YENİ EKLENEN KARTLAR ===== -->
+        <!-- Görsel Üret -->
         <div class="dashboard-card">
             <h3>🖼️ Görsel Üret (AI)</h3>
             <input id="imagePrompt" class="glow-input" placeholder="Görsel açıklaması yazın..." style="width:100%; margin-bottom:10px;">
@@ -2458,6 +2497,7 @@ footer {
             <div id="imageResults" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; max-height:200px; overflow-y:auto;"></div>
         </div>
 
+        <!-- 3D Model Üret -->
         <div class="dashboard-card">
             <h3>🧊 3D Model Üret</h3>
             <input id="threeDPrompt" class="glow-input" placeholder="3D nesne açıklaması yazın..." style="width:100%; margin-bottom:10px;">
@@ -2508,13 +2548,11 @@ footer {
     <!-- ===== YORUM SİSTEMİ ===== -->
     <section id="commentsSection">
         <h3>💬 Yorumlar</h3>
-
         <div id="commentsList">
             <div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">
                 🌟 Yorumlar yükleniyor...
             </div>
         </div>
-
         <div id="commentForm" style="display: none;">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                 <span style="color: var(--text2); font-size: 14px;">👤 <span id="commentUserName">Misafir</span></span>
@@ -2523,7 +2561,6 @@ footer {
             <textarea id="commentInput" rows="2" placeholder="Yorumunuzu yazın..." style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; resize: vertical; font-family: var(--font-body);"></textarea>
             <button onclick="postComment()" class="btn-primary" style="margin-top: 8px; width: 100%; font-size: 14px !important; padding: 12px !important;">💬 Yorum Gönder</button>
         </div>
-
         <div id="commentLoginMessage" style="margin-top: 16px; padding: 12px; background: var(--surface); border-radius: 12px; border: 1px dashed var(--border); text-align: center; color: var(--text3);">
             <p>Yorum yapmak için <button class="btn-secondary btn-sm" onclick="openModal('login')" style="display: inline-block; padding: 6px 16px; font-size: 12px;">giriş yapmalısınız</button>.</p>
         </div>
@@ -2566,9 +2603,6 @@ footer {
     </div>
 
 </div>
-    </div>
-
-</div>
         <!-- DASHBOARD HEADER -->
         <!-- AI ASİSTAN -->
         <!-- PROJELER, FAVORİLER, ARŞİV, ÇÖP KUTUSU, TALEPLER, GELEN KUTUSU, TAKIM -->
@@ -2576,7 +2610,7 @@ footer {
     </div>
 
     <!-- ============================================================ -->
-<!-- HTML-3: MODALLAR, WIDGET, FULL PANEL, YORUMLAR              -->
+<!-- HTML-3: MODALLAR, WIDGET, FULL PANEL, KULLANICI PANELİ      -->
 <!-- ============================================================ -->
 
 <!-- ===== GİRİŞ / KAYIT / DOĞRULAMA MODALI ===== -->
@@ -2771,13 +2805,11 @@ footer {
         <!-- ===== YORUM SİSTEMİ ===== -->
         <section id="commentsSection" style="max-width:800px; margin:0 auto; padding:20px;">
             <h3>💬 Yorumlar</h3>
-
             <div id="commentsList">
                 <div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">
                     🌟 Yorumlar yükleniyor...
                 </div>
             </div>
-
             <div id="commentForm" style="display: none;">
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                     <span style="color: var(--text2); font-size: 14px;">👤 <span id="commentUserName">Misafir</span></span>
@@ -2786,7 +2818,6 @@ footer {
                 <textarea id="commentInput" rows="2" placeholder="Yorumunuzu yazın..." style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; resize: vertical; font-family: var(--font-body);"></textarea>
                 <button onclick="postComment()" class="btn-primary" style="margin-top: 8px; width: 100%; font-size: 14px !important; padding: 12px !important;">💬 Yorum Gönder</button>
             </div>
-
             <div id="commentLoginMessage" style="margin-top: 16px; padding: 12px; background: var(--surface); border-radius: 12px; border: 1px dashed var(--border); text-align: center; color: var(--text3);">
                 <p>Yorum yapmak için <button class="btn-secondary btn-sm" onclick="openModal('login')" style="display: inline-block; padding: 6px 16px; font-size: 12px;">giriş yapmalısınız</button>.</p>
             </div>
@@ -2852,9 +2883,49 @@ footer {
                 <div id="userTrashList" class="project-list" style="max-height:150px;"></div>
             </div>
 
+            <!-- Gelen Kutusu -->
             <div class="dashboard-card" style="background:rgba(17,17,17,0.85); border:1px solid var(--accent); box-shadow:0 0 20px rgba(0,212,255,0.2); grid-column: span 2;">
                 <h3 style="color:var(--accent);">📬 Gelen Kutusu</h3>
                 <div id="userInboxList" class="inbox-list" style="max-height:150px;"></div>
+            </div>
+
+            <!-- ===== YÖNETİM İŞLEMLERİ (SADECE ADMIN/FOUNDER) ===== -->
+            <div class="dashboard-card" id="adminActionsCard" style="display:none; grid-column: span 2; background:rgba(17,17,17,0.85); border:1px solid var(--accent); box-shadow:0 0 20px rgba(0,212,255,0.2);">
+                <h3 style="color:var(--accent);">⚙️ Yönetim İşlemleri</h3>
+                <div style="display:flex; flex-direction:column; gap:16px;">
+
+                    <!-- Hediye Gönder -->
+                    <div>
+                        <h4>🎁 Hediye Paketi Gönder</h4>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <input type="email" id="giftEmailInput" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1; min-width:200px;">
+                            <select id="giftPackageSelect" class="glow-input">
+                                <option value="pro">🌟 Pro Paket</option>
+                                <option value="team">👥 Takım Paketi</option>
+                            </select>
+                            <button class="btn-primary btn-sm" onclick="sendGiftByEmail()">Gönder</button>
+                        </div>
+                    </div>
+
+                    <!-- Beta Ata -->
+                    <div>
+                        <h4>🔬 Beta Tester Ata</h4>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <input type="email" id="betaEmailInput" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1; min-width:200px;">
+                            <button class="btn-secondary btn-sm" onclick="assignBetaByEmail()">Beta Yap</button>
+                        </div>
+                    </div>
+
+                    <!-- Admin Ata (Sadece Founder) -->
+                    <div id="adminAssignSection" style="display:none;">
+                        <h4>⚙️ Admin Ata (Sadece Kurucu)</h4>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <input type="email" id="adminEmailInput" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1; min-width:200px;">
+                            <button class="btn-danger btn-sm" onclick="assignAdminByEmail()">Admin Yap</button>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
         </div>
@@ -4264,7 +4335,7 @@ document.addEventListener('click', function (e) {
 <!-- ============================================================ -->
 <script>
 // ================================================================
-// JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ
+// JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ + YÖNETİM İŞLEMLERİ
 // ================================================================
 
 function openProfileModal() {
@@ -4283,7 +4354,6 @@ function openProfileModal() {
     document.getElementById('profileModal').classList.add('open');
 }
 
-// ========== ŞİFRE DEĞİŞTİR ==========
 async function changePassword() {
     if (!currentUser) {
         showNotification('Önce giriş yapın!', 'error');
@@ -4307,7 +4377,6 @@ async function changePassword() {
     }
 }
 
-// ========== HESAP SİL ==========
 async function deleteAccount() {
     if (!currentUser) {
         showNotification('Önce giriş yapın!', 'error');
@@ -4359,7 +4428,7 @@ function openRolePanel(role) {
     document.getElementById('rolePanel').classList.add('open');
 }
 
-// ========== ROLE PANELİ GİRİŞ (ADMIN/BETA/FOUNDER) - MASTER KEY YOK ==========
+// ========== ROLE PANELİ GİRİŞ (MASTER KEY YOK) ==========
 async function checkRole() {
     var pass = document.getElementById('rolePassword').value;
     var valid =
@@ -4374,7 +4443,6 @@ async function checkRole() {
     
     closeModal('rolePanel');
     
-    // Mevcut oturumu kapat
     if (currentUser) {
         try {
             await Parse.User.logOut();
@@ -4395,10 +4463,8 @@ async function checkRole() {
     }
     
     try {
-        // ===== 1. Önce giriş yapmayı dene =====
         await Parse.User.logIn(info.email, info.password);
     } catch (loginError) {
-        // ===== 2. Kullanıcı yoksa (hata kodu 101) kayıt et =====
         if (loginError.code === 101) {
             try {
                 var newUser = new Parse.User();
@@ -4411,7 +4477,6 @@ async function checkRole() {
                 newUser.set('isVerified', true);
                 newUser.set('isBanned', false);
                 await newUser.signUp();
-                // signUp başarılı oldu, Parse.User.current() zaten dolu
             } catch (signUpError) {
                 showNotification('Kayıt hatası: ' + signUpError.message, 'error');
                 return;
@@ -4422,14 +4487,12 @@ async function checkRole() {
         }
     }
     
-    // ===== 3. Oturumu kontrol et =====
     currentUser = Parse.User.current();
     if (!currentUser) {
         showNotification('Oturum açılamadı!', 'error');
         return;
     }
     
-    // ===== 4. Rolü güncelle (eğer farklıysa) =====
     if (currentUser.get('role') !== info.role) {
         currentUser.set('role', info.role);
         await currentUser.save();
@@ -4444,7 +4507,6 @@ async function checkRole() {
         teamId: currentUser.get('teamId')
     }));
     
-    // ===== 5. Paneli aç =====
     await showUserPanel();
     updateCommentUI();
     await loadComments();
@@ -4626,7 +4688,7 @@ async function setAdminPassword() {
     }
 }
 
-// ========== MODAL AÇMA/KAPAMA ==========
+// ========== MODAL İŞLEMLERİ ==========
 function openModal(type) {
     var modal = document.getElementById('authModal');
     if (!modal) {
@@ -4671,7 +4733,6 @@ function openRandomSupport() {
     showNotification('Destek maili açılıyor', 'success');
 }
 
-// ========== ŞİFRE GÖSTER/GİZLE ==========
 function togglePassword(inputId, btn) {
     var input = document.getElementById(inputId);
     if (!input) return;
@@ -4981,14 +5042,14 @@ async function showUserPanel() {
         document.getElementById('dashboardArea').style.display = 'none';
         document.getElementById('userPanel').style.display = 'flex';
         
-        // ===== TÜM KARTLARI GÖRÜNÜR YAP (ÖNCEKİ GİZLEMELERİ TEMİZLE) =====
+        // ===== TÜM KARTLARI GÖRÜNÜR YAP =====
         var body = document.querySelector('#userPanel .user-panel-body');
         if (body) {
             var children = body.children;
             for (var i = 0; i < children.length; i++) {
                 var child = children[i];
                 if (child.id !== 'fullAIPanel') {
-                    child.style.display = ''; // CSS'deki varsayılana döner
+                    child.style.display = '';
                 }
             }
         }
@@ -5016,6 +5077,21 @@ async function showUserPanel() {
         
         var widget = document.querySelector('.ai-widget');
         if (widget) widget.style.display = 'none';
+        
+        // ===== YÖNETİM KARTINI GÖSTER/GİZLE =====
+        var adminActionsCard = document.querySelector('#userPanel #adminActionsCard');
+        if (adminActionsCard) {
+            if (role === 'admin' || role === 'founder') {
+                adminActionsCard.style.display = 'block';
+                // Admin atama bölümü sadece founder için
+                var adminAssignSection = document.querySelector('#userPanel #adminAssignSection');
+                if (adminAssignSection) {
+                    adminAssignSection.style.display = role === 'founder' ? 'block' : 'none';
+                }
+            } else {
+                adminActionsCard.style.display = 'none';
+            }
+        }
         
         await loadUserProjects();
         await loadUserFavorites();
@@ -5164,6 +5240,48 @@ async function loadUserInbox() {
     } catch(e) {
         console.error('User gelen kutusu yüklenirken hata:', e);
         document.getElementById('userInboxList').innerHTML = '<div class="inbox-item">⚠️ Mesajlar yüklenemedi.</div>';
+    }
+}
+
+// ========== YÖNETİM İŞLEMLERİ (ADMIN/FOUNDER) ==========
+
+async function sendGiftByEmail() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    const email = document.getElementById('giftEmailInput').value.trim();
+    const packageType = document.getElementById('giftPackageSelect').value;
+    if (!email) return showNotification('E-posta adresi girin!', 'error');
+    try {
+        const result = await Parse.Cloud.run('sendGiftByEmail', { email, packageType });
+        showNotification(result.message, 'success');
+        document.getElementById('giftEmailInput').value = '';
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function assignBetaByEmail() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    const email = document.getElementById('betaEmailInput').value.trim();
+    if (!email) return showNotification('E-posta adresi girin!', 'error');
+    try {
+        const result = await Parse.Cloud.run('assignBetaByEmail', { email });
+        showNotification(result.message, 'success');
+        document.getElementById('betaEmailInput').value = '';
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function assignAdminByEmail() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    const email = document.getElementById('adminEmailInput').value.trim();
+    if (!email) return showNotification('E-posta adresi girin!', 'error');
+    try {
+        const result = await Parse.Cloud.run('assignAdminByEmail', { email });
+        showNotification(result.message, 'success');
+        document.getElementById('adminEmailInput').value = '';
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
     }
 }
 
