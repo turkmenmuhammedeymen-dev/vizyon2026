@@ -2641,6 +2641,37 @@ footer {
             <button class="btn-secondary" onclick="openSettingsModal()">⚙️ Ayarlar</button>
         </div>
 
+        <!-- ===== KULLANICI PANELİ KARTLAR (NEON) ===== -->
+        <div style="max-width:800px; margin:0 auto 30px; display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+
+            <div class="dashboard-card" style="background:rgba(17,17,17,0.85); border:1px solid var(--accent); box-shadow:0 0 20px rgba(0,212,255,0.2);">
+                <h3 style="color:var(--accent);">📁 Projelerim</h3>
+                <div id="userProjectsList" class="project-list" style="max-height:150px;"></div>
+                <button class="btn-primary btn-sm" onclick="newProject()" style="margin-top:8px; font-size:12px !important; padding:8px 16px !important;">+ Yeni Proje</button>
+            </div>
+
+            <div class="dashboard-card" style="background:rgba(17,17,17,0.85); border:1px solid var(--accent); box-shadow:0 0 20px rgba(0,212,255,0.2);">
+                <h3 style="color:var(--accent);">⭐ Favoriler</h3>
+                <div id="userFavList" class="project-list" style="max-height:150px;"></div>
+            </div>
+
+            <div class="dashboard-card" style="background:rgba(17,17,17,0.85); border:1px solid var(--accent); box-shadow:0 0 20px rgba(0,212,255,0.2);">
+                <h3 style="color:var(--accent);">🗄️ Arşiv</h3>
+                <div id="userArchiveList" class="project-list" style="max-height:150px;"></div>
+            </div>
+
+            <div class="dashboard-card" style="background:rgba(17,17,17,0.85); border:1px solid var(--accent); box-shadow:0 0 20px rgba(0,212,255,0.2);">
+                <h3 style="color:var(--accent);">🗑️ Çöp Kutusu</h3>
+                <div id="userTrashList" class="project-list" style="max-height:150px;"></div>
+            </div>
+
+            <div class="dashboard-card" style="background:rgba(17,17,17,0.85); border:1px solid var(--accent); box-shadow:0 0 20px rgba(0,212,255,0.2); grid-column: span 2;">
+                <h3 style="color:var(--accent);">📬 Gelen Kutusu</h3>
+                <div id="userInboxList" class="inbox-list" style="max-height:150px;"></div>
+            </div>
+
+        </div>
+
     </div>
 </div>
 
@@ -4775,10 +4806,154 @@ async function showUserPanel() {
         var widget = document.querySelector('.ai-widget');
         if (widget) widget.style.display = 'none';
         
+        // === KULLANICI PANELİ KARTLARINI YÜKLE ===
+        await loadUserProjects();
+        await loadUserFavorites();
+        await loadUserArchive();
+        await loadUserTrash();
+        await loadUserInbox();
+        
         console.log('✅ Kullanıcı paneli açıldı!');
     } catch(e) {
         console.error('Kullanıcı paneli hatası:', e);
         showNotification('Panel yüklenirken hata oluştu: ' + e.message, 'error');
+    }
+}
+
+// ========== KULLANICI PANELİ PROJE LİSTELERİ ==========
+async function loadUserProjects() {
+    if (!currentUser) return;
+    try {
+        var Project = Parse.Object.extend('Project');
+        var query = new Parse.Query(Project);
+        query.equalTo('user_email', currentUser.get('email'));
+        query.equalTo('is_archived', false);
+        query.equalTo('is_trashed', false);
+        query.descending('createdAt');
+        var projects = await query.find();
+        var container = document.getElementById('userProjectsList');
+        if (!container) return;
+        
+        if (projects.length === 0) {
+            container.innerHTML = '<div class="project-item">Henüz proje yok.</div>';
+        } else {
+            var html = '';
+            for (var i = 0; i < projects.length; i++) {
+                var p = projects[i];
+                html += '<div class="project-item"><span>📄 ' + p.get('name').substring(0, 30) + '</span><div class="project-actions"><span onclick="editProject(\'' + p.id + '\')" title="Düzenle">✏️</span><span onclick="deleteProject(\'' + p.id + '\')" title="Sil">🗑️</span><span onclick="favoriteProject(\'' + p.id + '\')" title="Favori">⭐</span><span onclick="archiveProject(\'' + p.id + '\')" title="Arşivle">🗄️</span></div></div>';
+            }
+            container.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('User projeler yüklenirken hata:', e);
+        document.getElementById('userProjectsList').innerHTML = '<div class="project-item">⚠️ Projeler yüklenemedi.</div>';
+    }
+}
+
+async function loadUserFavorites() {
+    if (!currentUser) return;
+    try {
+        var Project = Parse.Object.extend('Project');
+        var query = new Parse.Query(Project);
+        query.equalTo('user_email', currentUser.get('email'));
+        query.equalTo('is_favorite', true);
+        query.equalTo('is_trashed', false);
+        var projects = await query.find();
+        var container = document.getElementById('userFavList');
+        if (!container) return;
+        
+        if (projects.length === 0) {
+            container.innerHTML = '<div class="project-item">Henüz favori proje yok.</div>';
+        } else {
+            var html = '';
+            for (var i = 0; i < projects.length; i++) {
+                var p = projects[i];
+                html += '<div class="project-item"><span>⭐ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="favoriteProject(\'' + p.id + '\')" title="Favoriden çıkar">★</span></div></div>';
+            }
+            container.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('User favoriler yüklenirken hata:', e);
+    }
+}
+
+async function loadUserArchive() {
+    if (!currentUser) return;
+    try {
+        var Project = Parse.Object.extend('Project');
+        var query = new Parse.Query(Project);
+        query.equalTo('user_email', currentUser.get('email'));
+        query.equalTo('is_archived', true);
+        query.equalTo('is_trashed', false);
+        var projects = await query.find();
+        var container = document.getElementById('userArchiveList');
+        if (!container) return;
+        
+        if (projects.length === 0) {
+            container.innerHTML = '<div class="project-item">Arşivde proje yok.</div>';
+        } else {
+            var html = '';
+            for (var i = 0; i < projects.length; i++) {
+                var p = projects[i];
+                html += '<div class="project-item"><span>🗄️ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="unarchiveProject(\'' + p.id + '\')" title="Arşivden çıkar">📤</span><span onclick="deleteProject(\'' + p.id + '\')" title="Sil">🗑️</span></div></div>';
+            }
+            container.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('User arşiv yüklenirken hata:', e);
+    }
+}
+
+async function loadUserTrash() {
+    if (!currentUser) return;
+    try {
+        var Project = Parse.Object.extend('Project');
+        var query = new Parse.Query(Project);
+        query.equalTo('user_email', currentUser.get('email'));
+        query.equalTo('is_trashed', true);
+        var projects = await query.find();
+        var container = document.getElementById('userTrashList');
+        if (!container) return;
+        
+        if (projects.length === 0) {
+            container.innerHTML = '<div class="project-item">Çöp kutusu boş.</div>';
+        } else {
+            var html = '';
+            for (var i = 0; i < projects.length; i++) {
+                var p = projects[i];
+                html += '<div class="project-item"><span>🗑️ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="restoreProject(\'' + p.id + '\')" title="Geri yükle">↩️</span><span onclick="deleteProject(\'' + p.id + '\')" title="Kalıcı sil">🔥</span></div></div>';
+            }
+            container.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('User çöp kutusu yüklenirken hata:', e);
+    }
+}
+
+async function loadUserInbox() {
+    if (!currentUser) return;
+    try {
+        var Inbox = Parse.Object.extend('Inbox');
+        var query = new Parse.Query(Inbox);
+        query.equalTo('receiver_email', currentUser.get('email'));
+        query.descending('createdAt');
+        var messages = await query.find();
+        var container = document.getElementById('userInboxList');
+        if (!container) return;
+        
+        if (messages.length === 0) {
+            container.innerHTML = '<div class="inbox-item">📭 Mesaj kutusu boş.</div>';
+        } else {
+            var html = '';
+            for (var i = 0; i < messages.length; i++) {
+                var m = messages[i];
+                html += '<div class="inbox-item"><div class="inbox-sender">📧 ' + m.get('sender_email') + '</div><div class="inbox-message">' + m.get('message') + '</div><div style="font-size:10px;color:var(--text3);margin-top:4px;">' + new Date(m.get('createdAt')).toLocaleString('tr-TR') + '</div></div>';
+            }
+            container.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('User gelen kutusu yüklenirken hata:', e);
+        document.getElementById('userInboxList').innerHTML = '<div class="inbox-item">⚠️ Mesajlar yüklenemedi.</div>';
     }
 }
 
