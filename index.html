@@ -3843,6 +3843,55 @@ window.sendDashboardAI = async function () {
     container.scrollTop = container.scrollHeight;
 };
 
+// ========== MİSAFİR AI PANELİ AÇ (SADECE GİRİŞ YAPMAMIŞLAR İÇİN) ==========
+function openFullAIPanel(mode) {
+    // Eğer zaten giriş yapmışsa, kullanıcı panelini göster
+    if (currentUser) {
+        document.getElementById('mainSite').style.display = 'none';
+        document.getElementById('userPanel').style.display = 'flex';
+        return;
+    }
+
+    // Misafir için paneli bul
+    var panel = document.getElementById('fullAIPanel');
+    if (!panel) {
+        showNotification('AI paneli bulunamadı!', 'error');
+        return;
+    }
+
+    // userPanel'i göster (ama sadece AI paneli görünecek)
+    var userPanel = document.getElementById('userPanel');
+    if (userPanel) {
+        userPanel.style.display = 'flex';
+        
+        // Misafir için gereksiz kartları gizle (sadece AI panelini göster)
+        var body = document.querySelector('#userPanel .user-panel-body');
+        if (body) {
+            var children = body.children;
+            for (var i = 0; i < children.length; i++) {
+                var child = children[i];
+                if (child.id !== 'fullAIPanel') {
+                    child.style.display = 'none';
+                }
+            }
+        }
+        // Widget'ı gizle
+        var widget = document.querySelector('.ai-widget');
+        if (widget) widget.style.display = 'none';
+    }
+
+    // Tam ekran modunu aktifleştir
+    panel.classList.remove('halfscreen');
+    panel.classList.add('fullscreen');
+    panel.style.display = 'flex';
+    
+    // Kapatma butonunu göster
+    var closeBtn = panel.querySelector('#fullscreenCloseBtn');
+    if (closeBtn) {
+        closeBtn.style.display = 'inline-block';
+    }
+}
+
 // ========== AI PANELİ KAPAT (MİSAFİR VE ÜYE) ==========
 function closeFullAIPanel() {
     // userPanel içindeki paneli kapat
@@ -4923,7 +4972,7 @@ if (cursor && ring) {
     }
 }
 
-// ========== KULLANICI PANELİ ==========
+// ========== KULLANICI PANELİ (TÜM ROLLER İÇİN) ==========
 async function showUserPanel() {
     try {
         console.log('🔄 Kullanıcı paneli açılıyor...');
@@ -4931,6 +4980,18 @@ async function showUserPanel() {
         document.getElementById('mainSite').style.display = 'none';
         document.getElementById('dashboardArea').style.display = 'none';
         document.getElementById('userPanel').style.display = 'flex';
+        
+        // ===== TÜM KARTLARI GÖRÜNÜR YAP (ÖNCEKİ GİZLEMELERİ TEMİZLE) =====
+        var body = document.querySelector('#userPanel .user-panel-body');
+        if (body) {
+            var children = body.children;
+            for (var i = 0; i < children.length; i++) {
+                var child = children[i];
+                if (child.id !== 'fullAIPanel') {
+                    child.style.display = ''; // CSS'deki varsayılana döner
+                }
+            }
+        }
         
         var logoutBtn = document.querySelector('.logout-btn');
         if (logoutBtn) logoutBtn.style.display = 'inline-block';
