@@ -2751,7 +2751,7 @@ footer {
 </div>
 
 <!-- ============================================================ -->
-<!-- KULLANICI PANELİ (AYRI EKRAN) – BURAYA YORUMLAR VE AI PANELİ -->
+<!-- KULLANICI PANELİ (AYNI EKRAN - TÜM ROLLER İÇİN)             -->
 <!-- ============================================================ -->
 <div id="userPanel" class="user-panel">
     <div class="user-panel-header">
@@ -2792,7 +2792,7 @@ footer {
             </div>
         </section>
 
-        <!-- ===== VİZYON AI PANELİ (YORUMLARIN ALTINDA) ===== -->
+        <!-- ===== VİZYON AI PANELİ (YARIM EKRAN - TÜM ROLLER İÇİN) ===== -->
         <div id="fullAIPanel" class="vizyon-ai-panel" style="display:flex; margin-top:20px;">
             <div class="vizyon-ai-header">
                 <div class="logo">
@@ -2828,7 +2828,7 @@ footer {
             <button class="btn-secondary" onclick="openSettingsModal()">⚙️ Ayarlar</button>
         </div>
 
-        <!-- ===== KULLANICI PANELİ KARTLAR (NEON) ===== -->
+        <!-- ===== KULLANICI PANELİ KARTLAR (TÜM ROLLER İÇİN) ===== -->
         <div style="max-width:800px; margin:0 auto 30px; display:grid; grid-template-columns:1fr 1fr; gap:20px;">
 
             <div class="dashboard-card" style="background:rgba(17,17,17,0.85); border:1px solid var(--accent); box-shadow:0 0 20px rgba(0,212,255,0.2);">
@@ -3843,68 +3843,9 @@ window.sendDashboardAI = async function () {
     container.scrollTop = container.scrollHeight;
 };
 
-// ========== AI PANELİ AÇ (MİSAFİR VE ÜYE DESTEĞİ - DÜZELTİLDİ) ==========
-function openFullAIPanel(mode) {
-    // Önce userPanel içindeki paneli ara
-    var panel = document.querySelector('#userPanel #fullAIPanel');
-    if (!panel) {
-        // Yoksa genel ID ile al (dashboard içindeki)
-        panel = document.getElementById('fullAIPanel');
-    }
-    if (!panel) {
-        showNotification('AI paneli bulunamadı!', 'error');
-        return;
-    }
-
-    // userPanel'i göster (eğer kapalıysa)
-    var userPanel = document.getElementById('userPanel');
-    if (userPanel) {
-        userPanel.style.display = 'flex';
-    }
-
-    // Panel stilini ayarla
-    panel.classList.remove('fullscreen', 'halfscreen');
-    if (mode === 'halfscreen') {
-        panel.classList.add('halfscreen');
-    } else {
-        panel.classList.add('fullscreen');
-    }
-    panel.style.display = 'flex';
-    
-    // Kapatma butonunu kontrol et - currentUser varsa gizle, yoksa göster
-    var closeBtn = panel.querySelector('#fullscreenCloseBtn');
-    if (closeBtn) {
-        if (currentUser) {
-            closeBtn.style.display = 'none';
-        } else {
-            closeBtn.style.display = 'inline-block';
-        }
-    }
-
-    // Eğer misafir ise, userPanel içindeki gereksiz kısımları gizle
-    if (!currentUser) {
-        var body = document.querySelector('#userPanel .user-panel-body');
-        if (body) {
-            var children = body.children;
-            for (var i = 0; i < children.length; i++) {
-                var child = children[i];
-                if (child.id !== 'fullAIPanel' && child.id !== 'commentsSection') {
-                    child.style.display = 'none';
-                } else if (child.id === 'commentsSection') {
-                    child.style.display = 'none';
-                }
-            }
-        }
-        // Widget'ı gizle
-        var widget = document.querySelector('.ai-widget');
-        if (widget) widget.style.display = 'none';
-    }
-}
-
 // ========== AI PANELİ KAPAT (MİSAFİR VE ÜYE) ==========
 function closeFullAIPanel() {
-    // Önce userPanel içindeki paneli kapat
-    var userPanel = document.getElementById('userPanel');
+    // userPanel içindeki paneli kapat
     var panel = document.querySelector('#userPanel #fullAIPanel');
     if (panel) {
         panel.style.display = 'none';
@@ -3912,59 +3853,30 @@ function closeFullAIPanel() {
     }
     // Eğer misafir ise userPanel'i kapat ve ana sayfayı göster
     if (!currentUser) {
+        var userPanel = document.getElementById('userPanel');
         if (userPanel) {
             userPanel.style.display = 'none';
             document.getElementById('mainSite').style.display = 'block';
             // Widget'ı geri göster
             var widget = document.querySelector('.ai-widget');
             if (widget) widget.style.display = 'block';
-            // userPanel içindeki gizlediğimiz öğeleri geri getir (onları göstermeye gerek yok, ama display'lerini sıfırla)
-            var body = document.querySelector('#userPanel .user-panel-body');
-            if (body) {
-                var children = body.children;
-                for (var i = 0; i < children.length; i++) {
-                    var child = children[i];
-                    if (child.id !== 'fullAIPanel' && child.id !== 'commentsSection') {
-                        child.style.display = '';
-                    } else if (child.id === 'commentsSection') {
-                        child.style.display = '';
-                    }
-                }
-            }
         }
-    } else {
-        // Üye ise sadece paneli kapat, userPanel açık kalsın
-        var userPanelElement = document.querySelector('#userPanel #fullAIPanel');
-        if (userPanelElement) {
-            userPanelElement.style.display = 'none';
-            userPanelElement.classList.remove('fullscreen', 'halfscreen');
-        }
-        // Widget'ı zaten gizli, tekrar gösterme
-    }
-    // Ayrıca dashboard'daki paneli de kapat (güvenlik)
-    var dashboardPanel = document.getElementById('fullAIPanel');
-    if (dashboardPanel) {
-        dashboardPanel.style.display = 'none';
-        dashboardPanel.classList.remove('fullscreen', 'halfscreen');
     }
 }
 
-// ========== AI MESAJ GÖNDER (DÜZELTİLDİ - KESİN ÇALIŞIR) ==========
+// ========== AI MESAJ GÖNDER ==========
 async function sendFullAI() {
     if (!await useQuery()) return;
     
-    // Önce userPanel içindeki elementleri dene
+    // userPanel içindeki elementleri bul
     var inp = document.querySelector('#userPanel #fullAIInput');
     var chat = document.querySelector('#userPanel #fullAIChat');
     
-    // Eğer userPanel'de yoksa, doğrudan ID ile al (ama önce userPanel'dekini al)
     if (!inp) inp = document.getElementById('fullAIInput');
     if (!chat) chat = document.getElementById('fullAIChat');
     
-    // Hala yoksa hata ver
     if (!inp || !chat) {
         showNotification('Sohbet alanı bulunamadı!', 'error');
-        console.error('sendFullAI: inp veya chat bulunamadı!');
         return;
     }
 
@@ -4322,7 +4234,7 @@ function openProfileModal() {
     document.getElementById('profileModal').classList.add('open');
 }
 
-// ========== ŞİFRE DEĞİŞTİR (MEVCUT ŞİFRE DOĞRULAMALI) ==========
+// ========== ŞİFRE DEĞİŞTİR ==========
 async function changePassword() {
     if (!currentUser) {
         showNotification('Önce giriş yapın!', 'error');
@@ -4398,25 +4310,103 @@ function openRolePanel(role) {
     document.getElementById('rolePanel').classList.add('open');
 }
 
-function checkRole() {
+// ========== ROLE PANELİ GİRİŞ (ADMIN/BETA/FOUNDER) - MASTER KEY YOK ==========
+async function checkRole() {
     var pass = document.getElementById('rolePassword').value;
     var valid =
         (currentRole === 'FOUNDER' && pass === 'Eymen11Amele44') ||
         (currentRole === 'ADMIN' && pass === 'ibrm4411') ||
         (currentRole === 'BETA' && pass === '4402');
-    if (valid) {
-        closeModal('rolePanel');
-        openFullAIPanel('fullscreen');
-        document.querySelector('.vizyon-ai-header .logo-text').innerHTML =
-            currentRole === 'FOUNDER' ? '👑 FOUNDER AI' :
-            currentRole === 'ADMIN' ? '⚙️ ADMIN AI' :
-            '🔬 BETA AI';
-        showNotification('Hoş geldiniz, ' + currentRole + ' paneli aktif!', 'success');
-    } else {
+    
+    if (!valid) {
         showNotification('Şifre hatalı!', 'error');
+        return;
     }
+    
+    closeModal('rolePanel');
+    
+    // Mevcut oturumu kapat
+    if (currentUser) {
+        try {
+            await Parse.User.logOut();
+            currentUser = null;
+        } catch(e) {}
+    }
+    
+    var roleInfo = {
+        'FOUNDER': { email: 'admin.tr.reis@gmail.com', password: 'Eymen11Amele44', name: 'Founder Admin', role: 'founder' },
+        'ADMIN': { email: 'iy5971828@gmail.com', password: 'ibrm4411', name: 'Ibrahim Admin', role: 'admin' },
+        'BETA': { email: 'beta@vizyon2027.com', password: '4402', name: 'Beta Kullanıcısı', role: 'beta' }
+    };
+    
+    var info = roleInfo[currentRole];
+    if (!info) {
+        showNotification('Geçersiz rol!', 'error');
+        return;
+    }
+    
+    try {
+        // ===== 1. Önce giriş yapmayı dene =====
+        await Parse.User.logIn(info.email, info.password);
+    } catch (loginError) {
+        // ===== 2. Kullanıcı yoksa (hata kodu 101) kayıt et =====
+        if (loginError.code === 101) {
+            try {
+                var newUser = new Parse.User();
+                newUser.set('username', info.email);
+                newUser.set('email', info.email);
+                newUser.set('password', info.password);
+                newUser.set('name', info.name);
+                newUser.set('role', info.role);
+                newUser.set('plan', 'team');
+                newUser.set('isVerified', true);
+                newUser.set('isBanned', false);
+                await newUser.signUp();
+                // signUp başarılı oldu, Parse.User.current() zaten dolu
+            } catch (signUpError) {
+                showNotification('Kayıt hatası: ' + signUpError.message, 'error');
+                return;
+            }
+        } else {
+            showNotification('Giriş hatası: ' + loginError.message, 'error');
+            return;
+        }
+    }
+    
+    // ===== 3. Oturumu kontrol et =====
+    currentUser = Parse.User.current();
+    if (!currentUser) {
+        showNotification('Oturum açılamadı!', 'error');
+        return;
+    }
+    
+    // ===== 4. Rolü güncelle (eğer farklıysa) =====
+    if (currentUser.get('role') !== info.role) {
+        currentUser.set('role', info.role);
+        await currentUser.save();
+    }
+    
+    localStorage.setItem('vizyon_user', JSON.stringify({
+        id: currentUser.id,
+        name: currentUser.get('name'),
+        email: currentUser.get('email'),
+        role: currentUser.get('role'),
+        plan: currentUser.get('plan'),
+        teamId: currentUser.get('teamId')
+    }));
+    
+    // ===== 5. Paneli aç =====
+    await showUserPanel();
+    updateCommentUI();
+    await loadComments();
+    
+    var roleLabel = currentRole === 'FOUNDER' ? '👑 KURUCU' :
+                    currentRole === 'ADMIN' ? '⚙️ ADMIN' :
+                    '🔬 BETA';
+    showNotification('Hoş geldiniz, ' + roleLabel + ' paneli aktif!', 'success');
 }
 
+// ========== ADMIN FONKSİYONLARI ==========
 async function loadUserList() {
     if (!currentUser) return;
     try {
@@ -4632,7 +4622,7 @@ function openRandomSupport() {
     showNotification('Destek maili açılıyor', 'success');
 }
 
-// ========== ŞİFRE GÖSTER/GİZLE (ŞIK ICON) ==========
+// ========== ŞİFRE GÖSTER/GİZLE ==========
 function togglePassword(inputId, btn) {
     var input = document.getElementById(inputId);
     if (!input) return;
@@ -4734,7 +4724,7 @@ async function toggleChatHistory() {
     }
 }
 
-// ========== AYARLAR FONKSİYONLARI ==========
+// ========== AYARLAR ==========
 function openSettingsModal() {
     document.getElementById('settingsModal').classList.add('open');
 }
@@ -4762,12 +4752,11 @@ function shareSite() {
     }
 }
 
-// ========== YORUMLAR (ANA SAYFA + KULLANICI PANELİ) ==========
+// ========== YORUMLAR ==========
 async function loadComments() {
     try {
         var comments = await Parse.Cloud.run('getComments');
         
-        // Ana sayfadaki listeyi doldur
         var mainContainer = document.getElementById('mainCommentsList');
         if (mainContainer) {
             if (!comments || comments.length === 0) {
@@ -4777,7 +4766,6 @@ async function loadComments() {
             }
         }
         
-        // userPanel içindeki listeyi doldur
         var userContainer = document.querySelector('#userPanel #commentsList');
         if (!userContainer) {
             userContainer = document.getElementById('commentsList');
@@ -4800,7 +4788,6 @@ async function loadComments() {
     }
 }
 
-// Yorum HTML'ini oluşturan yardımcı fonksiyon
 function buildCommentsHTML(comments) {
     var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 'user': '👤 KULLANICI' };
     var roleColors = { 'founder': 'var(--gold)', 'admin': 'var(--accent)', 'beta': 'var(--purple)', 'user': 'var(--text3)' };
@@ -4843,13 +4830,11 @@ async function deleteComment(commentId) {
     }
 }
 
-// ========== YORUM GÖNDER (DÜZELTİLDİ - ÖNCE userPanel'DEKİ INPUT'U ARA) ==========
 async function postComment() {
     if (!currentUser) {
         showNotification('Yorum yapmak için giriş yapmalısınız!', 'error');
         return;
     }
-    // Önce userPanel içindeki input'u bul
     var input = document.querySelector('#userPanel #commentInput');
     if (!input) input = document.getElementById('commentInput');
     if (!input) {
@@ -4871,21 +4856,17 @@ async function postComment() {
     }
 }
 
-// ========== YORUM ARAYÜZÜNÜ GÜNCELLE (DÜZELTİLDİ - userPanel ÖNCELİKLİ) ==========
 function updateCommentUI() {
-    // userPanel içindeki elemanları bul
     var form = document.querySelector('#userPanel #commentForm');
     var loginMsg = document.querySelector('#userPanel #commentLoginMessage');
     var userName = document.querySelector('#userPanel #commentUserName');
     var userRole = document.querySelector('#userPanel #commentUserRole');
     
-    // Eğer userPanel'de yoksa (misafir veya dashboard), genel olanları kullan
     if (!form) form = document.getElementById('commentForm');
     if (!loginMsg) loginMsg = document.getElementById('commentLoginMessage');
     if (!userName) userName = document.getElementById('commentUserName');
     if (!userRole) userRole = document.getElementById('commentUserRole');
     
-    // Eğer currentUser boşsa, Parse.User.current() ile tekrar dene
     if (!currentUser) {
         currentUser = Parse.User.current();
     }
@@ -4896,7 +4877,6 @@ function updateCommentUI() {
         if (userName) userName.textContent = currentUser.get('name') || 'Kullanıcı';
         var roleLabels = { 'founder': '👑 KURUCU', 'admin': '⚙️ ADMIN', 'beta': '🔬 BETA', 'user': '👤 KULLANICI' };
         if (userRole) userRole.textContent = roleLabels[currentUser.get('role')] || '👤 KULLANICI';
-        // Yorumları yeniden yükle (silme butonları için)
         loadComments();
     } else {
         if (form) form.style.display = 'none';
@@ -4943,7 +4923,7 @@ if (cursor && ring) {
     }
 }
 
-// ========== KULLANICI PANELİ (DÜZELTİLDİ - TİTREME ÖNLENDİ) ==========
+// ========== KULLANICI PANELİ ==========
 async function showUserPanel() {
     try {
         console.log('🔄 Kullanıcı paneli açılıyor...');
@@ -4967,33 +4947,15 @@ async function showUserPanel() {
         await loadComments();
         updateCommentUI();
         
-        // Dashboard'daki AI panelini gizle (çakışma olmasın)
-        var dashboardPanel = document.getElementById('fullAIPanel');
-        if (dashboardPanel) {
-            dashboardPanel.style.display = 'none';
-        }
-        // userPanel içindeki AI panelini göster
         var userPanelElement = document.querySelector('#userPanel #fullAIPanel');
         if (userPanelElement) {
             userPanelElement.style.display = 'flex';
             userPanelElement.classList.remove('fullscreen', 'halfscreen');
         }
         
-        // === KAPATMA BUTONUNU KONTROL ET (ÜYE İSE GİZLE) ===
-        var closeBtn = document.querySelector('#userPanel #fullscreenCloseBtn');
-        if (closeBtn) {
-            if (currentUser) {
-                closeBtn.style.display = 'none';
-            } else {
-                closeBtn.style.display = 'inline-block';
-            }
-        }
-        
-        // === ŞİMŞEK WİDGET'INI GİZLE ===
         var widget = document.querySelector('.ai-widget');
         if (widget) widget.style.display = 'none';
         
-        // === KULLANICI PANELİ KARTLARINI YÜKLE ===
         await loadUserProjects();
         await loadUserFavorites();
         await loadUserArchive();
@@ -5146,7 +5108,6 @@ async function loadUserInbox() {
 
 // ========== ÇIKIŞ ==========
 function logout() {
-    closeFullAIPanel();
     Parse.User.logOut();
     localStorage.removeItem('vizyon_user');
     currentUser = null;
@@ -5159,12 +5120,11 @@ function logout() {
     updateCommentUI();
     showNotification('Çıkış yapıldı.', 'success');
     
-    // === ŞİMŞEK WİDGET'INI GERİ GÖSTER ===
     var widget = document.querySelector('.ai-widget');
     if (widget) widget.style.display = 'block';
 }
 
-// ========== SAYFA YÜKLENİNCE (RELOAD YOK) ==========
+// ========== SAYFA YÜKLENİNCE ==========
 window.onload = async function () {
     console.log('🔄 Sayfa yükleniyor...');
     if (typeof initBack4App === 'function') {
@@ -5221,9 +5181,7 @@ window.onload = async function () {
         document.getElementById('userPanel').style.display = 'none';
     }
     
-    // Ana sayfa yorumlarını yükle
     await loadComments();
-    
     await updateStats();
     startStatsInterval();
     showNotification('✨ VİZYON 2027 Sistemi Aktif!', 'success');
