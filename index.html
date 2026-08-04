@@ -6,9 +6,14 @@
     <title>Vizyon 2027 | VİZYON AI</title>
 
     <!-- ========== HARİCİ KÜTÜPHANELER ========== -->
-    <script src="https://cdn.jsdelivr.net/npm/parse@5.0.0/dist/parse.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0
-
+    <script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
 -beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?
 
@@ -744,8 +749,8 @@ footer {
     background: #000000;
     z-index: 10000;
     overflow-y: auto;
-    padding: 20px;
-    display: none !important;
+    padding: 0 !important;
+    display: none;
 }
 .dashboard-container::before {
     content: '';
@@ -754,20 +759,34 @@ footer {
     background: radial-gradient(ellipse 120% 60% at 50% 0%, rgba(0,212,255,0.04) 0%, transparent 60%);
     z-index: -1;
 }
+
+/* ===== DASHBOARD HEADER (SABİT - STICKY) ===== */
 .dashboard-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    background: rgba(10,10,10,0.95) !important;
+    backdrop-filter: blur(16px) !important;
+    border-bottom: 2px solid var(--accent) !important;
+    padding: 12px 24px !important;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 32px;
-    background: rgba(10,10,10,0.95);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 100;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px;
+    min-height: 70px;
 }
+
+/* ===== DASHBOARD İÇERİK WRAPPER (Header'ın altından başlasın) ===== */
+.dashboard-content-wrapper {
+    padding: 20px;
+    padding-top: 10px;
+    margin-top: 0;
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .dashboard-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -775,6 +794,8 @@ footer {
     padding: 24px;
     max-width: 1600px;
     margin: 0 auto;
+    margin-top: 0;
+    padding-top: 10px;
 }
 .dashboard-grid-2col {
     display: grid;
@@ -784,6 +805,8 @@ footer {
     max-width: 1600px;
     margin: 0 auto;
     width: 100%;
+    margin-top: 0;
+    padding-top: 10px;
 }
 .dashboard-card {
     background: rgba(17,17,17,0.85);
@@ -1499,10 +1522,6 @@ footer {
     z-index: 999;
 }
 
-#dashboardArea {
-    display: none !important;
-}
-
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
     .dashboard-grid, .dashboard-grid-2col { 
@@ -1537,24 +1556,20 @@ footer {
 }
 
 @media (max-width: 480px) {
-    /* ===== DASHBOARD ===== */
-    .dashboard-container { padding: 4px !important; }
-    .dashboard-header { padding: 6px 10px !important; flex-direction: column !important; align-items: stretch !important; gap: 4px !important; }
+    .dashboard-container { padding: 0 !important; }
+    .dashboard-header { padding: 6px 10px !important; flex-direction: column !important; align-items: stretch !important; gap: 4px !important; min-height: 50px !important; }
     .dashboard-header .user-info { flex-wrap: wrap !important; gap: 4px !important; justify-content: center !important; }
     .dashboard-header .user-info span { font-size: 11px !important; }
     .dashboard-header .btn-sm { font-size: 8px !important; padding: 2px 6px !important; }
+    .dashboard-content-wrapper { padding: 8px !important; }
     .dashboard-grid, .dashboard-grid-2col { padding: 4px !important; gap: 6px !important; grid-template-columns: 1fr !important; }
     .dashboard-card { padding: 10px !important; border-radius: 16px !important; }
     .dashboard-card h3 { font-size: 13px !important; margin-bottom: 10px !important; padding-bottom: 6px !important; }
-    
-    /* ===== AI CHAT ===== */
     .ai-chat-messages { height: 140px !important; padding: 6px !important; border-radius: 12px !important; }
     .ai-message { font-size: 11px !important; padding: 6px 10px !important; max-width: 95% !important; margin-bottom: 6px !important; }
     .ai-input-area { flex-direction: column !important; gap: 4px !important; }
     .ai-input-area input, .ai-input-area textarea { font-size: 11px !important; padding: 6px 10px !important; min-width: auto !important; border-radius: 20px !important; }
     .glow-input { font-size: 11px !important; padding: 6px 10px !important; border-radius: 20px !important; }
-    
-    /* ===== MODAL ===== */
     .modal-overlay { padding: 6px !important; align-items: flex-end !important; }
     .modal { padding: 12px !important; width: 100% !important; max-width: 100% !important; border-radius: 16px 16px 0 0 !important; max-height: 95vh !important; }
     .modal-header { margin-bottom: 12px !important; }
@@ -1564,8 +1579,6 @@ footer {
     .form-input { font-size: 11px !important; padding: 8px 10px !important; margin-bottom: 8px !important; border-radius: 12px !important; }
     .form-row { gap: 6px !important; }
     .btn-google, .btn-facebook { font-size: 11px !important; padding: 8px !important; border-radius: 12px !important; margin-bottom: 6px !important; }
-    
-    /* ===== AI WIDGET ===== */
     .ai-widget { bottom: 10px !important; right: 10px !important; }
     .ai-widget-btn { width: 40px !important; height: 40px !important; font-size: 16px !important; }
     .ai-panel { width: calc(100vw - 20px) !important; right: 10px !important; bottom: 54px !important; border-radius: 14px !important; }
@@ -1575,8 +1588,6 @@ footer {
     .ai-suggestion { font-size: 9px !important; padding: 3px 8px !important; }
     .ai-input { font-size: 11px !important; padding: 6px 10px !important; border-radius: 20px !important; }
     .ai-send { font-size: 11px !important; padding: 6px 12px !important; }
-    
-    /* ===== VİZYON AI PANEL ===== */
     .vizyon-ai-panel { height: 260px !important; max-height: 260px !important; border-radius: 12px !important; margin-top: 6px !important; }
     .vizyon-ai-panel.fullscreen { height: 100% !important; max-height: 100% !important; border-radius: 0 !important; }
     .vizyon-ai-panel.halfscreen { height: 70% !important; max-height: 70% !important; }
@@ -1589,18 +1600,12 @@ footer {
     .vizyon-ai-input { font-size: 11px !important; padding: 6px 10px !important; border-radius: 8px !important; }
     .vizyon-ai-input-area .btn-primary { font-size: 11px !important; padding: 6px 12px !important; }
     .vizyon-ai-input-area .btn-secondary { font-size: 14px !important; padding: 6px 12px !important; }
-    
-    /* ===== PROJECT LIST ===== */
     .project-item { padding: 6px 10px !important; font-size: 11px !important; border-radius: 8px !important; }
     .project-actions span { font-size: 11px !important; }
     .project-list { max-height: 140px !important; gap: 4px !important; }
-    
-    /* ===== TEAM ===== */
     .team-member-item { padding: 6px 10px !important; font-size: 11px !important; }
     .team-chat-messages { height: 100px !important; padding: 6px !important; }
     .team-chat-messages .ai-message { font-size: 10px !important; padding: 4px 8px !important; }
-    
-    /* ===== COMMENT ===== */
     #commentsSection { padding: 6px !important; }
     .comment-item { padding: 6px 8px !important; border-radius: 8px !important; margin-bottom: 4px !important; }
     .comment-item .comment-text { font-size: 12px !important; }
@@ -1609,39 +1614,26 @@ footer {
     .comment-item .comment-time { font-size: 8px !important; }
     #commentForm textarea { font-size: 12px !important; padding: 6px !important; border-radius: 8px !important; }
     #commentLoginMessage { padding: 8px !important; font-size: 12px !important; }
-    
-    /* ===== USER PANEL ===== */
     .user-panel-header { padding: 6px 10px !important; flex-direction: column !important; align-items: stretch !important; gap: 4px !important; }
     .user-panel-header .logo-text { font-size: 14px !important; }
     .user-panel-header .logo-icon { width: 28px !important; height: 28px !important; font-size: 14px !important; }
     .user-panel-header .user-info { flex-wrap: wrap !important; gap: 4px !important; justify-content: center !important; }
     .user-panel-header .btn-sm { font-size: 8px !important; padding: 2px 8px !important; }
     .user-panel-body { padding: 6px !important; }
-    
-    /* ===== KULLANICI PANELİ KARTLAR ===== */
     .user-panel-body .dashboard-card { padding: 10px !important; }
     .user-panel-body .dashboard-card h3 { font-size: 12px !important; }
     .user-panel-body [style*="grid-template-columns"] { grid-template-columns: 1fr !important; gap: 6px !important; }
     .user-panel-body .dashboard-card .project-list { max-height: 100px !important; }
     .user-panel-body .dashboard-card .inbox-list { max-height: 100px !important; }
-    
-    /* ===== QUERY LIMIT BADGE ===== */
     .query-limit-badge { font-size: 7px !important; padding: 2px 6px !important; bottom: 50px !important; left: 10px !important; border-radius: 20px !important; }
-    
-    /* ===== 3D ===== */
     #canvas3d { height: 150px !important; }
-    
-    /* ===== BUTTONS ===== */
     .btn-primary, .btn-secondary, .btn-danger, .btn-success { font-size: 11px !important; padding: 6px 12px !important; border-radius: 20px !important; }
     .btn-sm { font-size: 9px !important; padding: 3px 8px !important; }
-    
-    /* ===== USER LIST ===== */
     .user-item { padding: 6px 8px !important; font-size: 11px !important; gap: 4px !important; }
     .user-item .user-email { font-size: 11px !important; }
     .user-item .user-role { font-size: 9px !important; padding: 1px 6px !important; }
     .user-item .user-actions button { font-size: 8px !important; padding: 2px 6px !important; }
 }
-
 </style>
 
 <!-- ============================================================ -->
@@ -2042,6 +2034,35 @@ footer {
   "imports": {
     "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
     "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+.admin-login-screen {
+    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: #000000 !important;
+    z-index: 999999 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+}
+.admin-login-screen .admin-login-box {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: rgba(0,10,20,0.95) !important;
+    border: 2px solid #00d4ff !important;
+    border-radius: 24px !important;
+    padding: 30px 40px !important;
+    max-width: 380px !important;
+    width: 100% !important;
+    text-align: center !important;
+    box-shadow: 0 0 60px rgba(0,212,255,0.3) !important;
+    cursor: pointer !important;
+    margin: 10px !important;
+    color: #ffffff !important;
+}
   }
 }
 </script>   
@@ -2353,15 +2374,11 @@ footer {
     </div>
 
     <!-- ============================================================ -->
-    <!-- HTML-2: DASHBOARD (GİRİŞ YAPINCA AÇILIR)                     -->
-    <!-- ============================================================ -->
-    <div id="dashboardArea" class="dashboard-container" style="display:none;">
-        <!-- ============================================================ -->
 <!-- HTML-2: DASHBOARD (GİRİŞ YAPINCA AÇILIR)                     -->
 <!-- ============================================================ -->
 <div id="dashboardArea" class="dashboard-container" style="display:none;">
 
-    <!-- ===== DASHBOARD HEADER ===== -->
+    <!-- ===== DASHBOARD HEADER (SABİT) ===== -->
     <div class="dashboard-header">
         <div class="logo">
             <div class="logo-icon">✨</div>
@@ -2377,232 +2394,237 @@ footer {
         </div>
     </div>
 
-    <!-- ===== AI ASİSTAN (HERKESTE) ===== -->
-    <div class="dashboard-grid">
-        <div class="dashboard-card full-width">
-            <h3>🤖 VİZYON AI ASİSTAN</h3>
-            <div id="dashboardAiMessages" class="ai-chat-messages">
-                <div class="ai-message bot">Merhaba! Size nasıl yardımcı olabilirim?</div>
+    <!-- ===== İÇERİK WRAPPER (Header'ın altından başlar) ===== -->
+    <div class="dashboard-content-wrapper">
+
+        <!-- ===== AI ASİSTAN (HERKESTE) ===== -->
+        <div class="dashboard-grid">
+            <div class="dashboard-card full-width">
+                <h3>🤖 VİZYON AI ASİSTAN</h3>
+                <div id="dashboardAiMessages" class="ai-chat-messages">
+                    <div class="ai-message bot">Merhaba! Size nasıl yardımcı olabilirim?</div>
+                </div>
+                <div class="ai-input-area">
+                    <input type="text" id="dashboardAiInput" placeholder="AI'ya sor..." class="glow-input" style="flex:1;">
+                    <button class="btn-primary" onclick="sendDashboardAI()">Gönder</button>
+                    <input type="file" id="dashboardFileInput" style="display:none;" accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip">
+                    <button class="btn-secondary" onclick="document.getElementById('dashboardFileInput').click()">📎</button>
+                </div>
             </div>
-            <div class="ai-input-area">
-                <input type="text" id="dashboardAiInput" placeholder="AI'ya sor..." class="glow-input" style="flex:1;">
-                <button class="btn-primary" onclick="sendDashboardAI()">Gönder</button>
-                <input type="file" id="dashboardFileInput" style="display:none;" accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip">
-                <button class="btn-secondary" onclick="document.getElementById('dashboardFileInput').click()">📎</button>
+        </div>
+
+        <!-- ===== KUTULAR (2 SÜTUN) - HERKESTE GÖRÜNÜR ===== -->
+        <div class="dashboard-grid-2col">
+
+            <!-- Projelerim -->
+            <div class="dashboard-card">
+                <h3>📁 Projelerim</h3>
+                <div id="projectsList" class="project-list"></div>
+                <button class="btn-primary btn-sm" onclick="newProject()" style="margin-top:8px;">+ Yeni Proje</button>
             </div>
-        </div>
-    </div>
 
-    <!-- ===== KUTULAR (2 SÜTUN) - HERKESTE GÖRÜNÜR ===== -->
-    <div class="dashboard-grid-2col">
+            <!-- Favoriler -->
+            <div class="dashboard-card">
+                <h3>⭐ Favoriler</h3>
+                <div id="favList" class="project-list"></div>
+            </div>
 
-        <!-- Projelerim -->
-        <div class="dashboard-card">
-            <h3>📁 Projelerim</h3>
-            <div id="projectsList" class="project-list"></div>
-            <button class="btn-primary btn-sm" onclick="newProject()" style="margin-top:8px;">+ Yeni Proje</button>
-        </div>
+            <!-- Arşiv -->
+            <div class="dashboard-card">
+                <h3>🗄️ Arşiv</h3>
+                <div id="archiveList" class="project-list"></div>
+            </div>
 
-        <!-- Favoriler -->
-        <div class="dashboard-card">
-            <h3>⭐ Favoriler</h3>
-            <div id="favList" class="project-list"></div>
-        </div>
+            <!-- Çöp Kutusu -->
+            <div class="dashboard-card">
+                <h3>🗑️ Çöp Kutusu</h3>
+                <div id="trashList" class="project-list"></div>
+            </div>
 
-        <!-- Arşiv -->
-        <div class="dashboard-card">
-            <h3>🗄️ Arşiv</h3>
-            <div id="archiveList" class="project-list"></div>
-        </div>
+            <!-- Proje Taleplerim -->
+            <div class="dashboard-card">
+                <h3>📨 Proje Taleplerim</h3>
+                <div id="projectRequestsList" class="project-list"></div>
+            </div>
 
-        <!-- Çöp Kutusu -->
-        <div class="dashboard-card">
-            <h3>🗑️ Çöp Kutusu</h3>
-            <div id="trashList" class="project-list"></div>
-        </div>
+            <!-- Gelen Kutusu -->
+            <div class="dashboard-card">
+                <h3>📬 Gelen Kutusu</h3>
+                <div id="inboxList" class="inbox-list"></div>
+            </div>
 
-        <!-- Proje Taleplerim -->
-        <div class="dashboard-card">
-            <h3>📨 Proje Taleplerim</h3>
-            <div id="projectRequestsList" class="project-list"></div>
-        </div>
+            <!-- ===== YÖNETİM İŞLEMLERİ (SADECE ADMIN/FOUNDER) ===== -->
+            <div class="dashboard-card" id="adminActionsCard" style="display:none; grid-column: span 2;">
+                <h3>⚙️ Yönetim İşlemleri</h3>
+                <div style="display:flex; flex-direction:column; gap:16px;">
 
-        <!-- Gelen Kutusu -->
-        <div class="dashboard-card">
-            <h3>📬 Gelen Kutusu</h3>
-            <div id="inboxList" class="inbox-list"></div>
-        </div>
-
-        <!-- ===== YÖNETİM İŞLEMLERİ (SADECE ADMIN/FOUNDER) ===== -->
-        <div class="dashboard-card" id="adminActionsCard" style="display:none; grid-column: span 2;">
-            <h3>⚙️ Yönetim İşlemleri</h3>
-            <div style="display:flex; flex-direction:column; gap:16px;">
-
-                <!-- Hediye Gönder -->
-                <div>
-                    <h4>🎁 Hediye Paketi Gönder</h4>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <input type="email" id="giftEmailInput" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1; min-width:200px;">
-                        <select id="giftPackageSelect" class="glow-input">
-                            <option value="pro">🌟 Pro Paket</option>
-                            <option value="team">👥 Takım Paketi</option>
-                        </select>
-                        <button class="btn-primary btn-sm" onclick="sendGiftByEmail()">Gönder</button>
+                    <!-- Hediye Gönder -->
+                    <div>
+                        <h4>🎁 Hediye Paketi Gönder</h4>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <input type="email" id="giftEmailInput" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1; min-width:200px;">
+                            <select id="giftPackageSelect" class="glow-input">
+                                <option value="pro">🌟 Pro Paket</option>
+                                <option value="team">👥 Takım Paketi</option>
+                            </select>
+                            <button class="btn-primary btn-sm" onclick="sendGiftByEmail()">Gönder</button>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Beta Ata -->
-                <div>
-                    <h4>🔬 Beta Tester Ata</h4>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <input type="email" id="betaEmailInput" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1; min-width:200px;">
-                        <button class="btn-secondary btn-sm" onclick="assignBetaByEmail()">Beta Yap</button>
+                    <!-- Beta Ata -->
+                    <div>
+                        <h4>🔬 Beta Tester Ata</h4>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <input type="email" id="betaEmailInput" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1; min-width:200px;">
+                            <button class="btn-secondary btn-sm" onclick="assignBetaByEmail()">Beta Yap</button>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Admin Ata (Sadece Founder) -->
-                <div id="adminAssignSection" style="display:none;">
-                    <h4>⚙️ Admin Ata (Sadece Kurucu)</h4>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <input type="email" id="adminEmailInput" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1; min-width:200px;">
-                        <button class="btn-danger btn-sm" onclick="assignAdminByEmail()">Admin Yap</button>
+                    <!-- Admin Ata (Sadece Founder) -->
+                    <div id="adminAssignSection" style="display:none;">
+                        <h4>⚙️ Admin Ata (Sadece Kurucu)</h4>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <input type="email" id="adminEmailInput" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1; min-width:200px;">
+                            <button class="btn-danger btn-sm" onclick="assignAdminByEmail()">Admin Yap</button>
+                        </div>
                     </div>
+
                 </div>
-
             </div>
-        </div>
 
-        <!-- Takım Kartı -->
-        <div class="dashboard-card">
-            <h3>👥 Takım</h3>
-            <div id="teamInfo"></div>
-            <div id="teamMembersList" class="team-list"></div>
-            <div id="teamChatMessages" class="team-chat-messages"></div>
-            <div class="ai-input-area">
-                <input type="text" id="teamChatInput" placeholder="Takıma mesaj yaz..." class="glow-input" style="flex:1;">
-                <button class="btn-primary btn-sm" onclick="sendTeamMessage()">Gönder</button>
-            </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-                <button class="btn-secondary btn-sm" onclick="createTeam()">+ Takım Oluştur</button>
-                <input type="email" id="inviteEmail" placeholder="Davet et (e-posta)" class="glow-input" style="flex:1;min-width:150px;">
-                <button class="btn-secondary btn-sm" onclick="inviteToTeam()">Davet Gönder</button>
-            </div>
-        </div>
-
-        <!-- Görsel Üret -->
-        <div class="dashboard-card">
-            <h3>🖼️ Görsel Üret (AI)</h3>
-            <input id="imagePrompt" class="glow-input" placeholder="Görsel açıklaması yazın..." style="width:100%; margin-bottom:10px;">
-            <button class="btn-primary btn-sm" onclick="generateImage()" style="width:100%;">🎨 Görsel Oluştur</button>
-            <div id="imageResults" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; max-height:200px; overflow-y:auto;"></div>
-        </div>
-
-        <!-- 3D Model Üret -->
-        <div class="dashboard-card">
-            <h3>🧊 3D Model Üret</h3>
-            <input id="threeDPrompt" class="glow-input" placeholder="3D nesne açıklaması yazın..." style="width:100%; margin-bottom:10px;">
-            <button class="btn-3d btn-sm" onclick="generate3D()" style="width:100%;">🧊 3D Oluştur</button>
-            <div id="canvas3d" style="width:100%; height:250px; margin-top:10px; background:#0a0a0a; border-radius:12px; border:1px solid var(--border);"></div>
-        </div>
-
-    </div>
-
-    <!-- ===== YÖNETİM PANELİ (SADECE ADMIN/FOUNDER) ===== -->
-    <div id="adminPanelCard" class="dashboard-card full-width" style="display:none;">
-        <h3>⚙️ YÖNETİM PANELİ</h3>
-        
-        <div style="margin-bottom:16px;">
-            <h4>👥 Kullanıcı Listesi</h4>
-            <div id="userList" class="user-list"></div>
-        </div>
-
-        <div style="margin-bottom:16px;">
-            <h4>🎯 Admin Atama</h4>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <input type="email" id="assignAdminEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;">
-                <button class="btn-primary btn-sm" onclick="assignAdmin()">Admin Yap</button>
-            </div>
-        </div>
-
-        <div style="margin-bottom:16px;">
-            <h4>🎁 Hediye Gönder</h4>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <input type="email" id="giftEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;">
-                <select id="giftPackage" class="glow-input">
-                    <option value="pro">🌟 Pro Paket</option>
-                    <option value="team">👥 Takım Paketi</option>
-                </select>
-                <button class="btn-primary btn-sm" onclick="sendGift()">Gönder</button>
-            </div>
-        </div>
-
-        <div>
-            <h4>🔒 Kullanıcı Engelle</h4>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <input type="email" id="banUserEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;">
-                <button class="btn-danger btn-sm" onclick="banUser()">Yasakla</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== YORUM SİSTEMİ ===== -->
-    <section id="commentsSection">
-        <h3>💬 Yorumlar</h3>
-        <div id="commentsList">
-            <div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">
-                🌟 Yorumlar yükleniyor...
-            </div>
-        </div>
-        <div id="commentForm" style="display: none;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                <span style="color: var(--text2); font-size: 14px;">👤 <span id="commentUserName">Misafir</span></span>
-                <span id="commentUserRole" style="font-size: 11px; padding: 2px 10px; border-radius: 12px; background: var(--border); color: var(--text3);">👤 KULLANICI</span>
-            </div>
-            <textarea id="commentInput" rows="2" placeholder="Yorumunuzu yazın..." style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; resize: vertical; font-family: var(--font-body);"></textarea>
-            <button onclick="postComment()" class="btn-primary" style="margin-top: 8px; width: 100%; font-size: 14px !important; padding: 12px !important;">💬 Yorum Gönder</button>
-        </div>
-        <div id="commentLoginMessage" style="margin-top: 16px; padding: 12px; background: var(--surface); border-radius: 12px; border: 1px dashed var(--border); text-align: center; color: var(--text3);">
-            <p>Yorum yapmak için <button class="btn-secondary btn-sm" onclick="openModal('login')" style="display: inline-block; padding: 6px 16px; font-size: 12px;">giriş yapmalısınız</button>.</p>
-        </div>
-    </section>
-
-    <!-- ===== VİZYON AI PANELİ (YORUMLARIN ALTINDA) ===== -->
-    <div id="fullAIPanel" class="vizyon-ai-panel" style="display:flex;">
-        <div class="vizyon-ai-header">
-            <div class="logo">
-                <div class="logo-icon">✨</div>
-                <div class="logo-text">VİZYON AI</div>
-            </div>
-            <div style="display:flex; gap:8px; align-items:center;">
-                <span style="color:var(--text3); font-size:12px;">⚡ 7 Model</span>
-                <button class="btn-secondary btn-sm" onclick="closeFullAIPanel()" style="display:inline-block; padding:4px 12px; font-size:10px;" id="fullscreenCloseBtn">✕ Kapat</button>
-            </div>
-        </div>
-        <div id="fullAIChat" class="vizyon-ai-chat">
-            <div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Size nasıl yardımcı olabilirim? Dosya yükleyebilir, kod yazabilir veya soru sorabilirsiniz.</div>
-        </div>
-        <div class="vizyon-ai-input-area">
-            <textarea id="fullAIInput" class="vizyon-ai-input" placeholder="Her dilde yazabilirsin... (Python, JavaScript, React, SQL...)" rows="2" onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendFullAI(); }"></textarea>
-            <div style="display:flex; gap:8px; position:relative;">
-                <button class="btn-secondary" onclick="toggleFileMenu()" style="padding:10px 16px; font-size:18px;">➕</button>
-                <div id="fileMenu" style="display:none; position:absolute; bottom:70px; right:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:8px; z-index:10001; min-width:180px; box-shadow:0 8px 32px rgba(0,0,0,0.5);">
-                    <button onclick="openCamera()" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📷 Fotoğraf Çek</button>
-                    <button onclick="document.getElementById('fullFileInput').click(); toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📁 Galeriden Seç</button>
-                    <button onclick="document.getElementById('fullFileInput').click(); toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📄 Dosya Yükle</button>
+            <!-- Takım Kartı -->
+            <div class="dashboard-card">
+                <h3>👥 Takım</h3>
+                <div id="teamInfo"></div>
+                <div id="teamMembersList" class="team-list"></div>
+                <div id="teamChatMessages" class="team-chat-messages"></div>
+                <div class="ai-input-area">
+                    <input type="text" id="teamChatInput" placeholder="Takıma mesaj yaz..." class="glow-input" style="flex:1;">
+                    <button class="btn-primary btn-sm" onclick="sendTeamMessage()">Gönder</button>
                 </div>
-                <input type="file" id="fullFileInput" style="display:none;" accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip,.png,.jpg,.jpeg,.gif,.bmp,.svg,.webp" onchange="uploadFullFile(this)">
-                <button class="btn-primary" onclick="sendFullAI()" style="padding:10px 20px;">⚡ Gönder</button>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                    <button class="btn-secondary btn-sm" onclick="createTeam()">+ Takım Oluştur</button>
+                    <input type="email" id="inviteEmail" placeholder="Davet et (e-posta)" class="glow-input" style="flex:1;min-width:150px;">
+                    <button class="btn-secondary btn-sm" onclick="inviteToTeam()">Davet Gönder</button>
+                </div>
+            </div>
+
+            <!-- Görsel Üret -->
+            <div class="dashboard-card">
+                <h3>🖼️ Görsel Üret (AI)</h3>
+                <input id="imagePrompt" class="glow-input" placeholder="Görsel açıklaması yazın..." style="width:100%; margin-bottom:10px;">
+                <button class="btn-primary btn-sm" onclick="generateImage()" style="width:100%;">🎨 Görsel Oluştur</button>
+                <div id="imageResults" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; max-height:200px; overflow-y:auto;"></div>
+            </div>
+
+            <!-- 3D Model Üret -->
+            <div class="dashboard-card">
+                <h3>🧊 3D Model Üret</h3>
+                <input id="threeDPrompt" class="glow-input" placeholder="3D nesne açıklaması yazın..." style="width:100%; margin-bottom:10px;">
+                <button class="btn-3d btn-sm" onclick="generate3D()" style="width:100%;">🧊 3D Oluştur</button>
+                <div id="canvas3d" style="width:100%; height:250px; margin-top:10px; background:#0a0a0a; border-radius:12px; border:1px solid var(--border);"></div>
+            </div>
+
+        </div>
+
+        <!-- ===== YÖNETİM PANELİ (SADECE ADMIN/FOUNDER) ===== -->
+        <div id="adminPanelCard" class="dashboard-card full-width" style="display:none;">
+            <h3>⚙️ YÖNETİM PANELİ</h3>
+            
+            <div style="margin-bottom:16px;">
+                <h4>👥 Kullanıcı Listesi</h4>
+                <div id="userList" class="user-list"></div>
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <h4>🎯 Admin Atama</h4>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <input type="email" id="assignAdminEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;">
+                    <button class="btn-primary btn-sm" onclick="assignAdmin()">Admin Yap</button>
+                </div>
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <h4>🎁 Hediye Gönder</h4>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <input type="email" id="giftEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;">
+                    <select id="giftPackage" class="glow-input">
+                        <option value="pro">🌟 Pro Paket</option>
+                        <option value="team">👥 Takım Paketi</option>
+                    </select>
+                    <button class="btn-primary btn-sm" onclick="sendGift()">Gönder</button>
+                </div>
+            </div>
+
+            <div>
+                <h4>🔒 Kullanıcı Engelle</h4>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <input type="email" id="banUserEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;">
+                    <button class="btn-danger btn-sm" onclick="banUser()">Yasakla</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- ===== ALT KISIM (Hesap & Ayarlar) ===== -->
-    <div class="dashboard-card full-width" style="margin-top:24px; text-align:center; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; padding:20px;">
-        <button class="btn-danger" onclick="deleteAccount()">🗑️ Hesabımı Sil</button>
-        <button class="btn-secondary" onclick="openSettingsModal()">⚙️ Ayarlar</button>
-    </div>
+        <!-- ===== YORUM SİSTEMİ ===== -->
+        <section id="commentsSection">
+            <h3>💬 Yorumlar</h3>
+            <div id="commentsList">
+                <div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">
+                    🌟 Yorumlar yükleniyor...
+                </div>
+            </div>
+            <div id="commentForm" style="display: none;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <span style="color: var(--text2); font-size: 14px;">👤 <span id="commentUserName">Misafir</span></span>
+                    <span id="commentUserRole" style="font-size: 11px; padding: 2px 10px; border-radius: 12px; background: var(--border); color: var(--text3);">👤 KULLANICI</span>
+                </div>
+                <textarea id="commentInput" rows="2" placeholder="Yorumunuzu yazın..." style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; resize: vertical; font-family: var(--font-body);"></textarea>
+                <button onclick="postComment()" class="btn-primary" style="margin-top: 8px; width: 100%; font-size: 14px !important; padding: 12px !important;">💬 Yorum Gönder</button>
+            </div>
+            <div id="commentLoginMessage" style="margin-top: 16px; padding: 12px; background: var(--surface); border-radius: 12px; border: 1px dashed var(--border); text-align: center; color: var(--text3);">
+                <p>Yorum yapmak için <button class="btn-secondary btn-sm" onclick="openModal('login')" style="display: inline-block; padding: 6px 16px; font-size: 12px;">giriş yapmalısınız</button>.</p>
+            </div>
+        </section>
 
-</div>
+        <!-- ===== VİZYON AI PANELİ (YORUMLARIN ALTINDA) ===== -->
+        <div id="fullAIPanel" class="vizyon-ai-panel" style="display:flex;">
+            <div class="vizyon-ai-header">
+                <div class="logo">
+                    <div class="logo-icon">✨</div>
+                    <div class="logo-text">VİZYON AI</div>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <span style="color:var(--text3); font-size:12px;">⚡ 7 Model</span>
+                    <button class="btn-secondary btn-sm" onclick="closeFullAIPanel()" style="display:inline-block; padding:4px 12px; font-size:10px;" id="fullscreenCloseBtn">✕ Kapat</button>
+                </div>
+            </div>
+            <div id="fullAIChat" class="vizyon-ai-chat">
+                <div class="ai-msg bot">🧠 <strong>VİZYON AI</strong>: Merhaba! Size nasıl yardımcı olabilirim? Dosya yükleyebilir, kod yazabilir veya soru sorabilirsiniz.</div>
+            </div>
+            <div class="vizyon-ai-input-area">
+                <textarea id="fullAIInput" class="vizyon-ai-input" placeholder="Her dilde yazabilirsin... (Python, JavaScript, React, SQL...)" rows="2" onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendFullAI(); }"></textarea>
+                <div style="display:flex; gap:8px; position:relative;">
+                    <button class="btn-secondary" onclick="toggleFileMenu()" style="padding:10px 16px; font-size:18px;">➕</button>
+                    <div id="fileMenu" style="display:none; position:absolute; bottom:70px; right:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:8px; z-index:10001; min-width:180px; box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+                        <button onclick="openCamera()" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📷 Fotoğraf Çek</button>
+                        <button onclick="document.getElementById('fullFileInput').click(); toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📁 Galeriden Seç</button>
+                        <button onclick="document.getElementById('fullFileInput').click(); toggleFileMenu();" style="display:block; width:100%; padding:10px 14px; background:none; border:none; color:var(--text); cursor:pointer; text-align:left; font-size:13px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">📄 Dosya Yükle</button>
+                    </div>
+                    <input type="file" id="fullFileInput" style="display:none;" accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip,.png,.jpg,.jpeg,.gif,.bmp,.svg,.webp" onchange="uploadFullFile(this)">
+                    <button class="btn-primary" onclick="sendFullAI()" style="padding:10px 20px;">⚡ Gönder</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ALT KISIM (Hesap & Ayarlar) ===== -->
+        <div class="dashboard-card full-width" style="margin-top:24px; text-align:center; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; padding:20px;">
+            <button class="btn-danger" onclick="deleteAccount()">🗑️ Hesabımı Sil</button>
+            <button class="btn-secondary" onclick="openSettingsModal()">⚙️ Ayarlar</button>
+        </div>
+
+    </div><!-- ===== İÇERİK WRAPPER SONU ===== -->
+
+</div><!-- ===== DASHBOARD SONU ===== -->
         <!-- DASHBOARD HEADER -->
         <!-- AI ASİSTAN -->
         <!-- PROJELER, FAVORİLER, ARŞİV, ÇÖP KUTUSU, TALEPLER, GELEN KUTUSU, TAKIM -->
@@ -2687,6 +2709,47 @@ footer {
         <input type="password" id="rolePassword" class="form-input" placeholder="Şifre">
         <button class="btn-primary" onclick="checkRole()" style="width:100%;">Giriş</button>
         <button class="btn-secondary" onclick="closeModal('rolePanel')" style="width:100%;margin-top:12px;">İptal</button>
+    </div>
+</div>
+
+<!-- ===== ADMIN ÖZEL GİRİŞ EKRANI (TAM EKRAN) ===== -->
+<div id="adminLoginScreen" class="admin-login-screen">
+    <div class="admin-login-wrapper">
+        <!-- İbrahim Admin -->
+        <div class="admin-login-box" data-admin="ibrahim">
+            <div class="admin-avatar">👤</div>
+            <div class="admin-name">İbrahim Admin</div>
+            <div class="admin-email">iy5971828@gmail.com</div>
+            <div class="admin-hint">
+                <i class="fas fa-chevron-down"></i> Giriş yapmak için tıklayın
+            </div>
+            <div class="admin-password-section" data-admin="ibrahim">
+                <p style="color:var(--text2); font-size:14px; margin-bottom:12px;">
+                    Hoş geldin İbrahim! Hesabına erişim için şifreni gir.
+                </p>
+                <input type="password" class="form-input admin-pass-input" placeholder="Admin Şifresi" data-admin="ibrahim" onkeypress="if(event.key==='Enter') handleAdminLogin('ibrahim')">
+                <button class="btn-primary" onclick="handleAdminLogin('ibrahim')">Giriş Yap</button>
+                <button class="btn-secondary" onclick="closeAdminLoginScreen()">Geri Dön</button>
+            </div>
+        </div>
+
+        <!-- Bozkurt Admin -->
+        <div class="admin-login-box" data-admin="bozkurt">
+            <div class="admin-avatar">👤</div>
+            <div class="admin-name">Bozkurt Admin</div>
+            <div class="admin-email">itaner686@gmail.com</div>
+            <div class="admin-hint">
+                <i class="fas fa-chevron-down"></i> Giriş yapmak için tıklayın
+            </div>
+            <div class="admin-password-section" data-admin="bozkurt">
+                <p style="color:var(--text2); font-size:14px; margin-bottom:12px;">
+                    Hoş geldin Bozkurt! Hesabına erişim için şifreni gir.
+                </p>
+                <input type="password" class="form-input admin-pass-input" placeholder="Admin Şifresi" data-admin="bozkurt" onkeypress="if(event.key==='Enter') handleAdminLogin('bozkurt')">
+                <button class="btn-primary" onclick="handleAdminLogin('bozkurt')">Giriş Yap</button>
+                <button class="btn-secondary" onclick="closeAdminLoginScreen()">Geri Dön</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -2823,7 +2886,7 @@ footer {
             </div>
         </section>
 
-        <!-- ===== VİZYON AI PANELİ (YARIM EKRAN - TÜM ROLLER İÇİN) ===== -->
+        <!-- ===== VİZYON AI PANELİ (YARIM EKRAN) ===== -->
         <div id="fullAIPanel" class="vizyon-ai-panel" style="display:flex; margin-top:20px;">
             <div class="vizyon-ai-header">
                 <div class="logo">
@@ -2853,13 +2916,13 @@ footer {
             </div>
         </div>
 
-        <!-- ===== ALT KISIM (Hesap & Ayarlar) ===== -->
+        <!-- ===== ALT KISIM ===== -->
         <div style="max-width:800px; margin:30px auto 20px; text-align:center; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; padding:20px; background:rgba(17,17,17,0.85); border-radius:24px; border:1px solid var(--border);">
             <button class="btn-danger" onclick="deleteAccount()">🗑️ Hesabımı Sil</button>
             <button class="btn-secondary" onclick="openSettingsModal()">⚙️ Ayarlar</button>
         </div>
 
-        <!-- ===== KULLANICI PANELİ KARTLAR (TÜM ROLLER İÇİN) ===== -->
+        <!-- ===== KULLANICI PANELİ KARTLAR ===== -->
         <div style="max-width:800px; margin:0 auto 30px; display:grid; grid-template-columns:1fr 1fr; gap:20px;">
 
             <div class="dashboard-card" style="background:rgba(17,17,17,0.85); border:1px solid var(--accent); box-shadow:0 0 20px rgba(0,212,255,0.2);">
@@ -2903,7 +2966,7 @@ footer {
                                 <option value="pro">🌟 Pro Paket</option>
                                 <option value="team">👥 Takım Paketi</option>
                             </select>
-                            <button class="btn-primary btn-sm" onclick="sendGiftByEmail()">Gönder</button>
+                            <button class="btn-primary btn-sm" onclick="sendGiftRequest()">Teklif Gönder</button>
                         </div>
                     </div>
 
@@ -2912,7 +2975,7 @@ footer {
                         <h4>🔬 Beta Tester Ata</h4>
                         <div style="display:flex; gap:8px; flex-wrap:wrap;">
                             <input type="email" id="betaEmailInput" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1; min-width:200px;">
-                            <button class="btn-secondary btn-sm" onclick="assignBetaByEmail()">Beta Yap</button>
+                            <button class="btn-secondary btn-sm" onclick="sendRoleRequest('beta')">Teklif Gönder</button>
                         </div>
                     </div>
 
@@ -2921,7 +2984,7 @@ footer {
                         <h4>⚙️ Admin Ata (Sadece Kurucu)</h4>
                         <div style="display:flex; gap:8px; flex-wrap:wrap;">
                             <input type="email" id="adminEmailInput" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1; min-width:200px;">
-                            <button class="btn-danger btn-sm" onclick="assignAdminByEmail()">Admin Yap</button>
+                            <button class="btn-danger btn-sm" onclick="sendRoleRequest('admin')">Teklif Gönder</button>
                         </div>
                     </div>
 
@@ -4329,13 +4392,12 @@ document.addEventListener('click', function (e) {
 </script>
 
 
- 
 <!-- ============================================================ -->
-<!-- JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ                    -->
+<!-- JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ + TEKLİF SİSTEMİ  -->
 <!-- ============================================================ -->
 <script>
 // ================================================================
-// JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ + YÖNETİM İŞLEMLERİ
+// JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ + İKİ ADMIN LOGIN (FULL DÜZELTİLDİ)
 // ================================================================
 
 function openProfileModal() {
@@ -4419,49 +4481,176 @@ async function buyPackage(pkg) {
     }
 }
 
+// ========== ROL PANELİ AÇ (FOUNDER/BETA/ADMIN) - DİNAMİK KARTLAR ==========
 function openRolePanel(role) {
+    if (role === 'ADMIN') {
+        var screen = document.getElementById('adminLoginScreen');
+        if (!screen) {
+            screen = document.createElement('div');
+            screen.id = 'adminLoginScreen';
+            document.body.appendChild(screen);
+        }
+        // Kartları doğrudan innerHTML ile ekle
+        screen.innerHTML = `
+            <div class="admin-login-wrapper" style="display:flex;flex-wrap:wrap;gap:30px;justify-content:center;align-items:center;max-width:850px;width:100%;padding:20px;">
+                <div class="admin-login-box" style="display:block;background:rgba(0,10,20,0.95);border:2px solid #00d4ff;border-radius:24px;padding:30px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,212,255,0.3);cursor:pointer;margin:10px;color:#ffffff;">
+                    <div style="font-size:48px;">👤</div>
+                    <div style="font-size:22px;font-weight:700;margin:8px 0;">İbrahim Admin</div>
+                    <div style="color:#8ab4cc;font-size:14px;">iy5971828@gmail.com</div>
+                    <div style="margin:12px 0;color:#00d4ff;font-size:13px;">👇 Giriş yapmak için tıklayın</div>
+                    <div style="margin-top:12px;">
+                        <input type="password" class="admin-pass-input" placeholder="Admin Şifresi" data-admin="ibrahim" style="width:100%;padding:14px 16px;background:#050a0f;border:1px solid #1a3350;color:#fff;font-size:14px;border-radius:16px;margin-bottom:12px;">
+                        <button onclick="var inp=document.querySelector('.admin-pass-input[data-admin=ibrahim]');if(inp.type==='password'){inp.type='text';this.innerHTML='🙈 Gizle';}else{inp.type='password';this.innerHTML='👁️ Göster';}" style="background:#00d4ff;color:#000;padding:8px 16px;border:none;border-radius:40px;cursor:pointer;font-weight:600;margin-right:8px;">👁️ Göster</button>
+                        <button onclick="handleAdminLogin('ibrahim')" style="background:#00d4ff;color:#000;padding:12px 24px;border:none;border-radius:40px;cursor:pointer;font-weight:600;margin-top:8px;">Giriş Yap</button>
+                    </div>
+                </div>
+                <div class="admin-login-box" style="display:block;background:rgba(0,10,20,0.95);border:2px solid #00d4ff;border-radius:24px;padding:30px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,212,255,0.3);cursor:pointer;margin:10px;color:#ffffff;">
+                    <div style="font-size:48px;">👤</div>
+                    <div style="font-size:22px;font-weight:700;margin:8px 0;">Bozkurt Admin</div>
+                    <div style="color:#8ab4cc;font-size:14px;">itaner686@gmail.com</div>
+                    <div style="margin:12px 0;color:#00d4ff;font-size:13px;">👇 Giriş yapmak için tıklayın</div>
+                    <div style="margin-top:12px;">
+                        <input type="password" class="admin-pass-input" placeholder="Admin Şifresi" data-admin="bozkurt" style="width:100%;padding:14px 16px;background:#050a0f;border:1px solid #1a3350;color:#fff;font-size:14px;border-radius:16px;margin-bottom:12px;">
+                        <button onclick="var inp=document.querySelector('.admin-pass-input[data-admin=bozkurt]');if(inp.type==='password'){inp.type='text';this.innerHTML='🙈 Gizle';}else{inp.type='password';this.innerHTML='👁️ Göster';}" style="background:#00d4ff;color:#000;padding:8px 16px;border:none;border-radius:40px;cursor:pointer;font-weight:600;margin-right:8px;">👁️ Göster</button>
+                        <button onclick="handleAdminLogin('bozkurt')" style="background:#00d4ff;color:#000;padding:12px 24px;border:none;border-radius:40px;cursor:pointer;font-weight:600;margin-top:8px;">Giriş Yap</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        screen.style.display = 'flex';
+        screen.style.position = 'fixed';
+        screen.style.top = '0';
+        screen.style.left = '0';
+        screen.style.right = '0';
+        screen.style.bottom = '0';
+        screen.style.zIndex = '999999';
+        screen.style.background = '#000000';
+        screen.style.alignItems = 'center';
+        screen.style.justifyContent = 'center';
+        screen.style.padding = '20px';
+        console.log('✅ Admin login screen gösteriliyor');
+        return;
+    }
+    // FOUNDER veya BETA için eski mantık
     currentRole = role;
-    document.getElementById('roleTitle').innerHTML =
-        role === 'FOUNDER' ? '👑 FOUNDER GİRİŞİ' :
-        role === 'ADMIN' ? '⚙️ ADMIN GİRİŞİ' :
-        '🔬 BETA GİRİŞİ';
-    document.getElementById('rolePanel').classList.add('open');
+    var title = document.getElementById('roleTitle');
+    if (title) {
+        title.innerHTML = role === 'FOUNDER' ? '👑 FOUNDER GİRİŞİ' : '🔬 BETA GİRİŞİ';
+    }
+    var panel = document.getElementById('rolePanel');
+    if (panel) panel.classList.add('open');
 }
 
-// ========== ROLE PANELİ GİRİŞ (MASTER KEY YOK) ==========
+// ========== ADMIN EKRANINI KAPAT (DOM'DAN KALDIR) ==========
+function closeAdminLoginScreen() {
+    var screen = document.getElementById('adminLoginScreen');
+    if (screen) {
+        screen.remove();
+    }
+    document.querySelectorAll('.admin-pass-input').forEach(el => el.value = '');
+    document.body.style.overflow = 'auto';
+}
+
+// ========== ADMIN GİRİŞ (YENİLEME YOK - DOĞRUDAN AÇ) ==========
+async function handleAdminLogin(adminKey) {
+    const admins = {
+        ibrahim: { email: 'iy5971828@gmail.com', password: 'ibrm4411', name: 'İbrahim Admin' },
+        bozkurt: { email: 'itaner686@gmail.com', password: 'bzkrt440204', name: 'Bozkurt Admin' }
+    };
+
+    const admin = admins[adminKey];
+    if (!admin) {
+        showNotification('Geçersiz admin seçimi!', 'error');
+        return;
+    }
+
+    const input = document.querySelector(`.admin-pass-input[data-admin="${adminKey}"]`);
+    if (!input) {
+        showNotification('Şifre alanı bulunamadı!', 'error');
+        return;
+    }
+
+    const pass = input.value.trim();
+    if (!pass) {
+        showNotification('Lütfen şifrenizi girin!', 'error');
+        return;
+    }
+
+    if (pass !== admin.password) {
+        showNotification('❌ Şifre hatalı!', 'error');
+        input.value = '';
+        input.focus();
+        return;
+    }
+
+    closeAdminLoginScreen();
+    showNotification('✅ Şifre doğrulandı, admin paneline yönlendiriliyorsunuz...', 'success');
+
+    if (currentUser) {
+        try { await Parse.User.logOut(); } catch(e) {}
+        currentUser = null;
+    }
+
+    try {
+        console.log('🔄 Admin giriş yapılıyor...');
+        await Parse.Cloud.run('initAdminUsers');
+        
+        await Parse.User.logIn(admin.email, admin.password);
+        currentUser = Parse.User.current();
+        localStorage.setItem('vizyon_user', JSON.stringify({
+            id: currentUser.id,
+            name: currentUser.get('name'),
+            email: currentUser.get('email'),
+            role: currentUser.get('role'),
+            plan: currentUser.get('plan'),
+            teamId: currentUser.get('teamId')
+        }));
+
+        console.log('✅ Giriş başarılı, dashboard açılıyor...');
+        
+        await showDashboard();
+        updateCommentUI();
+        await loadComments();
+        showNotification('Hoş geldin ' + admin.name + '!', 'success');
+
+    } catch (e) {
+        console.error('Admin giriş hatası:', e);
+        showNotification('Admin girişi başarısız: ' + e.message, 'error');
+    }
+}
+
+// ========== ROLE PANELİ GİRİŞ (FOUNDER / BETA) ==========
 async function checkRole() {
     var pass = document.getElementById('rolePassword').value;
     var valid =
         (currentRole === 'FOUNDER' && pass === 'Eymen11Amele44') ||
-        (currentRole === 'ADMIN' && pass === 'ibrm4411') ||
         (currentRole === 'BETA' && pass === '4402');
-    
+
     if (!valid) {
         showNotification('Şifre hatalı!', 'error');
         return;
     }
-    
+
     closeModal('rolePanel');
-    
+
     if (currentUser) {
         try {
             await Parse.User.logOut();
             currentUser = null;
         } catch(e) {}
     }
-    
+
     var roleInfo = {
         'FOUNDER': { email: 'admin.tr.reis@gmail.com', password: 'Eymen11Amele44', name: 'Founder Admin', role: 'founder' },
-        'ADMIN': { email: 'iy5971828@gmail.com', password: 'ibrm4411', name: 'Ibrahim Admin', role: 'admin' },
         'BETA': { email: 'beta@vizyon2027.com', password: '4402', name: 'Beta Kullanıcısı', role: 'beta' }
     };
-    
+
     var info = roleInfo[currentRole];
     if (!info) {
         showNotification('Geçersiz rol!', 'error');
         return;
     }
-    
+
     try {
         await Parse.User.logIn(info.email, info.password);
     } catch (loginError) {
@@ -4486,18 +4675,18 @@ async function checkRole() {
             return;
         }
     }
-    
+
     currentUser = Parse.User.current();
     if (!currentUser) {
         showNotification('Oturum açılamadı!', 'error');
         return;
     }
-    
+
     if (currentUser.get('role') !== info.role) {
         currentUser.set('role', info.role);
         await currentUser.save();
     }
-    
+
     localStorage.setItem('vizyon_user', JSON.stringify({
         id: currentUser.id,
         name: currentUser.get('name'),
@@ -4506,14 +4695,16 @@ async function checkRole() {
         plan: currentUser.get('plan'),
         teamId: currentUser.get('teamId')
     }));
-    
-    await showUserPanel();
+
+    if (currentUser.get('role') === 'founder' || currentUser.get('role') === 'admin') {
+        await showDashboard();
+    } else {
+        await showUserPanel();
+    }
     updateCommentUI();
     await loadComments();
-    
-    var roleLabel = currentRole === 'FOUNDER' ? '👑 KURUCU' :
-                    currentRole === 'ADMIN' ? '⚙️ ADMIN' :
-                    '🔬 BETA';
+
+    var roleLabel = currentRole === 'FOUNDER' ? '👑 KURUCU' : '🔬 BETA';
     showNotification('Hoş geldiniz, ' + roleLabel + ' paneli aktif!', 'success');
 }
 
@@ -4552,7 +4743,7 @@ async function assignAdminEmail(email) {
         var inbox = new Inbox();
         inbox.set('sender_email', 'system@vizyon2027.com');
         inbox.set('receiver_email', email);
-        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz. Lütfen şifrenizi belirlemek için "Admin Şifre Belirle" butonuna tıklayın.');
+        inbox.set('message', '🎉 Tebrikler! Admin yetkisi verildiniz.');
         await inbox.save();
         showNotification(email + ' admin yapıldı!', 'success');
         await loadUserList();
@@ -4704,15 +4895,15 @@ function switchTab(tab) {
     var registerForm = document.getElementById('formRegister');
     var verifyForm = document.getElementById('formVerify');
     var tabs = document.querySelectorAll('.modal-tab');
-    
+
     if (loginForm) loginForm.style.display = 'none';
     if (registerForm) registerForm.style.display = 'none';
     if (verifyForm) verifyForm.style.display = 'none';
-    
+
     for (var i = 0; i < tabs.length; i++) {
         tabs[i].classList.remove('active');
     }
-    
+
     if (tab === 'login') {
         if (loginForm) loginForm.style.display = 'block';
         if (tabs[0]) tabs[0].classList.add('active');
@@ -4723,7 +4914,7 @@ function switchTab(tab) {
         if (verifyForm) verifyForm.style.display = 'block';
         if (tabs[2]) tabs[2].classList.add('active');
     }
-    
+
     var modal = document.getElementById('authModal');
     if (modal) modal.classList.add('open');
 }
@@ -4783,12 +4974,12 @@ async function resetPasswordWithCode() {
     var code = document.getElementById('resetCode').value.trim();
     var newPass = document.getElementById('resetNewPass').value;
     var newPass2 = document.getElementById('resetNewPass2').value;
-    
+
     if (!code || newPass.length < 8 || newPass !== newPass2) {
         showNotification('Kodu girin, şifreler aynı ve min 8 karakter olmalı.', 'error');
         return;
     }
-    
+
     try {
         var result = await Parse.Cloud.run('resetPasswordWithCode', {
             email: email,
@@ -4865,35 +5056,31 @@ function shareSite() {
 // ========== YORUMLAR ==========
 async function loadComments() {
     try {
+        console.log('🔄 Yorumlar yükleniyor...');
         var comments = await Parse.Cloud.run('getComments');
-        
+        console.log('✅ Yorumlar alındı:', comments ? comments.length : 0);
+
         var mainContainer = document.getElementById('mainCommentsList');
-        if (mainContainer) {
-            if (!comments || comments.length === 0) {
-                mainContainer.innerHTML = '<div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">🌟 İlk yorumu sen yap!</div>';
-            } else {
-                mainContainer.innerHTML = buildCommentsHTML(comments);
-            }
-        }
-        
         var userContainer = document.querySelector('#userPanel #commentsList');
-        if (!userContainer) {
-            userContainer = document.getElementById('commentsList');
+        var dashContainer = document.querySelector('#dashboardArea #commentsList');
+
+        var html = '';
+        if (!comments || comments.length === 0) {
+            html = '<div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">🌟 İlk yorumu sen yap!</div>';
+        } else {
+            html = buildCommentsHTML(comments);
         }
-        if (userContainer) {
-            if (!comments || comments.length === 0) {
-                userContainer.innerHTML = '<div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">🌟 İlk yorumu sen yap!</div>';
-            } else {
-                userContainer.innerHTML = buildCommentsHTML(comments);
-            }
-        }
+
+        if (mainContainer) mainContainer.innerHTML = html;
+        if (userContainer) userContainer.innerHTML = html;
+        if (dashContainer) dashContainer.innerHTML = html;
+        
+        console.log('✅ Yorumlar gösterildi.');
     } catch (e) {
-        console.error('Yorumlar yüklenemedi:', e);
-        var containers = [document.getElementById('mainCommentsList'), document.querySelector('#userPanel #commentsList'), document.getElementById('commentsList')];
-        containers.forEach(function(container) {
-            if (container) {
-                container.innerHTML = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);;">⚠️ Yorumlar yüklenemedi: ' + e.message + '</div>';
-            }
+        console.error('❌ Yorumlar yüklenemedi:', e);
+        var errorHtml = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);">⚠️ Yorumlar yüklenemedi: ' + e.message + '</div>';
+        document.querySelectorAll('#mainCommentsList, #commentsList').forEach(el => {
+            if (el) el.innerHTML = errorHtml;
         });
     }
 }
@@ -4945,17 +5132,22 @@ async function postComment() {
         showNotification('Yorum yapmak için giriş yapmalısınız!', 'error');
         return;
     }
-    var input = document.querySelector('#userPanel #commentInput');
+    
+    var input = document.querySelector('#dashboardArea #commentInput');
+    if (!input) input = document.querySelector('#userPanel #commentInput');
     if (!input) input = document.getElementById('commentInput');
+    
     if (!input) {
         showNotification('Yorum alanı bulunamadı!', 'error');
         return;
     }
+    
     var text = input.value.trim();
     if (!text) {
         showNotification('Lütfen bir yorum yazın!', 'error');
         return;
     }
+    
     try {
         await Parse.Cloud.run('addComment', { comment: text });
         input.value = '';
@@ -4971,16 +5163,16 @@ function updateCommentUI() {
     var loginMsg = document.querySelector('#userPanel #commentLoginMessage');
     var userName = document.querySelector('#userPanel #commentUserName');
     var userRole = document.querySelector('#userPanel #commentUserRole');
-    
+
     if (!form) form = document.getElementById('commentForm');
     if (!loginMsg) loginMsg = document.getElementById('commentLoginMessage');
     if (!userName) userName = document.getElementById('commentUserName');
     if (!userRole) userRole = document.getElementById('commentUserRole');
-    
+
     if (!currentUser) {
         currentUser = Parse.User.current();
     }
-    
+
     if (currentUser) {
         if (form) form.style.display = 'block';
         if (loginMsg) loginMsg.style.display = 'none';
@@ -5033,16 +5225,15 @@ if (cursor && ring) {
     }
 }
 
-// ========== KULLANICI PANELİ (TÜM ROLLER İÇİN) ==========
+// ========== KULLANICI PANELİ ==========
 async function showUserPanel() {
     try {
         console.log('🔄 Kullanıcı paneli açılıyor...');
-        
+
         document.getElementById('mainSite').style.display = 'none';
         document.getElementById('dashboardArea').style.display = 'none';
         document.getElementById('userPanel').style.display = 'flex';
-        
-        // ===== TÜM KARTLARI GÖRÜNÜR YAP =====
+
         var body = document.querySelector('#userPanel .user-panel-body');
         if (body) {
             var children = body.children;
@@ -5053,10 +5244,10 @@ async function showUserPanel() {
                 }
             }
         }
-        
+
         var logoutBtn = document.querySelector('.logout-btn');
         if (logoutBtn) logoutBtn.style.display = 'inline-block';
-        
+
         var name = currentUser.get('name');
         var role = currentUser.get('role');
         document.getElementById('userPanelName').innerHTML = name || 'Kullanıcı';
@@ -5065,44 +5256,122 @@ async function showUserPanel() {
             role === 'admin' ? '⚙️ ADMIN' :
             role === 'beta' ? '🔬 BETA' :
             '👤 KULLANICI';
-        
+
         await loadComments();
         updateCommentUI();
-        
+
         var userPanelElement = document.querySelector('#userPanel #fullAIPanel');
         if (userPanelElement) {
             userPanelElement.style.display = 'flex';
             userPanelElement.classList.remove('fullscreen', 'halfscreen');
         }
-        
+
         var widget = document.querySelector('.ai-widget');
         if (widget) widget.style.display = 'none';
-        
-        // ===== YÖNETİM KARTINI GÖSTER/GİZLE =====
+
+        // === ROL KONTROLLERİ (Kullanıcı panelinde) ===
+        var isAdmin = (role === 'admin' || role === 'founder');
+        var isFounder = (role === 'founder');
+
         var adminActionsCard = document.querySelector('#userPanel #adminActionsCard');
         if (adminActionsCard) {
-            if (role === 'admin' || role === 'founder') {
-                adminActionsCard.style.display = 'block';
-                // Admin atama bölümü sadece founder için
-                var adminAssignSection = document.querySelector('#userPanel #adminAssignSection');
-                if (adminAssignSection) {
-                    adminAssignSection.style.display = role === 'founder' ? 'block' : 'none';
-                }
-            } else {
-                adminActionsCard.style.display = 'none';
+            adminActionsCard.style.display = isAdmin ? 'block' : 'none';
+            var adminAssignSection = document.querySelector('#userPanel #adminAssignSection');
+            if (adminAssignSection) {
+                adminAssignSection.style.display = isFounder ? 'block' : 'none';
             }
         }
-        
+
         await loadUserProjects();
         await loadUserFavorites();
         await loadUserArchive();
         await loadUserTrash();
-        await loadUserInbox();
-        
+        await loadInbox();
+
         console.log('✅ Kullanıcı paneli açıldı!');
     } catch(e) {
         console.error('Kullanıcı paneli hatası:', e);
         showNotification('Panel yüklenirken hata oluştu: ' + e.message, 'error');
+    }
+}
+
+// ========== DASHBOARD (GÜNCELLENMİŞ - ROL KONTROLLÜ) ==========
+async function showDashboard() {
+    try {
+        console.log('🔄 Dashboard açılıyor...');
+
+        // --- ADMİN EKRANINI KALDIR ---
+        var adminScreen = document.getElementById('adminLoginScreen');
+        if (adminScreen) {
+            adminScreen.remove();
+        }
+
+        // --- DİĞER EKRANLARI GİZLE ---
+        document.getElementById('mainSite').style.display = 'none';
+        document.getElementById('userPanel').style.display = 'none';
+
+        // --- DASHBOARD'U GÖSTER ---
+        var dash = document.getElementById('dashboardArea');
+        if (!dash) {
+            showNotification('Dashboard elementi eksik!', 'error');
+            return;
+        }
+
+        dash.style.display = 'block';
+        dash.style.visibility = 'visible';
+        dash.style.opacity = '1';
+
+        // --- KULLANICI BİLGİLERİ ---
+        var name = currentUser.get('name');
+        var role = currentUser.get('role');
+        
+        document.getElementById('dashboardUserName').innerHTML = name || 'Kullanıcı';
+        document.getElementById('userRoleBadge').innerHTML =
+            role === 'founder' ? '👑 KURUCU' :
+            role === 'admin' ? '⚙️ ADMIN' :
+            role === 'beta' ? '🔬 BETA' : '👤 KULLANICI';
+
+        // === ROL KONTROLLERİ ===
+        var isAdmin = (role === 'admin' || role === 'founder');
+        var isFounder = (role === 'founder');
+
+        // Admin panel kartları
+        var adminCard = document.getElementById('adminPanelCard');
+        var adminActions = document.getElementById('adminActionsCard');
+        var adminAssign = document.getElementById('adminAssignSection');
+
+        if (adminCard) adminCard.style.display = isAdmin ? 'block' : 'none';
+        if (adminActions) adminActions.style.display = isAdmin ? 'block' : 'none';
+        if (adminAssign) adminAssign.style.display = isFounder ? 'block' : 'none';
+
+        // Kullanıcı listesini sadece admin/founder yükle
+        if (isAdmin) {
+            await loadUserList();
+        } else {
+            var userListContainer = document.getElementById('userList');
+            if (userListContainer) userListContainer.innerHTML = '<div class="user-item">⚠️ Yetkiniz yok.</div>';
+        }
+
+        // --- VERİLERİ YÜKLE (HERKES İÇİN) ---
+        await loadProjects();
+        await loadFavorites();
+        await loadArchive();
+        await loadTrash();
+        await loadProjectRequests();
+        await loadInbox();
+        await loadTeamInfo();
+        await updateStats();
+        startStatsInterval();
+
+        // --- YORUMLARI YÜKLE ---
+        await loadComments();
+
+        console.log('✅ Dashboard açıldı! Rol: ' + role);
+        showNotification('Hoş geldin ' + name + '!', 'success');
+
+    } catch (e) {
+        console.error('Dashboard hatası:', e);
+        showNotification('Dashboard yüklenirken hata: ' + e.message, 'error');
     }
 }
 
@@ -5119,7 +5388,6 @@ async function loadUserProjects() {
         var projects = await query.find();
         var container = document.getElementById('userProjectsList');
         if (!container) return;
-        
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Henüz proje yok.</div>';
         } else {
@@ -5147,7 +5415,6 @@ async function loadUserFavorites() {
         var projects = await query.find();
         var container = document.getElementById('userFavList');
         if (!container) return;
-        
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Henüz favori proje yok.</div>';
         } else {
@@ -5174,7 +5441,6 @@ async function loadUserArchive() {
         var projects = await query.find();
         var container = document.getElementById('userArchiveList');
         if (!container) return;
-        
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Arşivde proje yok.</div>';
         } else {
@@ -5200,7 +5466,6 @@ async function loadUserTrash() {
         var projects = await query.find();
         var container = document.getElementById('userTrashList');
         if (!container) return;
-        
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Çöp kutusu boş.</div>';
         } else {
@@ -5216,73 +5481,510 @@ async function loadUserTrash() {
     }
 }
 
-async function loadUserInbox() {
+// ========== GELEN KUTUSU ==========
+async function loadInbox() {
     if (!currentUser) return;
     try {
-        var Inbox = Parse.Object.extend('Inbox');
-        var query = new Parse.Query(Inbox);
+        const Inbox = Parse.Object.extend('Inbox');
+        const query = new Parse.Query(Inbox);
         query.equalTo('receiver_email', currentUser.get('email'));
         query.descending('createdAt');
-        var messages = await query.find();
-        var container = document.getElementById('userInboxList');
-        if (!container) return;
-        
-        if (messages.length === 0) {
-            container.innerHTML = '<div class="inbox-item">📭 Mesaj kutusu boş.</div>';
-        } else {
-            var html = '';
-            for (var i = 0; i < messages.length; i++) {
-                var m = messages[i];
-                html += '<div class="inbox-item"><div class="inbox-sender">📧 ' + m.get('sender_email') + '</div><div class="inbox-message">' + m.get('message') + '</div><div style="font-size:10px;color:var(--text3);margin-top:4px;">' + new Date(m.get('createdAt')).toLocaleString('tr-TR') + '</div></div>';
+        const messages = await query.find();
+
+        const containers = [
+            document.getElementById('inboxList'),
+            document.getElementById('userInboxList')
+        ];
+
+        containers.forEach(container => {
+            if (!container) return;
+            if (messages.length === 0) {
+                container.innerHTML = '<div class="inbox-item">📭 Mesaj kutusu boş.</div>';
+                return;
             }
+
+            let html = '';
+            messages.forEach(m => {
+                const type = m.get('type') || 'message';
+                const status = m.get('status') || 'done';
+                const isPending = (type === 'gift_request' || type === 'role_request') && status === 'pending';
+
+                html += `<div class="inbox-item" style="border-left-color: ${isPending ? 'var(--gold)' : 'var(--accent2)'};">`;
+                html += `<div class="inbox-sender">📧 ${m.get('sender_email')}</div>`;
+                html += `<div class="inbox-message">${m.get('message')}</div>`;
+                html += `<div style="font-size:10px;color:var(--text3);margin-top:4px;">${new Date(m.get('createdAt')).toLocaleString('tr-TR')}</div>`;
+
+                if (isPending) {
+                    const reqId = m.get('request_id');
+                    html += `<div style="display:flex; gap:8px; margin-top:6px;">`;
+                    html += `<button class="btn-primary btn-sm" onclick="handleRequest('${reqId}','accept')" style="padding:4px 12px; font-size:11px;">✅ Kabul</button>`;
+                    html += `<button class="btn-danger btn-sm" onclick="handleRequest('${reqId}','reject')" style="padding:4px 12px; font-size:11px;">❌ Red</button>`;
+                    html += `</div>`;
+                }
+                html += `</div>`;
+            });
             container.innerHTML = html;
-        }
-    } catch(e) {
-        console.error('User gelen kutusu yüklenirken hata:', e);
-        document.getElementById('userInboxList').innerHTML = '<div class="inbox-item">⚠️ Mesajlar yüklenemedi.</div>';
+        });
+    } catch (e) {
+        console.error('Gelen kutusu yüklenirken hata:', e);
+        document.querySelectorAll('#inboxList, #userInboxList').forEach(el => {
+            if (el) el.innerHTML = '<div class="inbox-item">⚠️ Mesajlar yüklenemedi.</div>';
+        });
     }
 }
 
-// ========== YÖNETİM İŞLEMLERİ (ADMIN/FOUNDER) ==========
+// ========== YARDIMCI: DOĞRU PANELDEKİ INPUTU BUL ==========
+function getPanelInput(id) {
+    let el = document.querySelector('#userPanel #' + id);
+    if (!el) {
+        el = document.querySelector('#dashboardArea #' + id);
+    }
+    if (!el) {
+        el = document.getElementById(id);
+    }
+    return el;
+}
 
-async function sendGiftByEmail() {
+// ========== YÖNETİM İŞLEMLERİ (TEKLİF SİSTEMİ) ==========
+async function sendGiftRequest() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    const input = getPanelInput('giftEmailInput');
+    if (!input) return showNotification('Hediye inputu bulunamadı!', 'error');
+    const email = input.value.trim();
+    const packageType = document.getElementById('giftPackageSelect').value;
+    if (!email) return showNotification('Lütfen bir e-posta adresi girin!', 'error');
+    try {
+        const result = await Parse.Cloud.run('sendGiftRequest', { email, packageType });
+        showNotification(result.message, 'success');
+        input.value = '';
+        await loadInbox();
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function sendRoleRequest(role) {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    let inputId;
+    if (role === 'beta') {
+        inputId = 'betaEmailInput';
+    } else if (role === 'admin') {
+        inputId = 'adminEmailInput';
+    } else {
+        return showNotification('Geçersiz rol!', 'error');
+    }
+    const input = getPanelInput(inputId);
+    if (!input) return showNotification('Rol inputu bulunamadı!', 'error');
+    const email = input.value.trim();
+    if (!email) return showNotification('Lütfen bir e-posta adresi girin!', 'error');
+    try {
+        const result = await Parse.Cloud.run('sendRoleRequest', { email, role });
+        showNotification(result.message, 'success');
+        input.value = '';
+        await loadInbox();
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function handleRequest(requestId, action) {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    try {
+        const result = await Parse.Cloud.run('handleRequest', { requestId, action });
+        showNotification(result.message, 'success');
+        await loadInbox();
+        if (action === 'accept') {
+            await currentUser.fetch();
+            document.getElementById('userPanelRole').innerHTML =
+                currentUser.get('role') === 'founder' ? '👑 KURUCU' :
+                currentUser.get('role') === 'admin' ? '⚙️ ADMIN' :
+                currentUser.get('role') === 'beta' ? '🔬 BETA' :
+                '👤 KULLANICI';
+            if (document.getElementById('profileModal').classList.contains('open')) {
+                openProfileModal();
+            }
+        }
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+// ========== ESKİ ADMIN FONKSİYONLARI (UYUMLULUK İÇİN) ==========
+window.sendGiftByEmail = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     const email = document.getElementById('giftEmailInput').value.trim();
     const packageType = document.getElementById('giftPackageSelect').value;
     if (!email) return showNotification('E-posta adresi girin!', 'error');
     try {
-        const result = await Parse.Cloud.run('sendGiftByEmail', { email, packageType });
+        const result = await Parse.Cloud.run('sendGiftRequest', { email, packageType });
         showNotification(result.message, 'success');
         document.getElementById('giftEmailInput').value = '';
     } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
     }
-}
+};
 
-async function assignBetaByEmail() {
+window.assignBetaByEmail = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     const email = document.getElementById('betaEmailInput').value.trim();
     if (!email) return showNotification('E-posta adresi girin!', 'error');
     try {
-        const result = await Parse.Cloud.run('assignBetaByEmail', { email });
+        const result = await Parse.Cloud.run('sendRoleRequest', { email, role: 'beta' });
         showNotification(result.message, 'success');
         document.getElementById('betaEmailInput').value = '';
     } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
     }
-}
+};
 
-async function assignAdminByEmail() {
+window.assignAdminByEmail = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     const email = document.getElementById('adminEmailInput').value.trim();
     if (!email) return showNotification('E-posta adresi girin!', 'error');
     try {
-        const result = await Parse.Cloud.run('assignAdminByEmail', { email });
+        const result = await Parse.Cloud.run('sendRoleRequest', { email, role: 'admin' });
         showNotification(result.message, 'success');
         document.getElementById('adminEmailInput').value = '';
     } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
     }
+};
+
+// ========== PROJE İŞLEMLERİ (DASHBOARD) ==========
+async function loadProjects() {
+    if (!currentUser) return;
+    try {
+        var Project = Parse.Object.extend('Project');
+        var query = new Parse.Query(Project);
+        query.equalTo('user_email', currentUser.get('email'));
+        query.equalTo('is_archived', false);
+        query.equalTo('is_trashed', false);
+        query.descending('createdAt');
+        var projects = await query.find();
+        var container = document.getElementById('projectsList');
+        if (!container) return;
+        if (projects.length === 0) {
+            container.innerHTML = '<div class="project-item">Henüz proje yok.</div>';
+        } else {
+            var html = '';
+            for (var i = 0; i < projects.length; i++) {
+                var p = projects[i];
+                html += '<div class="project-item"><span>📄 ' + p.get('name').substring(0, 30) + '</span><div class="project-actions"><span onclick="editProject(\'' + p.id + '\')" title="Düzenle">✏️</span><span onclick="deleteProject(\'' + p.id + '\')" title="Sil">🗑️</span><span onclick="favoriteProject(\'' + p.id + '\')" title="Favori">⭐</span><span onclick="archiveProject(\'' + p.id + '\')" title="Arşivle">🗄️</span></div></div>';
+            }
+            container.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('Projeler yüklenirken hata:', e);
+        document.getElementById('projectsList').innerHTML = '<div class="project-item">⚠️ Projeler yüklenemedi.</div>';
+    }
+}
+
+async function newProject() {
+    var name = prompt('Proje adı:');
+    if (!name || !name.trim()) return;
+    try {
+        var Project = Parse.Object.extend('Project');
+        var project = new Project();
+        project.set('user_email', currentUser.get('email'));
+        project.set('name', name.trim());
+        project.set('is_favorite', false);
+        project.set('is_archived', false);
+        project.set('is_trashed', false);
+        await project.save();
+        await loadProjects();
+        showNotification('Proje oluşturuldu!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function editProject(id) {
+    var newName = prompt('Yeni proje adı:');
+    if (!newName || !newName.trim()) return;
+    try {
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
+        project.set('name', newName.trim());
+        await project.save();
+        await loadProjects();
+        showNotification('Proje güncellendi!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function deleteProject(id) {
+    if (!confirm('Projeyi silmek istediğinize emin misiniz?')) return;
+    try {
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
+        await project.destroy();
+        await loadProjects();
+        await loadArchive();
+        await loadTrash();
+        showNotification('Proje silindi!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function favoriteProject(id) {
+    try {
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
+        project.set('is_favorite', !project.get('is_favorite'));
+        await project.save();
+        await loadProjects();
+        await loadFavorites();
+        showNotification(project.get('is_favorite') ? '⭐ Favorilere eklendi!' : '⭐ Favorilerden çıkarıldı!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function archiveProject(id) {
+    try {
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
+        project.set('is_archived', true);
+        await project.save();
+        await loadProjects();
+        await loadArchive();
+        showNotification('🗄️ Proje arşivlendi!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function unarchiveProject(id) {
+    try {
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
+        project.set('is_archived', false);
+        await project.save();
+        await loadProjects();
+        await loadArchive();
+        showNotification('📤 Proje arşivden çıkarıldı!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function restoreProject(id) {
+    try {
+        var query = new Parse.Query('Project');
+        var project = await query.get(id);
+        project.set('is_trashed', false);
+        await project.save();
+        await loadProjects();
+        await loadTrash();
+        showNotification('↩️ Proje geri yüklendi!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function loadFavorites() {
+    if (!currentUser) return;
+    try {
+        var Project = Parse.Object.extend('Project');
+        var query = new Parse.Query(Project);
+        query.equalTo('user_email', currentUser.get('email'));
+        query.equalTo('is_favorite', true);
+        query.equalTo('is_trashed', false);
+        var projects = await query.find();
+        var container = document.getElementById('favList');
+        if (!container) return;
+        if (projects.length === 0) {
+            container.innerHTML = '<div class="project-item">Henüz favori proje yok.</div>';
+        } else {
+            var html = '';
+            for (var i = 0; i < projects.length; i++) {
+                var p = projects[i];
+                html += '<div class="project-item"><span>⭐ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="favoriteProject(\'' + p.id + '\')" title="Favoriden çıkar">★</span></div></div>';
+            }
+            container.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('Favoriler yüklenirken hata:', e);
+    }
+}
+
+async function loadArchive() {
+    if (!currentUser) return;
+    try {
+        var Project = Parse.Object.extend('Project');
+        var query = new Parse.Query(Project);
+        query.equalTo('user_email', currentUser.get('email'));
+        query.equalTo('is_archived', true);
+        query.equalTo('is_trashed', false);
+        var projects = await query.find();
+        var container = document.getElementById('archiveList');
+        if (!container) return;
+        if (projects.length === 0) {
+            container.innerHTML = '<div class="project-item">Arşivde proje yok.</div>';
+        } else {
+            var html = '';
+            for (var i = 0; i < projects.length; i++) {
+                var p = projects[i];
+                html += '<div class="project-item"><span>🗄️ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="unarchiveProject(\'' + p.id + '\')" title="Arşivden çıkar">📤</span><span onclick="deleteProject(\'' + p.id + '\')" title="Sil">🗑️</span></div></div>';
+            }
+            container.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('Arşiv yüklenirken hata:', e);
+    }
+}
+
+async function loadTrash() {
+    if (!currentUser) return;
+    try {
+        var Project = Parse.Object.extend('Project');
+        var query = new Parse.Query(Project);
+        query.equalTo('user_email', currentUser.get('email'));
+        query.equalTo('is_trashed', true);
+        var projects = await query.find();
+        var container = document.getElementById('trashList');
+        if (!container) return;
+        if (projects.length === 0) {
+            container.innerHTML = '<div class="project-item">Çöp kutusu boş.</div>';
+        } else {
+            var html = '';
+            for (var i = 0; i < projects.length; i++) {
+                var p = projects[i];
+                html += '<div class="project-item"><span>🗑️ ' + p.get('name').substring(0, 25) + '</span><div class="project-actions"><span onclick="restoreProject(\'' + p.id + '\')" title="Geri yükle">↩️</span><span onclick="deleteProject(\'' + p.id + '\')" title="Kalıcı sil">🔥</span></div></div>';
+            }
+            container.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('Çöp kutusu yüklenirken hata:', e);
+    }
+}
+
+async function loadProjectRequests() {
+    if (!currentUser) return;
+    try {
+        var Request = Parse.Object.extend('ProjectRequest');
+        var query = new Parse.Query(Request);
+        query.equalTo('user_email', currentUser.get('email'));
+        query.descending('createdAt');
+        var requests = await query.find();
+        var container = document.getElementById('projectRequestsList');
+        if (!container) return;
+        if (requests.length === 0) {
+            container.innerHTML = '<div class="project-item">Henüz proje talebiniz yok.</div>';
+        } else {
+            var html = '';
+            for (var i = 0; i < requests.length; i++) {
+                var r = requests[i];
+                html += '<div class="project-item"><span>📨 ' + r.get('name').substring(0, 25) + '</span><span style="font-size:10px;color:var(--text3);">' + (r.get('status') || 'Beklemede') + '</span></div>';
+            }
+            container.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('Proje talepleri yüklenirken hata:', e);
+    }
+}
+
+async function loadTeamInfo() {
+    if (!currentUser) return;
+    var teamId = currentUser.get('teamId');
+    if (!teamId) {
+        document.getElementById('teamInfo').innerHTML = '<p>Bir takıma üye değilsiniz. Takım oluşturun veya davet bekleyin.</p>';
+        document.getElementById('teamMembersList').innerHTML = '';
+        document.getElementById('teamChatMessages').innerHTML = '';
+        return;
+    }
+    try {
+        var Team = Parse.Object.extend('Team');
+        var query = new Parse.Query(Team);
+        var team = await query.get(teamId);
+        var Member = Parse.Object.extend('TeamMember');
+        var memberQuery = new Parse.Query(Member);
+        memberQuery.equalTo('team_id', teamId);
+        var members = await memberQuery.find();
+        var Message = Parse.Object.extend('TeamMessage');
+        var msgQuery = new Parse.Query(Message);
+        msgQuery.equalTo('team_id', teamId);
+        msgQuery.ascending('createdAt');
+        var messages = await msgQuery.find();
+        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + '</h4><p>Üye sayısı: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
+        var membersHtml = '';
+        for (var i = 0; i < members.length; i++) {
+            var m = members[i];
+            membersHtml += '<div class="team-member-item">👤 ' + m.get('user_email') + (m.get('user_email') === team.get('owner_email') ? ' (Sahip)' : '') + '</div>';
+        }
+        document.getElementById('teamMembersList').innerHTML = membersHtml;
+        var chatContainer = document.getElementById('teamChatMessages');
+        var userEmail = currentUser.get('email');
+        var chatHtml = '';
+        for (var j = 0; j < messages.length; j++) {
+            var msg = messages[j];
+            var cls = (msg.get('user_email') === userEmail) ? 'user' : 'bot';
+            var name = (msg.get('user_email') === userEmail) ? 'Ben' : msg.get('user_email').split('@')[0];
+            chatHtml += '<div class="ai-message ' + cls + '"><strong>' + name + '</strong>: ' + msg.get('message') + '</div>';
+        }
+        chatContainer.innerHTML = chatHtml || '<div>Henüz mesaj yok</div>';
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    } catch (e) { console.error('Takım bilgisi yüklenirken hata:', e); }
+}
+
+async function createTeam() {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    var name = prompt('Takım adı:');
+    if (!name) return;
+    try {
+        var Team = Parse.Object.extend('Team');
+        var team = new Team();
+        team.set('name', name);
+        team.set('owner_email', currentUser.get('email'));
+        await team.save();
+        var Member = Parse.Object.extend('TeamMember');
+        var member = new Member();
+        member.set('team_id', team.id);
+        member.set('user_email', currentUser.get('email'));
+        await member.save();
+        currentUser.set('teamId', team.id);
+        await currentUser.save();
+        await loadTeamInfo();
+        showNotification('"' + name + '" takımı oluşturuldu!', 'success');
+    } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
+}
+
+async function inviteToTeam() {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    var teamId = currentUser.get('teamId');
+    if (!teamId) { showNotification('Önce takım oluşturun!', 'error'); return; }
+    var email = document.getElementById('inviteEmail').value.trim();
+    if (!email) { showNotification('E-posta adresi girin!', 'error'); return; }
+    try {
+        var Inbox = Parse.Object.extend('Inbox');
+        var inbox = new Inbox();
+        inbox.set('sender_email', currentUser.get('email'));
+        inbox.set('receiver_email', email);
+        inbox.set('message', currentUser.get('name') + ' sizi takıma davet etti! Takım ID: ' + teamId);
+        await inbox.save();
+        showNotification('Davet gönderildi: ' + email, 'success');
+        document.getElementById('inviteEmail').value = '';
+    } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
+}
+
+async function sendTeamMessage() {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    var teamId = currentUser.get('teamId');
+    if (!teamId) { showNotification('Takımınız yok!', 'error'); return; }
+    var msg = document.getElementById('teamChatInput').value.trim();
+    if (!msg) return;
+    try {
+        var Message = Parse.Object.extend('TeamMessage');
+        var message = new Message();
+        message.set('team_id', teamId);
+        message.set('user_email', currentUser.get('email'));
+        message.set('message', msg);
+        await message.save();
+        document.getElementById('teamChatInput').value = '';
+        await loadTeamInfo();
+    } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
 }
 
 // ========== ÇIKIŞ ==========
@@ -5298,71 +6000,87 @@ function logout() {
     if (logoutBtn) logoutBtn.style.display = 'none';
     updateCommentUI();
     showNotification('Çıkış yapıldı.', 'success');
-    
     var widget = document.querySelector('.ai-widget');
     if (widget) widget.style.display = 'block';
 }
 
 // ========== SAYFA YÜKLENİNCE ==========
 window.onload = async function () {
-    console.log('🔄 Sayfa yükleniyor...');
-    if (typeof initBack4App === 'function') {
-        await initBack4App();
-    } else {
-        console.error('initBack4App fonksiyonu bulunamadı!');
-        showNotification('❌ Back4App bağlantısı kurulamadı!', 'error');
-        return;
-    }
-    if (typeof Parse === 'undefined' || !parseInitialized) {
-        showNotification('❌ Back4App bağlantısı kurulamadı!', 'error');
-        return;
-    }
-    
-    var user = Parse.User.current();
-    if (user) {
-        try {
-            await user.fetch();
-            currentUser = user;
-            localStorage.setItem('vizyon_user', JSON.stringify({
-                id: user.id,
-                name: user.get('name'),
-                email: user.get('email'),
-                role: user.get('role'),
-                plan: user.get('plan'),
-                teamId: user.get('teamId')
-            }));
-            console.log('✅ Oturum aktif, kullanıcı paneli açılıyor...');
-            await showUserPanel();
-            if (currentUser.get('role') === 'admin' || currentUser.get('role') === 'founder') {
-                try {
-                    await Parse.Cloud.run('initAdminUsers');
-                    console.log('✅ Admin hesaplar kontrol edildi');
-                } catch (e) {
-                    console.log('Admin kontrol hatası:', e.message);
+    try {
+        console.log('🔄 Sayfa yükleniyor...');
+        document.getElementById('mainSite').style.display = 'block';
+
+        if (typeof initBack4App === 'function') {
+            await initBack4App();
+        } else {
+            console.error('initBack4App fonksiyonu bulunamadı!');
+            showNotification('❌ Back4App bağlantısı kurulamadı!', 'error');
+            return;
+        }
+        if (typeof Parse === 'undefined' || !parseInitialized) {
+            showNotification('❌ Back4App bağlantısı kurulamadı!', 'error');
+            return;
+        }
+
+        var user = Parse.User.current();
+        if (user) {
+            try {
+                await user.fetch();
+                currentUser = user;
+                localStorage.setItem('vizyon_user', JSON.stringify({
+                    id: user.id,
+                    name: user.get('name'),
+                    email: user.get('email'),
+                    role: user.get('role'),
+                    plan: user.get('plan'),
+                    teamId: user.get('teamId')
+                }));
+                console.log('✅ Oturum aktif, panel açılıyor...');
+
+                var role = currentUser.get('role');
+                if (role === 'admin' || role === 'founder') {
+                    await showDashboard();
+                } else {
+                    await showUserPanel();
                 }
+
+                if (role === 'admin' || role === 'founder') {
+                    try {
+                        await Parse.Cloud.run('initAdminUsers');
+                        console.log('✅ Admin hesaplar kontrol edildi');
+                    } catch (e) {
+                        console.log('Admin kontrol hatası:', e.message);
+                    }
+                }
+                showNotification('Hoş geldin, ' + currentUser.get('name'), 'success');
+            } catch (e) {
+                console.log('Oturum geçersiz, çıkış yapılıyor...', e.message);
+                await Parse.User.logOut();
+                localStorage.removeItem('vizyon_user');
+                currentUser = null;
+                document.getElementById('mainSite').style.display = 'block';
+                document.getElementById('dashboardArea').style.display = 'none';
+                document.getElementById('userPanel').style.display = 'none';
+                showNotification('Oturum süresi doldu, tekrar giriş yapın.', 'warning');
             }
-            showNotification('Hoş geldin, ' + currentUser.get('name'), 'success');
-        } catch (e) {
-            console.log('Oturum geçersiz, çıkış yapılıyor...', e.message);
-            await Parse.User.logOut();
+        } else {
             localStorage.removeItem('vizyon_user');
             currentUser = null;
             document.getElementById('mainSite').style.display = 'block';
             document.getElementById('dashboardArea').style.display = 'none';
             document.getElementById('userPanel').style.display = 'none';
-            showNotification('Oturum süresi doldu, tekrar giriş yapın.', 'warning');
         }
-    } else {
-        localStorage.removeItem('vizyon_user');
-        currentUser = null;
+
+        await loadComments();
+        await updateStats();
+        startStatsInterval();
+        showNotification('✨ VİZYON 2027 Sistemi Aktif!', 'success');
+    } catch (e) {
+        console.error('🚨 Sayfa yüklenirken beklenmeyen hata:', e);
         document.getElementById('mainSite').style.display = 'block';
         document.getElementById('dashboardArea').style.display = 'none';
         document.getElementById('userPanel').style.display = 'none';
+        showNotification('Sayfa yüklenirken hata oluştu: ' + e.message, 'error');
     }
-    
-    await loadComments();
-    await updateStats();
-    startStatsInterval();
-    showNotification('✨ VİZYON 2027 Sistemi Aktif!', 'success');
 };
 </script>
