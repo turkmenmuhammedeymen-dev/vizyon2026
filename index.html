@@ -1438,6 +1438,11 @@ footer {
     margin: 10px !important;
     color: #ffffff !important;
 }
+/* Beta kartları için özel renk */
+.admin-login-box[data-beta] {
+    border-color: #00ff88 !important;
+    box-shadow: 0 0 60px rgba(0,255,136,0.3) !important;
+}
 
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
@@ -2204,7 +2209,15 @@ footer {
                 <div id="teamInfo"></div>
                 <div id="teamMembersList" class="team-list"></div>
                 <div id="teamChatMessages" class="team-chat-messages"></div>
-                <div class="ai-input-area"><input type="text" id="teamChatInput" placeholder="Takıma mesaj yaz..." class="glow-input" style="flex:1;"><button class="btn-primary btn-sm" onclick="sendTeamMessage()">Gönder</button></div>
+                <div class="ai-input-area">
+                    <input type="text" id="teamChatInput" placeholder="Takıma mesaj yaz..." class="glow-input" style="flex:1;">
+                    <button class="btn-primary btn-sm" onclick="sendTeamMessage()">Gönder</button>
+                </div>
+                <!-- Takım Kodu ile Katılma -->
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                    <input type="text" id="teamCodeInput" placeholder="Takım kodunu gir..." class="glow-input" style="flex:1;min-width:150px;">
+                    <button class="btn-secondary btn-sm" onclick="joinTeamWithCode()">🔑 Koda Katıl</button>
+                </div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
                     <button class="btn-secondary btn-sm" onclick="createTeam()">+ Takım Oluştur</button>
                     <input type="email" id="inviteEmail" placeholder="Davet et (e-posta)" class="glow-input" style="flex:1;min-width:150px;">
@@ -2718,7 +2731,7 @@ async function handleRegister() {
     }
 }
 
-// ========== DOĞRULAMA (Cloud Code ile) ==========
+// ========== DOĞRULAMA ==========
 async function verifyAccount() {
     var email = document.getElementById('verifyEmail').value.trim();
     var code = document.getElementById('verifyCode').value.trim();
@@ -2745,7 +2758,7 @@ async function verifyAccount() {
     }
 }
 
-// ========== GİRİŞ (DÜZELTİLDİ - TAM ÇALIŞIR) ==========
+// ========== GİRİŞ ==========
 async function handleLogin() {
     var email = document.getElementById('lEmail').value.trim();
     var pass = document.getElementById('lPass').value;
@@ -2785,10 +2798,10 @@ async function handleLogin() {
         
         closeModal('authModal');
         
-        // === PANELİ AÇ ===
-        await showUserPanel();
+        // === PANELİ AÇ (HERKES DASHBOARD'A) ===
+        await showDashboard();
         updateCommentUI();
-        await loadComments(); // Yorumları yeniden yükle
+        await loadComments();
         
         if (currentUser.get('role') === 'admin' || currentUser.get('role') === 'founder') {
             try {
@@ -2832,7 +2845,7 @@ window.loginWithGoogle = async function() {
         }));
         
         closeModal('authModal');
-        await showUserPanel();
+        await showDashboard();
         updateCommentUI();
         await loadComments();
         showNotification('Google ile giriş başarılı! Hoş geldin ' + (user.get('name') || 'Kullanıcı'), 'success');
@@ -2879,7 +2892,7 @@ window.loginWithFacebook = async function() {
         }));
         
         closeModal('authModal');
-        await showUserPanel();
+        await showDashboard();
         updateCommentUI();
         await loadComments();
         showNotification('Facebook ile giriş başarılı! Hoş geldin ' + (user.get('name') || 'Kullanıcı'), 'success');
@@ -2897,50 +2910,9 @@ window.loginWithFacebook = async function() {
     }
 };
 
-// ========== ÇIKIŞ ==========
-function logout() {
-    Parse.User.logOut();
-    localStorage.removeItem('vizyon_user');
-    currentUser = null;
-    stopStatsInterval();
-    location.reload();
-}
-
-// ========== DASHBOARD ==========
-async function showDashboard() {
-    document.getElementById('mainSite').style.display = 'none';
-    document.getElementById('dashboardArea').style.display = 'block';
-    
-    var name = currentUser.get('name');
-    var role = currentUser.get('role');
-    
-    document.getElementById('dashboardUserName').innerHTML = name || 'Kullanıcı';
-    document.getElementById('userRoleBadge').innerHTML =
-        role === 'founder' ? '👑 KURUCU' :
-        role === 'admin' ? '⚙️ ADMIN' :
-        role === 'beta' ? '🔬 BETA' :
-        '👤 KULLANICI';
-    
-    if (role === 'admin' || role === 'founder') {
-        document.getElementById('adminPanelCard').style.display = 'block';
-        await loadUserList();
-    } else {
-        document.getElementById('adminPanelCard').style.display = 'none';
-    }
-    
-    await loadProjects();
-    await loadFavorites();
-    await loadArchive();
-    await loadTrash();
-    await loadProjectRequests();
-    await loadInbox();
-    await loadTeamInfo();
-    await updateStats();
-    startStatsInterval();
-}
-
-// ========== PROJE İŞLEMLERİ ==========
+// ========== PROJE İŞLEMLERİ (Herkese açık) ==========
 async function loadProjects() {
+    if (!currentUser) return;
     try {
         var Project = Parse.Object.extend('Project');
         var query = new Parse.Query(Project);
@@ -2951,7 +2923,6 @@ async function loadProjects() {
         var projects = await query.find();
         var container = document.getElementById('projectsList');
         if (!container) return;
-        
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Henüz proje yok.</div>';
         } else {
@@ -2971,7 +2942,6 @@ async function loadProjects() {
 async function newProject() {
     var name = prompt('Proje adı:');
     if (!name || !name.trim()) return;
-    
     try {
         var Project = Parse.Object.extend('Project');
         var project = new Project();
@@ -2991,7 +2961,6 @@ async function newProject() {
 async function editProject(id) {
     var newName = prompt('Yeni proje adı:');
     if (!newName || !newName.trim()) return;
-    
     try {
         var query = new Parse.Query('Project');
         var project = await query.get(id);
@@ -3006,7 +2975,6 @@ async function editProject(id) {
 
 async function deleteProject(id) {
     if (!confirm('Projeyi silmek istediğinize emin misiniz?')) return;
-    
     try {
         var query = new Parse.Query('Project');
         var project = await query.get(id);
@@ -3076,8 +3044,9 @@ async function restoreProject(id) {
     }
 }
 
-// ========== FAVORİLER ==========
+// ========== FAVORİLER, ARŞİV, ÇÖP KUTUSU ==========
 async function loadFavorites() {
+    if (!currentUser) return;
     try {
         var Project = Parse.Object.extend('Project');
         var query = new Parse.Query(Project);
@@ -3087,7 +3056,6 @@ async function loadFavorites() {
         var projects = await query.find();
         var container = document.getElementById('favList');
         if (!container) return;
-        
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Henüz favori proje yok.</div>';
         } else {
@@ -3103,8 +3071,8 @@ async function loadFavorites() {
     }
 }
 
-// ========== ARŞİV ==========
 async function loadArchive() {
+    if (!currentUser) return;
     try {
         var Project = Parse.Object.extend('Project');
         var query = new Parse.Query(Project);
@@ -3114,7 +3082,6 @@ async function loadArchive() {
         var projects = await query.find();
         var container = document.getElementById('archiveList');
         if (!container) return;
-        
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Arşivde proje yok.</div>';
         } else {
@@ -3130,8 +3097,8 @@ async function loadArchive() {
     }
 }
 
-// ========== ÇÖP KUTUSU ==========
 async function loadTrash() {
+    if (!currentUser) return;
     try {
         var Project = Parse.Object.extend('Project');
         var query = new Parse.Query(Project);
@@ -3140,7 +3107,6 @@ async function loadTrash() {
         var projects = await query.find();
         var container = document.getElementById('trashList');
         if (!container) return;
-        
         if (projects.length === 0) {
             container.innerHTML = '<div class="project-item">Çöp kutusu boş.</div>';
         } else {
@@ -3158,6 +3124,7 @@ async function loadTrash() {
 
 // ========== PROJE TALEPLERİ ==========
 async function loadProjectRequests() {
+    if (!currentUser) return;
     try {
         var Request = Parse.Object.extend('ProjectRequest');
         var query = new Parse.Query(Request);
@@ -3166,7 +3133,6 @@ async function loadProjectRequests() {
         var requests = await query.find();
         var container = document.getElementById('projectRequestsList');
         if (!container) return;
-        
         if (requests.length === 0) {
             container.innerHTML = '<div class="project-item">Henüz proje talebiniz yok.</div>';
         } else {
@@ -3179,33 +3145,6 @@ async function loadProjectRequests() {
         }
     } catch(e) {
         console.error('Proje talepleri yüklenirken hata:', e);
-    }
-}
-
-// ========== GELEN KUTUSU ==========
-async function loadInbox() {
-    try {
-        var Inbox = Parse.Object.extend('Inbox');
-        var query = new Parse.Query(Inbox);
-        query.equalTo('receiver_email', currentUser.get('email'));
-        query.descending('createdAt');
-        var messages = await query.find();
-        var container = document.getElementById('inboxList');
-        if (!container) return;
-        
-        if (messages.length === 0) {
-            container.innerHTML = '<div class="inbox-item">📭 Mesaj kutusu boş.</div>';
-        } else {
-            var html = '';
-            for (var i = 0; i < messages.length; i++) {
-                var m = messages[i];
-                html += '<div class="inbox-item"><div class="inbox-sender">📧 ' + m.get('sender_email') + '</div><div class="inbox-message">' + m.get('message') + '</div><div style="font-size:10px;color:var(--text3);margin-top:4px;">' + new Date(m.get('createdAt')).toLocaleString('tr-TR') + '</div></div>';
-            }
-            container.innerHTML = html;
-        }
-    } catch(e) {
-        console.error('Mesajlar yüklenirken hata:', e);
-        document.getElementById('inboxList').innerHTML = '<div class="inbox-item">⚠️ Mesajlar yüklenemedi.</div>';
     }
 }
 </script>
@@ -3962,7 +3901,7 @@ async function buyPackage(pkg) {
 
 // ========== ROL PANELİ AÇ (FOUNDER/BETA/ADMIN) ==========
 function openRolePanel(role) {
-    if (role === 'ADMIN') {
+    if (role === 'ADMIN' || role === 'BETA') {
         var screen = document.getElementById('adminLoginScreen');
         if (!screen) {
             screen = document.createElement('div');
@@ -3975,13 +3914,14 @@ function openRolePanel(role) {
         screen.style.visibility = 'visible';
         screen.style.opacity = '1';
         screen.style.zIndex = '9999999';
-        console.log('✅ Admin login screen gösteriliyor');
+        console.log('✅ Admin/Beta login screen gösteriliyor');
         return;
     }
+    // FOUNDER için eski mantık
     currentRole = role;
     var title = document.getElementById('roleTitle');
     if (title) {
-        title.innerHTML = role === 'FOUNDER' ? '👑 FOUNDER GİRİŞİ' : '🔬 BETA GİRİŞİ';
+        title.innerHTML = '👑 FOUNDER GİRİŞİ';
     }
     var panel = document.getElementById('rolePanel');
     if (panel) panel.classList.add('open');
@@ -4066,90 +4006,123 @@ async function handleAdminLogin(adminKey) {
     }
 }
 
-// ========== ROLE PANELİ GİRİŞ (FOUNDER / BETA) ==========
-async function checkRole() {
-    var pass = document.getElementById('rolePassword').value;
-    var valid =
-        (currentRole === 'FOUNDER' && pass === 'Eymen11Amele44') ||
-        (currentRole === 'BETA' && pass === '4402');
-
-    if (!valid) {
-        showNotification('Şifre hatalı!', 'error');
-        return;
-    }
-
-    closeModal('rolePanel');
-
-    if (currentUser) {
-        try {
-            await Parse.User.logOut();
-            currentUser = null;
-        } catch(e) {}
-    }
-
-    var roleInfo = {
-        'FOUNDER': { email: 'admin.tr.reis@gmail.com', password: 'Eymen11Amele44', name: 'Founder Admin', role: 'founder' },
-        'BETA': { email: 'beta@vizyon2027.com', password: '4402', name: 'Beta Kullanıcısı', role: 'beta' }
+// ========== BETA GİRİŞ (Ömer ve Emir) ==========
+async function handleBetaLogin(betaKey) {
+    const betas = {
+        omer: { email: 'o2059497@gmail.com', password: 'mardin4787', name: 'Ömer Beta' },
+        emir: { email: 'aaababa789@gmail.com', password: 'ges190544', name: 'Emir Beta' }
     };
 
-    var info = roleInfo[currentRole];
-    if (!info) {
-        showNotification('Geçersiz rol!', 'error');
+    const beta = betas[betaKey];
+    if (!beta) {
+        showNotification('Geçersiz beta seçimi!', 'error');
         return;
+    }
+
+    const input = document.querySelector(`.admin-pass-input[data-beta="${betaKey}"]`);
+    if (!input) {
+        showNotification('Şifre alanı bulunamadı!', 'error');
+        return;
+    }
+
+    const pass = input.value.trim();
+    if (!pass) {
+        showNotification('Lütfen şifrenizi girin!', 'error');
+        return;
+    }
+
+    if (pass !== beta.password) {
+        showNotification('❌ Şifre hatalı!', 'error');
+        input.value = '';
+        input.focus();
+        return;
+    }
+
+    closeAdminLoginScreen();
+    showNotification('✅ Şifre doğrulandı, beta paneline yönlendiriliyorsunuz...', 'success');
+
+    if (currentUser) {
+        try { await Parse.User.logOut(); } catch(e) {}
+        currentUser = null;
     }
 
     try {
-        await Parse.User.logIn(info.email, info.password);
-    } catch (loginError) {
-        if (loginError.code === 101) {
-            try {
-                var newUser = new Parse.User();
-                newUser.set('username', info.email);
-                newUser.set('email', info.email);
-                newUser.set('password', info.password);
-                newUser.set('name', info.name);
-                newUser.set('role', info.role);
-                newUser.set('plan', 'team');
-                newUser.set('isVerified', true);
-                newUser.set('isBanned', false);
-                await newUser.signUp();
-            } catch (signUpError) {
-                showNotification('Kayıt hatası: ' + signUpError.message, 'error');
-                return;
-            }
-        } else {
-            showNotification('Giriş hatası: ' + loginError.message, 'error');
-            return;
+        console.log('🔄 Beta giriş yapılıyor...');
+        await Parse.Cloud.run('initAdminUsers');
+        
+        var query = new Parse.Query(Parse.User);
+        query.equalTo('email', beta.email);
+        var existingUser = await query.first({ useMasterKey: true });
+        
+        if (!existingUser) {
+            var newUser = new Parse.User();
+            newUser.set('username', beta.email);
+            newUser.set('email', beta.email);
+            newUser.set('password', beta.password);
+            newUser.set('name', beta.name);
+            newUser.set('role', 'beta');
+            newUser.set('plan', 'free');
+            newUser.set('isVerified', true);
+            newUser.set('isBanned', false);
+            await newUser.signUp();
         }
-    }
+        
+        await Parse.User.logIn(beta.email, beta.password);
+        currentUser = Parse.User.current();
+        localStorage.setItem('vizyon_user', JSON.stringify({
+            id: currentUser.id,
+            name: currentUser.get('name'),
+            email: currentUser.get('email'),
+            role: currentUser.get('role'),
+            plan: currentUser.get('plan'),
+            teamId: currentUser.get('teamId')
+        }));
 
-    currentUser = Parse.User.current();
-    if (!currentUser) {
-        showNotification('Oturum açılamadı!', 'error');
+        console.log('✅ Beta giriş başarılı, dashboard açılıyor...');
+        await showDashboard();
+        updateCommentUI();
+        await loadComments();
+        showNotification('Hoş geldin ' + beta.name + '! (Beta Kullanıcısı)', 'success');
+
+    } catch (e) {
+        console.error('Beta giriş hatası:', e);
+        showNotification('Beta girişi başarısız: ' + e.message, 'error');
+    }
+}
+
+// ========== ROLE PANELİ GİRİŞ (FOUNDER) ==========
+async function checkRole() {
+    var pass = document.getElementById('rolePassword').value;
+    if (currentRole !== 'FOUNDER' || pass !== 'Eymen11Amele44') {
+        showNotification('Şifre hatalı!', 'error');
         return;
     }
+    closeModal('rolePanel');
 
-    if (currentUser.get('role') !== info.role) {
-        currentUser.set('role', info.role);
-        await currentUser.save();
+    if (currentUser) {
+        try { await Parse.User.logOut(); } catch(e) {}
+        currentUser = null;
     }
 
-    localStorage.setItem('vizyon_user', JSON.stringify({
-        id: currentUser.id,
-        name: currentUser.get('name'),
-        email: currentUser.get('email'),
-        role: currentUser.get('role'),
-        plan: currentUser.get('plan'),
-        teamId: currentUser.get('teamId')
-    }));
-
-    // Herkes dashboard'a gitsin
-    await showDashboard();
-    updateCommentUI();
-    await loadComments();
-
-    var roleLabel = currentRole === 'FOUNDER' ? '👑 KURUCU' : '🔬 BETA';
-    showNotification('Hoş geldiniz, ' + roleLabel + ' paneli aktif!', 'success');
+    try {
+        await Parse.Cloud.run('initAdminUsers');
+        await Parse.User.logIn('admin.tr.reis@gmail.com', 'Eymen11Amele44');
+        currentUser = Parse.User.current();
+        localStorage.setItem('vizyon_user', JSON.stringify({
+            id: currentUser.id,
+            name: currentUser.get('name'),
+            email: currentUser.get('email'),
+            role: currentUser.get('role'),
+            plan: currentUser.get('plan'),
+            teamId: currentUser.get('teamId')
+        }));
+        await showDashboard();
+        updateCommentUI();
+        await loadComments();
+        showNotification('Hoş geldiniz, Founder paneli aktif!', 'success');
+    } catch(e) {
+        showNotification('Founder giriş hatası: ' + e.message, 'error');
+    }
 }
 
 // ========== ADMIN FONKSİYONLARI ==========
@@ -4651,6 +4624,12 @@ function updateCommentUI() {
     }
 }
 
+// ========== showUserPanel (BOŞ - Hata almamak için) ==========
+async function showUserPanel() {
+    console.log('showUserPanel çağrıldı ama artık kullanılmıyor.');
+    await showDashboard();
+}
+
 // ========== PARÇACIKLAR ==========
 var particlesContainer = document.getElementById('particles');
 if (particlesContainer) {
@@ -4728,6 +4707,7 @@ async function showDashboard() {
         var isFounder = (role === 'founder');
         var isBeta = (role === 'beta');
         var isTeamPlan = (plan === 'team');
+        var isAuthorized = (isAdmin || isFounder || isBeta || isTeamPlan); // Takım oluşturma yetkisi
 
         // Admin panel kartları (sadece admin/founder)
         var adminCard = document.getElementById('adminPanelCard');
@@ -4738,11 +4718,23 @@ async function showDashboard() {
         if (adminActions) adminActions.style.display = isAdmin ? 'block' : 'none';
         if (adminAssign) adminAssign.style.display = isFounder ? 'block' : 'none';
 
-        // Takım kartı (admin, founder, beta, team plan)
+        // === TAKIM KARTI HERKESE AÇIK ===
         var teamCard = document.getElementById('teamCard');
         if (teamCard) {
-            var showTeam = (isAdmin || isFounder || isBeta || isTeamPlan);
-            teamCard.style.display = showTeam ? 'block' : 'none';
+            teamCard.style.display = 'block';
+            // Yetkiye göre butonları göster/gizle
+            var createTeamBtn = teamCard.querySelector('button[onclick="createTeam()"]');
+            var inviteBtn = teamCard.querySelector('button[onclick="inviteToTeam()"]');
+            var inviteInput = teamCard.querySelector('#inviteEmail');
+            var teamCodeInput = teamCard.querySelector('#teamCodeInput');
+            var joinBtn = teamCard.querySelector('button[onclick="joinTeamWithCode()"]');
+            
+            if (createTeamBtn) createTeamBtn.style.display = isAuthorized ? 'inline-block' : 'none';
+            if (inviteBtn) inviteBtn.style.display = isAuthorized ? 'inline-block' : 'none';
+            if (inviteInput) inviteInput.style.display = isAuthorized ? 'inline-block' : 'none';
+            // Kod ile katılma herkese açık
+            if (teamCodeInput) teamCodeInput.style.display = 'inline-block';
+            if (joinBtn) joinBtn.style.display = 'inline-block';
         }
 
         // Kullanıcı listesini sadece admin/founder yükle
@@ -4760,7 +4752,7 @@ async function showDashboard() {
         await loadTrash();
         await loadProjectRequests();
         await loadInbox();
-        await loadTeamInfo(); // Takım bilgisi herkese yüklenir ama kart gizlenebilir
+        await loadTeamInfo();
         await updateStats();
         startStatsInterval();
 
@@ -5187,7 +5179,7 @@ async function loadTeamInfo() {
         msgQuery.equalTo('team_id', teamId);
         msgQuery.ascending('createdAt');
         var messages = await msgQuery.find();
-        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + '</h4><p>Üye sayısı: ' + members.length + ' | Sahip: ' + team.get('owner_email') + '</p>';
+        document.getElementById('teamInfo').innerHTML = '<h4>🏢 ' + team.get('name') + '</h4><p>Üye sayısı: ' + members.length + ' | Sahip: ' + team.get('owner_email') + ' | Takım Kodu: <strong style="color:#00d4ff;">' + team.get('teamCode') + '</strong></p>';
         var membersHtml = '';
         for (var i = 0; i < members.length; i++) {
             var m = members[i];
@@ -5231,10 +5223,43 @@ async function createTeam() {
     try {
         var result = await Parse.Cloud.run('createTeam', { name: name.trim() });
         if (result.success) {
-            showNotification('✅ "' + name.trim() + '" takımı oluşturuldu!', 'success');
+            showNotification('✅ "' + name.trim() + '" takımı oluşturuldu! Takım Kodunuz: ' + result.teamCode, 'success');
             await loadTeamInfo();
         } else {
             showNotification('Takım oluşturulamadı: ' + result.error, 'error');
+        }
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+// ========== TAKIM KODU İLE KATIL ==========
+async function joinTeamWithCode() {
+    if (!currentUser) {
+        showNotification('Önce giriş yapın!', 'error');
+        return;
+    }
+    var codeInput = document.getElementById('teamCodeInput');
+    if (!codeInput) {
+        showNotification('Takım kodu alanı bulunamadı!', 'error');
+        return;
+    }
+    var teamCode = codeInput.value.trim();
+    if (!teamCode) {
+        showNotification('Lütfen bir takım kodu girin!', 'error');
+        return;
+    }
+
+    try {
+        var result = await Parse.Cloud.run('joinTeamWithCode', { teamCode: teamCode });
+        if (result.success) {
+            showNotification('✅ ' + result.message, 'success');
+            currentUser.set('teamId', result.teamId);
+            await currentUser.save();
+            await loadTeamInfo();
+            codeInput.value = '';
+        } else {
+            showNotification('❌ ' + result.error, 'error');
         }
     } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
@@ -5337,7 +5362,6 @@ window.onload = async function () {
                 }));
                 console.log('✅ Oturum aktif, panel açılıyor...');
 
-                // Herkes dashboard'a gitsin
                 await showDashboard();
                 updateCommentUI();
                 await loadComments();
