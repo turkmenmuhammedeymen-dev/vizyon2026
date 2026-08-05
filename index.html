@@ -2448,7 +2448,7 @@ footer {
     </div>
 </div>
 
-<!-- ===== ADMIN / BETA ÖZEL GİRİŞ EKRANI (DÜZELTİLDİ) ===== -->
+<!-- ===== ADMIN / BETA ÖZEL GİRİŞ EKRANI (data-admin ve data-beta eklendi) ===== -->
 <div id="adminLoginScreen" class="admin-login-screen" style="display:none;">
     <div class="admin-login-wrapper" style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;align-items:center;max-width:900px;width:100%;padding:20px;">
 
@@ -2457,7 +2457,7 @@ footer {
             <h2 style="color:#00d4ff; font-family:'Syne',sans-serif; font-size:28px;" class="admin-login-title">👑 Yönetim Girişi</h2>
         </div>
 
-        <!-- İbrahim Admin -->
+        <!-- İbrahim Admin (data-admin) -->
         <div class="admin-login-box" data-admin="ibrahim" style="display:block;background:rgba(0,10,20,0.95);border:2px solid #00d4ff;border-radius:24px;padding:30px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,212,255,0.3);margin:10px;color:#ffffff;">
             <div style="font-size:48px;">👤</div>
             <div style="font-size:22px;font-weight:700;margin:8px 0;">İbrahim Admin</div>
@@ -2474,7 +2474,7 @@ footer {
             </div>
         </div>
 
-        <!-- Bozkurt Admin -->
+        <!-- Bozkurt Admin (data-admin) -->
         <div class="admin-login-box" data-admin="bozkurt" style="display:block;background:rgba(0,10,20,0.95);border:2px solid #00d4ff;border-radius:24px;padding:30px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,212,255,0.3);margin:10px;color:#ffffff;">
             <div style="font-size:48px;">👤</div>
             <div style="font-size:22px;font-weight:700;margin:8px 0;">Bozkurt Admin</div>
@@ -2491,7 +2491,7 @@ footer {
             </div>
         </div>
 
-        <!-- Ömer Beta -->
+        <!-- Ömer Beta (data-beta) -->
         <div class="admin-login-box" data-beta="omer" style="display:block;background:rgba(0,10,20,0.95);border:2px solid #00ff88;border-radius:24px;padding:30px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,255,136,0.3);margin:10px;color:#ffffff;">
             <div style="font-size:48px;">🧪</div>
             <div style="font-size:22px;font-weight:700;margin:8px 0;">Ömer Beta</div>
@@ -2508,7 +2508,7 @@ footer {
             </div>
         </div>
 
-        <!-- Emir Beta -->
+        <!-- Emir Beta (data-beta) -->
         <div class="admin-login-box" data-beta="emir" style="display:block;background:rgba(0,10,20,0.95);border:2px solid #00ff88;border-radius:24px;padding:30px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,255,136,0.3);margin:10px;color:#ffffff;">
             <div style="font-size:48px;">🧪</div>
             <div style="font-size:22px;font-weight:700;margin:8px 0;">Emir Beta</div>
@@ -4100,51 +4100,6 @@ async function buyPackage(pkg) {
     }
 }
 
-// ========== ROL PANELİ AÇ (FOUNDER/BETA/ADMIN - AYRI) ==========
-function openRolePanel(role) {
-    var screen = document.getElementById('adminLoginScreen');
-    if (!screen) {
-        screen = document.createElement('div');
-        screen.id = 'adminLoginScreen';
-        screen.className = 'admin-login-screen';
-        document.body.appendChild(screen);
-    }
-    
-    // TÜM KARTLARI ÖNCE GİZLE (display:none)
-    var allCards = screen.querySelectorAll('.admin-login-box');
-    allCards.forEach(c => c.style.display = 'none');
-    
-    var title = screen.querySelector('.admin-login-title');
-    
-    if (role === 'ADMIN') {
-        var adminCards = screen.querySelectorAll('[data-admin]');
-        adminCards.forEach(c => c.style.display = 'block');
-        if (title) title.textContent = '👑 Admin Girişi';
-    } else if (role === 'BETA') {
-        var betaCards = screen.querySelectorAll('[data-beta]');
-        betaCards.forEach(c => c.style.display = 'block');
-        if (title) title.textContent = '🧪 Beta Girişi';
-    } else if (role === 'FOUNDER') {
-        currentRole = 'FOUNDER';
-        var panel = document.getElementById('rolePanel');
-        if (panel) panel.classList.add('open');
-        // AdminLoginScreen'i gizle
-        screen.classList.remove('active');
-        screen.style.display = 'none';
-        return;
-    } else {
-        allCards.forEach(c => c.style.display = 'block');
-        if (title) title.textContent = '👑 Yönetim Girişi';
-    }
-    
-    screen.classList.add('active');
-    screen.style.display = 'flex';
-    screen.style.visibility = 'visible';
-    screen.style.opacity = '1';
-    screen.style.zIndex = '9999999';
-    console.log('✅ ' + role + ' login screen gösteriliyor');
-}
-
 // ========== ADMIN/BETA GÖZ İKONU İÇİN ÖZEL FONKSİYON ==========
 function togglePasswordInput(btn, type, key) {
     var input;
@@ -4163,6 +4118,58 @@ function togglePasswordInput(btn, type, key) {
     }
 }
 
+// ========== ROL PANELİ AÇ (ADMIN/BETA AYRI - KESİN ÇÖZÜM) ==========
+function openRolePanel(role) {
+    var screen = document.getElementById('adminLoginScreen');
+    if (!screen) {
+        screen = document.createElement('div');
+        screen.id = 'adminLoginScreen';
+        screen.className = 'admin-login-screen';
+        document.body.appendChild(screen);
+    }
+    
+    // TÜM KARTLARI ÖNCE GİZLE (display, visibility, opacity hepsini sıfırla)
+    var allCards = screen.querySelectorAll('.admin-login-box');
+    allCards.forEach(function(c) {
+        c.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important;';
+    });
+    
+    var title = screen.querySelector('.admin-login-title');
+    
+    if (role === 'ADMIN') {
+        var adminCards = screen.querySelectorAll('[data-admin]');
+        adminCards.forEach(function(c) {
+            c.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important;';
+        });
+        if (title) title.textContent = '👑 Admin Girişi';
+    } else if (role === 'BETA') {
+        var betaCards = screen.querySelectorAll('[data-beta]');
+        betaCards.forEach(function(c) {
+            c.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important;';
+        });
+        if (title) title.textContent = '🧪 Beta Girişi';
+    } else if (role === 'FOUNDER') {
+        // Founder için ayrı modal
+        currentRole = 'FOUNDER';
+        var panel = document.getElementById('rolePanel');
+        if (panel) panel.classList.add('open');
+        // AdminLoginScreen'i gizle
+        screen.classList.remove('active');
+        screen.style.display = 'none';
+        return;
+    } else {
+        // Hiçbiri değilse hepsini göster (ama bu durum olmamalı)
+        allCards.forEach(function(c) {
+            c.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important;';
+        });
+        if (title) title.textContent = '👑 Yönetim Girişi';
+    }
+    
+    screen.classList.add('active');
+    screen.style.cssText = 'display: flex !important; visibility: visible !important; opacity: 1 !important; position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; background: #000000 !important; z-index: 9999999 !important; align-items: center !important; justify-content: center !important; padding: 20px !important;';
+    console.log('✅ ' + role + ' login screen gösteriliyor');
+}
+
 // ========== ADMIN EKRANINI KAPAT ==========
 function closeAdminLoginScreen() {
     var screen = document.getElementById('adminLoginScreen');
@@ -4172,24 +4179,28 @@ function closeAdminLoginScreen() {
         screen.style.visibility = 'hidden';
         screen.style.opacity = '0';
     }
-    document.querySelectorAll('.admin-pass-input').forEach(el => el.value = '');
+    document.querySelectorAll('.admin-pass-input').forEach(function(el) {
+        el.value = '';
+    });
     document.body.style.overflow = 'auto';
     document.getElementById('mainSite').style.display = 'block';
     document.getElementById('dashboardArea').style.display = 'none';
     document.getElementById('userPanel').style.display = 'none';
     // Tam ekran AI panelini kapat
-    closeFullAIPanel();
+    if (typeof closeFullAIPanel === 'function') {
+        closeFullAIPanel();
+    }
 }
 
 // ========== ADMIN GİRİŞ ==========
 async function handleAdminLogin(adminKey) {
-    const input = document.querySelector(`.admin-pass-input[data-admin="${adminKey}"]`);
+    var input = document.querySelector('.admin-pass-input[data-admin="' + adminKey + '"]');
     if (!input) {
         showNotification('Şifre alanı bulunamadı!', 'error');
         return;
     }
 
-    const pass = input.value.trim();
+    var pass = input.value.trim();
     if (!pass) {
         showNotification('Lütfen şifrenizi girin!', 'error');
         return;
@@ -4199,7 +4210,7 @@ async function handleAdminLogin(adminKey) {
     showNotification('✅ Şifre doğrulanıyor...', 'success');
 
     try {
-        const result = await Parse.Cloud.run('adminLogin', { adminKey, password: pass });
+        var result = await Parse.Cloud.run('adminLogin', { adminKey: adminKey, password: pass });
         if (result.success) {
             currentUser = Parse.User.current();
             if (!currentUser) {
@@ -4234,13 +4245,13 @@ async function handleAdminLogin(adminKey) {
 
 // ========== BETA GİRİŞ ==========
 async function handleBetaLogin(betaKey) {
-    const input = document.querySelector(`.admin-pass-input[data-beta="${betaKey}"]`);
+    var input = document.querySelector('.admin-pass-input[data-beta="' + betaKey + '"]');
     if (!input) {
         showNotification('Şifre alanı bulunamadı!', 'error');
         return;
     }
 
-    const pass = input.value.trim();
+    var pass = input.value.trim();
     if (!pass) {
         showNotification('Lütfen şifrenizi girin!', 'error');
         return;
@@ -4250,7 +4261,7 @@ async function handleBetaLogin(betaKey) {
     showNotification('✅ Şifre doğrulanıyor...', 'success');
 
     try {
-        const result = await Parse.Cloud.run('betaLogin', { betaKey, password: pass });
+        var result = await Parse.Cloud.run('betaLogin', { betaKey: betaKey, password: pass });
         if (result.success) {
             currentUser = Parse.User.current();
             if (!currentUser) {
@@ -4294,7 +4305,7 @@ async function checkRole() {
     closeModal('rolePanel');
 
     try {
-        const result = await Parse.Cloud.run('founderLogin', { password: pass });
+        var result = await Parse.Cloud.run('founderLogin', { password: pass });
         if (result.success) {
             currentUser = Parse.User.current();
             if (!currentUser) {
@@ -4327,7 +4338,7 @@ async function checkRole() {
     }
 }
 
-// ========== ADMIN FONKSİYONLARI (Aynı, değişmedi) ==========
+// ========== ADMIN FONKSİYONLARI ==========
 async function loadUserList() {
     if (!currentUser) return;
     try {
@@ -4670,11 +4681,11 @@ function shareSite() {
             title: 'VİZYON 2027',
             text: 'Dünyanın en güçlü yapay zeka ekosistemi!',
             url: window.location.href
-        }).catch(() => {});
+        }).catch(function() {});
     } else {
-        navigator.clipboard.writeText(window.location.href).then(() => {
+        navigator.clipboard.writeText(window.location.href).then(function() {
             showNotification('🔗 Link kopyalandı!', 'success');
-        }).catch(() => {
+        }).catch(function() {
             prompt('Linki kopyala:', window.location.href);
         });
     }
@@ -4729,7 +4740,7 @@ async function loadComments() {
     } catch (e) {
         console.error('❌ Yorumlar yüklenemedi:', e);
         var errorHtml = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);">⚠️ Yorumlar yüklenemedi: ' + e.message + '</div>';
-        document.querySelectorAll('#mainCommentsList, #commentsList').forEach(el => {
+        document.querySelectorAll('#mainCommentsList, #commentsList').forEach(function(el) {
             if (el) el.innerHTML = errorHtml;
         });
     }
@@ -4811,7 +4822,9 @@ async function postComment() {
         await Parse.Cloud.run('addComment', { comment: text, rating: rating });
         input.value = '';
         // Yıldız seçimini sıfırla
-        document.querySelectorAll('input[name="rating"]').forEach(el => el.checked = false);
+        document.querySelectorAll('input[name="rating"]').forEach(function(el) {
+            el.checked = false;
+        });
         showNotification('💬 Yorumunuz gönderildi!', 'success');
         await loadComments();
     } catch (e) {
@@ -4983,7 +4996,7 @@ async function showDashboard() {
     }
 }
 
-// ========== PROJE İŞLEMLERİ (Aynı, değişmedi) ==========
+// ========== PROJE İŞLEMLERİ ==========
 async function loadProjects() {
     if (!currentUser) return;
     try {
@@ -5236,7 +5249,7 @@ async function loadInbox() {
         }
 
         let html = '';
-        messages.forEach(m => {
+        messages.forEach(function(m) {
             const type = m.get('type') || 'message';
             const status = m.get('status') || 'done';
             const isPending = (type === 'gift_request' || type === 'role_request') && status === 'pending';
@@ -5264,7 +5277,7 @@ async function loadInbox() {
 
 // ========== YARDIMCI: DOĞRU PANELDEKİ INPUTU BUL ==========
 function getPanelInput(id) {
-    let el = document.querySelector('#dashboardArea #' + id);
+    var el = document.querySelector('#dashboardArea #' + id);
     if (!el) {
         el = document.getElementById(id);
     }
@@ -5274,13 +5287,13 @@ function getPanelInput(id) {
 // ========== YÖNETİM İŞLEMLERİ ==========
 async function sendGiftRequest() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
-    const input = getPanelInput('giftEmailInput');
+    var input = getPanelInput('giftEmailInput');
     if (!input) return showNotification('Hediye inputu bulunamadı!', 'error');
-    const email = input.value.trim();
-    const packageType = document.getElementById('giftPackageSelect').value;
+    var email = input.value.trim();
+    var packageType = document.getElementById('giftPackageSelect').value;
     if (!email) return showNotification('Lütfen bir e-posta adresi girin!', 'error');
     try {
-        const result = await Parse.Cloud.run('sendGiftRequest', { email, packageType });
+        var result = await Parse.Cloud.run('sendGiftRequest', { email: email, packageType: packageType });
         showNotification(result.message, 'success');
         input.value = '';
         await loadInbox();
@@ -5291,7 +5304,7 @@ async function sendGiftRequest() {
 
 async function sendRoleRequest(role) {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
-    let inputId;
+    var inputId;
     if (role === 'beta') {
         inputId = 'betaEmailInput';
     } else if (role === 'admin') {
@@ -5299,12 +5312,12 @@ async function sendRoleRequest(role) {
     } else {
         return showNotification('Geçersiz rol!', 'error');
     }
-    const input = getPanelInput(inputId);
+    var input = getPanelInput(inputId);
     if (!input) return showNotification('Rol inputu bulunamadı!', 'error');
-    const email = input.value.trim();
+    var email = input.value.trim();
     if (!email) return showNotification('Lütfen bir e-posta adresi girin!', 'error');
     try {
-        const result = await Parse.Cloud.run('sendRoleRequest', { email, role });
+        var result = await Parse.Cloud.run('sendRoleRequest', { email: email, role: role });
         showNotification(result.message, 'success');
         input.value = '';
         await loadInbox();
@@ -5316,7 +5329,7 @@ async function sendRoleRequest(role) {
 async function handleRequest(requestId, action) {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     try {
-        const result = await Parse.Cloud.run('handleRequest', { requestId, action });
+        var result = await Parse.Cloud.run('handleRequest', { requestId: requestId, action: action });
         showNotification(result.message, 'success');
         await loadInbox();
         if (action === 'accept') {
@@ -5334,11 +5347,11 @@ async function handleRequest(requestId, action) {
 
 window.sendGiftByEmail = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
-    const email = document.getElementById('giftEmailInput').value.trim();
-    const packageType = document.getElementById('giftPackageSelect').value;
+    var email = document.getElementById('giftEmailInput').value.trim();
+    var packageType = document.getElementById('giftPackageSelect').value;
     if (!email) return showNotification('E-posta adresi girin!', 'error');
     try {
-        const result = await Parse.Cloud.run('sendGiftRequest', { email, packageType });
+        var result = await Parse.Cloud.run('sendGiftRequest', { email: email, packageType: packageType });
         showNotification(result.message, 'success');
         document.getElementById('giftEmailInput').value = '';
     } catch (e) {
@@ -5348,10 +5361,10 @@ window.sendGiftByEmail = async function() {
 
 window.assignBetaByEmail = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
-    const email = document.getElementById('betaEmailInput').value.trim();
+    var email = document.getElementById('betaEmailInput').value.trim();
     if (!email) return showNotification('E-posta adresi girin!', 'error');
     try {
-        const result = await Parse.Cloud.run('sendRoleRequest', { email, role: 'beta' });
+        var result = await Parse.Cloud.run('sendRoleRequest', { email: email, role: 'beta' });
         showNotification(result.message, 'success');
         document.getElementById('betaEmailInput').value = '';
     } catch (e) {
@@ -5361,10 +5374,10 @@ window.assignBetaByEmail = async function() {
 
 window.assignAdminByEmail = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
-    const email = document.getElementById('adminEmailInput').value.trim();
+    var email = document.getElementById('adminEmailInput').value.trim();
     if (!email) return showNotification('E-posta adresi girin!', 'error');
     try {
-        const result = await Parse.Cloud.run('sendRoleRequest', { email, role: 'admin' });
+        var result = await Parse.Cloud.run('sendRoleRequest', { email: email, role: 'admin' });
         showNotification(result.message, 'success');
         document.getElementById('adminEmailInput').value = '';
     } catch (e) {
@@ -5536,7 +5549,9 @@ function logout() {
     document.getElementById('mainSite').style.display = 'block';
     document.getElementById('dashboardArea').style.display = 'none';
     document.getElementById('userPanel').style.display = 'none';
-    closeFullAIPanel();
+    if (typeof closeFullAIPanel === 'function') {
+        closeFullAIPanel();
+    }
     var logoutBtn = document.querySelector('.logout-btn');
     if (logoutBtn) logoutBtn.style.display = 'none';
     updateCommentUI();
