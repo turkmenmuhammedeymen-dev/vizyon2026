@@ -1175,13 +1175,15 @@ footer {
     min-width: 120px;
 }
 
-/* ========== AI WIDGET (SADECE ANA SAYFADA GÖSTER, DASHBOARD'DA GİZLE) ========== */
+/* ========== AI WIDGET (SADECE ANA SAYFADA GÖSTER) ========== */
 .ai-widget {
     position: fixed;
     bottom: 32px;
     right: 32px;
     z-index: 500;
 }
+.dashboard-container .ai-widget,
+.dashboard-area .ai-widget,
 #dashboardArea .ai-widget,
 #userPanel .ai-widget {
     display: none !important;
@@ -1359,6 +1361,33 @@ footer {
     transform: scale(1.05);
 }
 
+/* ========== YILDIZ PUANLAMA ========== */
+.star-rating {
+    display: flex;
+    gap: 4px;
+    direction: rtl;
+}
+.star-rating input {
+    display: none;
+}
+.star-rating label {
+    font-size: 24px;
+    color: #555;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+    color: #ffb700;
+}
+.star-display {
+    display: inline-flex;
+    gap: 2px;
+    font-size: 16px;
+    color: #ffb700;
+}
+
 /* ========== KULLANICI PANELİ (ARTIK KULLANILMIYOR) ========== */
 .user-panel {
     position: fixed;
@@ -1438,7 +1467,6 @@ footer {
     margin: 10px !important;
     color: #ffffff !important;
 }
-/* Beta kartları için özel renk */
 .admin-login-box[data-beta] {
     border-color: #00ff88 !important;
     box-shadow: 0 0 60px rgba(0,255,136,0.3) !important;
@@ -1529,7 +1557,6 @@ footer {
     .admin-login-box button { font-size: 12px !important; padding: 10px !important; }
 }
 </style>
-
 <!-- ============================================================ -->
 <!-- CSS-4: ÖZEL STILLER, BUTONLAR, YORUMLAR, RESPONSIVE         -->
 <!-- ============================================================ -->
@@ -2143,9 +2170,21 @@ footer {
         </div>
         <div class="footer-bottom">
             <div class="footer-copy">© 2027 Vizyon2027. <span>Vizyon Ekibi</span> güvencesiyle.</div>
-            <div class="footer-badges"><span class="badge live">● Sistem Aktif</span><span class="badge">v24.0</span></div>
+            <div class="footer-badges" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                <!-- Destek & İletişim -->
+                <a class="support-link" onclick="openRandomSupport()" style="display:inline-flex; align-items:center; gap:8px; padding:10px 24px; background:rgba(0,212,255,0.08); border:1px solid var(--accent); border-radius:40px; color:var(--accent); cursor:pointer; transition:all 0.15s ease; text-decoration:none; font-size:13px;">
+                    📧 DESTEK & İLETİŞİM
+                </a>
+                <!-- WhatsApp -->
+                <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" style="display:inline-flex; align-items:center; gap:8px; padding:10px 24px; background:#25D366; border:1px solid #25D366; border-radius:40px; color:#fff; cursor:pointer; transition:all 0.15s ease; text-decoration:none; font-size:13px; font-weight:600;">
+                    <i class="fab fa-whatsapp" style="font-size:18px;"></i> WhatsApp Kanalımız
+                </a>
+                <!-- Instagram -->
+                <a href="https://www.instagram.com/vizyon2027.info?igsh=MXcxNnR2anQ2aW1rNA==" target="_blank" style="display:inline-flex; align-items:center; gap:8px; padding:10px 24px; background:linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); border:1px solid #dc2743; border-radius:40px; color:#fff; cursor:pointer; transition:all 0.15s ease; text-decoration:none; font-size:13px; font-weight:600;">
+                    <i class="fab fa-instagram" style="font-size:18px;"></i> Instagram Hesabımız
+                </a>
+            </div>
         </div>
-        <div class="support-footer"><a class="support-link" onclick="openRandomSupport()">📧 DESTEK & İLETİŞİM</a></div>
     </footer>
 </div>
 
@@ -2203,7 +2242,7 @@ footer {
                 </div>
             </div>
 
-            <!-- Takım Kartı (sadece admin/founder/beta/takım paketi) -->
+            <!-- Takım Kartı (herkese açık, butonlar yetkiye göre) -->
             <div class="dashboard-card" id="teamCard">
                 <h3>👥 Takım</h3>
                 <div id="teamInfo"></div>
@@ -2213,15 +2252,15 @@ footer {
                     <input type="text" id="teamChatInput" placeholder="Takıma mesaj yaz..." class="glow-input" style="flex:1;">
                     <button class="btn-primary btn-sm" onclick="sendTeamMessage()">Gönder</button>
                 </div>
-                <!-- Takım Kodu ile Katılma -->
                 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                    <!-- Takım Oluştur (sadece yetkililer) -->
+                    <button class="btn-secondary btn-sm" id="createTeamBtn" onclick="createTeam()" style="display:none;">+ Takım Oluştur</button>
+                    <!-- Davet Et (sadece yetkililer) -->
+                    <input type="email" id="inviteEmail" placeholder="Davet et (e-posta)" class="glow-input" style="flex:1;min-width:150px; display:none;">
+                    <button class="btn-secondary btn-sm" id="inviteBtn" onclick="inviteToTeam()" style="display:none;">Davet Gönder</button>
+                    <!-- Takım Kodu ile Katıl (herkese açık) -->
                     <input type="text" id="teamCodeInput" placeholder="Takım kodunu gir..." class="glow-input" style="flex:1;min-width:150px;">
                     <button class="btn-secondary btn-sm" onclick="joinTeamWithCode()">🔑 Koda Katıl</button>
-                </div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-                    <button class="btn-secondary btn-sm" onclick="createTeam()">+ Takım Oluştur</button>
-                    <input type="email" id="inviteEmail" placeholder="Davet et (e-posta)" class="glow-input" style="flex:1;min-width:150px;">
-                    <button class="btn-secondary btn-sm" onclick="inviteToTeam()">Davet Gönder</button>
                 </div>
             </div>
 
@@ -2255,9 +2294,31 @@ footer {
         <!-- Yorumlar (herkese açık) -->
         <section id="commentsSection">
             <h3>💬 Yorumlar</h3>
+            <!-- Yıldız filtresi -->
+            <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center;">
+                <span style="color:var(--text3); font-size:13px;">⭐ Filtrele:</span>
+                <button class="btn-secondary btn-sm" onclick="filterComments(0)" style="font-size:11px;">Tümü</button>
+                <button class="btn-secondary btn-sm" onclick="filterComments(5)" style="font-size:11px;">⭐⭐⭐⭐⭐</button>
+                <button class="btn-secondary btn-sm" onclick="filterComments(4)" style="font-size:11px;">⭐⭐⭐⭐</button>
+                <button class="btn-secondary btn-sm" onclick="filterComments(3)" style="font-size:11px;">⭐⭐⭐</button>
+                <button class="btn-secondary btn-sm" onclick="filterComments(2)" style="font-size:11px;">⭐⭐</button>
+                <button class="btn-secondary btn-sm" onclick="filterComments(1)" style="font-size:11px;">⭐</button>
+            </div>
             <div id="commentsList"><div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">🌟 Yorumlar yükleniyor...</div></div>
             <div id="commentForm" style="display: none;">
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;"><span style="color: var(--text2); font-size: 14px;">👤 <span id="commentUserName">Misafir</span></span><span id="commentUserRole" style="font-size: 11px; padding: 2px 10px; border-radius: 12px; background: var(--border); color: var(--text3);">👤 KULLANICI</span></div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap:wrap;">
+                    <span style="color: var(--text2); font-size: 14px;">👤 <span id="commentUserName">Misafir</span></span>
+                    <span id="commentUserRole" style="font-size: 11px; padding: 2px 10px; border-radius: 12px; background: var(--border); color: var(--text3);">👤 KULLANICI</span>
+                    <!-- Yıldız Seçimi -->
+                    <div style="display:flex; gap:4px; margin-left:auto;" id="ratingStars">
+                        <span class="star" data-value="1" style="font-size:24px; cursor:pointer; color:#444; transition:0.2s;" onclick="setRating(1)">★</span>
+                        <span class="star" data-value="2" style="font-size:24px; cursor:pointer; color:#444; transition:0.2s;" onclick="setRating(2)">★</span>
+                        <span class="star" data-value="3" style="font-size:24px; cursor:pointer; color:#444; transition:0.2s;" onclick="setRating(3)">★</span>
+                        <span class="star" data-value="4" style="font-size:24px; cursor:pointer; color:#444; transition:0.2s;" onclick="setRating(4)">★</span>
+                        <span class="star" data-value="5" style="font-size:24px; cursor:pointer; color:#444; transition:0.2s;" onclick="setRating(5)">★</span>
+                        <span id="ratingDisplay" style="color:var(--text3); font-size:13px; margin-left:8px;">Puan ver</span>
+                    </div>
+                </div>
                 <textarea id="commentInput" rows="2" placeholder="Yorumunuzu yazın..." style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; resize: vertical; font-family: var(--font-body);"></textarea>
                 <button onclick="postComment()" class="btn-primary" style="margin-top: 8px; width: 100%; font-size: 14px !important; padding: 12px !important;">💬 Yorum Gönder</button>
             </div>
@@ -2313,56 +2374,88 @@ footer {
             <button class="btn-facebook" onclick="loginWithFacebook()"><i class="fab fa-facebook"></i> Facebook ile Giriş Yap</button>
             <div style="text-align: center; margin: 8px 0 16px 0; color: var(--text3); font-size: 12px;">veya</div>
 
+            <!-- ===== KAYIT ===== -->
             <div id="formRegister">
                 <div class="form-row"><input id="rName" placeholder="Ad Soyad" class="form-input"></div>
                 <input id="rEmail" placeholder="E-posta" class="form-input">
                 <div style="display:flex; align-items:center; gap:8px;">
                     <input id="rPass" type="password" placeholder="Şifre (8+ karakter)" class="form-input" style="flex:1;">
-                    <button type="button" onclick="togglePassword('rPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;"><i class="fas fa-eye"></i></button>
+                    <button type="button" onclick="togglePassword('rPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
                 <div style="display:flex; align-items:center; gap:8px;">
                     <input id="rPass2" type="password" placeholder="Şifre Tekrar" class="form-input" style="flex:1;">
-                    <button type="button" onclick="togglePassword('rPass2', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;"><i class="fas fa-eye"></i></button>
+                    <button type="button" onclick="togglePassword('rPass2', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
                 <button class="btn-primary" onclick="handleRegister()" style="width:100%;">Kayıt Ol</button>
+                <div style="margin-top:16px; padding:12px; background:rgba(0,212,255,0.05); border:1px solid rgba(0,212,255,0.2); border-radius:12px; text-align:center; color:#8ab4cc; font-size:12px; line-height:1.6;">
+                    <strong>🔒 GÜVENLİK:</strong> Üyelerimizin sadece mail adresi ve profil fotoğrafını görebilmekteyiz.<br>
+                    Başka hiçbir şeye erişimimiz yoktur.<br>
+                    <strong style="color:#ff6b35;">⚠️ Üye olurken lütfen şifrenizi mail şifrenizle aynı yapmayın.</strong>
+                </div>
             </div>
 
+            <!-- ===== GİRİŞ ===== -->
             <div id="formLogin" style="display:none;">
                 <input id="lEmail" placeholder="E-posta" class="form-input">
                 <div style="display:flex; align-items:center; gap:8px;">
                     <input id="lPass" type="password" placeholder="Şifre" class="form-input" style="flex:1;">
-                    <button type="button" onclick="togglePassword('lPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;"><i class="fas fa-eye"></i></button>
+                    <button type="button" onclick="togglePassword('lPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
                 <button class="btn-primary" onclick="handleLogin()" style="width:100%;">Giriş Yap</button>
-                <div style="text-align:center; margin-top:12px;"><a href="javascript:void(0)" onclick="openResetPasswordModal()" style="color:var(--accent); font-size:13px; text-decoration:underline; cursor:pointer;">Şifremi unuttum</a></div>
+                <div style="text-align:center; margin-top:12px;">
+                    <a href="javascript:void(0)" onclick="openResetPasswordModal()" style="color:var(--accent); font-size:13px; text-decoration:underline; cursor:pointer;">Şifremi unuttum</a>
+                </div>
+                <div style="margin-top:16px; padding:12px; background:rgba(0,212,255,0.05); border:1px solid rgba(0,212,255,0.2); border-radius:12px; text-align:center; color:#8ab4cc; font-size:12px; line-height:1.6;">
+                    <strong>🔒 GÜVENLİK:</strong> Üyelerimizin sadece mail adresi ve profil fotoğrafını görebilmekteyiz.<br>
+                    Başka hiçbir şeye erişimimiz yoktur.<br>
+                    <strong style="color:#ff6b35;">⚠️ Lütfen şifrenizi güvenli bir yerde saklayın.</strong>
+                </div>
             </div>
 
+            <!-- ===== DOĞRULA ===== -->
             <div id="formVerify" style="display:none;">
                 <input id="verifyEmail" placeholder="E-posta" class="form-input">
                 <input id="verifyCode" placeholder="Doğrulama Kodu" class="form-input">
                 <button class="btn-primary" onclick="verifyAccount()" style="width:100%;">Doğrula</button>
+                <div style="margin-top:16px; padding:12px; background:rgba(0,212,255,0.05); border:1px solid rgba(0,212,255,0.2); border-radius:12px; text-align:center; color:#8ab4cc; font-size:12px; line-height:1.6;">
+                    <strong>🔒 GÜVENLİK:</strong> Doğrulama kodunuz e-posta adresinize gönderilmiştir.<br>
+                    Lütfen kimseyle paylaşmayın.
+                </div>
             </div>
 
         </div>
     </div>
 </div>
 
-<!-- ===== FOUNDER / ADMIN / BETA PANEL MODALI ===== -->
+<!-- ===== FOUNDER PANEL MODALI ===== -->
 <div id="rolePanel" class="modal-overlay" onclick="if(event.target===this) closeModal('rolePanel')">
     <div class="modal">
-        <h3 id="roleTitle">🔐 Yönetim Girişi</h3>
+        <h3 id="roleTitle">👑 FOUNDER GİRİŞİ</h3>
         <div style="display:flex; align-items:center; gap:8px;">
             <input type="password" id="rolePassword" class="form-input" placeholder="Şifre" style="flex:1;">
-            <button type="button" onclick="togglePassword('rolePassword', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;"><i class="fas fa-eye"></i></button>
+            <button type="button" onclick="togglePassword('rolePassword', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                <i class="fas fa-eye"></i>
+            </button>
         </div>
         <button class="btn-primary" onclick="checkRole()" style="width:100%;">Giriş</button>
         <button class="btn-secondary" onclick="closeModal('rolePanel')" style="width:100%;margin-top:12px;">İptal</button>
     </div>
 </div>
 
-<!-- ===== ADMIN ÖZEL GİRİŞ EKRANI (TAM EKRAN) ===== -->
+<!-- ===== ADMIN / BETA ÖZEL GİRİŞ EKRANI (DÜZELTİLDİ) ===== -->
 <div id="adminLoginScreen" class="admin-login-screen" style="display:none;">
-    <div class="admin-login-wrapper" style="display:flex;flex-wrap:wrap;gap:30px;justify-content:center;align-items:center;max-width:850px;width:100%;padding:20px;">
+    <div class="admin-login-wrapper" style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;align-items:center;max-width:900px;width:100%;padding:20px;">
+
+        <!-- Başlık -->
+        <div style="width:100%; text-align:center; margin-bottom:10px;">
+            <h2 style="color:#00d4ff; font-family:'Syne',sans-serif; font-size:28px;" class="admin-login-title">👑 Yönetim Girişi</h2>
+        </div>
 
         <!-- İbrahim Admin -->
         <div class="admin-login-box" data-admin="ibrahim" style="display:block;background:rgba(0,10,20,0.95);border:2px solid #00d4ff;border-radius:24px;padding:30px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,212,255,0.3);margin:10px;color:#ffffff;">
@@ -2373,7 +2466,9 @@ footer {
             <div style="margin-top:12px;">
                 <div style="display:flex; align-items:center; gap:8px;">
                     <input type="password" class="form-input admin-pass-input" placeholder="Admin Şifresi" data-admin="ibrahim" style="flex:1;">
-                    <button type="button" onclick="var inp=document.querySelector('.admin-pass-input[data-admin=ibrahim]');if(inp.type==='password'){inp.type='text';this.innerHTML='🙈';}else{inp.type='password';this.innerHTML='👁️';}" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">👁️</button>
+                    <button type="button" onclick="togglePasswordInput(this, 'admin', 'ibrahim')" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
                 <button onclick="handleAdminLogin('ibrahim')" style="background:#00d4ff;color:#000;padding:12px 24px;border:none;border-radius:40px;cursor:pointer;font-weight:600;margin-top:8px;width:100%;">Giriş Yap</button>
             </div>
@@ -2388,15 +2483,51 @@ footer {
             <div style="margin-top:12px;">
                 <div style="display:flex; align-items:center; gap:8px;">
                     <input type="password" class="form-input admin-pass-input" placeholder="Admin Şifresi" data-admin="bozkurt" style="flex:1;">
-                    <button type="button" onclick="var inp=document.querySelector('.admin-pass-input[data-admin=bozkurt]');if(inp.type==='password'){inp.type='text';this.innerHTML='🙈';}else{inp.type='password';this.innerHTML='👁️';}" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">👁️</button>
+                    <button type="button" onclick="togglePasswordInput(this, 'admin', 'bozkurt')" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
                 <button onclick="handleAdminLogin('bozkurt')" style="background:#00d4ff;color:#000;padding:12px 24px;border:none;border-radius:40px;cursor:pointer;font-weight:600;margin-top:8px;width:100%;">Giriş Yap</button>
             </div>
         </div>
 
+        <!-- Ömer Beta -->
+        <div class="admin-login-box" data-beta="omer" style="display:block;background:rgba(0,10,20,0.95);border:2px solid #00ff88;border-radius:24px;padding:30px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,255,136,0.3);margin:10px;color:#ffffff;">
+            <div style="font-size:48px;">🧪</div>
+            <div style="font-size:22px;font-weight:700;margin:8px 0;">Ömer Beta</div>
+            <div style="color:#8ab4cc;font-size:14px;">o2059497@gmail.com</div>
+            <div style="margin:12px 0;color:#00ff88;font-size:13px;">👇 Beta girişi için tıklayın</div>
+            <div style="margin-top:12px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <input type="password" class="form-input admin-pass-input" placeholder="Beta Şifresi" data-beta="omer" style="flex:1;">
+                    <button type="button" onclick="togglePasswordInput(this, 'beta', 'omer')" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <button onclick="handleBetaLogin('omer')" style="background:#00ff88;color:#000;padding:12px 24px;border:none;border-radius:40px;cursor:pointer;font-weight:600;margin-top:8px;width:100%;">Giriş Yap</button>
+            </div>
+        </div>
+
+        <!-- Emir Beta -->
+        <div class="admin-login-box" data-beta="emir" style="display:block;background:rgba(0,10,20,0.95);border:2px solid #00ff88;border-radius:24px;padding:30px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,255,136,0.3);margin:10px;color:#ffffff;">
+            <div style="font-size:48px;">🧪</div>
+            <div style="font-size:22px;font-weight:700;margin:8px 0;">Emir Beta</div>
+            <div style="color:#8ab4cc;font-size:14px;">aaababa789@gmail.com</div>
+            <div style="margin:12px 0;color:#00ff88;font-size:13px;">👇 Beta girişi için tıklayın</div>
+            <div style="margin-top:12px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <input type="password" class="form-input admin-pass-input" placeholder="Beta Şifresi" data-beta="emir" style="flex:1;">
+                    <button type="button" onclick="togglePasswordInput(this, 'beta', 'emir')" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <button onclick="handleBetaLogin('emir')" style="background:#00ff88;color:#000;padding:12px 24px;border:none;border-radius:40px;cursor:pointer;font-weight:600;margin-top:8px;width:100%;">Giriş Yap</button>
+            </div>
+        </div>
+
         <!-- Geri Dön Butonu -->
         <div style="width:100%; text-align:center; margin-top:20px;">
-            <button onclick="closeAdminLoginScreen()" style="background:transparent; border:1px solid #00d4ff; color:#00d4ff; padding:10px 24px; border-radius:40px; cursor:pointer; font-weight:600;">🔙 Ana Sayfaya Dön</button>
+            <button onclick="closeAdminLoginScreen()" style="background:transparent; border:1px solid #ff6b35; color:#ff6b35; padding:10px 24px; border-radius:40px; cursor:pointer; font-weight:600;">🔙 Ana Sayfaya Dön</button>
         </div>
 
     </div>
@@ -2420,8 +2551,18 @@ footer {
     <div class="modal">
         <h3>🔐 Admin Şifre Belirle</h3>
         <input type="email" id="adminEmail" placeholder="E-posta" class="form-input">
-        <div style="display:flex; align-items:center; gap:8px;"><input type="password" id="adminPass" placeholder="Yeni Şifre (8+)" class="form-input" style="flex:1;"><button type="button" onclick="togglePassword('adminPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;"><i class="fas fa-eye"></i></button></div>
-        <div style="display:flex; align-items:center; gap:8px;"><input type="password" id="adminPass2" placeholder="Şifre Tekrar" class="form-input" style="flex:1;"><button type="button" onclick="togglePassword('adminPass2', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;"><i class="fas fa-eye"></i></button></div>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <input type="password" id="adminPass" placeholder="Yeni Şifre (8+)" class="form-input" style="flex:1;">
+            <button type="button" onclick="togglePassword('adminPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                <i class="fas fa-eye"></i>
+            </button>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <input type="password" id="adminPass2" placeholder="Şifre Tekrar" class="form-input" style="flex:1;">
+            <button type="button" onclick="togglePassword('adminPass2', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                <i class="fas fa-eye"></i>
+            </button>
+        </div>
         <button class="btn-primary" onclick="setAdminPassword()" style="width:100%;">Şifre Belirle</button>
         <button class="btn-secondary" onclick="closeModal('adminPasswordModal')" style="width:100%;margin-top:12px;">İptal</button>
     </div>
@@ -2452,8 +2593,18 @@ footer {
             <div id="resetStep2" style="display:none;">
                 <p style="color:var(--text2); margin-bottom:16px;">E-postanıza gelen kodu girin ve yeni şifrenizi belirleyin.</p>
                 <input id="resetCode" placeholder="Doğrulama Kodu" class="form-input">
-                <div style="display:flex; align-items:center; gap:8px;"><input id="resetNewPass" type="password" placeholder="Yeni Şifre (8+ karakter)" class="form-input" style="flex:1;"><button type="button" onclick="togglePassword('resetNewPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;"><i class="fas fa-eye"></i></button></div>
-                <div style="display:flex; align-items:center; gap:8px;"><input id="resetNewPass2" type="password" placeholder="Yeni Şifre Tekrar" class="form-input" style="flex:1;"><button type="button" onclick="togglePassword('resetNewPass2', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;"><i class="fas fa-eye"></i></button></div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <input id="resetNewPass" type="password" placeholder="Yeni Şifre (8+ karakter)" class="form-input" style="flex:1;">
+                    <button type="button" onclick="togglePassword('resetNewPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <input id="resetNewPass2" type="password" placeholder="Yeni Şifre Tekrar" class="form-input" style="flex:1;">
+                    <button type="button" onclick="togglePassword('resetNewPass2', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
                 <button class="btn-primary" onclick="resetPasswordWithCode()" style="width:100%;">Şifreyi Sıfırla</button>
             </div>
             <button class="btn-secondary" onclick="closeModal('resetPasswordModal')" style="width:100%;margin-top:12px;">İptal</button>
@@ -2462,7 +2613,7 @@ footer {
 </div>
 
 <!-- ============================================================ -->
-<!-- AI WIDGET (SAĞ ALT KÖŞE)                                     -->
+<!-- AI WIDGET (SAĞ ALT KÖŞE) - SADECE ANA SAYFA İÇİN            -->
 <!-- ============================================================ -->
 <div class="ai-widget">
     <div class="ai-panel" id="aiPanel">
@@ -3375,6 +3526,7 @@ async function webSearch(query) {
     }
 }
 
+// ========== DASHBOARD AI MESAJ GÖNDER ==========
 window.sendDashboardAI = async function () {
     if (!await useQuery()) return;
     var inp = document.getElementById('dashboardAiInput');
@@ -3395,87 +3547,136 @@ window.sendDashboardAI = async function () {
     container.scrollTop = container.scrollHeight;
 };
 
-// ========== MİSAFİR AI PANELİ AÇ (SADECE GİRİŞ YAPMAMIŞLAR İÇİN) ==========
-function openFullAIPanel(mode) {
-    // Eğer zaten giriş yapmışsa, kullanıcı panelini göster
-    if (currentUser) {
-        document.getElementById('mainSite').style.display = 'none';
-        document.getElementById('userPanel').style.display = 'flex';
-        return;
-    }
-
-    // Misafir için paneli bul
+// ========== TAM EKRAN AI PANELİ (HERKESE AÇIK - LİMİT 25) ==========
+function openFullAIPanel() {
+    // Giriş yapmış olsa bile tam ekran AI aç, dashboard'a yönlendirme
     var panel = document.getElementById('fullAIPanel');
     if (!panel) {
-        showNotification('AI paneli bulunamadı!', 'error');
-        return;
+        // Eğer panel yoksa oluştur
+        panel = document.createElement('div');
+        panel.id = 'fullAIPanel';
+        panel.className = 'vizyon-ai-panel fullscreen';
+        panel.style.display = 'flex';
+        panel.style.position = 'fixed';
+        panel.style.top = '0';
+        panel.style.left = '0';
+        panel.style.right = '0';
+        panel.style.bottom = '0';
+        panel.style.zIndex = '100000';
+        panel.style.background = '#0a111a';
+        panel.style.flexDirection = 'column';
+        panel.innerHTML = `
+            <div class="vizyon-ai-header" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#112233;border-bottom:1px solid #1a3350;flex-shrink:0;">
+                <div class="logo" style="display:flex;align-items:center;gap:8px;">
+                    <div class="logo-icon" style="width:32px;height:32px;background:linear-gradient(135deg,#00d4ff,#a855f7,#ff6b35);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;animation:logoPulse 2s infinite;">✨</div>
+                    <div class="logo-text" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;background:linear-gradient(45deg,#00d4ff,#a855f7,#ff6b35,#00d4ff);background-size:300% 300%;-webkit-background-clip:text;background-clip:text;color:transparent;">VİZYON AI</div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <span style="color:#8ab4cc;font-size:12px;">🔋 25 sorgu kaldı</span>
+                    <button onclick="closeFullAIPanel()" style="background:transparent;border:1px solid #00d4ff;color:#00d4ff;padding:4px 12px;border-radius:20px;cursor:pointer;font-size:10px;">✕ Kapat</button>
+                </div>
+            </div>
+            <div id="fullAIChat" class="vizyon-ai-chat" style="flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
+                <div class="ai-msg bot" style="padding:10px 14px;font-size:13px;max-width:90%;border-radius:12px;background:rgba(0,255,136,0.06);border-left:3px solid #00ff88;border:1px solid rgba(0,255,136,0.08);">🧠 <strong>VİZYON AI</strong>: Merhaba! Günlük 25 sorgu hakkınız var. Size nasıl yardımcı olabilirim?</div>
+            </div>
+            <div class="vizyon-ai-input-area" style="display:flex;gap:8px;padding:12px;border-top:1px solid #1a3350;background:rgba(0,0,0,0.3);align-items:center;flex-shrink:0;">
+                <textarea id="fullAIInput" class="vizyon-ai-input" placeholder="Her dilde yazabilirsin... (Python, JavaScript, React, SQL...)" rows="2" style="flex:1;background:#050a0f;border:1px solid #1a3350;color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;resize:none;font-family:'Fira Code',monospace;" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendFullAI();}"></textarea>
+                <button class="btn-primary" onclick="sendFullAI()" style="padding:10px 20px;background:linear-gradient(135deg,#00d4ff,#a855f7);color:#fff;border:none;border-radius:30px;cursor:pointer;font-weight:600;">⚡ Gönder</button>
+            </div>
+        `;
+        document.body.appendChild(panel);
     }
 
-    // userPanel'i göster (ama sadece AI paneli görünecek)
-    var userPanel = document.getElementById('userPanel');
-    if (userPanel) {
-        userPanel.style.display = 'flex';
-        
-        // Misafir için gereksiz kartları gizle (sadece AI panelini göster)
-        var body = document.querySelector('#userPanel .user-panel-body');
-        if (body) {
-            var children = body.children;
-            for (var i = 0; i < children.length; i++) {
-                var child = children[i];
-                if (child.id !== 'fullAIPanel') {
-                    child.style.display = 'none';
-                }
-            }
-        }
+    // Giriş yapmışsa dashboard'u gizle, ana sayfayı gizle
+    if (currentUser) {
+        document.getElementById('dashboardArea').style.display = 'none';
+        document.getElementById('mainSite').style.display = 'none';
+        document.getElementById('userPanel').style.display = 'none';
         // Widget'ı gizle
         var widget = document.querySelector('.ai-widget');
         if (widget) widget.style.display = 'none';
+    } else {
+        document.getElementById('mainSite').style.display = 'none';
     }
 
-    // Tam ekran modunu aktifleştir
-    panel.classList.remove('halfscreen');
-    panel.classList.add('fullscreen');
     panel.style.display = 'flex';
+    panel.classList.add('fullscreen');
     
-    // Kapatma butonunu göster
-    var closeBtn = panel.querySelector('#fullscreenCloseBtn');
-    if (closeBtn) {
-        closeBtn.style.display = 'inline-block';
-    }
+    // Limit badge'ini güncelle
+    updateGuestQueryBadge();
 }
 
-// ========== AI PANELİ KAPAT (MİSAFİR VE ÜYE) ==========
+// ========== TAM EKRAN AI PANELİ KAPAT ==========
 function closeFullAIPanel() {
-    // userPanel içindeki paneli kapat
-    var panel = document.querySelector('#userPanel #fullAIPanel');
+    var panel = document.getElementById('fullAIPanel');
     if (panel) {
         panel.style.display = 'none';
-        panel.classList.remove('fullscreen', 'halfscreen');
+        panel.classList.remove('fullscreen');
     }
-    // Eğer misafir ise userPanel'i kapat ve ana sayfayı göster
-    if (!currentUser) {
-        var userPanel = document.getElementById('userPanel');
-        if (userPanel) {
-            userPanel.style.display = 'none';
-            document.getElementById('mainSite').style.display = 'block';
-            // Widget'ı geri göster
-            var widget = document.querySelector('.ai-widget');
-            if (widget) widget.style.display = 'block';
+    // Ana sayfayı göster
+    document.getElementById('mainSite').style.display = 'block';
+    if (currentUser) {
+        document.getElementById('dashboardArea').style.display = 'none';
+        document.getElementById('userPanel').style.display = 'none';
+    }
+    // Widget'ı geri göster (dashboard'da gizli olacak ama ana sayfada görünsün)
+    var widget = document.querySelector('.ai-widget');
+    if (widget) widget.style.display = 'block';
+}
+
+// ========== MİSAFİR SORGU LİMİTİ ==========
+async function useQuery() {
+    try {
+        var result = await Parse.Cloud.run('useQuery');
+        if (currentUser) {
+            updateQueryBadge(result);
+        } else {
+            updateGuestQueryBadge(result);
         }
+        return true;
+    } catch(e) {
+        var badges = document.querySelectorAll('.query-limit-badge');
+        badges.forEach(function(badge) {
+            badge.textContent = '⚠️ Limit bilinmiyor';
+            badge.style.display = 'inline-block';
+        });
+        var guestBadge = document.querySelector('#fullAIPanel .vizyon-ai-header span');
+        if (guestBadge) guestBadge.textContent = '⚠️ Limit bilinmiyor';
+        return true;
     }
 }
 
-// ========== AI MESAJ GÖNDER ==========
+function updateGuestQueryBadge(result) {
+    var remaining = result ? result.remaining : 25;
+    var badge = document.querySelector('#fullAIPanel .vizyon-ai-header span');
+    if (badge) {
+        badge.textContent = '🔋 ' + (remaining || 25) + ' sorgu kaldı';
+    }
+}
+
+// ========== TAM EKRAN AI MESAJ GÖNDER (HERKESE AÇIK) ==========
 async function sendFullAI() {
-    if (!await useQuery()) return;
-    
-    // userPanel içindeki elementleri bul
-    var inp = document.querySelector('#userPanel #fullAIInput');
-    var chat = document.querySelector('#userPanel #fullAIChat');
-    
-    if (!inp) inp = document.getElementById('fullAIInput');
-    if (!chat) chat = document.getElementById('fullAIChat');
-    
+    // Limit kontrolü (misafir ve üye aynı)
+    try {
+        var result = await Parse.Cloud.run('useQuery');
+        if (result && result.remaining !== undefined && result.remaining <= 0) {
+            showNotification('⚠️ Günlük sorgu limitiniz doldu!', 'error');
+            return;
+        }
+        if (!currentUser) {
+            updateGuestQueryBadge(result);
+        } else {
+            updateQueryBadge(result);
+        }
+    } catch(e) {
+        if (e.message && e.message.includes('limit')) {
+            showNotification('⚠️ ' + e.message, 'error');
+            return;
+        }
+    }
+
+    var inp = document.getElementById('fullAIInput');
+    var chat = document.getElementById('fullAIChat');
     if (!inp || !chat) {
         showNotification('Sohbet alanı bulunamadı!', 'error');
         return;
@@ -3488,11 +3689,11 @@ async function sendFullAI() {
     }
 
     // Kullanıcı mesajını ekle
-    chat.innerHTML += '<div class="ai-msg user">' + msg.replace(/</g, '&lt;') + '</div>';
+    chat.innerHTML += '<div class="ai-msg user" style="padding:10px 14px;font-size:13px;max-width:90%;border-radius:12px;background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.15);align-self:flex-end;text-align:right;">' + msg.replace(/</g, '&lt;') + '</div>';
     inp.value = '';
     chat.scrollTop = chat.scrollHeight;
     
-    // AI yanıtını al
+    // AI yanıtı
     var response;
     if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('hava') !== -1 || msg.indexOf('arama') !== -1) {
         response = await webSearch(msg);
@@ -3500,10 +3701,11 @@ async function sendFullAI() {
         response = await callAllAIModels(msg);
     }
     var cleaned = cleanClientResponse(response);
-    chat.innerHTML += '<div class="ai-msg bot">🧠 ' + cleaned + '</div>';
+    chat.innerHTML += '<div class="ai-msg bot" style="padding:10px 14px;font-size:13px;max-width:90%;border-radius:12px;background:rgba(0,255,136,0.06);border-left:3px solid #00ff88;border:1px solid rgba(0,255,136,0.08);">🧠 ' + cleaned + '</div>';
     chat.scrollTop = chat.scrollHeight;
 }
 
+// ========== AI WIDGET (ANA SAYFA) ==========
 function toggleAiPanel() {
     document.getElementById('aiPanel').classList.toggle('open');
 }
@@ -3609,7 +3811,7 @@ async function generateImage() {
     }
 }
 
-// ========== 3D MODEL ÜRETME (Three.ws + Yedek) ==========
+// ========== 3D MODEL ÜRETME ==========
 async function generate3D() {
     var prompt = document.getElementById('threeDPrompt').value.trim();
     if (!prompt) return showNotification('Lütfen bir açıklama yazın!', 'error');
@@ -3635,7 +3837,6 @@ async function generate3D() {
     }
 }
 
-// ========== BASİT 3D ŞEKİL OLUŞTUR (YEDEK) ==========
 function createSimple3DShape(prompt) {
     if (!scene) init3D();
     if (modelLoaded) {
@@ -3899,32 +4100,67 @@ async function buyPackage(pkg) {
     }
 }
 
-// ========== ROL PANELİ AÇ (FOUNDER/BETA/ADMIN) ==========
+// ========== ROL PANELİ AÇ (FOUNDER/BETA/ADMIN - AYRI) ==========
 function openRolePanel(role) {
-    if (role === 'ADMIN' || role === 'BETA') {
-        var screen = document.getElementById('adminLoginScreen');
-        if (!screen) {
-            screen = document.createElement('div');
-            screen.id = 'adminLoginScreen';
-            screen.className = 'admin-login-screen';
-            document.body.appendChild(screen);
-        }
-        screen.classList.add('active');
-        screen.style.display = 'flex';
-        screen.style.visibility = 'visible';
-        screen.style.opacity = '1';
-        screen.style.zIndex = '9999999';
-        console.log('✅ Admin/Beta login screen gösteriliyor');
+    var screen = document.getElementById('adminLoginScreen');
+    if (!screen) {
+        screen = document.createElement('div');
+        screen.id = 'adminLoginScreen';
+        screen.className = 'admin-login-screen';
+        document.body.appendChild(screen);
+    }
+    
+    // TÜM KARTLARI ÖNCE GİZLE (display:none)
+    var allCards = screen.querySelectorAll('.admin-login-box');
+    allCards.forEach(c => c.style.display = 'none');
+    
+    var title = screen.querySelector('.admin-login-title');
+    
+    if (role === 'ADMIN') {
+        var adminCards = screen.querySelectorAll('[data-admin]');
+        adminCards.forEach(c => c.style.display = 'block');
+        if (title) title.textContent = '👑 Admin Girişi';
+    } else if (role === 'BETA') {
+        var betaCards = screen.querySelectorAll('[data-beta]');
+        betaCards.forEach(c => c.style.display = 'block');
+        if (title) title.textContent = '🧪 Beta Girişi';
+    } else if (role === 'FOUNDER') {
+        currentRole = 'FOUNDER';
+        var panel = document.getElementById('rolePanel');
+        if (panel) panel.classList.add('open');
+        // AdminLoginScreen'i gizle
+        screen.classList.remove('active');
+        screen.style.display = 'none';
         return;
+    } else {
+        allCards.forEach(c => c.style.display = 'block');
+        if (title) title.textContent = '👑 Yönetim Girişi';
     }
-    // FOUNDER için eski mantık
-    currentRole = role;
-    var title = document.getElementById('roleTitle');
-    if (title) {
-        title.innerHTML = '👑 FOUNDER GİRİŞİ';
+    
+    screen.classList.add('active');
+    screen.style.display = 'flex';
+    screen.style.visibility = 'visible';
+    screen.style.opacity = '1';
+    screen.style.zIndex = '9999999';
+    console.log('✅ ' + role + ' login screen gösteriliyor');
+}
+
+// ========== ADMIN/BETA GÖZ İKONU İÇİN ÖZEL FONKSİYON ==========
+function togglePasswordInput(btn, type, key) {
+    var input;
+    if (type === 'admin') {
+        input = document.querySelector(`.admin-pass-input[data-admin="${key}"]`);
+    } else if (type === 'beta') {
+        input = document.querySelector(`.admin-pass-input[data-beta="${key}"]`);
     }
-    var panel = document.getElementById('rolePanel');
-    if (panel) panel.classList.add('open');
+    if (!input) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+    } else {
+        input.type = 'password';
+        btn.innerHTML = '<i class="fas fa-eye"></i>';
+    }
 }
 
 // ========== ADMIN EKRANINI KAPAT ==========
@@ -3933,24 +4169,20 @@ function closeAdminLoginScreen() {
     if (screen) {
         screen.classList.remove('active');
         screen.style.display = 'none';
+        screen.style.visibility = 'hidden';
+        screen.style.opacity = '0';
     }
     document.querySelectorAll('.admin-pass-input').forEach(el => el.value = '');
     document.body.style.overflow = 'auto';
+    document.getElementById('mainSite').style.display = 'block';
+    document.getElementById('dashboardArea').style.display = 'none';
+    document.getElementById('userPanel').style.display = 'none';
+    // Tam ekran AI panelini kapat
+    closeFullAIPanel();
 }
 
 // ========== ADMIN GİRİŞ ==========
 async function handleAdminLogin(adminKey) {
-    const admins = {
-        ibrahim: { email: 'iy5971828@gmail.com', password: 'ibrm4411', name: 'İbrahim Admin' },
-        bozkurt: { email: 'itaner686@gmail.com', password: 'bzkrt440204', name: 'Bozkurt Admin' }
-    };
-
-    const admin = admins[adminKey];
-    if (!admin) {
-        showNotification('Geçersiz admin seçimi!', 'error');
-        return;
-    }
-
     const input = document.querySelector(`.admin-pass-input[data-admin="${adminKey}"]`);
     if (!input) {
         showNotification('Şifre alanı bulunamadı!', 'error');
@@ -3963,62 +4195,45 @@ async function handleAdminLogin(adminKey) {
         return;
     }
 
-    if (pass !== admin.password) {
-        showNotification('❌ Şifre hatalı!', 'error');
-        input.value = '';
-        input.focus();
-        return;
-    }
-
     closeAdminLoginScreen();
-    showNotification('✅ Şifre doğrulandı, admin paneline yönlendiriliyorsunuz...', 'success');
-
-    if (currentUser) {
-        try { await Parse.User.logOut(); } catch(e) {}
-        currentUser = null;
-    }
+    showNotification('✅ Şifre doğrulanıyor...', 'success');
 
     try {
-        console.log('🔄 Admin giriş yapılıyor...');
-        await Parse.Cloud.run('initAdminUsers');
-        
-        await Parse.User.logIn(admin.email, admin.password);
-        currentUser = Parse.User.current();
-        localStorage.setItem('vizyon_user', JSON.stringify({
-            id: currentUser.id,
-            name: currentUser.get('name'),
-            email: currentUser.get('email'),
-            role: currentUser.get('role'),
-            plan: currentUser.get('plan'),
-            teamId: currentUser.get('teamId')
-        }));
-
-        console.log('✅ Giriş başarılı, dashboard açılıyor...');
-        
-        await showDashboard();
-        updateCommentUI();
-        await loadComments();
-        showNotification('Hoş geldin ' + admin.name + '!', 'success');
-
+        const result = await Parse.Cloud.run('adminLogin', { adminKey, password: pass });
+        if (result.success) {
+            currentUser = Parse.User.current();
+            if (!currentUser) {
+                await Parse.User.logIn(result.email, pass);
+                currentUser = Parse.User.current();
+            }
+            if (!currentUser) {
+                showNotification('❌ Oturum açılamadı, lütfen tekrar deneyin.', 'error');
+                return;
+            }
+            localStorage.setItem('vizyon_user', JSON.stringify({
+                id: currentUser.id,
+                name: currentUser.get('name'),
+                email: currentUser.get('email'),
+                role: currentUser.get('role'),
+                plan: currentUser.get('plan'),
+                teamId: currentUser.get('teamId')
+            }));
+            var chat = document.getElementById('fullAIChat');
+            if (chat) chat.innerHTML = '<div class="ai-msg bot" style="padding:10px 14px;font-size:13px;max-width:90%;border-radius:12px;background:rgba(0,255,136,0.06);border-left:3px solid #00ff88;border:1px solid rgba(0,255,136,0.08);">🧠 <strong>VİZYON AI</strong>: Merhaba! Size nasıl yardımcı olabilirim?</div>';
+            await showDashboard();
+            updateCommentUI();
+            await loadComments();
+            showNotification('Hoş geldin ' + result.name + '!', 'success');
+        }
     } catch (e) {
-        console.error('Admin giriş hatası:', e);
-        showNotification('Admin girişi başarısız: ' + e.message, 'error');
+        showNotification('❌ ' + e.message, 'error');
+        input.value = '';
+        input.focus();
     }
 }
 
-// ========== BETA GİRİŞ (Ömer ve Emir) ==========
+// ========== BETA GİRİŞ ==========
 async function handleBetaLogin(betaKey) {
-    const betas = {
-        omer: { email: 'o2059497@gmail.com', password: 'mardin4787', name: 'Ömer Beta' },
-        emir: { email: 'aaababa789@gmail.com', password: 'ges190544', name: 'Emir Beta' }
-    };
-
-    const beta = betas[betaKey];
-    if (!beta) {
-        showNotification('Geçersiz beta seçimi!', 'error');
-        return;
-    }
-
     const input = document.querySelector(`.admin-pass-input[data-beta="${betaKey}"]`);
     if (!input) {
         showNotification('Şifre alanı bulunamadı!', 'error');
@@ -4031,101 +4246,88 @@ async function handleBetaLogin(betaKey) {
         return;
     }
 
-    if (pass !== beta.password) {
-        showNotification('❌ Şifre hatalı!', 'error');
+    closeAdminLoginScreen();
+    showNotification('✅ Şifre doğrulanıyor...', 'success');
+
+    try {
+        const result = await Parse.Cloud.run('betaLogin', { betaKey, password: pass });
+        if (result.success) {
+            currentUser = Parse.User.current();
+            if (!currentUser) {
+                await Parse.User.logIn(result.email, pass);
+                currentUser = Parse.User.current();
+            }
+            if (!currentUser) {
+                showNotification('❌ Oturum açılamadı, lütfen tekrar deneyin.', 'error');
+                return;
+            }
+            localStorage.setItem('vizyon_user', JSON.stringify({
+                id: currentUser.id,
+                name: currentUser.get('name'),
+                email: currentUser.get('email'),
+                role: currentUser.get('role'),
+                plan: currentUser.get('plan'),
+                teamId: currentUser.get('teamId')
+            }));
+            var chat = document.getElementById('fullAIChat');
+            if (chat) chat.innerHTML = '<div class="ai-msg bot" style="padding:10px 14px;font-size:13px;max-width:90%;border-radius:12px;background:rgba(0,255,136,0.06);border-left:3px solid #00ff88;border:1px solid rgba(0,255,136,0.08);">🧠 <strong>VİZYON AI</strong>: Merhaba! Size nasıl yardımcı olabilirim?</div>';
+            await showDashboard();
+            updateCommentUI();
+            await loadComments();
+            showNotification('Hoş geldin ' + result.name + '! (Beta Kullanıcısı)', 'success');
+        }
+    } catch (e) {
+        showNotification('❌ ' + e.message, 'error');
         input.value = '';
         input.focus();
-        return;
-    }
-
-    closeAdminLoginScreen();
-    showNotification('✅ Şifre doğrulandı, beta paneline yönlendiriliyorsunuz...', 'success');
-
-    if (currentUser) {
-        try { await Parse.User.logOut(); } catch(e) {}
-        currentUser = null;
-    }
-
-    try {
-        console.log('🔄 Beta giriş yapılıyor...');
-        await Parse.Cloud.run('initAdminUsers');
-        
-        var query = new Parse.Query(Parse.User);
-        query.equalTo('email', beta.email);
-        var existingUser = await query.first({ useMasterKey: true });
-        
-        if (!existingUser) {
-            var newUser = new Parse.User();
-            newUser.set('username', beta.email);
-            newUser.set('email', beta.email);
-            newUser.set('password', beta.password);
-            newUser.set('name', beta.name);
-            newUser.set('role', 'beta');
-            newUser.set('plan', 'free');
-            newUser.set('isVerified', true);
-            newUser.set('isBanned', false);
-            await newUser.signUp();
-        }
-        
-        await Parse.User.logIn(beta.email, beta.password);
-        currentUser = Parse.User.current();
-        localStorage.setItem('vizyon_user', JSON.stringify({
-            id: currentUser.id,
-            name: currentUser.get('name'),
-            email: currentUser.get('email'),
-            role: currentUser.get('role'),
-            plan: currentUser.get('plan'),
-            teamId: currentUser.get('teamId')
-        }));
-
-        console.log('✅ Beta giriş başarılı, dashboard açılıyor...');
-        await showDashboard();
-        updateCommentUI();
-        await loadComments();
-        showNotification('Hoş geldin ' + beta.name + '! (Beta Kullanıcısı)', 'success');
-
-    } catch (e) {
-        console.error('Beta giriş hatası:', e);
-        showNotification('Beta girişi başarısız: ' + e.message, 'error');
     }
 }
 
-// ========== ROLE PANELİ GİRİŞ (FOUNDER) ==========
+// ========== FOUNDER GİRİŞ ==========
 async function checkRole() {
     var pass = document.getElementById('rolePassword').value;
-    if (currentRole !== 'FOUNDER' || pass !== 'Eymen11Amele44') {
-        showNotification('Şifre hatalı!', 'error');
+    if (!pass) {
+        showNotification('Lütfen şifreyi girin!', 'error');
         return;
     }
+
     closeModal('rolePanel');
 
-    if (currentUser) {
-        try { await Parse.User.logOut(); } catch(e) {}
-        currentUser = null;
-    }
-
     try {
-        await Parse.Cloud.run('initAdminUsers');
-        await Parse.User.logIn('admin.tr.reis@gmail.com', 'Eymen11Amele44');
-        currentUser = Parse.User.current();
-        localStorage.setItem('vizyon_user', JSON.stringify({
-            id: currentUser.id,
-            name: currentUser.get('name'),
-            email: currentUser.get('email'),
-            role: currentUser.get('role'),
-            plan: currentUser.get('plan'),
-            teamId: currentUser.get('teamId')
-        }));
-        await showDashboard();
-        updateCommentUI();
-        await loadComments();
-        showNotification('Hoş geldiniz, Founder paneli aktif!', 'success');
-    } catch(e) {
-        showNotification('Founder giriş hatası: ' + e.message, 'error');
+        const result = await Parse.Cloud.run('founderLogin', { password: pass });
+        if (result.success) {
+            currentUser = Parse.User.current();
+            if (!currentUser) {
+                await Parse.User.logIn(result.email, pass);
+                currentUser = Parse.User.current();
+            }
+            if (!currentUser) {
+                showNotification('❌ Oturum açılamadı, lütfen tekrar deneyin.', 'error');
+                return;
+            }
+            localStorage.setItem('vizyon_user', JSON.stringify({
+                id: currentUser.id,
+                name: currentUser.get('name'),
+                email: currentUser.get('email'),
+                role: currentUser.get('role'),
+                plan: currentUser.get('plan'),
+                teamId: currentUser.get('teamId')
+            }));
+            var chat = document.getElementById('fullAIChat');
+            if (chat) chat.innerHTML = '<div class="ai-msg bot" style="padding:10px 14px;font-size:13px;max-width:90%;border-radius:12px;background:rgba(0,255,136,0.06);border-left:3px solid #00ff88;border:1px solid rgba(0,255,136,0.08);">🧠 <strong>VİZYON AI</strong>: Merhaba! Size nasıl yardımcı olabilirim?</div>';
+            await showDashboard();
+            updateCommentUI();
+            await loadComments();
+            showNotification('Hoş geldin ' + result.name + '! (Founder)', 'success');
+        }
+    } catch (e) {
+        showNotification('❌ ' + e.message, 'error');
+        document.getElementById('rolePassword').value = '';
+        document.getElementById('rolePassword').focus();
     }
 }
 
-// ========== ADMIN FONKSİYONLARI ==========
+// ========== ADMIN FONKSİYONLARI (Aynı, değişmedi) ==========
 async function loadUserList() {
     if (!currentUser) return;
     try {
@@ -4421,8 +4623,10 @@ async function toggleChatHistory() {
         showNotification('Önce giriş yapın!', 'error');
         return;
     }
-    var chat = document.querySelector('#dashboardArea #fullAIChat');
-    if (!chat) chat = document.querySelector('#userPanel #fullAIChat');
+    var chat = document.getElementById('fullAIChat');
+    if (!chat) {
+        chat = document.querySelector('#dashboardArea #fullAIChat');
+    }
     if (!chat) {
         showNotification('Sohbet alanı bulunamadı!', 'error');
         return;
@@ -4431,10 +4635,12 @@ async function toggleChatHistory() {
         var result = await Parse.Cloud.run('getChatHistory');
         if (result.success && result.messages && result.messages.length > 0) {
             chat.innerHTML = '';
+            chat.innerHTML += '<div class="ai-msg bot" style="padding:10px 14px;font-size:13px;max-width:90%;border-radius:12px;background:rgba(0,255,136,0.06);border-left:3px solid #00ff88;border:1px solid rgba(0,255,136,0.08);">🧠 <strong>VİZYON AI</strong>: Geçmiş mesajlarınız yükleniyor...</div>';
             for (var i = 0; i < result.messages.length; i++) {
                 var msg = result.messages[i];
                 var cls = msg.role === 'user' ? 'user' : 'bot';
-                chat.innerHTML += '<div class="ai-msg ' + cls + '">' + msg.content + '</div>';
+                var clsStyle = cls === 'user' ? 'align-self:flex-end;text-align:right;background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.15);' : 'background:rgba(0,255,136,0.06);border-left:3px solid #00ff88;border:1px solid rgba(0,255,136,0.08);';
+                chat.innerHTML += '<div class="ai-msg ' + cls + '" style="padding:10px 14px;font-size:13px;max-width:90%;border-radius:12px;' + clsStyle + '">' + msg.content + '</div>';
             }
             chat.scrollTop = chat.scrollHeight;
             showNotification('📜 Geçmiş yüklendi (' + result.messages.length + ' mesaj)', 'success');
@@ -4499,7 +4705,7 @@ function updateQueryBadge(result) {
     });
 }
 
-// ========== YORUMLAR ==========
+// ========== YORUMLAR (YILDIZLI) ==========
 async function loadComments() {
     try {
         console.log('🔄 Yorumlar yükleniyor...');
@@ -4540,11 +4746,17 @@ function buildCommentsHTML(comments) {
         var color = roleColors[c.user_role] || 'var(--border)';
         var label = roleLabels[c.user_role] || '👤 KULLANICI';
         var canDelete = (currentUserEmail === c.user_email) || (currentUserRole === 'admin' || currentUserRole === 'founder');
+        var rating = c.rating || 0;
+        var stars = '';
+        for (var s = 1; s <= 5; s++) {
+            stars += s <= rating ? '★' : '☆';
+        }
         html += '<div class="comment-item" style="border-left-color: ' + color + ';">';
         html += '<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">';
         html += '<strong style="color: var(--accent2);">' + (c.user_name || 'İsimsiz') + '</strong>';
         html += '<span class="role-badge ' + (c.user_role || 'user') + '" style="border-color: ' + color + '; color: ' + color + ';">' + label + '</span>';
         html += '<span class="comment-email">📧 ' + (c.user_email || '---') + '</span>';
+        html += '<span class="star-display">' + stars + '</span>';
         html += '<span class="comment-time" style="margin-left: auto;">' + new Date(c.createdAt).toLocaleString('tr-TR') + '</span>';
         if (canDelete) {
             html += '<button class="btn-danger btn-sm" onclick="deleteComment(\'' + c.id + '\')" style="padding:2px 8px; font-size:10px;">🗑️</button>';
@@ -4591,9 +4803,15 @@ async function postComment() {
         return;
     }
     
+    // Yıldız puanını al
+    var ratingInput = document.querySelector('input[name="rating"]:checked');
+    var rating = ratingInput ? parseInt(ratingInput.value) : 0;
+    
     try {
-        await Parse.Cloud.run('addComment', { comment: text });
+        await Parse.Cloud.run('addComment', { comment: text, rating: rating });
         input.value = '';
+        // Yıldız seçimini sıfırla
+        document.querySelectorAll('input[name="rating"]').forEach(el => el.checked = false);
         showNotification('💬 Yorumunuz gönderildi!', 'success');
         await loadComments();
     } catch (e) {
@@ -4669,7 +4887,7 @@ if (cursor && ring) {
     }
 }
 
-// ========== DASHBOARD (HERKESE AÇIK - YÖNETİM KARTLARI GİZLİ) ==========
+// ========== DASHBOARD ==========
 async function showDashboard() {
     try {
         console.log('🔄 Dashboard açılıyor...');
@@ -4707,7 +4925,7 @@ async function showDashboard() {
         var isFounder = (role === 'founder');
         var isBeta = (role === 'beta');
         var isTeamPlan = (plan === 'team');
-        var isAuthorized = (isAdmin || isFounder || isBeta || isTeamPlan); // Takım oluşturma yetkisi
+        var isAuthorized = (isAdmin || isFounder || isBeta || isTeamPlan);
 
         // Admin panel kartları (sadece admin/founder)
         var adminCard = document.getElementById('adminPanelCard');
@@ -4737,7 +4955,6 @@ async function showDashboard() {
             if (joinBtn) joinBtn.style.display = 'inline-block';
         }
 
-        // Kullanıcı listesini sadece admin/founder yükle
         if (isAdmin) {
             await loadUserList();
         } else {
@@ -4745,7 +4962,6 @@ async function showDashboard() {
             if (userListContainer) userListContainer.innerHTML = '<div class="user-item">⚠️ Yetkiniz yok.</div>';
         }
 
-        // Herkese açık veriler
         await loadProjects();
         await loadFavorites();
         await loadArchive();
@@ -4767,7 +4983,7 @@ async function showDashboard() {
     }
 }
 
-// ========== PROJE İŞLEMLERİ ==========
+// ========== PROJE İŞLEMLERİ (Aynı, değişmedi) ==========
 async function loadProjects() {
     if (!currentUser) return;
     try {
@@ -5055,7 +5271,7 @@ function getPanelInput(id) {
     return el;
 }
 
-// ========== YÖNETİM İŞLEMLERİ (TEKLİF SİSTEMİ) ==========
+// ========== YÖNETİM İŞLEMLERİ ==========
 async function sendGiftRequest() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     const input = getPanelInput('giftEmailInput');
@@ -5233,7 +5449,6 @@ async function createTeam() {
     }
 }
 
-// ========== TAKIM KODU İLE KATIL ==========
 async function joinTeamWithCode() {
     if (!currentUser) {
         showNotification('Önce giriş yapın!', 'error');
@@ -5321,6 +5536,7 @@ function logout() {
     document.getElementById('mainSite').style.display = 'block';
     document.getElementById('dashboardArea').style.display = 'none';
     document.getElementById('userPanel').style.display = 'none';
+    closeFullAIPanel();
     var logoutBtn = document.querySelector('.logout-btn');
     if (logoutBtn) logoutBtn.style.display = 'none';
     updateCommentUI();
