@@ -3846,7 +3846,6 @@ async function generate3D() {
     removeDownloadButton();
 
     try {
-        // === 1. DENEME: Hugging Face API (Cloud Code üzerinden) ===
         const result = await Parse.Cloud.run('generate3DWithHF', { prompt: prompt });
         
         if (result.success && result.glbBase64) {
