@@ -6,20 +6,17 @@
     <title>Vizyon 2027 | VİZYON AI</title>
 
     <!-- ========== HARİCİ KÜTÜPHANELER ========== -->
-    <script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
--beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?
+    <!-- Three.js ve eklentileri (importmap KALDIRILDI, klasik script kullanıldı) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
 
-family=Inter:wght@300;400;600;700;800&family=Syne:wght@400;600;700;800&family=Fira
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
 
-+Code:wght@400;500;700&display=swap" rel="stylesheet">
 
     <!-- ============================================================ -->
     <!-- ===================== CSS BÖLÜMLERİ ========================= -->
@@ -1946,48 +1943,6 @@ footer {
    
     </style>
 
-
-       <!-- THREE.JS KÜTÜPHANESİ (3D YEDEK İÇİN) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-.admin-login-screen {
-    display: flex !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    background: #000000 !important;
-    z-index: 999999 !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 20px !important;
-}
-.admin-login-screen .admin-login-box {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    background: rgba(0,10,20,0.95) !important;
-    border: 2px solid #00d4ff !important;
-    border-radius: 24px !important;
-    padding: 30px 40px !important;
-    max-width: 380px !important;
-    width: 100% !important;
-    text-align: center !important;
-    box-shadow: 0 0 60px rgba(0,212,255,0.3) !important;
-    cursor: pointer !important;
-    margin: 10px !important;
-    color: #ffffff !important;
-}
-  }
-}
-</script>   
-
 </head>
 <body>
 
@@ -2002,7 +1957,6 @@ footer {
     <!-- ============================================================ -->
     <!-- ===================== HTML BÖLÜMLERİ ======================== -->
     <!-- ============================================================ -->
-
 <!-- ============================================================ -->
 <!-- HTML-1: ANA SAYFA (NAVBAR, HERO, FEATURES, PRICING, FOOTER)  -->
 <!-- ============================================================ -->
@@ -2171,23 +2125,13 @@ footer {
         <div class="footer-bottom">
             <div class="footer-copy">© 2027 Vizyon2027. <span>Vizyon Ekibi</span> güvencesiyle.</div>
             <div class="footer-badges" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                <!-- Destek & İletişim -->
-                <a class="support-link" onclick="openRandomSupport()" style="display:inline-flex; align-items:center; gap:8px; padding:10px 24px; background:rgba(0,212,255,0.08); border:1px solid var(--accent); border-radius:40px; color:var(--accent); cursor:pointer; transition:all 0.15s ease; text-decoration:none; font-size:13px;">
-                    📧 DESTEK & İLETİŞİM
-                </a>
-                <!-- WhatsApp -->
-                <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" style="display:inline-flex; align-items:center; gap:8px; padding:10px 24px; background:#25D366; border:1px solid #25D366; border-radius:40px; color:#fff; cursor:pointer; transition:all 0.15s ease; text-decoration:none; font-size:13px; font-weight:600;">
-                    <i class="fab fa-whatsapp" style="font-size:18px;"></i> WhatsApp Kanalımız
-                </a>
-                <!-- Instagram -->
-                <a href="https://www.instagram.com/vizyon2027.info?igsh=MXcxNnR2anQ2aW1rNA==" target="_blank" style="display:inline-flex; align-items:center; gap:8px; padding:10px 24px; background:linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); border:1px solid #dc2743; border-radius:40px; color:#fff; cursor:pointer; transition:all 0.15s ease; text-decoration:none; font-size:13px; font-weight:600;">
-                    <i class="fab fa-instagram" style="font-size:18px;"></i> Instagram Hesabımız
-                </a>
+                <a class="support-link" onclick="openRandomSupport()" style="display:inline-flex; align-items:center; gap:8px; padding:10px 24px; background:rgba(0,212,255,0.08); border:1px solid var(--accent); border-radius:40px; color:var(--accent); cursor:pointer; transition:all 0.15s ease; text-decoration:none; font-size:13px;">📧 DESTEK & İLETİŞİM</a>
+                <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" style="display:inline-flex; align-items:center; gap:8px; padding:10px 24px; background:#25D366; border:1px solid #25D366; border-radius:40px; color:#fff; cursor:pointer; transition:all 0.15s ease; text-decoration:none; font-size:13px; font-weight:600;"><i class="fab fa-whatsapp" style="font-size:18px;"></i> WhatsApp Kanalımız</a>
+                <a href="https://www.instagram.com/vizyon2027.info?igsh=MXcxNnR2anQ2aW1rNA==" target="_blank" style="display:inline-flex; align-items:center; gap:8px; padding:10px 24px; background:linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); border:1px solid #dc2743; border-radius:40px; color:#fff; cursor:pointer; transition:all 0.15s ease; text-decoration:none; font-size:13px; font-weight:600;"><i class="fab fa-instagram" style="font-size:18px;"></i> Instagram Hesabımız</a>
             </div>
         </div>
     </footer>
 </div>
-
 
 <!-- ============================================================ -->
 <!-- HTML-2: DASHBOARD (HERKESE AÇIK)                             -->
@@ -3549,10 +3493,8 @@ window.sendDashboardAI = async function () {
 
 // ========== TAM EKRAN AI PANELİ (HERKESE AÇIK - LİMİT 25) ==========
 function openFullAIPanel() {
-    // Giriş yapmış olsa bile tam ekran AI aç, dashboard'a yönlendirme
     var panel = document.getElementById('fullAIPanel');
     if (!panel) {
-        // Eğer panel yoksa oluştur
         panel = document.createElement('div');
         panel.id = 'fullAIPanel';
         panel.className = 'vizyon-ai-panel fullscreen';
@@ -3587,12 +3529,10 @@ function openFullAIPanel() {
         document.body.appendChild(panel);
     }
 
-    // Giriş yapmışsa dashboard'u gizle, ana sayfayı gizle
     if (currentUser) {
         document.getElementById('dashboardArea').style.display = 'none';
         document.getElementById('mainSite').style.display = 'none';
         document.getElementById('userPanel').style.display = 'none';
-        // Widget'ı gizle
         var widget = document.querySelector('.ai-widget');
         if (widget) widget.style.display = 'none';
     } else {
@@ -3601,25 +3541,20 @@ function openFullAIPanel() {
 
     panel.style.display = 'flex';
     panel.classList.add('fullscreen');
-    
-    // Limit badge'ini güncelle
     updateGuestQueryBadge();
 }
 
-// ========== TAM EKRAN AI PANELİ KAPAT ==========
 function closeFullAIPanel() {
     var panel = document.getElementById('fullAIPanel');
     if (panel) {
         panel.style.display = 'none';
         panel.classList.remove('fullscreen');
     }
-    // Ana sayfayı göster
     document.getElementById('mainSite').style.display = 'block';
     if (currentUser) {
         document.getElementById('dashboardArea').style.display = 'none';
         document.getElementById('userPanel').style.display = 'none';
     }
-    // Widget'ı geri göster (dashboard'da gizli olacak ama ana sayfada görünsün)
     var widget = document.querySelector('.ai-widget');
     if (widget) widget.style.display = 'block';
 }
@@ -3654,9 +3589,8 @@ function updateGuestQueryBadge(result) {
     }
 }
 
-// ========== TAM EKRAN AI MESAJ GÖNDER (HERKESE AÇIK) ==========
+// ========== TAM EKRAN AI MESAJ GÖNDER ==========
 async function sendFullAI() {
-    // Limit kontrolü (misafir ve üye aynı)
     try {
         var result = await Parse.Cloud.run('useQuery');
         if (result && result.remaining !== undefined && result.remaining <= 0) {
@@ -3688,12 +3622,10 @@ async function sendFullAI() {
         return;
     }
 
-    // Kullanıcı mesajını ekle
     chat.innerHTML += '<div class="ai-msg user" style="padding:10px 14px;font-size:13px;max-width:90%;border-radius:12px;background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.15);align-self:flex-end;text-align:right;">' + msg.replace(/</g, '&lt;') + '</div>';
     inp.value = '';
     chat.scrollTop = chat.scrollHeight;
     
-    // AI yanıtı
     var response;
     if (msg.indexOf('dolar') !== -1 || msg.indexOf('haber') !== -1 || msg.indexOf('hava') !== -1 || msg.indexOf('arama') !== -1) {
         response = await webSearch(msg);
@@ -3811,91 +3743,70 @@ async function generateImage() {
     }
 }
 
-// ========== 3D MODEL ÜRETME ==========
-async function generate3D() {
-    var prompt = document.getElementById('threeDPrompt').value.trim();
-    if (!prompt) return showNotification('Lütfen bir açıklama yazın!', 'error');
-    showNotification('⏳ 3D model oluşturuluyor...', 'success');
-    try {
-        var response = await fetch('https://three.ws/api/forge', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: prompt })
-        });
-        var data = await response.json();
-        if (data.glbUrl) {
-            load3DModel(data.glbUrl);
-            showNotification('✅ 3D model oluşturuldu!', 'success');
-            return;
-        } else {
-            throw new Error('Three.ws başarısız, basit şekil oluşturuluyor...');
-        }
-    } catch (e) {
-        console.warn('Three.ws hatası, basit şekil oluşturuluyor:', e.message);
-        createSimple3DShape(prompt);
-        showNotification('🔄 Basit 3D şekil oluşturuldu (Three.ws çalışmadı).', 'warning');
-    }
-}
+// ====================================================================
+// ===================== 3D SİSTEM (GÜNCELLENMİŞ) ====================
+// ====================================================================
 
-function createSimple3DShape(prompt) {
-    if (!scene) init3D();
-    if (modelLoaded) {
-        scene.remove(modelLoaded);
-        modelLoaded = null;
-    }
-    var lower = prompt.toLowerCase();
-    var geometry;
-    if (lower.includes('küp') || lower.includes('cube')) {
-        geometry = new THREE.BoxGeometry(1, 1, 1);
-    } else if (lower.includes('küre') || lower.includes('sphere')) {
-        geometry = new THREE.SphereGeometry(0.7, 32, 32);
-    } else if (lower.includes('silindir') || lower.includes('cylinder')) {
-        geometry = new THREE.CylinderGeometry(0.7, 0.7, 1, 32);
-    } else if (lower.includes('piramit') || lower.includes('pyramid')) {
-        geometry = new THREE.ConeGeometry(0.7, 1, 4);
-    } else {
-        geometry = new THREE.TorusGeometry(0.6, 0.2, 16, 32);
-    }
-    var material = new THREE.MeshStandardMaterial({
-        color: 0x00d4ff,
-        metalness: 0.5,
-        roughness: 0.2
-    });
-    var mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(0, 0.5, 0);
-    scene.add(mesh);
-    modelLoaded = mesh;
-    camera.position.set(2, 2, 5);
-    camera.lookAt(0, 0, 0);
-}
-
-// ========== 3D SAHNE ==========
-let scene, camera, renderer;
+let scene, camera, renderer, controls;
 let modelLoaded = false;
+let sceneInitialized = false;
+let currentModelData = null;
+let downloadButtonExists = false;
 
+// ========== 3D SAHNE (OrbitControls ile) ==========
 function init3D() {
     var container = document.getElementById('canvas3d');
-    if (!container) return;
-    if (scene) return;
+    if (!container) {
+        console.warn('canvas3d elementi bulunamadı!');
+        return;
+    }
+    if (sceneInitialized) return;
+    
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0a0a0a);
+    
     var width = container.clientWidth || 500;
     var height = container.clientHeight || 400;
+    
     camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    camera.position.set(2, 2, 5);
+    camera.position.set(3, 2, 5);
     camera.lookAt(0, 0, 0);
+    
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.setPixelRatio(window.devicePixelRatio);
     container.appendChild(renderer.domElement);
+    
+    // === Orbit Controls (Manuel Döndürme) ===
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.autoRotate = false;
+    controls.target.set(0, 0.5, 0);
+    controls.update();
+    
+    // Işıklar
     var ambientLight = new THREE.AmbientLight(0x404060);
     scene.add(ambientLight);
+    
     var dirLight = new THREE.DirectionalLight(0xffffff, 1);
     dirLight.position.set(5, 10, 7);
+    dirLight.castShadow = true;
     scene.add(dirLight);
+    
+    var fillLight = new THREE.DirectionalLight(0x4488ff, 0.3);
+    fillLight.position.set(-3, 2, 4);
+    scene.add(fillLight);
+    
     var gridHelper = new THREE.GridHelper(10, 10, 0x00d4ff, 0x1a3350);
+    gridHelper.position.y = -0.1;
     scene.add(gridHelper);
+    
+    sceneInitialized = true;
     animate3D();
+    
     window.addEventListener('resize', function () {
         var w = container.clientWidth;
         var h = container.clientHeight;
@@ -3909,37 +3820,410 @@ function init3D() {
 
 function animate3D() {
     requestAnimationFrame(animate3D);
+    if (controls) {
+        controls.update();
+    }
     if (renderer && scene && camera) {
         renderer.render(scene, camera);
     }
 }
 
+// ========== 3D MODEL ÜRETME (Hugging Face + Yedek) ==========
+async function generate3D() {
+    var prompt = document.getElementById('threeDPrompt').value.trim();
+    if (!prompt) {
+        showNotification('Lütfen bir açıklama yazın!', 'error');
+        return;
+    }
+    
+    showNotification('⏳ 3D model oluşturuluyor (Hugging Face)...', 'success');
+    
+    if (modelLoaded) {
+        scene.remove(modelLoaded);
+        modelLoaded = null;
+    }
+    currentModelData = null;
+    removeDownloadButton();
+
+    try {
+        // === 1. DENEME: Hugging Face API (Cloud Code üzerinden) ===
+        const result = await Parse.Cloud.run('generate3DWithHF', { prompt: prompt });
+        
+        if (result.success && result.glbBase64) {
+            loadModelFromBase64(result.glbBase64);
+            showNotification('✅ 3D model Hugging Face ile oluşturuldu!', 'success');
+            return;
+        } else {
+            throw new Error(result.error || 'Bilinmeyen hata');
+        }
+    } catch (e) {
+        console.warn('Hugging Face hatası:', e.message);
+        showNotification('⚠️ Hugging Face çalışmadı, yedek sistem devrede...', 'warning');
+        try {
+            createSimple3DShape(prompt);
+            showNotification('🔄 Basit 3D şekil oluşturuldu (Hugging Face çalışmadı).', 'warning');
+        } catch (err) {
+            showNotification('❌ 3D oluşturulamadı: ' + err.message, 'error');
+        }
+    }
+}
+
+// ========== MODEL YÜKLEME ==========
 function load3DModel(url) {
     if (!scene) init3D();
     var loader = new THREE.GLTFLoader();
     loader.load(url, function (gltf) {
         if (modelLoaded) {
             scene.remove(modelLoaded);
+            modelLoaded = null;
         }
         var model = gltf.scene;
         model.scale.set(1, 1, 1);
         model.position.set(0, 0, 0);
+        model.traverse(function (child) {
+            if (child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+        });
         scene.add(model);
         modelLoaded = model;
-        camera.position.set(2, 2, 5);
-        camera.lookAt(0, 0, 0);
-        showNotification('✅ 3D model yüklendi!', 'success');
+        currentModelData = model;
+        
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const fov = camera.fov * (Math.PI / 180);
+        let cameraZ = maxDim / (2 * Math.tan(fov / 2));
+        cameraZ *= 1.5;
+        camera.position.set(center.x, center.y + cameraZ * 0.3, center.z + cameraZ);
+        controls.target.copy(center);
+        controls.update();
+        
+        createDownloadButton();
+        showNotification('✅ 3D model yüklendi! (Fare ile döndürebilirsiniz)', 'success');
     }, undefined, function (error) {
         console.error('Model yüklenemedi:', error);
-        showNotification('❌ Model yüklenemedi: ' + error.message, 'error');
+        createSimple3DShape('küp');
     });
 }
 
+function loadModelFromData(data) {
+    try {
+        const blob = new Blob([data], { type: 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+        load3DModel(url);
+    } catch (e) {
+        console.error('Model verisi işlenemedi:', e);
+        createSimple3DShape('küp');
+    }
+}
+
+// ===== Base64'ten Model Yükle (YENİ) =====
+function loadModelFromBase64(base64String) {
+    try {
+        // Base64'ü binary'ye çevir
+        const binary = atob(base64String);
+        const array = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            array[i] = binary.charCodeAt(i);
+        }
+        const blob = new Blob([array], { type: 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+        load3DModel(url);
+    } catch (e) {
+        console.error('Base64 model yüklenemedi:', e);
+        createSimple3DShape('küp');
+    }
+}
+
+// ========== İNDİRME BUTONU ==========
+function createDownloadButton() {
+    if (downloadButtonExists) return;
+    var container = document.getElementById('canvas3d');
+    if (!container) return;
+    
+    var btn = document.createElement('button');
+    btn.id = 'download3DBtn';
+    btn.innerHTML = '⬇️ Modeli İndir (.glb)';
+    btn.style.cssText = `
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #00d4ff, #a855f7);
+        color: #fff;
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        z-index: 10;
+        box-shadow: 0 0 25px rgba(0,212,255,0.4);
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
+    `;
+    btn.onmouseover = function() { 
+        this.style.transform = 'scale(1.05)';
+        this.style.boxShadow = '0 0 40px rgba(0,212,255,0.7)';
+    };
+    btn.onmouseout = function() { 
+        this.style.transform = 'scale(1)';
+        this.style.boxShadow = '0 0 25px rgba(0,212,255,0.4)';
+    };
+    btn.onclick = downloadModel;
+    container.style.position = 'relative';
+    container.appendChild(btn);
+    downloadButtonExists = true;
+}
+
+function removeDownloadButton() {
+    var oldBtn = document.getElementById('download3DBtn');
+    if (oldBtn) oldBtn.remove();
+    downloadButtonExists = false;
+}
+
+function downloadModel() {
+    if (!modelLoaded) {
+        showNotification('❌ İndirilecek bir model yok!', 'error');
+        return;
+    }
+    
+    if (typeof THREE.GLTFExporter === 'undefined') {
+        showNotification('⚠️ GLTFExporter yüklenmedi, sayfayı yenileyin.', 'error');
+        return;
+    }
+    
+    showNotification('⏳ Model dışa aktarılıyor...', 'success');
+    
+    var exporter = new THREE.GLTFExporter();
+    exporter.parse(
+        scene,
+        function (glb) {
+            var blob = new Blob([glb], { type: 'application/octet-stream' });
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'vizyon3d_model.glb';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+            showNotification('✅ Model indirildi!', 'success');
+        },
+        function (error) {
+            console.error('Dışa aktarım hatası:', error);
+            showNotification('❌ İndirme hatası: ' + error.message, 'error');
+        },
+        { binary: true }
+    );
+}
+
+// ========== BASİT 3D ŞEKİL OLUŞTUR (GELİŞMİŞ) ==========
+function createSimple3DShape(prompt) {
+    try {
+        if (!scene) init3D();
+        if (modelLoaded) {
+            scene.remove(modelLoaded);
+            modelLoaded = null;
+        }
+        
+        var lower = prompt.toLowerCase();
+        var geometry;
+        var color = 0x00d4ff;
+        var positionY = 0.5;
+        
+        // ===== RENK ALGILAMA =====
+        if (lower.includes('kırmızı') || lower.includes('red')) color = 0xff0000;
+        else if (lower.includes('mavi') || lower.includes('blue')) color = 0x0066ff;
+        else if (lower.includes('yeşil') || lower.includes('green')) color = 0x00cc00;
+        else if (lower.includes('sarı') || lower.includes('yellow')) color = 0xffcc00;
+        else if (lower.includes('mor') || lower.includes('purple')) color = 0x9900ff;
+        else if (lower.includes('turuncu') || lower.includes('orange')) color = 0xff6600;
+        else if (lower.includes('pembe') || lower.includes('pink')) color = 0xff66aa;
+        else if (lower.includes('beyaz') || lower.includes('white')) color = 0xffffff;
+        else if (lower.includes('siyah') || lower.includes('black')) color = 0x222222;
+        else if (lower.includes('gri') || lower.includes('gray')) color = 0x888888;
+        else if (lower.includes('altın') || lower.includes('gold')) color = 0xffd700;
+        else if (lower.includes('gümüş') || lower.includes('silver')) color = 0xc0c0c0;
+        
+        // ===== ŞEKİL ALGILAMA =====
+        if (lower.includes('bina') || lower.includes('building') || lower.includes('gökdelen')) {
+            var buildingMat = new THREE.MeshStandardMaterial({ color: 0x8B7355, metalness: 0.1, roughness: 0.8 });
+            var building = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.8, 0.8), buildingMat);
+            building.position.set(0, 0.9, 0);
+            scene.add(building);
+            var roofMat = new THREE.MeshStandardMaterial({ color: 0x444444 });
+            var roof = new THREE.Mesh(new THREE.ConeGeometry(0.7, 0.3, 4), roofMat);
+            roof.position.set(0, 1.9, 0);
+            scene.add(roof);
+            modelLoaded = building;
+            camera.position.set(2, 1.5, 4);
+            camera.lookAt(0, 0.5, 0);
+            showNotification('🏢 Bina oluşturuldu!', 'success');
+            createDownloadButton();
+            return;
+        }
+        else if (lower.includes('ev') || lower.includes('house') || lower.includes('home')) {
+            var bodyMat = new THREE.MeshStandardMaterial({ color: 0xf5deb3, metalness: 0.1, roughness: 0.8 });
+            var body = new THREE.Mesh(new THREE.BoxGeometry(1, 0.8, 0.8), bodyMat);
+            body.position.set(0, 0.4, 0);
+            scene.add(body);
+            var roofMat2 = new THREE.MeshStandardMaterial({ color: 0xcc3333, metalness: 0.1, roughness: 0.8 });
+            var roof2 = new THREE.Mesh(new THREE.ConeGeometry(0.7, 0.5, 4), roofMat2);
+            roof2.position.set(0, 0.9, 0);
+            roof2.rotation.y = 0.2;
+            scene.add(roof2);
+            var doorMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+            var door = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.3, 0.05), doorMat);
+            door.position.set(0, 0.2, 0.43);
+            scene.add(door);
+            modelLoaded = body;
+            camera.position.set(2, 1.5, 4);
+            camera.lookAt(0, 0.5, 0);
+            showNotification('🏠 Ev oluşturuldu!', 'success');
+            createDownloadButton();
+            return;
+        }
+        else if (lower.includes('araba') || lower.includes('car') || lower.includes('otomobil')) {
+            var carMat = new THREE.MeshStandardMaterial({ color: 0xff3333, metalness: 0.5, roughness: 0.3 });
+            var carBody = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.3, 0.5), carMat);
+            carBody.position.set(0, 0.25, 0);
+            scene.add(carBody);
+            var cabinMat = new THREE.MeshStandardMaterial({ color: 0x4488ff, metalness: 0.3, roughness: 0.2 });
+            var cabin = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.25, 0.4), cabinMat);
+            cabin.position.set(-0.1, 0.45, 0);
+            scene.add(cabin);
+            var wheelMat = new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 0.8, roughness: 0.2 });
+            var positions = [[-0.3, 0.1, -0.3], [0.3, 0.1, -0.3], [-0.3, 0.1, 0.3], [0.3, 0.1, 0.3]];
+            positions.forEach(function(pos) {
+                var wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.05, 8), wheelMat);
+                wheel.rotation.x = Math.PI / 2;
+                wheel.position.set(pos[0], pos[1], pos[2]);
+                scene.add(wheel);
+            });
+            modelLoaded = carBody;
+            camera.position.set(2, 1.5, 4);
+            camera.lookAt(0, 0, 0);
+            showNotification('🚗 Araba oluşturuldu!', 'success');
+            createDownloadButton();
+            return;
+        }
+        else if (lower.includes('uçak') || lower.includes('plane') || lower.includes('airplane')) {
+            var planeMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.6, roughness: 0.2 });
+            var bodyPlane = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.8, 8), planeMat);
+            bodyPlane.rotation.z = Math.PI / 2;
+            bodyPlane.position.set(0, 0.3, 0);
+            scene.add(bodyPlane);
+            var wingMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, metalness: 0.4, roughness: 0.3 });
+            var wings = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.02, 0.2), wingMat);
+            wings.position.set(0, 0.35, 0);
+            scene.add(wings);
+            var tail = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.1), wingMat);
+            tail.position.set(0.4, 0.4, 0);
+            scene.add(tail);
+            modelLoaded = bodyPlane;
+            camera.position.set(2, 1.5, 4);
+            camera.lookAt(0, 0.3, 0);
+            showNotification('✈️ Uçak oluşturuldu!', 'success');
+            createDownloadButton();
+            return;
+        }
+        else if (lower.includes('ağaç') || lower.includes('tree')) {
+            var trunkMat = new THREE.MeshStandardMaterial({ color: 0x8B5A2B });
+            var trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.15, 0.6, 6), trunkMat);
+            trunk.position.set(0, 0.3, 0);
+            scene.add(trunk);
+            var leafMat = new THREE.MeshStandardMaterial({ color: 0x2e8b57 });
+            var leaves = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), leafMat);
+            leaves.position.set(0, 0.7, 0);
+            scene.add(leaves);
+            var leaf2 = new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 8), leafMat);
+            leaf2.position.set(0.15, 0.85, 0.1);
+            scene.add(leaf2);
+            var leaf3 = new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 8), leafMat);
+            leaf3.position.set(-0.15, 0.85, -0.1);
+            scene.add(leaf3);
+            modelLoaded = trunk;
+            camera.position.set(2, 1.5, 4);
+            camera.lookAt(0, 0.5, 0);
+            showNotification('🌳 Ağaç oluşturuldu!', 'success');
+            createDownloadButton();
+            return;
+        }
+        // ===== TEMEL ŞEKİLLER =====
+        else if (lower.includes('küp') || lower.includes('cube') || lower.includes('kare')) {
+            geometry = new THREE.BoxGeometry(1, 1, 1);
+        } else if (lower.includes('küre') || lower.includes('sphere') || lower.includes('yuvarlak') || lower.includes('top')) {
+            geometry = new THREE.SphereGeometry(0.7, 32, 32);
+        } else if (lower.includes('silindir') || lower.includes('cylinder') || lower.includes('tüp')) {
+            geometry = new THREE.CylinderGeometry(0.7, 0.7, 1, 32);
+        } else if (lower.includes('piramit') || lower.includes('pyramid') || lower.includes('üçgen')) {
+            geometry = new THREE.ConeGeometry(0.7, 1, 4);
+        } else if (lower.includes('konik') || lower.includes('cone')) {
+            geometry = new THREE.ConeGeometry(0.7, 1, 32);
+        } else if (lower.includes('torus') || lower.includes('halka') || lower.includes('simit')) {
+            geometry = new THREE.TorusGeometry(0.6, 0.2, 16, 32);
+        } else if (lower.includes('düğüm') || lower.includes('knot') || lower.includes('karışık')) {
+            geometry = new THREE.TorusKnotGeometry(0.5, 0.2, 64, 8);
+        } else {
+            geometry = new THREE.TorusKnotGeometry(0.5, 0.2, 64, 8);
+        }
+        
+        var material = new THREE.MeshStandardMaterial({
+            color: color,
+            metalness: 0.6,
+            roughness: 0.3,
+            emissive: new THREE.Color(color).multiplyScalar(0.1)
+        });
+        
+        var mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(0, positionY, 0);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        scene.add(mesh);
+        modelLoaded = mesh;
+        
+        camera.position.set(2, 1.5, 4);
+        camera.lookAt(0, 0.5, 0);
+        
+        var light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(3, 5, 4);
+        scene.add(light);
+        var ambient = new THREE.AmbientLight(0x404060);
+        scene.add(ambient);
+        
+        console.log('✅ Basit 3D şekil oluşturuldu:', prompt);
+        showNotification('✅ 3D şekil oluşturuldu!', 'success');
+        createDownloadButton();
+    } catch (e) {
+        console.error('3D şekil oluşturma hatası:', e);
+        showNotification('❌ 3D şekil oluşturulamadı: ' + e.message, 'error');
+    }
+}
+
+// ========== SAYFA YÜKLENİNCE 3D'Yİ BAŞLAT ==========
 document.addEventListener('DOMContentLoaded', function () {
     if (document.getElementById('canvas3d')) {
-        init3D();
+        setTimeout(function() {
+            init3D();
+            createSimple3DShape('küp');
+        }, 500);
     }
 });
+
+// ========== GLTFExporter'ı Yükle ==========
+(function loadGLTFExporter() {
+    var script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js';
+    script.onload = function() {
+        console.log('✅ GLTFExporter yüklendi');
+    };
+    script.onerror = function() {
+        console.warn('⚠️ GLTFExporter yüklenemedi, indirme butonu çalışmayabilir.');
+    };
+    document.head.appendChild(script);
+})();
 
 // ========== KOPYALA BUTONU STİLLERİ ==========
 (function addCopyButtonStyles() {
@@ -4009,8 +4293,6 @@ document.addEventListener('click', function (e) {
     }
 });
 </script>
-
-
 <!-- ============================================================ -->
 <!-- JS-4: ADMIN, PROFİL, YORUMLAR, BAŞLANGIÇ + TEKLİF SİSTEMİ  -->
 <!-- ============================================================ -->
