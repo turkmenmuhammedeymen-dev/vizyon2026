@@ -3915,11 +3915,10 @@ function animate3D() {
     if (renderer && scene && camera) renderer.render(scene, camera);
 }
 
-// ========== 3D MODEL ÜRET (HF + YEDEK) ==========
+// ========== 3D MODEL ÜRET (HF + YEDEK) – DÜZELTİLDİ ==========
 async function generate3D() {
     var prompt = document.getElementById('threeDPrompt').value.trim();
     if (!prompt) { showNotification('Lütfen bir açıklama yazın!', 'error'); return; }
-    
     if (modelLoaded) { scene.remove(modelLoaded); modelLoaded = null; }
     currentModelData = null;
     removeDownloadButton();
@@ -3936,8 +3935,9 @@ async function generate3D() {
             throw new Error(result.error || 'Bilinmeyen hata');
         }
     } catch (e) {
-        console.warn('Hugging Face hatası:', e.message);
-        showNotification('⚠️ HF çalışmadı, yedek sistem devrede...', 'warning');
+        console.error('HF hatası:', e);
+        // HF çalışmadı, yedek sisteme geç
+        showNotification('⚠️ Hugging Face çalışmadı, yedek sistem devrede...', 'warning');
         try {
             createSimple3DShape(prompt);
             setTimeout(createDownloadButton, 500);
