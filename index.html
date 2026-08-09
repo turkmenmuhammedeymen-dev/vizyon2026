@@ -2339,7 +2339,7 @@ footer {
                 </div>
             </div>
 
-            <!-- ===== TAKIM KARTI ===== -->
+            <!-- ===== TAKIM KARTI (GÜNCELLENDİ) ===== -->
             <div class="dashboard-card" id="teamCard">
                 <h3>👥 Takım</h3>
                 <div id="teamInfo"></div>
@@ -4612,11 +4612,9 @@ function openRolePanel(role) {
             }
         }
     } else if (role === 'FOUNDER') {
-        // FOUNDER: zaten rolePanel modal'ı var, onu aç
         var panel = document.getElementById('rolePanel');
         if (panel) {
             panel.classList.add('open');
-            // Input'u görünür yapmak için zorla
             setTimeout(function() {
                 var input = document.getElementById('rolePassword');
                 if (input) {
@@ -4632,7 +4630,6 @@ function openRolePanel(role) {
         return;
     }
 
-    // Admin/Beta için geri dön butonu
     var backDiv = document.createElement('div');
     backDiv.style.cssText = 'width:100%; text-align:center; margin-top:20px;';
     var backBtn = document.createElement('button');
@@ -4983,7 +4980,7 @@ async function giftUserEmail(email, pkg) {
     } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
 }
 
-// ========== YENİ YÖNETİM LİSTELERİ ==========
+// ========== YENİ YÖNETİM LİSTELERİ (GÜNCELLENDİ – GERİ TUŞU VE İŞLEMLER) ==========
 function showCustomModal(title, htmlContent) {
     var existing = document.getElementById('customModal');
     if (existing) existing.remove();
@@ -4993,13 +4990,7 @@ function showCustomModal(title, htmlContent) {
     modal.style.display = 'flex';
     modal.innerHTML = `
         <div class="modal" style="max-width:600px;width:90%;">
-            <div class="modal-header">
-                <h3>${title}</h3>
-                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">×</button>
-            </div>
-            <div style="max-height:400px;overflow-y:auto;">
-                ${htmlContent}
-            </div>
+            ${htmlContent}
             <div style="margin-top:16px; display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
                 <button class="btn-secondary" onclick="this.closest('.modal-overlay').remove()">🔙 Geri Dön</button>
             </div>
@@ -5013,19 +5004,26 @@ async function showAdminsList() {
     if (currentUser.get('role') !== 'founder') { showNotification('Sadece kurucu görebilir!', 'error'); return; }
     try {
         var result = await Parse.Cloud.run('getAdmins');
-        if (result && result.length > 0) {
-            var html = '<ul style="list-style:none;padding:0;">';
+        var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">';
+        html += '<h4 style="margin:0;">👑 Tüm Adminler</h4>';
+        html += '<button class="btn-secondary btn-sm" onclick="this.closest(\'.modal-overlay\').remove()">🔙 Geri</button>';
+        html += '</div>';
+        if (!result || result.length === 0) {
+            html += '<div class="comment-item" style="text-align:center;color:var(--text3);">📭 Hiç admin yok.</div>';
+        } else {
+            html += '<ul style="list-style:none;padding:0;">';
             result.forEach(function(adm) {
-                html += `<li style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-                    <span>${adm.name} (${adm.email})</span>
-                    <button class="btn-danger btn-sm" onclick="demoteAdmin('${adm.email}')">⬇️ Üye Yap</button>
+                html += `<li style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+                    <span><strong>${adm.name}</strong> (${adm.email}) <span class="badge" style="background:var(--accent);color:var(--bg);padding:2px 8px;border-radius:12px;font-size:10px;">ADMIN</span></span>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                        <button class="btn-secondary btn-sm" onclick="demoteAdmin('${adm.email}')" style="font-size:9px;padding:2px 8px;">⬇️ Üye Yap</button>
+                        <button class="btn-danger btn-sm" onclick="banUserByEmail('${adm.email}')" style="font-size:9px;padding:2px 8px;">🚫 Engelle</button>
+                    </div>
                 </li>`;
             });
             html += '</ul>';
-            showCustomModal('👑 Admin Listesi', html);
-        } else {
-            showNotification('Hiç admin yok.', 'warning');
         }
+        showCustomModal('👑 Admin Listesi', html);
     } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -5037,19 +5035,26 @@ async function showBetasList() {
     if (role !== 'admin' && role !== 'founder') { showNotification('Yetkiniz yok!', 'error'); return; }
     try {
         var result = await Parse.Cloud.run('getBetas');
-        if (result && result.length > 0) {
-            var html = '<ul style="list-style:none;padding:0;">';
+        var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">';
+        html += '<h4 style="margin:0;">🧪 Tüm Betalar</h4>';
+        html += '<button class="btn-secondary btn-sm" onclick="this.closest(\'.modal-overlay\').remove()">🔙 Geri</button>';
+        html += '</div>';
+        if (!result || result.length === 0) {
+            html += '<div class="comment-item" style="text-align:center;color:var(--text3);">📭 Hiç beta yok.</div>';
+        } else {
+            html += '<ul style="list-style:none;padding:0;">';
             result.forEach(function(bet) {
-                html += `<li style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-                    <span>${bet.name} (${bet.email})</span>
-                    <button class="btn-danger btn-sm" onclick="demoteBeta('${bet.email}')">⬇️ Üye Yap</button>
+                html += `<li style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+                    <span><strong>${bet.name}</strong> (${bet.email}) <span class="badge" style="background:var(--purple);color:var(--bg);padding:2px 8px;border-radius:12px;font-size:10px;">BETA</span></span>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                        <button class="btn-secondary btn-sm" onclick="demoteBeta('${bet.email}')" style="font-size:9px;padding:2px 8px;">⬇️ Üye Yap</button>
+                        <button class="btn-danger btn-sm" onclick="banUserByEmail('${bet.email}')" style="font-size:9px;padding:2px 8px;">🚫 Engelle</button>
+                    </div>
                 </li>`;
             });
             html += '</ul>';
-            showCustomModal('🧪 Beta Listesi', html);
-        } else {
-            showNotification('Hiç beta yok.', 'warning');
         }
+        showCustomModal('🧪 Beta Listesi', html);
     } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -5061,19 +5066,25 @@ async function showBannedList() {
     if (role !== 'admin' && role !== 'founder') { showNotification('Yetkiniz yok!', 'error'); return; }
     try {
         var result = await Parse.Cloud.run('getBannedUsers');
-        if (result && result.length > 0) {
-            var html = '<ul style="list-style:none;padding:0;">';
+        var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">';
+        html += '<h4 style="margin:0;">🚫 Engelli Kullanıcılar</h4>';
+        html += '<button class="btn-secondary btn-sm" onclick="this.closest(\'.modal-overlay\').remove()">🔙 Geri</button>';
+        html += '</div>';
+        if (!result || result.length === 0) {
+            html += '<div class="comment-item" style="text-align:center;color:var(--text3);">📭 Engelli kullanıcı yok.</div>';
+        } else {
+            html += '<ul style="list-style:none;padding:0;">';
             result.forEach(function(b) {
-                html += `<li style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-                    <span>${b.name} (${b.email})</span>
-                    <button class="btn-success btn-sm" onclick="unbanUser('${b.email}')">✅ Engel Kaldır</button>
+                html += `<li style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+                    <span><strong>${b.name}</strong> (${b.email}) <span class="badge" style="background:var(--danger);color:var(--bg);padding:2px 8px;border-radius:12px;font-size:10px;">ENGEL</span></span>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                        <button class="btn-success btn-sm" onclick="unbanUser('${b.email}')" style="font-size:9px;padding:2px 8px;">✅ Engel Kaldır</button>
+                    </div>
                 </li>`;
             });
             html += '</ul>';
-            showCustomModal('🚫 Engelli Kullanıcılar', html);
-        } else {
-            showNotification('Engelli kullanıcı yok.', 'warning');
         }
+        showCustomModal('🚫 Engelli Kullanıcılar', html);
     } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -5339,12 +5350,18 @@ async function postComment() {
     }
 }
 
+// ========== YILDIZ PUANLAMA (GÜNCELLENDİ) ==========
 function setRating(val) {
-    document.getElementById('ratingDisplay').textContent = val + ' ⭐';
-    document.getElementById('ratingDisplay').setAttribute('data-rating', val);
-    document.querySelectorAll('.star').forEach(function(el) {
-        var v = parseInt(el.getAttribute('data-value'));
-        el.style.color = (v <= val) ? '#ffb700' : '#444';
+    var display = document.getElementById('ratingDisplay');
+    var stars = document.querySelectorAll('.star');
+    if (!display || !stars.length) return;
+    
+    display.textContent = val + ' ⭐';
+    display.setAttribute('data-rating', val);
+    
+    stars.forEach(function(star) {
+        var v = parseInt(star.getAttribute('data-value'));
+        star.style.color = (v <= val) ? '#ffb700' : '#444';
     });
 }
 
@@ -5540,6 +5557,252 @@ async function handleRequest(requestId, action) {
         showNotification(result.message, 'success');
         await loadInbox();
     } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+// ========== TAKIM FONKSİYONLARI (GÜNCELLENDİ – YÖNETİCİ, ATMA) ==========
+async function loadTeamInfo() {
+    if (!currentUser) return;
+    var teamId = currentUser.get('teamId');
+    var teamInfo = document.getElementById('teamInfo');
+    var membersList = document.getElementById('teamMembersList');
+    var chatContainer = document.getElementById('teamChatMessages');
+    var viewBtn = document.getElementById('viewMembersBtn');
+    var leaveBtn = document.getElementById('leaveTeamBtn');
+
+    if (!teamId) {
+        teamInfo.innerHTML = '<p>Bir takıma üye değilsiniz. Takım oluşturun veya davet bekleyin.</p>';
+        membersList.innerHTML = '';
+        chatContainer.innerHTML = '';
+        if (viewBtn) viewBtn.style.display = 'none';
+        if (leaveBtn) leaveBtn.style.display = 'none';
+        return;
+    }
+    try {
+        var Team = Parse.Object.extend('Team');
+        var query = new Parse.Query(Team);
+        var team = await query.get(teamId);
+        var Member = Parse.Object.extend('TeamMember');
+        var memberQuery = new Parse.Query(Member);
+        memberQuery.equalTo('team_id', teamId);
+        var members = await memberQuery.find();
+        var Message = Parse.Object.extend('TeamMessage');
+        var msgQuery = new Parse.Query(Message);
+        msgQuery.equalTo('team_id', teamId);
+        msgQuery.ascending('createdAt');
+        var messages = await msgQuery.find();
+
+        var isOwner = (team.get('owner_email') === currentUser.get('email'));
+        var isManager = (team.get('manager_email') === currentUser.get('email') && !isOwner);
+        var canManage = isOwner || isManager;
+
+        teamInfo.innerHTML = `<h4>🏢 ${team.get('name')}</h4>
+                              <p>Üye sayısı: ${members.length} | Sahip: ${team.get('owner_email')}</p>
+                              <p>Takım Kodu: <strong style="color:#00d4ff;">${team.get('teamCode')}</strong></p>`;
+
+        if (canManage) {
+            var html = '<h5>📋 Üyeler (Sadece Kurucu/Yönetici Görür)</h5>';
+            html += '<div style="max-height:150px; overflow-y:auto;">';
+            for (var i = 0; i < members.length; i++) {
+                var m = members[i];
+                var email = m.get('user_email');
+                var isOwnerMember = (email === team.get('owner_email'));
+                var isManagerMember = (email === team.get('manager_email'));
+                var roleText = isOwnerMember ? '👑 Sahip' : (isManagerMember ? '⭐ Yönetici' : '👤 Üye');
+                html += `<div class="team-member-item" style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-bottom:1px solid var(--border);">
+                    <span>${email} (${roleText})</span>
+                    <div style="display:flex;gap:4px;flex-wrap:wrap;">`;
+                if (isOwner) {
+                    if (!isOwnerMember) {
+                        html += `<button class="btn-secondary btn-sm" onclick="makeManager('${email}')" style="font-size:9px;padding:2px 6px;">⭐ Yönetici Yap</button>`;
+                        html += `<button class="btn-danger btn-sm" onclick="removeFromTeam('${email}')" style="font-size:9px;padding:2px 6px;">🗑️ At</button>`;
+                    }
+                } else if (isManager && !isOwnerMember && !isManagerMember) {
+                    html += `<button class="btn-danger btn-sm" onclick="removeFromTeam('${email}')" style="font-size:9px;padding:2px 6px;">🗑️ At</button>`;
+                }
+                html += `</div></div>`;
+            }
+            html += '</div>';
+            membersList.innerHTML = html;
+        } else {
+            membersList.innerHTML = '<p>Üye listesi sadece kurucu veya yönetici tarafından görülebilir.</p>';
+        }
+
+        var userEmail = currentUser.get('email');
+        var chatHtml = '';
+        messages.forEach(msg => {
+            var cls = (msg.get('user_email') === userEmail) ? 'user' : 'bot';
+            var name = (msg.get('user_email') === userEmail) ? 'Ben' : msg.get('user_email').split('@')[0];
+            chatHtml += `<div class="ai-message ${cls}"><strong>${name}</strong>: ${msg.get('message')}</div>`;
+        });
+        chatContainer.innerHTML = chatHtml || '<div>Henüz mesaj yok</div>';
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        if (viewBtn) viewBtn.style.display = canManage ? 'inline-block' : 'none';
+        if (leaveBtn) leaveBtn.style.display = 'inline-block';
+    } catch (e) { console.error('Takım bilgisi yüklenirken hata:', e); }
+}
+
+async function createTeam() {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    var name = prompt('Takım adı:');
+    if (!name) return;
+    try {
+        var result = await Parse.Cloud.run('createTeam', { name: name });
+        if (result.success) {
+            currentUser.set('teamId', result.teamId);
+            await currentUser.save();
+            await loadTeamInfo();
+            showNotification('"' + name + '" takımı oluşturuldu! Takım kodu: ' + result.teamCode, 'success');
+        } else {
+            showNotification('Takım oluşturulamadı: ' + result.error, 'error');
+        }
+    } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
+}
+
+async function joinTeamWithCode() {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    var codeInput = document.getElementById('teamCodeInput');
+    if (!codeInput) { showNotification('Takım kodu alanı bulunamadı!', 'error'); return; }
+    var teamCode = codeInput.value.trim();
+    if (!teamCode) { showNotification('Lütfen bir takım kodu girin!', 'error'); return; }
+    try {
+        var result = await Parse.Cloud.run('joinTeamWithCode', { teamCode: teamCode });
+        if (result.success) {
+            currentUser.set('teamId', result.teamId);
+            await currentUser.save();
+            await loadTeamInfo();
+            codeInput.value = '';
+            showNotification('✅ Takıma katıldınız!', 'success');
+        } else {
+            showNotification('❌ ' + result.error, 'error');
+        }
+    } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
+}
+
+async function sendTeamMessage() {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    var teamId = currentUser.get('teamId');
+    if (!teamId) { showNotification('Takımınız yok!', 'error'); return; }
+    var msg = document.getElementById('teamChatInput').value.trim();
+    if (!msg) { showNotification('Lütfen bir mesaj yazın!', 'warning'); return; }
+    try {
+        var result = await Parse.Cloud.run('sendTeamMessage', { teamId: teamId, message: msg });
+        if (result.success) {
+            document.getElementById('teamChatInput').value = '';
+            await loadTeamInfo();
+        } else {
+            showNotification('Mesaj gönderilemedi: ' + result.error, 'error');
+        }
+    } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
+}
+
+async function inviteToTeam() {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    var teamId = currentUser.get('teamId');
+    if (!teamId) { showNotification('Önce takım oluşturun!', 'error'); return; }
+    var email = document.getElementById('inviteEmail').value.trim();
+    if (!email) { showNotification('E-posta adresi girin!', 'error'); return; }
+    try {
+        var result = await Parse.Cloud.run('inviteToTeam', { email: email });
+        if (result.success) {
+            showNotification('Davet gönderildi: ' + email, 'success');
+            document.getElementById('inviteEmail').value = '';
+        } else {
+            showNotification('Davet gönderilemedi: ' + result.error, 'error');
+        }
+    } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
+}
+
+async function acceptTeamInvite(teamId, inboxId) {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    try {
+        var result = await Parse.Cloud.run('acceptTeamInvite', { teamId: teamId, inboxId: inboxId });
+        if (result.success) {
+            showNotification('✅ ' + result.message, 'success');
+            await loadInbox();
+            await loadTeamInfo();
+        } else {
+            showNotification('❌ ' + result.error, 'error');
+        }
+    } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
+}
+
+async function rejectTeamInvite(inboxId) {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    try {
+        var result = await Parse.Cloud.run('rejectTeamInvite', { inboxId: inboxId });
+        if (result.success) {
+            showNotification('❌ Davet reddedildi.', 'success');
+            await loadInbox();
+        } else {
+            showNotification('❌ ' + result.error, 'error');
+        }
+    } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
+}
+
+async function leaveTeam() {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    if (!confirm('Takımdan ayrılmak istediğinize emin misiniz?')) return;
+    try {
+        var result = await Parse.Cloud.run('leaveTeam');
+        if (result.success) {
+            showNotification('✅ ' + result.message, 'success');
+            await loadTeamInfo();
+        } else {
+            showNotification('❌ ' + result.error, 'error');
+        }
+    } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
+}
+
+async function viewTeamMembers() {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    try {
+        var result = await Parse.Cloud.run('getTeamMembers');
+        if (result.success) {
+            var html = '<h4>📋 Takım Üyeleri</h4><ul style="list-style:none;padding:0;">';
+            result.members.forEach(m => {
+                html += `<li style="padding:4px 0;border-bottom:1px solid var(--border);">${m.email} ${m.isOwner ? '👑 (Kurucu)' : ''}</li>`;
+            });
+            html += '</ul>';
+            alert(html.replace(/<[^>]*>/g, '').replace(/👑/g, '(Kurucu)'));
+        }
+    } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
+}
+
+async function makeManager(email) {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    var teamId = currentUser.get('teamId');
+    if (!teamId) { showNotification('Takımınız yok!', 'error'); return; }
+    if (!confirm(`${email} adlı kullanıcıyı takım yöneticisi yapmak istediğinize emin misiniz?`)) return;
+    try {
+        var result = await Parse.Cloud.run('makeTeamManager', { teamId: teamId, targetEmail: email });
+        if (result.success) {
+            showNotification(result.message, 'success');
+            await loadTeamInfo();
+        } else {
+            showNotification(result.error, 'error');
+        }
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+}
+
+async function removeFromTeam(email) {
+    if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
+    var teamId = currentUser.get('teamId');
+    if (!teamId) { showNotification('Takımınız yok!', 'error'); return; }
+    if (!confirm(`${email} adlı kullanıcıyı takımdan atmak istediğinize emin misiniz?`)) return;
+    try {
+        var result = await Parse.Cloud.run('removeFromTeam', { teamId: teamId, targetEmail: email });
+        if (result.success) {
+            showNotification(result.message, 'success');
+            await loadTeamInfo();
+        } else {
+            showNotification(result.error, 'error');
+        }
+    } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 }
