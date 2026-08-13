@@ -1,8 +1,8 @@
 // ================================================================
-// VİZYON 2027 – CLOUD CODE (KENDİ SUNUCUN İÇİN)
+// VİZYON 2027 – CLOUD CODE (KENDİ SUNUCUN İÇİN - HATASIZ)
 // ================================================================
 
-// Yardımcı fonksiyon: API anahtarlarını al (isteğe bağlı)
+// Yardımcı fonksiyon: API anahtarlarını al
 async function getAPIKey(keyName) {
     try {
         const config = await Parse.Config.get({ useMasterKey: true });
@@ -43,7 +43,7 @@ Parse.Cloud.define("test", async (request) => {
     } catch (e) {
         return { success: false, error: e.message };
     }
-}, { useMasterKey: true });
+});
 
 // ========== SORGU LİMİTİ ==========
 Parse.Cloud.define("useQuery", async (request) => {
@@ -95,7 +95,7 @@ Parse.Cloud.define("useQuery", async (request) => {
         remaining = 25 - visitorStats.get("count");
         return { remaining, limit: 25, isMember: false };
     }
-}, { useMasterKey: true });
+});
 
 // ========== WEB ARAMA ==========
 Parse.Cloud.define("webSearch", async (request) => {
@@ -123,14 +123,13 @@ Parse.Cloud.define("webSearch", async (request) => {
     } catch (e) {
         return "⚠️ Arama hatası: " + e.message;
     }
-}, { useMasterKey: true });
+});
 
 // ========== SÜPER AI ==========
 Parse.Cloud.define("superAI", async (request) => {
     const prompt = request.params.prompt;
     const lowerPrompt = prompt.toLowerCase().trim();
 
-    // Web arama kontrolü
     if (lowerPrompt.includes('dolar') || lowerPrompt.includes('haber') || lowerPrompt.includes('arama') || lowerPrompt.includes('hava') || lowerPrompt.includes('altın')) {
         try {
             const result = await Parse.Cloud.run("webSearch", { query: prompt });
@@ -140,9 +139,8 @@ Parse.Cloud.define("superAI", async (request) => {
         } catch (e) { console.log('Web arama hatası:', e); }
     }
 
-    // Basit yanıt (API anahtarları olmadan çalışır)
     return "🧠 VİZYON AI: '" + prompt + "' hakkında yardımcı olabilirim. Detaylı yanıt için lütfen daha spesifik bir soru sorun.";
-}, { useMasterKey: true });
+});
 
 // ========== YORUM SİSTEMİ ==========
 Parse.Cloud.define("getComments", async () => {
@@ -169,7 +167,7 @@ Parse.Cloud.define("getComments", async () => {
             error: error.message
         };
     }
-}, { useMasterKey: true });
+});
 
 Parse.Cloud.define("addComment", async (request) => {
     const user = request.user;
@@ -185,7 +183,7 @@ Parse.Cloud.define("addComment", async (request) => {
     newComment.set('rating', Math.min(5, Math.max(0, rating)));
     await newComment.save(null, { useMasterKey: true });
     return { success: true, message: "Yorum gönderildi!" };
-}, { useMasterKey: true });
+});
 
 Parse.Cloud.define("deleteComment", async (request) => {
     const user = request.user;
@@ -204,7 +202,7 @@ Parse.Cloud.define("deleteComment", async (request) => {
     }
     await comment.destroy({ useMasterKey: true });
     return { success: true, message: "Yorum silindi!" };
-}, { useMasterKey: true });
+});
 
 Parse.Cloud.define("editComment", async (request) => {
     const user = request.user;
@@ -226,4 +224,4 @@ Parse.Cloud.define("editComment", async (request) => {
     }
     await comment.save(null, { useMasterKey: true });
     return { success: true, message: "Yorum güncellendi!" };
-}, { useMasterKey: true });
+});
