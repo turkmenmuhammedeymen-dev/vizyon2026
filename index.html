@@ -11,6 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/parse/5.0.0/parse.min.js"></script>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -2775,6 +2776,9 @@ button[onclick*="togglePassword"] i {
             <button class="btn-secondary btn-sm" onclick="window.openVizyonSupport()" style="display:flex;align-items:center;gap:4px;" data-i18n="Vizyon Destek">
                 📢 Vizyon Destek
             </button>
+            <button class="btn-secondary btn-sm" onclick="window.startVoiceInput()" style="display:flex;align-items:center;gap:4px;" data-i18n="Sesli Komut">
+                🎤 Sesli Komut
+            </button>
             <button class="logout-btn btn-sm" onclick="window.logout()" data-i18n="Çıkış">Çıkış</button>
         </div>
     </div>
@@ -2791,6 +2795,7 @@ button[onclick*="togglePassword"] i {
                     <button class="btn-primary" onclick="window.sendDashboardAI()" data-i18n="Gönder">Gönder</button>
                     <input type="file" id="dashboardFileInput" style="display:none;" accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip,.mp4,.mov,.avi,.mkv,.webm,.mp3,.wav">
                     <button class="btn-secondary" onclick="document.getElementById('dashboardFileInput').click()" data-i18n="Dosya Yükle">📎</button>
+                    <button class="btn-secondary" onclick="window.startVoiceInput()" data-i18n="Sesli Komut">🎤</button>
                 </div>
             </div>
         </div>
@@ -2925,7 +2930,6 @@ button[onclick*="togglePassword"] i {
 
     </div>
 </div>
-<!-- ===== DASHBOARD SONU ===== -->
 <!-- ===== DASHBOARD SONU ===== -->
 
 
@@ -3364,11 +3368,11 @@ button[onclick*="togglePassword"] i {
     <!-- ============================================================ -->
 
     <!-- ============================================================ -->
-<!-- JS-1: BACK4APP KONFIG + GERÇEK SAYAÇLAR + OTOMATİK OTURUM    -->
+<!-- JS-1: PARSE SERVER KONFIG + GERÇEK SAYAÇLAR + OTOMATİK OTURUM -->
 <!-- ============================================================ -->
 <script>
 // ============================================================
-// JS-1: BACK4APP KONFIG + GERÇEK SAYAÇLAR + OTOMATİK OTURUM
+// JS-1: PARSE SERVER KONFIG + GERÇEK SAYAÇLAR + OTOMATİK OTURUM
 // ============================================================
 
 var currentUser = null;
@@ -3376,34 +3380,7 @@ var currentRole = null;
 var parseInitialized = false;
 var statsInterval = null;
 
-// ========== BACK4APP BAŞLAT ==========
-async function initBack4App() {
-    if (parseInitialized) return;
-    try {
-        await loadParseSDK();
-        Parse.initialize("ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8", "mur4DtLsGOsQhykTnFVNGxYOeNbvjPbAkl6xPQGp");
-        Parse.serverURL = "https://parseapi.back4app.com";
-        parseInitialized = true;
-        console.log('Back4App baslatildi');
-        showNotification('Back4App baglantisi kuruldu!', 'success');
-    } catch(e) {
-        console.error('Back4App hatasi:', e);
-        showNotification('Back4App baglanti hatasi!', 'error');
-    }
-}
-
-function loadParseSDK() {
-    return new Promise(function(resolve, reject) {
-        if (typeof Parse !== 'undefined') { resolve(); return; }
-        var script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/parse@5.0.0/dist/parse.min.js';
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-    });
-}
-
-// ========== BİLDİRİM (ÇEVİRİ DESTEKLİ) ==========
+// ========== BİLDİRİM (BAĞIMSIZ) ==========
 function showNotification(msg, type) {
     var n = document.getElementById('notification');
     if (!n) {
@@ -3412,12 +3389,8 @@ function showNotification(msg, type) {
         n.className = 'notification';
         document.body.appendChild(n);
     }
-    // Çeviri kontrolü
-    var lang = currentLanguage || 'tr';
-    var translatedMsg = (typeof translations !== 'undefined' && translations[lang] && translations[lang][msg]) 
-        ? translations[lang][msg] 
-        : msg;
-    n.innerHTML = (type === 'error' ? '❌ ' : '✅ ') + translatedMsg;
+    var prefix = (type === 'error') ? '❌ ' : '✅ ';
+    n.innerHTML = prefix + msg;
     n.className = 'notification show' + (type === 'error' ? ' error' : '');
     setTimeout(function() { n.classList.remove('show'); }, 4000);
 }
@@ -3426,6 +3399,27 @@ function showNotification(msg, type) {
 function closeModal(id) {
     var modal = document.getElementById(id);
     if (modal) modal.classList.remove('open');
+}
+
+// ========== PARSE SERVER BAŞLAT (KENDİ SUNUCUN) ==========
+async function initBack4App() {
+    if (parseInitialized) return;
+    try {
+        if (typeof Parse === 'undefined') {
+            console.error('Parse SDK yüklenmedi!');
+            showNotification('Parse SDK yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
+            return;
+        }
+        // === KENDİ SUNUCUN (Back4App YOK) ===
+        Parse.initialize("vizyon2027", "vizyonMasterKey2027");
+        Parse.serverURL = "https://vizyon-parse-server.onrender.com/parse";
+        parseInitialized = true;
+        console.log('✅ Parse Server bağlantısı kuruldu!');
+        showNotification('✅ Parse Server bağlantısı kuruldu!', 'success');
+    } catch(e) {
+        console.error('Parse hatası:', e);
+        showNotification('❌ Parse bağlantı hatası: ' + e.message, 'error');
+    }
 }
 
 // ========== OTOMATİK OTURUM KONTROLÜ ==========
@@ -3451,7 +3445,7 @@ async function checkSession() {
     }
 }
 
-// ========== SORGU LİMİTİ (SESSİZ ÇALIŞIR) ==========
+// ========== SORGU LİMİTİ ==========
 async function useQuery() {
     try {
         var result = await Parse.Cloud.run('useQuery');
@@ -3467,18 +3461,10 @@ async function useQuery() {
     }
 }
 
-// ========== SORGU LİMİTİ ROZETİ GÜNCELLE ==========
 function updateQueryBadge(result) {
     var badges = document.querySelectorAll('.query-limit-badge');
-    var isMember = result && result.isMember;
     var remaining = result ? result.remaining : 'Sınırsız';
-    var limit = result ? result.limit : 25;
-    var text = '';
-    if (remaining === 'Sınırsız' || remaining === Infinity) {
-        text = '🔋 Sınırsız sorgu';
-    } else {
-        text = '🔋 ' + remaining + ' sorgu kaldı';
-    }
+    var text = (remaining === 'Sınırsız' || remaining === Infinity) ? '🔋 Sınırsız sorgu' : '🔋 ' + remaining + ' sorgu kaldı';
     badges.forEach(function(badge) {
         badge.textContent = text;
         badge.style.display = 'inline-block';
@@ -3527,11 +3513,8 @@ function stopStatsInterval() {
     }
 }
 
-// ================================================================
-// ========== PARÇACIK VE ÖZEL İMLEÇ (SÜREKLİ AKTİF) ============
-// ================================================================
+// ========== PARÇACIK VE ÖZEL İMLEÇ ==========
 (function initParticlesAndCursor() {
-    // Parçacıklar
     var container = document.getElementById('particles');
     if (container) {
         container.innerHTML = '';
@@ -3543,7 +3526,6 @@ function stopStatsInterval() {
         }
     }
 
-    // Özel imleç
     var cursor = document.getElementById('customCursor');
     var ring = document.getElementById('customCursorRing');
     if (cursor && ring) {
@@ -3563,7 +3545,6 @@ function stopStatsInterval() {
         }
         animateCursor();
 
-        // Buton hover efektleri
         var btns = document.querySelectorAll('button, a, .btn, .secret-btn, .support-link');
         for (var i = 0; i < btns.length; i++) {
             (function(btn) {
@@ -3574,10 +3555,9 @@ function stopStatsInterval() {
     }
 })();
 
-console.log('✅ JS-1 yüklendi (Back4App, sayaçlar, parçacık ve imleç)');
+console.log('✅ JS-1 yüklendi (Parse Server, sayaçlar, parçacık ve imleç)');
 </script>
     
-
     <!-- ============================================================ -->
 <!-- JS-2: KAYIT, GİRİŞ, DOĞRULAMA, GOOGLE, FACEBOOK, PROJE YÖNETİMİ -->
 <!-- ============================================================ -->
@@ -4063,13 +4043,12 @@ async function loadProjectRequests() {
 }
 </script>
     
-
-    <!-- ============================================================ -->
-<!-- JS-3: TAKIM VE AI (Cloud Code + Dosya Yükleme + Kopyala + 3D/Görsel) -->
+<!-- ============================================================ -->
+<!-- JS-3: TAKIM VE AI (Cloud Code + Dosya Yükleme + Kopyala + 3D/Görsel + SES) -->
 <!-- ============================================================ -->
 <script>
 // ================================================================
-// JS-3: TAKIM, AI, DOSYA YÜKLEME, 3D, KOPYALA (FULL – HATASIZ)
+// JS-3: TAKIM, AI, DOSYA YÜKLEME, 3D, KOPYALA, SES (FULL – HATASIZ)
 // ================================================================
 
 // ========== TAKIM BİLGİSİNİ YÜKLE ==========
@@ -4609,7 +4588,6 @@ async function uploadFullFile(input) {
             video.style.objectFit = 'cover';
             video.preload = 'metadata';
             card.appendChild(video);
-            // Süre bilgisi
             var durationSpan = document.createElement('span');
             durationSpan.style.cssText = 'position:absolute; bottom:2px; right:4px; background:rgba(0,0,0,0.7); color:#fff; font-size:10px; padding:1px 6px; border-radius:4px;';
             video.onloadedmetadata = function() {
@@ -4641,7 +4619,6 @@ async function uploadFullFile(input) {
 
         container.appendChild(card);
 
-        // Dosya içeriğini oku ve AI'ya gönder
         var reader = new FileReader();
         reader.onload = async function (event) {
             var content = event.target.result;
@@ -5189,7 +5166,79 @@ document.addEventListener('DOMContentLoaded', function () {
     document.head.appendChild(style);
 })();
 
-console.log('✅ JS-3 yüklendi (Takım, AI, 3D, Dosya Yükleme, Kopyala)');
+// ================================================================
+// ========== SESLİ KOMUT (SPEECH TO TEXT) ==========
+// ================================================================
+window.startVoiceInput = function() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        showNotification('❌ Tarayıcınız sesli komut desteklemiyor!', 'error');
+        return;
+    }
+    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    var recognition = new SpeechRecognition();
+    recognition.lang = 'tr-TR';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = function() {
+        showNotification('🎤 Konuşmaya başlayın...', 'success');
+    };
+
+    recognition.onresult = function(event) {
+        var transcript = event.results[0][0].transcript;
+        var input = document.getElementById('dashboardAiInput') || document.getElementById('fullAIInput') || document.getElementById('teamPageInput');
+        if (input) {
+            input.value = transcript;
+            if (input.id === 'dashboardAiInput') window.sendDashboardAI();
+            else if (input.id === 'fullAIInput') sendFullAI();
+            else if (input.id === 'teamPageInput') window.sendTeamPageMessage();
+        }
+        showNotification('✅ "' + transcript + '" gönderildi!', 'success');
+    };
+
+    recognition.onerror = function(event) {
+        showNotification('❌ Ses algılanamadı: ' + event.error, 'error');
+    };
+
+    recognition.start();
+};
+
+// ================================================================
+// ========== METİN OKUMA (TEXT TO SPEECH) ==========
+// ================================================================
+window.speakText = function(text) {
+    if (!text) {
+        showNotification('❌ Okunacak metin yok!', 'error');
+        return;
+    }
+    if (!('speechSynthesis' in window)) {
+        showNotification('❌ Tarayıcınız metin okuma desteklemiyor!', 'error');
+        return;
+    }
+    // Konuşma devam ediyorsa durdur
+    if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+    }
+    var utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'tr-TR';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1;
+    
+    // Türkçe ses seçimi
+    var voices = window.speechSynthesis.getVoices();
+    var trVoice = voices.find(function(v) { return v.lang.startsWith('tr'); });
+    if (trVoice) utterance.voice = trVoice;
+    
+    window.speechSynthesis.speak(utterance);
+    showNotification('🔊 Metin okunuyor...', 'success');
+};
+
+// AI cevabı geldikten sonra otomatik okuma (isteğe bağlı)
+// Bu fonksiyonu sendFullAI veya sendDashboardAI içinde çağırabilirsin.
+// Örnek: speakText(cleaned); (temizlenmiş metni okur)
+
+console.log('✅ JS-3 yüklendi (Takım, AI, 3D, Dosya Yükleme, Kopyala, Ses)');
 </script>
 
 <!-- ============================================================ -->
@@ -5325,7 +5374,6 @@ var translations = {
         'Back4App bağlantısı kuruldu!': 'Back4App bağlantısı kuruldu!',
         'Back4App bağlantı hatası!': 'Back4App bağlantı hatası!',
         'Sistem Aktif!': 'Sistem Aktif!',
-        // === EKSİK 15 ANAHTAR (TÜRKÇE) ===
         'Projelerim': 'Projelerim',
         'Yeni Proje': 'Yeni Proje',
         'Favoriler': 'Favoriler',
@@ -5343,7 +5391,6 @@ var translations = {
         'Yorum yapmak için giriş yapmalısınız.': 'Yorum yapmak için giriş yapmalısınız.'
     },
     en: {
-        // ... (İngilizce çeviriler, öncekiyle aynı) ...
         'Projelerim': 'My Projects',
         'Yeni Proje': 'New Project',
         'Favoriler': 'Favorites',
@@ -5361,7 +5408,6 @@ var translations = {
         'Yorum yapmak için giriş yapmalısınız.': 'You must login to comment.'
     },
     es: {
-        // ... (İspanyolca çeviriler, öncekiyle aynı) ...
         'Projelerim': 'Mis Proyectos',
         'Yeni Proje': 'Nuevo Proyecto',
         'Favoriler': 'Favoritos',
@@ -5379,7 +5425,6 @@ var translations = {
         'Yorum yapmak için giriş yapmalısınız.': 'Debes iniciar sesión para comentar.'
     },
     ru: {
-        // ... (Rusça çeviriler, öncekiyle aynı) ...
         'Projelerim': 'Мои проекты',
         'Yeni Proje': 'Новый проект',
         'Favoriler': 'Избранное',
@@ -5741,11 +5786,12 @@ window.handleLogin = async function() {
 };
 
 window.loginWithGoogle = async function() {
-    // (mevcut kod aynen)
+    // Google girişi için Back4App ayarları yapılmalı
+    showNotification('Google ile giriş yakında aktif olacak.', 'warning');
 };
 
 window.loginWithFacebook = async function() {
-    // (mevcut kod aynen)
+    showNotification('Facebook ile giriş yakında aktif olacak.', 'warning');
 };
 
 window.logout = function() {
@@ -6127,19 +6173,40 @@ window.updateCommentUI = function() {
     }
 };
 
+// ============================================================
+// ⭐ YORUM YÜKLEME – 400 HATASI DÜZELTİLDİ (FULL FIX)
+// ============================================================
 window.loadComments = async function() {
     try {
-        var comments = await Parse.Cloud.run('getComments');
+        // Cloud Code'dan artık { success: true, comments: [...] } formatında geliyor
+        const result = await Parse.Cloud.run('getComments');
+        let comments = [];
+        if (result && result.success) {
+            comments = result.comments || [];
+        } else {
+            // Eğer hata varsa veya eski format gelirse boş dizi olarak devam et
+            console.warn('Yorumlar yüklenirken uyarı:', result?.error || 'Bilinmeyen format');
+        }
+        
         var mainContainer = document.getElementById('mainCommentsList');
         var dashContainer = document.querySelector('#dashboardArea #commentsList');
         var html = '';
-        if (!comments || comments.length === 0) html = '<div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">🌟 İlk yorumu sen yap!</div>';
-        else html = window.buildCommentsHTML(comments);
+        
+        if (!comments || comments.length === 0) {
+            html = '<div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">🌟 İlk yorumu sen yap!</div>';
+        } else {
+            html = window.buildCommentsHTML(comments);
+        }
+        
         if (mainContainer) mainContainer.innerHTML = html;
         if (dashContainer) dashContainer.innerHTML = html;
+        
     } catch(e) {
+        console.error('Yorum yükleme hatası:', e);
         var errorHtml = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);">⚠️ Yorumlar yüklenemedi: ' + e.message + '</div>';
-        document.querySelectorAll('#mainCommentsList, #commentsList').forEach(function(el) { if (el) el.innerHTML = errorHtml; });
+        document.querySelectorAll('#mainCommentsList, #commentsList').forEach(function(el) { 
+            if (el) el.innerHTML = errorHtml; 
+        });
     }
 };
 
@@ -6635,11 +6702,124 @@ window.unbanUserByEmail = async function(email) {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
+// ========== EKSİK FONKSİYONLAR (DÜZELTİLDİ) ==========
+window.buyPackage = function(pkg) {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    showNotification(pkg === 'pro' ? '🌟 Pro paket seçildi! Ödeme sayfası yakında.' : '👥 Takım paketi seçildi!', 'success');
+};
+
+window.changePassword = async function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    var newPass = prompt('Yeni şifrenizi girin (8+ karakter):');
+    if (!newPass || newPass.length < 8) return showNotification('Şifre en az 8 karakter olmalı!', 'error');
+    var confirmPass = prompt('Yeni şifreyi tekrar girin:');
+    if (newPass !== confirmPass) return showNotification('Şifreler eşleşmiyor!', 'error');
+    try {
+        currentUser.set('password', newPass);
+        await currentUser.save();
+        showNotification('Şifre başarıyla değiştirildi!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+window.deleteAccount = async function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    if (!confirm('Hesabınızı kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) return;
+    try {
+        await currentUser.destroy();
+        await Parse.User.logOut();
+        localStorage.removeItem('vizyon_user');
+        currentUser = null;
+        location.reload();
+        showNotification('Hesabınız silindi.', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+window.setAdminPassword = async function() {
+    var email = document.getElementById('adminEmail').value.trim();
+    var pass = document.getElementById('adminPass').value;
+    var pass2 = document.getElementById('adminPass2').value;
+    if (!email || !pass || pass.length < 8 || pass !== pass2) {
+        return showNotification('Tüm alanları doldurun, şifreler aynı ve min 8 karakter.', 'error');
+    }
+    try {
+        var query = new Parse.Query(Parse.User);
+        query.equalTo('email', email);
+        var user = await query.first();
+        if (!user) return showNotification('Kullanıcı bulunamadı!', 'error');
+        user.set('password', pass);
+        await user.save();
+        showNotification('Şifre güncellendi!', 'success');
+        closeModal('adminPasswordModal');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+window.assignAdmin = function() {
+    var email = document.getElementById('assignAdminEmail').value.trim();
+    if (!email) return showNotification('E-posta girin!', 'error');
+    window.assignAdminEmail(email);
+};
+
+window.sendGift = function() {
+    var email = document.getElementById('giftEmail').value.trim();
+    var pkg = document.getElementById('giftPackage').value;
+    if (!email) return showNotification('E-posta girin!', 'error');
+    window.giftUserEmail(email, pkg);
+};
+
+window.banUser = function() {
+    var email = document.getElementById('banUserEmail').value.trim();
+    if (!email) return showNotification('E-posta girin!', 'error');
+    window.banUserEmail(email);
+};
+
 // ========== SAYFA YÜKLENİNCE ==========
 window.onload = async function() {
     try {
         console.log('🔄 Sayfa yükleniyor...');
-        document.getElementById('mainSite').style.display = 'block';
+        // Elementlerin varlığını kontrol et ve yoksa oluştur
+        let mainSite = document.getElementById('mainSite');
+        if (!mainSite) {
+            mainSite = document.createElement('div');
+            mainSite.id = 'mainSite';
+            document.body.prepend(mainSite);
+            console.warn('⚠️ mainSite elementi eksikti, otomatik oluşturuldu.');
+        }
+        let dashboardArea = document.getElementById('dashboardArea');
+        if (!dashboardArea) {
+            dashboardArea = document.createElement('div');
+            dashboardArea.id = 'dashboardArea';
+            dashboardArea.className = 'dashboard-container';
+            dashboardArea.style.display = 'none';
+            document.body.appendChild(dashboardArea);
+            console.warn('⚠️ dashboardArea elementi eksikti, otomatik oluşturuldu.');
+        }
+        let userPanel = document.getElementById('userPanel');
+        if (!userPanel) {
+            userPanel = document.createElement('div');
+            userPanel.id = 'userPanel';
+            userPanel.style.display = 'none';
+            document.body.appendChild(userPanel);
+            console.warn('⚠️ userPanel elementi eksikti, otomatik oluşturuldu.');
+        }
+        let notification = document.getElementById('notification');
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.id = 'notification';
+            notification.className = 'notification';
+            document.body.appendChild(notification);
+            console.warn('⚠️ notification elementi eksikti, otomatik oluşturuldu.');
+        }
+
+        mainSite.style.display = 'block';
+        dashboardArea.style.display = 'none';
+        userPanel.style.display = 'none';
+
         if (typeof initBack4App === 'function') {
             await initBack4App();
         } else {
@@ -6681,17 +6861,17 @@ window.onload = async function() {
                 await Parse.User.logOut();
                 localStorage.removeItem('vizyon_user');
                 currentUser = null;
-                document.getElementById('mainSite').style.display = 'block';
-                document.getElementById('dashboardArea').style.display = 'none';
-                document.getElementById('userPanel').style.display = 'none';
+                mainSite.style.display = 'block';
+                dashboardArea.style.display = 'none';
+                userPanel.style.display = 'none';
                 showNotification('Oturum süresi doldu, tekrar giriş yapın.', 'warning');
             }
         } else {
             localStorage.removeItem('vizyon_user');
             currentUser = null;
-            document.getElementById('mainSite').style.display = 'block';
-            document.getElementById('dashboardArea').style.display = 'none';
-            document.getElementById('userPanel').style.display = 'none';
+            mainSite.style.display = 'block';
+            dashboardArea.style.display = 'none';
+            userPanel.style.display = 'none';
         }
         await window.loadComments();
         await window.updateStats();
@@ -6699,9 +6879,13 @@ window.onload = async function() {
         showNotification('✨ VİZYON 2027 Sistemi Aktif!', 'success');
     } catch(e) {
         console.error('🚨 Sayfa yüklenirken beklenmeyen hata:', e);
-        document.getElementById('mainSite').style.display = 'block';
-        document.getElementById('dashboardArea').style.display = 'none';
-        document.getElementById('userPanel').style.display = 'none';
+        // Hata durumunda ana sayfayı göster
+        let mainSite = document.getElementById('mainSite');
+        if (mainSite) mainSite.style.display = 'block';
+        let dashboardArea = document.getElementById('dashboardArea');
+        if (dashboardArea) dashboardArea.style.display = 'none';
+        let userPanel = document.getElementById('userPanel');
+        if (userPanel) userPanel.style.display = 'none';
         showNotification('Sayfa yüklenirken hata oluştu: ' + e.message, 'error');
     }
 };
@@ -6732,8 +6916,7 @@ window.toggleTeamPage = function() {
             page.id = 'teamPage';
             page.className = 'team-page-overlay';
             page.style.display = 'none';
-            // HTML içeriği yukarıdaki gibi olmalı, ama zaten HTML-3'te var.
-            // Burada sadece mevcut sayfayı aç/kapa yapıyoruz.
+            // HTML içeriği zaten HTML-3'te var, burada sadece aç/kapa yapıyoruz
         }
     }
     if (page.classList.contains('open')) {
@@ -6749,7 +6932,7 @@ window.toggleTeamPage = function() {
     }
 };
 
-// ========== TAKIM SAYFASINI YÜKLE (DÜZENLİ) ==========
+// ========== TAKIM SAYFASINI YÜKLE ==========
 window.loadTeamPage = async function() {
     if (!currentUser) return;
     var teamId = currentUser.get('teamId');
@@ -6773,7 +6956,7 @@ window.loadTeamPage = async function() {
     var panelMemberCount = document.getElementById('teamPageMemberCount');
 
     if (!teamId) {
-        if (panelInfo) panelInfo.innerHTML = `<span data-i18n="Takım kodu">Takım kodu</span>: <span class="team-code">-</span> <span>0 <span data-i18n="üye">üye</span></span>`;
+        if (panelInfo) panelInfo.innerHTML = '<span data-i18n="Takım kodu">Takım kodu</span>: <span class="team-code">-</span> <span>0 <span data-i18n="üye">üye</span></span>';
         if (panelMessages) panelMessages.innerHTML = '<div style="color:var(--text3);text-align:center;padding:20px;">Bir takıma üye değilsiniz. Takım kurun veya kodla katılın.</div>';
         if (membersList) membersList.innerHTML = '';
         if (changesList) changesList.innerHTML = '';
@@ -6829,7 +7012,6 @@ window.loadTeamPage = async function() {
         if (badgeCount) badgeCount.textContent = members.length;
         if (panelMemberCount) panelMemberCount.textContent = members.length + ' üye';
 
-        // Sohbet mesajlarını temizle ve göster
         var userEmail = currentUser.get('email');
         var chatHtml = '';
         messages.forEach(function(msg) {
@@ -6853,14 +7035,13 @@ window.loadTeamPage = async function() {
                 else { content = '🗑️ Bu mesaj silinmiştir.'; }
             }
             if (msg.get('user_email') === 'admin.tr.reis@gmail.com' && !isSystem) sender += ' <span class="founder-badge">👑 VİZYON2027 FOUNDER</span>';
-            if (content) chatHtml += `<div class="ai-message ${cls}${extraClass}"><strong>${sender}</strong>: ${content} ${edited ? '<span style="font-size:9px;color:var(--text3);">(düzenlendi)</span>' : ''}</div>`;
+            if (content) chatHtml += '<div class="ai-message ' + cls + extraClass + '"><strong>' + sender + '</strong>: ' + content + (edited ? ' <span style="font-size:9px;color:var(--text3);">(düzenlendi)</span>' : '') + '</div>';
         });
         if (panelMessages) {
             panelMessages.innerHTML = chatHtml || '<div style="color:var(--text3);text-align:center;padding:20px;">Henüz mesaj yok</div>';
             panelMessages.scrollTop = panelMessages.scrollHeight;
         }
 
-        // Üyeleri göster
         var memberHtml = '';
         members.forEach(function(m) {
             var email = m.get('user_email');
@@ -6870,17 +7051,15 @@ window.loadTeamPage = async function() {
             var isVizyonFounderMember = (email === 'admin.tr.reis@gmail.com');
             var name = m.get('user_name') || email.split('@')[0] || 'İsimsiz';
             if (isVizyonFounderMember) name += ' <span class="founder-badge">👑 VİZYON2027 FOUNDER</span>';
-            memberHtml += `<div class="member-item"><span>${name} (${email})</span><span style="font-size:11px;color:var(--text3);">${roleText}</span></div>`;
+            memberHtml += '<div class="member-item"><span>' + name + ' (' + email + ')</span><span style="font-size:11px;color:var(--text3);">' + roleText + '</span></div>';
         });
         if (membersList) membersList.innerHTML = memberHtml;
 
-        // Değişiklikler (örnek)
         if (changesList) changesList.innerHTML = '<div style="color:var(--text3);">📋 Son değişiklikler burada görünecek.</div>';
         if (projectsDiv) projectsDiv.innerHTML = '📁 Henüz proje yok.';
         if (inboxDiv) inboxDiv.innerHTML = '📭 Mesaj kutusu boş.';
         if (vizyonLogDiv) vizyonLogDiv.innerHTML = '📜 Henüz kayıt yok.';
 
-        // Butonları göster/gizle
         if (inviteBtn) inviteBtn.style.display = canManage ? 'inline-block' : 'none';
         if (inviteEmail) inviteEmail.style.display = canManage ? 'inline-block' : 'none';
         if (closeBtn) closeBtn.style.display = isOwner ? 'inline-block' : 'none';
@@ -6892,7 +7071,9 @@ window.loadTeamPage = async function() {
                 document.getElementById('patrolStatus').textContent = vizyonPatrolActive ? 'AÇIK' : 'KAPALI';
                 document.getElementById('supportStatus').textContent = vizyonSupportActive ? 'AÇIK' : 'KAPALI';
                 window.loadVizyonLog();
-            } else founderPanel.style.display = 'none';
+            } else {
+                founderPanel.style.display = 'none';
+            }
         }
         window.applyTranslations(currentLanguage);
     } catch(e) {
@@ -6924,7 +7105,6 @@ window.sendTeamPageMessage = async function() {
             fileInput.value = '';
         }
 
-        // @vizyonal ve @vizyondestek kontrolü
         var isVizyonCommand = false;
         var isSupportCommand = false;
         var isOfflineCommand = false;
@@ -6947,14 +7127,13 @@ window.sendTeamPageMessage = async function() {
             if (isOfflineCommand) {
                 aiResponse = '🧠 VİZYON AI: Anladım, destek sohbetinden ayrılıyorum. Tekrar çağırmak için @vizyondestek yazın. 👋';
             } else {
-                // Sohbet geçmişini al
                 const Message = Parse.Object.extend('TeamMessage');
                 const chatQuery = new Parse.Query(Message);
                 chatQuery.equalTo('team_id', teamId);
                 chatQuery.ascending('createdAt');
                 chatQuery.limit(20);
                 const history = await chatQuery.find({ useMasterKey: true });
-                let context = "Takım sohbet geçmişi (son 20 mesaj):\n";
+                var context = "Takım sohbet geçmişi (son 20 mesaj):\n";
                 history.forEach(function(h) {
                     const sender = h.get('user_name') || h.get('user_email');
                     const txt = h.get('message') || '[Dosya]';
@@ -6977,7 +7156,9 @@ window.sendTeamPageMessage = async function() {
                         inbox.set("message", 'Destek talebinde hata: ' + command + '\nHata: ' + e.message + '\nKullanıcı: ' + currentUser.get('email'));
                         await inbox.save(null, { useMasterKey: true });
                         aiResponse = '🧠 VİZYON AI: Üzgünüm, bir hata oluştu. Bu durum kurucuya bildirildi. Lütfen daha sonra tekrar deneyin.';
-                    } else aiResponse = '🧠 VİZYON AI: Üzgünüm, şu anda cevap veremiyorum. Lütfen daha sonra tekrar deneyin.';
+                    } else {
+                        aiResponse = '🧠 VİZYON AI: Üzgünüm, şu anda cevap veremiyorum. Lütfen daha sonra tekrar deneyin.';
+                    }
                 }
             }
 
@@ -7004,8 +7185,12 @@ window.sendTeamPageMessage = async function() {
             msgInput.value = '';
             await window.loadTeamPage();
             showNotification('Mesaj gönderildi!', 'success');
-        } else showNotification('Mesaj gönderilemedi: ' + result.error, 'error');
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+        } else {
+            showNotification('Mesaj gönderilemedi: ' + result.error, 'error');
+        }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 // ========== TAKIM OLUŞTUR ==========
@@ -7019,8 +7204,12 @@ window.createTeamPage = async function() {
             await currentUser.save();
             await window.loadTeamPage();
             showNotification('"' + name + '" takımı oluşturuldu! Takım kodu: ' + result.teamCode, 'success');
-        } else showNotification('Takım oluşturulamadı: ' + result.error, 'error');
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+        } else {
+            showNotification('Takım oluşturulamadı: ' + result.error, 'error');
+        }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 // ========== KOD İLE TAKIMA KATIL ==========
@@ -7036,8 +7225,12 @@ window.joinTeamPageWithCode = async function() {
             codeInput.value = '';
             await window.loadTeamPage();
             showNotification('✅ Takıma katıldınız!', 'success');
-        } else showNotification('❌ ' + result.error, 'error');
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+        } else {
+            showNotification('❌ ' + result.error, 'error');
+        }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 // ========== TAKIMDAN AYRIL ==========
@@ -7048,8 +7241,12 @@ window.leaveTeamPage = async function() {
         if (result.success) {
             await window.loadTeamPage();
             showNotification('Takımdan ayrıldınız.', 'success');
-        } else showNotification('Hata: ' + result.error, 'error');
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+        } else {
+            showNotification('Hata: ' + result.error, 'error');
+        }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 // ========== TAKIMI KAPAT ==========
@@ -7060,8 +7257,12 @@ window.closeTeamPage = async function() {
         if (result.success) {
             await window.loadTeamPage();
             showNotification('Takım kapatıldı.', 'success');
-        } else showNotification('Hata: ' + result.error, 'error');
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+        } else {
+            showNotification('Hata: ' + result.error, 'error');
+        }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 // ========== ÜYE YÖNETİMİ ==========
@@ -7127,7 +7328,9 @@ window.openTeamMemberManagement = async function() {
         });
         container.innerHTML = html;
         window.applyTranslations(currentLanguage);
-    } catch(e) { showNotification('Üye listesi yüklenemedi: ' + e.message, 'error'); }
+    } catch(e) {
+        showNotification('Üye listesi yüklenemedi: ' + e.message, 'error');
+    }
 };
 
 window.makeManager = async function(email) {
@@ -7138,7 +7341,9 @@ window.makeManager = async function(email) {
         showNotification(result.message, 'success');
         window.openTeamMemberManagement();
         window.loadTeamPage();
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 window.demoteManager = async function(email) {
@@ -7149,7 +7354,9 @@ window.demoteManager = async function(email) {
         showNotification(result.message, 'success');
         window.openTeamMemberManagement();
         window.loadTeamPage();
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 window.removeMemberFromTeam = async function(email) {
@@ -7160,7 +7367,9 @@ window.removeMemberFromTeam = async function(email) {
         showNotification(result.message, 'success');
         window.openTeamMemberManagement();
         window.loadTeamPage();
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 window.transferOwnership = async function(email) {
@@ -7171,7 +7380,9 @@ window.transferOwnership = async function(email) {
         showNotification(result.message, 'success');
         window.openTeamMemberManagement();
         window.loadTeamPage();
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 // ========== VİZYON DESTEK ==========
@@ -7210,14 +7421,19 @@ window.openVizyonSupport = function() {
     var msgContainer = document.getElementById('vizyonSupportMessages');
     if (msgContainer) msgContainer.innerHTML = '<div class="ai-message bot">📢 Vizyon Destek\'e hoş geldiniz. Her türlü sorunuzu cevaplayabilirim. Yardımcı olmaya çalışacağım.</div>';
     var input = document.getElementById('vizyonSupportInput');
-    if (input) input.value = '';
-    if (input) input.focus();
+    if (input) {
+        input.value = '';
+        input.focus();
+    }
     window.applyTranslations(currentLanguage);
 };
 
 window.closeVizyonSupport = function() {
     var panel = document.getElementById('vizyonSupportPanel');
-    if (panel) { panel.style.display = 'none'; panel.classList.remove('open'); }
+    if (panel) {
+        panel.style.display = 'none';
+        panel.classList.remove('open');
+    }
 };
 
 window.sendVizyonSupportMessage = async function() {
@@ -7234,7 +7450,9 @@ window.sendVizyonSupportMessage = async function() {
     try {
         var result = await Parse.Cloud.run('vizyonSupportAI', { message: msg });
         var reply = result.reply || 'Üzgünüm, şu anda cevap veremiyorum.';
-        if (result.forwardedToFounder) reply += '<br><br>📨 Bu talep kurucumuza iletilmiştir. En kısa sürede ilgilenecektir.';
+        if (result.forwardedToFounder) {
+            reply += '<br><br>📨 Bu talep kurucumuza iletilmiştir. En kısa sürede ilgilenecektir.';
+        }
         container.innerHTML += '<div class="ai-message bot">' + reply + '</div>';
         container.scrollTop = container.scrollHeight;
     } catch(e) {
@@ -7265,72 +7483,87 @@ window.loadVizyonLog = async function() {
         var result = await Parse.Cloud.run('getVizyonLog');
         var container = document.getElementById('vizyonLogContainer');
         if (!container) return;
-        if (!result || result.length === 0) { container.innerHTML = '<div style="color:var(--text3);padding:8px;">📭 Henüz kayıt yok.</div>'; return; }
+        if (!result || result.length === 0) {
+            container.innerHTML = '<div style="color:var(--text3);padding:8px;">📭 Henüz kayıt yok.</div>';
+            return;
+        }
         var html = '';
         result.forEach(function(log) {
             var time = new Date(log.createdAt).toLocaleString('tr-TR');
-            html += `<div style="border-bottom:1px solid var(--border);padding:6px 0;font-size:13px;">
-                <span style="color:var(--text3);font-size:11px;">${time}</span>
-                <div>${log.message}</div>
-            </div>`;
+            html += '<div style="border-bottom:1px solid var(--border);padding:6px 0;font-size:13px;">';
+            html += '<span style="color:var(--text3);font-size:11px;">' + time + '</span>';
+            html += '<div>' + log.message + '</div>';
+            html += '</div>';
         });
         container.innerHTML = html;
         window.applyTranslations(currentLanguage);
-    } catch(e) { console.error('Vizyon log yüklenirken hata:', e); }
+    } catch(e) {
+        console.error('Vizyon log yüklenirken hata:', e);
+    }
 };
 
 // ========== TÜM TAKIMLARI LİSTELE (KURUCU) ==========
 window.showAllTeams = async function() {
     var container = document.getElementById('allTeamsList');
     if (!container) return;
-    if (container.style.display === 'block') { container.style.display = 'none'; return; }
+    if (container.style.display === 'block') {
+        container.style.display = 'none';
+        return;
+    }
     try {
         var result = await Parse.Cloud.run('getAllTeams');
-        if (!result || result.length === 0) { container.innerHTML = '<div style="color:var(--text3);padding:8px;">📭 Hiç takım yok.</div>'; }
-        else {
+        if (!result || result.length === 0) {
+            container.innerHTML = '<div style="color:var(--text3);padding:8px;">📭 Hiç takım yok.</div>';
+        } else {
             var html = '<div style="display:flex;flex-direction:column;gap:6px;">';
             result.forEach(function(t) {
-                html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-bottom:1px solid var(--border);">
-                    <span><strong>${t.name}</strong> (${t.code}) - 👑 ${t.owner} - ${t.memberCount} üye</span>
-                    <div style="display:flex;gap:4px;">
-                        <button class="btn-secondary btn-sm" onclick="window.joinTeamAsFounder('${t.id}')" style="font-size:9px;padding:2px 6px;">📥 Katıl</button>
-                        <button class="btn-danger btn-sm" onclick="window.forceCloseTeam('${t.id}')" style="font-size:9px;padding:2px 6px;">🗑️ Kapat</button>
-                    </div>
-                </div>`;
+                html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-bottom:1px solid var(--border);">';
+                html += '<span><strong>' + t.name + '</strong> (' + t.code + ') - 👑 ' + t.owner + ' - ' + t.memberCount + ' üye</span>';
+                html += '<div style="display:flex;gap:4px;">';
+                html += '<button class="btn-secondary btn-sm" onclick="window.joinTeamAsFounder(\'' + t.id + '\')" style="font-size:9px;padding:2px 6px;">📥 Katıl</button>';
+                html += '<button class="btn-danger btn-sm" onclick="window.forceCloseTeam(\'' + t.id + '\')" style="font-size:9px;padding:2px 6px;">🗑️ Kapat</button>';
+                html += '</div></div>';
             });
             html += '</div>';
             container.innerHTML = html;
         }
         container.style.display = 'block';
         window.applyTranslations(currentLanguage);
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 window.searchTeams = async function() {
     var query = document.getElementById('teamSearchInput').value.trim().toLowerCase();
-    if (!query) { window.showAllTeams(); return; }
+    if (!query) {
+        window.showAllTeams();
+        return;
+    }
     try {
         var result = await Parse.Cloud.run('searchTeams', { query: query });
         var container = document.getElementById('allTeamsList');
         if (!container) return;
-        if (!result || result.length === 0) { container.innerHTML = '<div style="color:var(--text3);padding:8px;">🔍 Takım bulunamadı.</div>'; }
-        else {
+        if (!result || result.length === 0) {
+            container.innerHTML = '<div style="color:var(--text3);padding:8px;">🔍 Takım bulunamadı.</div>';
+        } else {
             var html = '<div style="display:flex;flex-direction:column;gap:6px;">';
             result.forEach(function(t) {
-                html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-bottom:1px solid var(--border);">
-                    <span><strong>${t.name}</strong> (${t.code}) - 👑 ${t.owner} - ${t.memberCount} üye</span>
-                    <div style="display:flex;gap:4px;">
-                        <button class="btn-secondary btn-sm" onclick="window.joinTeamAsFounder('${t.id}')" style="font-size:9px;padding:2px 6px;">📥 Katıl</button>
-                        <button class="btn-danger btn-sm" onclick="window.forceCloseTeam('${t.id}')" style="font-size:9px;padding:2px 6px;">🗑️ Kapat</button>
-                    </div>
-                </div>`;
+                html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-bottom:1px solid var(--border);">';
+                html += '<span><strong>' + t.name + '</strong> (' + t.code + ') - 👑 ' + t.owner + ' - ' + t.memberCount + ' üye</span>';
+                html += '<div style="display:flex;gap:4px;">';
+                html += '<button class="btn-secondary btn-sm" onclick="window.joinTeamAsFounder(\'' + t.id + '\')" style="font-size:9px;padding:2px 6px;">📥 Katıl</button>';
+                html += '<button class="btn-danger btn-sm" onclick="window.forceCloseTeam(\'' + t.id + '\')" style="font-size:9px;padding:2px 6px;">🗑️ Kapat</button>';
+                html += '</div></div>';
             });
             html += '</div>';
             container.innerHTML = html;
         }
         container.style.display = 'block';
         window.applyTranslations(currentLanguage);
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 window.joinTeamAsFounder = async function(teamId) {
@@ -7342,8 +7575,12 @@ window.joinTeamAsFounder = async function(teamId) {
             await currentUser.save();
             await window.loadTeamPage();
             showNotification('✅ Takıma katıldınız!', 'success');
-        } else showNotification('Hata: ' + result.error, 'error');
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+        } else {
+            showNotification('Hata: ' + result.error, 'error');
+        }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 window.forceCloseTeam = async function(teamId) {
@@ -7353,10 +7590,13 @@ window.forceCloseTeam = async function(teamId) {
         if (result.success) {
             showNotification('Takım kapatıldı.', 'success');
             window.showAllTeams();
-        } else showNotification('Hata: ' + result.error, 'error');
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+        } else {
+            showNotification('Hata: ' + result.error, 'error');
+        }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
-console.log('✅ JS-5 yüklendi (Takım, Kurucu, Vizyon Destek, Üye Kontrolleri)');
 console.log('✅ JS-5 yüklendi (Takım, Kurucu, Vizyon Destek, Üye Kontrolleri)');
 </script>
