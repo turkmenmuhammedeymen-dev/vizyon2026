@@ -1,7 +1,11 @@
 const express = require('express');
 const ParseServer = require('parse-server').ParseServer;
+const cors = require('cors'); // CORS paketini ekle
 
 const app = express();
+
+// CORS'u aktifleştir (tüm kaynaklara izin ver)
+app.use(cors());
 
 const api = new ParseServer({
   databaseURI: process.env.DATABASE_URI,
