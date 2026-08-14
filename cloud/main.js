@@ -1551,7 +1551,7 @@ Parse.Cloud.define("generate3DWithHF", async (request) => {
         console.error("Hugging Face 3D üretim hatası:", e);
         return { success: false, error: e.message };
     }
-}, { timeout: 120000 });
+});
 
 // ========== YENİ YÖNETİM FONKSİYONLARI ==========
 Parse.Cloud.define("getAdmins", async (request) => {
