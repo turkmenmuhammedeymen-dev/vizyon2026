@@ -1,14 +1,25 @@
 // ================================================================
-// VİZYON 2027 – FULL CLOUD CODE (HATASIZ, TÜM ÖZELLİKLER)
+// VİZYON 2027 – FULL CLOUD CODE (KENDİ SUNUCUN İÇİN, HATASIZ)
 // ================================================================
 
+// Parse globalini tanımla (bazı ortamlarda gerekli)
+// Parse Server Cloud Code'da Parse zaten globaldir, ancak emniyet için:
+if (typeof Parse === 'undefined') {
+    try {
+        var Parse = require('parse/node');
+    } catch (e) {
+        // ignore
+    }
+}
+
 async function getAPIKey(keyName) {
-    // Önce ortam değişkenine bak (Render)
+    // 1. Önce Render'daki ortam değişkenlerine (process.env) bak
     if (process.env[keyName]) {
         console.log(`✅ API anahtarı ortam değişkeninden alındı: ${keyName}`);
         return process.env[keyName];
     }
-    // Yoksa Parse.Config'den al (yedek)
+
+    // 2. Eğer ortam değişkeninde yoksa Parse.Config'den al (yedek)
     try {
         const config = await Parse.Config.get({ useMasterKey: true });
         const value = config.get(keyName);
