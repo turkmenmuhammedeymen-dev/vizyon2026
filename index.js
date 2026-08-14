@@ -12,7 +12,6 @@ try {
     cloud: './cloud/main.js'
   });
 
-  // // ÖNEMLİ: api.app kullan!
   app.use('/parse', api.app);
 
   const port = process.env.PORT || 1337;
