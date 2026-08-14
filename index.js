@@ -3,7 +3,7 @@ const ParseServer = require('parse-server').ParseServer;
 const cors = require('cors');
 
 const app = express();
-app.use(cors()); // Tüm isteklere izin ver
+app.use(cors());
 
 const api = new ParseServer({
   databaseURI: process.env.DATABASE_URI,
