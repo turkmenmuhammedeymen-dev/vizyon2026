@@ -1,8 +1,15 @@
 // ================================================================
-// VİZYON 2027 – FULL CLOUD CODE (KENDİ SUNUCUN İÇİN, HATASIZ)
+// VİZYON 2027 – FULL CLOUD CODE (KENDİ SUNUCUN İÇİN, TÜM ANAHTARLAR)
 // ================================================================
 
 async function getAPIKey(keyName) {
+    // 1. Önce Render'daki ortam değişkenlerine (process.env) bak
+    if (process.env[keyName]) {
+        console.log(`✅ API anahtarı ortam değişkeninden alındı: ${keyName}`);
+        return process.env[keyName];
+    }
+
+    // 2. Eğer ortam değişkeninde yoksa Parse.Config'den al (Back4App stili, yedek)
     try {
         const config = await Parse.Config.get({ useMasterKey: true });
         const value = config.get(keyName);
@@ -10,6 +17,7 @@ async function getAPIKey(keyName) {
             console.warn('Config anahtarı bulunamadı:', keyName);
             return null;
         }
+        console.log(`✅ API anahtarı Parse.Config'den alındı: ${keyName}`);
         return value;
     } catch (e) {
         console.error(keyName + ' alınamadı:', e.message);
@@ -35,6 +43,8 @@ Parse.Cloud.define("test", async (request) => {
         const masterKey = await getAPIKey('BACK4APP_MASTER_KEY');
         const groqKey = await getAPIKey('GROQ_KEY');
         const hfToken = await getAPIKey('HF_TOKEN');
+        const deeplKey = await getAPIKey('DEEPL_API_KEY');
+        const cfAccount = await getAPIKey('CLOUDFLARE_ACCOUNT_ID');
         return {
             success: true,
             message: "Cloud Code çalışıyor!",
@@ -42,6 +52,8 @@ Parse.Cloud.define("test", async (request) => {
             groqKeyExists: !!groqKey,
             hfTokenExists: !!hfToken,
             hfTokenLength: hfToken ? hfToken.length : 0,
+            deeplKeyExists: !!deeplKey,
+            cloudflareAccountExists: !!cfAccount,
             user: request.user ? request.user.get('email') : 'Oturum yok',
             timestamp: new Date().toISOString()
         };
