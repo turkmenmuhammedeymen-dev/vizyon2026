@@ -1,11 +1,14 @@
 // ================================================================
-// VİZYON 2027 – FULL CLOUD CODE (HATASIZ, TÜM ANAHTARLAR)
+// VİZYON 2027 – FULL CLOUD CODE (HATASIZ, TÜM ÖZELLİKLER)
 // ================================================================
 
 async function getAPIKey(keyName) {
+    // Önce ortam değişkenine bak (Render)
     if (process.env[keyName]) {
+        console.log(`✅ API anahtarı ortam değişkeninden alındı: ${keyName}`);
         return process.env[keyName];
     }
+    // Yoksa Parse.Config'den al (yedek)
     try {
         const config = await Parse.Config.get({ useMasterKey: true });
         const value = config.get(keyName);
@@ -13,6 +16,7 @@ async function getAPIKey(keyName) {
             console.warn('Config anahtarı bulunamadı:', keyName);
             return null;
         }
+        console.log(`✅ API anahtarı Parse.Config'den alındı: ${keyName}`);
         return value;
     } catch (e) {
         console.error(keyName + ' alınamadı:', e.message);
