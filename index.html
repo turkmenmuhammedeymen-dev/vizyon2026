@@ -3069,7 +3069,7 @@ button[onclick*="togglePassword"] i {
             </div>
         </div>
 
-        <!-- Ömer Beta -->
+        <!-- Ömer Beta (SADECE ÖMER BETA) -->
         <div class="admin-login-box" data-beta="omer" style="display:block;background:rgba(0,10,20,0.95);border:2px solid #00ff88;border-radius:24px;padding:30px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,255,136,0.3);margin:10px;color:#ffffff;">
             <div style="font-size:48px;">🧪</div>
             <div style="font-size:22px;font-weight:700;margin:8px 0;">Ömer Beta</div>
@@ -3083,24 +3083,6 @@ button[onclick*="togglePassword"] i {
                     </button>
                 </div>
                 <button onclick="handleBetaLogin('omer')" style="background:#00ff88;color:#000;padding:12px 24px;border:none;border-radius:40px;cursor:pointer;font-weight:600;margin-top:8px;width:100%;">Giriş Yap</button>
-                <button onclick="closeAdminLoginScreen()" style="background:transparent; border:1px solid #ff6b35; color:#ff6b35; padding:6px 16px; border-radius:40px; cursor:pointer; font-weight:600; margin-top:10px; width:100%;">🔙 Ana Sayfaya Dön</button>
-            </div>
-        </div>
-
-        <!-- Emir Beta -->
-        <div class="admin-login-box" data-beta="emir" style="display:block;background:rgba(0,10,20,0.95);border:2px solid #00ff88;border-radius:24px;padding:30px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,255,136,0.3);margin:10px;color:#ffffff;">
-            <div style="font-size:48px;">🧪</div>
-            <div style="font-size:22px;font-weight:700;margin:8px 0;">Emir Beta</div>
-            <div style="color:#8ab4cc;font-size:14px;">aaababa789@gmail.com</div>
-            <div style="margin:12px 0;color:#00ff88;font-size:13px;">👇 Beta girişi için tıklayın</div>
-            <div style="margin-top:12px;">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <input type="password" class="form-input admin-pass-input" placeholder="Beta Şifresi" data-beta="emir" style="flex:1;">
-                    <button type="button" onclick="togglePasswordInput(this, 'beta', 'emir')" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-                <button onclick="handleBetaLogin('emir')" style="background:#00ff88;color:#000;padding:12px 24px;border:none;border-radius:40px;cursor:pointer;font-weight:600;margin-top:8px;width:100%;">Giriş Yap</button>
                 <button onclick="closeAdminLoginScreen()" style="background:transparent; border:1px solid #ff6b35; color:#ff6b35; padding:6px 16px; border-radius:40px; cursor:pointer; font-weight:600; margin-top:10px; width:100%;">🔙 Ana Sayfaya Dön</button>
             </div>
         </div>
@@ -5568,7 +5550,7 @@ window.openRolePanel = function(role) {
             if (!exists) wrapper.appendChild(window.createRoleCard('self_admin', currentUser.get('email'), currentUser.get('name') || 'Admin', 'admin', null));
         }
     } else if (role === 'BETA') {
-        var betaList = [{ key: 'omer', email: 'o2059497@gmail.com', name: 'Ömer Beta', passKey: 'BETA_OMER_PASS' }, { key: 'emir', email: 'aaababa789@gmail.com', name: 'Emir Beta', passKey: 'BETA_EMIR_PASS' }];
+        var betaList = [{ key: 'omer', email: 'o2059497@gmail.com', name: 'Ömer Beta', passKey: 'BETA_OMER_PASS' }];
         betaList.forEach(function(bet) { wrapper.appendChild(window.createRoleCard(bet.key, bet.email, bet.name, 'beta', bet.passKey)); });
         if (currentUser && currentUser.get('role') === 'beta') {
             var exists = betaList.some(function(bet) { return bet.email === currentUser.get('email'); });
@@ -5628,7 +5610,6 @@ window.createRoleCard = function(key, email, name, type, passKey) {
     if (key === 'ibrahim') passInput.dataset.admin = 'ibrahim';
     else if (key === 'bozkurt') passInput.dataset.admin = 'bozkurt';
     else if (key === 'omer') passInput.dataset.beta = 'omer';
-    else if (key === 'emir') passInput.dataset.beta = 'emir';
     var eyeWrapper = document.createElement('div');
     eyeWrapper.style.cssText = 'display:flex; align-items:center; gap:8px;';
     var eyeBtn = document.createElement('button');
@@ -5786,7 +5767,6 @@ window.handleLogin = async function() {
 };
 
 window.loginWithGoogle = async function() {
-    // Google girişi için Back4App ayarları yapılmalı
     showNotification('Google ile giriş yakında aktif olacak.', 'warning');
 };
 
@@ -6178,13 +6158,11 @@ window.updateCommentUI = function() {
 // ============================================================
 window.loadComments = async function() {
     try {
-        // Cloud Code'dan artık { success: true, comments: [...] } formatında geliyor
         const result = await Parse.Cloud.run('getComments');
         let comments = [];
         if (result && result.success) {
             comments = result.comments || [];
         } else {
-            // Eğer hata varsa veya eski format gelirse boş dizi olarak devam et
             console.warn('Yorumlar yüklenirken uyarı:', result?.error || 'Bilinmeyen format');
         }
         
@@ -6459,7 +6437,7 @@ window.assignAdminByEmail = async function() {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ========== DASHBOARD (GÜNCELLENMİŞ, NULL KONTROLLÜ) ==========
+// ========== DASHBOARD ==========
 window.showDashboard = async function() {
     try {
         console.log('🔄 Dashboard açılıyor...');
@@ -6702,7 +6680,7 @@ window.unbanUserByEmail = async function(email) {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ========== EKSİK FONKSİYONLAR (DÜZELTİLDİ) ==========
+// ========== EKSİK FONKSİYONLAR ==========
 window.buyPackage = function(pkg) {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     showNotification(pkg === 'pro' ? '🌟 Pro paket seçildi! Ödeme sayfası yakında.' : '👥 Takım paketi seçildi!', 'success');
@@ -6782,7 +6760,6 @@ window.banUser = function() {
 window.onload = async function() {
     try {
         console.log('🔄 Sayfa yükleniyor...');
-        // Elementlerin varlığını kontrol et ve yoksa oluştur
         let mainSite = document.getElementById('mainSite');
         if (!mainSite) {
             mainSite = document.createElement('div');
@@ -6879,7 +6856,6 @@ window.onload = async function() {
         showNotification('✨ VİZYON 2027 Sistemi Aktif!', 'success');
     } catch(e) {
         console.error('🚨 Sayfa yüklenirken beklenmeyen hata:', e);
-        // Hata durumunda ana sayfayı göster
         let mainSite = document.getElementById('mainSite');
         if (mainSite) mainSite.style.display = 'block';
         let dashboardArea = document.getElementById('dashboardArea');
