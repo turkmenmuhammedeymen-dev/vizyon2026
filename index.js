@@ -1,9 +1,7 @@
 const express = require('express');
 const ParseServer = require('parse-server').ParseServer;
-const cors = require('cors');
 
 const app = express();
-app.use(cors()); // Tüm isteklere izin ver
 
 try {
   const api = new ParseServer({
