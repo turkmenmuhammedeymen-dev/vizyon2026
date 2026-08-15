@@ -1,8 +1,8 @@
 // ================================================================
-// VİZYON 2027 – FULL CLOUD CODE (EMİR BETA TEMİZLENDİ)
+// VİZYON 2027 – FULL CLOUD CODE (HATASIZ, EMİR BETA TEMİZLENDİ)
 // ================================================================
 
-// API anahtarını al (önce process.env, sonra Parse.Config)
+// ========== YARDIMCI FONKSİYONLAR ==========
 async function getAPIKey(keyName) {
     if (process.env[keyName]) return process.env[keyName];
     try {
@@ -209,7 +209,7 @@ Parse.Cloud.define("superAI", async (request) => {
     const prompt = request.params.prompt;
     if (!prompt) return "Lütfen bir soru girin.";
 
-    if (prompt.toLowerCase().includes('dolar') || prompt.toLowerCase().includes('haber')) {
+    if (prompt.toLowerCase().includes('dolar') || prompt.toLowerCase().includes('haber') || prompt.toLowerCase().includes('arama')) {
         try {
             const result = await Parse.Cloud.run("webSearch", { query: prompt });
             if (result && !result.includes('tanımlanmamış')) return cleanResponse(result);
@@ -226,7 +226,7 @@ Parse.Cloud.define("superAI", async (request) => {
             if (result && result.length > 10) return cleanResponse(result);
         } catch (e) {}
     }
-    return "🧠 VİZYON AI: Üzgünüm, şu anda cevap veremiyorum.";
+    return "🧠 VİZYON AI: Üzgünüm, şu anda cevap veremiyorum. Lütfen daha sonra tekrar deneyin.";
 });
 
 // ========== WEB ARAMA ==========
@@ -275,7 +275,7 @@ Parse.Cloud.define("sendEmail", async (request) => {
     }
 });
 
-// ========== ADMIN KULLANICILARI ==========
+// ========== ADMIN KULLANICILARI OLUŞTUR ==========
 Parse.Cloud.define("initAdminUsers", async () => {
     try {
         const founderEmail = 'admin.tr.reis@gmail.com';
@@ -399,7 +399,7 @@ Parse.Cloud.define("adminLogin", async (request) => {
     }
 });
 
-// ========== BETA GİRİŞ ==========
+// ========== BETA GİRİŞ (SADECE ÖMER BETA) ==========
 Parse.Cloud.define("betaLogin", async (request) => {
     const { betaKey, password } = request.params;
     if (!betaKey || !password) throw new Error("Beta key ve şifre gerekli.");
