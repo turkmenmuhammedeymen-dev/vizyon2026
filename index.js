@@ -11,10 +11,7 @@ try {
     appId: process.env.APP_ID,
     masterKey: process.env.MASTER_KEY,
     serverURL: process.env.SERVER_URL || 'http://localhost:1337/parse',
-    cloud: './cloud/main.js',
-    allowClientClassCreation: true,
-    enableAnonymousUsers: true,
-    allowCustomObjectId: true
+    cloud: './cloud/main.js'
   });
 
   app.use('/parse', api.app);
