@@ -3383,7 +3383,7 @@ function closeModal(id) {
     if (modal) modal.classList.remove('open');
 }
 
-// ========== PARSE SERVER BAŞLAT (KENDİ SUNUCUN) ==========
+// ========== PARSE SERVER BAŞLAT (BACK4APP) ==========
 async function initBack4App() {
     if (parseInitialized) return;
     try {
@@ -3392,12 +3392,13 @@ async function initBack4App() {
             showNotification('Parse SDK yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
             return;
         }
-        // === KENDİ SUNUCUN (Back4App YOK) ===
-        Parse.initialize("vizyon2027", "vizyonMasterKey2027");
-        Parse.serverURL = "https://vizyon-parse-server.onrender.com/parse";
+        // ★ BACK4APP BAĞLANTISI ★
+        // ★ AŞAĞIDAKİ APP_ID VE CLIENT_KEY'i Back4app'ten aldığın değerlerle değiştir ★
+        Parse.initialize("ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8", "lVR6CNSVVQvYdzGpDrYindSRfMQVMtcqg1qZUXIv");
+        Parse.serverURL = "https://parseapi.back4app.com";
         parseInitialized = true;
-        console.log('✅ Parse Server bağlantısı kuruldu!');
-        showNotification('✅ Parse Server bağlantısı kuruldu!', 'success');
+        console.log('✅ Back4app bağlantısı kuruldu!');
+        showNotification('✅ Back4app bağlantısı kuruldu!', 'success');
     } catch(e) {
         console.error('Parse hatası:', e);
         showNotification('❌ Parse bağlantı hatası: ' + e.message, 'error');
@@ -3537,7 +3538,7 @@ function stopStatsInterval() {
     }
 })();
 
-console.log('✅ JS-1 yüklendi (Parse Server, sayaçlar, parçacık ve imleç)');
+console.log('✅ JS-1 yüklendi (Back4app, sayaçlar, parçacık ve imleç)');
 </script>
     
     <!-- ============================================================ -->
