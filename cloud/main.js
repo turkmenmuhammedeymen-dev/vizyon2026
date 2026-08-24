@@ -1,7 +1,7 @@
 // ================================================================
 // VİZYON 2027 – FULL CLOUD CODE (HATASIZ, EKSİKSİZ)
 // ================================================================
-
+console.log('✅ Cloud Code başarıyla yüklendi!');
 // ========== YARDIMCI FONKSİYONLAR ==========
 async function getAPIKey(keyName) {
     if (process.env[keyName]) return process.env[keyName];
