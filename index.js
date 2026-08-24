@@ -8,8 +8,8 @@ try {
     databaseURI: process.env.MONGODB_URI,
     appId: process.env.APP_ID,
     masterKey: process.env.MASTER_KEY,
-    // ★ DÜZELTİLDİ: /parse EKLENDİ
-    serverURL: process.env.SERVER_URL || 'https://vizyon-parse-server.onrender.com/parse',
+    // ★ DÜZELTİLDİ: Sunucu içinde localhost kullan
+    serverURL: process.env.SERVER_URL || 'http://localhost:10000/parse',
     cloud: './main.js'
   });
 
@@ -18,7 +18,7 @@ try {
   const port = process.env.PORT || 10000;
   app.listen(port, () => {
     console.log(`✅ Parse Server çalışıyor! Port: ${port}`);
-    console.log(`📡 Server URL: ${process.env.SERVER_URL || 'https://vizyon-parse-server.onrender.com/parse'}`);
+    console.log(`📡 Server URL: ${process.env.SERVER_URL || 'http://localhost:'+port+'/parse'}`);
   });
 } catch (error) {
   console.error('❌ Parse Server hatası:', error);
