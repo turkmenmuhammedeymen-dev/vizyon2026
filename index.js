@@ -8,7 +8,7 @@ try {
     databaseURI: process.env.MONGODB_URI,
     appId: process.env.APP_ID,
     masterKey: process.env.MASTER_KEY,
-    // ★ SABİT: localhost:10000/parse (SERVER_URL değişkenine güvenme)
+    // ★ KESİNLİKLE SABİT: localhost:10000/parse
     serverURL: 'http://localhost:10000/parse',
     cloud: './main.js'
   });
