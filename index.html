@@ -4642,9 +4642,10 @@ async function initBack4App() {
         }
         // ★ Back4app Bağlantısı – APP_ID ve CLIENT_KEY kullan
         Parse.initialize(
-            "ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8",      // App ID
-            "mur4DtLsGOsQhykTnFVNGxYOeNbvjPbAkl6xPQGp"        // JavaScript Key (Client ID)
+            "ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8",     // App ID
+            "mur4DtLsGOsQhykTnFVNGxYOeNbvjPbAkl6xPQGp"       // JavaScript Key (CLİENT ID)
         );
+
         Parse.serverURL = "https://parseapi.back4app.com";
         parseInitialized = true;
         console.log('✅ Back4app bağlantısı kuruldu!');
@@ -4949,8 +4950,6 @@ window.getReferralCodeFromUrl = function() {
 
 console.log('✅ JS-1 yüklendi (Back4app, sayaçlar, parçacık ve imleç)');
 </script>
-<!-- ============================================================ -->
-
 
 <!-- ============================================================ -->
 <!-- JS-2: KAYIT, GİRİŞ, DOĞRULAMA, GOOGLE, FACEBOOK, PROJE YÖNETİMİ -->
@@ -7173,7 +7172,7 @@ async function initBack4App() {
         }
         Parse.initialize(
             "ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8",
-            "lVR6CNSVVQvYdzGpDrYindSRfMQVMtcqg1qZUXIv"
+            "mur4DtLsGOsQhykTnFVNGxYOeNbvjPbAkl6xPQGp"
         );
         Parse.serverURL = "https://parseapi.back4app.com";
         parseInitialized = true;
@@ -7712,7 +7711,7 @@ window.openSettingsModal = function() { document.getElementById('settingsModal')
 window.toggleChatHistory = async function() { showNotification('Sohbet geçmişi özelliği yakında!', 'warning'); };
 
 // ================================================================
-// ========== PROJE İŞLEMLERİ (LOAD, NEW, EDIT, DELETE, FAVORITE, ARCHIVE, TRASH) ==========
+// ========== PROJE İŞLEMLERİ ==========
 // ================================================================
 
 window.loadProjects = async function() {
@@ -8536,12 +8535,14 @@ window.banUser = function() {
 };
 
 // ================================================================
-// ========== YENİ ÖZELLİKLER (PUAN, MAĞAZA, GÖREVLER, ANKET, DUYURU, AKADEMİ, YARIŞMA, İŞ İLANI, HATA, OYUN, CÜZDAN, TAKİP, DM, ARAMA, PROFİL, EBEVEYN, SOSYAL, UZAY, TEMA, SPLASH, VERSİYON, TAKIM, DESTEK, KURUCU, BANA ÖĞRET, GIF) ==========
+// ========== YENİ ÖZELLİKLER ==========
 // ================================================================
 
+// ---- PUAN ----
 window.updatePointsBadge = function(points) { var badge = document.getElementById('dashboardPointsDisplay'); if (badge) badge.textContent = points || 0; };
 window.loadUserPoints = async function() { if (!currentUser) return; try { var result = await Parse.Cloud.run('getUserPoints', {}); window.updatePointsBadge(result.points || 0); } catch(e) {} };
 
+// ---- MAĞAZA ----
 window.loadStore = async function() {
     if (!currentUser) return;
     try {
@@ -8581,35 +8582,60 @@ window.buyStoreItem = async function(itemId) {
 
 window.openStore = function() { var section = document.getElementById('storeSection'); if (section) { section.scrollIntoView({ behavior: 'smooth' }); window.loadStore(); } else { showNotification('Puan Mağazası bölümü bulunamadı.', 'warning'); } };
 
+// ---- GÖREV ----
 window.loadDailyTasks = async function() { /* aynı */ };
 window.completeTask = async function(taskId) { /* aynı */ };
+
+// ---- ANKET ----
 window.loadPoll = async function() { /* aynı */ };
 window.votePoll = async function(index) { /* aynı */ };
 window.createPoll = async function() { /* aynı */ };
 window.addPollOption = function() { /* aynı */ };
 window.getTimeRemaining = function(endDate) { /* aynı */ };
+
+// ---- DUYURU ----
 window.loadAnnouncements = async function() { /* aynı */ };
 window.addAnnouncement = async function() { /* aynı */ };
 window.deleteAnnouncement = async function(id) { /* aynı */ };
 window.editAnnouncement = async function(id) { /* aynı */ };
+
+// ---- AKADEMİ ----
 window.loadCourses = async function() { /* aynı */ };
 window.viewCourse = async function(courseId) { /* aynı */ };
 window.completeLesson = async function(lessonId) { /* aynı */ };
+
+// ---- YARIŞMA ----
 window.loadContestRanking = async function() { /* aynı */ };
+
+// ---- İŞ İLANI ----
 window.loadJobs = async function() { /* aynı */ };
 window.applyJob = async function(jobId) { /* aynı */ };
+
+// ---- HATA ----
 window.submitBugReport = async function() { /* aynı */ };
+
+// ---- OYUN ----
 window.loadQuiz = async function() { /* aynı */ };
 window.answerQuiz = async function(quizId, answerIndex) { /* aynı */ };
+
+// ---- CÜZDAN ----
 window.loadWallet = async function() { /* aynı */ };
 window.withdrawFunds = async function() { /* aynı */ };
+
+// ---- TAKİP ----
 window.toggleFollow = async function(userId) { /* aynı */ };
+
+// ---- DM ----
 window.openDmModal = function(userId) { /* aynı */ };
 window.loadConversations = async function() { /* aynı */ };
 window.loadConversation = async function(conversationId) { /* aynı */ };
 window.sendDmMessage = async function() { /* aynı */ };
 window.startConversation = async function(userId) { /* aynı */ };
+
+// ---- ARAMA ----
 window.searchUsers = async function() { /* aynı */ };
+
+// ---- EBEVEYN ----
 window.openParentSettings = function() { /* aynı */ };
 window.loadParentSettings = async function() { /* aynı */ };
 window.requestParentVerification = async function() { /* aynı */ };
@@ -8620,7 +8646,7 @@ window.toggleContest = function() { /* aynı */ };
 window.toggleDM = function() { /* aynı */ };
 window.setParentPin = function() { /* aynı */ };
 
-// ========== TAKIM ==========
+// ---- TAKIM ----
 window.toggleTeamPage = function() { /* aynı */ };
 window.loadTeamPage = async function() { /* aynı */ };
 window.sendTeamPageMessage = async function() { /* aynı */ };
@@ -8634,18 +8660,18 @@ window.demoteManager = async function(email) { /* aynı */ };
 window.removeMemberFromTeam = async function(email) { /* aynı */ };
 window.transferOwnership = async function(email) { /* aynı */ };
 
-// ========== VİZYON DESTEK ==========
+// ---- VİZYON DESTEK ----
 window.openVizyonSupport = function() { /* aynı */ };
 window.closeVizyonSupport = function() { /* aynı */ };
 window.sendVizyonSupportMessage = async function() { /* aynı */ };
 
-// ========== KURUCU İLETİŞİM ==========
+// ---- KURUCU İLETİŞİM ----
 window.contactFounder = async function() { /* aynı */ };
 
-// ========== BANA ÖĞRET ==========
+// ---- BANA ÖĞRET ----
 window.openHelpArticle = function() { /* aynı */ };
 
-// ========== GIF ==========
+// ---- GIF ----
 window.searchGif = function() {
     var query = prompt('GIF ara (örn: happy, coding):');
     if (!query) return;
@@ -8655,13 +8681,13 @@ window.searchGif = function() {
     window.sendTeamPageMessage();
 };
 
-// ========== SANSÜR ==========
+// ---- SANSÜR ----
 window.filterBadWords = function(text) { if (!text) return text; var badWords = ['küfür1', 'küfür2', 'siyasi']; var filtered = text; badWords.forEach(function(word) { var regex = new RegExp(word, 'gi'); filtered = filtered.replace(regex, '****'); }); return filtered; };
 
-// ========== SOSYAL GÖREV ==========
+// ---- SOSYAL GÖREV ----
 window.checkSocialFollow = async function() { /* aynı */ };
 
-// ========== UZAY MODU ==========
+// ---- UZAY MODU ----
 window.checkSpaceMode = function() {
     var hour = new Date().getHours();
     var body = document.body;
@@ -8684,14 +8710,14 @@ window.checkSpaceMode = function() {
     }
 };
 
-// ========== TEMA ==========
+// ---- TEMA ----
 window.toggleTheme = function() { /* aynı */ };
 window.loadTheme = function() { /* aynı */ };
 
-// ========== SPLASH ==========
+// ---- SPLASH ----
 window.hideSplash = function() { var splash = document.getElementById('splashScreen'); if (splash) { splash.classList.add('hidden'); setTimeout(function() { splash.style.display = 'none'; }, 800); } };
 
-// ========== VERSİYON ==========
+// ---- VERSİYON ----
 window.updateVersion = function(version) { var el = document.getElementById('versionDisplay'); if (el) el.textContent = version || 'V10.4'; };
 
 // ================================================================
@@ -8782,7 +8808,7 @@ window.onload = async function() {
         window.hideSplash();
         showNotification('Sayfa yüklenirken hata oluştu: ' + e.message, 'error');
     } finally {
-        window.hideSplash(); // EN SON GÜVENCE
+        window.hideSplash();
     }
 };
 
