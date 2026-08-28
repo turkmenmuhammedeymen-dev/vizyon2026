@@ -19,7 +19,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-// İstekleri yakala
+// Fetch
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
