@@ -1,12 +1,28 @@
-self.addEventListener('install', (e) => {
-  e.waitUntil(self.skipWaiting());
+const CACHE_NAME = 'vizyon-2026-v1';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/manifest.json'
+];
+
+// Kurulum
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(urlsToCache))
+  );
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(self.clients.claim());
+// Aktivasyon
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener('fetch', (e) => {
-  // İnternet yoksa cache'den ver. Yoksa direk internetten çek
-  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+// İstekleri yakala
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => response || fetch(event.request))
+  );
 });
