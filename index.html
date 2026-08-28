@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vizyon 2027 | VİZYON AI</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000">
 
     <!-- ========== HARİCİ KÜTÜPHANELER ========== -->
     <!-- Three.js ve eklentileri (importmap KALDIRILDI, klasik script kullanıldı) -->
@@ -8816,7 +8818,7 @@ console.log('✅ JS-4 tamamen yüklendi ve tüm fonksiyonlar global!');
 </script>
 
 <!-- ============================================================ -->
-<!-- JS-5: TAKIM YÖNETİMİ, KURUCU PANELİ, VİZYON DESTEK, ÜYE KONTROLLERİ, SOSYAL DM, Arama, TAKİP, EBEVEYN, ANKET, DUYURU, GİF, PROJE, PUAN, MAĞAZA, GÖREV, YARIŞMA, AKADEMİ, İŞ İLANI, HATA, OYUN, CÜZDAN -->
+<!-- JS-5: TAKIM YÖNETİMİ, KURUCU PANELİ, VİZYON DESTEK, ÜYE KONTROLLERİ, SOSYAL DM, ARAMA, TAKİP, EBEVEYN, ANKET, DUYURU, GİF, PROJE, PUAN, MAĞAZA, GÖREV, YARIŞMA, AKADEMİ, İŞ İLANI, HATA, OYUN, CÜZDAN -->
 <!-- ============================================================ -->
 <script>
 // ================================================================
@@ -8879,6 +8881,7 @@ window.loadTeamPage = async function() {
     var memberManagementBtn = document.getElementById('teamMemberManagementBtn');
     var panelMemberCount = document.getElementById('teamPageMemberCount');
 
+    // Eğer takım ID yoksa boş sayfa göster
     if (!teamId) {
         if (panelInfo) panelInfo.innerHTML = '<span data-i18n="Takım kodu">Takım kodu</span>: <span class="team-code">-</span> <span>0 <span data-i18n="üye">üye</span></span>';
         if (panelMessages) panelMessages.innerHTML = '<div style="color:var(--text3);text-align:center;padding:20px;">Bir takıma üye değilsiniz. Takım kurun veya kodla katılın.</div>';
@@ -8908,15 +8911,17 @@ window.loadTeamPage = async function() {
     if (leaveBtn) leaveBtn.style.display = 'inline-block';
 
     try {
-        var Team = Parse.Object.extend('Team');
+        // Gerekli sınıfları tanımla
+        const Team = Parse.Object.extend("Team");
+        const Member = Parse.Object.extend("TeamMember");
+        const Msg = Parse.Object.extend("TeamMessage");
+
         var query = new Parse.Query(Team);
         var team = await query.get(teamId);
-        var Member = Parse.Object.extend('TeamMember');
         var memberQuery = new Parse.Query(Member);
         memberQuery.equalTo('team_id', teamId);
         var members = await memberQuery.find();
-        var Message = Parse.Object.extend('TeamMessage');
-        var msgQuery = new Parse.Query(Message);
+        var msgQuery = new Parse.Query(Msg);
         msgQuery.equalTo('team_id', teamId);
         msgQuery.ascending('createdAt');
         var messages = await msgQuery.find();
@@ -9006,11 +9011,15 @@ window.loadTeamPage = async function() {
     }
 };
 
-// ========== TAKIM MESAJI GÖNDER ==========
+// ========== TAKIM MESAJI GÖNDER (HATASIZ) ==========
 window.sendTeamPageMessage = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     var teamId = currentUser.get('teamId');
     if (!teamId) return showNotification('Takımınız yok!', 'error');
+
+    // ✅ EKSİK SATIR: TeamMessage sınıfını tanımla
+    const TeamMessage = Parse.Object.extend("TeamMessage");
+
     var msgInput = document.getElementById('teamPageInput');
     var msg = msgInput.value.trim();
     var fileInput = document.getElementById('teamPageFileInput');
@@ -9048,8 +9057,8 @@ window.sendTeamPageMessage = async function() {
             if (isOfflineCommand) {
                 aiResponse = '🧠 VİZYON AI: Anladım, destek sohbetinden ayrılıyorum. Tekrar çağırmak için @vizyondestek yazın. 👋';
             } else {
-                const Message = Parse.Object.extend('TeamMessage');
-                const chatQuery = new Parse.Query(Message);
+                const MsgQuery = Parse.Object.extend("TeamMessage");
+                const chatQuery = new Parse.Query(MsgQuery);
                 chatQuery.equalTo('team_id', teamId);
                 chatQuery.ascending('createdAt');
                 chatQuery.limit(20);
@@ -9083,7 +9092,7 @@ window.sendTeamPageMessage = async function() {
                 }
             }
 
-            const botMsg = new Message();
+            const botMsg = new TeamMessage();
             botMsg.set("team_id", teamId);
             botMsg.set("user_email", 'system@vizyon2027.com');
             botMsg.set("user_name", '🧠 VİZYON AI');
@@ -10648,5 +10657,17 @@ window.filterBadWords = function(text) {
     return filtered;
 };
 
-console.log('✅ JS-5 yüklendi (Takım, Kurucu, Vizyon Destek, Üye Kontrolleri, Sosyal DM, Arama, Takip, Ebeveyn, Anket, Duyuru, GIF, Proje, Puan, Mağaza, Görev, Yarışma, Akademi, İş İlanı, Hata, Oyun, Cüzdan, Kurucu İletişim, Uzay Modu, Tema)');
+console.log('✅ JS-5 yüklendi (Takım, Kurucu, Vizyon Destek, Üye Kontrolleri, DM, Arama, Takip, Ebeveyn, Anket, Duyuru, GIF, Proje, Puan, Mağaza, Görev, Yarışma, Akademi, İş İlanı, Hata, Oyun, Cüzdan, Kurucu İletişim, Uzay Modu, Tema)');
 </script>
+<!-- ===== JS-5 SONU ===== -->
+
+<!-- SERVICE WORKER KAYDI - BURAYA EKLENDİ -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js');
+  });
+}
+</script>
+</body>
+</html>
