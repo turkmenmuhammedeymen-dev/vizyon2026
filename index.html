@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vizyon 2027 | VİZYON AI</title>
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#000">
 
     <!-- ========== HARİCİ KÜTÜPHANELER ========== -->
     <!-- Three.js ve eklentileri (importmap KALDIRILDI, klasik script kullanıldı) -->
@@ -7172,6 +7170,8 @@ async function initBack4App() {
             showNotification('Parse SDK yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
             return;
         }
+        // SADECE BURADA Parse.initialize çağrısı olsun
+        // JS-1'deki doğru key ile
         Parse.initialize(
             "ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8",
             "mur4DtLsGOsQhykTnFVNGxYOeNbvjPbAkl6xPQGp"
@@ -10660,14 +10660,5 @@ window.filterBadWords = function(text) {
 console.log('✅ JS-5 yüklendi (Takım, Kurucu, Vizyon Destek, Üye Kontrolleri, DM, Arama, Takip, Ebeveyn, Anket, Duyuru, GIF, Proje, Puan, Mağaza, Görev, Yarışma, Akademi, İş İlanı, Hata, Oyun, Cüzdan, Kurucu İletişim, Uzay Modu, Tema)');
 </script>
 <!-- ===== JS-5 SONU ===== -->
-
-<!-- SERVICE WORKER KAYDI - BURAYA EKLENDİ -->
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js');
-  });
-}
-</script>
 </body>
 </html>
