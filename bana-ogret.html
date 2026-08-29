@@ -3,104 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bana Öğret - Vizyon2027</title>
+    <title>Vizyon2027 – Kapsamlı Rehber</title>
     <style>
+        /* ===== GENEL STILLER ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #0a0a0a;
             color: #e0e0e0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding: 20px;
             line-height: 1.8;
+            transition: background 0.3s, color 0.3s;
         }
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
             background: #141414;
             padding: 40px;
-            border-radius: 16px;
+            border-radius: 20px;
             border: 1px solid #2a2a2a;
-            box-shadow: 0 0 40px rgba(0,212,255,0.05);
+            box-shadow: 0 0 60px rgba(0,212,255,0.05);
         }
+        /* ===== DİL SEÇİCİ ===== */
+        .lang-selector {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .lang-btn {
+            padding: 8px 20px;
+            border-radius: 40px;
+            border: 2px solid #2a2a2a;
+            background: transparent;
+            color: #aaa;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+        .lang-btn:hover {
+            border-color: #00d4ff;
+            color: #00d4ff;
+        }
+        .lang-btn.active {
+            border-color: #00d4ff;
+            background: #00d4ff22;
+            color: #00d4ff;
+        }
+        /* ===== BAŞLIKLAR ===== */
         h1 {
             color: #00d4ff;
-            font-size: 36px;
+            font-size: 38px;
             border-bottom: 3px solid #00d4ff;
-            padding-bottom: 15px;
+            padding-bottom: 18px;
             font-family: 'Syne', sans-serif;
+            margin-top: 10px;
         }
         h2 {
             color: #00d4ff;
-            font-size: 26px;
-            margin-top: 40px;
-            border-left: 5px solid #00d4ff;
-            padding-left: 18px;
+            font-size: 28px;
+            margin-top: 45px;
+            border-left: 6px solid #00d4ff;
+            padding-left: 20px;
             font-family: 'Syne', sans-serif;
         }
         h3 {
             color: #a0c4e0;
-            font-size: 20px;
-            margin-top: 30px;
+            font-size: 22px;
+            margin-top: 35px;
+        }
+        h4 {
+            color: #8ab4cc;
+            font-size: 18px;
+            margin-top: 25px;
         }
         p, li {
             color: #c8d0d8;
             font-size: 16px;
-        }
-        ul, ol {
-            padding-left: 25px;
-        }
-        li {
             margin-bottom: 10px;
         }
+        ul, ol {
+            padding-left: 28px;
+            margin: 12px 0;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        /* ===== KUTULAR ===== */
         .highlight-box {
             background: #1a1a2a;
-            border-left: 5px solid #00ff88;
-            padding: 18px 24px;
-            margin: 25px 0;
-            border-radius: 10px;
+            border-left: 6px solid #00ff88;
+            padding: 20px 26px;
+            margin: 28px 0;
+            border-radius: 12px;
         }
-        .important {
-            color: #ffb347;
-            font-weight: bold;
-        }
-        .legal-box {
+        .important-box {
             background: #1a0a0a;
-            border-left: 5px solid #ff6b6b;
-            padding: 18px 24px;
-            margin: 25px 0;
-            border-radius: 10px;
+            border-left: 6px solid #ff6b6b;
+            padding: 20px 26px;
+            margin: 28px 0;
+            border-radius: 12px;
+        }
+        .info-box {
+            background: #0a1a1a;
+            border-left: 6px solid #ffb700;
+            padding: 20px 26px;
+            margin: 28px 0;
+            border-radius: 12px;
         }
         .badge {
             display: inline-block;
             background: #00d4ff22;
             color: #00d4ff;
-            padding: 4px 14px;
+            padding: 4px 16px;
             border-radius: 30px;
             font-size: 14px;
             border: 1px solid #00d4ff55;
             margin-right: 8px;
+            margin-bottom: 6px;
         }
-        hr {
-            border: 0;
-            height: 1px;
-            background: #2a2a2a;
-            margin: 40px 0;
-        }
-        .back-link {
-            display: inline-block;
-            margin-top: 30px;
-            color: #00d4ff;
-            text-decoration: none;
-            border: 2px solid #00d4ff;
-            padding: 12px 28px;
-            border-radius: 40px;
-            transition: 0.3s;
-            font-weight: 600;
-        }
-        .back-link:hover {
-            background: #00d4ff;
-            color: #0a0a0a;
-            box-shadow: 0 0 30px rgba(0,212,255,0.3);
-        }
+        /* ===== GRID ===== */
         .feature-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -112,31 +136,45 @@
             padding: 18px 22px;
             border-radius: 12px;
             border: 1px solid #2a2a2a;
+            transition: 0.2s;
+        }
+        .feature-item:hover {
+            border-color: #00d4ff;
         }
         .feature-item strong {
             color: #00d4ff;
         }
-        @media (max-width: 768px) {
-            .feature-grid {
-                grid-template-columns: 1fr;
-            }
-            .container {
-                padding: 20px;
-            }
-            h1 {
-                font-size: 28px;
-            }
-            h2 {
-                font-size: 22px;
-            }
+        /* ===== DİĞER ===== */
+        hr {
+            border: 0;
+            height: 1px;
+            background: #2a2a2a;
+            margin: 45px 0;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #00d4ff;
+            text-decoration: none;
+            border: 2px solid #00d4ff;
+            padding: 12px 32px;
+            border-radius: 40px;
+            transition: 0.3s;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .back-link:hover {
+            background: #00d4ff;
+            color: #0a0a0a;
+            box-shadow: 0 0 40px rgba(0,212,255,0.3);
         }
         .footer-note {
             text-align: center;
-            margin-top: 40px;
+            margin-top: 45px;
             color: #666;
             font-size: 14px;
             border-top: 1px solid #2a2a2a;
-            padding-top: 20px;
+            padding-top: 25px;
         }
         a {
             color: #00d4ff;
@@ -147,147 +185,510 @@
         }
         code {
             background: #0a0a0a;
-            padding: 2px 8px;
+            padding: 2px 10px;
             border-radius: 6px;
             color: #00ff88;
             font-size: 14px;
+            font-family: 'Courier New', monospace;
+        }
+        /* ===== DİL SINIFLARI ===== */
+        .lang-content { display: none; }
+        .lang-content.active { display: block; }
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .container { padding: 20px; }
+            h1 { font-size: 28px; }
+            h2 { font-size: 22px; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .lang-selector { justify-content: center; }
+            .lang-btn { padding: 6px 14px; font-size: 12px; }
+        }
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .container { padding: 14px; }
+            h1 { font-size: 22px; }
+            h2 { font-size: 18px; padding-left: 12px; }
+            .lang-btn { padding: 4px 10px; font-size: 11px; }
         }
     </style>
 </head>
 <body>
-<div class="container">
 
-    <h1>📖 VİZYON 2027 – Kapsamlı Rehber</h1>
-    <p><span class="badge">📌 Son Güncelleme: 29 Ağustos 2026</span> <span class="badge">⚡ Sürüm 5.14.2</span></p>
+<div class="container" id="mainContainer">
 
-    <p><strong>Vizyon2027</strong>, dünyanın en güçlü yapay zeka ekosistemidir. 7 farklı AI modelini, takım çalışması araçlarını, puan sistemini, mağazayı, sosyal ağı ve daha fazlasını tek bir platformda birleştirir. Bu rehber, sitemizi tüm detaylarıyla tanımanız, haklarınızı bilmeniz ve en iyi şekilde kullanmanız için hazırlanmıştır.</p>
-
-    <div class="highlight-box">
-        <strong>🚀 VİZYONUMUZ:</strong> Yapay zekayı herkes için erişilebilir, anlaşılır ve faydalı kılmak. 2027 yılına kadar Türkiye'nin ve dünyanın lider AI platformu olmak.
+    <!-- ===== DİL SEÇİCİ ===== -->
+    <div class="lang-selector">
+        <button class="lang-btn active" data-lang="tr" onclick="switchLanguage('tr')">🇹🇷 Türkçe</button>
+        <button class="lang-btn" data-lang="en" onclick="switchLanguage('en')">🇬🇧 English</button>
+        <button class="lang-btn" data-lang="ar" onclick="switchLanguage('ar')">🇸🇦 العربية</button>
     </div>
 
-    <hr>
+    <!-- ===== İÇERİK TÜRKÇE ===== -->
+    <div id="lang-tr" class="lang-content active">
 
-    <h2>1. Vizyon2027 Nedir?</h2>
-    <p>Vizyon2027, geliştiriciler, girişimciler, öğrenciler ve yapay zeka meraklıları için tasarlanmış <strong>çok yönlü bir dijital ekosistemdir</strong>. Tek bir hesap ile:</p>
-    <ul>
-        <li>✅ 7 farklı AI modeline (Groq, DeepSeek, OpenAI, OpenRouter, Cohere, Cerebras, GitHub Models) tek bir sohbet üzerinden erişebilirsiniz.</li>
-        <li>✅ Takım kurup arkadaşlarınızla ortak projeler geliştirebilir, takım sohbetinde AI'dan destek alabilirsiniz.</li>
-        <li>✅ Projelerinizi yönetebilir, favorileyebilir, arşivleyebilir ve çöp kutusundan geri getirebilirsiniz.</li>
-        <li>✅ Puan kazanarak mağazadan rozetler, özel paketler ve hediyeler satın alabilirsiniz.</li>
-        <li>✅ Anketlere katılabilir, duyuruları takip edebilir, iş ilanlarına başvurabilir ve hata bildirerek puan kazanabilirsiniz.</li>
-        <li>✅ Diğer kullanıcılarla mesajlaşabilir, takip edebilir ve profilini görüntüleyebilirsiniz.</li>
-        <li>✅ Ebeveyn modu ile çocuğunuzu güvende tutabilir, canlı takip ve günlük limit ayarlayabilirsiniz.</li>
-    </ul>
+        <h1>📖 VİZYON 2027 – Kapsamlı Rehber</h1>
+        <p><span class="badge">📌 Son Güncelleme: 29 Ağustos 2026</span> <span class="badge">⚡ Sürüm 5.14.2</span></p>
 
-    <h2>2. Yapay Zeka Modelleri</h2>
-    <p>Vizyon2027, aşağıdaki 7 modeli <strong>tek bir sorguda</strong> kullanarak en doğru ve hızlı cevabı bulur:</p>
-    <div class="feature-grid">
-        <div class="feature-item"><strong>🧠 Groq</strong> – Llama 3.3 70B, en hızlı inferans, ücretsiz.</div>
-        <div class="feature-item"><strong>🧠 DeepSeek</strong> – Uygun fiyatlı, güçlü kod yazma yeteneği.</div>
-        <div class="feature-item"><strong>🧠 OpenAI</strong> – GPT-4o, en gelişmiş dil modeli (kredi gerektirir).</div>
-        <div class="feature-item"><strong>🧠 OpenRouter</strong> – 100+ modele erişim, ücretsiz modeller mevcut.</div>
-        <div class="feature-item"><strong>🧠 Cohere</strong> – İş odaklı metin üretimi ve analiz.</div>
-        <div class="feature-item"><strong>🧠 Cerebras</strong> – Yüksek performanslı Llama 3.1.</div>
-        <div class="feature-item"><strong>🧠 GitHub Models</strong> – Meta-Llama 3 8B, Azure üzerinden.</div>
-        <div class="feature-item"><strong>⚡ SuperAI</strong> – Tüm modelleri sırayla dener, en iyi yanıtı getirir.</div>
-    </div>
+        <p><strong>Vizyon2027</strong>, dünyanın en güçlü yapay zeka ekosistemidir. 7 farklı AI modelini, takım çalışması araçlarını, puan sistemini, mağazayı, sosyal ağı ve daha fazlasını tek bir platformda birleştirir. Bu rehber, sitemizi tüm detaylarıyla tanımanız, haklarınızı bilmeniz ve en iyi şekilde kullanmanız için hazırlanmıştır.</p>
 
-    <h2>3. Takım Çalışması</h2>
-    <ul>
-        <li><strong>Takım Oluşturma:</strong> Herkes takım kurabilir (Admin, Founder, Beta veya Takım paketi sahipleri). 6 haneli kod ile üye ekleyebilirsiniz.</li>
-        <li><strong>Takım Sohbeti:</strong> Mesajlaşın, dosya paylaşın, GIF gönderin. @vizyonal yazarak AI'ya takım geçmişine göre soru sorabilirsiniz.</li>
-        <li><strong>Üye Yönetimi:</strong> Kurucu, yönetici atayabilir, üye ekleyip çıkarabilir, sahipliği devredebilir.</li>
-        <li><strong>Ortak Projeler:</strong> Takım üyeleriyle birlikte proje geliştirin, görev dağılımı yapın.</li>
-    </ul>
+        <div class="highlight-box">
+            <strong>🚀 VİZYONUMUZ:</strong> Yapay zekayı herkes için erişilebilir, anlaşılır ve faydalı kılmak. 2027 yılına kadar Türkiye'nin ve dünyanın lider AI platformu olmak.
+        </div>
 
-    <h2>4. Puan Sistemi ve Mağaza</h2>
-    <ul>
-        <li><strong>Puan Kazanma Yolları:</strong>
+        <hr>
+
+        <h2>1. Vizyon2027 Nedir?</h2>
+        <p>Vizyon2027, geliştiriciler, girişimciler, öğrenciler ve yapay zeka meraklıları için tasarlanmış <strong>çok yönlü bir dijital ekosistemdir</strong>. Tek bir hesap ile:</p>
+        <ul>
+            <li>✅ 7 farklı AI modeline (Groq, DeepSeek, OpenAI, OpenRouter, Cohere, Cerebras, GitHub Models) tek bir sohbet üzerinden erişebilirsiniz.</li>
+            <li>✅ Takım kurup arkadaşlarınızla ortak projeler geliştirebilir, takım sohbetinde AI'dan destek alabilirsiniz.</li>
+            <li>✅ Projelerinizi yönetebilir, favorileyebilir, arşivleyebilir ve çöp kutusundan geri getirebilirsiniz.</li>
+            <li>✅ Puan kazanarak mağazadan rozetler, özel paketler ve hediyeler satın alabilirsiniz.</li>
+            <li>✅ Anketlere katılabilir, duyuruları takip edebilir, iş ilanlarına başvurabilir ve hata bildirerek puan kazanabilirsiniz.</li>
+            <li>✅ Diğer kullanıcılarla mesajlaşabilir, takip edebilir ve profilini görüntüleyebilirsiniz.</li>
+            <li>✅ Ebeveyn modu ile çocuğunuzu güvende tutabilir, canlı takip ve günlük limit ayarlayabilirsiniz.</li>
+        </ul>
+
+        <h2>2. Yapay Zeka Modelleri</h2>
+        <p>Vizyon2027, aşağıdaki 7 modeli <strong>tek bir sorguda</strong> kullanarak en doğru ve hızlı cevabı bulur:</p>
+        <div class="feature-grid">
+            <div class="feature-item"><strong>🧠 Groq</strong> – Llama 3.3 70B, en hızlı inferans, ücretsiz.</div>
+            <div class="feature-item"><strong>🧠 DeepSeek</strong> – Uygun fiyatlı, güçlü kod yazma yeteneği.</div>
+            <div class="feature-item"><strong>🧠 OpenAI</strong> – GPT-4o, en gelişmiş dil modeli (kredi gerektirir).</div>
+            <div class="feature-item"><strong>🧠 OpenRouter</strong> – 100+ modele erişim, ücretsiz modeller mevcut.</div>
+            <div class="feature-item"><strong>🧠 Cohere</strong> – İş odaklı metin üretimi ve analiz.</div>
+            <div class="feature-item"><strong>🧠 Cerebras</strong> – Yüksek performanslı Llama 3.1.</div>
+            <div class="feature-item"><strong>🧠 GitHub Models</strong> – Meta-Llama 3 8B, Azure üzerinden.</div>
+            <div class="feature-item"><strong>⚡ SuperAI</strong> – Tüm modelleri sırayla dener, en iyi yanıtı getirir.</div>
+        </div>
+        <p>Her modelin kendine özgü güçlü yönleri vardır. Groq hız, DeepSeek kodlama, OpenAI genel yetenek, OpenRouter çeşitlilik, Cohere iş analitiği, Cerebras performans, GitHub Models ise Azure entegrasyonu sunar. SuperAI, hepsini birleştirerek size en iyi deneyimi yaşatır.</p>
+
+        <h2>3. Takım Çalışması</h2>
+        <ul>
+            <li><strong>Takım Oluşturma:</strong> Herkes takım kurabilir (Admin, Founder, Beta veya Takım paketi sahipleri). 6 haneli kod ile üye ekleyebilirsiniz.</li>
+            <li><strong>Takım Sohbeti:</strong> Mesajlaşın, dosya paylaşın, GIF gönderin. @vizyonal yazarak AI'ya takım geçmişine göre soru sorabilirsiniz.</li>
+            <li><strong>Üye Yönetimi:</strong> Kurucu, yönetici atayabilir, üye ekleyip çıkarabilir, sahipliği devredebilir.</li>
+            <li><strong>Ortak Projeler:</strong> Takım üyeleriyle birlikte proje geliştirin, görev dağılımı yapın.</li>
+            <li><strong>Vizyon Devriye:</strong> Kurucu, takım içi güvenliği sağlamak için özel yetkilere sahiptir.</li>
+        </ul>
+
+        <h2>4. Puan Sistemi ve Mağaza</h2>
+        <ul>
+            <li><strong>Puan Kazanma Yolları:</strong>
+                <ul>
+                    <li>Günlük görevleri tamamlama (her gün yenilenir).</li>
+                    <li>Arkadaşlarını davet etme (her davet 500 puan).</li>
+                    <li>Ürün satışı (%5 puan).</li>
+                    <li>Hata bildirimi (100 puan).</li>
+                    <li>Dersleri tamamlama.</li>
+                    <li>Anket oylama (20 puan).</li>
+                    <li>Sosyal görevler (Instagram/WhatsApp takip).</li>
+                    <li><strong>Uzay Modu</strong> (02:00-05:00 arası tüm puanlar x2).</li>
+                </ul>
+            </li>
+            <li><strong>Mağaza:</strong> Puanlarınızla rozetler, özel renkler, pro paket ve takım paketi hediyeleri satın alabilirsiniz.</li>
+            <li><strong>Seviye Sistemi:</strong> 1000 puanda "Üye", 5000 puanda "Uzman", 20000 puanda "Efsane" seviyesine ulaşırsınız.</li>
+        </ul>
+
+        <h2>5. Yasal Haklar ve Sorumluluklar</h2>
+
+        <div class="important-box">
+            <h3 style="color:#ff6b6b; margin-top:0;">🔒 Gizlilik Politikası (Özet)</h3>
             <ul>
-                <li>Günlük görevleri tamamlama (her gün yenilenir).</li>
-                <li>Arkadaşlarını davet etme (her davet 500 puan).</li>
-                <li>Ürün satışı (%5 puan).</li>
-                <li>Hata bildirimi (100 puan).</li>
-                <li>Dersleri tamamlama.</li>
-                <li>Anket oylama (20 puan).</li>
-                <li>Sosyal görevler (Instagram/WhatsApp takip).</li>
-                <li><strong>Uzay Modu</strong> (02:00-05:00 arası tüm puanlar x2).</li>
+                <li><strong>Toplanan Veriler:</strong> E-posta, kullanıcı adı, AI sorguları, takım mesajları, cihaz bilgileri (model, işletim sistemi).</li>
+                <li><strong>TOPLANMAYAN VERİLER:</strong> Konum, fotoğraf, rehber, SMS, arama kayıtları, biyometrik veriler, finansal bilgiler <span class="badge" style="background:#ff6b6b22; border-color:#ff6b6b; color:#ff6b6b;">KESİNLİKLE TOPLANMAZ</span>.</li>
+                <li><strong>Veri Kullanımı:</strong> Yalnızca hizmet kalitesini artırmak ve size özel deneyim sunmak için.</li>
+                <li><strong>Veri Paylaşımı:</strong> Hiçbir 3. tarafla paylaşılmaz, satılmaz, kiralanmaz.</li>
+                <li><strong>Veri Saklama:</strong> Hesabınız aktif olduğu sürece saklanır. Hesap silindiğinde tüm veriler kalıcı olarak yok edilir.</li>
+                <li><strong>Kullanıcı Hakları:</strong> Bilgi edinme, düzeltme, silme (unutulma hakkı), itiraz, veri taşınabilirliği.</li>
             </ul>
-        </li>
-        <li><strong>Mağaza:</strong> Puanlarınızla rozetler, özel renkler, pro paket ve takım paketi hediyeleri satın alabilirsiniz.</li>
-    </ul>
+            <p>Detaylar için <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a> sayfamızı ziyaret edin.</p>
+        </div>
 
-    <h2>5. Yasal Haklar ve Sorumluluklar</h2>
+        <div class="info-box">
+            <h3 style="color:#ffb700; margin-top:0;">📜 Kullanıcı Sözleşmesi (Özet)</h3>
+            <ul>
+                <li><strong>Hesap Güvenliği:</strong> Şifrenizden siz sorumlusunuz. 13 yaş altı kullanıcılar ebeveyn izni olmadan hesap oluşturamaz.</li>
+                <li><strong>Kullanım Kuralları:</strong> Yasa dışı, taciz edici, zararlı içerik paylaşmak yasaktır. Spam, hack, telif ihlali yapılamaz.</li>
+                <li><strong>Fikri Mülkiyet:</strong> Tüm kodlar, tasarımlar, içerikler Vizyon2027'ye aittir. İzinsiz kopyalanamaz, dağıtılamaz.</li>
+                <li><strong>Sorumluluk Reddi:</strong> AI yanıtları "olduğu gibi" sağlanır. Vizyon2027, doğruluk veya güvenilirlik garantisi vermez.</li>
+                <li><strong>Hesap Feshi:</strong> Kuralları ihlal eden hesaplar askıya alınabilir veya kalıcı olarak silinebilir.</li>
+            </ul>
+            <p>Detaylar için <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">Kullanıcı Sözleşmesi</a> sayfamızı ziyaret edin.</p>
+        </div>
 
-    <div class="legal-box">
-        <h3 style="color:#ff6b6b; margin-top:0;">🔒 Gizlilik Politikası (Özet)</h3>
+        <h2>6. Sık Sorulan Sorular (SSS)</h2>
         <ul>
-            <li><strong>Toplanan Veriler:</strong> E-posta, kullanıcı adı, AI sorguları, takım mesajları, cihaz bilgileri (model, işletim sistemi).</li>
-            <li><strong>TOPLANMAYAN VERİLER:</strong> Konum, fotoğraf, rehber, SMS, arama kayıtları, biyometrik veriler, finansal bilgiler <span class="important">KESİNLİKLE TOPLANMAZ</span>.</li>
-            <li><strong>Veri Kullanımı:</strong> Yalnızca hizmet kalitesini artırmak ve size özel deneyim sunmak için.</li>
-            <li><strong>Veri Paylaşımı:</strong> Hiçbir 3. tarafla paylaşılmaz, satılmaz, kiralanmaz.</li>
-            <li><strong>Veri Saklama:</strong> Hesabınız aktif olduğu sürece saklanır. Hesap silindiğinde tüm veriler kalıcı olarak yok edilir.</li>
-            <li><strong>Kullanıcı Hakları:</strong> Bilgi edinme, düzeltme, silme (unutulma hakkı), itiraz, veri taşınabilirliği.</li>
+            <li><strong>Vizyon2027 ücretsiz mi?</strong> – Evet, ücretsiz plan (25 sorgu/gün) mevcuttur. Pro (2000 sorgu/gün) ve Takım (sınırsız) planları ücretlidir.</li>
+            <li><strong>Nasıl puan kazanırım?</strong> – Günlük görevler, arkadaş daveti, ürün satışı, hata bildirimi, ders tamamlama, anket oylama, sosyal görevler ve Uzay Modu ile.</li>
+            <li><strong>Puanlarımı nerede görürüm?</strong> – Dashboard sağ üstteki altın rozette.</li>
+            <li><strong>Takım nasıl kurulur?</strong> – Takım sayfasından "Takım Oluştur" butonu ile.</li>
+            <li><strong>AI'ya özel komutlar var mı?</strong> – @vizyonal (takım sohbetinde), @vizyondestek (destek için).</li>
+            <li><strong>Verilerim güvende mi?</strong> – Evet, Back4App üzerinde şifreli olarak saklanır, 3. taraflarla paylaşılmaz.</li>
+            <li><strong>Hesabımı nasıl silerim?</strong> – Dashboard'da "Hesabımı Sil" butonu veya vizyon2027.info@gmail.com adresine mail atarak.</li>
+            <li><strong>Ebeveyn modu nedir?</strong> – Canlı takip, günlük harcama limiti, yarışma ve DM kapatma gibi çocuk güvenliği özellikleri.</li>
+            <li><strong>Uzay Modu nedir?</strong> – Gece 02:00-05:00 arası tüm puan kazanımları x2 olur. 🌌</li>
+            <li><strong>Bana Öğret sayfası ne işe yarar?</strong> – Bu sayfa, platformun tüm detaylarını, yasal haklarınızı ve sık sorulan soruları içeren kapsamlı rehberdir.</li>
         </ul>
-        <p>Detaylar için <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a> sayfamızı ziyaret edin.</p>
-    </div>
 
-    <div class="legal-box" style="border-left-color: #ffb347;">
-        <h3 style="color:#ffb347; margin-top:0;">📜 Kullanıcı Sözleşmesi (Özet)</h3>
+        <h2>7. Topluluk ve Destek</h2>
         <ul>
-            <li><strong>Hesap Güvenliği:</strong> Şifrenizden siz sorumlusunuz. 13 yaş altı kullanıcılar ebeveyn izni olmadan hesap oluşturamaz.</li>
-            <li><strong>Kullanım Kuralları:</strong> Yasa dışı, taciz edici, zararlı içerik paylaşmak yasaktır. Spam, hack, telif ihlali yapılamaz.</li>
-            <li><strong>Fikri Mülkiyet:</strong> Tüm kodlar, tasarımlar, içerikler Vizyon2027'ye aittir. İzinsiz kopyalanamaz, dağıtılamaz.</li>
-            <li><strong>Sorumluluk Reddi:</strong> AI yanıtları "olduğu gibi" sağlanır. Vizyon2027, doğruluk veya güvenilirlik garantisi vermez.</li>
-            <li><strong>Hesap Feshi:</strong> Kuralları ihlal eden hesaplar askıya alınabilir veya kalıcı olarak silinebilir.</li>
+            <li><strong>📧 E-posta:</strong> <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a></li>
+            <li><strong>📱 WhatsApp Kanalı:</strong> <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank">Tıklayın</a></li>
+            <li><strong>📸 Instagram:</strong> <a href="https://www.instagram.com/vizyon2027.info" target="_blank">@vizyon2027.info</a></li>
+            <li><strong>🌐 Web:</strong> <a href="https://vizyon2026.vercel.app" target="_blank">https://vizyon2026.vercel.app</a></li>
+            <li><strong>💬 Vizyon Destek:</strong> Ana sayfada sağ alttaki 💬 ikonundan veya Dashboard'daki "Vizyon Destek" butonundan ulaşabilirsiniz.</li>
         </ul>
-        <p>Detaylar için <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">Kullanıcı Sözleşmesi</a> sayfamızı ziyaret edin.</p>
+
+        <h2>8. Güncellemeler ve Blog</h2>
+        <p>Yeni özellikler, duyurular ve makaleler için <a href="https://vizyon2026.vercel.app/blog.html" target="_blank">Blog</a> sayfamızı takip edin. Abone olarak yeni yazılardan e-posta ile haberdar olabilirsiniz.</p>
+
+        <h2>9. Lisans ve Telif Hakkı</h2>
+        <p>Vizyon2027 platformu, tüm kodları, tasarımları, metinleri, grafikleri ve logolarıyla <strong>Vizyon2027 Ekibi</strong>'nin mülkiyetindedir. Uluslararası telif hakkı, marka ve fikri mülkiyet yasaları tarafından korunmaktadır. İzinsiz kullanım, kopyalama, dağıtım veya türev çalışma oluşturma yasaktır ve yasal yaptırımlara tabidir.</p>
+
+        <div class="highlight-box">
+            <strong>⚠️ YASAL UYARI:</strong> Bu platformda üretilen tüm AI çıktıları (kod, metin, analiz, öneri) bilgilendirme amaçlıdır. Kullanıcı, bu çıktıları kendi sorumluluğunda kullanır. Vizyon2027, olası zararlardan sorumlu değildir.
+        </div>
+
+        <hr>
+
+        <div style="text-align:center; margin: 30px 0;">
+            <a href="index.html" class="back-link">⬅️ Ana Sayfaya Dön</a>
+        </div>
+
+        <div class="footer-note">
+            © 2026 Vizyon2027 – Tüm Hakları Saklıdır.<br>
+            Bu rehber, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) ve Avrupa Birliği Genel Veri Koruma Tüzüğü'ne (GDPR) uygun olarak hazırlanmıştır.
+        </div>
     </div>
 
-    <h2>6. Sık Sorulan Sorular (SSS)</h2>
-    <ul>
-        <li><strong>Vizyon2027 ücretsiz mi?</strong> – Evet, ücretsiz plan (25 sorgu/gün) mevcuttur. Pro (2000 sorgu/gün) ve Takım (sınırsız) planları ücretlidir.</li>
-        <li><strong>Nasıl puan kazanırım?</strong> – Günlük görevler, arkadaş daveti, ürün satışı, hata bildirimi, ders tamamlama, anket oylama, sosyal görevler ve Uzay Modu ile.</li>
-        <li><strong>Puanlarımı nerede görürüm?</strong> – Dashboard sağ üstteki altın rozette.</li>
-        <li><strong>Takım nasıl kurulur?</strong> – Takım sayfasından "Takım Oluştur" butonu ile.</li>
-        <li><strong>AI'ya özel komutlar var mı?</strong> – @vizyonal (takım sohbetinde), @vizyondestek (destek için).</li>
-        <li><strong>Verilerim güvende mi?</strong> – Evet, Back4App üzerinde şifreli olarak saklanır, 3. taraflarla paylaşılmaz.</li>
-        <li><strong>Hesabımı nasıl silerim?</strong> – Dashboard'da "Hesabımı Sil" butonu veya vizyon2027.info@gmail.com adresine mail atarak.</li>
-        <li><strong>Ebeveyn modu nedir?</strong> – Canlı takip, günlük harcama limiti, yarışma ve DM kapatma gibi çocuk güvenliği özellikleri.</li>
-        <li><strong>Uzay Modu nedir?</strong> – Gece 02:00-05:00 arası tüm puan kazanımları x2 olur. 🌌</li>
-    </ul>
+    <!-- ===== İÇERİK İNGİLİZCE ===== -->
+    <div id="lang-en" class="lang-content">
+        <h1>📖 VISION 2027 – Comprehensive Guide</h1>
+        <p><span class="badge">📌 Last Updated: August 29, 2026</span> <span class="badge">⚡ Version 5.14.2</span></p>
 
-    <h2>7. Topluluk ve Destek</h2>
-    <ul>
-        <li><strong>📧 E-posta:</strong> <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a></li>
-        <li><strong>📱 WhatsApp Kanalı:</strong> <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank">Tıklayın</a></li>
-        <li><strong>📸 Instagram:</strong> <a href="https://www.instagram.com/vizyon2027.info" target="_blank">@vizyon2027.info</a></li>
-        <li><strong>🌐 Web:</strong> <a href="https://vizyon2026.vercel.app" target="_blank">https://vizyon2026.vercel.app</a></li>
-        <li><strong>💬 Vizyon Destek:</strong> Ana sayfada sağ alttaki 💬 ikonundan veya Dashboard'daki "Vizyon Destek" butonundan ulaşabilirsiniz.</li>
-    </ul>
+        <p><strong>Vision2027</strong> is the world's most powerful artificial intelligence ecosystem. It combines 7 different AI models, team collaboration tools, a points system, a store, social networking, and much more in a single platform. This guide has been prepared for you to get to know our site in all its details, to know your rights, and to use it in the best way possible.</p>
 
-    <h2>8. Güncellemeler ve Blog</h2>
-    <p>Yeni özellikler, duyurular ve makaleler için <a href="https://vizyon2026.vercel.app/blog.html" target="_blank">Blog</a> sayfamızı takip edin. Abone olarak yeni yazılardan e-posta ile haberdar olabilirsiniz.</p>
+        <div class="highlight-box">
+            <strong>🚀 OUR VISION:</strong> To make artificial intelligence accessible, understandable, and beneficial for everyone. To become Turkey's and the world's leading AI platform by 2027.
+        </div>
 
-    <h2>9. Lisans ve Telif Hakkı</h2>
-    <p>Vizyon2027 platformu, tüm kodları, tasarımları, metinleri, grafikleri ve logolarıyla <strong>Vizyon2027 Ekibi</strong>'nin mülkiyetindedir. Uluslararası telif hakkı, marka ve fikri mülkiyet yasaları tarafından korunmaktadır. İzinsiz kullanım, kopyalama, dağıtım veya türev çalışma oluşturma yasaktır ve yasal yaptırımlara tabidir.</p>
+        <hr>
 
-    <div class="highlight-box">
-        <strong>⚠️ YASAL UYARI:</strong> Bu platformda üretilen tüm AI çıktıları (kod, metin, analiz, öneri) bilgilendirme amaçlıdır. Kullanıcı, bu çıktıları kendi sorumluluğunda kullanır. Vizyon2027, olası zararlardan sorumlu değildir.
+        <h2>1. What is Vision2027?</h2>
+        <p>Vision2027 is a <strong>versatile digital ecosystem</strong> designed for developers, entrepreneurs, students, and AI enthusiasts. With a single account, you can:</p>
+        <ul>
+            <li>✅ Access 7 different AI models (Groq, DeepSeek, OpenAI, OpenRouter, Cohere, Cerebras, GitHub Models) through a single chat.</li>
+            <li>✅ Create teams, develop joint projects with friends, and get AI support in team chat.</li>
+            <li>✅ Manage your projects, favorite them, archive them, and restore them from the trash.</li>
+            <li>✅ Earn points and purchase badges, special packages, and gifts from the store.</li>
+            <li>✅ Participate in polls, follow announcements, apply for job postings, and earn points by reporting bugs.</li>
+            <li>✅ Message other users, follow them, and view their profiles.</li>
+            <li>✅ Keep your child safe with parent mode, live tracking, and daily limit settings.</li>
+        </ul>
+
+        <h2>2. AI Models</h2>
+        <p>Vision2027 uses the following 7 models in <strong>a single query</strong> to find the most accurate and fastest answer:</p>
+        <div class="feature-grid">
+            <div class="feature-item"><strong>🧠 Groq</strong> – Llama 3.3 70B, fastest inference, free.</div>
+            <div class="feature-item"><strong>🧠 DeepSeek</strong> – Affordable, powerful coding ability.</div>
+            <div class="feature-item"><strong>🧠 OpenAI</strong> – GPT-4o, most advanced language model (requires credits).</div>
+            <div class="feature-item"><strong>🧠 OpenRouter</strong> – Access to 100+ models, free models available.</div>
+            <div class="feature-item"><strong>🧠 Cohere</strong> – Business-focused text generation and analysis.</div>
+            <div class="feature-item"><strong>🧠 Cerebras</strong> – High-performance Llama 3.1.</div>
+            <div class="feature-item"><strong>🧠 GitHub Models</strong> – Meta-Llama 3 8B, via Azure.</div>
+            <div class="feature-item"><strong>⚡ SuperAI</strong> – Tries all models sequentially and returns the best response.</div>
+        </div>
+        <p>Each model has its own strengths: Groq for speed, DeepSeek for coding, OpenAI for general capabilities, OpenRouter for variety, Cohere for business analytics, Cerebras for performance, and GitHub Models for Azure integration. SuperAI combines them all to give you the best experience.</p>
+
+        <h2>3. Team Collaboration</h2>
+        <ul>
+            <li><strong>Create Team:</strong> Anyone can create a team (Admin, Founder, Beta, or Team package owners). Add members with a 6-digit code.</li>
+            <li><strong>Team Chat:</strong> Chat, share files, send GIFs. Use @vizyonal to ask AI based on team history.</li>
+            <li><strong>Member Management:</strong> Founder can assign managers, add/remove members, transfer ownership.</li>
+            <li><strong>Joint Projects:</strong> Develop projects with team members, assign tasks.</li>
+            <li><strong>Vision Patrol:</strong> Founder has special privileges to ensure team security.</li>
+        </ul>
+
+        <h2>4. Points System and Store</h2>
+        <ul>
+            <li><strong>Ways to Earn Points:</strong>
+                <ul>
+                    <li>Complete daily tasks (renewed every day).</li>
+                    <li>Invite friends (500 points per invite).</li>
+                    <li>Product sales (5% points).</li>
+                    <li>Bug reports (100 points).</li>
+                    <li>Complete lessons.</li>
+                    <li>Vote in polls (20 points).</li>
+                    <li>Social tasks (Instagram/WhatsApp follow).</li>
+                    <li><strong>Space Mode</strong> (2x points between 02:00-05:00).</li>
+                </ul>
+            </li>
+            <li><strong>Store:</strong> Spend your points on badges, special colors, pro packages, and team package gifts.</li>
+            <li><strong>Level System:</strong> Reach "Member" at 1000 points, "Expert" at 5000, and "Legend" at 20000 points.</li>
+        </ul>
+
+        <h2>5. Legal Rights and Responsibilities</h2>
+
+        <div class="important-box">
+            <h3 style="color:#ff6b6b; margin-top:0;">🔒 Privacy Policy (Summary)</h3>
+            <ul>
+                <li><strong>Collected Data:</strong> Email, username, AI queries, team messages, device info (model, OS).</li>
+                <li><strong>DATA NOT COLLECTED:</strong> Location, photos, contacts, SMS, call logs, biometric data, financial information <span class="badge" style="background:#ff6b6b22; border-color:#ff6b6b; color:#ff6b6b;">NEVER COLLECTED</span>.</li>
+                <li><strong>Data Usage:</strong> Only to improve service quality and provide a personalized experience.</li>
+                <li><strong>Data Sharing:</strong> Not shared, sold, or rented to any third parties.</li>
+                <li><strong>Data Retention:</strong> Stored while your account is active. All data is permanently deleted when the account is closed.</li>
+                <li><strong>User Rights:</strong> Right to information, correction, deletion (right to be forgotten), objection, data portability.</li>
+            </ul>
+            <p>For details, visit our <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Privacy Policy</a> page.</p>
+        </div>
+
+        <div class="info-box">
+            <h3 style="color:#ffb700; margin-top:0;">📜 Terms of Service (Summary)</h3>
+            <ul>
+                <li><strong>Account Security:</strong> You are responsible for your password. Users under 13 cannot create accounts without parental consent.</li>
+                <li><strong>Usage Rules:</strong> Illegal, harassing, or harmful content is prohibited. No spam, hacking, or copyright infringement.</li>
+                <li><strong>Intellectual Property:</strong> All codes, designs, and content belong to Vision2027. Unauthorized copying, distribution, or derivative works are prohibited.</li>
+                <li><strong>Disclaimer:</strong> AI responses are provided "as is." Vision2027 gives no warranty for accuracy or reliability.</li>
+                <li><strong>Account Termination:</strong> Accounts violating the rules may be suspended or permanently deleted.</li>
+            </ul>
+            <p>For details, visit our <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">Terms of Service</a> page.</p>
+        </div>
+
+        <h2>6. Frequently Asked Questions (FAQ)</h2>
+        <ul>
+            <li><strong>Is Vision2027 free?</strong> – Yes, a free plan (25 queries/day) is available. Pro (2000 queries/day) and Team (unlimited) plans are paid.</li>
+            <li><strong>How do I earn points?</strong> – Daily tasks, inviting friends, product sales, bug reports, completing lessons, poll voting, social tasks, and Space Mode.</li>
+            <li><strong>Where do I see my points?</strong> – The golden badge in the top-right of the Dashboard.</li>
+            <li><strong>How do I create a team?</strong> – Use the "Create Team" button on the Team page.</li>
+            <li><strong>Are there special AI commands?</strong> – @vizyonal (in team chat), @vizyondestek (for support).</li>
+            <li><strong>Is my data safe?</strong> – Yes, stored encrypted on Back4App and not shared with third parties.</li>
+            <li><strong>How do I delete my account?</strong> – Use the "Delete My Account" button in the Dashboard or send an email to vizyon2027.info@gmail.com.</li>
+            <li><strong>What is Parent Mode?</strong> – Child safety features like live tracking, daily spending limit, disabling contests and DM.</li>
+            <li><strong>What is Space Mode?</strong> – Between 02:00-05:00 all point earnings are doubled. 🌌</li>
+            <li><strong>What is the "Teach Me" page for?</strong> – This comprehensive guide covers all platform details, your legal rights, and FAQs.</li>
+        </ul>
+
+        <h2>7. Community and Support</h2>
+        <ul>
+            <li><strong>📧 Email:</strong> <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a></li>
+            <li><strong>📱 WhatsApp Channel:</strong> <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank">Click here</a></li>
+            <li><strong>📸 Instagram:</strong> <a href="https://www.instagram.com/vizyon2027.info" target="_blank">@vizyon2027.info</a></li>
+            <li><strong>🌐 Web:</strong> <a href="https://vizyon2026.vercel.app" target="_blank">https://vizyon2026.vercel.app</a></li>
+            <li><strong>💬 Vision Support:</strong> Access via the 💬 icon on the bottom-right of the homepage or the "Vision Support" button in the Dashboard.</li>
+        </ul>
+
+        <h2>8. Updates and Blog</h2>
+        <p>Follow our <a href="https://vizyon2026.vercel.app/blog.html" target="_blank">Blog</a> for new features, announcements, and articles. Subscribe to receive email notifications about new posts.</p>
+
+        <h2>9. License and Copyright</h2>
+        <p>The Vision2027 platform, including all its codes, designs, texts, graphics, and logos, is the property of the <strong>Vision2027 Team</strong>. It is protected by international copyright, trademark, and intellectual property laws. Unauthorized use, copying, distribution, or creation of derivative works is prohibited and subject to legal action.</p>
+
+        <div class="highlight-box">
+            <strong>⚠️ LEGAL NOTICE:</strong> All AI outputs (code, text, analysis, suggestions) generated on this platform are for informational purposes only. Users use these outputs at their own risk. Vision2027 is not responsible for any damages.
+        </div>
+
+        <hr>
+
+        <div style="text-align:center; margin: 30px 0;">
+            <a href="index.html" class="back-link">⬅️ Back to Home</a>
+        </div>
+
+        <div class="footer-note">
+            © 2026 Vision2027 – All Rights Reserved.<br>
+            This guide has been prepared in compliance with the Turkish Personal Data Protection Law (KVKK) and the EU General Data Protection Regulation (GDPR).
+        </div>
     </div>
 
-    <hr>
+    <!-- ===== İÇERİK ARAPÇA ===== -->
+    <div id="lang-ar" class="lang-content" dir="rtl">
+        <h1>📖 فيجن 2027 – الدليل الشامل</h1>
+        <p><span class="badge">📌 آخر تحديث: 29 أغسطس 2026</span> <span class="badge">⚡ الإصدار 5.14.2</span></p>
 
-    <div style="text-align:center; margin: 30px 0;">
-        <a href="index.html" class="back-link">⬅️ Ana Sayfaya Dön</a>
-    </div>
+        <p><strong>فيجن 2027</strong> هو أقوى نظام بيئي للذكاء الاصطناعي في العالم. فهو يجمع 7 نماذج ذكاء اصطناعي مختلفة، وأدوات العمل الجماعي، ونظام النقاط، والمتجر، والتواصل الاجتماعي، وأكثر من ذلك بكثير في منصة واحدة. تم إعداد هذا الدليل للتعرف على موقعنا بكل تفاصيله، ومعرفة حقوقك، واستخدامه بأفضل طريقة ممكنة.</p>
 
-    <div class="footer-note">
-        © 2026 Vizyon2027 – Tüm Hakları Saklıdır.<br>
-        Bu rehber, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) ve Avrupa Birliği Genel Veri Koruma Tüzüğü'ne (GDPR) uygun olarak hazırlanmıştır.
+        <div class="highlight-box">
+            <strong>🚀 رؤيتنا:</strong> جعل الذكاء الاصطناعي متاحًا ومفهومًا ومفيدًا للجميع. أن نصبح المنصة الرائدة للذكاء الاصطناعي في تركيا والعالم بحلول عام 2027.
+        </div>
+
+        <hr>
+
+        <h2>1. ما هي فيجن 2027؟</h2>
+        <p>فيجن 2027 هي <strong>نظام بيئي رقمي متعدد الاستخدامات</strong> مصمم للمطورين ورواد الأعمال والطلاب وعشاق الذكاء الاصطناعي. بحساب واحد، يمكنك:</p>
+        <ul>
+            <li>✅ الوصول إلى 7 نماذج ذكاء اصطناعي مختلفة (Groq، DeepSeek، OpenAI، OpenRouter، Cohere، Cerebras، GitHub Models) من خلال محادثة واحدة.</li>
+            <li>✅ إنشاء فرق، وتطوير مشاريع مشتركة مع الأصدقاء، والحصول على دعم الذكاء الاصطناعي في محادثة الفريق.</li>
+            <li>✅ إدارة مشاريعك، ووضعها في المفضلة، وأرشفتها، واستعادتها من سلة المحذوفات.</li>
+            <li>✅ كسب النقاط وشراء الشارات والحزم الخاصة والهدايا من المتجر.</li>
+            <li>✅ المشاركة في الاستبيانات، ومتابعة الإعلانات، والتقديم على الوظائف، وكسب النقاط عن طريق الإبلاغ عن الأخطاء.</li>
+            <li>✅ مراسلة المستخدمين الآخرين، ومتابعتهم، وعرض ملفاتهم الشخصية.</li>
+            <li>✅ الحفاظ على سلامة طفلك من خلال وضع الوالدين، والتتبع المباشر، وإعدادات الحد اليومي.</li>
+        </ul>
+
+        <h2>2. نماذج الذكاء الاصطناعي</h2>
+        <p>تستخدم فيجن 2027 النماذج السبعة التالية في <strong>استعلام واحد</strong> للعثور على الإجابة الأكثر دقة وسرعة:</p>
+        <div class="feature-grid">
+            <div class="feature-item"><strong>🧠 Groq</strong> – Llama 3.3 70B، أسرع استدلال، مجاني.</div>
+            <div class="feature-item"><strong>🧠 DeepSeek</strong> – بأسعار معقولة، وقدرة قوية على البرمجة.</div>
+            <div class="feature-item"><strong>🧠 OpenAI</strong> – GPT-4o، نموذج اللغة الأكثر تقدمًا (يتطلب أرصدة).</div>
+            <div class="feature-item"><strong>🧠 OpenRouter</strong> – الوصول إلى أكثر من 100 نموذج، نماذج مجانية متاحة.</div>
+            <div class="feature-item"><strong>🧠 Cohere</strong> – إنشاء وتحليل النصوص الموجهة للأعمال.</div>
+            <div class="feature-item"><strong>🧠 Cerebras</strong> – Llama 3.1 عالي الأداء.</div>
+            <div class="feature-item"><strong>🧠 GitHub Models</strong> – Meta-Llama 3 8B عبر Azure.</div>
+            <div class="feature-item"><strong>⚡ SuperAI</strong> – يجرب جميع النماذج بالتسلسل ويعيد أفضل استجابة.</div>
+        </div>
+        <p>لكل نموذج نقاط قوة خاصة به: Groq للسرعة، DeepSeek للبرمجة، OpenAI للقدرات العامة، OpenRouter للتنوع، Cohere للتحليلات التجارية، Cerebras للأداء، وGitHub Models لتكامل Azure. يجمعها SuperAI جميعًا ليمنحك أفضل تجربة.</p>
+
+        <h2>3. العمل الجماعي</h2>
+        <ul>
+            <li><strong>إنشاء فريق:</strong> يمكن لأي شخص إنشاء فريق (المشرف، المؤسس، بيتا، أو مالكي حزمة الفريق). أضف أعضاء برمز مكون من 6 أرقام.</li>
+            <li><strong>محادثة الفريق:</strong> دردش، شارك الملفات، أرسل صور GIF. استخدم @vizyonal لسؤال الذكاء الاصطناعي بناءً على تاريخ الفريق.</li>
+            <li><strong>إدارة الأعضاء:</strong> يمكن للمؤسس تعيين مديرين، إضافة/إزالة أعضاء، نقل الملكية.</li>
+            <li><strong>المشاريع المشتركة:</strong> طوّر مشاريع مع أعضاء الفريق، خصص المهام.</li>
+            <li><strong>دورية فيجن:</strong> للمؤسس امتيازات خاصة لضمان أمن الفريق.</li>
+        </ul>
+
+        <h2>4. نظام النقاط والمتجر</h2>
+        <ul>
+            <li><strong>طرق كسب النقاط:</strong>
+                <ul>
+                    <li>إكمال المهام اليومية (تُجدد كل يوم).</li>
+                    <li>دعوة الأصدقاء (500 نقطة لكل دعوة).</li>
+                    <li>مبيعات المنتجات (5% نقاط).</li>
+                    <li>الإبلاغ عن الأخطاء (100 نقطة).</li>
+                    <li>إكمال الدروس.</li>
+                    <li>التصويت في الاستبيانات (20 نقطة).</li>
+                    <li>المهام الاجتماعية (متابعة Instagram/WhatsApp).</li>
+                    <li><strong>الوضع الفضائي</strong> (نقاط مضاعفة ×2 بين 02:00-05:00).</li>
+                </ul>
+            </li>
+            <li><strong>المتجر:</strong> أنفق نقاطك على الشارات والألوان الخاصة والحزم الاحترافية وهدايا حزمة الفريق.</li>
+            <li><strong>نظام المستويات:</strong> وصل إلى "عضو" عند 1000 نقطة، و"خبير" عند 5000، و"أسطورة" عند 20000 نقطة.</li>
+        </ul>
+
+        <h2>5. الحقوق القانونية والمسؤوليات</h2>
+
+        <div class="important-box">
+            <h3 style="color:#ff6b6b; margin-top:0;">🔒 سياسة الخصوصية (ملخص)</h3>
+            <ul>
+                <li><strong>البيانات المجمعة:</strong> البريد الإلكتروني، اسم المستخدم، استعلامات الذكاء الاصطناعي، رسائل الفريق، معلومات الجهاز (الطراز، نظام التشغيل).</li>
+                <li><strong>البيانات غير المجمعة:</strong> الموقع، الصور، جهات الاتصال، الرسائل القصيرة، سجلات المكالمات، البيانات البيومترية، المعلومات المالية <span class="badge" style="background:#ff6b6b22; border-color:#ff6b6b; color:#ff6b6b;">لا تُجمع أبدًا</span>.</li>
+                <li><strong>استخدام البيانات:</strong> فقط لتحسين جودة الخدمة وتقديم تجربة مخصصة لك.</li>
+                <li><strong>مشاركة البيانات:</strong> لا تشارك أو تباع أو تؤجر لأي طرف ثالث.</li>
+                <li><strong>الاحتفاظ بالبيانات:</strong> تُخزن طالما أن حسابك نشط. عند حذف الحساب، تُحذف جميع البيانات نهائيًا.</li>
+                <li><strong>حقوق المستخدم:</strong> الحق في الاطلاع، التصحيح، الحذف (الحق في النسيان)، الاعتراض، قابلية نقل البيانات.</li>
+            </ul>
+            <p>للتفاصيل، تفضل بزيارة صفحة <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">سياسة الخصوصية</a>.</p>
+        </div>
+
+        <div class="info-box">
+            <h3 style="color:#ffb700; margin-top:0;">📜 اتفاقية المستخدم (ملخص)</h3>
+            <ul>
+                <li><strong>أمان الحساب:</strong> أنت مسؤول عن كلمة المرور الخاصة بك. لا يمكن للمستخدمين دون 13 عامًا إنشاء حسابات دون موافقة الوالدين.</li>
+                <li><strong>قواعد الاستخدام:</strong> يُحظر المحتوى غير القانوني أو المسيء أو الضار. لا يُسمح بالبريد العشوائي أو الاختراق أو انتهاك حقوق النشر.</li>
+                <li><strong>الملكية الفكرية:</strong> جميع الأكواد والتصاميم والمحتويات مملوكة لفريق فيجن 2027. يُحظر النسخ أو التوزيع أو إنشاء أعمال مشتقة دون إذن.</li>
+                <li><strong>إخلاء المسؤولية:</strong> تُقدم استجابات الذكاء الاصطناعي "كما هي". لا تقدم فيجن 2027 أي ضمان بشأن الدقة أو الموثوقية.</li>
+                <li><strong>إنهاء الحساب:</strong> قد يتم تعليق أو حذف الحسابات التي تنتهك القواعد بشكل دائم.</li>
+            </ul>
+            <p>للتفاصيل، تفضل بزيارة صفحة <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">اتفاقية المستخدم</a>.</p>
+        </div>
+
+        <h2>6. الأسئلة الشائعة</h2>
+        <ul>
+            <li><strong>هل فيجن 2027 مجانية؟</strong> – نعم، توجد خطة مجانية (25 استعلام/يوم). خطط Pro (2000 استعلام/يوم) والفريق (غير محدود) مدفوعة.</li>
+            <li><strong>كيف أكسب النقاط؟</strong> – المهام اليومية، دعوة الأصدقاء، مبيعات المنتجات، الإبلاغ عن الأخطاء، إكمال الدروس، التصويت في الاستبيانات، المهام الاجتماعية، والوضع الفضائي.</li>
+            <li><strong>أين أرى نقاطي؟</strong> – الشارة الذهبية في أعلى يمين لوحة التحكم.</li>
+            <li><strong>كيف أنشئ فريقًا؟</strong> – استخدم زر "إنشاء فريق" في صفحة الفريق.</li>
+            <li><strong>هل توجد أوامر خاصة للذكاء الاصطناعي؟</strong> – @vizyonal (في محادثة الفريق)، @vizyondestek (للحصول على الدعم).</li>
+            <li><strong>هل بياناتي آمنة؟</strong> – نعم، تُخزن مشفرة على Back4App ولا تُشارك مع أطراف ثالثة.</li>
+            <li><strong>كيف أحذف حسابي؟</strong> – استخدم زر "حذف حسابي" في لوحة التحكم أو أرسل بريدًا إلكترونيًا إلى vizyon2027.info@gmail.com.</li>
+            <li><strong>ما هو وضع الوالدين؟</strong> – ميزات سلامة الأطفال مثل التتبع المباشر والحد اليومي للإنفاق وتعطيل المسابقات والرسائل الخاصة.</li>
+            <li><strong>ما هو الوضع الفضائي؟</strong> – بين 02:00-05:00 تتضاعف جميع أرباح النقاط. 🌌</li>
+            <li><strong>ما هي صفحة "علمني"؟</strong> – هذا الدليل الشامل يغطي جميع تفاصيل المنصة وحقوقك القانونية والأسئلة الشائعة.</li>
+        </ul>
+
+        <h2>7. المجتمع والدعم</h2>
+        <ul>
+            <li><strong>📧 البريد الإلكتروني:</strong> <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a></li>
+            <li><strong>📱 قناة WhatsApp:</strong> <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank">انقر هنا</a></li>
+            <li><strong>📸 Instagram:</strong> <a href="https://www.instagram.com/vizyon2027.info" target="_blank">@vizyon2027.info</a></li>
+            <li><strong>🌐 الويب:</strong> <a href="https://vizyon2026.vercel.app" target="_blank">https://vizyon2026.vercel.app</a></li>
+            <li><strong>💬 دعم فيجن:</strong> يمكنك الوصول عبر أيقونة 💬 في أسفل يمين الصفحة الرئيسية أو زر "دعم فيجن" في لوحة التحكم.</li>
+        </ul>
+
+        <h2>8. التحديثات والمدونة</h2>
+        <p>تابع <a href="https://vizyon2026.vercel.app/blog.html" target="_blank">المدونة</a> للحصول على الميزات الجديدة والإعلانات والمقالات. اشترك لتلقي إشعارات البريد الإلكتروني حول المنشورات الجديدة.</p>
+
+        <h2>9. الترخيص وحقوق النشر</h2>
+        <p>منصة فيجن 2027، بما في ذلك جميع أكوادها وتصميماتها ونصوصها ورسوماتها وشعاراتها، هي ملك <strong>فريق فيجن 2027</strong>. وهي محمية بقوانين حقوق النشر والعلامات التجارية والملكية الفكرية الدولية. يُحظر الاستخدام غير المصرح به أو النسخ أو التوزيع أو إنشاء أعمال مشتقة ويخضع لعقوبات قانونية.</p>
+
+        <div class="highlight-box">
+            <strong>⚠️ إشعار قانوني:</strong> جميع مخرجات الذكاء الاصطناعي (الكود، النص، التحليل، الاقتراحات) التي يتم إنشاؤها على هذه المنصة هي لأغراض إعلامية فقط. يستخدم المستخدم هذه المخرجات على مسؤوليته الخاصة. فيجن 2027 ليست مسؤولة عن أي أضرار.
+        </div>
+
+        <hr>
+
+        <div style="text-align:center; margin: 30px 0;">
+            <a href="index.html" class="back-link">⬅️ العودة إلى الصفحة الرئيسية</a>
+        </div>
+
+        <div class="footer-note">
+            © 2026 فيجن 2027 – جميع الحقوق محفوظة.<br>
+            تم إعداد هذا الدليل وفقًا لقانون حماية البيانات الشخصية التركي (KVKK) واللائحة العامة لحماية البيانات (GDPR) للاتحاد الأوروبي.
+        </div>
     </div>
 
 </div>
+
+<script>
+    // ===== DİL DEĞİŞTİRME FONKSİYONU =====
+    function switchLanguage(lang) {
+        // Tüm dil içeriklerini gizle
+        document.querySelectorAll('.lang-content').forEach(el => {
+            el.classList.remove('active');
+        });
+        // Seçilen dili göster
+        const target = document.getElementById('lang-' + lang);
+        if (target) target.classList.add('active');
+
+        // Butonları güncelle
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.lang === lang) {
+                btn.classList.add('active');
+            }
+        });
+
+        // Sayfa yönünü ayarla (Arapça için RTL)
+        const container = document.getElementById('mainContainer');
+        if (lang === 'ar') {
+            container.style.direction = 'rtl';
+        } else {
+            container.style.direction = 'ltr';
+        }
+
+        // Dil tercihini localStorage'a kaydet
+        localStorage.setItem('preferred_lang', lang);
+    }
+
+    // Sayfa yüklendiğinde kaydedilmiş dili kontrol et
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedLang = localStorage.getItem('preferred_lang');
+        if (savedLang && (savedLang === 'tr' || savedLang === 'en' || savedLang === 'ar')) {
+            switchLanguage(savedLang);
+        } else {
+            // Varsayılan olarak Türkçe
+            switchLanguage('tr');
+        }
+    });
+
+    // URL'den dil parametresi al (isteğe bağlı, ?lang=tr gibi)
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlLang = urlParams.get('lang');
+    if (urlLang && (urlLang === 'tr' || urlLang === 'en' || urlLang === 'ar')) {
+        switchLanguage(urlLang);
+    }
+</script>
+
 </body>
 </html>
