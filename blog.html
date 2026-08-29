@@ -9,34 +9,37 @@
         .container { max-width: 1000px; margin: 0 auto; background: #141414; padding: 40px; border-radius: 16px; border: 1px solid #2a2a2a; }
         h1 { color: #00d4ff; font-size: 32px; border-bottom: 2px solid #00d4ff; padding-bottom: 15px; }
         h2 { color: #00d4ff; font-size: 22px; margin-top: 35px; border-left: 4px solid #00d4ff; padding-left: 15px; }
-        h3 { color: #a0c4e0; font-size: 18px; margin-top: 25px; }
+        h3 { color: #a0c4e0; font-size: 20px; margin-top: 25px; }
         p, li { color: #c8d0d8; font-size: 15px; }
-        ul { padding-left: 25px; }
-        li { margin-bottom: 8px; }
         .back-link { display: inline-block; margin-top: 30px; color: #00d4ff; text-decoration: none; border: 1px solid #00d4ff; padding: 10px 20px; border-radius: 30px; transition: 0.3s; }
         .back-link:hover { background: #00d4ff; color: #0a0a0a; }
         .badge { display: inline-block; background: #00d4ff22; color: #00d4ff; padding: 2px 12px; border-radius: 20px; font-size: 13px; border: 1px solid #00d4ff55; }
         hr { border: 0; height: 1px; background: #2a2a2a; margin: 30px 0; }
-        .blog-post { background: #1a1a2a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; transition: 0.3s; }
-        .blog-post:hover { border-color: #00d4ff; transform: translateY(-2px); }
-        .blog-post h3 { margin-top: 0; color: #00d4ff; font-size: 20px; }
+        .blog-post { background: #1a1a2a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 24px; margin-bottom: 30px; }
+        .blog-post h3 { margin-top: 0; color: #00d4ff; }
         .blog-post .meta { font-size: 13px; color: #888; margin-bottom: 10px; }
         .blog-post .meta span { margin-right: 15px; }
         .blog-post p { color: #b0b8c0; }
-        .blog-post .read-more { color: #00d4ff; text-decoration: none; font-weight: 600; border-bottom: 1px solid transparent; transition: 0.3s; }
-        .blog-post .read-more:hover { border-bottom-color: #00d4ff; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
         .category-tag { display: inline-block; background: #00d4ff22; color: #00d4ff; padding: 2px 10px; border-radius: 20px; font-size: 11px; border: 1px solid #00d4ff44; margin-right: 6px; }
+        .subscribe-box { background: #0d1a26; border: 2px solid #00d4ff; border-radius: 16px; padding: 30px; text-align: center; margin-top: 40px; }
+        .subscribe-box input { padding: 14px 20px; border-radius: 40px; border: 1px solid #2a2a2a; background: #0a0a0a; color: #fff; font-size: 16px; width: 70%; margin-right: 10px; }
+        .subscribe-box button { padding: 14px 30px; border-radius: 40px; background: #00d4ff; color: #0a0a0a; border: none; font-weight: 700; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .subscribe-box button:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(0,212,255,0.4); }
+        .subscribe-box .info { margin-top: 12px; font-size: 13px; color: #8ab4cc; }
+        #subscribeMessage { margin-top: 12px; font-weight: 600; }
+        .success { color: #00ff88; }
+        .error { color: #ff6b6b; }
+        @media (max-width: 768px) {
+            .subscribe-box input { width: 100%; margin-bottom: 10px; }
+            .subscribe-box button { width: 100%; }
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>📝 Vizyon2027 Blog</h1>
     <p><span class="badge">📰 Yapay Zeka, Teknoloji ve Vizyon</span> <span class="badge" style="margin-left:10px;">📅 Güncel İçerikler</span></p>
-
     <p>Hoş geldiniz! Vizyon2027 Blog'da, yapay zeka dünyasındaki gelişmeleri, platform güncellemelerini, eğitim içeriklerini ve ilham verici hikayeleri paylaşıyoruz. Her hafta yeni yazılar eklenir.</p>
-
     <hr>
 
     <!-- ===== BLOG YAZILARI ===== -->
@@ -49,8 +52,13 @@
             <span>👤 Eymen</span>
             <span>🏷️ <span class="category-tag">Yapay Zeka</span> <span class="category-tag">Verimlilik</span></span>
         </div>
-        <p>VİZYON AI, 7 farklı yapay zeka modelini tek bir platformda birleştirerek günlük iş akışınızı nasıl dönüştürebilir? Kod yazmaktan içerik üretmeye, veri analizinden takım çalışmasına kadar her alanda size nasıl yardımcı olacağını keşfedin.</p>
-        <a href="#" class="read-more" onclick="alert('📖 Bu yazı yakında yayınlanacak!')">Devamını Oku →</a>
+        <p>Günümüz iş dünyasında zaman en değerli kaynaktır. VİZYON AI, 7 farklı yapay zeka modelini (Groq, DeepSeek, OpenAI, OpenRouter, Cohere, Cerebras, GitHub Models) tek bir platformda birleştirerek iş akışınızı kökten değiştirir. Kod yazmaktan içerik üretmeye, veri analizinden takım çalışmasına kadar her alanda size nasıl yardımcı olacağını keşfedin.</p>
+        <p>Örneğin, karmaşık bir Python betiği yazmak yerine VİZYON AI'ya "Python'da bir web scraper yaz" diyebilir, saniyeler içinde çalışan bir kod alabilirsiniz. Aynı şekilde, "React ile bir dashboard tasarla" dediğinizde size hazır bir bileşen yapısı sunar. Bu, yazılım geliştirme süresini %80 oranında azaltır.</p>
+        <p>Ayrıca, VİZYON AI web arama özelliği ile anlık dolar kuru, hava durumu, güncel haberler gibi bilgileri size getirir. Bu sayede araştırma yapmak için saatler harcamazsınız. Takım çalışmasında ise, ekip üyelerinizle ortak projeler yürütebilir, AI'ya takım sohbetinde sorular sorabilirsiniz.</p>
+        <p>Verimlilik artışı sadece hız değil, aynı zamanda kalite demektir. VİZYON AI, kod hatalarını bulup düzeltir, öneriler sunar ve en iyi uygulamaları size gösterir. Bu sayede hem daha az hata yaparsınız hem de daha temiz kod yazarsınız.</p>
+        <p>Kısacası, VİZYON AI sizin kişisel asistanınız, kod yazma ortağınız ve fikir üretme motorunuzdur. Günlük iş yükünüzü hafifletir, yaratıcılığınızı ön plana çıkarır. Henüz denemediyseniz, hemen bugün ücretsiz plana kaydolun ve farkı görün!</p>
+        <p><em>VİZYON AI ile üretkenliğinizin sınırlarını zorlayın.</em></p>
+        <a href="#" class="read-more" style="color:#00d4ff; text-decoration:none; font-weight:600; border-bottom:1px solid transparent; transition:0.3s;" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
     </div>
 
     <!-- 2 -->
@@ -61,8 +69,17 @@
             <span>👤 İbrahim Admin</span>
             <span>🏷️ <span class="category-tag">Geliştirici</span> <span class="category-tag">API</span></span>
         </div>
-        <p>Back4App Cloud Code kullanarak kendi API fonksiyonlarınızı nasıl yazacağınızı, test edeceğinizi ve canlıya alacağınızı adım adım anlatan kapsamlı bir rehber. Örnek kodlar ve en iyi pratiklerle birlikte.</p>
-        <a href="#" class="read-more" onclick="alert('📖 Bu yazı yakında yayınlanacak!')">Devamını Oku →</a>
+        <p>Back4App, Parse Server tabanlı bir Backend-as-a-Service platformudur. Cloud Code, sunucu tarafında çalışan JavaScript fonksiyonlarıdır. Bu rehberde, Cloud Code kullanarak nasıl kendi API fonksiyonlarınızı yazacağınızı, test edeceğinizi ve canlıya alacağınızı adım adım anlatacağım.</p>
+        <p>Öncelikle, Back4App Dashboard'da Cloud Code bölümüne gidin. `main.js` dosyasını düzenleyerek yeni fonksiyonlar ekleyebilirsiniz. Örneğin, basit bir "merhaba dünya" fonksiyonu:</p>
+        <pre style="background:#0a0a0a; padding:12px; border-radius:8px; color:#00ff88;">
+Parse.Cloud.define("hello", async (request) => {
+    return "Merhaba, Dünya!";
+});</pre>
+        <p>Bu fonksiyonu istemci tarafından `Parse.Cloud.run('hello')` ile çağırabilirsiniz. Daha karmaşık işlemler için, veritabanı sorguları, dış API çağrıları ve dosya işlemleri ekleyebilirsiniz.</p>
+        <p>Cloud Code'un en büyük avantajı, güvenli bir ortamda çalışmasıdır. API anahtarlarınızı ve hassas bilgileri istemci tarafında değil, Cloud Code içinde saklayabilirsiniz. Ayrıca, oturum kontrolü yaparak yalnızca yetkili kullanıcıların belirli fonksiyonlara erişmesini sağlayabilirsiniz.</p>
+        <p>Bu rehberde, gerçek dünya örnekleriyle Cloud Code'un tüm inceliklerini öğreneceksiniz. Hata yönetimi, asenkron işlemler, veritabanı ilişkileri ve daha fazlası.</p>
+        <p>Back4App Cloud Code, ölçeklenebilir ve güvenilir bir arka uç çözümüdür. Vizyon2027'nin tüm arka uç işlemleri Cloud Code üzerinden çalışmaktadır. Siz de kendi projelerinizde bu güçlü aracı kullanabilirsiniz.</p>
+        <a href="#" class="read-more" style="color:#00d4ff; text-decoration:none; font-weight:600; border-bottom:1px solid transparent; transition:0.3s;" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
     </div>
 
     <!-- 3 -->
@@ -73,8 +90,12 @@
             <span>👤 Bozkurt Admin</span>
             <span>🏷️ <span class="category-tag">Vizyon</span> <span class="category-tag">Gelecek</span></span>
         </div>
-        <p>Vizyon2027'nin kuruluş hikayesi, hedefleri ve 2027 yılına kadar yapay zeka ekosisteminde nasıl bir dönüşüm hedeflediğimizi anlatıyoruz. Geleceğin teknolojilerine bugünden hazırlanın.</p>
-        <a href="#" class="read-more" onclick="alert('📖 Bu yazı yakında yayınlanacak!')">Devamını Oku →</a>
+        <p>Vizyon2027, 2027 yılına kadar yapay zeka ekosisteminde lider olmayı hedefleyen bir projedir. Bu yazıda, kuruluş hikayemizden, hedeflerimize ve 2027'de nerede olmayı planladığımıza dair kapsamlı bir bakış sunacağız.</p>
+        <p>Her şey, bir grup teknoloji meraklısının "Ya yapay zekayı herkes için erişilebilir hale getirirsek?" sorusuyla başladı. O gün bugündür, en iyi AI modellerini tek bir platformda toplamak, kullanıcıların işlerini kolaylaştırmak ve onlara ilham vermek için çalışıyoruz.</p>
+        <p>2027 vizyonumuz, yapay zekanın sadece büyük şirketlerin değil, bireylerin, girişimcilerin ve küçük işletmelerin de günlük hayatının bir parçası haline gelmesidir. Bu doğrultuda, eğitim içerikleri, topluluk etkinlikleri ve açık kaynak projeleriyle ekosistemi büyütüyoruz.</p>
+        <p>Gelecekte, VİZYON AI'nın daha da akıllı hale gelmesi, kullanıcı ihtiyaçlarını öngörmesi ve proaktif öneriler sunması hedefleniyor. Ayrıca, mobil uygulama, donanım entegrasyonları ve oyunlaştırma gibi yeni alanlara açılmayı planlıyoruz.</p>
+        <p>Siz de bu yolculuğun bir parçası olun. Birlikte, yapay zekanın sınırsız potansiyelini keşfedelim ve 2027'de dünyayı değiştirelim.</p>
+        <a href="#" class="read-more" style="color:#00d4ff; text-decoration:none; font-weight:600; border-bottom:1px solid transparent; transition:0.3s;" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
     </div>
 
     <!-- 4 -->
@@ -85,8 +106,11 @@
             <span>👤 Eymen Beta</span>
             <span>🏷️ <span class="category-tag">Takım</span> <span class="category-tag">İş Birliği</span></span>
         </div>
-        <p>Vizyon2027'nin takım özellikleri, AI destekli sohbet, ortak proje yönetimi ve otomatik görev dağılımı ile takım çalışmasını nasıl daha verimli hale getirdiğini keşfedin. Gerçek kullanıcı deneyimleri ve ipuçları.</p>
-        <a href="#" class="read-more" onclick="alert('📖 Bu yazı yakında yayınlanacak!')">Devamını Oku →</a>
+        <p>Vizyon2027'nin en güçlü yanlarından biri, takım çalışmasını destekleyen özellikleridir. Bu yazıda, AI destekli sohbet, ortak proje yönetimi, otomatik görev dağılımı ve gerçek zamanlı işbirliği araçlarının takım performansını nasıl artırdığını anlatacağım.</p>
+        <p>Takım sohbetinde, @vizyonal komutuyla AI'ya sorular sorabilir, takım üyeleriyle fikir alışverişi yapabilirsiniz. AI, takımın geçmiş mesajlarını analiz ederek bağlama uygun cevaplar verir. Ayrıca, dosya paylaşımı, GIF gönderme ve sesli komut gibi özellikler iletişimi hızlandırır.</p>
+        <p>Ortak projelerde, her takım üyesi kendi görevlerini görür, ilerlemeyi takip edebilir ve proje sahibiyle yöneticiler kontrolü elinde tutar. Sahiplik devri, üye atama ve yetkilendirme gibi işlemler kolayca yapılır.</p>
+        <p>Vizyon2027, yapay zekayı takım çalışmasının merkezine koyarak, ekiplerin daha hızlı, daha organize ve daha yaratıcı olmasını sağlar. Gerçek kullanıcı deneyimlerine dayanan bu yazıda, en iyi uygulamaları ve ipuçlarını bulacaksınız.</p>
+        <a href="#" class="read-more" style="color:#00d4ff; text-decoration:none; font-weight:600; border-bottom:1px solid transparent; transition:0.3s;" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
     </div>
 
     <!-- 5 -->
@@ -97,8 +121,11 @@
             <span>👤 Vizyon Ekibi</span>
             <span>🏷️ <span class="category-tag">Girişimcilik</span> <span class="category-tag">Gelir</span></span>
         </div>
-        <p>Yapay zeka araçlarını kullanarak freelance işlerden SaaS ürünlerine, içerik üretiminden veri analizine kadar nasıl gelir elde edebileceğinizi anlatan pratik bir rehber. Vizyon2027 ile bu fırsatları nasıl değerlendireceğinizi öğrenin.</p>
-        <a href="#" class="read-more" onclick="alert('📖 Bu yazı yakında yayınlanacak!')">Devamını Oku →</a>
+        <p>Yapay zeka sadece bir teknoloji değil, aynı zamanda büyük bir iş fırsatıdır. Bu yazıda, AI araçlarını kullanarak freelance işlerden SaaS ürünlerine, içerik üretiminden veri analizine kadar nasıl gelir elde edebileceğinizi adım adım anlatıyoruz.</p>
+        <p>Örneğin, VİZYON AI ile müşterileriniz için otomatik kod yazabilir, web siteleri veya mobil uygulamalar geliştirebilirsiniz. Ayrıca, AI destekli içerik üretimi (blog yazısı, sosyal medya gönderisi, e-posta) ile dijital pazarlama hizmetleri sunabilirsiniz.</p>
+        <p>Veri analizi ve raporlama, AI'nın en güçlü olduğu alanlardan biridir. Şirketlere, müşteri davranışlarını analiz eden, satış tahminleri yapan ve stratejik öneriler sunan AI çözümleri geliştirebilirsiniz.</p>
+        <p>Vizyon2027, bu fırsatları değerlendirmeniz için size hem altyapı hem de topluluk desteği sağlar. Kendi AI tabanlı ürünlerinizi geliştirebilir, vizyon2027 pazarında satabilirsiniz. Bu yazıda, başarılı girişimcilerden ilham alacak ve harekete geçeceksiniz.</p>
+        <a href="#" class="read-more" style="color:#00d4ff; text-decoration:none; font-weight:600; border-bottom:1px solid transparent; transition:0.3s;" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
     </div>
 
     <!-- 6 -->
@@ -109,21 +136,77 @@
             <span>👤 Eymen</span>
             <span>🏷️ <span class="category-tag">Mobil</span> <span class="category-tag">Güncelleme</span></span>
         </div>
-        <p>Vizyon2027 mobil uygulaması geliştirme sürecinde! Hangi özellikler gelecek, ne zaman yayınlanacak ve beta test sürecine nasıl katılabilirsiniz? Tüm detaylar bu yazıda.</p>
-        <a href="#" class="read-more" onclick="alert('📖 Bu yazı yakında yayınlanacak!')">Devamını Oku →</a>
+        <p>Vizyon2027 mobil uygulaması geliştirme sürecinde! Bu yazıda, hangi özelliklerin geleceğini, ne zaman yayınlanacağını ve beta test sürecine nasıl katılabileceğinizi tüm detaylarıyla anlatıyorum.</p>
+        <p>Mobil uygulama, web platformunun tüm özelliklerini (AI asistan, takım sohbeti, proje yönetimi, puan sistemi, mağaza, anketler, duyurular, vb.) yanınızda taşımanızı sağlayacak. Ayrıca, mobil özel özellikler (push bildirimleri, kamera entegrasyonu, konum tabanlı hizmetler) de planlanıyor.</p>
+        <p>Beta test sürecine katılmak için topluluk kanallarımızı takip edin. İlk 100 beta kullanıcısına özel sürpriz ödüller var. Uygulama, hem iOS hem de Android platformlarında yayınlanacak.</p>
+        <p>Mobil uygulama ile yapay zeka gücü cebinizde! Tüm güncellemeleri blogdan takip edebilir, abone olarak anında haberdar olabilirsiniz.</p>
+        <a href="#" class="read-more" style="color:#00d4ff; text-decoration:none; font-weight:600; border-bottom:1px solid transparent; transition:0.3s;" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
     </div>
 
     <hr>
 
-    <h2>📬 Blog'a Abone Ol</h2>
-    <p>Yeni yazılar yayınlandığında e-posta ile haberdar olmak ister misiniz? Aşağıdaki formu doldurun.</p>
-    <div style="display:flex; gap:12px; flex-wrap:wrap; margin:12px 0;">
-        <input type="email" placeholder="E-posta adresiniz" style="flex:1; min-width:200px; padding:12px 16px; background:#0a0a0a; border:1px solid #2a2a2a; border-radius:30px; color:#e0e0e0; font-size:14px;">
-        <button onclick="alert('✅ Abone oldunuz!')" style="padding:12px 32px; background:#00d4ff; color:#0a0a0a; border:none; border-radius:30px; font-weight:700; cursor:pointer; transition:0.3s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">📩 Abone Ol</button>
+    <!-- ===== ABONE FORMU ===== -->
+    <div class="subscribe-box" id="subscribeBox">
+        <h2 style="color:#00d4ff; margin-top:0;">📬 Blog'a Abone Ol</h2>
+        <p>Yeni yazılar yayınlandığında e-posta ile haberdar olmak ister misiniz? Aşağıdaki forma e-posta adresinizi girin, <strong>ücretsiz</strong> abone olun.</p>
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin:20px 0;">
+            <input type="email" id="subscribeEmail" placeholder="E-posta adresiniz" style="flex:1; min-width:250px; padding:14px 20px; border-radius:40px; border:1px solid #2a2a2a; background:#0a0a0a; color:#fff; font-size:16px;">
+            <button id="subscribeBtn" style="padding:14px 30px; border-radius:40px; background:#00d4ff; color:#0a0a0a; border:none; font-weight:700; cursor:pointer; font-size:16px; transition:0.3s;">📩 Abone Ol</button>
+        </div>
+        <div id="subscribeMessage" style="font-weight:600;"></div>
+        <div class="info">🔔 Abonelik tamamen ücretsizdir. Dilediğiniz zaman abonelikten ayrılabilirsiniz.</div>
     </div>
 
     <hr>
     <a href="index.html" class="back-link">⬅️ Ana Sayfaya Dön</a>
 </div>
+
+<script>
+    // Abone olma fonksiyonu
+    document.getElementById('subscribeBtn').addEventListener('click', async function() {
+        const emailInput = document.getElementById('subscribeEmail');
+        const msgDiv = document.getElementById('subscribeMessage');
+        const email = emailInput.value.trim();
+
+        // Boş kontrol
+        if (!email) {
+            msgDiv.innerHTML = '<span class="error">⚠️ Lütfen e-posta adresinizi girin.</span>';
+            return;
+        }
+
+        // Basit e-posta format kontrolü
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            msgDiv.innerHTML = '<span class="error">⚠️ Geçerli bir e-posta adresi girin (örnek: kullanici@domain.com).</span>';
+            return;
+        }
+
+        // Back4App Cloud Code'a abone kaydı gönder
+        try {
+            const result = await Parse.Cloud.run('subscribeToBlog', { email: email });
+            if (result.success) {
+                msgDiv.innerHTML = '<span class="success">✅ Başarıyla abone oldunuz! Yeni yazılardan haberdar olacaksınız.</span>';
+                emailInput.value = '';
+            } else {
+                msgDiv.innerHTML = '<span class="error">❌ ' + result.error + '</span>';
+            }
+        } catch (error) {
+            console.error('Abone olma hatası:', error);
+            msgDiv.innerHTML = '<span class="error">❌ Bir hata oluştu. Lütfen daha sonra tekrar deneyin.</span>';
+        }
+    });
+</script>
+
+<!-- Parse SDK (Back4App için) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/parse/5.0.0/parse.min.js"></script>
+<script>
+    // Back4App başlatma (bu kısım zaten index.html'de var, ama blog sayfası için de ekleyelim)
+    Parse.initialize(
+        "ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8",
+        "mur4DtLsGOsQhykTnFVNGxYOeNbvjPbAkl6xPQGp"
+    );
+    Parse.serverURL = "https://parseapi.back4app.com";
+</script>
+
 </body>
 </html>
