@@ -398,8 +398,7 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
     .hero-title .line3 { font-size: 10px !important; }
     .hero-sub { font-size: 12px !important; padding: 0 4px !important; }
     .hero-actions { gap: 8px !important; }
-    .hero-actions .btn-primary,
-    .hero-actions .btn-secondary { font-size: 12px !important; padding: 8px 16px !important; }
+    .hero-actions .btn-primary, .hero-actions .btn-secondary { font-size: 12px !important; padding: 8px 16px !important; }
     .stats-bar { border-radius: 12px !important; }
     .stat-item { flex: 1 1 100% !important; padding: 8px !important; border-bottom: 1px solid var(--border) !important; }
     .stat-item:last-child { border-bottom: none !important; }
@@ -3546,7 +3545,7 @@ body.light-theme .legal-banner {
 <!-- ============================================================ -->
 
 <!-- ============================================================ -->
-<!-- HTML-1: ANA SAYFA (NAVBAR, HERO, FEATURES, PRICING, FOOTER)  -->
+<!-- HTML-1: ANA SAYFA (NAVBAR, HERO, FEATURES, PRICING, FOOTER + ABONELİK KARTI) -->
 <!-- ============================================================ -->
 <div id="mainSite">
 
@@ -3578,6 +3577,10 @@ body.light-theme .legal-banner {
             <li><a href="https://vizyon2026.vercel.app/bana-ogret.html" target="_blank">📖 Bana Öğret</a></li>
         </ul>
         <div class="button-group">
+            <!-- BİLDİRİM ÇANI (YENİ) -->
+            <button class="nav-cta" onclick="toggleNotificationPanel()" style="position:relative; padding:8px 14px;">
+                🔔 <span id="notificationBadge" style="position:absolute; top:-5px; right:-5px; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:10px; display:none;">0</span>
+            </button>
             <div class="secret-buttons">
                 <button class="secret-btn" onclick="openRolePanel('FOUNDER')">👑 FOUNDER</button>
                 <button class="secret-btn" onclick="openRolePanel('ADMIN')">⚙️ ADMIN</button>
@@ -3773,6 +3776,16 @@ body.light-theme .legal-banner {
         </div>
     </div>
 
+    <!-- ===== ABONELİK KARTI (SADECE GİRİŞ YAPMIŞ KURUCU HARİÇ KULLANICILAR İÇİN) ===== -->
+    <div id="subscriptionsCardWrapper" style="max-width:1000px; margin:40px auto; padding:0 20px; display:none;">
+        <div class="dashboard-card" style="background:var(--surface); border:1px solid var(--accent); border-radius:24px; padding:24px;">
+            <h3 style="color:var(--accent); font-family:var(--font-display); margin-bottom:16px;">📬 Aboneliklerim</h3>
+            <div id="subscriptionsContent">
+                <p style="color:var(--text3);">Yükleniyor...</p>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== FOOTER ===== -->
     <footer>
         <div class="footer-grid">
@@ -3835,47 +3848,6 @@ body.light-theme .legal-banner {
 </div>
 <!-- ===== HTML-1 SONU ===== -->
 
-<!-- ===== HTML-1 ABONE FONKSİYONU (JavaScript) ===== -->
-<script>
-// Ana sayfa abone olma fonksiyonu (mainSubscribe)
-async function mainSubscribe() {
-    const emailInput = document.getElementById('mainSubscribeEmail');
-    const msgDiv = document.getElementById('mainSubscribeMessage');
-    const email = emailInput.value.trim();
-
-    // Boş kontrol
-    if (!email) {
-        msgDiv.innerHTML = '<span style="color:#ff6b6b;">⚠️ Lütfen e-posta adresinizi girin.</span>';
-        return;
-    }
-
-    // Geçerli e-posta formatı kontrolü
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        msgDiv.innerHTML = '<span style="color:#ff6b6b;">⚠️ Geçerli bir e-posta adresi girin (örnek: kullanici@domain.com).</span>';
-        return;
-    }
-
-    try {
-        // Back4App Cloud Code'a abone kaydı gönder
-        const result = await Parse.Cloud.run('subscribeToBlog', { email: email });
-        if (result.success) {
-            msgDiv.innerHTML = '<span style="color:#00ff88;">✅ Başarıyla abone oldunuz! Yeni yazılardan haberdar olacaksınız.</span>';
-            emailInput.value = ''; // input'u temizle
-        } else {
-            msgDiv.innerHTML = '<span style="color:#ff6b6b;">❌ ' + result.message + '</span>';
-        }
-    } catch (error) {
-        console.error('Abone olma hatası:', error);
-        let errorMsg = error.message || 'Bilinmeyen bir hata oluştu.';
-        if (errorMsg.includes('Geçersiz e-posta')) {
-            errorMsg = 'Geçersiz e-posta formatı. Lütfen doğru bir e-posta girin.';
-        }
-        msgDiv.innerHTML = '<span style="color:#ff6b6b;">❌ ' + errorMsg + '</span>';
-    }
-}
-</script>
-<!-- ===== HTML-1 SONU ===== -->
 
 <!-- ============================================================ -->
 <!-- HTML-2: DASHBOARD (FULL – TÜM GÜNCELLEMELER DAHİL)            -->
@@ -3936,6 +3908,8 @@ async function mainSubscribe() {
                     <button class="btn-secondary" onclick="document.getElementById('dashboardFileInput').click()" data-i18n="Dosya Yükle">📎</button>
                     <button class="btn-secondary" onclick="window.startVoiceInput()" data-i18n="Sesli Komut">🎤</button>
                 </div>
+                <!-- DOSYA ÖNİZLEME KONTEYNERİ -->
+                <div id="filePreviewContainer" style="display:flex; flex-wrap:wrap; gap:10px; padding:8px 12px; background:rgba(0,0,0,0.2); min-height:0; border-top:1px solid #1a3350; margin-top:12px;"></div>
             </div>
         </div>
 
@@ -4372,53 +4346,152 @@ async function mainSubscribe() {
     </div>
 </div>
 
-<!-- ===== EBEVEYN AYARLARI MODALI ===== -->
+<!-- ===== EBEVEYN AYARLARI MODALI (GELİŞMİŞ) ===== -->
 <div id="parentSettingsModal" class="modal-overlay" onclick="if(event.target===this) closeModal('parentSettingsModal')">
-    <div class="modal" style="max-width:600px;">
+    <div class="modal" style="max-width:700px;">
         <div class="modal-header">
-            <h3>🛡️ Ebeveyn Ayarları (Güvenli Mod)</h3>
+            <h3>🛡️ Ebeveyn Paneli (Gelişmiş)</h3>
             <button class="modal-close" onclick="closeModal('parentSettingsModal')">×</button>
         </div>
         <div id="parentSettingsContent" class="parent-panel">
-            <p style="color:var(--text2);">Ebeveyn modunu aktifleştirmek için e-posta doğrulaması yapmalısınız.</p>
-            <input type="email" id="parentEmailInput" placeholder="Ebeveyn E-posta" class="form-input">
-            <button class="btn-primary btn-sm" onclick="window.requestParentVerification()">📧 Doğrulama İste</button>
-            <div id="parentVerificationSection" style="display:none;margin-top:12px;">
-                <input type="text" id="parentCodeInput" placeholder="Doğrulama Kodunu Girin" class="form-input">
-                <button class="btn-primary btn-sm" onclick="window.verifyParentCode()">✅ Onayla</button>
+            <!-- Doğrulama kısmı -->
+            <div id="parentVerificationSection">
+                <p style="color:var(--text2);">Ebeveyn modunu aktifleştirmek için e-posta doğrulaması yapmalısınız.</p>
+                <input type="email" id="parentEmailInput" placeholder="Ebeveyn E-posta" class="form-input">
+                <button class="btn-primary btn-sm" onclick="window.requestParentVerification()">📧 Doğrulama İste</button>
+                <div id="parentCodeSection" style="display:none;margin-top:12px;">
+                    <input type="text" id="parentCodeInput" placeholder="Doğrulama Kodunu Girin" class="form-input">
+                    <button class="btn-primary btn-sm" onclick="window.verifyParentCode()">✅ Onayla</button>
+                </div>
             </div>
-            <hr style="margin:16px 0;border-color:var(--border);">
-            <div id="parentControls" style="display:none;">
+
+            <!-- Ana kontroller -->
+            <div id="parentControls" style="display:none; margin-top:20px;">
+                <hr style="margin:16px 0;border-color:var(--border);">
+
+                <!-- 1. HESAP DURUMU -->
                 <div class="parent-setting">
-                    <span class="setting-label">Canlı Takip</span>
+                    <span class="setting-label">👤 Hesap Durumu</span>
                     <div class="setting-control">
-                        <span id="liveTrackingStatus" style="font-size:14px;">🔴 Kapalı</span>
-                        <button class="btn-secondary btn-sm" onclick="window.toggleLiveTracking()">Aç/Kapat</button>
+                        <span id="accountStatus" style="font-size:14px;">✅ Aktif</span>
+                        <button class="btn-secondary btn-sm" onclick="window.toggleSuspend()">⏸️ Askıya Al</button>
                     </div>
                 </div>
+
+                <!-- 2. HARCAMA LİMİTLERİ -->
                 <div class="parent-setting">
-                    <span class="setting-label">Günlük Harcama Limiti (TL)</span>
+                    <span class="setting-label">💰 Günlük Limit (TL)</span>
                     <div class="setting-control">
                         <input type="number" id="dailyLimitInput" placeholder="0" class="form-input" style="width:100px;">
                         <button class="btn-primary btn-sm" onclick="window.setDailyLimit()">Kaydet</button>
                     </div>
                 </div>
                 <div class="parent-setting">
-                    <span class="setting-label">Yarışmalar</span>
+                    <span class="setting-label">💰 Haftalık Limit (TL)</span>
                     <div class="setting-control">
-                        <div class="toggle-switch" id="contestToggle" onclick="window.toggleContest()"></div>
+                        <input type="number" id="weeklyLimitInput" placeholder="0" class="form-input" style="width:100px;">
+                        <button class="btn-primary btn-sm" onclick="window.setWeeklyLimit()">Kaydet</button>
                     </div>
                 </div>
                 <div class="parent-setting">
-                    <span class="setting-label">DM Mesajlaşma</span>
+                    <span class="setting-label">💰 Aylık Limit (TL)</span>
                     <div class="setting-control">
-                        <div class="toggle-switch" id="dmToggle" onclick="window.toggleDM()"></div>
+                        <input type="number" id="monthlyLimitInput" placeholder="0" class="form-input" style="width:100px;">
+                        <button class="btn-primary btn-sm" onclick="window.setMonthlyLimit()">Kaydet</button>
                     </div>
                 </div>
-                <button class="btn-danger btn-sm" onclick="window.setParentPin()">🔑 PIN Değiştir</button>
+
+                <!-- 3. ÖZELLİK AÇ/KAPA (7 özellik) -->
+                <div style="margin:16px 0;">
+                    <h4 style="color:var(--accent);">🔧 Özellik Kontrolleri</h4>
+                    <div class="parent-setting">
+                        <span class="setting-label">💬 Sohbet</span>
+                        <div class="setting-control">
+                            <div class="toggle-switch" id="featureChat" onclick="window.toggleFeature('chat')"></div>
+                        </div>
+                    </div>
+                    <div class="parent-setting">
+                        <span class="setting-label">🏪 Mağaza</span>
+                        <div class="setting-control">
+                            <div class="toggle-switch" id="featureStore" onclick="window.toggleFeature('store')"></div>
+                        </div>
+                    </div>
+                    <div class="parent-setting">
+                        <span class="setting-label">🎮 Oyun</span>
+                        <div class="setting-control">
+                            <div class="toggle-switch" id="featureGame" onclick="window.toggleFeature('game')"></div>
+                        </div>
+                    </div>
+                    <div class="parent-setting">
+                        <span class="setting-label">📚 Akademi</span>
+                        <div class="setting-control">
+                            <div class="toggle-switch" id="featureAcademy" onclick="window.toggleFeature('academy')"></div>
+                        </div>
+                    </div>
+                    <div class="parent-setting">
+                        <span class="setting-label">📁 Proje</span>
+                        <div class="setting-control">
+                            <div class="toggle-switch" id="featureProject" onclick="window.toggleFeature('project')"></div>
+                        </div>
+                    </div>
+                    <div class="parent-setting">
+                        <span class="setting-label">🏆 Yarışma</span>
+                        <div class="setting-control">
+                            <div class="toggle-switch" id="featureContest" onclick="window.toggleFeature('contest')"></div>
+                        </div>
+                    </div>
+                    <div class="parent-setting">
+                        <span class="setting-label">✈️ DM</span>
+                        <div class="setting-control">
+                            <div class="toggle-switch" id="featureDm" onclick="window.toggleFeature('dm')"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. CANLI TAKİP -->
+                <div class="parent-setting">
+                    <span class="setting-label">🟢 Canlı Takip</span>
+                    <div class="setting-control">
+                        <span id="liveTrackingStatus" style="font-size:14px;">🔴 Kapalı</span>
+                        <button class="btn-secondary btn-sm" onclick="window.toggleLiveTracking()">Aç/Kapat</button>
+                    </div>
+                </div>
+
+                <!-- 5. OTURUM GEÇMİŞİ -->
+                <div class="parent-setting" style="flex-direction:column; align-items:stretch; gap:8px;">
+                    <span class="setting-label">📜 Oturum Geçmişi</span>
+                    <div id="sessionList" style="background:var(--bg); border-radius:8px; padding:8px; max-height:100px; overflow-y:auto; font-size:12px;">
+                        Yükleniyor...
+                    </div>
+                    <button class="btn-secondary btn-sm" onclick="window.loadSessions()">🔄 Yenile</button>
+                </div>
+
+                <!-- 6. RAPOR GÖNDER -->
+                <div class="parent-setting">
+                    <span class="setting-label">📧 Haftalık Rapor</span>
+                    <div class="setting-control">
+                        <button class="btn-primary btn-sm" onclick="window.sendReport()">📤 Gönder</button>
+                    </div>
+                </div>
+
+                <!-- 7. PIN DEĞİŞTİR -->
+                <div class="parent-setting">
+                    <span class="setting-label">🔑 PIN Değiştir</span>
+                    <div class="setting-control">
+                        <button class="btn-danger btn-sm" onclick="window.setParentPin()">Değiştir</button>
+                    </div>
+                </div>
+
+                <!-- 8. EBEVEYN DENETİMİNİ KALDIR (TEHLİKELİ) -->
+                <div class="parent-setting" style="border-top:2px solid var(--danger); padding-top:16px; margin-top:16px;">
+                    <span class="setting-label" style="color:var(--danger);">⚠️ Ebeveyn Denetimini Kaldır</span>
+                    <div class="setting-control">
+                        <button class="btn-danger btn-sm" onclick="window.removeParentControl()">🗑️ Kalıcı Olarak Kaldır</button>
+                    </div>
+                </div>
             </div>
         </div>
-        <button class="btn-secondary" onclick="closeModal('parentSettingsModal')" style="margin-top:16px;" data-i18n="Kapat">Kapat</button>
+        <button class="btn-secondary" onclick="closeModal('parentSettingsModal')" style="margin-top:16px; width:100%;" data-i18n="Kapat">Kapat</button>
     </div>
 </div>
 
@@ -4668,6 +4741,20 @@ async function mainSubscribe() {
     </div>
 </div>
 
+<!-- ===== BİLDİRİM MODALI ===== -->
+<div class="modal-overlay" id="notificationModal" onclick="if(event.target===this) closeModal('notificationModal')">
+    <div class="modal" style="max-width:500px;">
+        <div class="modal-header">
+            <h3>🔔 Bildirimler</h3>
+            <button class="modal-close" onclick="closeModal('notificationModal')">×</button>
+        </div>
+        <div id="notificationList" style="max-height:400px; overflow-y:auto; padding:10px;">
+            <div style="color:var(--text3); text-align:center; padding:20px;">📭 Henüz bildirim yok.</div>
+        </div>
+        <button class="btn-secondary" onclick="closeModal('notificationModal')" style="margin-top:16px; width:100%;" data-i18n="Kapat">Kapat</button>
+    </div>
+</div>
+
 <!-- ===== (YORUM SATIRLARI – TEMİZLİK İÇİN) ===== -->
 <!-- GİRİŞ / KAYIT / DOĞRULAMA MODALI -->
 <!-- FOUNDER / ADMIN / BETA PANEL MODALI -->
@@ -4688,7 +4775,7 @@ async function mainSubscribe() {
 <!-- ============================================================ -->
 <script>
 // ============================================================
-// JS-1: BACK4APP KONFIG + GERÇEK SAYAÇLAR + OTOMATİK OTURUM
+// JS-1: BACK4APP KONFIG + GERÇEK SAYAÇLAR + OTOMATİK OTURUM + SPLASH
 // ============================================================
 
 var currentUser = null;
@@ -4726,7 +4813,7 @@ async function initBack4App() {
             showNotification('Parse SDK yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
             return;
         }
-        // ★ Back4app Bağlantısı – APP_ID ve CLIENT_KEY kullan
+        // ★ Back4app Bağlantısı – APP_ID ve CLIENT_KEY kullan (MASTER KEY OPSİYONEL)
         Parse.initialize(
             "ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8",     // App ID
             "mur4DtLsGOsQhykTnFVNGxYOeNbvjPbAkl6xPQGp"       // JavaScript Key (CLİENT ID)
@@ -4922,7 +5009,16 @@ window.applyTheme = function() {
     }
 };
 
-// ========== SPLASH EKRANI ==========
+// ========== SPLASH EKRANI (ANİMASYONLU) ==========
+window.showSplash = function() {
+    var splash = document.getElementById('splashScreen');
+    if (splash) {
+        splash.style.display = 'flex';
+        splash.classList.remove('hidden');
+        // Splash logo animasyonu için ekstra class ekleme (CSS zaten var)
+    }
+};
+
 window.hideSplash = function() {
     var splash = document.getElementById('splashScreen');
     if (splash) {
@@ -4930,14 +5026,6 @@ window.hideSplash = function() {
         setTimeout(function() {
             splash.style.display = 'none';
         }, 800);
-    }
-};
-
-window.showSplash = function() {
-    var splash = document.getElementById('splashScreen');
-    if (splash) {
-        splash.style.display = 'flex';
-        splash.classList.remove('hidden');
     }
 };
 
@@ -5034,7 +5122,7 @@ window.getReferralCodeFromUrl = function() {
     }
 })();
 
-console.log('✅ JS-1 yüklendi (Back4app, sayaçlar, parçacık ve imleç)');
+console.log('✅ JS-1 yüklendi (Back4app, sayaçlar, parçacık, imleç, splash)');
 </script>
 
 <!-- ============================================================ -->
@@ -5898,7 +5986,8 @@ function fallbackCopy(code, btn) {
 // ========== AI MODELLERİ ==========
 async function callAllAIModels(prompt) {
     try {
-        return await Parse.Cloud.run('superAI', { prompt: prompt });
+        const result = await Parse.Cloud.run('superAI', { prompt: prompt });
+        return result;
     } catch (e) {
         console.error('AI hatası:', e);
         return '🧠 VİZYON AI: "' + prompt + '" hakkında yardımcı olabilirim. Detaylı yanıt için lütfen daha spesifik bir soru sorun.';
@@ -6225,7 +6314,7 @@ async function uploadFullFile(input) {
 }
 
 // ========== GÖRSEL ÜRETME ==========
-async function generateImage() {
+window.generateImage = async function() {
     var prompt = document.getElementById('imagePrompt').value.trim();
     if (!prompt) return showNotification('Lütfen bir açıklama yazın!', 'error');
     showNotification('⏳ Görsel üretiliyor...', 'success');
@@ -6253,7 +6342,7 @@ async function generateImage() {
         console.error('Görsel üretme hatası:', e);
         showNotification('❌ Görsel üretilemedi: ' + e.message, 'error');
     }
-}
+};
 
 // ================================================================
 // ===================== 3D SİSTEM ================================
@@ -6334,7 +6423,7 @@ function animate3D() {
 }
 
 // ========== 3D MODEL ÜRET (HF + YEDEK) ==========
-async function generate3D() {
+window.generate3D = async function() {
     var prompt = document.getElementById('threeDPrompt').value.trim();
     if (!prompt) {
         showNotification('Lütfen bir açıklama yazın!', 'error');
@@ -6371,7 +6460,7 @@ async function generate3D() {
             showNotification('❌ 3D oluşturulamadı: ' + err.message, 'error');
         }
     }
-}
+};
 
 function load3DModel(url) {
     if (!scene) init3D();
@@ -6985,7 +7074,6 @@ window.closeModal = function(id) {
         modal.style.display = 'none';
         modal.style.visibility = 'hidden';
         modal.style.opacity = '0';
-        // İçindeki formları temizle
         var inputs = modal.querySelectorAll('input, textarea');
         inputs.forEach(function(inp) {
             if (inp.type !== 'submit' && inp.type !== 'button') {
@@ -7011,6 +7099,38 @@ document.addEventListener('click', function(e) {
         window.closeModal(e.target.id);
     }
 });
+
+// ========== ŞİFRE GÖSTERME ==========
+window.togglePassword = function(inputId, btn) {
+    var input = document.getElementById(inputId);
+    if (!input) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        btn.title = 'Şifreyi Gizle';
+    } else {
+        input.type = 'password';
+        btn.innerHTML = '<i class="fas fa-eye"></i>';
+        btn.title = 'Şifreyi Göster';
+    }
+};
+
+window.togglePasswordInput = function(btn, type, key) {
+    var wrapper = btn.closest('.admin-login-box') || btn.closest('div');
+    var input = wrapper ? wrapper.querySelector('.admin-pass-input') : null;
+    if (!input) {
+        var selector = type === 'admin' ? '[data-admin="' + key + '"]' : '[data-beta="' + key + '"]';
+        input = document.querySelector(selector);
+    }
+    if (!input) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+    } else {
+        input.type = 'password';
+        btn.innerHTML = '<i class="fas fa-eye"></i>';
+    }
+};
 
 // ========== DİL DESTEĞİ ==========
 var translations = {
@@ -7136,30 +7256,15 @@ var translations = {
         'Back4App bağlantısı kuruldu!': 'Back4App bağlantısı kuruldu!',
         'Back4App bağlantı hatası!': 'Back4App bağlantı hatası!',
         'Sistem Aktif!': 'Sistem Aktif!',
-        'Projelerim': 'Projelerim',
-        'Yeni Proje': 'Yeni Proje',
-        'Favoriler': 'Favoriler',
-        'Arşiv': 'Arşiv',
-        'Çöp Kutusu': 'Çöp Kutusu',
-        'Proje Taleplerim': 'Proje Taleplerim',
-        'Yönetim İşlemleri': 'Yönetim İşlemleri',
-        'Hediye Paketi Gönder': 'Hediye Paketi Gönder',
-        'Kullanıcı Yasakla': 'Kullanıcı Yasakla',
-        'Görsel Üret (AI)': 'Görsel Üret (AI)',
-        'Görsel Oluştur': 'Görsel Oluştur',
-        'Yönetim Paneli (Sadece Kurucu)': 'Yönetim Paneli (Sadece Kurucu)',
-        'Kullanıcı Engelle': 'Kullanıcı Engelle',
-        'Tümü': 'Tümü',
-        'Yorum yapmak için giriş yapmalısınız.': 'Yorum yapmak için giriş yapmalısınız.',
         'Sesli Komut': 'Sesli Komut',
-        'Puan Mağazası': 'Puan Mağazası',
-        'Mağaza': 'Mağaza',
-        'Satın Al': 'Satın Al',
-        'Puan': 'Puan',
         'Bana Öğret': 'Bana Öğret',
         'Kurucu ile İletişime Geç': 'Kurucu ile İletişime Geç',
         'Ebeveyn Ayarları': 'Ebeveyn Ayarları',
-        'GIF Ara': 'GIF Ara'
+        'GIF Ara': 'GIF Ara',
+        'Puan Mağazası': 'Puan Mağazası',
+        'Mağaza': 'Mağaza',
+        'Satın Al': 'Satın Al',
+        'Puan': 'Puan'
     },
     en: {
         'Projelerim': 'My Projects',
@@ -7238,6 +7343,32 @@ var translations = {
         'Kurucu ile İletişime Geç': 'Связаться с основателем',
         'Ebeveyn Ayarları': 'Родительские настройки',
         'GIF Ara': 'Поиск GIF'
+    },
+    fr: {
+        'Projelerim': 'Mes Projets',
+        'Yeni Proje': 'Nouveau Projet',
+        'Favoriler': 'Favoris',
+        'Arşiv': 'Archive',
+        'Çöp Kutusu': 'Corbeille',
+        'Proje Taleplerim': 'Mes Demandes de Projet',
+        'Yönetim İşlemleri': 'Actions Admin',
+        'Hediye Paketi Gönder': 'Envoyer un Cadeau',
+        'Kullanıcı Yasakla': 'Bannir l\'Utilisateur',
+        'Görsel Üret (AI)': 'Générer une Image (IA)',
+        'Görsel Oluştur': 'Créer une Image',
+        'Yönetim Paneli (Sadece Kurucu)': 'Panel Admin (Fondateur Uniquement)',
+        'Kullanıcı Engelle': 'Bloquer l\'Utilisateur',
+        'Tümü': 'Tout',
+        'Yorum yapmak için giriş yapmalısınız.': 'Vous devez vous connecter pour commenter.',
+        'Sesli Komut': 'Commande Vocale',
+        'Puan Mağazası': 'Magasin de Points',
+        'Mağaza': 'Magasin',
+        'Satın Al': 'Acheter',
+        'Puan': 'Points',
+        'Bana Öğret': 'Apprends-moi',
+        'Kurucu ile İletişime Geç': 'Contacter le Fondateur',
+        'Ebeveyn Ayarları': 'Paramètres Parentaux',
+        'GIF Ara': 'Rechercher un GIF'
     }
 };
 
@@ -7523,6 +7654,7 @@ window.handleLogin = async function() {
         await showDashboard();
         updateCommentUI();
         await loadComments();
+        await checkAndShowSubscriptionCard();
         showNotification('Hoş geldin, ' + user.get('name'), 'success');
     } catch(e) { showNotification('Giriş başarısız: ' + e.message, 'error'); }
 };
@@ -7545,6 +7677,8 @@ window.logout = function() {
     var logoutBtn = document.querySelector('.logout-btn');
     if (logoutBtn) logoutBtn.style.display = 'none';
     updateCommentUI();
+    var wrapper = document.getElementById('subscriptionsCardWrapper');
+    if (wrapper) wrapper.style.display = 'none';
     showNotification('Çıkış yapıldı.', 'success');
     var widget = document.querySelector('.ai-widget');
     if (widget) widget.style.display = 'block';
@@ -7772,6 +7906,7 @@ window.handleAdminLogin = async function(adminKey, password) {
             await window.showDashboard();
             updateCommentUI();
             await loadComments();
+            await checkAndShowSubscriptionCard();
             showNotification('Hoş geldin ' + result.name + '!', 'success');
         } else showNotification('Giriş başarısız!', 'error');
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
@@ -7790,6 +7925,7 @@ window.handleBetaLogin = async function(betaKey, password) {
             await window.showDashboard();
             updateCommentUI();
             await loadComments();
+            await checkAndShowSubscriptionCard();
             showNotification('Hoş geldin ' + result.name + '! (Beta)', 'success');
         } else showNotification('Giriş başarısız!', 'error');
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
@@ -7809,19 +7945,72 @@ window.checkRole = async function() {
             await window.showDashboard();
             updateCommentUI();
             await loadComments();
+            await checkAndShowSubscriptionCard();
             showNotification('Hoş geldin ' + result.name + '! (Founder)', 'success');
         } else showNotification('Giriş başarısız!', 'error');
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ---- ŞİFRE SIFIRLAMA ----
-window.openResetPasswordModal = function() { document.getElementById('resetPasswordModal').classList.add('open'); };
-window.sendVerificationCode = async function() { /* aynı */ };
-window.resetPasswordWithCode = async function() { /* aynı */ };
-window.togglePassword = function(inputId, btn) { /* aynı */ };
-window.togglePasswordInput = function(btn, type, key) { /* aynı */ };
+// ---- ŞİFRE SIFIRLAMA (DÜZELTİLDİ) ----
+window.openResetPasswordModal = function() {
+    document.getElementById('resetPasswordModal').classList.add('open');
+    document.getElementById('resetStep1').style.display = 'block';
+    document.getElementById('resetStep2').style.display = 'none';
+};
+
+window.sendVerificationCode = async function() {
+    var email = document.getElementById('resetEmail').value.trim();
+    if (!email) return showNotification('E-posta adresi girin!', 'error');
+    try {
+        var result = await Parse.Cloud.run('sendVerificationCode', { email: email });
+        if (result.success) {
+            document.getElementById('resetStep1').style.display = 'none';
+            document.getElementById('resetStep2').style.display = 'block';
+            showNotification('Doğrulama kodu gönderildi!', 'success');
+        } else {
+            showNotification('Hata: ' + result.error, 'error');
+        }
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+};
+
+window.resetPasswordWithCode = async function() {
+    var email = document.getElementById('resetEmail').value.trim();
+    var code = document.getElementById('resetCode').value.trim();
+    var newPass = document.getElementById('resetNewPass').value;
+    var newPass2 = document.getElementById('resetNewPass2').value;
+    if (!email || !code || !newPass) return showNotification('Tüm alanları doldurun!', 'error');
+    if (newPass.length < 8) return showNotification('Şifre en az 8 karakter olmalı!', 'error');
+    if (newPass !== newPass2) return showNotification('Şifreler eşleşmiyor!', 'error');
+    try {
+        var result = await Parse.Cloud.run('resetPasswordWithCode', { email: email, code: code, newPassword: newPass });
+        if (result.success) {
+            showNotification('Şifre başarıyla değiştirildi!', 'success');
+            closeModal('resetPasswordModal');
+        } else {
+            showNotification('Hata: ' + result.error, 'error');
+        }
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+};
+
+// ---- DİĞER ----
 window.openRandomSupport = function() { window.location.href = 'mailto:vizyon2027.info@gmail.com?subject=Vizyon2027%20Destek'; };
-window.shareSite = function() { /* aynı */ };
+window.shareSite = function() {
+    if (navigator.share) {
+        navigator.share({
+            title: 'Vizyon2027 - Dünyanın En Güçlü Yapay Zeka Ekosistemi',
+            text: 'Vizyon2027 ile yapay zekanın gücünü keşfet! 7 model tek platformda.',
+            url: 'https://vizyon2026.vercel.app'
+        }).catch(function() {});
+    } else {
+        var dummy = document.createElement('input');
+        dummy.value = 'https://vizyon2026.vercel.app';
+        document.body.appendChild(dummy);
+        dummy.select();
+        document.execCommand('copy');
+        document.body.removeChild(dummy);
+        showNotification('Site linki kopyalandı!', 'success');
+    }
+};
 window.openSettingsModal = function() { document.getElementById('settingsModal').classList.add('open'); };
 window.toggleChatHistory = async function() { showNotification('Sohbet geçmişi özelliği yakında!', 'warning'); };
 
@@ -8030,7 +8219,7 @@ window.loadProjectRequests = async function() {
 };
 
 // ================================================================
-// ========== YORUMLAR ==========
+// ========== YORUMLAR (DÜZELTİLDİ) ==========
 // ================================================================
 
 window.updateCommentUI = function() {
@@ -8403,7 +8592,10 @@ window.showDashboard = async function() {
             try { window.loadJobs(); } catch(e) {}
             try { window.loadQuiz(); } catch(e) {}
             try { window.loadWallet(); } catch(e) {}
+            try { window.loadReferralLeaderboard(); } catch(e) {}
         }
+
+        await checkAndShowSubscriptionCard();
 
         var extraCard = document.getElementById('extraAdminCard');
         if (!extraCard) {
@@ -8427,6 +8619,8 @@ window.showDashboard = async function() {
                         <input type="email" id="banEmailInput" placeholder="Engellenecek e-posta" class="glow-input" style="flex:1;min-width:150px;">
                         <button class="btn-danger btn-sm" onclick="window.banUserByEmail(document.getElementById('banEmailInput').value)">🚫 Engelle</button>
                     </div>`;
+                    html += `<button class="btn-primary btn-sm" onclick="sendBlogNotification()">📝 Blog Bildirimi Gönder</button>`;
+                    html += `<button class="btn-primary btn-sm" onclick="sendSystemNotification()">⚡ Sistem Güncellemesi Bildir</button>`;
                 }
                 html += '</div>';
                 extraCard.innerHTML = html;
@@ -8657,30 +8851,72 @@ window.banUser = function() {
 window.updatePointsBadge = function(points) { var badge = document.getElementById('dashboardPointsDisplay'); if (badge) badge.textContent = points || 0; };
 window.loadUserPoints = async function() { if (!currentUser) return; try { var result = await Parse.Cloud.run('getUserPoints', {}); window.updatePointsBadge(result.points || 0); } catch(e) {} };
 
-// ---- MAĞAZA ----
+// ---- MAĞAZA (GÜNCELLENMİŞ - Admin + Kullanıcı Projeleri) ----
 window.loadStore = async function() {
     if (!currentUser) return;
     try {
-        var result = await Parse.Cloud.run('getStoreItems', {});
-        var container = document.getElementById('storeItems');
+        const storeResult = await Parse.Cloud.run('getStoreItems', {});
+        const marketResult = await Parse.Cloud.run('getMarketProjects', {});
+        let allItems = [];
+        if (storeResult && storeResult.length > 0) {
+            storeResult.forEach(item => {
+                allItems.push({
+                    id: item.id,
+                    name: item.name,
+                    price_points: item.price_points,
+                    icon: item.icon || '🎁',
+                    type: 'store',
+                    isAdmin: true,
+                    description: 'Admin tarafından eklenmiştir.',
+                    imageUrl: 'https://via.placeholder.com/200x200?text=Ma%C4%9Faza'
+                });
+            });
+        }
+        if (marketResult && marketResult.length > 0) {
+            marketResult.forEach(item => {
+                allItems.push({
+                    id: item.id,
+                    name: item.title,
+                    price_points: item.price_points,
+                    icon: item.type === '3D' ? '🧊' : (item.type === 'Kod' ? '⌨️' : '🖼️'),
+                    type: 'market',
+                    isAdmin: false,
+                    description: item.description,
+                    imageUrl: item.imageUrl,
+                    owner: item.owner_name,
+                    owner_email: item.owner_email,
+                    projectId: item.projectId,
+                    marketId: item.id
+                });
+            });
+        }
+        const container = document.getElementById('storeItems');
         if (!container) return;
-        if (!result || result.length === 0) {
-            container.innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center;">🏪 Mağaza boş.</div>';
+        if (allItems.length === 0) {
+            container.innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center;">🏪 Mağaza boş. Henüz ürün veya proje yok.</div>';
             return;
         }
         var html = '';
-        result.forEach(function(item) {
+        allItems.forEach(function(item) {
             html += `
-                <div class="store-item">
+                <div class="store-item" style="position:relative;">
                     <div class="item-icon">${item.icon || '🎁'}</div>
                     <div class="item-name">${item.name}</div>
+                    ${item.isAdmin ? '' : `<div style="font-size:10px;color:var(--text3);">👤 ${item.owner || 'Kullanıcı'}</div>`}
+                    <div style="font-size:11px;color:var(--text2);margin:4px 0;">${item.description.substring(0,40)}...</div>
                     <div class="item-price">⭐ ${item.price_points} Puan</div>
-                    <button class="btn-primary btn-sm" onclick="window.buyStoreItem('${item.id}')">Satın Al</button>
+                    ${item.isAdmin ? 
+                        `<button class="btn-primary btn-sm" onclick="window.buyStoreItem('${item.id}')">Satın Al</button>` :
+                        `<button class="btn-primary btn-sm" onclick="window.buyMarketProject('${item.marketId}')">Satın Al</button>`
+                    }
                 </div>
             `;
         });
         container.innerHTML = html;
-    } catch(e) { console.error('Mağaza yüklenirken hata:', e); }
+    } catch(e) {
+        console.error('Mağaza yüklenirken hata:', e);
+        document.getElementById('storeItems').innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center;">⚠️ Mağaza yüklenemedi.</div>';
+    }
 };
 
 window.buyStoreItem = async function(itemId) {
@@ -8693,6 +8929,20 @@ window.buyStoreItem = async function(itemId) {
         window.loadStore();
         window.loadUserPoints();
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+};
+
+window.buyMarketProject = async function(marketId) {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    if (!confirm('Bu projeyi satın almak istediğinize emin misiniz?')) return;
+    try {
+        const result = await Parse.Cloud.run('buyMarketProject', { marketProjectId: marketId });
+        showNotification(result.message, 'success');
+        window.updatePointsBadge(result.remaining_points);
+        window.loadStore();
+        window.loadUserPoints();
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 window.openStore = function() { var section = document.getElementById('storeSection'); if (section) { section.scrollIntoView({ behavior: 'smooth' }); window.loadStore(); } else { showNotification('Puan Mağazası bölümü bulunamadı.', 'warning'); } };
@@ -9298,83 +9548,47 @@ window.searchUsers = async function() {
     } catch(e) { showNotification('Arama hatası: ' + e.message, 'error'); }
 };
 
-// ---- EBEVEYN ----
+// ---- EBEVEYN (GELİŞMİŞ) ----
 window.openParentSettings = function() {
     var modal = document.getElementById('parentSettingsModal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'parentSettingsModal';
-        modal.className = 'modal-overlay';
-        modal.innerHTML = `
-            <div class="modal" style="max-width:600px;">
-                <div class="modal-header">
-                    <h3>🛡️ Ebeveyn Ayarları (Güvenli Mod)</h3>
-                    <button class="modal-close" onclick="closeModal('parentSettingsModal')">×</button>
-                </div>
-                <div id="parentSettingsContent" class="parent-panel">
-                    <p style="color:var(--text2);">Ebeveyn modunu aktifleştirmek için e-posta doğrulaması yapmalısınız.</p>
-                    <input type="email" id="parentEmailInput" placeholder="Ebeveyn E-posta" class="form-input">
-                    <button class="btn-primary btn-sm" onclick="window.requestParentVerification()">📧 Doğrulama İste</button>
-                    <div id="parentVerificationSection" style="display:none;margin-top:12px;">
-                        <input type="text" id="parentCodeInput" placeholder="Doğrulama Kodunu Girin" class="form-input">
-                        <button class="btn-primary btn-sm" onclick="window.verifyParentCode()">✅ Onayla</button>
-                    </div>
-                    <hr style="margin:16px 0;border-color:var(--border);">
-                    <div id="parentControls" style="display:none;">
-                        <div class="parent-setting">
-                            <span class="setting-label">Canlı Takip</span>
-                            <div class="setting-control">
-                                <span id="liveTrackingStatus" style="font-size:14px;">🔴 Kapalı</span>
-                                <button class="btn-secondary btn-sm" onclick="window.toggleLiveTracking()">Aç/Kapat</button>
-                            </div>
-                        </div>
-                        <div class="parent-setting">
-                            <span class="setting-label">Günlük Harcama Limiti (TL)</span>
-                            <div class="setting-control">
-                                <input type="number" id="dailyLimitInput" placeholder="0" class="form-input" style="width:100px;">
-                                <button class="btn-primary btn-sm" onclick="window.setDailyLimit()">Kaydet</button>
-                            </div>
-                        </div>
-                        <div class="parent-setting">
-                            <span class="setting-label">Yarışmalar</span>
-                            <div class="setting-control">
-                                <div class="toggle-switch" id="contestToggle" onclick="window.toggleContest()"></div>
-                            </div>
-                        </div>
-                        <div class="parent-setting">
-                            <span class="setting-label">DM Mesajlaşma</span>
-                            <div class="setting-control">
-                                <div class="toggle-switch" id="dmToggle" onclick="window.toggleDM()"></div>
-                            </div>
-                        </div>
-                        <button class="btn-danger btn-sm" onclick="window.setParentPin()">🔑 PIN Değiştir</button>
-                    </div>
-                </div>
-                <button class="btn-secondary" onclick="closeModal('parentSettingsModal')" style="margin-top:16px;" data-i18n="Kapat">Kapat</button>
-            </div>
-        `;
-        document.body.appendChild(modal);
+    if (modal) {
+        modal.classList.add('open');
+        modal.style.display = 'flex';
+        window.loadParentSettings();
+        window.loadSessions();
     }
-    modal.classList.add('open');
-    modal.style.display = 'flex';
-    window.loadParentSettings();
 };
 
 window.loadParentSettings = async function() {
     if (!currentUser) return;
     try {
-        var result = await Parse.Cloud.run('getParentSettings', {});
+        const result = await Parse.Cloud.run('getParentSettings', {});
         if (result.parent_mode) {
             document.getElementById('parentControls').style.display = 'block';
+            document.getElementById('parentVerificationSection').style.display = 'none';
             document.getElementById('parentEmailInput').value = result.parent_email || '';
             document.getElementById('liveTrackingStatus').textContent = result.live_tracking ? '🟢 Açık' : '🔴 Kapalı';
             document.getElementById('dailyLimitInput').value = result.daily_limit || 0;
-            var contestToggle = document.getElementById('contestToggle');
-            var dmToggle = document.getElementById('dmToggle');
-            if (contestToggle) contestToggle.className = 'toggle-switch' + (result.contest_enabled ? ' active' : '');
-            if (dmToggle) dmToggle.className = 'toggle-switch' + (result.dm_enabled ? ' active' : '');
+            try {
+                const full = await Parse.Cloud.run('getFullParentSettings', { childEmail: currentUser.get('email') });
+                document.getElementById('weeklyLimitInput').value = full.weekly_limit || 0;
+                document.getElementById('monthlyLimitInput').value = full.monthly_limit || 0;
+                document.getElementById('accountStatus').textContent = full.is_suspended ? '⛔ Askıda' : '✅ Aktif';
+                const features = full.features || {};
+                for (const [key, val] of Object.entries(features)) {
+                    const toggle = document.getElementById('feature' + key.charAt(0).toUpperCase() + key.slice(1));
+                    if (toggle) toggle.className = 'toggle-switch' + (val ? ' active' : '');
+                }
+            } catch (e) {
+                console.warn('Full ayarlar yüklenemedi:', e);
+            }
+        } else {
+            document.getElementById('parentControls').style.display = 'none';
+            document.getElementById('parentVerificationSection').style.display = 'block';
         }
-    } catch(e) { console.error('Ebeveyn ayarları yüklenemedi:', e); }
+    } catch(e) {
+        console.error('Ebeveyn ayarları yüklenemedi:', e);
+    }
 };
 
 window.requestParentVerification = async function() {
@@ -9383,7 +9597,7 @@ window.requestParentVerification = async function() {
     try {
         var result = await Parse.Cloud.run('requestParentVerification', { email: email });
         if (result.success) {
-            document.getElementById('parentVerificationSection').style.display = 'block';
+            document.getElementById('parentCodeSection').style.display = 'block';
             showNotification('Doğrulama kodu gönderildi!', 'success');
         } else {
             showNotification('Hata: ' + result.error, 'error');
@@ -9398,6 +9612,7 @@ window.verifyParentCode = async function() {
         var result = await Parse.Cloud.run('verifyParentCode', { code: code });
         if (result.success) {
             document.getElementById('parentControls').style.display = 'block';
+            document.getElementById('parentVerificationSection').style.display = 'none';
             showNotification('Ebeveyn modu aktif!', 'success');
             window.loadParentSettings();
         } else {
@@ -9429,32 +9644,129 @@ window.setDailyLimit = async function() {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-window.toggleContest = function() {
-    var toggle = document.getElementById('contestToggle');
-    var enabled = toggle.classList.contains('active');
-    toggle.classList.toggle('active');
-    Parse.Cloud.run('toggleContest', { enabled: !enabled });
-    showNotification('Yarışmalar ' + (!enabled ? 'açıldı' : 'kapatıldı'), 'success');
-};
-
-window.toggleDM = function() {
-    var toggle = document.getElementById('dmToggle');
-    var enabled = toggle.classList.contains('active');
-    toggle.classList.toggle('active');
-    Parse.Cloud.run('toggleDM', { enabled: !enabled });
-    showNotification('DM ' + (!enabled ? 'açıldı' : 'kapatıldı'), 'success');
-};
-
-window.setParentPin = function() {
-    var pin = prompt('4 haneli PIN belirleyin:');
-    if (!pin || pin.length !== 4 || isNaN(pin)) {
-        return showNotification('Geçerli 4 haneli PIN girin!', 'error');
-    }
-    Parse.Cloud.run('setParentPin', { pin: pin }).then(function(result) {
+window.setWeeklyLimit = async function() {
+    var limit = parseInt(document.getElementById('weeklyLimitInput').value);
+    if (isNaN(limit) || limit < 0) return showNotification('Geçerli bir limit girin!', 'error');
+    try {
+        const result = await Parse.Cloud.run('updateParentSettings', {
+            childEmail: currentUser.get('email'),
+            settings: { weekly_limit: limit }
+        });
         showNotification(result.message, 'success');
-    }).catch(function(e) {
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+};
+
+window.setMonthlyLimit = async function() {
+    var limit = parseInt(document.getElementById('monthlyLimitInput').value);
+    if (isNaN(limit) || limit < 0) return showNotification('Geçerli bir limit girin!', 'error');
+    try {
+        const result = await Parse.Cloud.run('updateParentSettings', {
+            childEmail: currentUser.get('email'),
+            settings: { monthly_limit: limit }
+        });
+        showNotification(result.message, 'success');
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+};
+
+window.toggleFeature = async function(feature) {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    const toggle = document.getElementById('feature' + feature.charAt(0).toUpperCase() + feature.slice(1));
+    if (!toggle) return;
+    const enabled = toggle.classList.contains('active');
+    try {
+        const result = await Parse.Cloud.run('toggleParentFeature', {
+            childEmail: currentUser.get('email'),
+            feature: feature,
+            enabled: !enabled
+        });
+        toggle.classList.toggle('active');
+        showNotification(result.message, 'success');
+    } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
-    });
+    }
+};
+
+window.toggleSuspend = async function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    const status = document.getElementById('accountStatus');
+    if (status.textContent.includes('Askıda')) {
+        if (!confirm('Hesabın askısını kaldırmak istediğinize emin misiniz?')) return;
+        try {
+            const result = await Parse.Cloud.run('unsuspendChildAccount', { childEmail: currentUser.get('email') });
+            status.textContent = '✅ Aktif';
+            showNotification(result.message, 'success');
+        } catch(e) {
+            showNotification('Hata: ' + e.message, 'error');
+        }
+    } else {
+        const hours = prompt('Kaç saat askıya almak istiyorsunuz? (örn: 24)');
+        if (!hours) return;
+        const duration = parseInt(hours);
+        if (isNaN(duration) || duration <= 0) return showNotification('Geçerli bir saat girin!', 'error');
+        if (!confirm(`${duration} saat boyunca hesap askıya alınacak. Devam et?`)) return;
+        try {
+            const result = await Parse.Cloud.run('suspendChildAccount', {
+                childEmail: currentUser.get('email'),
+                durationHours: duration
+            });
+            status.textContent = '⛔ Askıda';
+            showNotification(result.message, 'success');
+        } catch(e) {
+            showNotification('Hata: ' + e.message, 'error');
+        }
+    }
+};
+
+window.loadSessions = async function() {
+    if (!currentUser) return;
+    try {
+        const result = await Parse.Cloud.run('getChildSessions', { childEmail: currentUser.get('email') });
+        const list = document.getElementById('sessionList');
+        if (!result.sessions || result.sessions.length === 0) {
+            list.innerHTML = '📭 Oturum kaydı yok.';
+            return;
+        }
+        let html = '';
+        result.sessions.forEach(s => {
+            html += `<div style="border-bottom:1px solid var(--border); padding:4px 0;">
+                🕒 ${new Date(s.time).toLocaleString('tr-TR')} | 🌐 ${s.ip || 'Bilinmiyor'} | 📱 ${s.device || 'Bilinmiyor'}
+            </div>`;
+        });
+        list.innerHTML = html;
+    } catch(e) {
+        console.error('Oturum geçmişi yüklenemedi:', e);
+        document.getElementById('sessionList').innerHTML = '⚠️ Yüklenemedi.';
+    }
+};
+
+window.sendReport = async function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    try {
+        const result = await Parse.Cloud.run('sendParentReport', { childEmail: currentUser.get('email') });
+        showNotification(result.message, 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+window.removeParentControl = async function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    const confirmMsg = '⚠️ Bu işlem tüm ebeveyn ayarlarını kalıcı olarak silecek ve çocuk hesabı tamamen bağımsız hale gelecektir. Devam etmek istediğinize emin misiniz?';
+    if (!confirm(confirmMsg)) return;
+    const pin = prompt('Ebeveyn PIN\'inizi girin (4 haneli):');
+    if (!pin || pin.length !== 4 || isNaN(pin)) return showNotification('Geçerli PIN girin!', 'error');
+    try {
+        const settings = await Parse.Cloud.run('getParentSettings', {});
+        if (settings.parent_pin !== pin) {
+            return showNotification('❌ PIN yanlış!', 'error');
+        }
+        const result = await Parse.Cloud.run('removeParentControl', { childEmail: currentUser.get('email') });
+        showNotification(result.message, 'success');
+        closeModal('parentSettingsModal');
+        setTimeout(() => location.reload(), 1500);
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 // ---- TAKIM ----
@@ -9884,7 +10196,9 @@ window.makeManager = async function(email) {
         showNotification(result.message, 'success');
         window.openTeamMemberManagement();
         window.loadTeamPage();
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 window.demoteManager = async function(email) {
@@ -9895,7 +10209,9 @@ window.demoteManager = async function(email) {
         showNotification(result.message, 'success');
         window.openTeamMemberManagement();
         window.loadTeamPage();
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 window.removeMemberFromTeam = async function(email) {
@@ -9906,7 +10222,9 @@ window.removeMemberFromTeam = async function(email) {
         showNotification(result.message, 'success');
         window.openTeamMemberManagement();
         window.loadTeamPage();
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 window.transferOwnership = async function(email) {
@@ -9917,7 +10235,9 @@ window.transferOwnership = async function(email) {
         showNotification(result.message, 'success');
         window.openTeamMemberManagement();
         window.loadTeamPage();
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 // ---- VİZYON DESTEK ----
@@ -10215,54 +10535,468 @@ window.contactFounder = async function() {
 
 // ---- BANA ÖĞRET ----
 window.openHelpArticle = function() {
-    var modal = document.getElementById('helpArticleModal');
+    window.open('https://vizyon2026.vercel.app/bana-ogret.html', '_blank');
+};
+
+// ================================================================
+// ========== BİLDİRİM PANELİ ==========
+// ================================================================
+
+window.toggleNotificationPanel = function() {
+    var modal = document.getElementById('notificationModal');
     if (modal) {
-        modal.classList.add('open');
-        modal.style.display = 'flex';
+        modal.classList.toggle('open');
+        modal.style.display = modal.classList.contains('open') ? 'flex' : 'none';
+        if (modal.classList.contains('open')) {
+            window.loadNotifications();
+        }
+    }
+};
+
+window.loadNotifications = async function() {
+    if (!currentUser) return;
+    try {
+        var result = await Parse.Cloud.run('getNotifications', {});
+        var list = document.getElementById('notificationList');
+        if (!list) return;
+        if (!result || result.length === 0) {
+            list.innerHTML = '<div style="color:var(--text3); text-align:center; padding:20px;">📭 Henüz bildirim yok.</div>';
+            return;
+        }
+        var html = '';
+        result.forEach(function(n) {
+            html += `<div style="padding:10px; border-bottom:1px solid var(--border); ${n.is_read ? 'opacity:0.6;' : ''}">
+                <div style="font-size:14px;">${n.message}</div>
+                <div style="font-size:10px; color:var(--text3); margin-top:4px;">${new Date(n.createdAt).toLocaleString('tr-TR')}</div>
+                ${!n.is_read ? `<button class="btn-secondary btn-sm" onclick="window.markNotificationRead('${n.id}')" style="font-size:10px; padding:2px 8px; margin-top:4px;">✅ Okundu</button>` : ''}
+            </div>`;
+        });
+        list.innerHTML = html;
+        var badge = document.getElementById('notificationBadge');
+        if (badge) {
+            var unread = result.filter(function(n) { return !n.is_read; }).length;
+            badge.textContent = unread;
+            badge.style.display = unread > 0 ? 'inline' : 'none';
+        }
+    } catch (e) {
+        console.error('Bildirimler yüklenemedi:', e);
+    }
+};
+
+window.markNotificationRead = async function(id) {
+    try {
+        await Parse.Cloud.run('markNotificationRead', { notificationId: id });
+        window.loadNotifications();
+    } catch (e) {
+        console.error('Okundu işaretlenemedi:', e);
+    }
+};
+
+// ================================================================
+// ========== LİDERLİK TABLOSU (DAVET SIRALAMASI) ==========
+// ================================================================
+
+window.loadReferralLeaderboard = async function() {
+    try {
+        var result = await Parse.Cloud.run('getReferralLeaderboard', {});
+        var container = document.getElementById('referralLeaderboard');
+        if (!container) {
+            var mainSite = document.getElementById('mainSite');
+            if (mainSite) {
+                var newSection = document.createElement('section');
+                newSection.id = 'referralLeaderboardSection';
+                newSection.style.cssText = 'max-width:800px; margin:40px auto; padding:20px;';
+                newSection.innerHTML = `
+                    <h3 style="color:var(--accent); font-family:var(--font-display); font-size:24px; margin-bottom:20px;">🏆 En Çok Davet Edenler</h3>
+                    <div id="referralLeaderboard" style="max-height:400px; overflow-y:auto; background:var(--surface); border-radius:12px; padding:12px; border:1px solid var(--border);"></div>
+                `;
+                var pricingSection = document.getElementById('pricing');
+                if (pricingSection) {
+                    pricingSection.parentNode.insertBefore(newSection, pricingSection.nextSibling);
+                } else {
+                    mainSite.appendChild(newSection);
+                }
+                container = document.getElementById('referralLeaderboard');
+            }
+        }
+        if (!container) return;
+
+        if (!result || result.length === 0) {
+            container.innerHTML = '<div style="color:var(--text3); text-align:center; padding:20px;">📊 Henüz kimse davet edilmedi.</div>';
+            return;
+        }
+
+        var html = '<div style="font-size:14px;">';
+        var medals = ['🥇', '🥈', '🥉'];
+        result.forEach(function(item, index) {
+            var medal = index < 3 ? medals[index] : (index + 1) + '.';
+            html += `
+                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border);">
+                    <span>${medal} <strong>${item.name}</strong> (${item.email})</span>
+                    <span style="color:var(--gold); font-weight:600;">${item.count} davet</span>
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+        window.applyTranslations(currentLanguage);
+    } catch(e) {
+        console.error('Liderlik tablosu yüklenemedi:', e);
+    }
+};
+
+// ================================================================
+// ========== PROJE OLUŞTURMA SİHİRBAZI ==========
+// ================================================================
+
+window.createProjectWizard = function() {
+    if (!currentUser) {
+        showNotification('Önce giriş yapın!', 'error');
         return;
     }
-    modal = document.createElement('div');
-    modal.id = 'helpArticleModal';
-    modal.className = 'modal-overlay';
+
+    var modal = document.createElement('div');
+    modal.className = 'modal-overlay open';
+    modal.style.display = 'flex';
+    modal.id = 'projectWizardModal';
     modal.innerHTML = `
-        <div class="modal" style="max-width:800px;">
+        <div class="modal" style="max-width:600px;">
             <div class="modal-header">
-                <h3>📖 VİZYON 2027 Rehberi</h3>
-                <button class="modal-close" onclick="closeModal('helpArticleModal')">×</button>
+                <h3>📁 Yeni Proje Oluştur</h3>
+                <button class="modal-close" onclick="closeModal('projectWizardModal')">×</button>
             </div>
-            <div id="helpArticleContent" style="max-height:500px;overflow-y:auto;padding:10px;">
-                <h2>VİZYON 2027'ye Hoş Geldiniz!</h2>
-                <p>Bu platform, yapay zeka, ticaret ve sosyal ağ özelliklerini bir arada sunan devrim niteliğinde bir ekosistemdir.</p>
-                <h3>🚀 Temel Özellikler</h3>
-                <ul>
-                    <li><strong>V27 AI Asistan:</strong> 7 farklı AI modelini tek bir sohbet üzerinden kullanabilirsiniz.</li>
-                    <li><strong>V27 Pazarı:</strong> Ürünlerinizi %0 komisyonla satabilir veya satın alabilirsiniz.</li>
-                    <li><strong>Puan Sistemi:</strong> Görevleri tamamlayarak, arkadaşlarını davet ederek veya alışveriş yaparak puan kazanabilirsiniz.</li>
-                    <li><strong>Puan Mağazası:</strong> Kazandığınız puanlarla rozetler, renkler, paketler ve daha fazlasını satın alabilirsiniz.</li>
-                    <li><strong>Günlük Görevler:</strong> Her gün yeni görevler gelir. Tamamlayarak puan kazanın!</li>
-                    <li><strong>Sosyal DM:</strong> Diğer kullanıcılarla özel mesajlaşın, dosya ve resim gönderin.</li>
-                    <li><strong>Anketler:</strong> Topluluk kararlarına oy verin, gelecek özellikleri belirleyin.</li>
-                    <li><strong>Ebeveyn Modu:</strong> Çocuğunuzu güvende tutmak için özel ayarlar.</li>
-                    <li><strong>Uzay Modu:</strong> Gece 02:00-05:00 arası x2 puan kazanın!</li>
-                </ul>
-                <h3>📌 Sık Sorulan Sorular</h3>
-                <ul>
-                    <li><strong>Nasıl puan kazanırım?</strong> Günlük görevleri tamamlayarak, arkadaş davet ederek, pazarda satış yaparak ve sosyal görevleri (Instagram/WhatsApp takip) yaparak.</li>
-                    <li><strong>Puanlarımı nerede görürüm?</strong> Dashboard'un sağ üst köşesindeki puan rozetinde.</li>
-                    <li><strong>Davet kodumu nasıl bulurum?</strong> Profilinizde "Benim Davet Kodum" bölümünde.</li>
-                    <li><strong>Nasıl takım kurabilirim?</strong> Takım sayfasından "Takım Oluştur" butonuna tıklayarak.</li>
-                </ul>
-                <p>Daha fazla sorunuz varsa, sağ alttaki 💬 destek balonundan bize ulaşabilirsiniz.</p>
-                <hr>
-                <p style="text-align:center;color:var(--text3);">VİZYON 2027 © 2026 - Tüm Hakları Saklıdır.</p>
+            <div style="padding:10px 0;">
+                <p style="color:var(--text2); margin-bottom:16px;">Ne tür bir proje oluşturmak istersiniz?</p>
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <button class="btn-primary" onclick="window.selectProjectType('3d')" style="font-size:16px; padding:14px;">🧊 3D Tasarım</button>
+                    <button class="btn-primary" onclick="window.selectProjectType('code')" style="font-size:16px; padding:14px;">⌨️ Kod Yazma</button>
+                    <button class="btn-primary" onclick="window.selectProjectType('image')" style="font-size:16px; padding:14px;">🖼️ Görsel Oluşturma</button>
+                </div>
             </div>
-            <button class="btn-secondary" onclick="closeModal('helpArticleModal')" style="margin-top:16px;" data-i18n="Kapat">Kapat</button>
+            <button class="btn-secondary" onclick="closeModal('projectWizardModal')" style="margin-top:16px; width:100%;">İptal</button>
         </div>
     `;
     document.body.appendChild(modal);
-    modal.classList.add('open');
-    modal.style.display = 'flex';
 };
+
+window.selectProjectType = function(type) {
+    closeModal('projectWizardModal');
+    if (type === '3d') {
+        var prompt3D = prompt('3D nesne açıklaması yazın:');
+        if (prompt3D) {
+            document.getElementById('threeDPrompt').value = prompt3D;
+            window.generate3D();
+            setTimeout(function() {
+                var name = prompt('Projenize bir isim verin:');
+                if (name) {
+                    window.saveProject(name, '3D', '3D model oluşturuldu.');
+                }
+            }, 3000);
+        }
+    } else if (type === 'code') {
+        var subModal = document.createElement('div');
+        subModal.className = 'modal-overlay open';
+        subModal.style.display = 'flex';
+        subModal.id = 'codeTypeModal';
+        subModal.innerHTML = `
+            <div class="modal" style="max-width:500px;">
+                <div class="modal-header">
+                    <h3>⌨️ Kod Yazma Yöntemi</h3>
+                    <button class="modal-close" onclick="closeModal('codeTypeModal')">×</button>
+                </div>
+                <div style="padding:10px 0;">
+                    <p style="color:var(--text2); margin-bottom:16px;">Kodu nasıl oluşturmak istersiniz?</p>
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        <button class="btn-primary" onclick="window.startManualCode()" style="font-size:16px; padding:14px;">✍️ Elle Kod Yaz</button>
+                        <button class="btn-primary" onclick="window.startAICode()" style="font-size:16px; padding:14px;">🤖 Yapay Zekaya Yazdır</button>
+                    </div>
+                </div>
+                <button class="btn-secondary" onclick="closeModal('codeTypeModal')" style="margin-top:16px; width:100%;">İptal</button>
+            </div>
+        `;
+        document.body.appendChild(subModal);
+    } else if (type === 'image') {
+        var promptImage = prompt('Görsel açıklaması yazın:');
+        if (promptImage) {
+            document.getElementById('imagePrompt').value = promptImage;
+            window.generateImage();
+            setTimeout(function() {
+                var name = prompt('Projenize bir isim verin:');
+                if (name) {
+                    window.saveProject(name, 'Görsel', 'Görsel oluşturuldu.');
+                }
+            }, 3000);
+        }
+    }
+};
+
+window.startManualCode = function() {
+    closeModal('codeTypeModal');
+    var codeContent = prompt('Kodunuzu yazın:');
+    if (codeContent) {
+        var name = prompt('Projenize bir isim verin:');
+        if (name) {
+            window.saveProject(name, 'Kod (Elle)', codeContent);
+        }
+    }
+};
+
+window.startAICode = function() {
+    closeModal('codeTypeModal');
+    var promptCode = prompt('Yapay zekaya hangi kodu yazdırmak istersiniz?');
+    if (promptCode) {
+        var input = document.getElementById('dashboardAiInput');
+        if (input) {
+            input.value = promptCode;
+            window.sendDashboardAI();
+            setTimeout(function() {
+                var name = prompt('Projenize bir isim verin:');
+                if (name) {
+                    var codeResponse = document.querySelector('#dashboardAiMessages .ai-message.bot:last-child');
+                    var codeText = codeResponse ? codeResponse.textContent : 'AI kodu oluşturdu.';
+                    window.saveProject(name, 'Kod (AI)', codeText);
+                }
+            }, 4000);
+        }
+    }
+};
+
+window.saveProject = async function(name, type, content) {
+    if (!currentUser) return;
+    try {
+        var Project = Parse.Object.extend('Project');
+        var project = new Project();
+        project.set('user_email', currentUser.get('email'));
+        project.set('name', name);
+        project.set('type', type);
+        project.set('content', content);
+        project.set('is_favorite', false);
+        project.set('is_archived', false);
+        project.set('is_trashed', false);
+        await project.save(null);
+        await window.loadProjects();
+        showNotification('✅ Proje "' + name + '" kaydedildi!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+// ---- PROJEYİ PUAN MAĞAZASINA SATIŞA KOY ----
+window.publishProjectToStore = async function(projectId) {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    var projects = await new Parse.Query('Project').equalTo('user_email', currentUser.get('email')).find();
+    var project = projects.find(p => p.id === projectId);
+    if (!project) return showNotification('Proje bulunamadı!', 'error');
+
+    var price = prompt('Proje için puan fiyatı belirleyin (max 10000 puan):');
+    if (!price) return;
+    price = parseInt(price);
+    if (isNaN(price) || price <= 0 || price > 10000) {
+        return showNotification('Geçerli bir fiyat girin (1-10000 arası).', 'error');
+    }
+    var description = prompt('Proje açıklaması (özellikler):');
+    if (!description) return;
+
+    var imageUrl = prompt('Proje görseli URL\'si (isteğe bağlı):');
+    if (!imageUrl) imageUrl = 'https://via.placeholder.com/200x200?text=Proje';
+
+    try {
+        var result = await Parse.Cloud.run('publishProjectToStore', {
+            projectId: projectId,
+            price: price,
+            description: description,
+            imageUrl: imageUrl
+        });
+        if (result.success) {
+            showNotification('✅ Proje puan mağazasına eklendi!', 'success');
+            window.loadStore();
+        } else {
+            showNotification('Hata: ' + result.error, 'error');
+        }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+// ================================================================
+// ========== ABONELİK SİSTEMİ ==========
+// ================================================================
+
+async function checkAndShowSubscriptionCard() {
+    var wrapper = document.getElementById('subscriptionsCardWrapper');
+    if (!wrapper) return;
+
+    if (!currentUser || currentUser.get('role') === 'founder') {
+        wrapper.style.display = 'none';
+        return;
+    }
+
+    wrapper.style.display = 'block';
+    await loadMySubscriptions();
+}
+
+async function loadMySubscriptions() {
+    const container = document.getElementById('subscriptionsContent');
+    if (!container) return;
+
+    if (!currentUser) {
+        container.innerHTML = `
+            <div style="text-align:center; padding:20px;">
+                <p style="color:var(--text3);">🔔 Henüz aboneliğiniz yok.</p>
+                <button class="btn-primary btn-sm" onclick="showSubscribeOptions()" style="margin-top:10px;">📩 Abone olmak ister misiniz?</button>
+            </div>
+        `;
+        return;
+    }
+
+    try {
+        const result = await Parse.Cloud.run('getMySubscriptions', {});
+
+        let html = `
+            <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:10px;">
+                <div style="flex:1; min-width:200px; background:var(--bg); padding:16px; border-radius:12px; border:1px solid var(--border);">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span><strong>📝 Blog Aboneliği</strong></span>
+                        <span style="color:${result.blogActive ? 'var(--success)' : 'var(--text3)'};">
+                            ${result.blogActive ? '✅ Aktif' : '❌ Pasif'}
+                        </span>
+                    </div>
+                    <button class="btn-secondary btn-sm" onclick="toggleSubscription('blog')" style="margin-top:10px; width:100%;">
+                        ${result.blogActive ? '🚫 Ayrıl' : '✅ Abone Ol'}
+                    </button>
+                    <div style="font-size:12px; color:var(--text3); margin-top:6px;">
+                        ${result.blogActive ? 'Yeni blog yazılarından haberdar olursunuz.' : 'Blog yazılarından bildirim almazsınız.'}
+                    </div>
+                </div>
+                <div style="flex:1; min-width:200px; background:var(--bg); padding:16px; border-radius:12px; border:1px solid var(--border);">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span><strong>⚡ Sistem Güncellemeleri</strong></span>
+                        <span style="color:${result.systemActive ? 'var(--success)' : 'var(--text3)'};">
+                            ${result.systemActive ? '✅ Aktif' : '❌ Pasif'}
+                        </span>
+                    </div>
+                    <button class="btn-secondary btn-sm" onclick="toggleSubscription('system')" style="margin-top:10px; width:100%;">
+                        ${result.systemActive ? '🚫 Ayrıl' : '✅ Abone Ol'}
+                    </button>
+                    <div style="font-size:12px; color:var(--text3); margin-top:6px;">
+                        ${result.systemActive ? 'Sistem güncellemelerinden haberdar olursunuz.' : 'Sistem güncellemelerinden bildirim almazsınız.'}
+                    </div>
+                </div>
+            </div>
+        `;
+        container.innerHTML = html;
+    } catch(e) {
+        console.error('Abonelikler yüklenemedi:', e);
+        container.innerHTML = '<p style="color:var(--text3);">Abonelik bilgileri yüklenemedi.</p>';
+    }
+}
+
+function showSubscribeOptions() {
+    if (!currentUser) {
+        showNotification('Önce giriş yapın!', 'error');
+        return;
+    }
+    const choice = confirm(
+        'Hangi aboneliğe kaydolmak istersiniz?\n\n' +
+        '✅ "Tamam" -> Blog aboneliği (Yeni yazılardan haberdar olun)\n' +
+        '❌ "İptal" -> Sistem güncelleme aboneliği (Sistem güncellemelerinden haberdar olun)'
+    );
+    if (choice) {
+        subscribeToBlog();
+    } else {
+        subscribeToSystem();
+    }
+}
+
+async function subscribeToBlog() {
+    if (!currentUser) {
+        showNotification('Önce giriş yapın!', 'error');
+        return;
+    }
+    try {
+        await Parse.Cloud.run('subscribeToBlog', { email: currentUser.get('email') });
+        showNotification('✅ Blog aboneliğine kaydoldunuz!', 'success');
+        loadMySubscriptions();
+    } catch(e) {
+        showNotification('❌ Hata: ' + e.message, 'error');
+    }
+}
+
+async function subscribeToSystem() {
+    if (!currentUser) {
+        showNotification('Önce giriş yapın!', 'error');
+        return;
+    }
+    try {
+        await Parse.Cloud.run('subscribeToSystemUpdates', {});
+        showNotification('✅ Sistem güncelleme aboneliğine kaydoldunuz!', 'success');
+        loadMySubscriptions();
+    } catch(e) {
+        showNotification('❌ Hata: ' + e.message, 'error');
+    }
+}
+
+async function toggleSubscription(type) {
+    if (!currentUser) {
+        showNotification('Önce giriş yapın!', 'error');
+        return;
+    }
+    try {
+        const result = await Parse.Cloud.run('getMySubscriptions', {});
+        const isActive = type === 'blog' ? result.blogActive : result.systemActive;
+
+        if (isActive) {
+            if (!confirm(`${type === 'blog' ? 'Blog' : 'Sistem'} aboneliğinden ayrılmak istediğinize emin misiniz? Bildirim almayı bırakacaksınız.`)) return;
+            await Parse.Cloud.run('unsubscribeFrom', { type: type });
+            showNotification(`${type === 'blog' ? 'Blog' : 'Sistem'} aboneliğinden ayrıldınız.`, 'success');
+            loadMySubscriptions();
+        } else {
+            if (type === 'blog') {
+                await Parse.Cloud.run('subscribeToBlog', { email: currentUser.get('email') });
+            } else {
+                await Parse.Cloud.run('subscribeToSystemUpdates', {});
+            }
+            showNotification(`${type === 'blog' ? 'Blog' : 'Sistem'} aboneliğine kaydoldunuz!`, 'success');
+            loadMySubscriptions();
+        }
+    } catch(e) {
+        showNotification('❌ Hata: ' + e.message, 'error');
+    }
+}
+
+async function sendBlogNotification() {
+    if (!currentUser || !['admin', 'founder'].includes(currentUser.get('role'))) {
+        showNotification('Yetkiniz yok!', 'error');
+        return;
+    }
+    const subject = prompt('Blog yazısı başlığı:');
+    if (!subject) return;
+    const message = prompt('Özet mesaj:');
+    if (!message) return;
+    try {
+        const result = await Parse.Cloud.run('sendBlogUpdateToSubscribers', { subject, message });
+        showNotification(`${result.sentCount} aboneye blog bildirimi gönderildi.`, 'success');
+    } catch(e) {
+        showNotification('❌ Hata: ' + e.message, 'error');
+    }
+}
+
+async function sendSystemNotification() {
+    if (!currentUser || !['admin', 'founder'].includes(currentUser.get('role'))) {
+        showNotification('Yetkiniz yok!', 'error');
+        return;
+    }
+    const version = prompt('Sürüm numarası (örn: 5.15.0):');
+    if (!version) return;
+    const changes = prompt('Değişiklikleri açıklayın:');
+    if (!changes) return;
+    try {
+        const result = await Parse.Cloud.run('sendSystemUpdateToSubscribers', { version, changes });
+        showNotification(`${result.sentCount} aboneye sistem güncellemesi gönderildi.`, 'success');
+    } catch(e) {
+        showNotification('❌ Hata: ' + e.message, 'error');
+    }
+}
 
 // ================================================================
 // ========== UZAY MODU, TEMA, SPLASH, VERSİYON ==========
@@ -10339,14 +11073,13 @@ window.updateVersion = function(version) {
 window.onload = async function() {
     try {
         console.log('🔄 Sayfa yükleniyor...');
-        // Eksik elementleri oluştur
-        let mainSite = document.getElementById('mainSite');
+        var mainSite = document.getElementById('mainSite');
         if (!mainSite) { mainSite = document.createElement('div'); mainSite.id = 'mainSite'; document.body.prepend(mainSite); console.warn('⚠️ mainSite elementi eksikti, otomatik oluşturuldu.'); }
-        let dashboardArea = document.getElementById('dashboardArea');
+        var dashboardArea = document.getElementById('dashboardArea');
         if (!dashboardArea) { dashboardArea = document.createElement('div'); dashboardArea.id = 'dashboardArea'; dashboardArea.className = 'dashboard-container'; dashboardArea.style.display = 'none'; document.body.appendChild(dashboardArea); console.warn('⚠️ dashboardArea elementi eksikti, otomatik oluşturuldu.'); }
-        let userPanel = document.getElementById('userPanel');
+        var userPanel = document.getElementById('userPanel');
         if (!userPanel) { userPanel = document.createElement('div'); userPanel.id = 'userPanel'; userPanel.style.display = 'none'; document.body.appendChild(userPanel); console.warn('⚠️ userPanel elementi eksikti, otomatik oluşturuldu.'); }
-        let notification = document.getElementById('notification');
+        var notification = document.getElementById('notification');
         if (!notification) { notification = document.createElement('div'); notification.id = 'notification'; notification.className = 'notification'; document.body.appendChild(notification); console.warn('⚠️ notification elementi eksikti, otomatik oluşturuldu.'); }
 
         mainSite.style.display = 'block';
@@ -10381,6 +11114,7 @@ window.onload = async function() {
                     try { await Parse.Cloud.run('initAdminUsers', {}); console.log('✅ Admin hesaplar kontrol edildi'); }
                     catch(e) { console.log('Admin kontrol hatası:', e.message); }
                 }
+                await checkAndShowSubscriptionCard();
                 showNotification('Hoş geldin, ' + currentUser.get('name'), 'success');
             } catch(e) {
                 console.log('Oturum geçersiz, çıkış yapılıyor...', e.message);
@@ -10411,11 +11145,11 @@ window.onload = async function() {
         showNotification('✨ VİZYON 2027 Sistemi Aktif!', 'success');
     } catch(e) {
         console.error('🚨 Sayfa yüklenirken beklenmeyen hata:', e);
-        let mainSite = document.getElementById('mainSite');
+        var mainSite = document.getElementById('mainSite');
         if (mainSite) mainSite.style.display = 'block';
-        let dashboardArea = document.getElementById('dashboardArea');
+        var dashboardArea = document.getElementById('dashboardArea');
         if (dashboardArea) dashboardArea.style.display = 'none';
-        let userPanel = document.getElementById('userPanel');
+        var userPanel = document.getElementById('userPanel');
         if (userPanel) userPanel.style.display = 'none';
         window.hideSplash();
         showNotification('Sayfa yüklenirken hata oluştu: ' + e.message, 'error');
@@ -10432,7 +11166,7 @@ console.log('✅ JS-4 tamamen yüklendi ve tüm fonksiyonlar global!');
 <!-- ============================================================ -->
 <script>
 // ================================================================
-// JS-5: TÜM İSTEMCİ FONKSİYONLAR (FULL – HATASIZ, EKSİKSİZ)
+// JS-5: TAKIM YÖNETİMİ, KURUCU PANELİ, VİZYON DESTEK, ÜYE KONTROLLERİ, SOSYAL DM, ARAMA, TAKİP, EBEVEYN, ANKET, DUYURU, GİF, PROJE, PUAN, MAĞAZA, GÖREV, YARIŞMA, AKADEMİ, İŞ İLANI, HATA, OYUN, CÜZDAN
 // ================================================================
 
 // ========== GLOBAL DEĞİŞKENLER ==========
