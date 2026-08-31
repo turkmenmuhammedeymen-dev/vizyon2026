@@ -3560,6 +3560,11 @@ body.light-theme .legal-banner {
 #referralMessage.error {
     color: var(--danger);
 }
+/* Davet kodu oluştur butonu için küçük düzenleme */
+#referralCard .btn-sm {
+    font-size: 11px !important;
+    padding: 4px 12px !important;
+}
 
 /* ----- EBEVEYN ŞİFRE SIFIRLAMA ALANLARI ----- */
 #parentResetSection {
@@ -3608,6 +3613,21 @@ body.light-theme .legal-banner {
     display: none !important;
 }
 
+/* ----- EBEVEYN GİRİŞ BÖLÜMÜ (YENİ) ----- */
+#parentLoginSection {
+    margin-bottom: 16px;
+}
+#parentLoginSection .form-input {
+    margin-bottom: 8px;
+}
+#parentEmailDisplay {
+    font-weight: 600;
+    color: var(--accent);
+}
+#parentControls .btn-secondary {
+    margin-left: 8px;
+}
+
 /* ----- RESPONSIVE DÜZELTMELER (YENİ EKLENENLER) ----- */
 @media (max-width: 768px) {
     #referralCard .glow-input {
@@ -3628,6 +3648,10 @@ body.light-theme .legal-banner {
     #pollManage .btn-secondary {
         width: 100%;
         text-align: center;
+    }
+    #parentControls .btn-secondary {
+        margin-left: 0;
+        margin-top: 4px;
     }
 }
 
@@ -3651,8 +3675,13 @@ body.light-theme .legal-banner {
         font-size: 11px !important;
         padding: 6px 10px !important;
     }
+    #parentLoginSection .form-input {
+        font-size: 11px !important;
+        padding: 6px 10px !important;
+    }
 }
 </style>
+
 
 
 </head>
@@ -3948,7 +3977,7 @@ body.light-theme .legal-banner {
         </div>
         <!-- Sürüm Bilgisi -->
         <div style="text-align:center; margin-top:16px; font-size:12px; color:var(--text3);">
-            Sürüm: <span id="versionDisplay">V5.14.2</span>
+            Sürüm: <span id="versionDisplay">V5.15.1</span>
         </div>
         <!-- Topluluk Kuralları Footer -->
         <div class="community-rules-footer">
@@ -4040,13 +4069,14 @@ body.light-theme .legal-banner {
             <div class="dashboard-card"><h3 data-i18n="Proje Taleplerim">📨 Proje Taleplerim</h3><div id="projectRequestsList" class="project-list"></div></div>
             <div class="dashboard-card"><h3 data-i18n="Gelen Kutusu">📬 Gelen Kutusu</h3><div id="inboxList" class="inbox-list"></div></div>
 
-            <!-- ===== DAVET KODU GİRME KARTI (YENİ) ===== -->
+            <!-- ===== DAVET KODU KARTI (GİRME + OLUŞTURMA) ===== -->
             <div class="dashboard-card full-width" id="referralCard">
                 <h3>🎁 Davet Kodu</h3>
                 <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
                     <input type="text" id="referralCodeInput" placeholder="Arkadaşının davet kodunu gir..." class="glow-input" style="flex:1; min-width:200px;" onkeypress="if(event.key==='Enter') window.enterReferralCode()">
                     <button class="btn-primary btn-sm" onclick="window.enterReferralCode()">✅ Kodu Kullan</button>
                     <button class="btn-secondary btn-sm" onclick="window.showMyReferralCode()">📍 Benim Kodum</button>
+                    <button class="btn-secondary btn-sm" onclick="window.generateReferralCode()">🔄 Kod Oluştur</button>
                 </div>
                 <div id="referralMessage" style="margin-top:8px; font-size:13px; color:var(--text3);"></div>
             </div>
@@ -4463,41 +4493,44 @@ body.light-theme .legal-banner {
             <button class="modal-close" onclick="closeModal('parentSettingsModal')">×</button>
         </div>
         <div id="parentSettingsContent" class="parent-panel">
-            <div id="parentVerificationSection">
-                <p style="color:var(--text2);">Ebeveyn modunu aktifleştirmek için e-posta doğrulaması yapmalısınız.</p>
-                <div style="margin-bottom:8px;">
-                    <input type="email" id="parentEmailInput" placeholder="Ebeveyn E-posta" class="form-input">
-                    <div id="parentEmailWarning" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;">⚠️ Ebeveyn e-postası, hesap e-postası ile aynı olamaz!</div>
+            <!-- Ebeveyn giriş / doğrulama / şifre belirleme -->
+            <div id="parentLoginSection" style="display:block;">
+                <p style="color:var(--text2);">Ebeveyn paneline erişmek için lütfen şifrenizi girin.</p>
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                    <input type="password" id="parentLoginPass" placeholder="Ebeveyn Şifresi" class="form-input" style="flex:1;">
+                    <button type="button" onclick="togglePassword('parentLoginPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
-                <button class="btn-primary btn-sm" onclick="window.requestParentVerification()">📧 Doğrulama İste</button>
-                <div id="parentCodeSection" style="display:none;margin-top:12px;">
-                    <input type="text" id="parentCodeInput" placeholder="Doğrulama Kodunu Girin" class="form-input">
-                    <button class="btn-primary btn-sm" onclick="window.verifyParentCode()">✅ Onayla</button>
+                <button class="btn-primary btn-sm" onclick="window.loginParent()">🔑 Giriş Yap</button>
+                <div style="margin-top:8px;">
+                    <a href="javascript:void(0)" onclick="window.requestParentReset()" style="color:var(--accent); font-size:13px; text-decoration:underline; cursor:pointer;">Şifremi unuttum</a>
                 </div>
-                <!-- Şifre Sıfırlama (Ebeveyn) -->
-                <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:16px;">
-                    <h4>🔑 Ebeveyn ile Şifre Sıfırla</h4>
-                    <p style="font-size:13px; color:var(--text2);">Ebeveyn e-postanıza doğrulama kodu gönderilir, onaylandıktan sonra yeni şifre belirleyebilirsiniz.</p>
-                    <button class="btn-secondary btn-sm" onclick="window.requestParentReset()">📧 Şifre Sıfırlama Kodu Gönder</button>
-                    <div id="parentResetSection" style="display:none; margin-top:8px;">
-                        <input type="text" id="parentResetCode" placeholder="Doğrulama Kodu" class="form-input" style="width:100%; margin-bottom:4px;">
-                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                            <input type="password" id="parentNewPass" placeholder="Yeni Şifre (8+)" class="form-input" style="flex:1;">
-                            <button type="button" onclick="togglePassword('parentNewPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <input type="password" id="parentNewPass2" placeholder="Yeni Şifre Tekrar" class="form-input" style="flex:1;">
-                            <button type="button" onclick="togglePassword('parentNewPass2', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                        <button class="btn-primary btn-sm" onclick="window.confirmParentReset()">✅ Şifreyi Sıfırla</button>
+                <div id="parentResetSection" style="display:none; margin-top:12px; padding:12px; background:var(--bg2); border-radius:12px; border:1px solid var(--border);">
+                    <p style="font-size:13px; color:var(--text2);">Ebeveyn e-postanıza doğrulama kodu gönderilecektir.</p>
+                    <input type="text" id="parentResetCode" placeholder="Doğrulama Kodu" class="form-input" style="width:100%; margin-bottom:6px;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                        <input type="password" id="parentNewPass" placeholder="Yeni Şifre (8+)" class="form-input" style="flex:1;">
+                        <button type="button" onclick="togglePassword('parentNewPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                            <i class="fas fa-eye"></i>
+                        </button>
                     </div>
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                        <input type="password" id="parentNewPass2" placeholder="Yeni Şifre Tekrar" class="form-input" style="flex:1;">
+                        <button type="button" onclick="togglePassword('parentNewPass2', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <button class="btn-primary btn-sm" onclick="window.confirmParentReset()">✅ Şifreyi Sıfırla</button>
                 </div>
             </div>
+
+            <!-- Ebeveyn kontrol ayarları (giriş yapıldıktan sonra görünür) -->
             <div id="parentControls" style="display:none; margin-top:20px;">
+                <div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                    <span><strong>👤 Ebeveyn E-posta:</strong> <span id="parentEmailDisplay"></span></span>
+                    <button class="btn-secondary btn-sm" onclick="window.changeParentPassword()">🔑 Şifre Değiştir</button>
+                </div>
                 <hr style="margin:16px 0;border-color:var(--border);">
                 <div class="parent-setting">
                     <span class="setting-label">👤 Hesap Durumu</span>
@@ -5214,7 +5247,7 @@ window.closeDownloadOptions = function() {
 // ========== SÜRÜM GÖSTER ==========
 window.updateVersion = function(version) {
     var el = document.getElementById('versionDisplay');
-    if (el) el.textContent = version || 'V5.14.2';
+    if (el) el.textContent = version || 'V5.15.1';
 };
 
 // ========== UZAY MODU KONTROLÜ ==========
@@ -9745,8 +9778,34 @@ window.openParentSettings = function() {
     if (modal) {
         modal.classList.add('open');
         modal.style.display = 'flex';
+        // Önce giriş bölümünü göster, kontrolleri gizle
+        document.getElementById('parentLoginSection').style.display = 'block';
+        document.getElementById('parentControls').style.display = 'none';
+        document.getElementById('parentVerificationSection').style.display = 'none';
+        // Eğer zaten parent_mode varsa ve pin varsa direkt giriş yapmış olabilir, ama güvenlik için pin soralım.
+        // loadParentSettings çağrılacak, ama kontroller gizli kalacak.
         window.loadParentSettings();
         window.loadSessions();
+    }
+};
+
+window.loginParent = async function() {
+    if (!currentUser) return showNotification('Giriş yapın!', 'error');
+    var pin = document.getElementById('parentLoginPass').value.trim();
+    if (!pin) return showNotification('PIN girin!', 'error');
+    try {
+        var settings = await Parse.Cloud.run('getParentSettings', {});
+        if (settings.parent_pin !== pin) {
+            return showNotification('❌ PIN yanlış!', 'error');
+        }
+        // PIN doğru, kontrolleri göster
+        document.getElementById('parentLoginSection').style.display = 'none';
+        document.getElementById('parentControls').style.display = 'block';
+        document.getElementById('parentEmailDisplay').textContent = settings.parent_email || currentUser.get('email');
+        showNotification('Ebeveyn paneline hoş geldiniz!', 'success');
+        window.loadParentSettings(); // ayarları yeniden yükle
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
     }
 };
 
@@ -9755,9 +9814,9 @@ window.loadParentSettings = async function() {
     try {
         const result = await Parse.Cloud.run('getParentSettings', {});
         if (result.parent_mode) {
-            document.getElementById('parentControls').style.display = 'block';
-            document.getElementById('parentVerificationSection').style.display = 'none';
-            document.getElementById('parentEmailInput').value = result.parent_email || '';
+            // Eğer zaten parent_mode ise, ve pin varsa, login section'ı gizle kontrolü göster.
+            // Ama loginParent zaten bunu yapacak. Bu fonksiyon sadece ayarları yüklemek için.
+            document.getElementById('parentEmailDisplay').textContent = result.parent_email || currentUser.get('email');
             document.getElementById('liveTrackingStatus').textContent = result.live_tracking ? '🟢 Açık' : '🔴 Kapalı';
             document.getElementById('dailyLimitInput').value = result.daily_limit || 0;
             try {
@@ -9774,7 +9833,9 @@ window.loadParentSettings = async function() {
                 console.warn('Full ayarlar yüklenemedi:', e);
             }
         } else {
+            // Ebeveyn modu yoksa, doğrulama bölümünü göster, login ve kontrolleri gizle
             document.getElementById('parentControls').style.display = 'none';
+            document.getElementById('parentLoginSection').style.display = 'block';
             document.getElementById('parentVerificationSection').style.display = 'block';
         }
     } catch(e) {
@@ -9813,9 +9874,24 @@ window.verifyParentCode = async function() {
     try {
         var result = await Parse.Cloud.run('verifyParentCode', { code: code });
         if (result.success) {
-            document.getElementById('parentControls').style.display = 'block';
+            // Eğer PIN set edilmemişse, kullanıcıya PIN oluşturmasını söyle
+            var settings = await Parse.Cloud.run('getParentSettings', {});
+            if (!settings.parent_pin) {
+                var pin = prompt('Ebeveyn paneline erişim için 4 haneli bir PIN belirleyin:');
+                if (pin && pin.length === 4 && !isNaN(pin)) {
+                    await Parse.Cloud.run('setParentPin', { pin: pin });
+                    showNotification('Ebeveyn PIN\'i oluşturuldu!', 'success');
+                } else {
+                    showNotification('Geçerli PIN belirleyin!', 'error');
+                    return;
+                }
+            }
+            // Doğrulama başarılı, şimdi giriş yapması için login bölümünü göster, ama kontrolleri gizle
             document.getElementById('parentVerificationSection').style.display = 'none';
-            showNotification('Ebeveyn modu aktif!', 'success');
+            document.getElementById('parentLoginSection').style.display = 'block';
+            document.getElementById('parentControls').style.display = 'none';
+            document.getElementById('parentEmailDisplay').textContent = settings.parent_email || currentUser.get('email');
+            showNotification('Ebeveyn e-postası doğrulandı! Lütfen PIN\'inizi girin.', 'success');
             window.loadParentSettings();
         } else {
             showNotification('Hata: ' + result.error, 'error');
@@ -9826,7 +9902,6 @@ window.verifyParentCode = async function() {
 // ---- EBEVEYN ŞİFRE SIFIRLAMA (YENİ) ----
 window.requestParentReset = async function() {
     if (!currentUser) return showNotification('Giriş yapın!', 'error');
-    if (!currentUser.get('parent_mode')) return showNotification('Ebeveyn modu aktif değil!', 'error');
     try {
         const result = await Parse.Cloud.run('requestParentReset', {});
         if (result.success) {
@@ -9848,7 +9923,29 @@ window.confirmParentReset = async function() {
         const result = await Parse.Cloud.run('confirmParentReset', { code: code, newPassword: newPass });
         showNotification(result.message, 'success');
         document.getElementById('parentResetSection').style.display = 'none';
+        // Şifre sıfırlandıktan sonra login bölümünü göster
+        document.getElementById('parentLoginSection').style.display = 'block';
+        document.getElementById('parentControls').style.display = 'none';
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+};
+
+// ---- EBEVEYN ŞİFRE DEĞİŞTİR (YENİ) ----
+window.changeParentPassword = async function() {
+    if (!currentUser) return showNotification('Giriş yapın!', 'error');
+    var oldPin = prompt('Mevcut PIN\'inizi girin:');
+    if (!oldPin) return;
+    var newPass = prompt('Yeni PIN (4 haneli) girin:');
+    if (!newPass || newPass.length !== 4 || isNaN(newPass)) return showNotification('PIN 4 haneli olmalı!', 'error');
+    try {
+        var settings = await Parse.Cloud.run('getParentSettings', {});
+        if (settings.parent_pin !== oldPin) {
+            return showNotification('❌ Mevcut PIN yanlış!', 'error');
+        }
+        await Parse.Cloud.run('setParentPin', { pin: newPass });
+        showNotification('PIN başarıyla değiştirildi!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 // ---- EBEVEYN DİĞER FONKSİYONLAR ----
@@ -9995,6 +10092,29 @@ window.removeParentControl = async function() {
         showNotification(result.message, 'success');
         closeModal('parentSettingsModal');
         setTimeout(() => location.reload(), 1500);
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+// ---- DAVET KODU OLUŞTUR (YENİ) ----
+window.generateReferralCode = async function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    try {
+        var result = await Parse.Cloud.run('generateReferralCode', {});
+        if (result && result.referral_code) {
+            showNotification('✅ Davet kodunuz: ' + result.referral_code, 'success');
+            // Kullanıcı bilgilerini güncelle
+            await currentUser.fetch();
+            // Liderlik tablosunu güncelle
+            window.loadReferralLeaderboard();
+            // Profil içeriğini güncelle (eğer açıksa)
+            if (document.getElementById('profileModal').classList.contains('open')) {
+                window.openProfileModal();
+            }
+        } else {
+            showNotification('Kod oluşturulamadı.', 'warning');
+        }
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -10925,6 +11045,8 @@ window.enterReferralCode = async function() {
             document.getElementById('referralCodeInput').value = '';
             await currentUser.fetch();
             window.updatePointsBadge(currentUser.get('points') || 0);
+            // Liderlik tablosunu güncelle
+            window.loadReferralLeaderboard();
             showNotification('✅ ' + result.message, 'success');
         } else {
             msgDiv.innerHTML = '❌ ' + (result.error || result.message || 'Geçersiz kod!');
@@ -11557,7 +11679,7 @@ window.hideSplash = function() {
 
 window.updateVersion = function(version) {
     var el = document.getElementById('versionDisplay');
-    if (el) el.textContent = version || 'V5.14.2';
+    if (el) el.textContent = version || 'V5.15.1';
 };
 
 // ================================================================
@@ -11643,7 +11765,7 @@ window.onload = async function() {
         window.startStatsInterval();
         window.loadTheme();
         window.checkSpaceMode();
-        window.updateVersion('V5.14.2');
+        window.updateVersion('V5.15.1');
         setInterval(window.checkSpaceMode, 60000);
         setTimeout(window.hideSplash, 3000);
         showNotification('✨ VİZYON 2027 Sistemi Aktif!', 'success');
