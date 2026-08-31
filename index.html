@@ -3527,7 +3527,133 @@ body.light-theme .legal-banner {
         white-space: normal !important;
     }
 }
+
+/* ============================================================ */
+/* ========== YENİ EKLENEN ÖZELLİKLER (DAVET KODU, EBEVEYN ŞİFRE SIFIRLAMA, VS.) ========== */
+/* ============================================================ */
+
+/* ----- DAVET KODU KARTI ----- */
+#referralCard {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+#referralCard h3 {
+    color: var(--accent);
+    font-family: var(--font-display);
+    margin-bottom: 12px;
+}
+#referralCard .glow-input {
+    flex: 1;
+    min-width: 200px;
+}
+#referralMessage {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--text3);
+}
+#referralMessage.success {
+    color: var(--success);
+}
+#referralMessage.error {
+    color: var(--danger);
+}
+
+/* ----- EBEVEYN ŞİFRE SIFIRLAMA ALANLARI ----- */
+#parentResetSection {
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--bg2);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+#parentResetSection .form-input {
+    margin-bottom: 6px;
+}
+#parentResetSection .btn-primary {
+    width: 100%;
+}
+#parentEmailWarning {
+    color: var(--danger);
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+}
+#parentEmailWarning.show {
+    display: block;
+}
+
+/* ----- OYLAMA YÖNETİM BUTONLARI (KURUCU) ----- */
+#pollManage {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+#pollManage .btn-danger,
+#pollManage .btn-secondary {
+    font-size: 12px !important;
+    padding: 6px 14px !important;
+}
+
+/* ----- VİZYON PATROL / DESTEK BUTON GÖRÜNÜRLÜK (JS KONTROLLÜ) ----- */
+#vizyonPatrolBtn,
+#vizyonSupportBtn {
+    display: inline-flex;
+}
+#vizyonPatrolBtn.hidden,
+#vizyonSupportBtn.hidden {
+    display: none !important;
+}
+
+/* ----- RESPONSIVE DÜZELTMELER (YENİ EKLENENLER) ----- */
+@media (max-width: 768px) {
+    #referralCard .glow-input {
+        min-width: 150px;
+    }
+    #referralCard .btn-sm {
+        font-size: 11px !important;
+        padding: 4px 10px !important;
+    }
+    #parentResetSection {
+        padding: 10px;
+    }
+    #pollManage {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    #pollManage .btn-danger,
+    #pollManage .btn-secondary {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    #referralCard {
+        padding: 12px;
+    }
+    #referralCard .glow-input {
+        min-width: 100px;
+        font-size: 11px !important;
+        padding: 6px 10px !important;
+    }
+    #referralCard .btn-sm {
+        font-size: 10px !important;
+        padding: 4px 8px !important;
+    }
+    #parentResetSection {
+        padding: 8px;
+    }
+    #parentResetSection .form-input {
+        font-size: 11px !important;
+        padding: 6px 10px !important;
+    }
+}
 </style>
+
 
 </head>
 <body>
@@ -3543,9 +3669,8 @@ body.light-theme .legal-banner {
     <!-- ============================================================ -->
 <!-- ===================== HTML BÖLÜMLERİ ======================== -->
 <!-- ============================================================ -->
-
 <!-- ============================================================ -->
-<!-- HTML-1: ANA SAYFA (NAVBAR, HERO, FEATURES, PRICING, FOOTER + ABONELİK KARTI) -->
+<!-- HTML-1: ANA SAYFA (NAVBAR, HERO, FEATURES, PRICING, FOOTER)  -->
 <!-- ============================================================ -->
 <div id="mainSite">
 
@@ -3577,10 +3702,6 @@ body.light-theme .legal-banner {
             <li><a href="https://vizyon2026.vercel.app/bana-ogret.html" target="_blank">📖 Bana Öğret</a></li>
         </ul>
         <div class="button-group">
-            <!-- BİLDİRİM ÇANI (YENİ) -->
-            <button class="nav-cta" onclick="toggleNotificationPanel()" style="position:relative; padding:8px 14px;">
-                🔔 <span id="notificationBadge" style="position:absolute; top:-5px; right:-5px; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:10px; display:none;">0</span>
-            </button>
             <div class="secret-buttons">
                 <button class="secret-btn" onclick="openRolePanel('FOUNDER')">👑 FOUNDER</button>
                 <button class="secret-btn" onclick="openRolePanel('ADMIN')">⚙️ ADMIN</button>
@@ -3776,16 +3897,6 @@ body.light-theme .legal-banner {
         </div>
     </div>
 
-    <!-- ===== ABONELİK KARTI (SADECE GİRİŞ YAPMIŞ KURUCU HARİÇ KULLANICILAR İÇİN) ===== -->
-    <div id="subscriptionsCardWrapper" style="max-width:1000px; margin:40px auto; padding:0 20px; display:none;">
-        <div class="dashboard-card" style="background:var(--surface); border:1px solid var(--accent); border-radius:24px; padding:24px;">
-            <h3 style="color:var(--accent); font-family:var(--font-display); margin-bottom:16px;">📬 Aboneliklerim</h3>
-            <div id="subscriptionsContent">
-                <p style="color:var(--text3);">Yükleniyor...</p>
-            </div>
-        </div>
-    </div>
-
     <!-- ===== FOOTER ===== -->
     <footer>
         <div class="footer-grid">
@@ -3850,13 +3961,14 @@ body.light-theme .legal-banner {
 
 
 <!-- ============================================================ -->
-<!-- HTML-2: DASHBOARD (FULL – TÜM GÜNCELLEMELER DAHİL)            -->
+<!-- HTML-2: DASHBOARD (GİRİŞ YAPAN KULLANICI)                    -->
+<!-- (Bildirim çanı, abonelik kartı, tüm özellikler burada)      -->
 <!-- ============================================================ -->
 <div id="dashboardArea" class="dashboard-container" style="display:none;">
 
     <div class="dashboard-header">
         <div class="logo">
-            <div class="logo-icon" style="background: transparent; box-shadow: none; animation: none; width: 40px; height: 40px;">
+            <div class="logo-icon" style="background:transparent; box-shadow:none; animation:none; width:40px; height:40px;">
                 <svg width="40" height="40" viewBox="0 0 50 50">
                     <circle cx="25" cy="25" r="22" fill="none" stroke="#00d4ff" stroke-width="2"/>
                     <text x="25" y="22" font-size="8" fill="#00d4ff" text-anchor="middle" font-family="Arial">بسم</text>
@@ -3876,6 +3988,12 @@ body.light-theme .legal-banner {
                 <span class="points-amount" id="dashboardPointsDisplay">0</span> Puan
             </span>
             <span id="dashQueryLimitBadge" class="query-limit-badge" style="position:relative;bottom:auto;left:auto;display:inline-block;padding:4px 12px;font-size:11px;">🔋 100 sorgu kaldı</span>
+
+            <!-- BİLDİRİM ÇANI (SADECE BURADA) -->
+            <button class="nav-cta" onclick="toggleNotificationPanel()" style="position:relative; padding:8px 14px; background:transparent; border:1px solid var(--accent); border-radius:40px; color:var(--accent);">
+                🔔 <span id="notificationBadge" style="position:absolute; top:-5px; right:-5px; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:10px; display:none;">0</span>
+            </button>
+
             <button class="btn-secondary btn-sm" onclick="window.openProfileModal()" data-i18n="Profil">👤 Profil</button>
             <button class="btn-secondary btn-sm" onclick="window.toggleChatHistory()" data-i18n="Geçmiş">📜 Geçmiş</button>
             <button class="btn-secondary btn-sm" onclick="window.toggleTeamPage()" style="display:flex;align-items:center;gap:6px;" data-i18n="Takım">
@@ -3887,7 +4005,7 @@ body.light-theme .legal-banner {
             <button class="btn-secondary btn-sm" onclick="window.startVoiceInput()" style="display:flex;align-items:center;gap:4px;" data-i18n="Sesli Komut">
                 🎤 Sesli Komut
             </button>
-            <button class="btn-secondary btn-sm" onclick="window.openStore()" style="display:flex;align-items:center;gap:4px;" data-i18n="Puan Mağazası">
+            <button class="btn-secondary btn-sm" onclick="window.openMarket()" style="display:flex;align-items:center;gap:4px;" data-i18n="Puan Mağazası">
                 🛒 Puan Mağazası
             </button>
             <button class="logout-btn btn-sm" onclick="window.logout()" data-i18n="Çıkış">Çıkış</button>
@@ -3908,7 +4026,6 @@ body.light-theme .legal-banner {
                     <button class="btn-secondary" onclick="document.getElementById('dashboardFileInput').click()" data-i18n="Dosya Yükle">📎</button>
                     <button class="btn-secondary" onclick="window.startVoiceInput()" data-i18n="Sesli Komut">🎤</button>
                 </div>
-                <!-- DOSYA ÖNİZLEME KONTEYNERİ -->
                 <div id="filePreviewContainer" style="display:flex; flex-wrap:wrap; gap:10px; padding:8px 12px; background:rgba(0,0,0,0.2); min-height:0; border-top:1px solid #1a3350; margin-top:12px;"></div>
             </div>
         </div>
@@ -3916,24 +4033,22 @@ body.light-theme .legal-banner {
         <!-- ===== KUTULAR (2 SÜTUN) ===== -->
         <div class="dashboard-grid-2col">
 
-            <div class="dashboard-card"><h3 data-i18n="Projelerim">📁 Projelerim</h3><div id="projectsList" class="project-list"></div><button class="btn-primary btn-sm" onclick="window.newProject()" style="margin-top:8px;" data-i18n="Yeni Proje">+ Yeni Proje</button></div>
+            <div class="dashboard-card"><h3 data-i18n="Projelerim">📁 Projelerim</h3><div id="projectsList" class="project-list"></div><button class="btn-primary btn-sm" onclick="window.createProjectWizard()" style="margin-top:8px;" data-i18n="Yeni Proje">+ Yeni Proje</button></div>
             <div class="dashboard-card"><h3 data-i18n="Favoriler">⭐ Favoriler</h3><div id="favList" class="project-list"></div></div>
             <div class="dashboard-card"><h3 data-i18n="Arşiv">🗄️ Arşiv</h3><div id="archiveList" class="project-list"></div></div>
             <div class="dashboard-card"><h3 data-i18n="Çöp Kutusu">🗑️ Çöp Kutusu</h3><div id="trashList" class="project-list"></div></div>
             <div class="dashboard-card"><h3 data-i18n="Proje Taleplerim">📨 Proje Taleplerim</h3><div id="projectRequestsList" class="project-list"></div></div>
             <div class="dashboard-card"><h3 data-i18n="Gelen Kutusu">📬 Gelen Kutusu</h3><div id="inboxList" class="inbox-list"></div></div>
 
-            <!-- ===== V27 PAZARI (ÜRÜNLER) ===== -->
-            <div class="dashboard-card full-width">
-                <h3>🛒 V27 Pazarı <span style="font-size:12px;color:var(--text3);font-weight:400;">(%0 Komisyon)</span></h3>
-                <div id="marketProducts" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;max-height:300px;overflow-y:auto;padding:4px;"></div>
-                <button class="btn-primary btn-sm" onclick="window.showUploadProduct()" style="margin-top:10px;">📤 Ürün Ekle</button>
-            </div>
-
-            <!-- ===== PUAN MAĞAZASI ===== -->
-            <div class="dashboard-card full-width" id="storeSection">
-                <h3>🏪 V27 Puan Mağazası</h3>
-                <div id="storeItems" class="store-grid"></div>
+            <!-- ===== DAVET KODU GİRME KARTI (YENİ) ===== -->
+            <div class="dashboard-card full-width" id="referralCard">
+                <h3>🎁 Davet Kodu</h3>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                    <input type="text" id="referralCodeInput" placeholder="Arkadaşının davet kodunu gir..." class="glow-input" style="flex:1; min-width:200px;" onkeypress="if(event.key==='Enter') window.enterReferralCode()">
+                    <button class="btn-primary btn-sm" onclick="window.enterReferralCode()">✅ Kodu Kullan</button>
+                    <button class="btn-secondary btn-sm" onclick="window.showMyReferralCode()">📍 Benim Kodum</button>
+                </div>
+                <div id="referralMessage" style="margin-top:8px; font-size:13px; color:var(--text3);"></div>
             </div>
 
             <!-- ===== GÜNLÜK GÖREVLER ===== -->
@@ -3950,7 +4065,6 @@ body.light-theme .legal-banner {
                     <div id="pollOptions"></div>
                     <div style="margin-top:12px;font-size:12px;color:var(--text3);" id="pollStatus">Oy verin!</div>
                 </div>
-                <!-- Kurucu için anket oluşturma -->
                 <div id="pollCreator" style="display:none;margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
                     <h4>📝 Anket Oluştur (Kurucu)</h4>
                     <input type="text" id="pollQuestionInput" placeholder="Soru" class="glow-input" style="width:100%;margin-bottom:8px;">
@@ -3961,10 +4075,15 @@ body.light-theme .legal-banner {
                     <button class="btn-secondary btn-sm" onclick="window.addPollOption()">+ Seçenek Ekle</button>
                     <input type="number" id="pollDuration" placeholder="Süre (gün)" class="glow-input" style="width:100px;display:inline-block;margin:8px 0;">
                     <button class="btn-primary btn-sm" onclick="window.createPoll()">📢 Anket Yayınla</button>
+                    <!-- Oylama silme/düzenleme (kurucu) -->
+                    <div id="pollManage" style="margin-top:12px; display:none;">
+                        <button class="btn-danger btn-sm" onclick="window.deletePoll()">🗑️ Anketi Sil</button>
+                        <button class="btn-secondary btn-sm" onclick="window.editPoll()">✏️ Anketi Düzenle</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- ===== DUYURU PANOSU (SADECE ADMIN/KURUCU) ===== -->
+            <!-- ===== DUYURU PANOSU (ADMİN/KURUCU) ===== -->
             <div class="dashboard-card full-width" id="announcementSection">
                 <h3>📢 Duyuru Panosu</h3>
                 <div id="announcementList" style="max-height:200px;overflow-y:auto;"></div>
@@ -4012,6 +4131,12 @@ body.light-theme .legal-banner {
                 <h3>💰 V27 Cüzdan</h3>
                 <div style="font-size:24px;font-weight:700;color:var(--gold);">₺ <span id="walletBalance">0.00</span></div>
                 <button class="btn-secondary btn-sm" onclick="window.withdrawFunds()">💳 Para Çek</button>
+            </div>
+
+            <!-- ===== ABONELİK KARTI (SADECE BURADA) ===== -->
+            <div class="dashboard-card full-width" id="subscriptionsCardWrapper" style="display:none;">
+                <h3 style="color:var(--accent);">📬 Aboneliklerim</h3>
+                <div id="subscriptionsContent"><p style="color:var(--text3);">Yükleniyor...</p></div>
             </div>
 
             <!-- ===== YÖNETİM İŞLEMLERİ (Admin/Founder) ===== -->
@@ -4125,7 +4250,6 @@ body.light-theme .legal-banner {
             <button class="btn-secondary" onclick="window.openParentSettings()" style="display:none;" id="parentSettingsBtn">🛡️ Ebeveyn Ayarları</button>
         </div>
 
-        <!-- ===== GELİŞMİŞ YÖNETİM KARTI ===== -->
         <div id="extraAdminCard" class="dashboard-card full-width" style="display:none; margin-top:24px;"></div>
 
     </div>
@@ -4135,10 +4259,11 @@ body.light-theme .legal-banner {
 
 <!-- ============================================================ -->
 <!-- HTML-3: MODALLAR, WIDGET, FULL PANEL, TAKIM, DM, PROFİL, AYARLAR -->
+<!-- (Proje Sihirbazı, V27 Pazarı, Bildirim Modalı dahil)        -->
 <!-- ============================================================ -->
 
 <!-- ===== GİRİŞ / KAYIT / DOĞRULAMA MODALI ===== -->
-<div class="modal-overlay" id="authModal" onclick="if(event.target===this) closeModal('authModal')">
+<div id="authModal" class="modal-overlay" onclick="if(event.target===this) closeModal('authModal')">
     <div class="modal">
         <div class="modal-header"><h3 data-i18n="Hesap Oluştur">Hesap Oluştur</h3><button class="modal-close" onclick="closeModal('authModal')">×</button></div>
         <div class="modal-tabs">
@@ -4150,8 +4275,6 @@ body.light-theme .legal-banner {
             <button class="btn-google" onclick="loginWithGoogle()"><i class="fab fa-google"></i> Google ile Giriş Yap</button>
             <button class="btn-facebook" onclick="loginWithFacebook()"><i class="fab fa-facebook"></i> Facebook ile Giriş Yap</button>
             <div style="text-align: center; margin: 8px 0 16px 0; color: var(--text3); font-size: 12px;">veya</div>
-
-            <!-- ===== KAYIT ===== -->
             <div id="formRegister">
                 <div class="form-row"><input id="rName" placeholder="Ad Soyad" class="form-input"></div>
                 <input id="rEmail" placeholder="E-posta" class="form-input">
@@ -4171,13 +4294,9 @@ body.light-theme .legal-banner {
                 <input id="rReferralCode" placeholder="Davet Kodu (varsa)" class="form-input">
                 <button class="btn-primary" onclick="handleRegister()" style="width:100%;" data-i18n="Kayıt Ol">Kayıt Ol</button>
                 <div style="margin-top:16px; padding:12px; background:rgba(0,212,255,0.05); border:1px solid rgba(0,212,255,0.2); border-radius:12px; text-align:center; color:#8ab4cc; font-size:12px; line-height:1.6;">
-                    <strong>🔒 GÜVENLİK:</strong> Üyelerimizin sadece mail adresi ve profil fotoğrafını görebilmekteyiz.<br>
-                    Başka hiçbir şeye erişimimiz yoktur.<br>
-                    <strong style="color:#ff6b35;">⚠️ Üye olurken lütfen şifrenizi mail şifrenizle aynı yapmayın.</strong>
+                    <strong>🔒 GÜVENLİK:</strong> Üyelerimizin sadece mail adresi ve profil fotoğrafını görebilmekteyiz.<br>Başka hiçbir şeye erişimimiz yoktur.<br><strong style="color:#ff6b35;">⚠️ Üye olurken lütfen şifrenizi mail şifrenizle aynı yapmayın.</strong>
                 </div>
             </div>
-
-            <!-- ===== GİRİŞ ===== -->
             <div id="formLogin" style="display:none;">
                 <input id="lEmail" placeholder="E-posta" class="form-input">
                 <div style="display:flex; align-items:center; gap:8px;">
@@ -4187,24 +4306,17 @@ body.light-theme .legal-banner {
                     </button>
                 </div>
                 <button class="btn-primary" onclick="handleLogin()" style="width:100%;" data-i18n="Giriş Yap">Giriş Yap</button>
-                <div style="text-align:center; margin-top:12px;">
-                    <a href="javascript:void(0)" onclick="openResetPasswordModal()" style="color:var(--accent); font-size:13px; text-decoration:underline; cursor:pointer;">Şifremi unuttum</a>
-                </div>
+                <div style="text-align:center; margin-top:12px;"><a href="javascript:void(0)" onclick="openResetPasswordModal()" style="color:var(--accent); font-size:13px; text-decoration:underline; cursor:pointer;">Şifremi unuttum</a></div>
                 <div style="margin-top:16px; padding:12px; background:rgba(0,212,255,0.05); border:1px solid rgba(0,212,255,0.2); border-radius:12px; text-align:center; color:#8ab4cc; font-size:12px; line-height:1.6;">
-                    <strong>🔒 GÜVENLİK:</strong> Üyelerimizin sadece mail adresi ve profil fotoğrafını görebilmekteyiz.<br>
-                    Başka hiçbir şeye erişimimiz yoktur.<br>
-                    <strong style="color:#ff6b35;">⚠️ Lütfen şifrenizi güvenli bir yerde saklayın.</strong>
+                    <strong>🔒 GÜVENLİK:</strong> Üyelerimizin sadece mail adresi ve profil fotoğrafını görebilmekteyiz.<br>Başka hiçbir şeye erişimimiz yoktur.<br><strong style="color:#ff6b35;">⚠️ Lütfen şifrenizi güvenli bir yerde saklayın.</strong>
                 </div>
             </div>
-
-            <!-- ===== DOĞRULA ===== -->
             <div id="formVerify" style="display:none;">
                 <input id="verifyEmail" placeholder="E-posta" class="form-input">
                 <input id="verifyCode" placeholder="Doğrulama Kodu" class="form-input">
                 <button class="btn-primary" onclick="verifyAccount()" style="width:100%;" data-i18n="Doğrula">Doğrula</button>
                 <div style="margin-top:16px; padding:12px; background:rgba(0,212,255,0.05); border:1px solid rgba(0,212,255,0.2); border-radius:12px; text-align:center; color:#8ab4cc; font-size:12px; line-height:1.6;">
-                    <strong>🔒 GÜVENLİK:</strong> Doğrulama kodunuz e-posta adresinize gönderilmiştir.<br>
-                    Lütfen kimseyle paylaşmayın.
+                    <strong>🔒 GÜVENLİK:</strong> Doğrulama kodunuz e-posta adresinize gönderilmiştir.<br>Lütfen kimseyle paylaşmayın.
                 </div>
             </div>
         </div>
@@ -4226,13 +4338,12 @@ body.light-theme .legal-banner {
     </div>
 </div>
 
-<!-- ===== ADMIN / BETA ÖZEL GİRİŞ EKRANI ===== -->
+<!-- ===== ADMIN / BETA GİRİŞ EKRANI ===== -->
 <div id="adminLoginScreen" class="admin-login-screen" style="display:none;">
     <div class="admin-login-wrapper" style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;align-items:center;max-width:900px;width:100%;padding:20px;">
         <div style="width:100%; text-align:center; margin-bottom:10px;">
             <h2 style="color:#00d4ff; font-family:'Syne',sans-serif; font-size:28px;" class="admin-login-title">👑 Yönetim Girişi</h2>
         </div>
-        <!-- İbrahim Admin -->
         <div class="admin-login-box" data-admin="ibrahim" style="display:block;background:rgba(0,10,20,0.95);border:2px solid #00d4ff;border-radius:24px;padding:30px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,212,255,0.3);margin:10px;color:#ffffff;">
             <div style="font-size:48px;">👤</div>
             <div style="font-size:22px;font-weight:700;margin:8px 0;">İbrahim Admin</div>
@@ -4249,7 +4360,6 @@ body.light-theme .legal-banner {
                 <button onclick="closeAdminLoginScreen()" style="background:transparent; border:1px solid #ff6b35; color:#ff6b35; padding:6px 16px; border-radius:40px; cursor:pointer; font-weight:600; margin-top:10px; width:100%;">🔙 Ana Sayfaya Dön</button>
             </div>
         </div>
-        <!-- Bozkurt Admin -->
         <div class="admin-login-box" data-admin="bozkurt" style="display:block;background:rgba(0,10,20,0.95);border:2px solid #00d4ff;border-radius:24px;padding:30px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,212,255,0.3);margin:10px;color:#ffffff;">
             <div style="font-size:48px;">👤</div>
             <div style="font-size:22px;font-weight:700;margin:8px 0;">Bozkurt Admin</div>
@@ -4266,7 +4376,6 @@ body.light-theme .legal-banner {
                 <button onclick="closeAdminLoginScreen()" style="background:transparent; border:1px solid #ff6b35; color:#ff6b35; padding:6px 16px; border-radius:40px; cursor:pointer; font-weight:600; margin-top:10px; width:100%;">🔙 Ana Sayfaya Dön</button>
             </div>
         </div>
-        <!-- Ömer Beta (SADECE ÖMER BETA) -->
         <div class="admin-login-box" data-beta="omer" style="display:block;background:rgba(0,10,20,0.95);border:2px solid #00ff88;border-radius:24px;padding:30px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,255,136,0.3);margin:10px;color:#ffffff;">
             <div style="font-size:48px;">🧪</div>
             <div style="font-size:22px;font-weight:700;margin:8px 0;">Ömer Beta</div>
@@ -4354,22 +4463,42 @@ body.light-theme .legal-banner {
             <button class="modal-close" onclick="closeModal('parentSettingsModal')">×</button>
         </div>
         <div id="parentSettingsContent" class="parent-panel">
-            <!-- Doğrulama kısmı -->
             <div id="parentVerificationSection">
                 <p style="color:var(--text2);">Ebeveyn modunu aktifleştirmek için e-posta doğrulaması yapmalısınız.</p>
-                <input type="email" id="parentEmailInput" placeholder="Ebeveyn E-posta" class="form-input">
+                <div style="margin-bottom:8px;">
+                    <input type="email" id="parentEmailInput" placeholder="Ebeveyn E-posta" class="form-input">
+                    <div id="parentEmailWarning" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;">⚠️ Ebeveyn e-postası, hesap e-postası ile aynı olamaz!</div>
+                </div>
                 <button class="btn-primary btn-sm" onclick="window.requestParentVerification()">📧 Doğrulama İste</button>
                 <div id="parentCodeSection" style="display:none;margin-top:12px;">
                     <input type="text" id="parentCodeInput" placeholder="Doğrulama Kodunu Girin" class="form-input">
                     <button class="btn-primary btn-sm" onclick="window.verifyParentCode()">✅ Onayla</button>
                 </div>
+                <!-- Şifre Sıfırlama (Ebeveyn) -->
+                <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:16px;">
+                    <h4>🔑 Ebeveyn ile Şifre Sıfırla</h4>
+                    <p style="font-size:13px; color:var(--text2);">Ebeveyn e-postanıza doğrulama kodu gönderilir, onaylandıktan sonra yeni şifre belirleyebilirsiniz.</p>
+                    <button class="btn-secondary btn-sm" onclick="window.requestParentReset()">📧 Şifre Sıfırlama Kodu Gönder</button>
+                    <div id="parentResetSection" style="display:none; margin-top:8px;">
+                        <input type="text" id="parentResetCode" placeholder="Doğrulama Kodu" class="form-input" style="width:100%; margin-bottom:4px;">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                            <input type="password" id="parentNewPass" placeholder="Yeni Şifre (8+)" class="form-input" style="flex:1;">
+                            <button type="button" onclick="togglePassword('parentNewPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <input type="password" id="parentNewPass2" placeholder="Yeni Şifre Tekrar" class="form-input" style="flex:1;">
+                            <button type="button" onclick="togglePassword('parentNewPass2', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <button class="btn-primary btn-sm" onclick="window.confirmParentReset()">✅ Şifreyi Sıfırla</button>
+                    </div>
+                </div>
             </div>
-
-            <!-- Ana kontroller -->
             <div id="parentControls" style="display:none; margin-top:20px;">
                 <hr style="margin:16px 0;border-color:var(--border);">
-
-                <!-- 1. HESAP DURUMU -->
                 <div class="parent-setting">
                     <span class="setting-label">👤 Hesap Durumu</span>
                     <div class="setting-control">
@@ -4377,8 +4506,6 @@ body.light-theme .legal-banner {
                         <button class="btn-secondary btn-sm" onclick="window.toggleSuspend()">⏸️ Askıya Al</button>
                     </div>
                 </div>
-
-                <!-- 2. HARCAMA LİMİTLERİ -->
                 <div class="parent-setting">
                     <span class="setting-label">💰 Günlük Limit (TL)</span>
                     <div class="setting-control">
@@ -4400,8 +4527,6 @@ body.light-theme .legal-banner {
                         <button class="btn-primary btn-sm" onclick="window.setMonthlyLimit()">Kaydet</button>
                     </div>
                 </div>
-
-                <!-- 3. ÖZELLİK AÇ/KAPA (7 özellik) -->
                 <div style="margin:16px 0;">
                     <h4 style="color:var(--accent);">🔧 Özellik Kontrolleri</h4>
                     <div class="parent-setting">
@@ -4447,8 +4572,6 @@ body.light-theme .legal-banner {
                         </div>
                     </div>
                 </div>
-
-                <!-- 4. CANLI TAKİP -->
                 <div class="parent-setting">
                     <span class="setting-label">🟢 Canlı Takip</span>
                     <div class="setting-control">
@@ -4456,33 +4579,23 @@ body.light-theme .legal-banner {
                         <button class="btn-secondary btn-sm" onclick="window.toggleLiveTracking()">Aç/Kapat</button>
                     </div>
                 </div>
-
-                <!-- 5. OTURUM GEÇMİŞİ -->
                 <div class="parent-setting" style="flex-direction:column; align-items:stretch; gap:8px;">
                     <span class="setting-label">📜 Oturum Geçmişi</span>
-                    <div id="sessionList" style="background:var(--bg); border-radius:8px; padding:8px; max-height:100px; overflow-y:auto; font-size:12px;">
-                        Yükleniyor...
-                    </div>
+                    <div id="sessionList" style="background:var(--bg); border-radius:8px; padding:8px; max-height:100px; overflow-y:auto; font-size:12px;">Yükleniyor...</div>
                     <button class="btn-secondary btn-sm" onclick="window.loadSessions()">🔄 Yenile</button>
                 </div>
-
-                <!-- 6. RAPOR GÖNDER -->
                 <div class="parent-setting">
                     <span class="setting-label">📧 Haftalık Rapor</span>
                     <div class="setting-control">
                         <button class="btn-primary btn-sm" onclick="window.sendReport()">📤 Gönder</button>
                     </div>
                 </div>
-
-                <!-- 7. PIN DEĞİŞTİR -->
                 <div class="parent-setting">
                     <span class="setting-label">🔑 PIN Değiştir</span>
                     <div class="setting-control">
                         <button class="btn-danger btn-sm" onclick="window.setParentPin()">Değiştir</button>
                     </div>
                 </div>
-
-                <!-- 8. EBEVEYN DENETİMİNİ KALDIR (TEHLİKELİ) -->
                 <div class="parent-setting" style="border-top:2px solid var(--danger); padding-top:16px; margin-top:16px;">
                     <span class="setting-label" style="color:var(--danger);">⚠️ Ebeveyn Denetimini Kaldır</span>
                     <div class="setting-control">
@@ -4546,7 +4659,7 @@ body.light-theme .legal-banner {
 </div>
 
 <!-- ===== TAKIM SAYFASI ===== -->
-<div class="team-page-overlay" id="teamPage">
+<div id="teamPage" class="team-page-overlay">
     <div class="team-page-header">
         <h2 data-i18n="Takım Yönetimi">👥 Takım Yönetimi</h2>
         <button class="team-page-close" onclick="window.toggleTeamPage()">✕</button>
@@ -4616,8 +4729,8 @@ body.light-theme .legal-banner {
         <div id="teamPageFounderPanel" style="display:none;margin-top:16px;border-top:2px solid var(--gold);padding-top:16px;">
             <h4 style="color:var(--gold);" data-i18n="Kurucu Paneli">👑 Kurucu Paneli</h4>
             <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
-                <button class="btn-secondary btn-sm" onclick="window.toggleVizyonPatrol()">🛡️ Vizyon Devriye: <span id="patrolStatus" data-i18n="AÇIK">AÇIK</span></button>
-                <button class="btn-secondary btn-sm" onclick="window.toggleVizyonSupport()">📨 Vizyon Destek: <span id="supportStatus" data-i18n="AÇIK">AÇIK</span></button>
+                <button class="btn-secondary btn-sm" id="vizyonPatrolBtn" onclick="window.toggleVizyonPatrol()">🛡️ Vizyon Devriye: <span id="patrolStatus" data-i18n="AÇIK">AÇIK</span></button>
+                <button class="btn-secondary btn-sm" id="vizyonSupportBtn" onclick="window.toggleVizyonSupport()">📨 Vizyon Destek: <span id="supportStatus" data-i18n="AÇIK">AÇIK</span></button>
                 <button class="btn-secondary btn-sm" onclick="window.showAllTeams()" data-i18n="Tüm Takımlar">🌐 Tüm Takımlar</button>
                 <input type="text" id="teamSearchInput" placeholder="Takım ara (isim/kod)..." class="glow-input" style="flex:1;min-width:150px;font-size:12px;padding:4px 10px;height:32px;" onkeypress="if(event.key==='Enter') searchTeams()">
                 <button class="btn-secondary btn-sm" onclick="window.searchTeams()" data-i18n="Ara">🔍 Ara</button>
@@ -4631,7 +4744,7 @@ body.light-theme .legal-banner {
 </div>
 
 <!-- ===== VİZYON DESTEK PANELİ ===== -->
-<div class="team-page-overlay" id="vizyonSupportPanel" style="display:none;">
+<div id="vizyonSupportPanel" class="team-page-overlay" style="display:none;">
     <div class="team-page-header">
         <h2 data-i18n="Vizyon Destek">📢 Vizyon Destek</h2>
         <button class="team-page-close" onclick="window.closeVizyonSupport()">×</button>
@@ -4651,7 +4764,7 @@ body.light-theme .legal-banner {
 </div>
 
 <!-- ===== DM / MESAJLAŞMA PANELİ ===== -->
-<div class="modal-overlay" id="dmModal" onclick="if(event.target===this) closeModal('dmModal')">
+<div id="dmModal" class="modal-overlay" onclick="if(event.target===this) closeModal('dmModal')">
     <div class="modal" style="max-width:900px;width:95%;">
         <div class="modal-header">
             <h3>✈️ Mesajlar</h3>
@@ -4677,7 +4790,7 @@ body.light-theme .legal-banner {
 </div>
 
 <!-- ===== KULLANICI ARA (BÜYÜTEÇ) ===== -->
-<div class="modal-overlay" id="searchModal" onclick="if(event.target===this) closeModal('searchModal')">
+<div id="searchModal" class="modal-overlay" onclick="if(event.target===this) closeModal('searchModal')">
     <div class="modal" style="max-width:500px;">
         <div class="modal-header">
             <h3>🔍 Kullanıcı Ara</h3>
@@ -4691,7 +4804,7 @@ body.light-theme .legal-banner {
 </div>
 
 <!-- ===== ÜYE YÖNETİMİ MODALI ===== -->
-<div class="modal-overlay" id="teamMemberModal" onclick="if(event.target===this) closeModal('teamMemberModal')">
+<div id="teamMemberModal" class="modal-overlay" onclick="if(event.target===this) closeModal('teamMemberModal')">
     <div class="modal" style="max-width:700px;">
         <div class="modal-header">
             <h3 data-i18n="Üye Kontrolleri">👥 Üye Yönetimi</h3>
@@ -4705,7 +4818,7 @@ body.light-theme .legal-banner {
 </div>
 
 <!-- ===== BANA ÖĞRET (DESTEK MAKALESİ) ===== -->
-<div class="modal-overlay" id="helpArticleModal" onclick="if(event.target===this) closeModal('helpArticleModal')">
+<div id="helpArticleModal" class="modal-overlay" onclick="if(event.target===this) closeModal('helpArticleModal')">
     <div class="modal" style="max-width:800px;">
         <div class="modal-header">
             <h3>📖 VİZYON 2027 Rehberi</h3>
@@ -4742,7 +4855,7 @@ body.light-theme .legal-banner {
 </div>
 
 <!-- ===== BİLDİRİM MODALI ===== -->
-<div class="modal-overlay" id="notificationModal" onclick="if(event.target===this) closeModal('notificationModal')">
+<div id="notificationModal" class="modal-overlay" onclick="if(event.target===this) closeModal('notificationModal')">
     <div class="modal" style="max-width:500px;">
         <div class="modal-header">
             <h3>🔔 Bildirimler</h3>
@@ -4755,7 +4868,64 @@ body.light-theme .legal-banner {
     </div>
 </div>
 
-<!-- ===== (YORUM SATIRLARI – TEMİZLİK İÇİN) ===== -->
+<!-- ===== V27 PAZARI (TAM EKRAN MODAL) ===== -->
+<div id="marketModal" class="modal-overlay" onclick="if(event.target===this) closeMarket()">
+    <div class="modal" style="max-width:95vw; max-height:95vh; width:100%; height:95vh; overflow-y:auto; padding:20px;">
+        <div class="modal-header">
+            <h3>🛒 V27 Puan Pazarı</h3>
+            <button class="modal-close" onclick="closeMarket()">×</button>
+        </div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px; align-items:center;">
+            <input type="text" id="marketSearchInput" placeholder="🔍 Proje ara..." class="glow-input" style="flex:1; min-width:150px;" onkeypress="if(event.key==='Enter') window.filterMarket()">
+            <select id="marketTypeFilter" class="glow-input" onchange="window.filterMarket()">
+                <option value="all">Tüm Türler</option>
+                <option value="3D">🧊 3D</option>
+                <option value="Kod">⌨️ Kod</option>
+                <option value="Görsel">🖼️ Görsel</option>
+                <option value="store">🎁 Mağaza</option>
+            </select>
+            <input type="number" id="marketPriceMin" placeholder="Min Puan" class="glow-input" style="width:100px;" onchange="window.filterMarket()">
+            <input type="number" id="marketPriceMax" placeholder="Max Puan" class="glow-input" style="width:100px;" onchange="window.filterMarket()">
+            <button class="btn-secondary btn-sm" onclick="window.filterMarket()">Filtrele</button>
+            <button class="btn-secondary btn-sm" onclick="window.loadMarket()">🔄 Yenile</button>
+        </div>
+        <div id="marketItems" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:16px; margin-top:10px;">
+            <div style="grid-column:1/-1; text-align:center; color:var(--text3); padding:40px;">Yükleniyor...</div>
+        </div>
+        <div style="margin-top:20px; text-align:center;">
+            <button class="btn-secondary" onclick="closeMarket()">🔙 Kapat</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== PROJE SİHİRBAZI MODALI (ADIM ADIM) ===== -->
+<div id="projectWizardModal" class="modal-overlay" onclick="if(event.target===this) closeModal('projectWizardModal')">
+    <div class="modal" style="max-width:600px;">
+        <div class="modal-header">
+            <h3 id="wizardTitle">📁 Yeni Proje Oluştur</h3>
+            <button class="modal-close" onclick="closeModal('projectWizardModal')">×</button>
+        </div>
+        <div id="wizardBody" style="padding:10px 0;">
+            <!-- Adım 1: Tür Seçimi -->
+            <div id="wizardStep1">
+                <p style="color:var(--text2); margin-bottom:16px;">Ne tür bir proje oluşturmak istersiniz?</p>
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <button class="btn-primary" onclick="window.wizardSelectType('3d')" style="font-size:16px; padding:14px;">🧊 3D Tasarım</button>
+                    <button class="btn-primary" onclick="window.wizardSelectType('code')" style="font-size:16px; padding:14px;">⌨️ Kod Yazma</button>
+                    <button class="btn-primary" onclick="window.wizardSelectType('image')" style="font-size:16px; padding:14px;">🖼️ Görsel Oluşturma</button>
+                </div>
+            </div>
+            <!-- Adım 2: Detaylar (dinamik) -->
+            <div id="wizardStep2" style="display:none;">
+                <div id="wizardDynamicFields"></div>
+                <button class="btn-primary" onclick="window.wizardFinish()" style="margin-top:16px; width:100%;">✅ Projeyi Oluştur</button>
+            </div>
+            <button class="btn-secondary" onclick="closeModal('projectWizardModal')" style="margin-top:16px; width:100%;">İptal</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== (YORUM SATIRLARI) ===== -->
 <!-- GİRİŞ / KAYIT / DOĞRULAMA MODALI -->
 <!-- FOUNDER / ADMIN / BETA PANEL MODALI -->
 <!-- PROFİL MODALI -->
@@ -4764,6 +4934,9 @@ body.light-theme .legal-banner {
 <!-- AI WIDGET (SAĞ ALT KÖŞE) -->
 <!-- VİZYON AI FULL PANEL (TAM EKRAN) -->
 <!-- YORUM SİSTEMİ -->
+<!-- BİLDİRİM MODALI -->
+<!-- V27 PAZARI MODALI -->
+<!-- PROJE SİHİRBAZI MODALI -->
 
    
     <!-- ============================================================ -->
@@ -7033,7 +7206,7 @@ console.log('✅ JS-3 yüklendi (Takım, AI, 3D, Dosya Yükleme, Kopyala, Ses, G
 </script>
 
 <!-- ============================================================ -->
-<!-- JS-4: TÜM İSTEMCİ TARAFI FONKSİYONLARI (DİL, PROFİL, YORUMLAR, PROJELER, ADMIN, DASHBOARD, PUAN, MAĞAZA, GÖREVLER, ANKET, DUYURU, AKADEMİ, YARIŞMA, İŞ İLANI, HATA, OYUN, CÜZDAN, SPLASH, TEMA, SOSYAL GÖREV, UZAY MODU, TAKIM, DESTEK, KURUCU İLETİŞİM, BANA ÖĞRET, GIF, DM, ARAMA, TAKİP, EBEVEYN, VS.) -->
+<!-- JS-4: TÜM İSTEMCİ TARAFI FONKSİYONLAR (FULL – HATASIZ, EKSİKSİZ) -->
 <!-- ============================================================ -->
 <script>
 // ================================================================
@@ -7050,6 +7223,8 @@ var vizyonSupportActive = true;
 var teamPageOpen = false;
 var currentDmConversation = null;
 var currentLanguage = localStorage.getItem('vizyon_language') || 'tr';
+var wizardType = null;
+var wizardData = {};
 
 // ========== BİLDİRİM ==========
 window.showNotification = function(msg, type) {
@@ -7132,7 +7307,7 @@ window.togglePasswordInput = function(btn, type, key) {
     }
 };
 
-// ========== DİL DESTEĞİ ==========
+// ========== DİL DESTEĞİ (TAM) ==========
 var translations = {
     tr: {
         'Merhaba! Size nasıl yardımcı olabilirim?': 'Merhaba! Size nasıl yardımcı olabilirim?',
@@ -8041,23 +8216,6 @@ window.loadProjects = async function() {
     } catch(e) { console.error('Projeler yüklenirken hata:', e); document.getElementById('projectsList').innerHTML = '<div class="project-item">⚠️ Projeler yüklenemedi.</div>'; }
 };
 
-window.newProject = async function() {
-    var name = prompt('Proje adı:');
-    if (!name || !name.trim()) return;
-    try {
-        var Project = Parse.Object.extend('Project');
-        var project = new Project();
-        project.set('user_email', currentUser.get('email'));
-        project.set('name', name.trim());
-        project.set('is_favorite', false);
-        project.set('is_archived', false);
-        project.set('is_trashed', false);
-        await project.save(null);
-        await loadProjects();
-        showNotification('Proje oluşturuldu!', 'success');
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
-};
-
 window.editProject = async function(id) {
     var newName = prompt('Yeni proje adı:');
     if (!newName || !newName.trim()) return;
@@ -8065,7 +8223,7 @@ window.editProject = async function(id) {
         var query = new Parse.Query('Project');
         var project = await query.get(id);
         project.set('name', newName.trim());
-        await project.save(null);
+        await project.save(null, { useMasterKey: true });
         await loadProjects();
         showNotification('Proje güncellendi!', 'success');
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
@@ -8076,7 +8234,7 @@ window.deleteProject = async function(id) {
     try {
         var query = new Parse.Query('Project');
         var project = await query.get(id);
-        await project.destroy();
+        await project.destroy({ useMasterKey: true });
         await loadProjects();
         await loadArchive();
         await loadTrash();
@@ -8089,7 +8247,7 @@ window.favoriteProject = async function(id) {
         var query = new Parse.Query('Project');
         var project = await query.get(id);
         project.set('is_favorite', !project.get('is_favorite'));
-        await project.save(null);
+        await project.save(null, { useMasterKey: true });
         await loadProjects();
         await loadFavorites();
         showNotification(project.get('is_favorite') ? '⭐ Favorilere eklendi!' : '⭐ Favorilerden çıkarıldı!', 'success');
@@ -8101,7 +8259,7 @@ window.archiveProject = async function(id) {
         var query = new Parse.Query('Project');
         var project = await query.get(id);
         project.set('is_archived', true);
-        await project.save(null);
+        await project.save(null, { useMasterKey: true });
         await loadProjects();
         await loadArchive();
         showNotification('🗄️ Proje arşivlendi!', 'success');
@@ -8113,7 +8271,7 @@ window.unarchiveProject = async function(id) {
         var query = new Parse.Query('Project');
         var project = await query.get(id);
         project.set('is_archived', false);
-        await project.save(null);
+        await project.save(null, { useMasterKey: true });
         await loadProjects();
         await loadArchive();
         showNotification('📤 Proje arşivden çıkarıldı!', 'success');
@@ -8125,7 +8283,7 @@ window.restoreProject = async function(id) {
         var query = new Parse.Query('Project');
         var project = await query.get(id);
         project.set('is_trashed', false);
-        await project.save(null);
+        await project.save(null, { useMasterKey: true });
         await loadProjects();
         await loadTrash();
         showNotification('↩️ Proje geri yüklendi!', 'success');
@@ -8568,6 +8726,16 @@ window.showDashboard = async function() {
         var adminPanelCard = document.getElementById('adminPanelCard');
         if (adminPanelCard) adminPanelCard.style.display = isFounder ? 'block' : 'none';
 
+        // Kurucu için anket ve duyuru oluşturma bölümlerini göster
+        var pollCreator = document.getElementById('pollCreator');
+        var announcementCreator = document.getElementById('announcementCreator');
+        if (pollCreator) pollCreator.style.display = isFounder ? 'block' : 'none';
+        if (announcementCreator) announcementCreator.style.display = isFounder || isAdmin ? 'block' : 'none';
+
+        // Poll yönetim butonları
+        var pollManage = document.getElementById('pollManage');
+        if (pollManage) pollManage.style.display = isFounder ? 'flex' : 'none';
+
         if (isFounder) await window.loadUserList();
         else { var userListContainer = document.getElementById('userList'); if (userListContainer) userListContainer.innerHTML = '<div class="user-item">⚠️ Sadece Kurucu görebilir.</div>'; }
 
@@ -8988,7 +9156,7 @@ window.completeTask = async function(taskId) {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ---- ANKET ----
+// ---- ANKET (KURUCU OLUŞTURUR, HERKES GÖRÜR, ANA SAYFA + DASHBOARD) ----
 window.loadPoll = async function() {
     try {
         var result = await Parse.Cloud.run('getActivePoll', {});
@@ -9051,6 +9219,28 @@ window.createPoll = async function() {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
+// ========== OYLAMA SİLME / DÜZENLEME (KURUCU) ==========
+window.deletePoll = async function() {
+    if (!currentUser || currentUser.get('role') !== 'founder') return showNotification('Sadece kurucu silebilir!', 'error');
+    if (!confirm('Bu anketi silmek istediğinize emin misiniz?')) return;
+    try {
+        await Parse.Cloud.run('deletePoll', {});
+        showNotification('Anket silindi!', 'success');
+        window.loadPoll();
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+};
+
+window.editPoll = async function() {
+    if (!currentUser || currentUser.get('role') !== 'founder') return showNotification('Sadece kurucu düzenleyebilir!', 'error');
+    var newQuestion = prompt('Yeni anket sorusu:');
+    if (newQuestion === null) return;
+    try {
+        await Parse.Cloud.run('editPoll', { question: newQuestion });
+        showNotification('Anket güncellendi!', 'success');
+        window.loadPoll();
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+};
+
 window.addPollOption = function() {
     var container = document.getElementById('pollOptionsInputs');
     var input = document.createElement('input');
@@ -9071,7 +9261,7 @@ window.getTimeRemaining = function(endDate) {
     return days + ' gün ' + hours + ' saat';
 };
 
-// ---- DUYURU ----
+// ---- DUYURU (ADMİN/KURUCU, HERKES GÖRÜR) ----
 window.loadAnnouncements = async function() {
     try {
         var result = await Parse.Cloud.run('getAnnouncements', {});
@@ -9424,7 +9614,7 @@ window.openDmModal = function(userId) {
 window.loadConversations = async function() {
     if (!currentUser) return;
     try {
-        var result = await Parse.Cloud.run('getConversations', {});
+        var result = await Parse.Cloud.run('getConversations');
         var container = document.getElementById('dmConversations');
         if (!container) return;
         if (!result || result.length === 0) {
@@ -9484,6 +9674,7 @@ window.sendDmMessage = async function() {
     var fileInput = document.getElementById('dmFileInput');
     var file = fileInput ? fileInput.files[0] : null;
     if (!msg && !file) return showNotification('Mesaj veya dosya gerekli!', 'warning');
+
     try {
         var fileUrl = null, fileName = null;
         if (file) {
@@ -9591,9 +9782,20 @@ window.loadParentSettings = async function() {
     }
 };
 
+// ---- EBEVEYN E-POSTA DOĞRULAMA (Aynı e-posta kontrolü eklendi) ----
 window.requestParentVerification = async function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     var email = document.getElementById('parentEmailInput').value.trim();
     if (!email) return showNotification('E-posta girin!', 'error');
+    
+    // Ebeveyn e-postası, kullanıcının kendi e-postası ile aynı olamaz
+    if (email === currentUser.get('email')) {
+        document.getElementById('parentEmailWarning').classList.add('show');
+        return showNotification('Ebeveyn e-postası kendi e-postanız ile aynı olamaz!', 'error');
+    } else {
+        document.getElementById('parentEmailWarning').classList.remove('show');
+    }
+
     try {
         var result = await Parse.Cloud.run('requestParentVerification', { email: email });
         if (result.success) {
@@ -9621,9 +9823,38 @@ window.verifyParentCode = async function() {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
+// ---- EBEVEYN ŞİFRE SIFIRLAMA (YENİ) ----
+window.requestParentReset = async function() {
+    if (!currentUser) return showNotification('Giriş yapın!', 'error');
+    if (!currentUser.get('parent_mode')) return showNotification('Ebeveyn modu aktif değil!', 'error');
+    try {
+        const result = await Parse.Cloud.run('requestParentReset', {});
+        if (result.success) {
+            document.getElementById('parentResetSection').style.display = 'block';
+            showNotification('Şifre sıfırlama kodu ebeveyn e-postanıza gönderildi.', 'success');
+        } else {
+            showNotification('Hata: ' + result.error, 'error');
+        }
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+};
+
+window.confirmParentReset = async function() {
+    var code = document.getElementById('parentResetCode').value.trim();
+    var newPass = document.getElementById('parentNewPass').value;
+    var newPass2 = document.getElementById('parentNewPass2').value;
+    if (!code || !newPass || newPass.length < 8) return showNotification('Kod ve 8+ karakter şifre girin!', 'error');
+    if (newPass !== newPass2) return showNotification('Şifreler eşleşmiyor!', 'error');
+    try {
+        const result = await Parse.Cloud.run('confirmParentReset', { code: code, newPassword: newPass });
+        showNotification(result.message, 'success');
+        document.getElementById('parentResetSection').style.display = 'none';
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+};
+
+// ---- EBEVEYN DİĞER FONKSİYONLAR ----
 window.toggleLiveTracking = async function() {
     try {
-        var result = await Parse.Cloud.run('toggleLiveTracking', {});
+        var result = await Parse.Cloud.run('toggleLiveTracking');
         var status = document.getElementById('liveTrackingStatus');
         if (result.enabled) {
             status.textContent = '🟢 Açık';
@@ -9817,6 +10048,19 @@ window.loadTeamPage = async function() {
     var memberManagementBtn = document.getElementById('teamMemberManagementBtn');
     var panelMemberCount = document.getElementById('teamPageMemberCount');
 
+    // === VİZYON PATROL / DESTEK GÖRÜNÜRLÜK (SADECE FOUNDER) ===
+    var patrolBtn = document.getElementById('vizyonPatrolBtn');
+    var supportBtn = document.getElementById('vizyonSupportBtn');
+    var isFounder = currentUser ? currentUser.get('role') === 'founder' : false;
+    if (patrolBtn) {
+        if (isFounder) patrolBtn.classList.remove('hidden');
+        else patrolBtn.classList.add('hidden');
+    }
+    if (supportBtn) {
+        if (isFounder) supportBtn.classList.remove('hidden');
+        else supportBtn.classList.add('hidden');
+    }
+
     if (!teamId) {
         if (panelInfo) panelInfo.innerHTML = '<span data-i18n="Takım kodu">Takım kodu</span>: <span class="team-code">-</span> <span>0 <span data-i18n="üye">üye</span></span>';
         if (panelMessages) panelMessages.innerHTML = '<div style="color:var(--text3);text-align:center;padding:20px;">Bir takıma üye değilsiniz. Takım kurun veya kodla katılın.</div>';
@@ -9863,7 +10107,7 @@ window.loadTeamPage = async function() {
         var isOwner = (team.get('owner_email') === currentUser.get('email'));
         var isManager = (team.get('manager_email') === currentUser.get('email') && !isOwner);
         var canManage = isOwner || isManager;
-        var isFounder = currentUser.get('role') === 'founder';
+        var isFounderRole = currentUser.get('role') === 'founder';
 
         if (panelInfo) {
             panelInfo.innerHTML = `
@@ -9926,10 +10170,10 @@ window.loadTeamPage = async function() {
         if (inviteBtn) inviteBtn.style.display = canManage ? 'inline-block' : 'none';
         if (inviteEmail) inviteEmail.style.display = canManage ? 'inline-block' : 'none';
         if (closeBtn) closeBtn.style.display = isOwner ? 'inline-block' : 'none';
-        if (memberManagementBtn) memberManagementBtn.style.display = (isOwner || isManager || isFounder) ? 'inline-block' : 'none';
+        if (memberManagementBtn) memberManagementBtn.style.display = (isOwner || isManager || isFounderRole) ? 'inline-block' : 'none';
 
         if (founderPanel) {
-            if (isFounder) {
+            if (isFounderRole) {
                 founderPanel.style.display = 'block';
                 document.getElementById('patrolStatus').textContent = vizyonPatrolActive ? 'AÇIK' : 'KAPALI';
                 document.getElementById('supportStatus').textContent = vizyonSupportActive ? 'AÇIK' : 'KAPALI';
@@ -10646,7 +10890,56 @@ window.loadReferralLeaderboard = async function() {
 };
 
 // ================================================================
-// ========== PROJE OLUŞTURMA SİHİRBAZI ==========
+// ========== DAVET KODU GİRME (BENİM KODUM + KOD GİRME) ==========
+// ================================================================
+
+window.showMyReferralCode = function() {
+    if (!currentUser) {
+        showNotification('Önce giriş yapın!', 'error');
+        return;
+    }
+    var code = currentUser.get('referral_code');
+    if (!code) {
+        showNotification('Davet kodunuz henüz oluşturulmamış.', 'warning');
+        return;
+    }
+    alert('📍 Sizin Davet Kodunuz:\n\n' + code + '\n\nBu kodu arkadaşlarınıza verin, kayıt olurken girsinler. Her kullanımda 1000 puan kazanırsınız! (Maks. 2 kişi)');
+};
+
+window.enterReferralCode = async function() {
+    if (!currentUser) {
+        showNotification('Önce giriş yapın!', 'error');
+        return;
+    }
+    var code = document.getElementById('referralCodeInput').value.trim();
+    if (!code) {
+        showNotification('Lütfen bir davet kodu girin!', 'warning');
+        return;
+    }
+    var msgDiv = document.getElementById('referralMessage');
+    try {
+        var result = await Parse.Cloud.run('applyReferral', { code: code });
+        if (result.success) {
+            msgDiv.innerHTML = '✅ ' + result.message;
+            msgDiv.className = 'success';
+            document.getElementById('referralCodeInput').value = '';
+            await currentUser.fetch();
+            window.updatePointsBadge(currentUser.get('points') || 0);
+            showNotification('✅ ' + result.message, 'success');
+        } else {
+            msgDiv.innerHTML = '❌ ' + (result.error || result.message || 'Geçersiz kod!');
+            msgDiv.className = 'error';
+            showNotification('❌ ' + (result.error || result.message), 'error');
+        }
+    } catch(e) {
+        msgDiv.innerHTML = '❌ Hata: ' + e.message;
+        msgDiv.className = 'error';
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+// ================================================================
+// ========== PROJE OLUŞTURMA SİHİRBAZI (ADIM ADIM, TAM) ==========
 // ================================================================
 
 window.createProjectWizard = function() {
@@ -10654,130 +10947,197 @@ window.createProjectWizard = function() {
         showNotification('Önce giriş yapın!', 'error');
         return;
     }
-
-    var modal = document.createElement('div');
-    modal.className = 'modal-overlay open';
-    modal.style.display = 'flex';
-    modal.id = 'projectWizardModal';
-    modal.innerHTML = `
-        <div class="modal" style="max-width:600px;">
-            <div class="modal-header">
-                <h3>📁 Yeni Proje Oluştur</h3>
-                <button class="modal-close" onclick="closeModal('projectWizardModal')">×</button>
-            </div>
-            <div style="padding:10px 0;">
-                <p style="color:var(--text2); margin-bottom:16px;">Ne tür bir proje oluşturmak istersiniz?</p>
-                <div style="display:flex; flex-direction:column; gap:12px;">
-                    <button class="btn-primary" onclick="window.selectProjectType('3d')" style="font-size:16px; padding:14px;">🧊 3D Tasarım</button>
-                    <button class="btn-primary" onclick="window.selectProjectType('code')" style="font-size:16px; padding:14px;">⌨️ Kod Yazma</button>
-                    <button class="btn-primary" onclick="window.selectProjectType('image')" style="font-size:16px; padding:14px;">🖼️ Görsel Oluşturma</button>
-                </div>
-            </div>
-            <button class="btn-secondary" onclick="closeModal('projectWizardModal')" style="margin-top:16px; width:100%;">İptal</button>
-        </div>
-    `;
-    document.body.appendChild(modal);
-};
-
-window.selectProjectType = function(type) {
-    closeModal('projectWizardModal');
-    if (type === '3d') {
-        var prompt3D = prompt('3D nesne açıklaması yazın:');
-        if (prompt3D) {
-            document.getElementById('threeDPrompt').value = prompt3D;
-            window.generate3D();
-            setTimeout(function() {
-                var name = prompt('Projenize bir isim verin:');
-                if (name) {
-                    window.saveProject(name, '3D', '3D model oluşturuldu.');
-                }
-            }, 3000);
-        }
-    } else if (type === 'code') {
-        var subModal = document.createElement('div');
-        subModal.className = 'modal-overlay open';
-        subModal.style.display = 'flex';
-        subModal.id = 'codeTypeModal';
-        subModal.innerHTML = `
-            <div class="modal" style="max-width:500px;">
+    wizardType = null;
+    wizardData = {};
+    var modal = document.getElementById('projectWizardModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'projectWizardModal';
+        modal.className = 'modal-overlay';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="modal" style="max-width:600px;">
                 <div class="modal-header">
-                    <h3>⌨️ Kod Yazma Yöntemi</h3>
-                    <button class="modal-close" onclick="closeModal('codeTypeModal')">×</button>
+                    <h3 id="wizardTitle">📁 Yeni Proje Oluştur</h3>
+                    <button class="modal-close" onclick="closeModal('projectWizardModal')">×</button>
                 </div>
-                <div style="padding:10px 0;">
-                    <p style="color:var(--text2); margin-bottom:16px;">Kodu nasıl oluşturmak istersiniz?</p>
-                    <div style="display:flex; flex-direction:column; gap:12px;">
-                        <button class="btn-primary" onclick="window.startManualCode()" style="font-size:16px; padding:14px;">✍️ Elle Kod Yaz</button>
-                        <button class="btn-primary" onclick="window.startAICode()" style="font-size:16px; padding:14px;">🤖 Yapay Zekaya Yazdır</button>
+                <div id="wizardBody" style="padding:10px 0;">
+                    <div id="wizardStep1">
+                        <p style="color:var(--text2); margin-bottom:16px;">Ne tür bir proje oluşturmak istersiniz?</p>
+                        <div style="display:flex; flex-direction:column; gap:12px;">
+                            <button class="btn-primary" onclick="window.wizardSelectType('3d')" style="font-size:16px; padding:14px;">🧊 3D Tasarım</button>
+                            <button class="btn-primary" onclick="window.wizardSelectType('code')" style="font-size:16px; padding:14px;">⌨️ Kod Yazma</button>
+                            <button class="btn-primary" onclick="window.wizardSelectType('image')" style="font-size:16px; padding:14px;">🖼️ Görsel Oluşturma</button>
+                        </div>
                     </div>
+                    <div id="wizardStep2" style="display:none;">
+                        <div id="wizardDynamicFields"></div>
+                        <button class="btn-primary" onclick="window.wizardFinish()" style="margin-top:16px; width:100%;">✅ Projeyi Oluştur</button>
+                    </div>
+                    <button class="btn-secondary" onclick="closeModal('projectWizardModal')" style="margin-top:16px; width:100%;">İptal</button>
                 </div>
-                <button class="btn-secondary" onclick="closeModal('codeTypeModal')" style="margin-top:16px; width:100%;">İptal</button>
             </div>
         `;
-        document.body.appendChild(subModal);
+        document.body.appendChild(modal);
+    }
+    modal.classList.add('open');
+    modal.style.display = 'flex';
+    document.getElementById('wizardStep1').style.display = 'block';
+    document.getElementById('wizardStep2').style.display = 'none';
+};
+
+window.wizardSelectType = function(type) {
+    wizardType = type;
+    document.getElementById('wizardStep1').style.display = 'none';
+    document.getElementById('wizardStep2').style.display = 'block';
+    document.getElementById('wizardTitle').textContent = '📁 ' + (type === '3d' ? '3D Tasarım' : type === 'code' ? 'Kod Yazma' : 'Görsel Oluşturma') + ' Projesi';
+    
+    var fields = document.getElementById('wizardDynamicFields');
+    fields.innerHTML = '';
+    
+    if (type === '3d') {
+        fields.innerHTML = `
+            <div style="margin-bottom:12px;">
+                <label>3D Nesne Açıklaması</label>
+                <input type="text" id="wizard3DPrompt" placeholder="Örn: kırmızı küp" class="form-input" style="margin-top:4px;">
+            </div>
+            <div style="margin-bottom:12px;">
+                <label>Proje Adı</label>
+                <input type="text" id="wizardProjectName" placeholder="Projenize bir isim verin" class="form-input" style="margin-top:4px;">
+            </div>
+        `;
+    } else if (type === 'code') {
+        fields.innerHTML = `
+            <div style="margin-bottom:12px;">
+                <label>Kodlama Yöntemi</label>
+                <div style="display:flex; gap:8px; margin-top:4px;">
+                    <button class="btn-secondary btn-sm" onclick="window.wizardSetCodeMethod('manual')" id="wizardCodeManual" style="flex:1;">✍️ Elle Yaz</button>
+                    <button class="btn-secondary btn-sm" onclick="window.wizardSetCodeMethod('ai')" id="wizardCodeAi" style="flex:1;">🤖 AI ile Yaz</button>
+                </div>
+                <div id="wizardCodeField" style="margin-top:8px;">
+                    <textarea id="wizardCodeContent" placeholder="Kodunuzu yazın..." rows="5" class="form-input"></textarea>
+                </div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <label>Proje Adı</label>
+                <input type="text" id="wizardProjectName" placeholder="Projenize bir isim verin" class="form-input" style="margin-top:4px;">
+            </div>
+        `;
+        window.wizardSetCodeMethod('manual');
     } else if (type === 'image') {
-        var promptImage = prompt('Görsel açıklaması yazın:');
-        if (promptImage) {
-            document.getElementById('imagePrompt').value = promptImage;
-            window.generateImage();
-            setTimeout(function() {
-                var name = prompt('Projenize bir isim verin:');
-                if (name) {
-                    window.saveProject(name, 'Görsel', 'Görsel oluşturuldu.');
-                }
-            }, 3000);
-        }
+        fields.innerHTML = `
+            <div style="margin-bottom:12px;">
+                <label>Görsel Açıklaması</label>
+                <input type="text" id="wizardImagePrompt" placeholder="Örn: dağ manzarası" class="form-input" style="margin-top:4px;">
+            </div>
+            <div style="margin-bottom:12px;">
+                <label>Proje Adı</label>
+                <input type="text" id="wizardProjectName" placeholder="Projenize bir isim verin" class="form-input" style="margin-top:4px;">
+            </div>
+        `;
     }
 };
 
-window.startManualCode = function() {
-    closeModal('codeTypeModal');
-    var codeContent = prompt('Kodunuzu yazın:');
-    if (codeContent) {
-        var name = prompt('Projenize bir isim verin:');
-        if (name) {
-            window.saveProject(name, 'Kod (Elle)', codeContent);
-        }
+window.wizardSetCodeMethod = function(method) {
+    wizardData.codeMethod = method;
+    var manualBtn = document.getElementById('wizardCodeManual');
+    var aiBtn = document.getElementById('wizardCodeAi');
+    var field = document.getElementById('wizardCodeField');
+    if (method === 'manual') {
+        manualBtn.style.borderColor = 'var(--accent)';
+        manualBtn.style.background = 'rgba(0,212,255,0.1)';
+        aiBtn.style.borderColor = 'var(--border)';
+        aiBtn.style.background = 'transparent';
+        field.innerHTML = `<textarea id="wizardCodeContent" placeholder="Kodunuzu yazın..." rows="5" class="form-input"></textarea>`;
+    } else {
+        aiBtn.style.borderColor = 'var(--accent)';
+        aiBtn.style.background = 'rgba(0,212,255,0.1)';
+        manualBtn.style.borderColor = 'var(--border)';
+        manualBtn.style.background = 'transparent';
+        field.innerHTML = `
+            <input type="text" id="wizardCodePrompt" placeholder="AI'ya ne yazdırmak istersiniz? Örn: Python'da hesap makinesi" class="form-input" style="margin-bottom:8px;">
+            <button class="btn-secondary btn-sm" onclick="window.wizardGenerateCode()">🤖 Kod Oluştur</button>
+            <div id="wizardCodeResult" style="margin-top:8px; background:var(--bg); border-radius:8px; padding:8px; display:none;"></div>
+        `;
     }
 };
 
-window.startAICode = function() {
-    closeModal('codeTypeModal');
-    var promptCode = prompt('Yapay zekaya hangi kodu yazdırmak istersiniz?');
-    if (promptCode) {
-        var input = document.getElementById('dashboardAiInput');
-        if (input) {
-            input.value = promptCode;
-            window.sendDashboardAI();
-            setTimeout(function() {
-                var name = prompt('Projenize bir isim verin:');
-                if (name) {
-                    var codeResponse = document.querySelector('#dashboardAiMessages .ai-message.bot:last-child');
-                    var codeText = codeResponse ? codeResponse.textContent : 'AI kodu oluşturdu.';
-                    window.saveProject(name, 'Kod (AI)', codeText);
-                }
-            }, 4000);
-        }
-    }
-};
-
-window.saveProject = async function(name, type, content) {
-    if (!currentUser) return;
+window.wizardGenerateCode = async function() {
+    var prompt = document.getElementById('wizardCodePrompt').value.trim();
+    if (!prompt) return showNotification('Lütfen bir komut yazın!', 'error');
+    showNotification('⏳ Kod üretiliyor...', 'success');
     try {
-        var Project = Parse.Object.extend('Project');
-        var project = new Project();
+        var result = await Parse.Cloud.run('superAI', { prompt: 'Sadece kod ver, açıklama yapma: ' + prompt });
+        var resultDiv = document.getElementById('wizardCodeResult');
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = '<pre style="white-space:pre-wrap; word-break:break-word; color:var(--accent2);">' + result + '</pre>';
+        wizardData.generatedCode = result;
+        showNotification('✅ Kod oluşturuldu!', 'success');
+    } catch(e) {
+        showNotification('❌ Kod üretilemedi: ' + e.message, 'error');
+    }
+};
+
+window.wizardFinish = async function() {
+    var name = document.getElementById('wizardProjectName').value.trim();
+    if (!name) return showNotification('Lütfen proje adı girin!', 'error');
+    
+    var typeLabel = wizardType === '3d' ? '3D' : wizardType === 'code' ? 'Kod' : 'Görsel';
+    var content = '';
+    
+    if (wizardType === '3d') {
+        var prompt3D = document.getElementById('wizard3DPrompt').value.trim();
+        if (!prompt3D) return showNotification('3D açıklaması girin!', 'error');
+        content = '3D: ' + prompt3D;
+        try {
+            document.getElementById('threeDPrompt').value = prompt3D;
+            await window.generate3D();
+        } catch(e) {}
+    } else if (wizardType === 'code') {
+        if (wizardData.codeMethod === 'manual') {
+            var codeContent = document.getElementById('wizardCodeContent').value.trim();
+            if (!codeContent) return showNotification('Kod yazın!', 'error');
+            content = 'Kod (Elle):\n' + codeContent;
+        } else {
+            if (wizardData.generatedCode) {
+                content = 'Kod (AI):\n' + wizardData.generatedCode;
+            } else {
+                var promptCode = document.getElementById('wizardCodePrompt').value.trim();
+                if (!promptCode) return showNotification('AI\'ya ne yazdırmak istediğinizi yazın!', 'error');
+                try {
+                    var result = await Parse.Cloud.run('superAI', { prompt: 'Sadece kod ver, açıklama yapma: ' + promptCode });
+                    content = 'Kod (AI):\n' + result;
+                } catch(e) {
+                    return showNotification('AI kod üretemedi: ' + e.message, 'error');
+                }
+            }
+        }
+    } else if (wizardType === 'image') {
+        var promptImage = document.getElementById('wizardImagePrompt').value.trim();
+        if (!promptImage) return showNotification('Görsel açıklaması girin!', 'error');
+        content = 'Görsel: ' + promptImage;
+        try {
+            document.getElementById('imagePrompt').value = promptImage;
+            await window.generateImage();
+        } catch(e) {}
+    }
+    
+    try {
+        const Project = Parse.Object.extend('Project');
+        const project = new Project();
         project.set('user_email', currentUser.get('email'));
         project.set('name', name);
-        project.set('type', type);
+        project.set('type', typeLabel);
         project.set('content', content);
         project.set('is_favorite', false);
         project.set('is_archived', false);
         project.set('is_trashed', false);
-        await project.save(null);
+        await project.save(null, { useMasterKey: true });
+        closeModal('projectWizardModal');
         await window.loadProjects();
         showNotification('✅ Proje "' + name + '" kaydedildi!', 'success');
     } catch(e) {
-        showNotification('Hata: ' + e.message, 'error');
+        showNotification('❌ Proje kaydedilemedi: ' + e.message, 'error');
     }
 };
 
@@ -10816,6 +11176,140 @@ window.publishProjectToStore = async function(projectId) {
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
+};
+
+// ---- V27 PAZARI (TAM EKRAN) ----
+window.openMarket = function() {
+    var modal = document.getElementById('marketModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'marketModal';
+        modal.className = 'modal-overlay';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="modal" style="max-width:95vw; max-height:95vh; width:100%; height:95vh; overflow-y:auto; padding:20px;">
+                <div class="modal-header">
+                    <h3>🛒 V27 Puan Pazarı</h3>
+                    <button class="modal-close" onclick="window.closeMarket()">×</button>
+                </div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px; align-items:center;">
+                    <input type="text" id="marketSearchInput" placeholder="🔍 Proje ara..." class="glow-input" style="flex:1; min-width:150px;" onkeypress="if(event.key==='Enter') window.filterMarket()">
+                    <select id="marketTypeFilter" class="glow-input" onchange="window.filterMarket()">
+                        <option value="all">Tüm Türler</option>
+                        <option value="3D">🧊 3D</option>
+                        <option value="Kod">⌨️ Kod</option>
+                        <option value="Görsel">🖼️ Görsel</option>
+                        <option value="store">🎁 Mağaza</option>
+                    </select>
+                    <input type="number" id="marketPriceMin" placeholder="Min Puan" class="glow-input" style="width:100px;" onchange="window.filterMarket()">
+                    <input type="number" id="marketPriceMax" placeholder="Max Puan" class="glow-input" style="width:100px;" onchange="window.filterMarket()">
+                    <button class="btn-secondary btn-sm" onclick="window.filterMarket()">Filtrele</button>
+                    <button class="btn-secondary btn-sm" onclick="window.loadMarket()">🔄 Yenile</button>
+                </div>
+                <div id="marketItems" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:16px; margin-top:10px;">
+                    <div style="grid-column:1/-1; text-align:center; color:var(--text3); padding:40px;">Yükleniyor...</div>
+                </div>
+                <div style="margin-top:20px; text-align:center;">
+                    <button class="btn-secondary" onclick="window.closeMarket()">🔙 Kapat</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    modal.classList.add('open');
+    modal.style.display = 'flex';
+    window.loadMarket();
+};
+
+window.closeMarket = function() {
+    var modal = document.getElementById('marketModal');
+    if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+    }
+};
+
+window.loadMarket = async function() {
+    try {
+        const storeResult = await Parse.Cloud.run('getStoreItems', {});
+        const marketResult = await Parse.Cloud.run('getMarketProjects', {});
+        let allItems = [];
+        if (storeResult && storeResult.length > 0) {
+            storeResult.forEach(item => {
+                allItems.push({
+                    id: item.id,
+                    name: item.name,
+                    price_points: item.price_points,
+                    icon: item.icon || '🎁',
+                    type: 'store',
+                    isAdmin: true,
+                    description: 'Admin tarafından eklenmiştir.',
+                    imageUrl: 'https://via.placeholder.com/200x200?text=Ma%C4%9Faza'
+                });
+            });
+        }
+        if (marketResult && marketResult.length > 0) {
+            marketResult.forEach(item => {
+                allItems.push({
+                    id: item.id,
+                    name: item.title,
+                    price_points: item.price_points,
+                    icon: item.type === '3D' ? '🧊' : (item.type === 'Kod' ? '⌨️' : '🖼️'),
+                    type: item.type || 'Bilinmiyor',
+                    isAdmin: false,
+                    description: item.description,
+                    imageUrl: item.imageUrl,
+                    owner: item.owner_name,
+                    owner_email: item.owner_email,
+                    projectId: item.projectId,
+                    marketId: item.id
+                });
+            });
+        }
+        window.marketItemsCache = allItems;
+        window.filterMarket();
+    } catch(e) {
+        console.error('Pazar yüklenirken hata:', e);
+        document.getElementById('marketItems').innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--danger); padding:40px;">⚠️ Yüklenemedi: ' + e.message + '</div>';
+    }
+};
+
+window.filterMarket = function() {
+    var search = document.getElementById('marketSearchInput').value.toLowerCase().trim();
+    var typeFilter = document.getElementById('marketTypeFilter').value;
+    var minPrice = parseInt(document.getElementById('marketPriceMin').value) || 0;
+    var maxPrice = parseInt(document.getElementById('marketPriceMax').value) || 999999;
+    var items = window.marketItemsCache || [];
+    var filtered = items.filter(item => {
+        var matchSearch = item.name.toLowerCase().includes(search) || item.description.toLowerCase().includes(search);
+        var matchType = typeFilter === 'all' || item.type === typeFilter || (typeFilter === '3D' && item.type === '3D') || (typeFilter === 'Kod' && item.type === 'Kod') || (typeFilter === 'Görsel' && item.type === 'Görsel') || (typeFilter === 'store' && item.isAdmin);
+        var matchPrice = item.price_points >= minPrice && item.price_points <= maxPrice;
+        return matchSearch && matchType && matchPrice;
+    });
+    var container = document.getElementById('marketItems');
+    if (filtered.length === 0) {
+        container.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--text3); padding:40px;">🔍 Sonuç bulunamadı.</div>';
+        return;
+    }
+    var html = '';
+    filtered.forEach(item => {
+        html += `
+            <div class="store-item" style="position:relative; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px; text-align:center;">
+                <div style="width:100%; height:150px; overflow:hidden; border-radius:8px; margin-bottom:8px; background:var(--bg);">
+                    <img src="${item.imageUrl}" alt="${item.name}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://via.placeholder.com/200x200?text=${encodeURIComponent(item.name)}'">
+                </div>
+                <div style="font-weight:700; font-size:15px;">${item.name}</div>
+                <div style="font-size:11px; color:var(--text3);">${item.isAdmin ? '🎁 Mağaza' : '👤 ' + (item.owner || 'Kullanıcı') + (item.owner_email ? ' (' + item.owner_email + ')' : '')}</div>
+                <div style="font-size:12px; color:var(--text2); margin:4px 0;">${item.description.substring(0,50)}...</div>
+                <div style="font-weight:600; color:var(--gold); margin:6px 0;">⭐ ${item.price_points} Puan</div>
+                ${item.isAdmin ? 
+                    `<button class="btn-primary btn-sm" onclick="window.buyStoreItem('${item.id}')">Satın Al</button>` :
+                    `<button class="btn-primary btn-sm" onclick="window.buyMarketProject('${item.marketId}')">Satın Al</button>`
+                }
+            </div>
+        `;
+    });
+    container.innerHTML = html;
 };
 
 // ================================================================
@@ -11134,6 +11628,16 @@ window.onload = async function() {
             userPanel.style.display = 'none';
         }
 
+        // --- ANA SAYFA (HTML1) İÇİN ANKET VE DUYURU YÜKLEME ---
+        // Ana sayfada pollContainer veya announcementList varsa yükle.
+        // Bu container'lar HTML1'de mevcut değilse hata vermez (zaten kontrol var).
+        try {
+            if (document.getElementById('pollContainer')) window.loadPoll();
+            if (document.getElementById('announcementList')) window.loadAnnouncements();
+        } catch(e) {
+            console.log('Ana sayfa anket/duyuru yüklenemedi (muhtemelen container yok):', e.message);
+        }
+
         await window.loadComments();
         await window.updateStats();
         window.startStatsInterval();
@@ -11160,6 +11664,7 @@ window.onload = async function() {
 
 console.log('✅ JS-4 tamamen yüklendi ve tüm fonksiyonlar global!');
 </script>
+<!-- ===== JS-4 SONU ===== -->
 
 <!-- ============================================================ -->
 <!-- JS-5: TAKIM YÖNETİMİ, KURUCU PANELİ, VİZYON DESTEK, ÜYE KONTROLLERİ, SOSYAL DM, ARAMA, TAKİP, EBEVEYN, ANKET, DUYURU, GİF, PROJE, PUAN, MAĞAZA, GÖREV, YARIŞMA, AKADEMİ, İŞ İLANI, HATA, OYUN, CÜZDAN -->
