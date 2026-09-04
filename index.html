@@ -3698,6 +3698,7 @@ body.light-theme .legal-banner {
     <!-- ============================================================ -->
 <!-- ===================== HTML BÖLÜMLERİ ======================== -->
 <!-- ============================================================ -->
+
 <!-- ============================================================ -->
 <!-- HTML-1: ANA SAYFA (NAVBAR, HERO, FEATURES, PRICING, FOOTER)  -->
 <!-- ============================================================ -->
@@ -3847,6 +3848,40 @@ body.light-theme .legal-banner {
         </div>
     </section>
 
+    <!-- ===== ANKET (OYALAMA) – ANA SAYFA ===== -->
+    <section class="features" style="padding-top:0;">
+        <div class="section-header"><div class="section-tag">// topluluk oylaması</div><h2 class="section-title">Aktif <span class="hl">Anket</span></h2></div>
+        <div id="pollContainer" class="poll-container" style="max-width:800px; margin:0 auto;">
+            <div class="poll-question" id="pollQuestion">Yeni özellik ne olsun?</div>
+            <div id="pollOptions"></div>
+            <div style="margin-top:12px;font-size:12px;color:var(--text3);" id="pollStatus">Oy verin!</div>
+        </div>
+    </section>
+
+    <!-- ===== DUYURU PANOSU – ANA SAYFA ===== -->
+    <section class="features" style="padding-top:0;">
+        <div class="section-header"><div class="section-tag">// duyurular</div><h2 class="section-title">Son <span class="hl">Duyurular</span></h2></div>
+        <div id="announcementList" style="max-width:800px; margin:0 auto; max-height:300px; overflow-y:auto;"></div>
+    </section>
+
+    <!-- ===== TOPLULUK GÖREVLERİ (SOCIAL) – ANA SAYFA ===== -->
+    <section class="features" style="padding-top:0;">
+        <div class="section-header"><div class="section-tag">// topluluk görevleri</div><h2 class="section-title">🌐 Topluluk <span class="hl">Görevleri</span></h2></div>
+        <div id="socialTasksContainer" style="max-width:800px; margin:0 auto;"></div>
+    </section>
+
+    <!-- ===== V27 AKADEMİ – ANA SAYFA ===== -->
+    <section class="features" style="padding-top:0;">
+        <div class="section-header"><div class="section-tag">// v27 akademi</div><h2 class="section-title">📚 V27 <span class="hl">Akademi</span></h2></div>
+        <div id="courseList" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; max-width:1000px; margin:0 auto;"></div>
+    </section>
+
+    <!-- ===== V27 ZEKA TESTİ – ANA SAYFA ===== -->
+    <section class="features" style="padding-top:0;">
+        <div class="section-header"><div class="section-tag">// v27 zeka testi</div><h2 class="section-title">🧠 V27 <span class="hl">Zeka Testi</span></h2></div>
+        <div id="quizContainer" style="max-width:800px; margin:0 auto;"></div>
+    </section>
+
     <!-- ===== TECH STACK ===== -->
     <div class="tech-section">
         <div class="tech-scroll">
@@ -3897,6 +3932,16 @@ body.light-theme .legal-banner {
                 <div class="comment-item" style="border-left-color: var(--accent2); text-align: center; color: var(--text3);">🌟 Yorumlar yükleniyor...</div>
             </div>
         </div>
+    </section>
+
+    <!-- ===== KURUCU İLETİŞİM (ANA SAYFA) ===== -->
+    <section style="max-width:800px; margin:40px auto; padding:20px; text-align:center;">
+        <button class="btn-secondary" onclick="window.contactFounder()" style="font-size:16px; padding:12px 30px;">
+            👑 Kurucu ile İletişime Geç
+        </button>
+        <p style="color:var(--text3); font-size:13px; margin-top:8px;">
+            📧 admin.tr.reis@gmail.com
+        </p>
     </section>
 
     <!-- ===== BLOG ABONE FORMU (ANA SAYFA) ===== -->
@@ -3977,7 +4022,7 @@ body.light-theme .legal-banner {
         </div>
         <!-- Sürüm Bilgisi -->
         <div style="text-align:center; margin-top:16px; font-size:12px; color:var(--text3);">
-            Sürüm: <span id="versionDisplay">V5.15.1</span>
+            Sürüm: <span id="versionDisplay">V5.14.2</span>
         </div>
         <!-- Topluluk Kuralları Footer -->
         <div class="community-rules-footer">
@@ -5216,22 +5261,13 @@ window.applyTheme = function() {
 };
 
 // ========== SPLASH EKRANI (ANİMASYONLU) ==========
-window.showSplash = function() {
-    var splash = document.getElementById('splashScreen');
-    if (splash) {
-        splash.style.display = 'flex';
-        splash.classList.remove('hidden');
-        // Splash logo animasyonu için ekstra class ekleme (CSS zaten var)
-    }
-};
-
 window.hideSplash = function() {
     var splash = document.getElementById('splashScreen');
     if (splash) {
         splash.classList.add('hidden');
-        setTimeout(function() {
-            splash.style.display = 'none';
-        }, 800);
+        splash.style.display = 'none'; // Direkt gizle
+        splash.style.opacity = '0';
+        splash.style.pointerEvents = 'none';
     }
 };
 
@@ -8786,6 +8822,8 @@ window.showDashboard = async function() {
         if (currentUser) {
             try { window.loadStore(); } catch(e) {}
             try { window.loadDailyTasks(); } catch(e) {}
+            try { window.loadSocialTasks(); } catch(e) {}
+            try { window.loadTeamTasks(); } catch(e) {}
             try { window.loadPoll(); } catch(e) {}
             try { window.loadAnnouncements(); } catch(e) {}
             try { window.loadContestRanking(); } catch(e) {}
@@ -8995,15 +9033,24 @@ window.changePassword = async function() {
 
 window.deleteAccount = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
-    if (!confirm('Hesabınızı kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) return;
+    var password = prompt('Hesabınızı silmek için şifrenizi girin (8+ karakter):');
+    if (!password) return showNotification('İşlem iptal edildi.', 'warning');
     try {
+        await Parse.User.logIn(currentUser.get('email'), password);
+        if (!confirm('Hesabınızı kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) return;
         await currentUser.destroy();
         await Parse.User.logOut();
         localStorage.removeItem('vizyon_user');
         currentUser = null;
         location.reload();
         showNotification('Hesabınız silindi.', 'success');
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+    } catch(e) {
+        if (e.code === 101) {
+            showNotification('Şifre yanlış! Lütfen tekrar deneyin.', 'error');
+        } else {
+            showNotification('Hata: ' + e.message, 'error');
+        }
+    }
 };
 
 window.setAdminPassword = async function() {
@@ -9052,7 +9099,7 @@ window.banUser = function() {
 window.updatePointsBadge = function(points) { var badge = document.getElementById('dashboardPointsDisplay'); if (badge) badge.textContent = points || 0; };
 window.loadUserPoints = async function() { if (!currentUser) return; try { var result = await Parse.Cloud.run('getUserPoints', {}); window.updatePointsBadge(result.points || 0); } catch(e) {} };
 
-// ---- MAĞAZA (GÜNCELLENMİŞ - Admin + Kullanıcı Projeleri) ----
+// ---- MAĞAZA ----
 window.loadStore = async function() {
     if (!currentUser) return;
     try {
@@ -9148,7 +9195,7 @@ window.buyMarketProject = async function(marketId) {
 
 window.openStore = function() { var section = document.getElementById('storeSection'); if (section) { section.scrollIntoView({ behavior: 'smooth' }); window.loadStore(); } else { showNotification('Puan Mağazası bölümü bulunamadı.', 'warning'); } };
 
-// ---- GÖREV ----
+// ---- GÜNLÜK GÖREV ----
 window.loadDailyTasks = async function() {
     if (!currentUser) return;
     try {
@@ -9169,16 +9216,16 @@ window.loadDailyTasks = async function() {
                         <span class="task-points">+${task.points} Puan</span>
                     </div>
                     <div>
-                        ${!completed ? `<button class="btn-primary btn-sm" onclick="window.completeTask('${task.id}')" style="font-size:11px;padding:4px 12px;">✅ Tamamla</button>` : '<span class="task-status">✅ Tamamlandı</span>'}
+                        ${!completed ? `<button class="btn-primary btn-sm" onclick="window.completeDailyTask('${task.id}')" style="font-size:11px;padding:4px 12px;">✅ Tamamla</button>` : '<span class="task-status">✅ Tamamlandı</span>'}
                     </div>
                 </div>
             `;
         });
         container.innerHTML = html;
-    } catch(e) { console.error('Görevler yüklenirken hata:', e); }
+    } catch(e) { console.error('Günlük görevler yüklenirken hata:', e); }
 };
 
-window.completeTask = async function(taskId) {
+window.completeDailyTask = async function(taskId) {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     try {
         var result = await Parse.Cloud.run('completeDailyTask', { taskId: taskId });
@@ -9189,7 +9236,135 @@ window.completeTask = async function(taskId) {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ---- ANKET (KURUCU OLUŞTURUR, HERKES GÖRÜR, ANA SAYFA + DASHBOARD) ----
+// ---- TOPLULUK GÖREVLERİ (AYLIK) ----
+window.loadSocialTasks = async function() {
+    if (!currentUser) return;
+    try {
+        var result = await Parse.Cloud.run('getSocialTasks', {});
+        var container = document.getElementById('socialTasksContainer');
+        if (!container) {
+            // Dashboard'da container yoksa oluştur
+            var dashGrid = document.querySelector('#dashboardArea .dashboard-grid-2col');
+            if (dashGrid) {
+                var newCard = document.createElement('div');
+                newCard.className = 'dashboard-card full-width';
+                newCard.id = 'socialTasksContainer';
+                newCard.innerHTML = '<h3>🌐 Topluluk Görevleri</h3><div id="socialTasksList" style="font-size:13px;">Yükleniyor...</div>';
+                dashGrid.appendChild(newCard);
+                container = document.getElementById('socialTasksList');
+            }
+        }
+        if (!container) {
+            container = document.getElementById('socialTasksList');
+        }
+        if (!container) return;
+        if (!result || result.length === 0) {
+            container.innerHTML = '<div style="color:var(--text3);padding:12px;text-align:center;">🌐 Henüz topluluk görevi yok.</div>';
+            return;
+        }
+        var html = '';
+        result.forEach(function(task) {
+            var completed = task.completed || false;
+            html += `
+                <div class="task-card ${completed ? 'completed' : ''}">
+                    <div class="task-info">
+                        <span>${task.platform}: ${task.url}</span>
+                        <span class="task-points">+${task.points_reward} Puan</span>
+                    </div>
+                    <div>
+                        ${!completed ? `<button class="btn-primary btn-sm" onclick="window.verifySocialFollow('${task.id}')" style="font-size:11px;padding:4px 12px;">✅ Doğrula</button>` : '<span class="task-status">✅ Tamamlandı</span>'}
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    } catch(e) { console.error('Topluluk görevleri yüklenirken hata:', e); }
+};
+
+window.verifySocialFollow = async function(taskId) {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    try {
+        var result = await Parse.Cloud.run('verifySocialFollow', { taskId: taskId });
+        showNotification(result.message, 'success');
+        window.updatePointsBadge(result.remaining_points);
+        window.loadSocialTasks();
+        window.loadUserPoints();
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+};
+
+// ---- TAKIM GÖREVLERİ ----
+window.loadTeamTasks = async function() {
+    if (!currentUser) return;
+    var teamId = currentUser.get('teamId');
+    var container = document.getElementById('teamTasksContainer');
+    if (!container) {
+        // Takım sayfasında container oluştur
+        var teamPage = document.getElementById('teamPage');
+        if (teamPage) {
+            var bottomDiv = teamPage.querySelector('.team-page-bottom');
+            if (bottomDiv) {
+                var newCard = document.createElement('div');
+                newCard.className = 'team-page-card';
+                newCard.id = 'teamTasksContainer';
+                newCard.innerHTML = '<h4>📋 Takım Görevleri</h4><div id="teamTasksList" style="font-size:13px;">Yükleniyor...</div>';
+                bottomDiv.appendChild(newCard);
+                container = document.getElementById('teamTasksList');
+            }
+        }
+        if (!container) {
+            var dash = document.querySelector('#dashboardArea .dashboard-grid-2col');
+            if (dash) {
+                var newCard = document.createElement('div');
+                newCard.className = 'dashboard-card full-width';
+                newCard.id = 'teamTasksContainer';
+                newCard.innerHTML = '<h3>👥 Takım Görevleri</h3><div id="teamTasksList" style="font-size:13px;">Yükleniyor...</div>';
+                dash.appendChild(newCard);
+                container = document.getElementById('teamTasksList');
+            }
+        }
+    }
+    if (!container) return;
+    if (!teamId) {
+        container.innerHTML = '<div style="color:var(--text3);padding:12px;text-align:center;">👥 Takım görevleri için bir takıma katılın.</div>';
+        return;
+    }
+    try {
+        var result = await Parse.Cloud.run('getTeamTasks', { teamId: teamId });
+        if (!result || result.length === 0) {
+            container.innerHTML = '<div style="color:var(--text3);padding:12px;text-align:center;">📋 Bugün için takım görevi yok.</div>';
+            return;
+        }
+        var html = '';
+        result.forEach(function(task) {
+            var completed = task.completed || false;
+            html += `
+                <div class="task-card ${completed ? 'completed' : ''}">
+                    <div class="task-info">
+                        <span>👥 ${task.task_text}</span>
+                        <span class="task-points">+${task.points} Puan</span>
+                    </div>
+                    <div>
+                        ${!completed ? `<button class="btn-primary btn-sm" onclick="window.completeTeamTask('${task.id}')" style="font-size:11px;padding:4px 12px;">✅ Tamamla</button>` : '<span class="task-status">✅ Tamamlandı</span>'}
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    } catch(e) { console.error('Takım görevleri yüklenirken hata:', e); }
+};
+
+window.completeTeamTask = async function(taskId) {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    try {
+        var result = await Parse.Cloud.run('completeTeamTask', { taskId: taskId });
+        showNotification(result.message, 'success');
+        window.updatePointsBadge(result.remaining_points);
+        window.loadTeamTasks();
+        window.loadUserPoints();
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+};
+
+// ---- ANKET ----
 window.loadPoll = async function() {
     try {
         var result = await Parse.Cloud.run('getActivePoll', {});
@@ -9252,7 +9427,6 @@ window.createPoll = async function() {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ========== OYLAMA SİLME / DÜZENLEME (KURUCU) ==========
 window.deletePoll = async function() {
     if (!currentUser || currentUser.get('role') !== 'founder') return showNotification('Sadece kurucu silebilir!', 'error');
     if (!confirm('Bu anketi silmek istediğinize emin misiniz?')) return;
@@ -9294,7 +9468,7 @@ window.getTimeRemaining = function(endDate) {
     return days + ' gün ' + hours + ' saat';
 };
 
-// ---- DUYURU (ADMİN/KURUCU, HERKES GÖRÜR) ----
+// ---- DUYURU ----
 window.loadAnnouncements = async function() {
     try {
         var result = await Parse.Cloud.run('getAnnouncements', {});
@@ -9363,7 +9537,7 @@ window.editAnnouncement = async function(id) {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ---- AKADEMİ ----
+// ---- V27 AKADEMİ ----
 window.loadCourses = async function() {
     try {
         var result = await Parse.Cloud.run('getCourses', {});
@@ -9521,7 +9695,7 @@ window.submitBugReport = async function() {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ---- OYUN (ZEKA TESTİ) ----
+// ---- V27 ZEKA TESTİ ----
 window.loadQuiz = async function() {
     try {
         var result = await Parse.Cloud.run('getQuizQuestions', {});
@@ -9781,9 +9955,7 @@ window.openParentSettings = function() {
         // Önce giriş bölümünü göster, kontrolleri gizle
         document.getElementById('parentLoginSection').style.display = 'block';
         document.getElementById('parentControls').style.display = 'none';
-        document.getElementById('parentVerificationSection').style.display = 'none';
-        // Eğer zaten parent_mode varsa ve pin varsa direkt giriş yapmış olabilir, ama güvenlik için pin soralım.
-        // loadParentSettings çağrılacak, ama kontroller gizli kalacak.
+        document.getElementById('parentVerificationSection').style.display = 'block';
         window.loadParentSettings();
         window.loadSessions();
     }
@@ -9798,12 +9970,11 @@ window.loginParent = async function() {
         if (settings.parent_pin !== pin) {
             return showNotification('❌ PIN yanlış!', 'error');
         }
-        // PIN doğru, kontrolleri göster
         document.getElementById('parentLoginSection').style.display = 'none';
         document.getElementById('parentControls').style.display = 'block';
         document.getElementById('parentEmailDisplay').textContent = settings.parent_email || currentUser.get('email');
         showNotification('Ebeveyn paneline hoş geldiniz!', 'success');
-        window.loadParentSettings(); // ayarları yeniden yükle
+        window.loadParentSettings();
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
@@ -9814,8 +9985,6 @@ window.loadParentSettings = async function() {
     try {
         const result = await Parse.Cloud.run('getParentSettings', {});
         if (result.parent_mode) {
-            // Eğer zaten parent_mode ise, ve pin varsa, login section'ı gizle kontrolü göster.
-            // Ama loginParent zaten bunu yapacak. Bu fonksiyon sadece ayarları yüklemek için.
             document.getElementById('parentEmailDisplay').textContent = result.parent_email || currentUser.get('email');
             document.getElementById('liveTrackingStatus').textContent = result.live_tracking ? '🟢 Açık' : '🔴 Kapalı';
             document.getElementById('dailyLimitInput').value = result.daily_limit || 0;
@@ -9833,7 +10002,6 @@ window.loadParentSettings = async function() {
                 console.warn('Full ayarlar yüklenemedi:', e);
             }
         } else {
-            // Ebeveyn modu yoksa, doğrulama bölümünü göster, login ve kontrolleri gizle
             document.getElementById('parentControls').style.display = 'none';
             document.getElementById('parentLoginSection').style.display = 'block';
             document.getElementById('parentVerificationSection').style.display = 'block';
@@ -9843,20 +10011,16 @@ window.loadParentSettings = async function() {
     }
 };
 
-// ---- EBEVEYN E-POSTA DOĞRULAMA (Aynı e-posta kontrolü eklendi) ----
 window.requestParentVerification = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     var email = document.getElementById('parentEmailInput').value.trim();
     if (!email) return showNotification('E-posta girin!', 'error');
-    
-    // Ebeveyn e-postası, kullanıcının kendi e-postası ile aynı olamaz
     if (email === currentUser.get('email')) {
         document.getElementById('parentEmailWarning').classList.add('show');
         return showNotification('Ebeveyn e-postası kendi e-postanız ile aynı olamaz!', 'error');
     } else {
         document.getElementById('parentEmailWarning').classList.remove('show');
     }
-
     try {
         var result = await Parse.Cloud.run('requestParentVerification', { email: email });
         if (result.success) {
@@ -9886,7 +10050,6 @@ window.verifyParentCode = async function() {
                     return;
                 }
             }
-            // Doğrulama başarılı, şimdi giriş yapması için login bölümünü göster, ama kontrolleri gizle
             document.getElementById('parentVerificationSection').style.display = 'none';
             document.getElementById('parentLoginSection').style.display = 'block';
             document.getElementById('parentControls').style.display = 'none';
@@ -9899,7 +10062,6 @@ window.verifyParentCode = async function() {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ---- EBEVEYN ŞİFRE SIFIRLAMA (YENİ) ----
 window.requestParentReset = async function() {
     if (!currentUser) return showNotification('Giriş yapın!', 'error');
     try {
@@ -9923,13 +10085,11 @@ window.confirmParentReset = async function() {
         const result = await Parse.Cloud.run('confirmParentReset', { code: code, newPassword: newPass });
         showNotification(result.message, 'success');
         document.getElementById('parentResetSection').style.display = 'none';
-        // Şifre sıfırlandıktan sonra login bölümünü göster
         document.getElementById('parentLoginSection').style.display = 'block';
         document.getElementById('parentControls').style.display = 'none';
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ---- EBEVEYN ŞİFRE DEĞİŞTİR (YENİ) ----
 window.changeParentPassword = async function() {
     if (!currentUser) return showNotification('Giriş yapın!', 'error');
     var oldPin = prompt('Mevcut PIN\'inizi girin:');
@@ -9948,7 +10108,30 @@ window.changeParentPassword = async function() {
     }
 };
 
-// ---- EBEVEYN DİĞER FONKSİYONLAR ----
+window.changeChildPassword = async function() {
+    if (!currentUser) return showNotification('Giriş yapın!', 'error');
+    var settings = await Parse.Cloud.run('getParentSettings', {});
+    if (!settings.parent_mode) return showNotification('Ebeveyn modu aktif değil!', 'error');
+    var oldPassword = prompt('Mevcut çocuk şifresini girin (8+ karakter):');
+    if (!oldPassword) return;
+    var newPassword = prompt('Yeni çocuk şifresini girin (8+ karakter):');
+    if (!newPassword || newPassword.length < 8) return showNotification('Şifre en az 8 karakter olmalı!', 'error');
+    var confirmPassword = prompt('Yeni şifreyi tekrar girin:');
+    if (newPassword !== confirmPassword) return showNotification('Şifreler eşleşmiyor!', 'error');
+    try {
+        await Parse.User.logIn(currentUser.get('email'), oldPassword);
+        currentUser.set('password', newPassword);
+        await currentUser.save();
+        showNotification('Çocuğun hesap şifresi başarıyla değiştirildi!', 'success');
+    } catch(e) {
+        if (e.code === 101) {
+            showNotification('Mevcut şifre yanlış!', 'error');
+        } else {
+            showNotification('Hata: ' + e.message, 'error');
+        }
+    }
+};
+
 window.toggleLiveTracking = async function() {
     try {
         var result = await Parse.Cloud.run('toggleLiveTracking');
@@ -10097,18 +10280,15 @@ window.removeParentControl = async function() {
     }
 };
 
-// ---- DAVET KODU OLUŞTUR (YENİ) ----
+// ---- DAVET KODU OLUŞTUR ----
 window.generateReferralCode = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     try {
         var result = await Parse.Cloud.run('generateReferralCode', {});
         if (result && result.referral_code) {
             showNotification('✅ Davet kodunuz: ' + result.referral_code, 'success');
-            // Kullanıcı bilgilerini güncelle
             await currentUser.fetch();
-            // Liderlik tablosunu güncelle
             window.loadReferralLeaderboard();
-            // Profil içeriğini güncelle (eğer açıksa)
             if (document.getElementById('profileModal').classList.contains('open')) {
                 window.openProfileModal();
             }
@@ -10168,7 +10348,7 @@ window.loadTeamPage = async function() {
     var memberManagementBtn = document.getElementById('teamMemberManagementBtn');
     var panelMemberCount = document.getElementById('teamPageMemberCount');
 
-    // === VİZYON PATROL / DESTEK GÖRÜNÜRLÜK (SADECE FOUNDER) ===
+    // VİZYON PATROL / DESTEK görünürlük
     var patrolBtn = document.getElementById('vizyonPatrolBtn');
     var supportBtn = document.getElementById('vizyonSupportBtn');
     var isFounder = currentUser ? currentUser.get('role') === 'founder' : false;
@@ -10302,6 +10482,10 @@ window.loadTeamPage = async function() {
                 founderPanel.style.display = 'none';
             }
         }
+
+        // Takım görevlerini yükle
+        window.loadTeamTasks();
+
         window.applyTranslations(currentLanguage);
     } catch(e) {
         console.error('Takım sayfası yüklenirken hata:', e);
@@ -10309,13 +10493,13 @@ window.loadTeamPage = async function() {
     }
 };
 
+// ---- DİĞER FONKSİYONLAR (kısa kullanımlar) ----
 window.sendTeamPageMessage = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     var teamId = currentUser.get('teamId');
     if (!teamId) return showNotification('Takımınız yok!', 'error');
 
     const TeamMessage = Parse.Object.extend("TeamMessage");
-
     var msgInput = document.getElementById('teamPageInput');
     var msg = msgInput.value.trim();
     var fileInput = document.getElementById('teamPageFileInput');
@@ -10815,7 +10999,7 @@ window.forceCloseTeam = async function(teamId) {
     }
 };
 
-// ---- PROFİL GÖRÜNTÜLEME (BAŞKASININ) ----
+// ---- PROFİL GÖRÜNTÜLEME ----
 window.viewProfile = async function(userId) {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     try {
@@ -10869,7 +11053,7 @@ window.searchGif = function() {
     window.sendTeamPageMessage();
 };
 
-// ---- SOSYAL GÖREV ----
+// ---- SOSYAL GÖREV CHECK ----
 window.checkSocialFollow = async function() {
     if (!currentUser) return;
     try {
@@ -10957,7 +11141,7 @@ window.markNotificationRead = async function(id) {
 };
 
 // ================================================================
-// ========== LİDERLİK TABLOSU (DAVET SIRALAMASI) ==========
+// ========== LİDERLİK TABLOSU ==========
 // ================================================================
 
 window.loadReferralLeaderboard = async function() {
@@ -11010,7 +11194,7 @@ window.loadReferralLeaderboard = async function() {
 };
 
 // ================================================================
-// ========== DAVET KODU GİRME (BENİM KODUM + KOD GİRME) ==========
+// ========== DAVET KODU GİRME ==========
 // ================================================================
 
 window.showMyReferralCode = function() {
@@ -11045,7 +11229,6 @@ window.enterReferralCode = async function() {
             document.getElementById('referralCodeInput').value = '';
             await currentUser.fetch();
             window.updatePointsBadge(currentUser.get('points') || 0);
-            // Liderlik tablosunu güncelle
             window.loadReferralLeaderboard();
             showNotification('✅ ' + result.message, 'success');
         } else {
@@ -11061,7 +11244,7 @@ window.enterReferralCode = async function() {
 };
 
 // ================================================================
-// ========== PROJE OLUŞTURMA SİHİRBAZI (ADIM ADIM, TAM) ==========
+// ========== PROJE SİHİRBAZI ==========
 // ================================================================
 
 window.createProjectWizard = function() {
@@ -11263,7 +11446,6 @@ window.wizardFinish = async function() {
     }
 };
 
-// ---- PROJEYİ PUAN MAĞAZASINA SATIŞA KOY ----
 window.publishProjectToStore = async function(projectId) {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     var projects = await new Parse.Query('Project').equalTo('user_email', currentUser.get('email')).find();
@@ -11300,7 +11482,7 @@ window.publishProjectToStore = async function(projectId) {
     }
 };
 
-// ---- V27 PAZARI (TAM EKRAN) ----
+// ---- V27 PAZARI ----
 window.openMarket = function() {
     var modal = document.getElementById('marketModal');
     if (!modal) {
@@ -11615,7 +11797,7 @@ async function sendSystemNotification() {
 }
 
 // ================================================================
-// ========== UZAY MODU, TEMA, SPLASH, VERSİYON ==========
+// ========== SPLASH VE UZAY MODU ==========
 // ================================================================
 
 window.checkSpaceMode = function() {
@@ -11671,22 +11853,23 @@ window.hideSplash = function() {
     var splash = document.getElementById('splashScreen');
     if (splash) {
         splash.classList.add('hidden');
-        setTimeout(function() {
-            splash.style.display = 'none';
-        }, 800);
+        splash.style.display = 'none';
+        splash.style.opacity = '0';
+        splash.style.pointerEvents = 'none';
+        splash.style.visibility = 'hidden';
     }
 };
 
 window.updateVersion = function(version) {
     var el = document.getElementById('versionDisplay');
-    if (el) el.textContent = version || 'V5.15.1';
+    if (el) el.textContent = version || 'V5.14.2';
 };
 
 // ================================================================
 // ========== SAYFA YÜKLENİNCE ==========
 // ================================================================
 
-window.onload = async function() {
+window.addEventListener('load', async function() {
     try {
         console.log('🔄 Sayfa yükleniyor...');
         var mainSite = document.getElementById('mainSite');
@@ -11750,14 +11933,17 @@ window.onload = async function() {
             userPanel.style.display = 'none';
         }
 
-        // --- ANA SAYFA (HTML1) İÇİN ANKET VE DUYURU YÜKLEME ---
-        // Ana sayfada pollContainer veya announcementList varsa yükle.
-        // Bu container'lar HTML1'de mevcut değilse hata vermez (zaten kontrol var).
+        // ANA SAYFA ELEMANLARINI YÜKLE
         try {
             if (document.getElementById('pollContainer')) window.loadPoll();
             if (document.getElementById('announcementList')) window.loadAnnouncements();
+            if (document.getElementById('dailyTasksContainer')) window.loadDailyTasks();
+            if (document.getElementById('socialTasksContainer')) window.loadSocialTasks();
+            if (document.getElementById('teamTasksContainer')) window.loadTeamTasks();
+            if (document.getElementById('courseList')) window.loadCourses();
+            if (document.getElementById('quizContainer')) window.loadQuiz();
         } catch(e) {
-            console.log('Ana sayfa anket/duyuru yüklenemedi (muhtemelen container yok):', e.message);
+            console.log('Ana sayfa öğeleri yüklenemedi (muhtemelen container yok):', e.message);
         }
 
         await window.loadComments();
@@ -11765,9 +11951,13 @@ window.onload = async function() {
         window.startStatsInterval();
         window.loadTheme();
         window.checkSpaceMode();
-        window.updateVersion('V5.15.1');
+        window.updateVersion('V5.14.2');
         setInterval(window.checkSpaceMode, 60000);
-        setTimeout(window.hideSplash, 3000);
+        
+        window.hideSplash();
+        setTimeout(function() {
+            window.hideSplash();
+        }, 3000);
         showNotification('✨ VİZYON 2027 Sistemi Aktif!', 'success');
     } catch(e) {
         console.error('🚨 Sayfa yüklenirken beklenmeyen hata:', e);
@@ -11779,10 +11969,8 @@ window.onload = async function() {
         if (userPanel) userPanel.style.display = 'none';
         window.hideSplash();
         showNotification('Sayfa yüklenirken hata oluştu: ' + e.message, 'error');
-    } finally {
-        window.hideSplash();
     }
-};
+});
 
 console.log('✅ JS-4 tamamen yüklendi ve tüm fonksiyonlar global!');
 </script>
