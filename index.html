@@ -9201,6 +9201,9 @@ window.loadDailyTasks = async function() {
     try {
         var result = await Parse.Cloud.run('getDailyTasks', {});
         var container = document.getElementById('dailyTasksContainer');
+        if (!container) {
+            container = document.querySelector('#dashboardArea .dashboard-grid-2col .dashboard-card:has(.daily-tasks-placeholder)');
+        }
         if (!container) return;
         if (!result || result.length === 0) {
             container.innerHTML = '<div style="color:var(--text3);padding:12px;text-align:center;">🎯 Bugünlük görev yok.</div>';
@@ -9209,14 +9212,21 @@ window.loadDailyTasks = async function() {
         var html = '';
         result.forEach(function(task) {
             var completed = task.completed || false;
+            var taskText = task.task_text;
+            var actionUrl = '';
+            if (taskText.includes('AI sorgusu')) actionUrl = 'openFullAIPanel()';
+            else if (taskText.includes('yorum')) actionUrl = "document.getElementById('commentInput').focus()";
+            else if (taskText.includes('proje oluştur')) actionUrl = "window.createProjectWizard()";
+            else if (taskText.includes('favorile')) actionUrl = "document.getElementById('favList').scrollIntoView({behavior:'smooth'})";
+            else if (taskText.includes('takım mesajı')) actionUrl = "document.getElementById('teamPageInput').focus()";
             html += `
                 <div class="task-card ${completed ? 'completed' : ''}">
                     <div class="task-info">
-                        <span>${task.task_text}</span>
+                        <span>${taskText}</span>
                         <span class="task-points">+${task.points} Puan</span>
                     </div>
                     <div>
-                        ${!completed ? `<button class="btn-primary btn-sm" onclick="window.completeDailyTask('${task.id}')" style="font-size:11px;padding:4px 12px;">✅ Tamamla</button>` : '<span class="task-status">✅ Tamamlandı</span>'}
+                        ${!completed ? `<button class="btn-primary btn-sm" onclick="${actionUrl}" style="font-size:11px;padding:4px 12px;">✅ Tamamla</button>` : '<span class="task-status">✅ Tamamlandı</span>'}
                     </div>
                 </div>
             `;
@@ -9236,26 +9246,23 @@ window.completeDailyTask = async function(taskId) {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ---- TOPLULUK GÖREVLERİ (AYLIK) ----
+// ---- TOPLULUK GÖREVLERİ ----
 window.loadSocialTasks = async function() {
     if (!currentUser) return;
     try {
         var result = await Parse.Cloud.run('getSocialTasks', {});
         var container = document.getElementById('socialTasksContainer');
         if (!container) {
-            // Dashboard'da container yoksa oluştur
-            var dashGrid = document.querySelector('#dashboardArea .dashboard-grid-2col');
-            if (dashGrid) {
+            // Dashboard'da bir container oluştur
+            var dash = document.querySelector('#dashboardArea .dashboard-grid-2col');
+            if (dash) {
                 var newCard = document.createElement('div');
                 newCard.className = 'dashboard-card full-width';
                 newCard.id = 'socialTasksContainer';
                 newCard.innerHTML = '<h3>🌐 Topluluk Görevleri</h3><div id="socialTasksList" style="font-size:13px;">Yükleniyor...</div>';
-                dashGrid.appendChild(newCard);
+                dash.appendChild(newCard);
                 container = document.getElementById('socialTasksList');
             }
-        }
-        if (!container) {
-            container = document.getElementById('socialTasksList');
         }
         if (!container) return;
         if (!result || result.length === 0) {
@@ -9265,6 +9272,7 @@ window.loadSocialTasks = async function() {
         var html = '';
         result.forEach(function(task) {
             var completed = task.completed || false;
+            var actionUrl = task.url || '#';
             html += `
                 <div class="task-card ${completed ? 'completed' : ''}">
                     <div class="task-info">
@@ -9272,7 +9280,7 @@ window.loadSocialTasks = async function() {
                         <span class="task-points">+${task.points_reward} Puan</span>
                     </div>
                     <div>
-                        ${!completed ? `<button class="btn-primary btn-sm" onclick="window.verifySocialFollow('${task.id}')" style="font-size:11px;padding:4px 12px;">✅ Doğrula</button>` : '<span class="task-status">✅ Tamamlandı</span>'}
+                        ${!completed ? `<button class="btn-primary btn-sm" onclick="window.open('${actionUrl}','_blank')" style="font-size:11px;padding:4px 12px;">✅ Git</button>` : '<span class="task-status">✅ Tamamlandı</span>'}
                     </div>
                 </div>
             `;
@@ -9337,6 +9345,7 @@ window.loadTeamTasks = async function() {
         var html = '';
         result.forEach(function(task) {
             var completed = task.completed || false;
+            var actionUrl = "document.getElementById('teamPageInput').focus()";
             html += `
                 <div class="task-card ${completed ? 'completed' : ''}">
                     <div class="task-info">
@@ -9344,7 +9353,7 @@ window.loadTeamTasks = async function() {
                         <span class="task-points">+${task.points} Puan</span>
                     </div>
                     <div>
-                        ${!completed ? `<button class="btn-primary btn-sm" onclick="window.completeTeamTask('${task.id}')" style="font-size:11px;padding:4px 12px;">✅ Tamamla</button>` : '<span class="task-status">✅ Tamamlandı</span>'}
+                        ${!completed ? `<button class="btn-primary btn-sm" onclick="${actionUrl}" style="font-size:11px;padding:4px 12px;">✅ Tamamla</button>` : '<span class="task-status">✅ Tamamlandı</span>'}
                     </div>
                 </div>
             `;
@@ -9364,39 +9373,41 @@ window.completeTeamTask = async function(taskId) {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ---- ANKET ----
+// ---- ANKET (HEM ANA SAYFA HEM DASHBOARD) ----
 window.loadPoll = async function() {
     try {
         var result = await Parse.Cloud.run('getActivePoll', {});
-        var container = document.getElementById('pollContainer');
-        var questionEl = document.getElementById('pollQuestion');
-        var optionsEl = document.getElementById('pollOptions');
-        var statusEl = document.getElementById('pollStatus');
-        if (!container || !questionEl || !optionsEl || !statusEl) return;
-        if (!result || !result.question) {
-            questionEl.textContent = 'Aktif anket yok.';
-            optionsEl.innerHTML = '';
-            statusEl.textContent = 'Kurucu anket oluşturabilir.';
-            return;
-        }
-        questionEl.textContent = result.question;
-        var html = '';
-        var totalVotes = result.votes.reduce((a,b) => a + b, 0);
-        result.options.forEach(function(option, index) {
-            var percent = totalVotes > 0 ? (result.votes[index] / totalVotes * 100) : 0;
-            html += `
-                <div class="poll-option" onclick="window.votePoll(${index})">
-                    <span>${option}</span>
-                    <div class="poll-bar">
-                        <div class="poll-bar-fill" style="width:${percent}%;"></div>
+        var containers = document.querySelectorAll('#pollContainer');
+        containers.forEach(function(container) {
+            var questionEl = container.querySelector('.poll-question');
+            var optionsEl = container.querySelector('#pollOptions');
+            var statusEl = container.querySelector('#pollStatus');
+            if (!questionEl || !optionsEl || !statusEl) return;
+            if (!result || !result.question) {
+                questionEl.textContent = 'Aktif anket yok.';
+                optionsEl.innerHTML = '';
+                statusEl.textContent = 'Kurucu anket oluşturabilir.';
+                return;
+            }
+            questionEl.textContent = result.question;
+            var html = '';
+            var totalVotes = result.votes.reduce((a,b) => a + b, 0);
+            result.options.forEach(function(option, index) {
+                var percent = totalVotes > 0 ? (result.votes[index] / totalVotes * 100) : 0;
+                html += `
+                    <div class="poll-option" onclick="window.votePoll(${index})">
+                        <span>${option}</span>
+                        <div class="poll-bar">
+                            <div class="poll-bar-fill" style="width:${percent}%;"></div>
+                        </div>
+                        <span class="poll-percent">${Math.round(percent)}%</span>
+                        <span class="poll-votes">(${result.votes[index]} oy)</span>
                     </div>
-                    <span class="poll-percent">${Math.round(percent)}%</span>
-                    <span class="poll-votes">(${result.votes[index]} oy)</span>
-                </div>
-            `;
+                `;
+            });
+            optionsEl.innerHTML = html;
+            statusEl.textContent = totalVotes + ' oy kullanıldı. ' + (result.end_date ? 'Kalan süre: ' + window.getTimeRemaining(result.end_date) : '');
         });
-        optionsEl.innerHTML = html;
-        statusEl.textContent = totalVotes + ' oy kullanıldı. ' + (result.end_date ? 'Kalan süre: ' + window.getTimeRemaining(result.end_date) : '');
     } catch(e) { console.error('Anket yüklenirken hata:', e); }
 };
 
@@ -9468,35 +9479,37 @@ window.getTimeRemaining = function(endDate) {
     return days + ' gün ' + hours + ' saat';
 };
 
-// ---- DUYURU ----
+// ---- DUYURU (HEM ANA SAYFA HEM DASHBOARD) ----
 window.loadAnnouncements = async function() {
     try {
         var result = await Parse.Cloud.run('getAnnouncements', {});
-        var container = document.getElementById('announcementList');
-        if (!container) return;
-        if (!result || result.length === 0) {
-            container.innerHTML = '<div style="color:var(--text3);padding:8px;">📭 Henüz duyuru yok.</div>';
-            return;
-        }
-        var html = '';
-        result.forEach(function(a) {
-            html += `
-                <div style="background:var(--surface);border-radius:8px;padding:12px 16px;margin-bottom:8px;border-left:3px solid var(--accent);">
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <strong>${a.title || 'Duyuru'}</strong>
-                        <span style="font-size:10px;color:var(--text3);">${new Date(a.createdAt).toLocaleString('tr-TR')}</span>
-                    </div>
-                    <div style="font-size:13px;color:var(--text2);margin-top:4px;">${a.content}</div>
-                    ${(currentUser && (currentUser.get('role') === 'admin' || currentUser.get('role') === 'founder')) ? `
-                        <div style="margin-top:6px;display:flex;gap:6px;">
-                            <button class="btn-danger btn-sm" onclick="window.deleteAnnouncement('${a.id}')" style="font-size:9px;padding:2px 8px;">🗑️ Sil</button>
-                            <button class="btn-secondary btn-sm" onclick="window.editAnnouncement('${a.id}')" style="font-size:9px;padding:2px 8px;">✏️ Düzenle</button>
+        var containers = document.querySelectorAll('#announcementList');
+        containers.forEach(function(container) {
+            if (!container) return;
+            if (!result || result.length === 0) {
+                container.innerHTML = '<div style="color:var(--text3);padding:8px;">📭 Henüz duyuru yok.</div>';
+                return;
+            }
+            var html = '';
+            result.forEach(function(a) {
+                html += `
+                    <div style="background:var(--surface);border-radius:8px;padding:12px 16px;margin-bottom:8px;border-left:3px solid var(--accent);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <strong>${a.title || 'Duyuru'}</strong>
+                            <span style="font-size:10px;color:var(--text3);">${new Date(a.createdAt).toLocaleString('tr-TR')}</span>
                         </div>
-                    ` : ''}
-                </div>
-            `;
+                        <div style="font-size:13px;color:var(--text2);margin-top:4px;">${a.content}</div>
+                        ${(currentUser && (currentUser.get('role') === 'admin' || currentUser.get('role') === 'founder')) ? `
+                            <div style="margin-top:6px;display:flex;gap:6px;">
+                                <button class="btn-danger btn-sm" onclick="window.deleteAnnouncement('${a.id}')" style="font-size:9px;padding:2px 8px;">🗑️ Sil</button>
+                                <button class="btn-secondary btn-sm" onclick="window.editAnnouncement('${a.id}')" style="font-size:9px;padding:2px 8px;">✏️ Düzenle</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
         });
-        container.innerHTML = html;
     } catch(e) { console.error('Duyurular yüklenirken hata:', e); }
 };
 
@@ -9537,7 +9550,7 @@ window.editAnnouncement = async function(id) {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ---- V27 AKADEMİ ----
+// ---- AKADEMİ ----
 window.loadCourses = async function() {
     try {
         var result = await Parse.Cloud.run('getCourses', {});
@@ -9695,7 +9708,7 @@ window.submitBugReport = async function() {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ---- V27 ZEKA TESTİ ----
+// ---- ZEKA TESTİ ----
 window.loadQuiz = async function() {
     try {
         var result = await Parse.Cloud.run('getQuizQuestions', {});
@@ -9952,10 +9965,10 @@ window.openParentSettings = function() {
     if (modal) {
         modal.classList.add('open');
         modal.style.display = 'flex';
-        // Önce giriş bölümünü göster, kontrolleri gizle
         document.getElementById('parentLoginSection').style.display = 'block';
         document.getElementById('parentControls').style.display = 'none';
-        document.getElementById('parentVerificationSection').style.display = 'block';
+        document.getElementById('parentVerificationSection').style.display = 'none';
+        document.getElementById('parentCreateSection').style.display = 'block';
         window.loadParentSettings();
         window.loadSessions();
     }
@@ -9978,6 +9991,65 @@ window.loginParent = async function() {
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
+};
+
+// Ebeveyn Hesabı Oluştur (Yeni)
+window.createParentAccount = async function() {
+    if (!currentUser) return showNotification('Giriş yapın!', 'error');
+    var email = document.getElementById('parentCreateEmail').value.trim();
+    if (!email) return showNotification('Ebeveyn e-posta girin!', 'error');
+    if (email === currentUser.get('email')) return showNotification('Ebeveyn e-postası kendi e-postanız ile aynı olamaz!', 'error');
+    var pass = document.getElementById('parentCreatePass').value;
+    var pass2 = document.getElementById('parentCreatePass2').value;
+    if (!pass || pass.length < 8) return showNotification('Şifre en az 8 karakter olmalı!', 'error');
+    if (pass !== pass2) return showNotification('Şifreler eşleşmiyor!', 'error');
+    try {
+        var code = Math.floor(100000 + Math.random() * 900000).toString();
+        currentUser.set('parent_email', email);
+        currentUser.set('parent_verification_code', code);
+        currentUser.set('parent_code_expires', new Date(Date.now() + 15 * 60000));
+        currentUser.set('parent_temp_password', pass);
+        await currentUser.save(null, { useMasterKey: true });
+        await Parse.Cloud.run('sendEmail', {
+            to: email,
+            subject: 'VİZYON2027 Ebeveyn Doğrulama Kodu',
+            html: `<h3>Ebeveyn Doğrulama</h3><p>Kodunuz: <strong>${code}</strong></p><p>15 dakika geçerlidir.</p><p>Ebeveyn hesabı oluşturmak için bu kodu girin.</p>`
+        }, { useMasterKey: true });
+        document.getElementById('parentCreateSection').style.display = 'none';
+        document.getElementById('parentVerificationSection').style.display = 'block';
+        showNotification('Doğrulama kodu gönderildi!', 'success');
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+window.verifyParentCode = async function() {
+    var code = document.getElementById('parentCodeInput').value.trim();
+    if (!code) return showNotification('Kodu girin!', 'error');
+    try {
+        var result = await Parse.Cloud.run('verifyParentCode', { code: code });
+        if (result.success) {
+            var settings = await Parse.Cloud.run('getParentSettings', {});
+            if (!settings.parent_pin) {
+                var pin = prompt('Ebeveyn paneline erişim için 4 haneli bir PIN belirleyin:');
+                if (pin && pin.length === 4 && !isNaN(pin)) {
+                    await Parse.Cloud.run('setParentPin', { pin: pin });
+                    showNotification('Ebeveyn PIN\'i oluşturuldu!', 'success');
+                } else {
+                    showNotification('Geçerli PIN belirleyin!', 'error');
+                    return;
+                }
+            }
+            document.getElementById('parentVerificationSection').style.display = 'none';
+            document.getElementById('parentLoginSection').style.display = 'block';
+            document.getElementById('parentControls').style.display = 'none';
+            document.getElementById('parentEmailDisplay').textContent = currentUser.get('parent_email');
+            showNotification('Ebeveyn e-postası doğrulandı! Lütfen PIN\'inizi girin.', 'success');
+            window.loadParentSettings();
+        } else {
+            showNotification('Hata: ' + result.error, 'error');
+        }
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
 window.loadParentSettings = async function() {
@@ -10004,7 +10076,8 @@ window.loadParentSettings = async function() {
         } else {
             document.getElementById('parentControls').style.display = 'none';
             document.getElementById('parentLoginSection').style.display = 'block';
-            document.getElementById('parentVerificationSection').style.display = 'block';
+            document.getElementById('parentVerificationSection').style.display = 'none';
+            document.getElementById('parentCreateSection').style.display = 'block';
         }
     } catch(e) {
         console.error('Ebeveyn ayarları yüklenemedi:', e);
@@ -10038,7 +10111,6 @@ window.verifyParentCode = async function() {
     try {
         var result = await Parse.Cloud.run('verifyParentCode', { code: code });
         if (result.success) {
-            // Eğer PIN set edilmemişse, kullanıcıya PIN oluşturmasını söyle
             var settings = await Parse.Cloud.run('getParentSettings', {});
             if (!settings.parent_pin) {
                 var pin = prompt('Ebeveyn paneline erişim için 4 haneli bir PIN belirleyin:');
@@ -10348,7 +10420,6 @@ window.loadTeamPage = async function() {
     var memberManagementBtn = document.getElementById('teamMemberManagementBtn');
     var panelMemberCount = document.getElementById('teamPageMemberCount');
 
-    // VİZYON PATROL / DESTEK görünürlük
     var patrolBtn = document.getElementById('vizyonPatrolBtn');
     var supportBtn = document.getElementById('vizyonSupportBtn');
     var isFounder = currentUser ? currentUser.get('role') === 'founder' : false;
@@ -10381,6 +10452,9 @@ window.loadTeamPage = async function() {
         if (memberManagementBtn) memberManagementBtn.style.display = 'none';
         if (panelMemberCount) panelMemberCount.textContent = '0 üye';
         window.applyTranslations(currentLanguage);
+        // Takım görevleri container'ı temizle
+        var teamTasksContainer = document.getElementById('teamTasksContainer');
+        if (teamTasksContainer) teamTasksContainer.innerHTML = '<div style="color:var(--text3);padding:12px;text-align:center;">👥 Takım görevleri için bir takıma katılın.</div>';
         return;
     }
 
@@ -10483,9 +10557,7 @@ window.loadTeamPage = async function() {
             }
         }
 
-        // Takım görevlerini yükle
         window.loadTeamTasks();
-
         window.applyTranslations(currentLanguage);
     } catch(e) {
         console.error('Takım sayfası yüklenirken hata:', e);
@@ -10493,7 +10565,6 @@ window.loadTeamPage = async function() {
     }
 };
 
-// ---- DİĞER FONKSİYONLAR (kısa kullanımlar) ----
 window.sendTeamPageMessage = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     var teamId = currentUser.get('teamId');
@@ -11933,7 +12004,7 @@ window.addEventListener('load', async function() {
             userPanel.style.display = 'none';
         }
 
-        // ANA SAYFA ELEMANLARINI YÜKLE
+        // Tüm öğeleri yükle (hem ana sayfa hem dashboard)
         try {
             if (document.getElementById('pollContainer')) window.loadPoll();
             if (document.getElementById('announcementList')) window.loadAnnouncements();
@@ -11943,7 +12014,7 @@ window.addEventListener('load', async function() {
             if (document.getElementById('courseList')) window.loadCourses();
             if (document.getElementById('quizContainer')) window.loadQuiz();
         } catch(e) {
-            console.log('Ana sayfa öğeleri yüklenemedi (muhtemelen container yok):', e.message);
+            console.log('Öğeler yüklenemedi:', e.message);
         }
 
         await window.loadComments();
