@@ -2476,26 +2476,73 @@ button[onclick*="togglePassword"] i {
     color: #ffffff;
 }
 
-/* ----- 2. SPLASH INTRO EKRANI ----- */
+/* ----- 2. SPLASH INTRO EKRANI (GELİŞMİŞ) ----- */
 .splash-screen {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: #0a0a1a;
+    background: #050a0f;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 999999;
     transition: opacity 0.8s ease, visibility 0.8s ease;
+    overflow: hidden;
 }
 .splash-screen.hidden {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
 }
+
+/* Arka plan hareketli gradient */
+.splash-screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(0,212,255,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(168,85,247,0.10) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 20%, rgba(255,107,53,0.08) 0%, transparent 40%);
+    animation: splashBgPulse 6s ease-in-out infinite alternate;
+    z-index: 0;
+}
+@keyframes splashBgPulse {
+    0% { opacity: 0.6; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.05); }
+}
+
+/* Partikül efekti (arka planda yüzen noktalar) */
+.splash-particles {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+}
+.splash-particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: rgba(0,212,255,0.4);
+    border-radius: 50%;
+    animation: floatParticle linear infinite;
+}
+.splash-particle:nth-child(odd) {
+    background: rgba(168,85,247,0.3);
+    width: 4px;
+    height: 4px;
+}
+@keyframes floatParticle {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 0.6; }
+    100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+}
+
+/* Logo / Amblem */
 .splash-logo {
     width: 120px;
     height: 120px;
@@ -2507,34 +2554,162 @@ button[onclick*="togglePassword"] i {
     font-size: 48px;
     color: #fff;
     box-shadow: 0 0 80px rgba(0, 212, 255, 0.6);
-    animation: splashPulse 1.5s ease-in-out infinite;
+    animation: splashPulse 1.8s ease-in-out infinite, logoSpin 6s linear infinite;
+    position: relative;
+    z-index: 2;
 }
 @keyframes splashPulse {
     0% { transform: scale(1); box-shadow: 0 0 40px rgba(0,212,255,0.4); }
-    50% { transform: scale(1.1); box-shadow: 0 0 100px rgba(0,212,255,0.8); }
+    50% { transform: scale(1.08); box-shadow: 0 0 100px rgba(0,212,255,0.8); }
     100% { transform: scale(1); box-shadow: 0 0 40px rgba(0,212,255,0.4); }
 }
+@keyframes logoSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Ana başlık */
 .splash-title {
     margin-top: 30px;
     font-family: var(--font-display);
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 800;
-    background: linear-gradient(90deg, #00d4ff, #a855f7);
+    background: linear-gradient(90deg, #00d4ff, #a855f7, #ff6b35, #00d4ff);
+    background-size: 300% 300%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    animation: splashTextFade 1.2s ease;
+    animation: gradientMove 3s ease infinite, fadeUp 1.2s ease forwards;
+    position: relative;
+    z-index: 2;
+    letter-spacing: 2px;
 }
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+@keyframes fadeUp {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Alt metin */
 .splash-sub {
     color: #8ab4cc;
-    font-size: 14px;
-    margin-top: 10px;
-    letter-spacing: 4px;
-    animation: splashTextFade 1.6s ease;
+    font-size: 16px;
+    margin-top: 12px;
+    letter-spacing: 6px;
+    animation: fadeUp 1.6s ease forwards;
+    position: relative;
+    z-index: 2;
+    opacity: 0;
 }
-@keyframes splashTextFade {
-    0% { opacity: 0; transform: translateY(20px); }
-    100% { opacity: 1; transform: translateY(0); }
+.splash-sub em {
+    font-style: normal;
+    color: #00ff88;
+}
+
+/* İlerleme çubuğu (progress bar) */
+.splash-progress {
+    width: 280px;
+    max-width: 80%;
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    margin-top: 30px;
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 0 20px rgba(0,212,255,0.2);
+}
+.splash-progress-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #00d4ff, #a855f7, #ff6b35);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    animation: progressGlow 1.5s ease-in-out infinite alternate;
+}
+@keyframes progressGlow {
+    0% { box-shadow: 0 0 10px rgba(0,212,255,0.3); }
+    100% { box-shadow: 0 0 30px rgba(168,85,247,0.6); }
+}
+
+/* Progress yüzdesi */
+.splash-percent {
+    font-family: var(--font-code);
+    font-size: 14px;
+    color: #8ab4cc;
+    margin-top: 8px;
+    letter-spacing: 2px;
+    position: relative;
+    z-index: 2;
+}
+
+/* Sürüm bilgisi */
+.splash-version {
+    position: absolute;
+    bottom: 30px;
+    right: 40px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.2);
+    font-family: var(--font-code);
+    letter-spacing: 1px;
+    z-index: 2;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .splash-logo {
+        width: 80px;
+        height: 80px;
+        font-size: 32px;
+    }
+    .splash-title {
+        font-size: 24px;
+    }
+    .splash-sub {
+        font-size: 13px;
+        letter-spacing: 4px;
+    }
+    .splash-progress {
+        width: 200px;
+    }
+    .splash-version {
+        bottom: 20px;
+        right: 20px;
+        font-size: 10px;
+    }
+}
+@media (max-width: 480px) {
+    .splash-logo {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+    }
+    .splash-title {
+        font-size: 18px;
+        margin-top: 20px;
+    }
+    .splash-sub {
+        font-size: 11px;
+        letter-spacing: 3px;
+        margin-top: 8px;
+    }
+    .splash-progress {
+        width: 150px;
+        height: 3px;
+        margin-top: 20px;
+    }
+    .splash-percent {
+        font-size: 11px;
+    }
+    .splash-version {
+        bottom: 12px;
+        right: 12px;
+        font-size: 9px;
+    }
 }
 
 /* ----- 3. İNDİR POPUP'U ----- */
@@ -3682,8 +3857,6 @@ body.light-theme .legal-banner {
 }
 </style>
 
-
-
 </head>
 <body>
 
@@ -3758,11 +3931,30 @@ body.light-theme .legal-banner {
         </div>
     </nav>
 
-    <!-- ===== SPLASH INTRO EKRANI ===== -->
+    <!-- ===== SPLASH INTRO EKRANI (GELİŞMİŞ / HAVALI) ===== -->
     <div class="splash-screen" id="splashScreen">
-        <div class="splash-logo">✨</div>
+        <!-- Arka plan partikülleri (CSS ile oluşturulacak) -->
+        <div class="splash-particles" id="splashParticles"></div>
+
+        <!-- Logo / Amblem -->
+        <div class="splash-logo">🚀</div>
+
+        <!-- Ana Başlık -->
         <div class="splash-title">VİZYON 2027</div>
-        <div class="splash-sub">Yükleniyor...</div>
+
+        <!-- Alt Metin -->
+        <div class="splash-sub">Geleceği <em>şekillendiriyoruz</em>...</div>
+
+        <!-- İlerleme Çubuğu (Progress Bar) -->
+        <div class="splash-progress">
+            <div class="splash-progress-bar" id="splashProgressBar"></div>
+        </div>
+
+        <!-- Yüzde Göstergesi -->
+        <div class="splash-percent" id="splashPercent">0%</div>
+
+        <!-- Sürüm Bilgisi -->
+        <div class="splash-version">v6.01.1</div>
     </div>
 
     <!-- ===== HERO ===== -->
@@ -4022,7 +4214,7 @@ body.light-theme .legal-banner {
         </div>
         <!-- Sürüm Bilgisi -->
         <div style="text-align:center; margin-top:16px; font-size:12px; color:var(--text3);">
-            Sürüm: <span id="versionDisplay">V5.14.2</span>
+            Sürüm: <span id="versionDisplay">V6.01.1</span>
         </div>
         <!-- Topluluk Kuralları Footer -->
         <div class="community-rules-footer">
@@ -4032,7 +4224,6 @@ body.light-theme .legal-banner {
     </footer>
 </div>
 <!-- ===== HTML-1 SONU ===== -->
-
 
 <!-- ============================================================ -->
 <!-- HTML-2: DASHBOARD (GİRİŞ YAPAN KULLANICI)                    -->
@@ -4063,8 +4254,8 @@ body.light-theme .legal-banner {
             </span>
             <span id="dashQueryLimitBadge" class="query-limit-badge" style="position:relative;bottom:auto;left:auto;display:inline-block;padding:4px 12px;font-size:11px;">🔋 100 sorgu kaldı</span>
 
-            <!-- BİLDİRİM ÇANI (SADECE BURADA) -->
-            <button class="nav-cta" onclick="toggleNotificationPanel()" style="position:relative; padding:8px 14px; background:transparent; border:1px solid var(--accent); border-radius:40px; color:var(--accent);">
+            <!-- BİLDİRİM ÇANI -->
+            <button class="nav-cta" onclick="window.toggleNotificationPanel()" style="position:relative; padding:8px 14px; background:transparent; border:1px solid var(--accent); border-radius:40px; color:var(--accent);">
                 🔔 <span id="notificationBadge" style="position:absolute; top:-5px; right:-5px; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:10px; display:none;">0</span>
             </button>
 
@@ -4088,7 +4279,7 @@ body.light-theme .legal-banner {
 
     <div class="dashboard-content-wrapper">
 
-        <!-- ===== AI ASİSTAN (GELİŞMİŞ HAFIZA + YENİ SOHBET + GEÇMİŞ) ===== -->
+        <!-- ===== AI ASİSTAN ===== -->
         <div class="dashboard-grid">
             <div class="dashboard-card full-width">
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
@@ -4110,7 +4301,7 @@ body.light-theme .legal-banner {
                     <button class="btn-secondary" onclick="window.speakLastAIResponse()" data-i18n="Sesli Oku">🔊</button>
                 </div>
                 <div id="filePreviewContainer" style="display:flex; flex-wrap:wrap; gap:10px; padding:8px 12px; background:rgba(0,0,0,0.2); min-height:0; border-top:1px solid #1a3350; margin-top:12px;"></div>
-                <!-- Sohbet Geçmişi Listesi (gizlenebilir) -->
+                <!-- Sohbet Geçmişi Listesi -->
                 <div id="conversationHistoryList" style="display:none; margin-top:12px; border-top:1px solid var(--border); padding-top:12px; max-height:200px; overflow-y:auto;">
                     <h4 style="color:var(--text3); font-size:13px;">📜 Sohbet Geçmişi</h4>
                     <div id="conversationHistoryItems"></div>
@@ -4121,14 +4312,47 @@ body.light-theme .legal-banner {
         <!-- ===== KUTULAR (2 SÜTUN) ===== -->
         <div class="dashboard-grid-2col">
 
-            <div class="dashboard-card"><h3 data-i18n="Projelerim">📁 Projelerim</h3><div id="projectsList" class="project-list"></div><button class="btn-primary btn-sm" onclick="window.createProjectWizard()" style="margin-top:8px;" data-i18n="Yeni Proje">+ Yeni Proje</button></div>
-            <div class="dashboard-card"><h3 data-i18n="Favoriler">⭐ Favoriler</h3><div id="favList" class="project-list"></div></div>
-            <div class="dashboard-card"><h3 data-i18n="Arşiv">🗄️ Arşiv</h3><div id="archiveList" class="project-list"></div></div>
-            <div class="dashboard-card"><h3 data-i18n="Çöp Kutusu">🗑️ Çöp Kutusu</h3><div id="trashList" class="project-list"></div></div>
-            <div class="dashboard-card"><h3 data-i18n="Proje Taleplerim">📨 Proje Taleplerim</h3><div id="projectRequestsList" class="project-list"></div></div>
-            <div class="dashboard-card"><h3 data-i18n="Gelen Kutusu">📬 Gelen Kutusu</h3><div id="inboxList" class="inbox-list"></div></div>
+            <!-- Projelerim -->
+            <div class="dashboard-card">
+                <h3 data-i18n="Projelerim">📁 Projelerim</h3>
+                <div id="projectsList" class="project-list"></div>
+                <button class="btn-primary btn-sm" onclick="window.createProjectWizard()" style="margin-top:8px;" data-i18n="Yeni Proje">+ Yeni Proje</button>
+            </div>
 
-            <!-- ===== DAVET KODU KARTI (GİRME + OLUŞTURMA) ===== -->
+            <!-- Favoriler -->
+            <div class="dashboard-card">
+                <h3 data-i18n="Favoriler">⭐ Favoriler</h3>
+                <div id="favList" class="project-list"></div>
+            </div>
+
+            <!-- Arşiv -->
+            <div class="dashboard-card">
+                <h3 data-i18n="Arşiv">🗄️ Arşiv</h3>
+                <div id="archiveList" class="project-list"></div>
+            </div>
+
+            <!-- Çöp Kutusu -->
+            <div class="dashboard-card">
+                <h3 data-i18n="Çöp Kutusu">🗑️ Çöp Kutusu</h3>
+                <div id="trashList" class="project-list"></div>
+            </div>
+
+            <!-- Proje Taleplerim (Başlıkta + buton) -->
+            <div class="dashboard-card">
+                <h3 data-i18n="Proje Taleplerim">
+                    📨 Proje Taleplerim
+                    <button class="btn-primary btn-sm" onclick="window.createProjectRequest()" style="margin-left:10px;font-size:11px;padding:4px 12px;">➕ Proje Talebi Oluştur</button>
+                </h3>
+                <div id="projectRequestsList" class="project-list"></div>
+            </div>
+
+            <!-- Gelen Kutusu -->
+            <div class="dashboard-card">
+                <h3 data-i18n="Gelen Kutusu">📬 Gelen Kutusu</h3>
+                <div id="inboxList" class="inbox-list"></div>
+            </div>
+
+            <!-- Davet Kodu Kartı -->
             <div class="dashboard-card full-width" id="referralCard">
                 <h3>🎁 Davet Kodu</h3>
                 <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
@@ -4140,13 +4364,13 @@ body.light-theme .legal-banner {
                 <div id="referralMessage" style="margin-top:8px; font-size:13px; color:var(--text3);"></div>
             </div>
 
-            <!-- ===== GÜNLÜK GÖREVLER ===== -->
+            <!-- Günlük Görevler -->
             <div class="dashboard-card full-width">
                 <h3>📋 Günlük Görevler <span style="font-size:12px;color:var(--text3);font-weight:400;">(Her gün 00:00'da yenilenir)</span></h3>
                 <div id="dailyTasksContainer"></div>
             </div>
 
-            <!-- ===== GÜNLÜK SERİ (STREAK) – YENİ ===== -->
+            <!-- Günlük Seri (Streak) -->
             <div class="dashboard-card full-width" id="streakCard">
                 <h3>🔥 Günlük Seri <span style="font-size:12px;color:var(--text3);font-weight:400;">(Her gün ödül al!)</span></h3>
                 <div id="streakContainer" style="display:flex; flex-direction:column; gap:8px;">
@@ -4162,7 +4386,7 @@ body.light-theme .legal-banner {
                 </div>
             </div>
 
-            <!-- ===== ANKET / OYLAMA ===== -->
+            <!-- Anket / Oylama -->
             <div class="dashboard-card full-width" id="pollSection">
                 <h3>📊 Anket / Oylama</h3>
                 <div id="pollContainer" class="poll-container">
@@ -4180,7 +4404,6 @@ body.light-theme .legal-banner {
                     <button class="btn-secondary btn-sm" onclick="window.addPollOption()">+ Seçenek Ekle</button>
                     <input type="number" id="pollDuration" placeholder="Süre (gün)" class="glow-input" style="width:100px;display:inline-block;margin:8px 0;">
                     <button class="btn-primary btn-sm" onclick="window.createPoll()">📢 Anket Yayınla</button>
-                    <!-- Oylama silme/düzenleme (kurucu) -->
                     <div id="pollManage" style="margin-top:12px; display:none;">
                         <button class="btn-danger btn-sm" onclick="window.deletePoll()">🗑️ Anketi Sil</button>
                         <button class="btn-secondary btn-sm" onclick="window.editPoll()">✏️ Anketi Düzenle</button>
@@ -4188,7 +4411,7 @@ body.light-theme .legal-banner {
                 </div>
             </div>
 
-            <!-- ===== DUYURU PANOSU (ADMİN/KURUCU) ===== -->
+            <!-- Duyuru Panosu -->
             <div class="dashboard-card full-width" id="announcementSection">
                 <h3>📢 Duyuru Panosu</h3>
                 <div id="announcementList" style="max-height:200px;overflow-y:auto;"></div>
@@ -4199,25 +4422,25 @@ body.light-theme .legal-banner {
                 </div>
             </div>
 
-            <!-- ===== V27 AKADEMİ ===== -->
+            <!-- V27 Akademi -->
             <div class="dashboard-card full-width">
                 <h3>📚 V27 Akademi</h3>
                 <div id="courseList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;"></div>
             </div>
 
-            <!-- ===== AYLIK YARIŞMA ===== -->
+            <!-- Aylık Yarışma -->
             <div class="dashboard-card full-width">
                 <h3>🏆 Aylık Yarışma</h3>
                 <div id="contestRanking" style="max-height:200px;overflow-y:auto;"></div>
             </div>
 
-            <!-- ===== İŞ İLANLARI ===== -->
+            <!-- İş İlanları -->
             <div class="dashboard-card full-width">
                 <h3>💼 V27 İş İlanları</h3>
                 <div id="jobList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;"></div>
             </div>
 
-            <!-- ===== HATA BİLDİR ===== -->
+            <!-- Hata Bildir -->
             <div class="dashboard-card">
                 <h3>🐛 Hata Bildir (Puan Kazan!)</h3>
                 <textarea id="bugDescription" placeholder="Hata açıklaması" rows="2" class="glow-input" style="width:100%;margin-bottom:8px;"></textarea>
@@ -4225,26 +4448,26 @@ body.light-theme .legal-banner {
                 <button class="btn-primary btn-sm" onclick="window.submitBugReport()">📤 Gönder (100 Puan)</button>
             </div>
 
-            <!-- ===== MİNİ OYUN ===== -->
+            <!-- Mini Oyun (Zeka Testi) -->
             <div class="dashboard-card">
                 <h3>🎮 V27 Zeka Testi</h3>
                 <div id="quizContainer"></div>
             </div>
 
-            <!-- ===== V27 CÜZDAN ===== -->
+            <!-- V27 Cüzdan -->
             <div class="dashboard-card">
                 <h3>💰 V27 Cüzdan</h3>
                 <div style="font-size:24px;font-weight:700;color:var(--gold);">₺ <span id="walletBalance">0.00</span></div>
                 <button class="btn-secondary btn-sm" onclick="window.withdrawFunds()">💳 Para Çek</button>
             </div>
 
-            <!-- ===== ABONELİK KARTI (SADECE BURADA) ===== -->
+            <!-- Abonelik Kartı -->
             <div class="dashboard-card full-width" id="subscriptionsCardWrapper" style="display:none;">
                 <h3 style="color:var(--accent);">📬 Aboneliklerim</h3>
                 <div id="subscriptionsContent"><p style="color:var(--text3);">Yükleniyor...</p></div>
             </div>
 
-            <!-- ===== YÖNETİM İŞLEMLERİ (Admin/Founder) ===== -->
+            <!-- Yönetim İşlemleri (Admin/Founder) -->
             <div class="dashboard-card" id="adminActionsCard" style="display:none; grid-column: span 2;">
                 <h3 data-i18n="Yönetim İşlemleri">⚙️ Yönetim İşlemleri</h3>
                 <div style="display:flex; flex-direction:column; gap:16px;">
@@ -4283,7 +4506,7 @@ body.light-theme .legal-banner {
                 </div>
             </div>
 
-            <!-- ===== GÖRSEL ÜRET ===== -->
+            <!-- Görsel Üret -->
             <div class="dashboard-card">
                 <h3 data-i18n="Görsel Üret (AI)">🖼️ Görsel Üret (AI)</h3>
                 <input id="imagePrompt" class="glow-input" placeholder="Görsel açıklaması yazın..." style="width:100%; margin-bottom:10px;" onkeypress="if(event.key==='Enter') window.generateImage()">
@@ -4291,7 +4514,7 @@ body.light-theme .legal-banner {
                 <div id="imageResults" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; max-height:200px; overflow-y:auto;"></div>
             </div>
 
-            <!-- ===== 3D MODEL ÜRET ===== -->
+            <!-- 3D Model Üret -->
             <div class="dashboard-card">
                 <h3 data-i18n="3D Model Üret">🧊 3D Model Üret</h3>
                 <input id="threeDPrompt" class="glow-input" placeholder="3D nesne açıklaması yazın..." style="width:100%; margin-bottom:10px;" onkeypress="if(event.key==='Enter') window.generate3D()">
@@ -4299,7 +4522,7 @@ body.light-theme .legal-banner {
                 <div id="canvas3d" style="width:100%; height:250px; margin-top:10px; background:#0a0a0a; border-radius:12px; border:1px solid var(--border);"></div>
             </div>
 
-            <!-- ===== SAVAŞ MODU (AI vs AI) – YENİ ===== -->
+            <!-- Savaş Modu -->
             <div class="dashboard-card full-width">
                 <h3>⚔️ Savaş Modu <span style="font-size:12px;color:var(--text3);font-weight:400;">(AI vs AI)</span></h3>
                 <input type="text" id="battlePrompt" placeholder="Hangi konuda savaşsınlar? (örn: 'Yapay zeka tehlikeli mi?')" class="glow-input" style="width:100%; margin-bottom:8px;" onkeypress="if(event.key==='Enter') window.startBattle()">
@@ -4322,7 +4545,7 @@ body.light-theme .legal-banner {
                 <div id="battleResults" style="margin-top:10px; max-height:300px; overflow-y:auto; background:var(--bg); border-radius:12px; padding:12px; border:1px solid var(--border);"></div>
             </div>
 
-            <!-- ===== ÇOKLU AI (4 MODEL) – YENİ ===== -->
+            <!-- Çoklu AI -->
             <div class="dashboard-card full-width">
                 <h3>🧠 Çoklu AI <span style="font-size:12px;color:var(--text3);font-weight:400;">(4 model tek ekranda)</span></h3>
                 <input type="text" id="multiAIPrompt" placeholder="4 modele aynı soruyu sor..." class="glow-input" style="width:100%; margin-bottom:8px;" onkeypress="if(event.key==='Enter') window.runMultiAI()">
@@ -4335,7 +4558,7 @@ body.light-theme .legal-banner {
                 </div>
             </div>
 
-            <!-- ===== VIDEO ANALİZ – YENİ ===== -->
+            <!-- Video Analiz -->
             <div class="dashboard-card full-width">
                 <h3>🎬 Video Analiz</h3>
                 <input type="text" id="videoUrlInput" placeholder="YouTube veya video URL'si..." class="glow-input" style="width:100%; margin-bottom:8px;" onkeypress="if(event.key==='Enter') window.analyzeVideo()">
@@ -4346,7 +4569,7 @@ body.light-theme .legal-banner {
                 <div id="videoAnalysisResult" style="margin-top:10px; max-height:200px; overflow-y:auto; background:var(--bg); border-radius:12px; padding:12px; border:1px solid var(--border);"></div>
             </div>
 
-            <!-- ===== UYGULAMA YAPTIRICI – YENİ ===== -->
+            <!-- Uygulama Yaptırıcı -->
             <div class="dashboard-card full-width">
                 <h3>📱 AI Uygulama Yaptırıcı</h3>
                 <input type="text" id="appPrompt" placeholder="Nasıl bir uygulama istersin? (örn: 'Sayaç uygulaması')" class="glow-input" style="width:100%; margin-bottom:8px;" onkeypress="if(event.key==='Enter') window.generateApp()">
@@ -4354,7 +4577,7 @@ body.light-theme .legal-banner {
                 <div id="appResult" style="margin-top:10px; max-height:300px; overflow-y:auto; background:var(--bg); border-radius:12px; padding:12px; border:1px solid var(--border);"></div>
             </div>
 
-            <!-- ===== PRO ARAÇLARI (/kod, /yazi, /ceviri) – YENİ ===== -->
+            <!-- Pro Araçları -->
             <div class="dashboard-card full-width">
                 <h3>🛠️ Pro Araçları</h3>
                 <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
@@ -4367,18 +4590,43 @@ body.light-theme .legal-banner {
                 <div id="proToolResult" style="margin-top:10px; max-height:200px; overflow-y:auto; background:var(--bg); border-radius:12px; padding:12px; border:1px solid var(--border);"></div>
             </div>
 
-        </div>
+        </div> <!-- dashboard-grid-2col sonu -->
 
-        <!-- ===== YÖNETİM PANELİ (SADECE KURUCU) ===== -->
+        <!-- Yönetim Paneli (Sadece Kurucu) -->
         <div id="adminPanelCard" class="dashboard-card full-width" style="display:none;">
             <h3 data-i18n="Yönetim Paneli (Sadece Kurucu)">⚙️ YÖNETİM PANELİ (SADECE KURUCU)</h3>
-            <div style="margin-bottom:16px;"><h4 data-i18n="Kullanıcı Listesi">👥 Kullanıcı Listesi</h4><div id="userList" class="user-list"></div></div>
-            <div style="margin-bottom:16px;"><h4 data-i18n="Admin Ata">🎯 Admin Atama</h4><div style="display:flex;gap:8px;flex-wrap:wrap;"><input type="email" id="assignAdminEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;" onkeypress="if(event.key==='Enter') window.assignAdmin()"><button class="btn-primary btn-sm" onclick="window.assignAdmin()" data-i18n="Admin Yap">Admin Yap</button></div></div>
-            <div style="margin-bottom:16px;"><h4 data-i18n="Hediye Gönder">🎁 Hediye Gönder</h4><div style="display:flex;gap:8px;flex-wrap:wrap;"><input type="email" id="giftEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;" onkeypress="if(event.key==='Enter') window.sendGift()"><select id="giftPackage" class="glow-input"><option value="pro" data-i18n="Pro Paket">🌟 Pro Paket</option><option value="team" data-i18n="Takım Paketi">👥 Takım Paketi</option></select><button class="btn-primary btn-sm" onclick="window.sendGift()" data-i18n="Gönder">Gönder</button></div></div>
-            <div><h4 data-i18n="Kullanıcı Engelle">🔒 Kullanıcı Engelle</h4><div style="display:flex;gap:8px;flex-wrap:wrap;"><input type="email" id="banUserEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;" onkeypress="if(event.key==='Enter') window.banUser()"><button class="btn-danger btn-sm" onclick="window.banUser()" data-i18n="Yasakla">Yasakla</button></div></div>
+            <div style="margin-bottom:16px;">
+                <h4 data-i18n="Kullanıcı Listesi">👥 Kullanıcı Listesi</h4>
+                <div id="userList" class="user-list"></div>
+            </div>
+            <div style="margin-bottom:16px;">
+                <h4 data-i18n="Admin Ata">🎯 Admin Atama</h4>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <input type="email" id="assignAdminEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;" onkeypress="if(event.key==='Enter') window.assignAdmin()">
+                    <button class="btn-primary btn-sm" onclick="window.assignAdmin()" data-i18n="Admin Yap">Admin Yap</button>
+                </div>
+            </div>
+            <div style="margin-bottom:16px;">
+                <h4 data-i18n="Hediye Gönder">🎁 Hediye Gönder</h4>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <input type="email" id="giftEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;" onkeypress="if(event.key==='Enter') window.sendGift()">
+                    <select id="giftPackage" class="glow-input">
+                        <option value="pro" data-i18n="Pro Paket">🌟 Pro Paket</option>
+                        <option value="team" data-i18n="Takım Paketi">👥 Takım Paketi</option>
+                    </select>
+                    <button class="btn-primary btn-sm" onclick="window.sendGift()" data-i18n="Gönder">Gönder</button>
+                </div>
+            </div>
+            <div>
+                <h4 data-i18n="Kullanıcı Engelle">🔒 Kullanıcı Engelle</h4>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <input type="email" id="banUserEmail" placeholder="Kullanıcı E-posta" class="glow-input" style="flex:1;min-width:200px;" onkeypress="if(event.key==='Enter') window.banUser()">
+                    <button class="btn-danger btn-sm" onclick="window.banUser()" data-i18n="Yasakla">Yasakla</button>
+                </div>
+            </div>
         </div>
 
-        <!-- ===== YORUMLAR ===== -->
+        <!-- Yorumlar -->
         <section id="commentsSection">
             <h3 data-i18n="Yorumlar">💬 Yorumlar</h3>
             <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center;">
@@ -4416,7 +4664,7 @@ body.light-theme .legal-banner {
             </div>
         </section>
 
-        <!-- ===== ALT KISIM ===== -->
+        <!-- Alt Kısım -->
         <div class="dashboard-card full-width" style="margin-top:24px; text-align:center; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; padding:20px;">
             <button class="btn-danger" onclick="window.deleteAccount()" data-i18n="Hesabımı Sil">🗑️ Hesabımı Sil</button>
             <button class="btn-secondary" onclick="window.openSettingsModal()" data-i18n="Ayarlar">⚙️ Ayarlar</button>
@@ -4425,7 +4673,7 @@ body.light-theme .legal-banner {
 
         <div id="extraAdminCard" class="dashboard-card full-width" style="display:none; margin-top:24px;"></div>
 
-    </div>
+    </div> <!-- dashboard-content-wrapper sonu -->
 </div>
 <!-- ===== DASHBOARD SONU ===== -->
 
@@ -5144,416 +5392,482 @@ body.light-theme .legal-banner {
 <!-- JS-1: BACK4APP KONFIG + GERÇEK SAYAÇLAR + OTOMATİK OTURUM -->
 <!-- ============================================================ -->
 <script>
-// ============================================================
-// JS-1: BACK4APP KONFIG + GERÇEK SAYAÇLAR + OTOMATİK OTURUM + SPLASH + TEMA + PARÇACIK + İMLEÇ + BİLDİRİM
-// ============================================================
+// ============================================================  
+// JS-1: BACK4APP KONFIG + GERÇEK SAYAÇLAR + OTOMATİK OTURUM + SPLASH + TEMA + PARÇACIK + İMLEÇ + BİLDİRİM  
+// ============================================================  
 
-var currentUser = null;
-var currentRole = null;
-var parseInitialized = false;
-var statsInterval = null;
-var currentConversationId = null; // AI sohbeti için mevcut konuşma ID'si
+var currentUser = null;  
+var currentRole = null;  
+var parseInitialized = false;  
+var statsInterval = null;  
+var currentConversationId = null;  
 
-// ========== BİLDİRİM (GLOBAL) ==========
-window.showNotification = function(msg, type) {
-    var n = document.getElementById('notification');
-    if (!n) {
-        n = document.createElement('div');
-        n.id = 'notification';
-        n.className = 'notification';
-        document.body.appendChild(n);
-    }
-    var prefix = (type === 'error') ? '❌ ' : (type === 'warning' ? '⚠️ ' : '✅ ');
-    n.innerHTML = prefix + msg;
-    n.className = 'notification show' + (type === 'error' ? ' error' : (type === 'warning' ? ' warning' : ''));
-    setTimeout(function() { n.classList.remove('show'); }, 4000);
-};
+// ========== BİLDİRİM (GLOBAL) ==========  
+window.showNotification = function(msg, type) {  
+    var n = document.getElementById('notification');  
+    if (!n) {  
+        n = document.createElement('div');  
+        n.id = 'notification';  
+        n.className = 'notification';  
+        document.body.appendChild(n);  
+    }  
+    var prefix = (type === 'error') ? '❌ ' : (type === 'warning' ? '⚠️ ' : '✅ ');  
+    n.innerHTML = prefix + msg;  
+    n.className = 'notification show' + (type === 'error' ? ' error' : (type === 'warning' ? ' warning' : ''));  
+    setTimeout(function() { n.classList.remove('show'); }, 4000);  
+};  
 
-// ========== MODAL KAPAT (KESİN ÇÖZÜM) ==========
-window.closeModal = function(id) {
-    var modal = document.getElementById(id);
-    if (modal) {
-        modal.classList.remove('open');
-        modal.style.display = ''; // CSS'de .modal-overlay.open { display: flex; } olduğu için
-        modal.style.visibility = '';
-        modal.style.opacity = '';
-        var inputs = modal.querySelectorAll('input, textarea');
-        inputs.forEach(function(inp) {
-            if (inp.type !== 'submit' && inp.type !== 'button') {
-                inp.value = '';
-            }
-        });
-    }
-};
+// ========== MODAL KAPAT (KESİN ÇÖZÜM) ==========  
+window.closeModal = function(id) {  
+    var modal = document.getElementById(id);  
+    if (modal) {  
+        modal.classList.remove('open');  
+        modal.style.display = '';  
+        modal.style.visibility = '';  
+        modal.style.opacity = '';  
+        var inputs = modal.querySelectorAll('input, textarea');  
+        inputs.forEach(function(inp) {  
+            if (inp.type !== 'submit' && inp.type !== 'button') {  
+                inp.value = '';  
+            }  
+        });  
+    }  
+};  
 
-// ESC tuşuna basınca açık olan modal'i kapat
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        var openModals = document.querySelectorAll('.modal-overlay.open');
-        openModals.forEach(function(modal) {
-            window.closeModal(modal.id);
-        });
-    }
-});
+// ESC tuşuna basınca açık olan modal'i kapat  
+document.addEventListener('keydown', function(e) {  
+    if (e.key === 'Escape') {  
+        var openModals = document.querySelectorAll('.modal-overlay.open');  
+        openModals.forEach(function(modal) {  
+            window.closeModal(modal.id);  
+        });  
+    }  
+});  
 
-// Overlay'e tıklayınca kapat (sadece modalın kendisine tıklandığında)
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('modal-overlay')) {
-        window.closeModal(e.target.id);
-    }
-});
+// Overlay'e tıklayınca kapat (sadece modalın kendisine tıklandığında)  
+document.addEventListener('click', function(e) {  
+    if (e.target.classList.contains('modal-overlay')) {  
+        window.closeModal(e.target.id);  
+    }  
+});  
 
-// ========== PARSE SERVER BAŞLAT (BACK4APP) ==========
-async function initBack4App() {
-    if (parseInitialized) return;
-    try {
-        if (typeof Parse === 'undefined') {
-            console.error('Parse SDK yüklenmedi!');
-            showNotification('Parse SDK yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-            return;
-        }
-        // ★ Back4app Bağlantısı – APP_ID ve CLIENT_KEY kullan
-        Parse.initialize(
-            "ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8",     // App ID
-            "mur4DtLsGOsQhykTnFVNGxYOeNbvjPbAkl6xPQGp"       // JavaScript Key (CLIENT ID)
-        );
+// ========== PARSE SERVER BAŞLAT (BACK4APP) ==========  
+async function initBack4App() {  
+    if (parseInitialized) return;  
+    try {  
+        if (typeof Parse === 'undefined') {  
+            console.error('Parse SDK yüklenmedi!');  
+            showNotification('Parse SDK yüklenemedi! Lütfen sayfayı yenileyin.', 'error');  
+            return;  
+        }  
+        Parse.initialize(  
+            "ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8",  
+            "mur4DtLsGOsQhykTnFVNGxYOeNbvjPbAkl6xPQGp"  
+        );  
+        Parse.serverURL = "https://parseapi.back4app.com";  
+        parseInitialized = true;  
+        console.log('✅ Back4app bağlantısı kuruldu!');  
+        showNotification('✅ Back4app bağlantısı kuruldu!', 'success');  
+    } catch(e) {  
+        console.error('Parse hatası:', e);  
+        showNotification('❌ Parse bağlantı hatası: ' + e.message, 'error');  
+    }  
+}  
 
-        Parse.serverURL = "https://parseapi.back4app.com";
-        parseInitialized = true;
-        console.log('✅ Back4app bağlantısı kuruldu!');
-        showNotification('✅ Back4app bağlantısı kuruldu!', 'success');
-    } catch(e) {
-        console.error('Parse hatası:', e);
-        showNotification('❌ Parse bağlantı hatası: ' + e.message, 'error');
-    }
-}
+// ========== OTOMATİK OTURUM KONTROLÜ ==========  
+async function checkSession() {  
+    try {  
+        var user = Parse.User.current();  
+        if (user) {  
+            try {  
+                await user.fetch();  
+                return true;  
+            } catch(e) {  
+                console.log('Oturum geçersiz, çıkış yapılıyor...');  
+                await Parse.User.logOut();  
+                localStorage.removeItem('vizyon_user');  
+                currentUser = null;  
+                return false;  
+            }  
+        }  
+        return false;  
+    } catch(e) {  
+        console.log('Oturum kontrol hatası:', e);  
+        return false;  
+    }  
+}  
 
-// ========== OTOMATİK OTURUM KONTROLÜ ==========
-async function checkSession() {
-    try {
-        var user = Parse.User.current();
-        if (user) {
-            try {
-                await user.fetch();
-                return true;
-            } catch(e) {
-                console.log('Oturum geçersiz, çıkış yapılıyor...');
-                await Parse.User.logOut();
-                localStorage.removeItem('vizyon_user');
-                currentUser = null;
-                return false;
-            }
-        }
-        return false;
-    } catch(e) {
-        console.log('Oturum kontrol hatası:', e);
-        return false;
-    }
-}
+// ========== SORGU LİMİTİ ==========  
+async function useQuery() {  
+    try {  
+        var result = await Parse.Cloud.run('useQuery', {});  
+        updateQueryBadge(result);  
+        return true;  
+    } catch(e) {  
+        var badges = document.querySelectorAll('.query-limit-badge');  
+        badges.forEach(function(badge) {  
+            badge.textContent = '⚠️ Limit bilinmiyor';  
+            badge.style.display = 'inline-block';  
+        });  
+        return true;  
+    }  
+}  
 
-// ========== SORGU LİMİTİ ==========
-async function useQuery() {
-    try {
-        var result = await Parse.Cloud.run('useQuery', {});
-        updateQueryBadge(result);
-        return true;
-    } catch(e) {
-        var badges = document.querySelectorAll('.query-limit-badge');
-        badges.forEach(function(badge) {
-            badge.textContent = '⚠️ Limit bilinmiyor';
-            badge.style.display = 'inline-block';
-        });
-        return true;
-    }
-}
+function updateQueryBadge(result) {  
+    var badges = document.querySelectorAll('.query-limit-badge');  
+    var remaining = result ? result.remaining : 'Sınırsız';  
+    var text = (remaining === 'Sınırsız' || remaining === Infinity) ? '🔋 Sınırsız sorgu' : '🔋 ' + remaining + ' sorgu kaldı';  
+    badges.forEach(function(badge) {  
+        badge.textContent = text;  
+        badge.style.display = 'inline-block';  
+    });  
+}  
 
-function updateQueryBadge(result) {
-    var badges = document.querySelectorAll('.query-limit-badge');
-    var remaining = result ? result.remaining : 'Sınırsız';
-    var text = (remaining === 'Sınırsız' || remaining === Infinity) ? '🔋 Sınırsız sorgu' : '🔋 ' + remaining + ' sorgu kaldı';
-    badges.forEach(function(badge) {
-        badge.textContent = text;
-        badge.style.display = 'inline-block';
-    });
-}
+// ========== GERÇEK SAYAÇLAR ==========  
+async function updateStats() {  
+    if (!currentUser) {  
+        document.getElementById('counter1').innerHTML = '0';  
+        document.getElementById('counter2').innerHTML = '0';  
+        document.getElementById('counter3').innerHTML = '0';  
+        return;  
+    }  
+    try {  
+        var userQuery = new Parse.Query(Parse.User);  
+        var userCount = await userQuery.count();  
+        document.getElementById('counter1').innerHTML = userCount || 0;  
+        var projectQuery = new Parse.Query('Project');  
+        var projectCount = await projectQuery.count();  
+        document.getElementById('counter3').innerHTML = projectCount || 0;  
+        var queryQuery = new Parse.Query('QueryStat');  
+        var totalQueries = await queryQuery.count();  
+        document.getElementById('counter2').innerHTML = totalQueries || 0;  
+    } catch(e) {  
+        console.log('İstatistikler güncellenemedi:', e);  
+        document.getElementById('counter1').innerHTML = '0';  
+        document.getElementById('counter2').innerHTML = '0';  
+        document.getElementById('counter3').innerHTML = '0';  
+    }  
+}  
 
-// ========== GERÇEK SAYAÇLAR ==========
-async function updateStats() {
-    if (!currentUser) {
-        document.getElementById('counter1').innerHTML = '0';
-        document.getElementById('counter2').innerHTML = '0';
-        document.getElementById('counter3').innerHTML = '0';
-        return;
-    }
-    try {
-        var userQuery = new Parse.Query(Parse.User);
-        var userCount = await userQuery.count();
-        document.getElementById('counter1').innerHTML = userCount || 0;
-        
-        var projectQuery = new Parse.Query('Project');
-        var projectCount = await projectQuery.count();
-        document.getElementById('counter3').innerHTML = projectCount || 0;
-        
-        var queryQuery = new Parse.Query('QueryStat');
-        var totalQueries = await queryQuery.count();
-        document.getElementById('counter2').innerHTML = totalQueries || 0;
-        
-    } catch(e) {
-        console.log('İstatistikler güncellenemedi:', e);
-        document.getElementById('counter1').innerHTML = '0';
-        document.getElementById('counter2').innerHTML = '0';
-        document.getElementById('counter3').innerHTML = '0';
-    }
-}
+function startStatsInterval() {  
+    if (statsInterval) clearInterval(statsInterval);  
+    updateStats();  
+    statsInterval = setInterval(updateStats, 30000);  
+}  
 
-function startStatsInterval() {
-    if (statsInterval) clearInterval(statsInterval);
-    updateStats();
-    statsInterval = setInterval(updateStats, 30000);
-}
+function stopStatsInterval() {  
+    if (statsInterval) {  
+        clearInterval(statsInterval);  
+        statsInterval = null;  
+    }  
+}  
 
-function stopStatsInterval() {
-    if (statsInterval) {
-        clearInterval(statsInterval);
-        statsInterval = null;
-    }
-}
+// ========== PUAN SİSTEMİ (İSTEMCİ TARAFI) ==========  
+window.updatePointsDisplay = function(points) {  
+    var badge = document.getElementById('dashboardPointsDisplay');  
+    if (badge) badge.textContent = points || 0;  
+    var level = calculateLevel(points);  
+    var levelBadge = document.getElementById('userLevelBadge');  
+    if (levelBadge) levelBadge.textContent = level;  
+};  
 
-// ========== PUAN SİSTEMİ (İSTEMCİ TARAFI) ==========
-window.updatePointsDisplay = function(points) {
-    var badge = document.getElementById('dashboardPointsDisplay');
-    if (badge) badge.textContent = points || 0;
-    var level = calculateLevel(points);
-    var levelBadge = document.getElementById('userLevelBadge');
-    if (levelBadge) levelBadge.textContent = level;
-};
+window.calculateLevel = function(points) {  
+    if (points >= 20000) return '🏆 V27 Efsanesi';  
+    if (points >= 5000) return '⭐ V27 Uzmanı';  
+    if (points >= 1000) return '🔰 V27 Üyesi';  
+    return '🟢 Çaylak';  
+};  
 
-window.calculateLevel = function(points) {
-    if (points >= 20000) return '🏆 V27 Efsanesi';
-    if (points >= 5000) return '⭐ V27 Uzmanı';
-    if (points >= 1000) return '🔰 V27 Üyesi';
-    return '🟢 Çaylak';
-};
+window.checkLevelUp = function(oldPoints, newPoints) {  
+    var oldLevel = calculateLevel(oldPoints);  
+    var newLevel = calculateLevel(newPoints);  
+    if (oldLevel !== newLevel) {  
+        triggerLevelUpAnimation(newLevel);  
+        showNotification('🎉 Tebrikler! ' + newLevel + ' seviyesine ulaştınız!', 'success');  
+    }  
+};  
 
-window.checkLevelUp = function(oldPoints, newPoints) {
-    var oldLevel = calculateLevel(oldPoints);
-    var newLevel = calculateLevel(newPoints);
-    if (oldLevel !== newLevel) {
-        triggerLevelUpAnimation(newLevel);
-        showNotification('🎉 Tebrikler! ' + newLevel + ' seviyesine ulaştınız!', 'success');
-    }
-};
+window.triggerLevelUpAnimation = function(level) {  
+    var container = document.createElement('div');  
+    container.className = 'confetti-container';  
+    document.body.appendChild(container);  
+    var colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff8800'];  
+    for (var i = 0; i < 100; i++) {  
+        var piece = document.createElement('div');  
+        piece.className = 'confetti-piece';  
+        piece.style.left = Math.random() * 100 + '%';  
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];  
+        piece.style.width = (Math.random() * 10 + 5) + 'px';  
+        piece.style.height = (Math.random() * 10 + 5) + 'px';  
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';  
+        piece.style.animationDuration = (Math.random() * 2 + 2) + 's';  
+        piece.style.animationDelay = (Math.random() * 1) + 's';  
+        container.appendChild(piece);  
+    }  
+    setTimeout(function() {  
+        container.remove();  
+    }, 4000);  
 
-window.triggerLevelUpAnimation = function(level) {
-    // Konfeti efekti
-    var container = document.createElement('div');
-    container.className = 'confetti-container';
-    document.body.appendChild(container);
-    var colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff8800'];
-    for (var i = 0; i < 100; i++) {
-        var piece = document.createElement('div');
-        piece.className = 'confetti-piece';
-        piece.style.left = Math.random() * 100 + '%';
-        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-        piece.style.width = (Math.random() * 10 + 5) + 'px';
-        piece.style.height = (Math.random() * 10 + 5) + 'px';
-        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
-        piece.style.animationDuration = (Math.random() * 2 + 2) + 's';
-        piece.style.animationDelay = (Math.random() * 1) + 's';
-        container.appendChild(piece);
-    }
-    setTimeout(function() {
-        container.remove();
-    }, 4000);
+    var modal = document.createElement('div');  
+    modal.className = 'level-up-modal';  
+    modal.innerHTML = `  
+        <span class="level-badge">${level.includes('Efsane') ? '👑' : level.includes('Uzman') ? '⭐' : level.includes('Üye') ? '🔰' : '🟢'}</span>  
+        <div class="level-title">${level}</div>  
+        <div class="level-sub">🎉 Tebrikler! Yeni seviyeye ulaştınız!</div>  
+    `;  
+    document.body.appendChild(modal);  
+    setTimeout(function() {  
+        modal.remove();  
+    }, 4000);  
+};  
 
-    // Level up modal
-    var modal = document.createElement('div');
-    modal.className = 'level-up-modal';
-    modal.innerHTML = `
-        <span class="level-badge">${level.includes('Efsane') ? '👑' : level.includes('Uzman') ? '⭐' : level.includes('Üye') ? '🔰' : '🟢'}</span>
-        <div class="level-title">${level}</div>
-        <div class="level-sub">🎉 Tebrikler! Yeni seviyeye ulaştınız!</div>
-    `;
-    document.body.appendChild(modal);
-    setTimeout(function() {
-        modal.remove();
-    }, 4000);
-};
+// ========== TEMA DEĞİŞTİRME ==========  
+window.toggleTheme = function() {  
+    var body = document.body;  
+    var btn = document.querySelector('.theme-toggle-btn');  
+    if (body.classList.contains('light-theme')) {  
+        body.classList.remove('light-theme');  
+        if (btn) btn.innerHTML = '🌙';  
+        localStorage.setItem('vizyon_theme', 'dark');  
+    } else {  
+        body.classList.add('light-theme');  
+        if (btn) btn.innerHTML = '☀️';  
+        localStorage.setItem('vizyon_theme', 'light');  
+    }  
+};  
 
-// ========== TEMA DEĞİŞTİRME ==========
-window.toggleTheme = function() {
-    var body = document.body;
-    var btn = document.querySelector('.theme-toggle-btn');
-    if (body.classList.contains('light-theme')) {
-        body.classList.remove('light-theme');
-        if (btn) btn.innerHTML = '🌙';
-        localStorage.setItem('vizyon_theme', 'dark');
-    } else {
-        body.classList.add('light-theme');
-        if (btn) btn.innerHTML = '☀️';
-        localStorage.setItem('vizyon_theme', 'light');
-    }
-};
+window.applyTheme = function() {  
+    var theme = localStorage.getItem('vizyon_theme') || 'dark';  
+    var body = document.body;  
+    var btn = document.querySelector('.theme-toggle-btn');  
+    if (theme === 'light') {  
+        body.classList.add('light-theme');  
+        if (btn) btn.innerHTML = '☀️';  
+    } else {  
+        body.classList.remove('light-theme');  
+        if (btn) btn.innerHTML = '🌙';  
+    }  
+};  
 
-window.applyTheme = function() {
-    var theme = localStorage.getItem('vizyon_theme') || 'dark';
-    var body = document.body;
-    var btn = document.querySelector('.theme-toggle-btn');
-    if (theme === 'light') {
-        body.classList.add('light-theme');
-        if (btn) btn.innerHTML = '☀️';
-    } else {
-        body.classList.remove('light-theme');
-        if (btn) btn.innerHTML = '🌙';
-    }
-};
+// ========== SPLASH EKRANI (GELİŞMİŞ YÖNETİM) ==========  
+let splashProgress = 0;  
+let splashInterval = null;  
+let appReady = false;  
 
-// ========== SPLASH EKRANI (ANİMASYONLU) ==========
-window.hideSplash = function() {
-    // 1. Yol: ID ile bul
-    var splash = document.getElementById('splashScreen');
-    // 2. Yol: class ile bul (yedek)
-    if (!splash) splash = document.querySelector('.splash-screen');
-    
-    if (splash) {
-        // Doğrudan display none yap (en garanti yöntem)
-        splash.style.display = 'none';
-        splash.style.opacity = '0';
-        splash.style.visibility = 'hidden';
-        splash.style.pointerEvents = 'none';
-        splash.classList.add('hidden');
-        console.log('✅ Splash gizlendi (hideSplash)');
-    } else {
-        console.warn('Splash elementi bulunamadı!');
-    }
-};
+// Progress bar'ı güncelle  
+function updateSplashProgress(value) {  
+    var bar = document.querySelector('.splash-progress-bar');  
+    var percent = document.querySelector('.splash-percent');  
+    if (bar) {  
+        var val = Math.min(100, Math.max(0, value));  
+        bar.style.width = val + '%';  
+        if (percent) percent.textContent = val + '%';  
+    }  
+}  
 
-// ========== İNDİR POPUP'U ==========
-window.showDownloadOptions = function() {
-    document.getElementById('downloadModal').classList.add('active');
-};
+// Progress bar'ı simüle et – 3 saniyede %100'e ulaşacak şekilde (hemen dolsun)  
+function startSplashProgress() {  
+    splashProgress = 0;  
+    updateSplashProgress(0);  
+    if (splashInterval) clearInterval(splashInterval);  
+    // 30ms'de %2 artış → 50 adım × 30ms = 1500ms (1.5 saniye) ama %2 artışla 50 adımda %100 olur.  
+    // Daha hızlı olsun diye 20ms'de %2 → 50×20=1000ms (1 saniye)  
+    splashInterval = setInterval(function() {  
+        splashProgress += 2;  
+        if (splashProgress > 100) splashProgress = 100;  
+        updateSplashProgress(splashProgress);  
+        if (splashProgress >= 100) {  
+            clearInterval(splashInterval);  
+            splashInterval = null;  
+            // Progress tamamlandı, eğer appReady ise splash'i kapat, değilse bekle  
+            if (appReady) {  
+                window.hideSplash();  
+            }  
+        }  
+    }, 20); // 20ms = 1 saniyede %100  
+}  
 
-window.closeDownloadOptions = function() {
-    document.getElementById('downloadModal').classList.remove('active');
-};
+// Splash'i gizle (yumuşak geçişle)  
+window.hideSplash = function() {  
+    // Eğer progress %100 değilse tamamla  
+    if (splashProgress < 100) {  
+        splashProgress = 100;  
+        updateSplashProgress(100);  
+        if (splashInterval) {  
+            clearInterval(splashInterval);  
+            splashInterval = null;  
+        }  
+    }  
+    var splash = document.getElementById('splashScreen');  
+    if (!splash) splash = document.querySelector('.splash-screen');  
+    if (splash) {  
+        splash.classList.add('hidden');  
+        splash.style.opacity = '0';  
+        splash.style.visibility = 'hidden';  
+        splash.style.pointerEvents = 'none';  
+        setTimeout(function() {  
+            splash.style.display = 'none';  
+        }, 800);  
+        console.log('✅ Splash gizlendi (hideSplash)');  
+    } else {  
+        console.warn('Splash elementi bulunamadı!');  
+    }  
+};  
 
-// ========== SÜRÜM GÖSTER ==========
-window.updateVersion = function(version) {
-    var el = document.getElementById('versionDisplay');
-    if (el) el.textContent = version || 'V6.01.1';
-};
+// Uygulama hazır olduğunda splash'i kapat  
+function setAppReady() {  
+    appReady = true;  
+    console.log('✅ Uygulama hazır, splash kapanabilir.');  
+    // Eğer progress zaten %100 olduysa hemen kapat  
+    if (splashProgress >= 100) {  
+        window.hideSplash();  
+    }  
+}  
 
-// ========== UZAY MODU KONTROLÜ ==========
-window.checkSpaceMode = function() {
-    var now = new Date();
-    var hours = now.getHours();
-    var body = document.body;
-    if (hours >= 2 && hours < 5) {
-        body.classList.add('space-mode');
-        var stars = document.createElement('div');
-        stars.className = 'space-stars';
-        if (!document.querySelector('.space-stars')) {
-            document.body.appendChild(stars);
-        }
-        var badge = document.querySelector('.space-badge');
-        if (!badge) {
-            var b = document.createElement('span');
-            b.className = 'space-badge';
-            b.textContent = '🚀 UZAY MODU (x2 Puan)';
-            document.querySelector('.navbar .logo').appendChild(b);
-        }
-        return true;
-    } else {
-        body.classList.remove('space-mode');
-        var stars = document.querySelector('.space-stars');
-        if (stars) stars.remove();
-        var badge = document.querySelector('.space-badge');
-        if (badge) badge.remove();
-        return false;
-    }
-};
+// ========== SPLASH PARTİKÜLLERİ OLUŞTUR ==========  
+function createSplashParticles() {  
+    var container = document.getElementById('splashParticles');  
+    if (!container) return;  
+    container.innerHTML = '';  
+    for (var i = 0; i < 40; i++) {  
+        var p = document.createElement('div');  
+        p.className = 'splash-particle';  
+        p.style.left = Math.random() * 100 + '%';  
+        p.style.animationDuration = (8 + Math.random() * 20) + 's';  
+        p.style.animationDelay = (Math.random() * 10) + 's';  
+        p.style.width = (2 + Math.random() * 4) + 'px';  
+        p.style.height = p.style.width;  
+        container.appendChild(p);  
+    }  
+}  
 
-// ========== URL REFERANS TAKİBİ ==========
-window.getReferralCodeFromUrl = function() {
-    var params = new URLSearchParams(window.location.search);
-    return params.get('ref');
-};
+// ========== İNDİR POPUP'U ==========  
+window.showDownloadOptions = function() {  
+    document.getElementById('downloadModal').classList.add('active');  
+};  
 
-// ========== PARÇACIK VE ÖZEL İMLEÇ ==========
-(function initParticlesAndCursor() {
-    var container = document.getElementById('particles');
-    if (container) {
-        container.innerHTML = '';
-        for (var i = 0; i < 60; i++) {
-            var p = document.createElement('div');
-            p.className = 'particle';
-            p.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';
-            container.appendChild(p);
-        }
-    }
+window.closeDownloadOptions = function() {  
+    document.getElementById('downloadModal').classList.remove('active');  
+};  
 
-    var cursor = document.getElementById('customCursor');
-    var ring = document.getElementById('customCursorRing');
-    if (cursor && ring) {
-        var mx = 0, my = 0, rx = 0, ry = 0;
-        document.addEventListener('mousemove', function(e) {
-            mx = e.clientX;
-            my = e.clientY;
-            cursor.style.left = (mx - 6) + 'px';
-            cursor.style.top = (my - 6) + 'px';
-        });
-        function animateCursor() {
-            rx += (mx - rx - 18) * 0.12;
-            ry += (my - ry - 18) * 0.12;
-            ring.style.left = rx + 'px';
-            ring.style.top = ry + 'px';
-            requestAnimationFrame(animateCursor);
-        }
-        animateCursor();
+// ========== SÜRÜM GÖSTER ==========  
+window.updateVersion = function(version) {  
+    var el = document.getElementById('versionDisplay');  
+    if (el) el.textContent = version || 'V6.01.1';  
+};  
 
-        var btns = document.querySelectorAll('button, a, .btn, .secret-btn, .support-link');
-        for (var i = 0; i < btns.length; i++) {
-            (function(btn) {
-                btn.addEventListener('mouseenter', function() { cursor.classList.add('hover'); });
-                btn.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); });
-            })(btns[i]);
-        }
-    }
-})();
+// ========== UZAY MODU KONTROLÜ ==========  
+window.checkSpaceMode = function() {  
+    var now = new Date();  
+    var hours = now.getHours();  
+    var body = document.body;  
+    if (hours >= 2 && hours < 5) {  
+        body.classList.add('space-mode');  
+        var stars = document.createElement('div');  
+        stars.className = 'space-stars';  
+        if (!document.querySelector('.space-stars')) {  
+            document.body.appendChild(stars);  
+        }  
+        var badge = document.querySelector('.space-badge');  
+        if (!badge) {  
+            var b = document.createElement('span');  
+            b.className = 'space-badge';  
+            b.textContent = '🚀 UZAY MODU (x2 Puan)';  
+            var nav = document.querySelector('nav');  
+            if (nav) nav.appendChild(b);  
+        }  
+        return true;  
+    } else {  
+        body.classList.remove('space-mode');  
+        var stars = document.querySelector('.space-stars');  
+        if (stars) stars.remove();  
+        var badge = document.querySelector('.space-badge');  
+        if (badge) badge.remove();  
+        return false;  
+    }  
+};  
 
-// ========== ŞİFRE GÖSTERME (GLOBAL) ==========
-window.togglePassword = function(inputId, btn) {
-    var input = document.getElementById(inputId);
-    if (!input) return;
-    if (input.type === 'password') {
-        input.type = 'text';
-        btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
-        btn.title = 'Şifreyi Gizle';
-    } else {
-        input.type = 'password';
-        btn.innerHTML = '<i class="fas fa-eye"></i>';
-        btn.title = 'Şifreyi Göster';
-    }
-};
+// ========== URL REFERANS TAKİBİ ==========  
+window.getReferralCodeFromUrl = function() {  
+    var params = new URLSearchParams(window.location.search);  
+    return params.get('ref');  
+};  
 
-window.togglePasswordInput = function(btn, type, key) {
-    var wrapper = btn.closest('.admin-login-box') || btn.closest('div');
-    var input = wrapper ? wrapper.querySelector('.admin-pass-input') : null;
-    if (!input) {
-        var selector = type === 'admin' ? '[data-admin="' + key + '"]' : '[data-beta="' + key + '"]';
-        input = document.querySelector(selector);
-    }
-    if (!input) return;
-    if (input.type === 'password') {
-        input.type = 'text';
-        btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
-    } else {
-        input.type = 'password';
-        btn.innerHTML = '<i class="fas fa-eye"></i>';
-    }
-};
+// ========== PARÇACIK VE ÖZEL İMLEÇ ==========  
+(function initParticlesAndCursor() {  
+    var container = document.getElementById('particles');  
+    if (container) {  
+        container.innerHTML = '';  
+        for (var i = 0; i < 60; i++) {  
+            var p = document.createElement('div');  
+            p.className = 'particle';  
+            p.style.cssText = 'left:' + (Math.random() * 100) + '%;animation-duration:' + (5 + Math.random() * 25) + 's;animation-delay:' + (-Math.random() * 35) + 's;';  
+            container.appendChild(p);  
+        }  
+    }  
 
-console.log('✅ JS-1 yüklendi (Back4app, sayaçlar, parçacık, imleç, splash, tema, bildirim, modal)');
+    var cursor = document.getElementById('customCursor');  
+    var ring = document.getElementById('customCursorRing');  
+    if (cursor && ring) {  
+        var mx = 0, my = 0, rx = 0, ry = 0;  
+        document.addEventListener('mousemove', function(e) {  
+            mx = e.clientX;  
+            my = e.clientY;  
+            cursor.style.left = (mx - 6) + 'px';  
+            cursor.style.top = (my - 6) + 'px';  
+        });  
+        function animateCursor() {  
+            rx += (mx - rx - 18) * 0.12;  
+            ry += (my - ry - 18) * 0.12;  
+            ring.style.left = rx + 'px';  
+            ring.style.top = ry + 'px';  
+            requestAnimationFrame(animateCursor);  
+        }  
+        animateCursor();  
+
+        var btns = document.querySelectorAll('button, a, .btn, .secret-btn, .support-link');  
+        for (var i = 0; i < btns.length; i++) {  
+            (function(btn) {  
+                btn.addEventListener('mouseenter', function() { cursor.classList.add('hover'); });  
+                btn.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); });  
+            })(btns[i]);  
+        }  
+    }  
+})();  
+
+// ========== ŞİFRE GÖSTERME (GLOBAL) ==========  
+window.togglePassword = function(inputId, btn) {  
+    var input = document.getElementById(inputId);  
+    if (!input) return;  
+    if (input.type === 'password') {  
+        input.type = 'text';  
+        btn.innerHTML = '<i class="fas fa-eye-slash"></i>';  
+        btn.title = 'Şifreyi Gizle';  
+    } else {  
+        input.type = 'password';  
+        btn.innerHTML = '<i class="fas fa-eye"></i>';  
+        btn.title = 'Şifreyi Göster';  
+    }  
+};  
+
+window.togglePasswordInput = function(btn, type, key) {  
+    var wrapper = btn.closest('.admin-login-box') || btn.closest('div');  
+    var input = wrapper ? wrapper.querySelector('.admin-pass-input') : null;  
+    if (!input) {  
+        var selector = type === 'admin' ? '[data-admin="' + key + '"]' : '[data-beta="' + key + '"]';  
+        input = document.querySelector(selector);  
+    }  
+    if (!input) return;  
+    if (input.type === 'password') {  
+        input.type = 'text';  
+        btn.innerHTML = '<i class="fas fa-eye-slash"></i>';  
+    } else {  
+        input.type = 'password';  
+        btn.innerHTML = '<i class="fas fa-eye"></i>';  
+    }  
+};  
+
+console.log('✅ JS-1 yüklendi (Back4app, sayaçlar, parçacık, imleç, splash, tema, bildirim, modal)');        
 </script>
 
 <!-- ============================================================ -->
@@ -5619,7 +5933,6 @@ async function handleRegister() {
         user.set('completed_social_tasks', []);
         user.set('completed_team_tasks', []);
         
-        // Davet kodu oluştur
         var code = Math.floor(100000 + Math.random() * 900000).toString();
         var namePart = name.substring(0, 4).toUpperCase();
         var randomPart = Math.floor(1000 + Math.random() * 9000);
@@ -5627,14 +5940,12 @@ async function handleRegister() {
         user.set('referral_code', refCode);
         user.set('invited_by', referralCode || '');
         
-        // Doğrulama kodu
         var verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
         user.set('verificationCode', verifyCode);
         user.set('verificationCodeExpires', new Date(Date.now() + 15 * 60000));
         
         await user.signUp();
         
-        // Davet kodu varsa puan ekle (arka planda)
         if (referralCode) {
             try {
                 await Parse.Cloud.run('applyReferral', { code: referralCode });
@@ -5716,7 +6027,6 @@ async function handleLogin() {
             return;
         }
         
-        // === GLOBAL CURRENTUSER'U GÜNCELLE ===
         currentUser = user;
         localStorage.setItem('vizyon_user', JSON.stringify({
             id: user.id,
@@ -5730,14 +6040,11 @@ async function handleLogin() {
         }));
         
         closeModal('authModal');
-        
-        // === PANELİ AÇ ===
         await showDashboard();
         updateCommentUI();
         await loadComments();
         updatePointsDisplay(user.get('points') || 0);
         
-        // Ebeveyn modu kontrolü
         if (user.get('parent_mode')) {
             document.getElementById('parentSettingsBtn').style.display = 'inline-block';
         }
@@ -5748,7 +6055,6 @@ async function handleLogin() {
             } catch(e) {}
         }
         
-        // Streak kontrolü
         try {
             await checkStreakStatus();
         } catch(e) {}
@@ -5875,7 +6181,7 @@ window.logout = function() {
     stopStatsInterval();
     document.getElementById('mainSite').style.display = 'block';
     document.getElementById('dashboardArea').style.display = 'none';
-    document.getElementById('userPanel').style.display = 'none';
+    // userPanel satırı kaldırıldı (null hatası için)
     if (typeof closeFullAIPanel === 'function') closeFullAIPanel();
     var logoutBtn = document.querySelector('.logout-btn');
     if (logoutBtn) logoutBtn.style.display = 'none';
@@ -6371,7 +6677,7 @@ console.log('✅ JS-2 yüklendi (Kayıt, Giriş, Doğrulama, Google, Facebook, P
 <!-- ============================================================ -->
 <script>
 // ================================================================
-// JS-3: TAKIM VE AI (Cloud Code + Dosya Yükleme + Kopyala + 3D/Görsel + SES + GIF + ÇEVİRİ + SANSÜR + AI KOÇ + CANLI DESTEK)
+// JS-3: TAKIM VE AI (Cloud Code + Dosya Yükleme + Kopyala + 3D/Görsel HF + SES + GIF + ÇEVİRİ + SANSÜR + AI KOÇ + CANLI DESTEK)
 // ================================================================
 
 // ========== TAKIM BİLGİSİNİ YÜKLE ==========
@@ -6650,26 +6956,21 @@ function fallbackCopy(code, btn) {
     document.body.removeChild(textarea);
 }
 
-// ========== AI MODELLERİ (GELİŞTİRİLMİŞ HAFIZA İLE) ==========
+// ========== AI MODELLERİ (GELİŞTİRİLMİŞ HAFIZA İLE - Master Key Hatası Giderildi) ==========
 async function callAllAIModels(prompt, conversationId) {
     try {
-        // Sohbet geçmişini al
         var history = [];
         if (conversationId) {
             try {
-                const Msg = Parse.Object.extend("Message");
-                const q = new Parse.Query(Msg);
-                q.equalTo("conversation", conversationId);
-                q.ascending("createdAt");
-                q.limit(20);
-                const msgs = await q.find({ useMasterKey: true });
-                history = msgs.map(m => ({
-                    role: m.get('from_user').id === currentUser.id ? 'user' : 'assistant',
-                    content: m.get('text') || ''
-                }));
+                const result = await Parse.Cloud.run('getConversationMessages', { conversationId: conversationId });
+                if (result && result.messages) {
+                    history = result.messages.map(m => ({
+                        role: (m.from_user && m.from_user.id === currentUser.id) ? 'user' : 'assistant',
+                        content: m.text || ''
+                    }));
+                }
             } catch(e) { console.log('Geçmiş alınamadı:', e); }
         }
-        // Prompt'u geçmişle zenginleştir
         var fullPrompt = prompt;
         if (history.length > 0) {
             var context = "Sohbet geçmişi:\n";
@@ -6706,7 +7007,6 @@ window.sendDashboardAI = async function () {
     inp.value = '';
     container.scrollTop = container.scrollHeight;
     
-    // Mevcut konuşmayı al veya oluştur
     if (!currentConversationId) {
         try {
             var result = await Parse.Cloud.run('startConversation', {});
@@ -6724,7 +7024,6 @@ window.sendDashboardAI = async function () {
     container.innerHTML += '<div class="ai-message bot">' + cleaned + '</div>';
     container.scrollTop = container.scrollHeight;
     
-    // Mesajı kaydet
     if (currentConversationId) {
         try {
             await Parse.Cloud.run('sendMessage', {
@@ -6733,7 +7032,6 @@ window.sendDashboardAI = async function () {
                 fileUrl: null,
                 fileName: null
             });
-            // AI yanıtını da kaydet
             await Parse.Cloud.run('sendMessage', {
                 conversationId: currentConversationId,
                 text: response,
@@ -6880,7 +7178,6 @@ async function sendFullAI() {
     inp.value = '';
     chat.scrollTop = chat.scrollHeight;
     
-    // Mevcut konuşmayı al veya oluştur (full panel için ayrı)
     if (!window.fullAIConversationId) {
         try {
             var result = await Parse.Cloud.run('startConversation', {});
@@ -6898,7 +7195,6 @@ async function sendFullAI() {
     chat.innerHTML += '<div class="ai-msg bot" style="padding:10px 14px;font-size:13px;max-width:90%;border-radius:12px;background:rgba(0,255,136,0.06);border-left:3px solid #00ff88;border:1px solid rgba(0,255,136,0.08);">🧠 ' + cleaned + '</div>';
     chat.scrollTop = chat.scrollHeight;
     
-    // Mesajı kaydet
     if (window.fullAIConversationId) {
         try {
             await Parse.Cloud.run('sendMessage', {
@@ -7059,30 +7355,27 @@ async function uploadFullFile(input) {
     input.value = '';
 }
 
-// ========== GÖRSEL ÜRETME ==========
+// ================================================================
+// ===================== GÖRSEL ÜRET (HF) =========================
+// ================================================================
 window.generateImage = async function() {
     var prompt = document.getElementById('imagePrompt').value.trim();
     if (!prompt) return showNotification('Lütfen bir açıklama yazın!', 'error');
-    showNotification('⏳ Görsel üretiliyor...', 'success');
+    showNotification('⏳ Görsel üretiliyor (Hugging Face)...', 'success');
     try {
-        var response = await fetch('https://vizyon-ai.your-worker.workers.dev/generate-image', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: prompt })
-        });
-        var data = await response.json();
-        if (data.image) {
+        var result = await Parse.Cloud.run('generateImageWithHF', { prompt: prompt });
+        if (result.success) {
             var img = document.createElement('img');
-            img.src = 'data:image/png;base64,' + data.image;
+            img.src = 'data:image/png;base64,' + result.imageBase64;
             img.style.width = '200px';
             img.style.height = '200px';
             img.style.objectFit = 'cover';
             img.style.borderRadius = '8px';
             img.style.border = '1px solid var(--border)';
             document.getElementById('imageResults').appendChild(img);
-            showNotification('✅ Görsel üretildi!', 'success');
+            showNotification('✅ Görsel Hugging Face ile oluşturuldu!', 'success');
         } else {
-            showNotification('❌ Görsel üretilemedi: ' + (data.error || 'Bilinmeyen hata'), 'error');
+            showNotification('❌ Görsel üretilemedi: ' + (result.error || 'Bilinmeyen hata'), 'error');
         }
     } catch (e) {
         console.error('Görsel üretme hatası:', e);
@@ -7091,14 +7384,25 @@ window.generateImage = async function() {
 };
 
 // ================================================================
-// ===================== 3D SİSTEM ================================
+// ===================== 3D SİSTEM (HF + YEDEK) ===================
 // ================================================================
 
-let scene, camera, renderer, controls;
-let modelLoaded = false;
-let sceneInitialized = false;
-let currentModelData = null;
-let downloadButtonExists = false;
+// === TÜM DEĞİŞKENLER KONTROLLÜ TANIMLANIYOR (HATA DÜZELTİLDİ) ===
+if (typeof scene === 'undefined') {
+    var scene, camera, renderer, controls;
+}
+if (typeof modelLoaded === 'undefined') {
+    var modelLoaded = false;
+}
+if (typeof sceneInitialized === 'undefined') {
+    var sceneInitialized = false;
+}
+if (typeof currentModelData === 'undefined') {
+    var currentModelData = null;
+}
+if (typeof downloadButtonExists === 'undefined') {
+    var downloadButtonExists = false;
+}
 
 function init3D() {
     var container = document.getElementById('canvas3d');
@@ -7327,7 +7631,7 @@ function downloadModel() {
     }, { binary: true });
 }
 
-// ========== BASİT 3D ŞEKİL OLUŞTUR ==========
+// ========== BASİT 3D ŞEKİL OLUŞTUR (YEDEK) ==========
 function createSimple3DShape(prompt) {
     try {
         if (!scene) init3D();
@@ -7785,11 +8089,12 @@ window.contactFounder = async function() {
     }
 };
 
-console.log('✅ JS-3 yüklendi (Takım, AI, 3D, Dosya Yükleme, Kopyala, Ses, GIF, Çeviri, Sansür, AI Koç, Canlı Destek)');
+console.log('✅ JS-3 yüklendi (Takım, AI, 3D HF, Görsel HF, Dosya Yükleme, Kopyala, Ses, GIF, Çeviri, Sansür, AI Koç, Canlı Destek)');
 </script>
+<!-- ===== JS-3 SONU ===== -->
 
 <!-- ============================================================ -->
-<!-- JS-4: TÜM İSTEMCİ TARAFI FONKSİYONLAR (FULL – HATASIZ, EKSİKSİZ) -->
+<!-- ===================== JS-4: TÜM İSTEMCİ TARAFI FONKSİYONLAR (FULL) ===================== -->
 <!-- ============================================================ -->
 <script>
 // ================================================================
@@ -7811,6 +8116,10 @@ var wizardData = {};
 var currentConversationId = null;
 var fullAIConversationId = null;
 var marketItemsCache = [];
+var selectedProTool = 'kod';
+var currentRating = 0;
+var commentFilter = 0;
+var isDashboardVisible = false;
 
 // ========== SANSÜR YARDIMCI FONKSİYONLARI ==========
 function censorName(name, isLoggedIn) {
@@ -7918,7 +8227,7 @@ window.togglePasswordInput = function(btn, type, key) {
     }
 };
 
-// ========== DİL DESTEĞİ ==========
+// ========== DİL DESTEĞİ (KISALTILMIŞ, SADECE TEMEL) ==========
 var translations = {
     tr: {
         'Merhaba! Size nasıl yardımcı olabilirim?': 'Merhaba! Size nasıl yardımcı olabilirim?',
@@ -8077,88 +8386,9 @@ var translations = {
         'Kurucu ile İletişime Geç': 'Contact Founder',
         'Ebeveyn Ayarları': 'Parent Settings',
         'GIF Ara': 'Search GIF'
-    },
-    es: {
-        'Projelerim': 'Mis Proyectos',
-        'Yeni Proje': 'Nuevo Proyecto',
-        'Favoriler': 'Favoritos',
-        'Arşiv': 'Archivo',
-        'Çöp Kutusu': 'Papelera',
-        'Proje Taleplerim': 'Mis Solicitudes de Proyecto',
-        'Yönetim İşlemleri': 'Acciones de Administración',
-        'Hediye Paketi Gönder': 'Enviar Paquete de Regalo',
-        'Kullanıcı Yasakla': 'Banear Usuario',
-        'Görsel Üret (AI)': 'Generar Imagen (IA)',
-        'Görsel Oluştur': 'Crear Imagen',
-        'Yönetim Paneli (Sadece Kurucu)': 'Panel de Admin (Solo Fundador)',
-        'Kullanıcı Engelle': 'Bloquear Usuario',
-        'Tümü': 'Todos',
-        'Yorum yapmak için giriş yapmalısınız.': 'Debes iniciar sesión para comentar.',
-        'Sesli Komut': 'Comando de Voz',
-        'Puan Mağazası': 'Tienda de Puntos',
-        'Mağaza': 'Tienda',
-        'Satın Al': 'Comprar',
-        'Puan': 'Puntos',
-        'Bana Öğret': 'Enséñame',
-        'Kurucu ile İletişime Geç': 'Contactar Fundador',
-        'Ebeveyn Ayarları': 'Configuración de Padres',
-        'GIF Ara': 'Buscar GIF'
-    },
-    ru: {
-        'Projelerim': 'Мои проекты',
-        'Yeni Proje': 'Новый проект',
-        'Favoriler': 'Избранное',
-        'Arşiv': 'Архив',
-        'Çöp Kutusu': 'Корзина',
-        'Proje Taleplerim': 'Мои запросы проектов',
-        'Yönetim İşlemleri': 'Действия администратора',
-        'Hediye Paketi Gönder': 'Отправить подарочный пакет',
-        'Kullanıcı Yasakla': 'Забанить пользователя',
-        'Görsel Üret (AI)': 'Создать изображение (ИИ)',
-        'Görsel Oluştur': 'Создать изображение',
-        'Yönetim Paneli (Sadece Kurucu)': 'Панель администратора (Только основатель)',
-        'Kullanıcı Engelle': 'Заблокировать пользователя',
-        'Tümü': 'Все',
-        'Yorum yapmak için giriş yapmalısınız.': 'Вы должны войти, чтобы оставить комментарий.',
-        'Sesli Komut': 'Голосовая команда',
-        'Puan Mağazası': 'Магазин очков',
-        'Mağaza': 'Магазин',
-        'Satın Al': 'Купить',
-        'Puan': 'Очки',
-        'Bana Öğret': 'Научи меня',
-        'Kurucu ile İletişime Geç': 'Связаться с основателем',
-        'Ebeveyn Ayarları': 'Родительские настройки',
-        'GIF Ara': 'Поиск GIF'
-    },
-    fr: {
-        'Projelerim': 'Mes Projets',
-        'Yeni Proje': 'Nouveau Projet',
-        'Favoriler': 'Favoris',
-        'Arşiv': 'Archive',
-        'Çöp Kutusu': 'Corbeille',
-        'Proje Taleplerim': 'Mes Demandes de Projet',
-        'Yönetim İşlemleri': 'Actions Admin',
-        'Hediye Paketi Gönder': 'Envoyer un Cadeau',
-        'Kullanıcı Yasakla': 'Bannir l\'Utilisateur',
-        'Görsel Üret (AI)': 'Générer une Image (IA)',
-        'Görsel Oluştur': 'Créer une Image',
-        'Yönetim Paneli (Sadece Kurucu)': 'Panel Admin (Fondateur Uniquement)',
-        'Kullanıcı Engelle': 'Bloquer l\'Utilisateur',
-        'Tümü': 'Tout',
-        'Yorum yapmak için giriş yapmalısınız.': 'Vous devez vous connecter pour commenter.',
-        'Sesli Komut': 'Commande Vocale',
-        'Puan Mağazası': 'Magasin de Points',
-        'Mağaza': 'Magasin',
-        'Satın Al': 'Acheter',
-        'Puan': 'Points',
-        'Bana Öğret': 'Apprends-moi',
-        'Kurucu ile İletişime Geç': 'Contacter le Fondateur',
-        'Ebeveyn Ayarları': 'Paramètres Parentaux',
-        'GIF Ara': 'Rechercher un GIF'
     }
 };
 
-// ========== ÇEVİRİ ==========
 window.applyTranslations = function(lang) {
     if (!lang) lang = currentLanguage || 'tr';
     var dict = translations[lang];
@@ -8458,7 +8688,7 @@ window.logout = function() {
     stopStatsInterval();
     document.getElementById('mainSite').style.display = 'block';
     document.getElementById('dashboardArea').style.display = 'none';
-    document.getElementById('userPanel').style.display = 'none';
+    // userPanel satırı kaldırıldı
     if (typeof closeFullAIPanel === 'function') closeFullAIPanel();
     var logoutBtn = document.querySelector('.logout-btn');
     if (logoutBtn) logoutBtn.style.display = 'none';
@@ -8585,139 +8815,86 @@ window.openRolePanel = function(role) {
             if (!exists) wrapper.appendChild(window.createRoleCard('self_beta', currentUser.get('email'), currentUser.get('name') || 'Beta', 'beta', null));
         }
     } else if (role === 'FOUNDER') {
-        var panel = document.getElementById('rolePanel');
-        if (panel) {
-            panel.classList.add('open');
-            panel.style.display = 'flex';
-            setTimeout(function() { var inp = document.getElementById('rolePassword'); if (inp) { inp.style.display = 'block'; inp.style.visibility = 'visible'; inp.style.opacity = '1'; inp.focus(); } }, 100);
-        }
-        screen.classList.remove('active');
-        screen.style.display = 'none';
-        return;
+        wrapper.appendChild(window.createRoleCard('founder', 'admin.tr.reis@gmail.com', 'Eymen (Founder)', 'founder', 'FOUNDER_PASS'));
     }
-    var backDiv = document.createElement('div');
-    backDiv.style.cssText = 'width:100%; text-align:center; margin-top:20px;';
-    var backBtn = document.createElement('button');
-    backBtn.textContent = '🔙 Ana Sayfaya Dön';
-    backBtn.style.cssText = 'background:transparent; border:1px solid #ff6b35; color:#ff6b35; padding:10px 24px; border-radius:40px; cursor:pointer; font-weight:600;';
-    backBtn.onclick = window.closeAdminLoginScreen;
-    backDiv.appendChild(backBtn);
-    wrapper.appendChild(backDiv);
+    screen.style.display = 'flex';
     screen.classList.add('active');
-    screen.style.cssText = 'display: flex !important; visibility: visible !important; opacity: 1 !important; position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; background: #000000 !important; z-index: 9999999 !important; align-items: center !important; justify-content: center !important; padding: 20px !important;';
-    console.log('✅ ' + role + ' login screen gösteriliyor');
 };
 
 window.createRoleCard = function(key, email, name, type, passKey) {
     var box = document.createElement('div');
     box.className = 'admin-login-box';
-    var borderColor = type === 'admin' ? '#00d4ff' : '#00ff88';
-    box.style.cssText = 'display:block;background:rgba(0,10,20,0.95);border:2px solid ' + borderColor + ';border-radius:24px;padding:30px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px ' + (type === 'admin' ? 'rgba(0,212,255,0.3)' : 'rgba(0,255,136,0.3)') + ';margin:10px;color:#ffffff;';
-    var icon = document.createElement('div');
-    icon.style.cssText = 'font-size:48px;';
-    icon.textContent = type === 'admin' ? '👤' : '🧪';
-    box.appendChild(icon);
-    var nameDiv = document.createElement('div');
-    nameDiv.style.cssText = 'font-size:22px;font-weight:700;margin:8px 0;';
-    nameDiv.textContent = name;
-    box.appendChild(nameDiv);
-    var emailDiv = document.createElement('div');
-    emailDiv.style.cssText = 'color:#8ab4cc;font-size:14px;';
-    emailDiv.textContent = email;
-    box.appendChild(emailDiv);
-    var infoDiv = document.createElement('div');
-    infoDiv.style.cssText = 'margin:12px 0;color:' + borderColor + ';font-size:13px;';
-    infoDiv.textContent = '👇 Giriş yapmak için tıklayın';
-    box.appendChild(infoDiv);
-    var inputWrapper = document.createElement('div');
-    inputWrapper.style.cssText = 'margin-top:12px;';
-    var passInput = document.createElement('input');
-    passInput.type = 'password';
-    passInput.className = 'form-input admin-pass-input';
-    passInput.placeholder = type === 'admin' ? 'Admin Şifresi' : 'Beta Şifresi';
-    passInput.style.cssText = 'flex:1;width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:14px;border-radius:16px;margin-bottom:8px;';
-    if (key === 'ibrahim') passInput.dataset.admin = 'ibrahim';
-    else if (key === 'bozkurt') passInput.dataset.admin = 'bozkurt';
-    else if (key === 'omer') passInput.dataset.beta = 'omer';
-    var eyeWrapper = document.createElement('div');
-    eyeWrapper.style.cssText = 'display:flex; align-items:center; gap:8px;';
-    var eyeBtn = document.createElement('button');
-    eyeBtn.type = 'button';
-    eyeBtn.innerHTML = '<i class="fas fa-eye"></i>';
-    eyeBtn.style.cssText = 'background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;';
-    eyeBtn.onclick = function() {
-        if (passInput.type === 'password') { passInput.type = 'text'; eyeBtn.innerHTML = '<i class="fas fa-eye-slash"></i>'; }
-        else { passInput.type = 'password'; eyeBtn.innerHTML = '<i class="fas fa-eye"></i>'; }
-    };
-    eyeWrapper.appendChild(passInput);
-    eyeWrapper.appendChild(eyeBtn);
-    inputWrapper.appendChild(eyeWrapper);
-    var loginBtn = document.createElement('button');
-    loginBtn.textContent = 'Giriş Yap';
-    loginBtn.style.cssText = 'background:' + borderColor + ';color:#000;padding:12px 24px;border:none;border-radius:40px;cursor:pointer;font-weight:600;margin-top:8px;width:100%;';
-    loginBtn.onclick = function() {
-        var pass = passInput.value.trim();
-        if (!pass) { showNotification('Lütfen şifrenizi girin!', 'error'); return; }
-        if (type === 'admin') window.handleAdminLogin(key, pass);
-        else window.handleBetaLogin(key, pass);
-    };
-    inputWrapper.appendChild(loginBtn);
-    var backBtn = document.createElement('button');
-    backBtn.textContent = '🔙 Ana Sayfaya Dön';
-    backBtn.style.cssText = 'background:transparent; border:1px solid #ff6b35; color:#ff6b35; padding:6px 16px; border-radius:40px; cursor:pointer; font-weight:600; margin-top:10px; width:100%;';
-    backBtn.onclick = window.closeAdminLoginScreen;
-    inputWrapper.appendChild(backBtn);
-    box.appendChild(inputWrapper);
+    box.style.cssText = 'display:block;background:rgba(0,10,20,0.95);border:2px solid #00d4ff;border-radius:24px;padding:30px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,212,255,0.3);margin:10px;color:#ffffff;';
+    if (type === 'beta') {
+        box.style.borderColor = '#00ff88';
+        box.style.boxShadow = '0 0 60px rgba(0,255,136,0.3)';
+    }
+    box.innerHTML = `
+        <div style="font-size:48px;">${type === 'founder' ? '👑' : (type === 'beta' ? '🧪' : '👤')}</div>
+        <div style="font-size:22px;font-weight:700;margin:8px 0;">${name}</div>
+        <div style="color:#8ab4cc;font-size:14px;">${email}</div>
+        <div style="margin:12px 0;color:#00d4ff;font-size:13px;">👇 Giriş yapmak için tıklayın</div>
+        <div style="margin-top:12px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <input type="password" class="form-input admin-pass-input" placeholder="Şifre" data-email="${email}" style="flex:1;">
+                <button type="button" onclick="window.togglePasswordInput(this, '${type}', '${key}')" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <button onclick="window.handleRoleLogin('${type}', '${email}')" style="background:#00d4ff;color:#000;padding:12px 24px;border:none;border-radius:40px;cursor:pointer;font-weight:600;margin-top:8px;width:100%;">Giriş Yap</button>
+            <button onclick="window.closeAdminLoginScreen()" style="background:transparent; border:1px solid #ff6b35; color:#ff6b35; padding:6px 16px; border-radius:40px; cursor:pointer; font-weight:600; margin-top:10px; width:100%;">🔙 Ana Sayfaya Dön</button>
+        </div>
+    `;
     return box;
 };
 
 window.closeAdminLoginScreen = function() {
     var screen = document.getElementById('adminLoginScreen');
-    if (screen) { screen.classList.remove('active'); screen.style.display = 'none'; screen.style.visibility = 'hidden'; screen.style.opacity = '0'; }
-    document.querySelectorAll('.admin-pass-input').forEach(function(el) { el.value = ''; });
-    document.body.style.overflow = 'auto';
-    document.getElementById('mainSite').style.display = 'block';
-    document.getElementById('dashboardArea').style.display = 'none';
-    document.getElementById('userPanel').style.display = 'none';
-    if (typeof closeFullAIPanel === 'function') closeFullAIPanel();
+    if (screen) { screen.style.display = 'none'; screen.classList.remove('active'); }
 };
 
-window.handleAdminLogin = async function(adminKey, password) {
-    if (!adminKey || !password) return showNotification('Admin key ve şifre gerekli!', 'error');
+window.handleRoleLogin = async function(type, email) {
+    var wrapper = document.querySelector('.admin-login-box');
+    var input = wrapper ? wrapper.querySelector('.admin-pass-input') : null;
+    if (!input) { var allInputs = document.querySelectorAll('.admin-pass-input'); for (var i = 0; i < allInputs.length; i++) { if (allInputs[i].getAttribute('data-email') === email) { input = allInputs[i]; break; } } }
+    if (!input) return showNotification('Şifre alanı bulunamadı!', 'error');
+    var pass = input.value;
+    if (!pass) return showNotification('Şifre girin!', 'error');
     try {
-        var result = await Parse.Cloud.run('adminLogin', { adminKey: adminKey, password: password });
+        var result;
+        if (type === 'founder') {
+            result = await Parse.Cloud.run('founderLogin', { password: pass });
+        } else if (type === 'admin') {
+            var key = email === 'iy5971828@gmail.com' ? 'ibrahim' : 'bozkurt';
+            result = await Parse.Cloud.run('adminLogin', { adminKey: key, password: pass });
+        } else if (type === 'beta') {
+            result = await Parse.Cloud.run('betaLogin', { betaKey: 'omer', password: pass });
+        }
         if (result && result.success) {
-            currentUser = Parse.User.current();
-            if (!currentUser) { await Parse.User.logIn(result.email, password); currentUser = Parse.User.current(); }
-            if (!currentUser) return showNotification('Oturum açılamadı!', 'error');
-            localStorage.setItem('vizyon_user', JSON.stringify({ id: currentUser.id, name: currentUser.get('name'), email: currentUser.get('email'), role: currentUser.get('role'), plan: currentUser.get('plan'), teamId: currentUser.get('teamId') }));
-            window.closeAdminLoginScreen();
-            await window.showDashboard();
-            updateCommentUI();
-            await loadComments();
-            await checkAndShowSubscriptionCard();
-            showNotification('Hoş geldin ' + result.name + '!', 'success');
-        } else showNotification('Giriş başarısız!', 'error');
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
-};
-
-window.handleBetaLogin = async function(betaKey, password) {
-    if (!betaKey || !password) return showNotification('Beta key ve şifre gerekli!', 'error');
-    try {
-        var result = await Parse.Cloud.run('betaLogin', { betaKey: betaKey, password: password });
-        if (result && result.success) {
-            currentUser = Parse.User.current();
-            if (!currentUser) { await Parse.User.logIn(result.email, password); currentUser = Parse.User.current(); }
-            if (!currentUser) return showNotification('Oturum açılamadı!', 'error');
-            localStorage.setItem('vizyon_user', JSON.stringify({ id: currentUser.id, name: currentUser.get('name'), email: currentUser.get('email'), role: currentUser.get('role'), plan: currentUser.get('plan'), teamId: currentUser.get('teamId') }));
-            window.closeAdminLoginScreen();
-            await window.showDashboard();
-            updateCommentUI();
-            await loadComments();
-            await checkAndShowSubscriptionCard();
-            showNotification('Hoş geldin ' + result.name + '! (Beta)', 'success');
-        } else showNotification('Giriş başarısız!', 'error');
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+            showNotification('✅ ' + result.name + ' olarak giriş yapıldı!', 'success');
+            var user = Parse.User.current();
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('vizyon_user', JSON.stringify({
+                    id: user.id,
+                    name: user.get('name'),
+                    email: user.get('email'),
+                    role: user.get('role'),
+                    plan: user.get('plan'),
+                    teamId: user.get('teamId')
+                }));
+                closeAdminLoginScreen();
+                await showDashboard();
+                updateCommentUI();
+                await loadComments();
+                showNotification('Hoş geldin, ' + user.get('name'), 'success');
+            }
+        } else {
+            showNotification('Giriş başarısız!', 'error');
+        }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
 window.checkRole = async function() {
@@ -8730,7 +8907,14 @@ window.checkRole = async function() {
             currentUser = Parse.User.current();
             if (!currentUser) { await Parse.User.logIn(result.email, pass); currentUser = Parse.User.current(); }
             if (!currentUser) return showNotification('Oturum açılamadı!', 'error');
-            localStorage.setItem('vizyon_user', JSON.stringify({ id: currentUser.id, name: currentUser.get('name'), email: currentUser.get('email'), role: currentUser.get('role'), plan: currentUser.get('plan'), teamId: currentUser.get('teamId') }));
+            localStorage.setItem('vizyon_user', JSON.stringify({
+                id: currentUser.id,
+                name: currentUser.get('name'),
+                email: currentUser.get('email'),
+                role: currentUser.get('role'),
+                plan: currentUser.get('plan'),
+                teamId: currentUser.get('teamId')
+            }));
             await window.showDashboard();
             updateCommentUI();
             await loadComments();
@@ -8803,6 +8987,72 @@ window.shareSite = function() {
 };
 window.openSettingsModal = function() { document.getElementById('settingsModal').classList.add('open'); document.getElementById('settingsModal').style.display = 'flex'; };
 window.toggleChatHistory = function() { window.toggleConversationHistory(); };
+
+// ================================================================
+// ========== ABONELİK KARTI (EK) ==========
+// ================================================================
+window.checkAndShowSubscriptionCard = async function() {
+    if (!currentUser) return;
+    var plan = currentUser.get('plan');
+    var wrapper = document.getElementById('subscriptionsCardWrapper');
+    if (!wrapper) return;
+    if (plan === 'pro' || plan === 'team') {
+        wrapper.style.display = 'block';
+        var content = document.getElementById('subscriptionsContent');
+        if (content) {
+            content.innerHTML = `✅ <strong>${plan === 'pro' ? '🌟 Pro' : '👥 Takım'}</strong> paketine abonesiniz.`;
+        }
+    } else {
+        wrapper.style.display = 'none';
+    }
+};
+
+// ================================================================
+// ========== BİLDİRİM PANELİ (EK) ==========
+// ================================================================
+window.toggleNotificationPanel = function() {
+    var modal = document.getElementById('notificationModal');
+    if (!modal) {
+        console.warn('notificationModal bulunamadı!');
+        return;
+    }
+    modal.classList.add('open');
+    modal.style.display = 'flex';
+    window.loadNotifications();
+};
+
+window.loadNotifications = async function() {
+    if (!currentUser) return;
+    try {
+        var result = await Parse.Cloud.run('getNotifications', {});
+        var container = document.getElementById('notificationList');
+        if (!container) return;
+        if (!result || result.length === 0) {
+            container.innerHTML = '<div style="color:var(--text3);text-align:center;padding:20px;">📭 Henüz bildirim yok.</div>';
+            return;
+        }
+        var html = '';
+        result.forEach(function(n) {
+            html += `<div style="padding:10px;border-bottom:1px solid var(--border);">
+                <div>${n.message}</div>
+                <div style="font-size:10px;color:var(--text3);">${new Date(n.createdAt).toLocaleString('tr-TR')}</div>
+                ${!n.is_read ? `<button class="btn-secondary btn-sm" onclick="window.markNotificationRead('${n.id}')">Okundu İşaretle</button>` : ''}
+            </div>`;
+        });
+        container.innerHTML = html;
+    } catch(e) {
+        console.error('Bildirimler yüklenemedi:', e);
+    }
+};
+
+window.markNotificationRead = async function(notificationId) {
+    try {
+        await Parse.Cloud.run('markNotificationRead', { notificationId: notificationId });
+        window.loadNotifications();
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
 
 // ================================================================
 // ========== AI SOHBET GEÇMİŞİ YÖNETİMİ ==========
@@ -9261,6 +9511,7 @@ window.showDashboard = async function() {
 
         await checkAndShowSubscriptionCard();
 
+        // ========== extraAdminCard DÜZELTMESİ ==========
         var extraCard = document.getElementById('extraAdminCard');
         if (!extraCard) {
             extraCard = document.createElement('div');
@@ -9268,8 +9519,8 @@ window.showDashboard = async function() {
             extraCard.className = 'dashboard-card full-width';
             extraCard.style.marginTop = '24px';
             extraCard.style.display = 'none';
-            var wrapper = document.querySelector('.dashboard-content-wrapper');
-            if (wrapper) wrapper.appendChild(extraCard);
+            var wrapperEl = document.querySelector('.dashboard-content-wrapper');
+            if (wrapperEl) wrapperEl.appendChild(extraCard);
         }
         if (extraCard) {
             if (isFounder || isAdmin) {
@@ -9476,19 +9727,24 @@ window.loadProjectRequests = async function() {
         var requests = await query.find();
         var container = document.getElementById('projectRequestsList');
         if (!container) return;
-        if (requests.length === 0) container.innerHTML = '<div class="project-item">Henüz proje talebiniz yok.</div>';
-        else {
+        if (requests.length === 0) {
+            container.innerHTML = '<div class="project-item">Henüz proje talebiniz yok.</div>';
+        } else {
             var html = '';
             requests.forEach(function(r) {
-                html += `<div class="project-item"><span>📨 ${r.get('name').substring(0,25)}</span><span style="font-size:10px;color:var(--text3);">${r.get('status') || 'Beklemede'}</span></div>`;
+                var name = r.get('name') || 'İsimsiz Proje';
+                html += '<div class="project-item"><span>📨 ' + name.substring(0, 25) + '</span><span style="font-size:10px;color:var(--text3);">' + (r.get('status') || 'Beklemede') + '</span></div>';
             });
             container.innerHTML = html;
         }
-    } catch(e) { console.error('Proje talepleri yüklenirken hata:', e); }
+    } catch(e) {
+        console.error('Proje talepleri yüklenirken hata:', e);
+        document.getElementById('projectRequestsList').innerHTML = '<div class="project-item">⚠️ Talepler yüklenemedi.</div>';
+    }
 };
 
 // ================================================================
-// ========== YORUMLAR (SANSÜR EKLENDİ) ==========
+// ========== YORUMLAR (SANSÜR EKLENDİ + HATA YÖNETİMİ İYİLEŞTİRİLDİ) ==========
 // ================================================================
 
 window.updateCommentUI = function() {
@@ -9529,8 +9785,10 @@ window.loadComments = async function() {
         if (dashContainer) dashContainer.innerHTML = html;
     } catch(e) {
         console.error('Yorum yükleme hatası:', e);
-        var errorHtml = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);">⚠️ Yorumlar yüklenemedi: ' + e.message + '</div>';
+        var errorHtml = '<div class="comment-item" style="border-left-color: var(--danger); text-align: center; color: var(--danger);">⚠️ Yorumlar yüklenemedi: ' + e.message + ' (CORS veya Cloud Code hatası olabilir)</div>';
         document.querySelectorAll('#mainCommentsList, #commentsList').forEach(function(el) { if (el) el.innerHTML = errorHtml; });
+        // Kullanıcıya bilgi ver
+        showNotification('Yorumlar yüklenirken bir sorun oluştu. Lütfen Back4App CORS ayarlarını kontrol edin.', 'error');
     } finally {
         window.hideSplash();
     }
@@ -9817,7 +10075,7 @@ window.assignAdminEmail = async function(email) {
     try {
         var query = new Parse.Query(Parse.User);
         query.equalTo('email', email);
-        var user = await query.first();
+        var user = await query.first({ useMasterKey: true });
         if (!user) return showNotification('Kullanıcı bulunamadı!', 'error');
         user.set('role', 'admin');
         await user.save(null);
@@ -9840,7 +10098,7 @@ window.setUserRole = async function(email, role) {
     try {
         var query = new Parse.Query(Parse.User);
         query.equalTo('email', email);
-        var user = await query.first();
+        var user = await query.first({ useMasterKey: true });
         if (!user) return showNotification('Kullanıcı bulunamadı!', 'error');
         user.set('role', role);
         await user.save(null);
@@ -9853,7 +10111,7 @@ window.banUserEmail = async function(email) {
     try {
         var query = new Parse.Query(Parse.User);
         query.equalTo('email', email);
-        var user = await query.first();
+        var user = await query.first({ useMasterKey: true });
         if (!user) return showNotification('Kullanıcı bulunamadı!', 'error');
         user.set('isBanned', true);
         await user.save(null);
@@ -9866,7 +10124,7 @@ window.giftUserEmail = async function(email, pkg) {
     try {
         var query = new Parse.Query(Parse.User);
         query.equalTo('email', email);
-        var user = await query.first();
+        var user = await query.first({ useMasterKey: true });
         if (!user) return showNotification('Kullanıcı bulunamadı!', 'error');
         var Gift = Parse.Object.extend('Gift');
         var gift = new Gift();
@@ -9907,8 +10165,25 @@ window.showBannedList = async function() {
     try {
         var result = await Parse.Cloud.run('getBannedUsers', {});
         if (!result || result.length === 0) return showNotification('Engelli kullanıcı yok.', 'warning');
-        var msg = '🚫 Engelli Kullanıcılar:\n' + result.map(b => b.name + ' (' + b.email + ')').join('\n');
-        alert(msg);
+        var msg = '🚫 Engelli Kullanıcılar:\n';
+        result.forEach((b, index) => {
+            msg += `${index+1}. ${b.name} (${b.email})\n`;
+        });
+        var email = prompt(msg + '\n\nKaldırmak istediğiniz kullanıcının e-posta adresini girin:');
+        if (email) {
+            await window.unbanUserByEmail(email);
+        }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+window.unbanUserByEmail = async function(email) {
+    if (!email) return showNotification('Lütfen e-posta girin!', 'error');
+    try {
+        var result = await Parse.Cloud.run('unbanUser', { targetEmail: email });
+        showNotification(result.message, 'success');
+        await loadUserList();
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
@@ -9916,15 +10191,6 @@ window.banUserByEmail = async function(email) {
     if (!email) return showNotification('Lütfen e-posta girin!', 'error');
     try {
         var result = await Parse.Cloud.run('banUser', { targetEmail: email });
-        showNotification(result.message, 'success');
-        await loadUserList();
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
-};
-
-window.unbanUserByEmail = async function(email) {
-    if (!email) return showNotification('Lütfen e-posta girin!', 'error');
-    try {
-        var result = await Parse.Cloud.run('unbanUser', { targetEmail: email });
         showNotification(result.message, 'success');
         await loadUserList();
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
@@ -9980,7 +10246,7 @@ window.setAdminPassword = async function() {
     try {
         var query = new Parse.Query(Parse.User);
         query.equalTo('email', email);
-        var user = await query.first();
+        var user = await query.first({ useMasterKey: true });
         if (!user) return showNotification('Kullanıcı bulunamadı!', 'error');
         user.set('password', pass);
         await user.save(null);
@@ -10809,7 +11075,6 @@ window.sendDmMessage = async function() {
     var fileInput = document.getElementById('dmFileInput');
     var file = fileInput ? fileInput.files[0] : null;
     if (!msg && !file) return showNotification('Mesaj veya dosya gerekli!', 'warning');
-
     try {
         var fileUrl = null, fileName = null;
         if (file) {
@@ -11463,10 +11728,8 @@ window.removeParentControl = async function() {
 window.loadReferralLeaderboard = async function() {
     try {
         var result = await Parse.Cloud.run('getReferralLeaderboard', {});
-        // Ana sayfa ve dashboard'da ayrı ayrı hedefleme
         var containers = document.querySelectorAll('#referralLeaderboard, #mainReferralLeaderboard');
         if (!containers || containers.length === 0) {
-            // Ana sayfaya ekleme: eğer yoksa oluştur
             var mainSite = document.getElementById('mainSite');
             if (mainSite && !document.getElementById('mainReferralLeaderboard')) {
                 var section = document.createElement('section');
@@ -11778,7 +12041,6 @@ window.wizardFinish = async function() {
         project.set('is_favorite', false);
         project.set('is_archived', false);
         project.set('is_trashed', false);
-        // **DÜZELTME:** useMasterKey kaldırıldı, normal save yapılıyor
         await project.save();
         closeModal('projectWizardModal');
         await window.loadProjects();
@@ -11914,16 +12176,26 @@ window.addEventListener('load', async function() {
 });
 
 console.log('✅ JS-4 tamamen yüklendi ve tüm fonksiyonlar global!');
-
 </script>
-<!-- ===== JS-4 SONU ===== -->
+<!-- ============================================================ -->
+<!-- ===================== JS-4 SONU ============================= -->
+<!-- ============================================================ -->
 
 <!-- ============================================================ -->
-<!-- JS-5: TAKIM YÖNETİMİ, KURUCU PANELİ, VİZYON DESTEK, ÜYE KONTROLLERİ, SOSYAL DM, ARAMA, TAKİP, EBEVEYN, ANKET, DUYURU, GİF, PROJE, PUAN, MAĞAZA, GÖREV, YARIŞMA, AKADEMİ, İŞ İLANI, HATA, OYUN, CÜZDAN -->
+<!-- JS-5: TAKIM YÖNETİMİ, KURUCU PANELİ, VİZYON DESTEK, ÜYE KONTROLLERİ,
+ SOSYAL DM, ARAMA, TAKİP, EBEVEYN (DÜZELTİLDİ), ANKET, DUYURU,
+ GİF, PROJE, PUAN, MAĞAZA, GÖREV, YARIŞMA, AKADEMİ, İŞ İLANI,
+ HATA, OYUN, CÜZDAN, KURUCU İLETİŞİM, UZAY MODU, TEMA,
+ + FOOTER BİLGİ SAYFALARI, PROJE TALEBİ, MAĞAZA, VİZYON DESTEK -->
 <!-- ============================================================ -->
 <script>
 // ================================================================
-// JS-5: TAKIM YÖNETİMİ, KURUCU PANELİ, VİZYON DESTEK, ÜYE KONTROLLERİ, SOSYAL DM, ARAMA, TAKİP, EBEVEYN (DÜZELTİLDİ), ANKET, DUYURU, GİF, PROJE, PUAN, MAĞAZA, GÖREV, YARIŞMA, AKADEMİ, İŞ İLANI, HATA, OYUN, CÜZDAN, KURUCU İLETİŞİM, UZAY MODU, TEMA, + FOOTER BİLGİ SAYFALARI
+// JS-5: TAKIM YÖNETİMİ, KURUCU PANELİ, VİZYON DESTEK, ÜYE KONTROLLERİ,
+// SOSYAL DM, ARAMA, TAKİP, EBEVEYN (DÜZELTİLDİ), ANKET, DUYURU,
+// GİF, PROJE, PUAN, MAĞAZA, GÖREV, YARIŞMA, AKADEMİ, İŞ İLANI,
+// HATA, OYUN, CÜZDAN, KURUCU İLETİŞİM, UZAY MODU, TEMA,
+// + FOOTER BİLGİ SAYFALARI, PROJE TALEBİ, MAĞAZA, VİZYON DESTEK
+// + BLOG/SİSTEM ABONELİK SİSTEMİ (EKLENDİ)
 // ================================================================
 
 // ========== GLOBAL DEĞİŞKENLER ==========
@@ -11933,15 +12205,18 @@ var teamPageOpen = false;
 var currentDmConversation = null;
 var currentUserId = null;
 var vizyonSupportMessagesCache = [];
+var vizyonSupportContext = {};
 
-// ========== FOOTER LİNKLERİ İÇİN BİLGİ SAYFALARI (Geri Butonlu) ==========
+// ================================================================
+// ========== FOOTER LİNKLERİ İÇİN BİLGİ SAYFALARI ==========
+// ================================================================
 window.openInfoPage = function(type) {
     var modal = document.getElementById('infoModal');
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'infoModal';
         modal.className = 'modal-overlay';
-        modal.onclick = function(e) { if(e.target === this) closeModal('infoModal'); };
+        modal.onclick = function(e) { if(e.target === this) window.closeModal('infoModal'); };
         document.body.appendChild(modal);
     }
 
@@ -12014,9 +12289,9 @@ Parse.Cloud.run('superAI', { prompt: 'Merhaba' })
                 <p><strong>VİZYON 2027 Dokümantasyonu</strong> yakında tüm özellikleri, API kullanımını, takım yönetimini ve daha fazlasını detaylıca anlatacak.</p>
                 <p>Şimdilik aşağıdaki kaynaklardan yararlanabilirsin:</p>
                 <ul>
-                    <li>📖 <a href="javascript:void(0)" onclick="closeModal('infoModal'); window.openHelpArticle();">"Bana Öğret"</a> – Temel rehber</li>
-                    <li>💬 <a href="javascript:void(0)" onclick="closeModal('infoModal'); window.openVizyonSupport();">Vizyon Destek</a> – Canlı yardım</li>
-                    <li>👑 <a href="javascript:void(0)" onclick="closeModal('infoModal'); window.contactFounder();">Kurucu ile İletişim</a></li>
+                    <li>📖 <a href="javascript:void(0)" onclick="window.closeModal('infoModal'); window.openHelpArticle();">"Bana Öğret"</a> – Temel rehber</li>
+                    <li>💬 <a href="javascript:void(0)" onclick="window.closeModal('infoModal'); window.openVizyonSupport();">Vizyon Destek</a> – Canlı yardım</li>
+                    <li>👑 <a href="javascript:void(0)" onclick="window.closeModal('infoModal'); window.contactFounder();">Kurucu ile İletişim</a></li>
                 </ul>
                 <p>Dokümantasyon tamamlandığında buradan erişilebilir olacak.</p>
             `;
@@ -12100,13 +12375,13 @@ Parse.Cloud.run('superAI', { prompt: 'Merhaba' })
         <div class="modal" style="max-width:700px; max-height:90vh; overflow-y:auto;">
             <div class="modal-header">
                 <h3 style="color:var(--accent);">${title}</h3>
-                <button class="modal-close" onclick="closeModal('infoModal')">×</button>
+                <button class="modal-close" onclick="window.closeModal('infoModal')">×</button>
             </div>
             <div style="padding:10px 0; color:var(--text2); line-height:1.8;">
                 ${content}
             </div>
             <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
-                <button class="btn-secondary" onclick="closeModal('infoModal')" style="flex:1; padding:12px; border-radius:40px; border:1px solid var(--accent); background:transparent; color:var(--accent); cursor:pointer; font-size:16px;">
+                <button class="btn-secondary" onclick="window.closeModal('infoModal')" style="flex:1; padding:12px; border-radius:40px; border:1px solid var(--accent); background:transparent; color:var(--accent); cursor:pointer; font-size:16px;">
                     ⬅️ Geri
                 </button>
             </div>
@@ -12117,20 +12392,15 @@ Parse.Cloud.run('superAI', { prompt: 'Merhaba' })
 };
 
 // ================================================================
-// ========== MODAL KAPAT (GLOBAL DÜZELTME – AÇILMA SORUNUNA KARŞI) ==========
+// ========== MODAL KAPAT (DÜZELTİLDİ) ==========
 // ================================================================
-// Bu fonksiyon JS-1/JS-4'te de olabilir, ancak buraya da ekleyerek
-// tüm modal/panel kapatma işlemlerinde display'in tamamen temizlenmesini sağlıyoruz.
 window.closeModal = function(id) {
     var modal = document.getElementById(id);
     if (modal) {
         modal.classList.remove('open');
-        // CSS'de .modal-overlay.open { display: flex; } olduğu için
-        // inline display'i kaldırıyoruz ki tekrar açıldığında CSS devreye girsin.
         modal.style.display = '';
         modal.style.visibility = '';
         modal.style.opacity = '';
-        // Input temizleme
         var inputs = modal.querySelectorAll('input, textarea');
         inputs.forEach(function(inp) {
             if (inp.type !== 'submit' && inp.type !== 'button') {
@@ -12141,7 +12411,196 @@ window.closeModal = function(id) {
 };
 
 // ================================================================
-// ========== TAKIM SAYFASI AÇ/KAPA ==========
+// ========== MAĞAZA MODALI (AÇ/KAPA) ==========
+// ================================================================
+window.openMarket = function() {
+    var modal = document.getElementById('marketModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'marketModal';
+        modal.className = 'modal-overlay';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="modal" style="max-width:95vw; max-height:95vh; width:100%; height:95vh; overflow-y:auto; padding:20px;">
+                <div class="modal-header">
+                    <h3>🛒 V27 Puan Pazarı</h3>
+                    <button class="modal-close" onclick="window.closeMarket()">×</button>
+                </div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px; align-items:center;">
+                    <input type="text" id="marketSearchInput" placeholder="🔍 Proje ara..." class="glow-input" style="flex:1; min-width:150px;" onkeypress="if(event.key==='Enter') window.filterMarket()">
+                    <select id="marketTypeFilter" class="glow-input" onchange="window.filterMarket()">
+                        <option value="all">Tüm Türler</option>
+                        <option value="3D">🧊 3D</option>
+                        <option value="Kod">⌨️ Kod</option>
+                        <option value="Görsel">🖼️ Görsel</option>
+                    </select>
+                    <input type="number" id="marketPriceMin" placeholder="Min Puan" class="glow-input" style="width:100px;" onchange="window.filterMarket()">
+                    <input type="number" id="marketPriceMax" placeholder="Max Puan" class="glow-input" style="width:100px;" onchange="window.filterMarket()">
+                    <button class="btn-secondary btn-sm" onclick="window.filterMarket()">Filtrele</button>
+                    <button class="btn-secondary btn-sm" onclick="window.loadMarket()">🔄 Yenile</button>
+                </div>
+                <div id="marketItems" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:16px; margin-top:10px;">
+                    <div style="grid-column:1/-1; text-align:center; color:var(--text3); padding:40px;">Yükleniyor...</div>
+                </div>
+                <div style="margin-top:20px; text-align:center;">
+                    <button class="btn-secondary" onclick="window.closeMarket()">🔙 Kapat</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    modal.classList.add('open');
+    modal.style.display = 'flex';
+    window.loadMarket();
+};
+
+window.closeMarket = function() {
+    var modal = document.getElementById('marketModal');
+    if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+    }
+};
+
+window.loadMarket = async function() {
+    try {
+        var result = await Parse.Cloud.run('getMarketProjects', {});
+        var container = document.getElementById('marketItems');
+        if (!container) return;
+        if (!result || result.length === 0) {
+            container.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--text3); padding:40px;">📭 Henüz satılık proje yok.</div>';
+            return;
+        }
+        var html = '';
+        result.forEach(function(item) {
+            html += `
+                <div class="store-item" style="background:var(--bg); border:1px solid var(--border); border-radius:16px; padding:16px; text-align:center; transition:all 0.25s; cursor:pointer;" onclick="window.viewMarketProject('${item.id}')">
+                    <div style="font-size:40px; margin-bottom:10px;">${item.type === '3D' ? '🧊' : (item.type === 'Kod' ? '⌨️' : '🖼️')}</div>
+                    <div style="font-weight:700; color:var(--text); font-size:15px;">${item.title}</div>
+                    <div style="font-size:11px; color:var(--text3); margin:4px 0;">👤 ${item.owner_name || 'Kullanıcı'}</div>
+                    <div style="font-size:13px; color:var(--text2); margin:6px 0;">${(item.description || '').substring(0,60)}</div>
+                    <div style="color:var(--gold); font-weight:600; font-size:16px;">⭐ ${item.price_points} Puan</div>
+                    <button class="btn-primary btn-sm" onclick="event.stopPropagation(); window.buyMarketProject('${item.id}')" style="margin-top:8px; font-size:12px; padding:6px 18px;">Satın Al</button>
+                    ${currentUser && (currentUser.get('email') === item.owner_email || currentUser.get('role') === 'founder') ? `<button class="btn-danger btn-sm" onclick="event.stopPropagation(); window.removeFromMarket('${item.id}')" style="margin-top:4px; font-size:10px; padding:4px 12px;">🗑️ Kaldır</button>` : ''}
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    } catch(e) {
+        console.error('Pazar yüklenirken hata:', e);
+        document.getElementById('marketItems').innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--danger); padding:40px;">⚠️ Pazar yüklenemedi.</div>';
+    }
+};
+
+window.viewMarketProject = function(marketId) {
+    alert('Proje detayları yakında gösterilecek. (Market ID: ' + marketId + ')');
+};
+
+window.filterMarket = function() {
+    window.loadMarket();
+};
+
+window.buyMarketProject = async function(marketId) {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    if (!confirm('Bu projeyi satın almak istediğinize emin misiniz?')) return;
+    try {
+        var result = await Parse.Cloud.run('buyMarketProject', { marketProjectId: marketId });
+        showNotification(result.message || 'Proje satın alındı!', 'success');
+        window.updatePointsBadge(result.remaining_points);
+        window.loadMarket();
+        window.loadUserPoints();
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+window.removeFromMarket = async function(marketId) {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    if (!confirm('Bu projeyi mağazadan kaldırmak istediğinize emin misiniz?')) return;
+    try {
+        var result = await Parse.Cloud.run('removeFromMarket', { marketId: marketId });
+        showNotification(result.message, 'success');
+        window.loadMarket();
+        window.loadStore();
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+// ================================================================
+// ========== PROJE TALEBİ OLUŞTUR (ARTI BUTONU) ==========
+// ================================================================
+window.createProjectRequest = function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    
+    var modal = document.getElementById('projectRequestModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'projectRequestModal';
+        modal.className = 'modal-overlay';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="modal" style="max-width:600px;">
+                <div class="modal-header">
+                    <h3>📨 Proje Talebi Oluştur</h3>
+                    <button class="modal-close" onclick="window.closeModal('projectRequestModal')">×</button>
+                </div>
+                <div style="padding:10px 0;">
+                    <div style="margin-bottom:12px;">
+                        <label>Proje Türü</label>
+                        <select id="requestType" class="glow-input" style="width:100%;">
+                            <option value="3D">🧊 3D Tasarım</option>
+                            <option value="Kod">⌨️ Kod Yazma</option>
+                            <option value="Görsel">🖼️ Görsel Oluşturma</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label>Proje Başlığı</label>
+                        <input type="text" id="requestTitle" placeholder="Proje başlığını girin" class="form-input">
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label>Proje Açıklaması</label>
+                        <textarea id="requestDescription" placeholder="Projenizi detaylıca anlatın..." rows="4" class="form-input"></textarea>
+                    </div>
+                    <div style="background:rgba(255,215,0,0.1); border:1px solid var(--gold); border-radius:12px; padding:12px; margin-bottom:16px;">
+                        ⚠️ Bu talep tüm admin ve kuruculara gönderilecektir. İlk değerlendiren kabul ederse projeniz oluşturulacaktır.
+                    </div>
+                    <button class="btn-primary" onclick="window.submitProjectRequest()" style="width:100%; padding:14px;">📤 Talebi Gönder</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    modal.classList.add('open');
+    modal.style.display = 'flex';
+    document.getElementById('requestTitle').value = '';
+    document.getElementById('requestDescription').value = '';
+};
+
+window.submitProjectRequest = async function() {
+    var title = document.getElementById('requestTitle').value.trim();
+    var type = document.getElementById('requestType').value;
+    var description = document.getElementById('requestDescription').value.trim();
+    
+    if (!title) return showNotification('Lütfen proje başlığı girin!', 'error');
+    if (!description) return showNotification('Lütfen proje açıklaması girin!', 'error');
+    
+    try {
+        var result = await Parse.Cloud.run('createProjectRequest', {
+            title: title,
+            type: type,
+            description: description
+        });
+        showNotification(result.message, 'success');
+        window.closeModal('projectRequestModal');
+        window.loadProjectRequests();
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+// ================================================================
+// ========== TAKIM SAYFASI ==========
 // ================================================================
 window.toggleTeamPage = function() {
     var page = document.getElementById('teamPage');
@@ -12168,7 +12627,6 @@ window.toggleTeamPage = function() {
     }
 };
 
-// ========== TAKIM SAYFASINI YÜKLE ==========
 window.loadTeamPage = async function() {
     if (!currentUser) return;
     var teamId = currentUser.get('teamId');
@@ -12319,7 +12777,9 @@ window.loadTeamPage = async function() {
     }
 };
 
-// ========== TAKIM MESAJI GÖNDER (DÜZELTİLDİ – @vizyonal, @vizyondestek, OFFLINE, VİZYON DESTEK SİTE ANALİZİ) ==========
+// ================================================================
+// ========== TAKIM MESAJI GÖNDER (GELİŞMİŞ AI) ==========
+// ================================================================
 window.sendTeamPageMessage = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     var teamId = currentUser.get('teamId');
@@ -12344,21 +12804,40 @@ window.sendTeamPageMessage = async function() {
             fileInput.value = '';
         }
 
-        // === KOMUT TESPİTİ (DÜZELTİLDİ) ===
+        // === KOMUT TESPİTİ (GELİŞTİRİLMİŞ) ===
         var isVizyonCommand = false;
         var isSupportCommand = false;
         var isOfflineCommand = false;
         var command = msg;
 
-        // Offline komutlar (herhangi bir yerde geçiyorsa)
-        if (msg.toLowerCase().includes('@vizyondestektheoffline') || msg.toLowerCase().trim() === '@vizyondestektheoffline') {
-            isOfflineCommand = true;
-        } else if (msg.toLowerCase().startsWith('@vizyonal')) {
-            isVizyonCommand = true;
-            command = msg.replace(/@vizyonal\s*/i, '').trim();
-        } else if (msg.toLowerCase().startsWith('@vizyondestek')) {
-            isSupportCommand = true;
-            command = msg.replace(/@vizyondestek\s*/i, '').trim();
+        // Offline komutlar
+        var offlineTriggers = ['@vizyondestektheoffline', '@vizyonaltheoffline', 'vizyonal the offline', 'vizyondestek the offline'];
+        for (var t of offlineTriggers) {
+            if (msg.toLowerCase().includes(t)) {
+                isOfflineCommand = true;
+                break;
+            }
+        }
+
+        if (!isOfflineCommand) {
+            // Vizyon AI komutu
+            var aiTriggers = ['@vizyonal', 'vizyon al'];
+            for (var t of aiTriggers) {
+                if (msg.toLowerCase().startsWith(t)) {
+                    isVizyonCommand = true;
+                    command = msg.replace(new RegExp(t, 'i'), '').trim();
+                    break;
+                }
+            }
+            // Vizyon Destek komutu
+            var supportTriggers = ['@vizyondestek', 'vizyon destek'];
+            for (var t of supportTriggers) {
+                if (msg.toLowerCase().startsWith(t)) {
+                    isSupportCommand = true;
+                    command = msg.replace(new RegExp(t, 'i'), '').trim();
+                    break;
+                }
+            }
         }
 
         if (isOfflineCommand) {
@@ -12366,75 +12845,120 @@ window.sendTeamPageMessage = async function() {
             botMsg.set("team_id", teamId);
             botMsg.set("user_email", 'system@vizyon2027.com');
             botMsg.set("user_name", '🧠 VİZYON AI');
-            botMsg.set("message", '🧠 VİZYON AI: Anladım, destek sohbetinden ayrılıyorum. Tekrar çağırmak için @vizyondestek yazın. 👋');
-            await botMsg.save(null);
+            botMsg.set("message", '🧠 VİZYON AI: Anladım, sohbetten ayrılıyorum. Beni tekrar çağırmak için @vizyonal veya @vizyondestek yazabilirsiniz. 👋');
+            await botMsg.save(null, { useMasterKey: true });
             await window.loadTeamPage();
             showNotification('AI sohbetten ayrıldı.', 'success');
             return;
         }
 
         if (isVizyonCommand || isSupportCommand) {
-            var aiResponse = '';
+            // Sohbet geçmişini al
             const MsgQuery = Parse.Object.extend("TeamMessage");
             const chatQuery = new Parse.Query(MsgQuery);
             chatQuery.equalTo('team_id', teamId);
             chatQuery.ascending('createdAt');
-            chatQuery.limit(20);
-            const history = await chatQuery.find();
-            var context = "Takım sohbet geçmişi (son 20 mesaj):\n";
+            chatQuery.limit(50);
+            const history = await chatQuery.find({ useMasterKey: true });
+            var context = "Takım sohbet geçmişi (son 50 mesaj):\n";
             history.forEach(function(h) {
                 const sender = h.get('user_name') || h.get('user_email');
                 const txt = h.get('message') || '[Dosya]';
                 context += sender + ': ' + txt + '\n';
             });
-            
-            // Destek komutu için özel işlem: site içeriğini analiz et
-            if (isSupportCommand) {
-                // Site hakkında bilgi içeriyorsa özel yanıt
-                if (command.toLowerCase().includes('site') || command.toLowerCase().includes('vizyon') || command.toLowerCase().includes('hakkında')) {
-                    // Önceden cache'lenmiş site bilgisi varsa kullan
-                    if (vizyonSupportMessagesCache.length > 0) {
-                        aiResponse = vizyonSupportMessagesCache.join('\n');
-                    } else {
-                        // Site içeriğini al
-                        try {
-                            const siteContent = await fetchSiteContent();
-                            vizyonSupportMessagesCache = siteContent;
-                            aiResponse = siteContent.join('\n');
-                        } catch(e) {
-                            aiResponse = '📢 Vizyon Destek: Site içeriği alınamadı. Lütfen daha sonra tekrar deneyin.';
-                        }
-                    }
-                } else {
-                    // Normal destek sorusu
-                    const prompt = '[Destek Talebi] ' + command + '\n\nSohbet geçmişi:\n' + context;
-                    try {
-                        const result = await Parse.Cloud.run('superAI', { prompt: prompt });
-                        aiResponse = '🧠 VİZYON AI: ' + result;
-                    } catch(e) {
-                        aiResponse = '🧠 VİZYON AI: Üzgünüm, şu anda cevap veremiyorum. Lütfen daha sonra tekrar deneyin.';
-                    }
-                }
-            } else {
-                // Normal AI komutu
-                const prompt = 'Soru: ' + command + '\n\nSohbet geçmişi:\n' + context;
-                try {
-                    const result = await Parse.Cloud.run('superAI', { prompt: prompt });
-                    aiResponse = '🧠 VİZYON AI: ' + result;
-                } catch(e) {
-                    aiResponse = '🧠 VİZYON AI: Üzgünüm, şu anda cevap veremiyorum. Lütfen daha sonra tekrar deneyin.';
+
+            var prompt = '';
+            var isGreeting = false;
+            var greetingWords = ['selam', 'merhaba', 'hey', 'slm', 'hello', 'hi', 'naber', 'nasılsın', 'iyi misin'];
+            for (var g of greetingWords) {
+                if (command.toLowerCase().includes(g)) {
+                    isGreeting = true;
+                    break;
                 }
             }
 
-            const botMsg = new TeamMessage();
-            botMsg.set("team_id", teamId);
-            botMsg.set("user_email", 'system@vizyon2027.com');
-            botMsg.set("user_name", '🧠 VİZYON AI');
-            botMsg.set("message", aiResponse);
-            await botMsg.save(null);
-            await window.loadTeamPage();
-            showNotification('AI yanıtladı!', 'success');
-            return;
+            if (isSupportCommand) {
+                // Vizyon Destek - site içeriğini kullan
+                try {
+                    const siteContent = await fetchSiteContent();
+                    var supportPrompt = '';
+                    if (isGreeting) {
+                        supportPrompt = `Kullanıcı selam veriyor: "${command}". Sen Vizyon Destek'sin. 
+                        Nazik ve profesyonel bir şekilde selamına karşılık ver. 
+                        Ardından "Size nasıl yardımcı olabilirim?" de.
+                        VİZYON2027 sitesi hakkında bilgi: ${siteContent.substring(0, 1500)}`;
+                    } else {
+                        supportPrompt = `Kullanıcı sorusu: "${command}". 
+                        Sen Vizyon Destek'sin. VİZYON2027 sitesi hakkında bilgi: ${siteContent.substring(0, 1500)}
+                        Sohbet geçmişi: ${context}
+                        Eğer soru site hakkında ise, site bilgisine göre detaylı cevap ver.
+                        Eğer soru site dışı bir konu ise, yardımcı olmaya çalış.
+                        Cevabın "Vizyon Destek:" diye başlamasın, doğrudan cevabı ver.
+                        Cevabın kısa, net ve anlaşılır olsun.`;
+                    }
+                    const result = await Parse.Cloud.run('superAI', { prompt: supportPrompt });
+                    var reply = result || 'Vizyon Destek olarak size yardımcı olmaktan mutluluk duyarım. Lütfen daha detaylı sorunuzu belirtin.';
+                    const botMsg = new TeamMessage();
+                    botMsg.set("team_id", teamId);
+                    botMsg.set("user_email", 'system@vizyon2027.com');
+                    botMsg.set("user_name", '🧠 VİZYON DESTEK');
+                    botMsg.set("message", '🧠 VİZYON DESTEK: ' + reply);
+                    await botMsg.save(null, { useMasterKey: true });
+                    await window.loadTeamPage();
+                    showNotification('Vizyon Destek yanıtladı!', 'success');
+                    return;
+                } catch(e) {
+                    console.error('Vizyon Destek hatası:', e);
+                    const botMsg = new TeamMessage();
+                    botMsg.set("team_id", teamId);
+                    botMsg.set("user_email", 'system@vizyon2027.com');
+                    botMsg.set("user_name", '🧠 VİZYON DESTEK');
+                    botMsg.set("message", '🧠 VİZYON DESTEK: Üzgünüm, şu anda size yardımcı olamıyorum. Lütfen daha sonra tekrar deneyin veya destek talebinizi kurucuya iletin.');
+                    await botMsg.save(null, { useMasterKey: true });
+                    await window.loadTeamPage();
+                    return;
+                }
+            }
+
+            if (isVizyonCommand) {
+                // Vizyon AI
+                var aiPrompt = '';
+                if (isGreeting) {
+                    aiPrompt = `Kullanıcı selam veriyor: "${command}". Sen VİZYON AI'sın. 
+                    Sohbete başlamak için nazik ve samimi bir selam ver. 
+                    Ardından "Size nasıl yardımcı olabilirim?" de.`;
+                } else {
+                    aiPrompt = `Kullanıcı sorusu: "${command}". 
+                    Sen VİZYON AI'sın. Sohbet geçmişi: ${context}
+                    Soruyu detaylı ve anlaşılır bir şekilde cevapla.
+                    Eğer kod istiyorsa, çalışan kod örneği ver.
+                    Cevabın "VİZYON AI:" diye başlamasın, doğrudan cevabı ver.
+                    Cevabın kısa, net ve anlaşılır olsun.`;
+                }
+                try {
+                    const result = await Parse.Cloud.run('superAI', { prompt: aiPrompt });
+                    var reply = result || 'VİZYON AI olarak size yardımcı olmaktan mutluluk duyarım. Lütfen daha detaylı sorunuzu belirtin.';
+                    const botMsg = new TeamMessage();
+                    botMsg.set("team_id", teamId);
+                    botMsg.set("user_email", 'system@vizyon2027.com');
+                    botMsg.set("user_name", '🧠 VİZYON AI');
+                    botMsg.set("message", '🧠 VİZYON AI: ' + reply);
+                    await botMsg.save(null, { useMasterKey: true });
+                    await window.loadTeamPage();
+                    showNotification('VİZYON AI yanıtladı!', 'success');
+                    return;
+                } catch(e) {
+                    console.error('VİZYON AI hatası:', e);
+                    const botMsg = new TeamMessage();
+                    botMsg.set("team_id", teamId);
+                    botMsg.set("user_email", 'system@vizyon2027.com');
+                    botMsg.set("user_name", '🧠 VİZYON AI');
+                    botMsg.set("message", '🧠 VİZYON AI: Üzgünüm, şu anda size cevap veremiyorum. Lütfen daha sonra tekrar deneyin.');
+                    await botMsg.save(null, { useMasterKey: true });
+                    await window.loadTeamPage();
+                    return;
+                }
+            }
         }
 
         // Normal mesaj gönder
@@ -12460,55 +12984,20 @@ window.sendTeamPageMessage = async function() {
 // ========== SİTE İÇERİĞİNİ ÇEK (VİZYON DESTEK İÇİN) ==========
 async function fetchSiteContent() {
     try {
-        // Ana sayfa içeriğini çek
         const response = await fetch('https://vizyon2026.vercel.app/');
         const html = await response.text();
-        
-        // HTML'den metin içeriğini çıkar (basitçe)
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-        const text = tempDiv.textContent || '';
-        
-        // Önemli bölümleri ayıkla
-        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 10);
-        const importantLines = lines.slice(0, 100); // İlk 100 satır
-        
-        // Özet oluştur
-        const siteInfo = [
-            '📢 Vizyon Destek: Sitemiz hakkında bilgi veriyorum.',
-            '',
-            '🌐 VİZYON 2027 – Dünyanın En Güçlü Yapay Zeka Ekosistemi',
-            '',
-            '🔹 PLATFORM:',
-            '  • VİZYON AI – 7 farklı AI modeli tek platformda (Groq, DeepSeek, OpenAI, OpenRouter, Cohere, Cerebras, GitHub Models)',
-            '  • Kod Editörü – Her dilde kod yazma ve debug',
-            '  • API – Tüm fonksiyonlara erişim',
-            '',
-            '🔹 KAYNAKLAR:',
-            '  • Dokümantasyon – Detaylı kullanım kılavuzu',
-            '  • Topluluk – Diğer kullanıcılarla etkileşim',
-            '  • Blog – Güncellemeler ve makaleler',
-            '',
-            '🔹 ŞİRKET:',
-            '  • Hakkımızda – Vizyon ve misyon',
-            '  • Kariyer – İş fırsatları',
-            '  • İletişim – Bize ulaşın',
-            '',
-            '🔹 YASAL:',
-            '  • Gizlilik Politikası – Veri koruma',
-            '  • Kullanıcı Sözleşmesi – Kullanım şartları',
-            '',
-            '💡 VİZYON 2027, yapay zeka, ticaret ve sosyal ağ özelliklerini bir arada sunan devrim niteliğinde bir ekosistemdir.',
-            '🔗 https://vizyon2026.vercel.app/'
-        ];
-        return siteInfo;
+        const text = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+        const summary = text.substring(0, 3000);
+        return summary;
     } catch(e) {
         console.error('Site içeriği alınamadı:', e);
-        return ['📢 Vizyon Destek: Site içeriği şu anda alınamıyor. Lütfen daha sonra tekrar deneyin.'];
+        return 'Site içeriği şu anda alınamıyor. Lütfen daha sonra tekrar deneyin.';
     }
 }
 
-// ========== TAKIM OLUŞTUR ==========
+// ================================================================
+// ========== TAKIM OLUŞTUR / KATIL / AYRIL ==========
+// ================================================================
 window.createTeamPage = async function() {
     var name = prompt('Takım adı:');
     if (!name) return;
@@ -12527,7 +13016,6 @@ window.createTeamPage = async function() {
     }
 };
 
-// ========== KOD İLE TAKIMA KATIL ==========
 window.joinTeamPageWithCode = async function() {
     var codeInput = document.getElementById('teamPageCodeInput');
     var teamCode = codeInput.value.trim();
@@ -12548,7 +13036,6 @@ window.joinTeamPageWithCode = async function() {
     }
 };
 
-// ========== TAKIMDAN AYRIL ==========
 window.leaveTeamPage = async function() {
     if (!confirm('Takımdan ayrılmak istediğinize emin misiniz?')) return;
     try {
@@ -12564,7 +13051,6 @@ window.leaveTeamPage = async function() {
     }
 };
 
-// ========== TAKIMI KAPAT ==========
 window.closeTeamPage = async function() {
     if (!confirm('Takımı kapatmak tüm verileri siler ve herkesi atar. Emin misiniz?')) return;
     try {
@@ -12580,7 +13066,9 @@ window.closeTeamPage = async function() {
     }
 };
 
+// ================================================================
 // ========== ÜYE YÖNETİMİ ==========
+// ================================================================
 window.openTeamMemberManagement = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     var teamId = currentUser.get('teamId');
@@ -12599,11 +13087,11 @@ window.openTeamMemberManagement = async function() {
                 <div class="modal" style="max-width:700px;">
                     <div class="modal-header">
                         <h3 data-i18n="Üye Kontrolleri">👥 Üye Yönetimi</h3>
-                        <button class="modal-close" onclick="closeModal('teamMemberModal')">×</button>
+                        <button class="modal-close" onclick="window.closeModal('teamMemberModal')">×</button>
                     </div>
                     <div id="teamMemberListContainer" style="max-height:400px; overflow-y:auto;"></div>
                     <div style="margin-top:16px; display:flex; gap:8px; justify-content:flex-end;">
-                        <button class="btn-secondary" onclick="closeModal('teamMemberModal')" data-i18n="Kapat">Kapat</button>
+                        <button class="btn-secondary" onclick="window.closeModal('teamMemberModal')" data-i18n="Kapat">Kapat</button>
                     </div>
                 </div>
             `;
@@ -12699,7 +13187,9 @@ window.transferOwnership = async function(email) {
     }
 };
 
-// ========== VİZYON DESTEK ==========
+// ================================================================
+// ========== VİZYON DESTEK PANELİ ==========
+// ================================================================
 window.openVizyonSupport = function() {
     var panel = document.getElementById('vizyonSupportPanel');
     if (!panel) {
@@ -12775,7 +13265,9 @@ window.sendVizyonSupportMessage = async function() {
     }
 };
 
-// ========== VİZYON DEVRİYE ve DESTEK KONTROLLERİ (KURUCU) ==========
+// ================================================================
+// ========== VİZYON DEVRİYE ve DESTEK KONTROLLERİ ==========
+// ================================================================
 window.toggleVizyonPatrol = function() {
     vizyonPatrolActive = !vizyonPatrolActive;
     var statusEl = document.getElementById('patrolStatus');
@@ -12790,7 +13282,9 @@ window.toggleVizyonSupport = function() {
     showNotification('Vizyon Destek ' + (vizyonSupportActive ? 'açıldı' : 'kapatıldı'), 'success');
 };
 
+// ================================================================
 // ========== KURUCU LOG ==========
+// ================================================================
 window.loadVizyonLog = async function() {
     if (!currentUser || currentUser.get('role') !== 'founder') return;
     try {
@@ -12816,7 +13310,9 @@ window.loadVizyonLog = async function() {
     }
 };
 
+// ================================================================
 // ========== TÜM TAKIMLARI LİSTELE (KURUCU) ==========
+// ================================================================
 window.showAllTeams = async function() {
     var container = document.getElementById('allTeamsList');
     if (!container) return;
@@ -12912,7 +13408,9 @@ window.forceCloseTeam = async function(teamId) {
     }
 };
 
+// ================================================================
 // ========== SOSYAL DM (ÖZEL MESAJLAŞMA) ==========
+// ================================================================
 window.openDmModal = function(userId) {
     var modal = document.getElementById('dmModal');
     if (!modal) {
@@ -12924,7 +13422,7 @@ window.openDmModal = function(userId) {
             <div class="modal" style="max-width:900px;width:95%;">
                 <div class="modal-header">
                     <h3>✈️ Mesajlar</h3>
-                    <button class="modal-close" onclick="closeModal('dmModal')">×</button>
+                    <button class="modal-close" onclick="window.closeModal('dmModal')">×</button>
                 </div>
                 <div class="dm-container">
                     <div class="dm-conversations" id="dmConversations">
@@ -12941,7 +13439,7 @@ window.openDmModal = function(userId) {
                         </div>
                     </div>
                 </div>
-                <button class="btn-secondary" onclick="closeModal('dmModal')" style="margin-top:16px;" data-i18n="Kapat">Kapat</button>
+                <button class="btn-secondary" onclick="window.closeModal('dmModal')" style="margin-top:16px;" data-i18n="Kapat">Kapat</button>
             </div>
         `;
         document.body.appendChild(modal);
@@ -12973,10 +13471,7 @@ window.loadConversations = async function() {
             html += `</div>`;
         });
         container.innerHTML = html;
-    } catch(e) {
-        console.error('Konuşmalar yüklenirken hata:', e);
-        document.getElementById('dmConversations').innerHTML = '<div style="padding:12px;color:var(--text3);text-align:center;">⚠️ Konuşmalar yüklenemedi.</div>';
-    }
+    } catch(e) { console.error('Konuşmalar yüklenirken hata:', e); }
 };
 
 window.loadConversation = async function(conversationId) {
@@ -13007,10 +13502,7 @@ window.loadConversation = async function(conversationId) {
         });
         container.innerHTML = html;
         container.scrollTop = container.scrollHeight;
-    } catch(e) {
-        console.error('Mesajlar yüklenirken hata:', e);
-        showNotification('Mesajlar yüklenemedi: ' + e.message, 'error');
-    }
+    } catch(e) { console.error('Mesajlar yüklenirken hata:', e); }
 };
 
 window.sendDmMessage = async function() {
@@ -13040,9 +13532,7 @@ window.sendDmMessage = async function() {
         input.value = '';
         await window.loadConversation(currentDmConversation);
         showNotification('Mesaj gönderildi!', 'success');
-    } catch(e) {
-        showNotification('Mesaj gönderilemedi: ' + e.message, 'error');
-    }
+    } catch(e) { showNotification('Mesaj gönderilemedi: ' + e.message, 'error'); }
 };
 
 window.startConversation = async function(userId) {
@@ -13060,7 +13550,9 @@ window.startConversation = async function(userId) {
     }
 };
 
-// ========== KULLANICI ARA (BÜYÜTEÇ) ==========
+// ================================================================
+// ========== KULLANICI ARA ==========
+// ================================================================
 window.openSearchModal = function() {
     var modal = document.getElementById('searchModal');
     if (!modal) {
@@ -13071,12 +13563,12 @@ window.openSearchModal = function() {
             <div class="modal" style="max-width:500px;">
                 <div class="modal-header">
                     <h3>🔍 Kullanıcı Ara</h3>
-                    <button class="modal-close" onclick="closeModal('searchModal')">×</button>
+                    <button class="modal-close" onclick="window.closeModal('searchModal')">×</button>
                 </div>
                 <input type="text" id="searchInput" placeholder="Kullanıcı adı veya e-posta ile ara..." class="form-input" onkeypress="if(event.key==='Enter') window.searchUsers()">
                 <button class="btn-primary" onclick="window.searchUsers()" style="width:100%;">🔍 Ara</button>
                 <div id="searchResults" style="margin-top:16px;max-height:300px;overflow-y:auto;"></div>
-                <button class="btn-secondary" onclick="closeModal('searchModal')" style="margin-top:16px;" data-i18n="Kapat">Kapat</button>
+                <button class="btn-secondary" onclick="window.closeModal('searchModal')" style="margin-top:16px;" data-i18n="Kapat">Kapat</button>
             </div>
         `;
         document.body.appendChild(modal);
@@ -13119,7 +13611,9 @@ window.searchUsers = async function() {
     }
 };
 
-// ========== PROFİL GÖRÜNTÜLEME (BAŞKASININ) ==========
+// ================================================================
+// ========== PROFİL GÖRÜNTÜLEME ==========
+// ================================================================
 window.viewProfile = async function(userId) {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     try {
@@ -13182,13 +13676,11 @@ window.toggleFollow = async function(userId) {
 };
 
 // ================================================================
-// ========== EBEVEYN AYARLARI (DÜZELTİLDİ – AÇILMA SORUNU GİDERİLDİ) ==========
+// ========== EBEVEYN AYARLARI (DÜZELTİLDİ) ==========
 // ================================================================
-
 window.openParentSettings = function() {
     var modal = document.getElementById('parentSettingsModal');
     if (!modal) {
-        // Eğer modal yoksa oluştur (HTML'de var ama yedek)
         modal = document.createElement('div');
         modal.id = 'parentSettingsModal';
         modal.className = 'modal-overlay';
@@ -13196,7 +13688,7 @@ window.openParentSettings = function() {
             <div class="modal" style="max-width:700px;">
                 <div class="modal-header">
                     <h3>🛡️ Ebeveyn Paneli (Gelişmiş)</h3>
-                    <button class="modal-close" onclick="closeModal('parentSettingsModal')">×</button>
+                    <button class="modal-close" onclick="window.closeModal('parentSettingsModal')">×</button>
                 </div>
                 <div id="parentSettingsContent" class="parent-panel">
                     <div id="parentCreateSection" style="margin-top:12px; padding:12px; background:var(--bg2); border-radius:12px; border:1px solid var(--border);">
@@ -13223,7 +13715,7 @@ window.openParentSettings = function() {
                         <p style="color:var(--text2);">Ebeveyn paneline erişmek için lütfen şifrenizi girin.</p>
                         <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
                             <input type="password" id="parentLoginPass" placeholder="Ebeveyn Şifresi" class="form-input" style="flex:1;">
-                            <button type="button" onclick="togglePassword('parentLoginPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                            <button type="button" onclick="window.togglePassword('parentLoginPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
@@ -13236,13 +13728,13 @@ window.openParentSettings = function() {
                             <input type="text" id="parentResetCode" placeholder="Doğrulama Kodu" class="form-input" style="width:100%; margin-bottom:6px;">
                             <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
                                 <input type="password" id="parentNewPass" placeholder="Yeni Şifre (8+)" class="form-input" style="flex:1;">
-                                <button type="button" onclick="togglePassword('parentNewPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                                <button type="button" onclick="window.togglePassword('parentNewPass', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
                             <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
                                 <input type="password" id="parentNewPass2" placeholder="Yeni Şifre Tekrar" class="form-input" style="flex:1;">
-                                <button type="button" onclick="togglePassword('parentNewPass2', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
+                                <button type="button" onclick="window.togglePassword('parentNewPass2', this)" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:20px; padding:0 8px;">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
@@ -13361,19 +13853,17 @@ window.openParentSettings = function() {
                         </div>
                     </div>
                 </div>
-                <button class="btn-secondary" onclick="closeModal('parentSettingsModal')" style="margin-top:16px; width:100%;" data-i18n="Kapat">Kapat</button>
+                <button class="btn-secondary" onclick="window.closeModal('parentSettingsModal')" style="margin-top:16px; width:100%;" data-i18n="Kapat">Kapat</button>
             </div>
         `;
         document.body.appendChild(modal);
     }
 
-    // === AÇILMA SORUNU ÇÖZÜMÜ: TÜM STİLLERİ TEMİZLE, YENİDEN AYARLA ===
     modal.classList.add('open');
     modal.style.display = 'flex';
     modal.style.visibility = 'visible';
     modal.style.opacity = '1';
     
-    // İçerik bölümlerini sıfırla (her açılışta doğru durumda olsun)
     var createSection = document.getElementById('parentCreateSection');
     var loginSection = document.getElementById('parentLoginSection');
     var controlsSection = document.getElementById('parentControls');
@@ -13386,7 +13876,6 @@ window.openParentSettings = function() {
     
     window.loadParentSettings();
     window.loadSessions();
-    
     console.log('✅ Ebeveyn paneli açıldı (zorla)');
 };
 
@@ -13455,7 +13944,8 @@ window.verifyParentCode = async function() {
             document.getElementById('parentCreateSection').style.display = 'none';
             document.getElementById('parentLoginSection').style.display = 'block';
             document.getElementById('parentControls').style.display = 'none';
-            document.getElementById('parentEmailDisplay').textContent = currentUser.get('parent_email');
+            var displayEl = document.getElementById('parentEmailDisplay');
+            if (displayEl) displayEl.textContent = currentUser.get('parent_email');
             showNotification('Ebeveyn e-postası doğrulandı! Lütfen PIN\'inizi girin.', 'success');
             window.loadParentSettings();
         } else {
@@ -13470,20 +13960,25 @@ window.loadParentSettings = async function() {
     if (!currentUser) return;
     try {
         const result = await Parse.Cloud.run('getParentSettings', {});
-        // Her zaman oluşturma ve giriş bölümlerini göster, kontrolleri gizle (giriş yapılmadıysa)
         document.getElementById('parentCreateSection').style.display = 'block';
         document.getElementById('parentLoginSection').style.display = 'block';
         document.getElementById('parentControls').style.display = 'none';
 
         if (result.parent_mode) {
-            document.getElementById('parentEmailDisplay').textContent = result.parent_email || currentUser.get('email');
-            document.getElementById('liveTrackingStatus').textContent = result.live_tracking ? '🟢 Açık' : '🔴 Kapalı';
-            document.getElementById('dailyLimitInput').value = result.daily_limit || 0;
+            var displayEl = document.getElementById('parentEmailDisplay');
+            if (displayEl) displayEl.textContent = result.parent_email || currentUser.get('email');
+            var statusEl = document.getElementById('liveTrackingStatus');
+            if (statusEl) statusEl.textContent = result.live_tracking ? '🟢 Açık' : '🔴 Kapalı';
+            var dailyInput = document.getElementById('dailyLimitInput');
+            if (dailyInput) dailyInput.value = result.daily_limit || 0;
             try {
                 const full = await Parse.Cloud.run('getFullParentSettings', { childEmail: currentUser.get('email') });
-                document.getElementById('weeklyLimitInput').value = full.weekly_limit || 0;
-                document.getElementById('monthlyLimitInput').value = full.monthly_limit || 0;
-                document.getElementById('accountStatus').textContent = full.is_suspended ? '⛔ Askıda' : '✅ Aktif';
+                var weeklyInput = document.getElementById('weeklyLimitInput');
+                if (weeklyInput) weeklyInput.value = full.weekly_limit || 0;
+                var monthlyInput = document.getElementById('monthlyLimitInput');
+                if (monthlyInput) monthlyInput.value = full.monthly_limit || 0;
+                var accountStatus = document.getElementById('accountStatus');
+                if (accountStatus) accountStatus.textContent = full.is_suspended ? '⛔ Askıda' : '✅ Aktif';
                 const features = full.features || {};
                 for (const [key, val] of Object.entries(features)) {
                     const toggle = document.getElementById('feature' + key.charAt(0).toUpperCase() + key.slice(1));
@@ -13515,7 +14010,8 @@ window.loginParent = async function() {
         document.getElementById('parentLoginSection').style.display = 'none';
         document.getElementById('parentControls').style.display = 'block';
         document.getElementById('parentCreateSection').style.display = 'none';
-        document.getElementById('parentEmailDisplay').textContent = settings.parent_email || currentUser.get('email');
+        var displayEl = document.getElementById('parentEmailDisplay');
+        if (displayEl) displayEl.textContent = settings.parent_email || currentUser.get('email');
         showNotification('Ebeveyn paneline hoş geldiniz!', 'success');
         window.loadParentSettings();
     } catch(e) {
@@ -13723,100 +14219,515 @@ window.removeParentControl = async function() {
         }
         const result = await Parse.Cloud.run('removeParentControl', { childEmail: currentUser.get('email') });
         showNotification(result.message, 'success');
-        closeModal('parentSettingsModal');
+        window.closeModal('parentSettingsModal');
         setTimeout(() => location.reload(), 1500);
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 };
 
-// ========== KURUCU İLETİŞİM, BANA ÖĞRET, SOSYAL GÖREV, GİF ==========
-window.contactFounder = async function() {
-    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
-    var message = prompt('Kurucuya iletmek istediğiniz mesajı yazın:');
-    if (!message) return;
+// ================================================================
+// ========== LİDERLİK TABLOSU (SANSÜR KALDIRILDI) ==========
+// ================================================================
+window.loadReferralLeaderboard = async function() {
     try {
-        var result = await Parse.Cloud.run('sendFounderMessage', { message: message });
-        showNotification(result.message, 'success');
+        var result = await Parse.Cloud.run('getReferralLeaderboard', {});
+        var containers = document.querySelectorAll('#referralLeaderboard, #mainReferralLeaderboard');
+        if (!containers || containers.length === 0) {
+            var mainSite = document.getElementById('mainSite');
+            if (mainSite && !document.getElementById('mainReferralLeaderboard')) {
+                var section = document.createElement('section');
+                section.id = 'mainReferralLeaderboard';
+                section.style.cssText = 'max-width:800px; margin:40px auto; padding:20px;';
+                section.innerHTML = `
+                    <h3 style="color:var(--accent); font-family:var(--font-display); font-size:24px; margin-bottom:20px;">🏆 En Çok Davet Edenler</h3>
+                    <div id="referralLeaderboard" style="max-height:400px; overflow-y:auto; background:var(--surface); border-radius:12px; padding:12px; border:1px solid var(--border);"></div>
+                `;
+                var pricingSection = document.getElementById('pricing');
+                if (pricingSection) {
+                    pricingSection.parentNode.insertBefore(section, pricingSection.nextSibling);
+                } else {
+                    mainSite.appendChild(section);
+                }
+                containers = [document.getElementById('referralLeaderboard')];
+            }
+        }
+        containers.forEach(function(container) {
+            if (!container) return;
+            var isLoggedIn = !!currentUser;
+            if (!result || result.length === 0) {
+                container.innerHTML = '<div style="color:var(--text3); text-align:center; padding:20px;">📊 Henüz kimse davet edilmedi.</div>';
+                return;
+            }
+            var html = '<div style="font-size:14px;">';
+            var medals = ['🥇', '🥈', '🥉'];
+            result.forEach(function(item, index) {
+                var medal = index < 3 ? medals[index] : (index + 1) + '.';
+                var displayName = isLoggedIn ? item.name : censorName(item.name, false);
+                var displayEmail = isLoggedIn ? item.email : censorEmail(item.email, false);
+                html += `
+                    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border);">
+                        <span>${medal} <strong>${displayName}</strong> (${displayEmail})</span>
+                        <span style="color:var(--gold); font-weight:600;">${item.count} davet</span>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+            window.applyTranslations(currentLanguage);
+        });
+    } catch(e) {
+        console.error('Liderlik tablosu yüklenemedi:', e);
+    }
+};
+
+// ================================================================
+// ========== DAVET KODU ==========
+// ================================================================
+window.showMyReferralCode = function() {
+    if (!currentUser) {
+        showNotification('Önce giriş yapın!', 'error');
+        return;
+    }
+    var code = currentUser.get('referral_code');
+    if (!code) {
+        showNotification('Davet kodunuz henüz oluşturulmamış.', 'warning');
+        return;
+    }
+    alert('📍 Sizin Davet Kodunuz:\n\n' + code + '\n\nBu kodu arkadaşlarınıza verin, kayıt olurken girsinler. Her kullanımda 1000 puan kazanırsınız! (Maks. 2 kişi)');
+};
+
+window.enterReferralCode = async function() {
+    if (!currentUser) {
+        showNotification('Önce giriş yapın!', 'error');
+        return;
+    }
+    var code = document.getElementById('referralCodeInput').value.trim();
+    if (!code) {
+        showNotification('Lütfen bir davet kodu girin!', 'warning');
+        return;
+    }
+    var msgDiv = document.getElementById('referralMessage');
+    try {
+        var result = await Parse.Cloud.run('applyReferral', { code: code });
+        if (result.success) {
+            msgDiv.innerHTML = '✅ ' + result.message;
+            msgDiv.className = 'success';
+            document.getElementById('referralCodeInput').value = '';
+            await currentUser.fetch();
+            window.updatePointsBadge(currentUser.get('points') || 0);
+            window.loadReferralLeaderboard();
+            showNotification('✅ ' + result.message, 'success');
+        } else {
+            msgDiv.innerHTML = '❌ ' + (result.error || result.message || 'Geçersiz kod!');
+            msgDiv.className = 'error';
+            showNotification('❌ ' + (result.error || result.message), 'error');
+        }
+    } catch(e) {
+        msgDiv.innerHTML = '❌ Hata: ' + e.message;
+        msgDiv.className = 'error';
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+window.generateReferralCode = async function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    try {
+        var result = await Parse.Cloud.run('generateReferralCode', {});
+        if (result && result.referral_code) {
+            showNotification('✅ Davet kodunuz: ' + result.referral_code, 'success');
+            await currentUser.fetch();
+            window.loadReferralLeaderboard();
+            if (document.getElementById('profileModal').classList.contains('open')) {
+                window.openProfileModal();
+            }
+        } else {
+            showNotification('Kod oluşturulamadı.', 'warning');
+        }
     } catch(e) {
         showNotification('Hata: ' + e.message, 'error');
     }
 };
 
-window.openHelpArticle = function() {
-    var modal = document.getElementById('helpArticleModal');
-    if (modal) {
-        modal.style.display = 'flex';
-        modal.classList.add('open');
+// ================================================================
+// ========== PROJE SATIŞTAN ÇIKARMA ==========
+// ================================================================
+window.publishProjectToStore = async function(projectId) {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    if (!projectId) return showNotification('Proje ID gerekli!', 'error');
+    
+    try {
+        var query = new Parse.Query('Project');
+        var project = await query.get(projectId);
+        if (!project) return showNotification('Proje bulunamadı!', 'error');
+        if (project.get('user_email') !== currentUser.get('email')) {
+            return showNotification('Bu proje size ait değil!', 'error');
+        }
+        if (project.get('is_published')) {
+            return showNotification('Bu proje zaten mağazada!', 'warning');
+        }
+        
+        var type = prompt('Proje türünü seçin (3D, Kod, Görsel):', 'Kod');
+        if (!type || !['3D', 'Kod', 'Görsel'].includes(type)) {
+            return showNotification('Geçersiz tür!', 'error');
+        }
+        var price = prompt('Puan fiyatını girin (1-10000):', '100');
+        if (!price) return;
+        var desc = prompt('Proje açıklaması:', project.get('name') || 'Harika bir proje!');
+        if (!desc) return;
+        var imageUrl = prompt('Görsel URL (isteğe bağlı):', 'https://via.placeholder.com/200x200?text=Proje');
+        
+        var result = await Parse.Cloud.run('publishProjectToStore', {
+            projectId: projectId,
+            price: parseInt(price),
+            description: desc,
+            imageUrl: imageUrl || 'https://via.placeholder.com/200x200?text=Proje',
+            type: type
+        });
+        showNotification(result.message, 'success');
+        window.loadProjects();
+        window.loadStore();
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+// ================================================================
+// ========== TOPLULUK GÖREVLERİ – GİRİŞ YAPAN KULLANICI İÇİN ==========
+// ================================================================
+// Bu fonksiyon zaten JS-4'te tanımlı, burada tekrara gerek yok.
+
+// ================================================================
+// ========== EKSİK FONKSİYONLAR (DÜZELTİLDİ) ==========
+// ================================================================
+
+// ========== checkAndShowSubscriptionCard ==========
+window.checkAndShowSubscriptionCard = async function() {
+    if (!currentUser) return;
+    var plan = currentUser.get('plan');
+    var wrapper = document.getElementById('subscriptionsCardWrapper');
+    if (!wrapper) return;
+    if (plan === 'pro' || plan === 'team') {
+        wrapper.style.display = 'block';
+        document.getElementById('subscriptionsContent').innerHTML = 
+            `✅ <strong>${plan === 'pro' ? '🌟 Pro' : '👥 Takım'}</strong> paketine abonesiniz.`;
+    } else {
+        wrapper.style.display = 'none';
+    }
+};
+
+// ========== toggleNotificationPanel ==========
+window.toggleNotificationPanel = function() {
+    var modal = document.getElementById('notificationModal');
+    if (!modal) {
+        console.warn('notificationModal bulunamadı!');
         return;
     }
-    modal = document.createElement('div');
-    modal.id = 'helpArticleModal';
-    modal.className = 'modal-overlay';
-    modal.onclick = function(e) { if(e.target === this) closeModal('helpArticleModal'); };
-    modal.innerHTML = `
-        <div class="modal" style="max-width:800px;">
-            <div class="modal-header">
-                <h3>📖 VİZYON 2027 Rehberi</h3>
-                <button class="modal-close" onclick="closeModal('helpArticleModal')">×</button>
-            </div>
-            <div id="helpArticleContent" style="max-height:500px;overflow-y:auto;padding:10px;color:var(--text2);">
-                <h2>VİZYON 2027'ye Hoş Geldiniz!</h2>
-                <p>Bu platform, yapay zeka, ticaret ve sosyal ağ özelliklerini bir arada sunan devrim niteliğinde bir ekosistemdir.</p>
-                <h3>🚀 Temel Özellikler</h3>
-                <ul>
-                    <li><strong>V27 AI Asistan:</strong> 7 farklı AI modelini tek bir sohbet üzerinden kullanabilirsiniz.</li>
-                    <li><strong>V27 Pazarı:</strong> Ürünlerinizi %0 komisyonla satabilir veya satın alabilirsiniz.</li>
-                    <li><strong>Puan Sistemi:</strong> Görevleri tamamlayarak, arkadaşlarını davet ederek veya alışveriş yaparak puan kazanabilirsiniz.</li>
-                    <li><strong>Puan Mağazası:</strong> Kazandığınız puanlarla rozetler, renkler, paketler ve daha fazlasını satın alabilirsiniz.</li>
-                    <li><strong>Günlük Görevler:</strong> Her gün yeni görevler gelir. Tamamlayarak puan kazanın!</li>
-                    <li><strong>Sosyal DM:</strong> Diğer kullanıcılarla özel mesajlaşın, dosya ve resim gönderin.</li>
-                    <li><strong>Anketler:</strong> Topluluk kararlarına oy verin, gelecek özellikleri belirleyin.</li>
-                    <li><strong>Ebeveyn Modu:</strong> Çocuğunuzu güvende tutmak için özel ayarlar.</li>
-                    <li><strong>Uzay Modu:</strong> Gece 02:00-05:00 arası x2 puan kazanın!</li>
-                </ul>
-                <h3>📌 Sık Sorulan Sorular</h3>
-                <ul>
-                    <li><strong>Nasıl puan kazanırım?</strong> Günlük görevleri tamamlayarak, arkadaş davet ederek, pazarda satış yaparak ve sosyal görevleri (Instagram/WhatsApp takip) yaparak.</li>
-                    <li><strong>Puanlarımı nerede görürüm?</strong> Dashboard'un sağ üst köşesindeki puan rozetinde.</li>
-                    <li><strong>Davet kodumu nasıl bulurum?</strong> Profilinizde "Benim Davet Kodum" bölümünde.</li>
-                    <li><strong>Nasıl takım kurabilirim?</strong> Takım sayfasından "Takım Oluştur" butonuna tıklayarak.</li>
-                </ul>
-                <hr style="border-color:var(--border); margin:16px 0;">
-                <p style="text-align:center;color:var(--text3);">VİZYON 2027 © 2026 - Tüm Hakları Saklıdır.</p>
-            </div>
-            <button class="btn-secondary" onclick="closeModal('helpArticleModal')" style="margin-top:16px; width:100%; padding:12px; border-radius:40px;">Kapat</button>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    modal.style.display = 'flex';
     modal.classList.add('open');
+    modal.style.display = 'flex';
+    window.loadNotifications();
 };
 
-window.checkSocialFollow = async function() {
+// ========== loadNotifications ==========
+window.loadNotifications = async function() {
     if (!currentUser) return;
     try {
-        var result = await Parse.Cloud.run('checkSocialFollows');
-        if (result.penalty_applied) {
-            showNotification(result.message, 'warning');
-            window.updatePointsBadge(result.remaining_points);
-            window.loadUserPoints();
+        var result = await Parse.Cloud.run('getNotifications', {});
+        var container = document.getElementById('notificationList');
+        if (!container) return;
+        if (!result || result.length === 0) {
+            container.innerHTML = '<div style="color:var(--text3);text-align:center;padding:20px;">📭 Henüz bildirim yok.</div>';
+            return;
         }
+        var html = '';
+        result.forEach(function(n) {
+            html += `<div style="padding:10px;border-bottom:1px solid var(--border);">
+                <div>${n.message}</div>
+                <div style="font-size:10px;color:var(--text3);">${new Date(n.createdAt).toLocaleString('tr-TR')}</div>
+                ${!n.is_read ? `<button class="btn-secondary btn-sm" onclick="window.markNotificationRead('${n.id}')">Okundu İşaretle</button>` : ''}
+            </div>`;
+        });
+        container.innerHTML = html;
     } catch(e) {
-        console.error('Sosyal görev kontrol hatası:', e);
+        console.error('Bildirimler yüklenemedi:', e);
     }
 };
 
-window.searchGif = function() {
-    var query = prompt('GIF ara (örn: happy, coding):');
-    if (!query) return;
-    var input = document.getElementById('teamPageInput');
-    if (!input) return;
-    input.value = '@vizyonal ' + query + ' gif ara';
-    window.sendTeamPageMessage();
+// ========== markNotificationRead ==========
+window.markNotificationRead = async function(notificationId) {
+    try {
+        await Parse.Cloud.run('markNotificationRead', { notificationId: notificationId });
+        window.loadNotifications();
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
 };
 
-console.log('✅ JS-5 yüklendi (Takım, Kurucu, Vizyon Destek, Üye Kontrolleri, DM, Arama, Takip, Ebeveyn (düzeltildi), Anket, Duyuru, GIF, Proje, Puan, Mağaza, Görev, Yarışma, Akademi, İş İlanı, Hata, Oyun, Cüzdan, Kurucu İletişim, Uzay Modu, Tema, + Footer Bilgi Sayfaları)');
+// ========== BLOG/SİSTEM ABONELİK SİSTEMİ ==========
+// Ana sayfa abone ol butonu için
+window.mainSubscribe = async function() {
+    var email = document.getElementById('mainSubscribeEmail').value.trim();
+    if (!email) {
+        showNotification('Lütfen e-posta adresinizi girin!', 'warning');
+        return;
+    }
+    try {
+        var result = await Parse.Cloud.run('subscribeToBlog', { email: email });
+        if (result.success) {
+            showNotification(result.message || '✅ Abone oldunuz!', 'success');
+            document.getElementById('mainSubscribeEmail').value = '';
+        } else {
+            showNotification('❌ ' + (result.error || 'Abone olunamadı.'), 'error');
+        }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+// Dashboard'da abonelik durumunu gösterme
+window.loadMySubscriptions = async function() {
+    if (!currentUser) return;
+    try {
+        var result = await Parse.Cloud.run('getMySubscriptions', {});
+        var container = document.getElementById('subscriptionsContent');
+        if (!container) return;
+        var html = '';
+        if (result.blogActive) {
+            html += '<p>✅ Blog aboneliğiniz aktif.</p>';
+        } else {
+            html += '<p>❌ Blog aboneliğiniz yok. <button class="btn-secondary btn-sm" onclick="window.subscribeBlog()">Abone Ol</button></p>';
+        }
+        if (result.systemActive) {
+            html += '<p>✅ Sistem güncelleme aboneliğiniz aktif.</p>';
+        } else {
+            html += '<p>❌ Sistem güncelleme aboneliğiniz yok. <button class="btn-secondary btn-sm" onclick="window.subscribeSystem()">Abone Ol</button></p>';
+        }
+        container.innerHTML = html;
+    } catch(e) {
+        console.error('Abonelik durumu alınamadı:', e);
+    }
+};
+
+// Admin/Kurucu için Blog Bildirimi Gönderme
+window.sendBlogNotification = async function() {
+    if (!currentUser || !['admin', 'founder'].includes(currentUser.get('role'))) {
+        showNotification('Bu işlem için yetkiniz yok!', 'error');
+        return;
+    }
+    var subject = prompt('Blog güncellemesi başlığı:');
+    if (!subject) return;
+    var message = prompt('Blog güncellemesi içeriği (HTML olabilir):');
+    if (!message) return;
+    try {
+        var result = await Parse.Cloud.run('sendBlogUpdateToSubscribers', { subject: subject, message: message });
+        if (result.success) {
+            showNotification(`✅ ${result.sentCount} kişiye blog bildirimi gönderildi.`, 'success');
+        } else {
+            showNotification('❌ ' + (result.message || 'Gönderim başarısız.'), 'error');
+        }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+// Admin/Kurucu için Sistem Güncellemesi Bildirimi
+window.sendSystemNotification = async function() {
+    if (!currentUser || !['admin', 'founder'].includes(currentUser.get('role'))) {
+        showNotification('Bu işlem için yetkiniz yok!', 'error');
+        return;
+    }
+    var version = prompt('Yeni sürüm numarası (örn: 6.02.0):');
+    if (!version) return;
+    var changes = prompt('Değişiklikleri açıklayın (HTML olabilir):');
+    if (!changes) return;
+    try {
+        var result = await Parse.Cloud.run('sendSystemUpdateToSubscribers', { version: version, changes: changes });
+        if (result.success) {
+            showNotification(`✅ ${result.sentCount} kişiye sistem güncelleme bildirimi gönderildi.`, 'success');
+        } else {
+            showNotification('❌ ' + (result.message || 'Gönderim başarısız.'), 'error');
+        }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+// Dashboard'da ayrı abonelik butonları
+window.subscribeBlog = async function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    try {
+        var result = await Parse.Cloud.run('subscribeToBlog', { email: currentUser.get('email') });
+        showNotification(result.message, 'success');
+        window.loadMySubscriptions();
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+window.subscribeSystem = async function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    try {
+        var result = await Parse.Cloud.run('subscribeToSystemUpdates', {});
+        showNotification(result.message, 'success');
+        window.loadMySubscriptions();
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+window.unsubscribeFromBlog = async function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    if (!confirm('Blog aboneliğinden çıkmak istediğinize emin misiniz?')) return;
+    try {
+        var result = await Parse.Cloud.run('unsubscribeFrom', { type: 'blog' });
+        showNotification(result.message, 'success');
+        window.loadMySubscriptions();
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+window.unsubscribeFromSystem = async function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    if (!confirm('Sistem güncelleme aboneliğinden çıkmak istediğinize emin misiniz?')) return;
+    try {
+        var result = await Parse.Cloud.run('unsubscribeFrom', { type: 'system' });
+        showNotification(result.message, 'success');
+        window.loadMySubscriptions();
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+// ================================================================
+// ========== SAYFA YÜKLENİNCE JS-5 ÖZEL BAŞLAT ==========
+// ================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔄 JS-5 başlatılıyor...');
+    var marketBtn = document.querySelector('[onclick*="openMarket"]');
+    if (marketBtn) {
+        marketBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.openMarket();
+        });
+    }
+    if (document.getElementById('teamPage')) {
+        // Takım sayfası zaten HTML'de var
+    }
+    // Bildirim paneli butonunu kontrol et
+    var notifBtn = document.querySelector('[onclick*="toggleNotificationPanel"]');
+    if (notifBtn) {
+        notifBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.toggleNotificationPanel();
+        });
+    }
+// ================================================================
+// ========== BLOG VE SİSTEM GÜNCELLEME ABONELİĞİ (JS-5 EK) ==========
+// ================================================================
+
+// Kullanıcının abonelik durumunu göster ve butonları oluştur
+window.renderSubscriptionButtons = function() {
+    if (!currentUser) return;
+    var container = document.getElementById('subscriptionControls');
+    if (!container) {
+        // Eğer container yoksa, dashboard'da uygun bir yere ekleyelim
+        var dashboardContent = document.querySelector('.dashboard-content-wrapper');
+        if (!dashboardContent) return;
+        var card = document.createElement('div');
+        card.className = 'dashboard-card full-width';
+        card.id = 'subscriptionControls';
+        card.innerHTML = '<h3>📬 Bildirim Abonelikleri</h3><div id="subscriptionStatus"></div>';
+        // Abonelik kartını en sona ekleyelim
+        dashboardContent.appendChild(card);
+        container = document.getElementById('subscriptionControls');
+    }
+    // Abonelik durumunu yükle
+    window.loadSubscriptionStatus();
+};
+
+// Abonelik durumunu yükle ve arayüzü güncelle
+window.loadSubscriptionStatus = async function() {
+    if (!currentUser) return;
+    var statusContainer = document.getElementById('subscriptionStatus');
+    if (!statusContainer) return;
+    try {
+        var result = await Parse.Cloud.run('getMySubscriptions', {});
+        var html = '';
+        // Blog aboneliği
+        html += '<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border);">';
+        html += '<span>📰 Blog Güncellemeleri</span>';
+        if (result.blogActive) {
+            html += '<span style="color:var(--success);">✅ Abonesiniz</span>';
+            html += '<button class="btn-secondary btn-sm" onclick="window.toggleBlogSubscription(false)">Aboneliği İptal Et</button>';
+        } else {
+            html += '<span style="color:var(--text3);">❌ Abone değilsiniz</span>';
+            html += '<button class="btn-primary btn-sm" onclick="window.toggleBlogSubscription(true)">Abone Ol</button>';
+        }
+        html += '</div>';
+        // Sistem aboneliği
+        html += '<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0;">';
+        html += '<span>⚡ Sistem Güncellemeleri</span>';
+        if (result.systemActive) {
+            html += '<span style="color:var(--success);">✅ Abonesiniz</span>';
+            html += '<button class="btn-secondary btn-sm" onclick="window.toggleSystemSubscription(false)">Aboneliği İptal Et</button>';
+        } else {
+            html += '<span style="color:var(--text3);">❌ Abone değilsiniz</span>';
+            html += '<button class="btn-primary btn-sm" onclick="window.toggleSystemSubscription(true)">Abone Ol</button>';
+        }
+        html += '</div>';
+        statusContainer.innerHTML = html;
+    } catch (e) {
+        console.error('Abonelik durumu alınamadı:', e);
+        statusContainer.innerHTML = '<p style="color:var(--danger);">Abonelik durumu yüklenemedi.</p>';
+    }
+};
+
+// Blog aboneliğini aç/kapat
+window.toggleBlogSubscription = async function(enable) {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    var email = currentUser.get('email');
+    try {
+        if (enable) {
+            var result = await Parse.Cloud.run('subscribeToBlog', { email: email });
+            showNotification(result.message || '✅ Blog aboneliğiniz aktif edildi.', 'success');
+        } else {
+            var result = await Parse.Cloud.run('unsubscribeFrom', { type: 'blog' });
+            showNotification(result.message || 'Blog aboneliğiniz iptal edildi.', 'success');
+        }
+        window.loadSubscriptionStatus();
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+// Sistem aboneliğini aç/kapat
+window.toggleSystemSubscription = async function(enable) {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    try {
+        if (enable) {
+            var result = await Parse.Cloud.run('subscribeToSystemUpdates', {});
+            showNotification(result.message || '✅ Sistem güncelleme aboneliğiniz aktif edildi.', 'success');
+        } else {
+            var result = await Parse.Cloud.run('unsubscribeFrom', { type: 'system' });
+            showNotification(result.message || 'Sistem güncelleme aboneliğiniz iptal edildi.', 'success');
+        }
+        window.loadSubscriptionStatus();
+    } catch (e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+// Dashboard açıldığında abonelik kontrollerini göster (showDashboard içinde çağrılabilir)
+// Aşağıdaki satırı showDashboard fonksiyonunun sonuna ekleyin:
+// window.renderSubscriptionButtons();
+
+// Ayrıca, giriş yapıldığında da çağırmak için handleLogin içinde de çağırabilirsiniz.
+    window.renderSubscriptionButtons();
+    console.log('✅ JS-5 başlatıldı.');
+});
+
+console.log('✅ JS-5 tamamen yüklendi ve tüm fonksiyonlar global!');
 </script>
 <!-- ===== JS-5 SONU ===== -->
 </body>
