@@ -3,172 +3,507 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kariyer - Vizyon2027</title>
+    <title>Kariyer – Vizyon2027</title>
     <style>
+        /* ===== GENEL ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0a0a0a; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; line-height: 1.7; }
-        .container { max-width: 1000px; margin: 0 auto; background: #141414; padding: 40px; border-radius: 16px; border: 1px solid #2a2a2a; }
-        h1 { color: #00d4ff; font-size: 32px; border-bottom: 2px solid #00d4ff; padding-bottom: 15px; }
-        h2 { color: #00d4ff; font-size: 22px; margin-top: 35px; border-left: 4px solid #00d4ff; padding-left: 15px; }
-        h3 { color: #a0c4e0; font-size: 18px; margin-top: 25px; }
-        p, li { color: #c8d0d8; font-size: 15px; }
-        ul { padding-left: 25px; }
+        .container { max-width: 1100px; margin: 0 auto; background: #141414; padding: 40px; border-radius: 20px; border: 1px solid #2a2a2a; box-shadow: 0 0 60px rgba(0,212,255,0.05); }
+
+        /* ===== DİL SEÇİCİ ===== */
+        .lang-selector { display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
+        .lang-btn { padding: 8px 20px; border-radius: 40px; border: 2px solid #2a2a2a; background: transparent; color: #aaa; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .lang-btn:hover { border-color: #00d4ff; color: #00d4ff; }
+        .lang-btn.active { border-color: #00d4ff; background: #00d4ff22; color: #00d4ff; }
+        .lang-content { display: none; }
+        .lang-content.active { display: block; }
+
+        /* ===== BAŞLIKLAR ===== */
+        h1 { color: #00d4ff; font-size: 36px; border-bottom: 3px solid #00d4ff; padding-bottom: 18px; font-family: 'Syne', sans-serif; }
+        h2 { color: #00d4ff; font-size: 28px; margin-top: 45px; border-left: 6px solid #00d4ff; padding-left: 20px; font-family: 'Syne', sans-serif; }
+        h3 { color: #a0c4e0; font-size: 20px; margin-top: 20px; }
+        p, li { color: #c8d0d8; font-size: 16px; margin-bottom: 10px; }
+        ul, ol { padding-left: 28px; margin: 12px 0; }
         li { margin-bottom: 8px; }
-        .back-link { display: inline-block; margin-top: 30px; color: #00d4ff; text-decoration: none; border: 1px solid #00d4ff; padding: 10px 20px; border-radius: 30px; transition: 0.3s; }
-        .back-link:hover { background: #00d4ff; color: #0a0a0a; }
-        .badge { display: inline-block; background: #00d4ff22; color: #00d4ff; padding: 2px 12px; border-radius: 20px; font-size: 13px; border: 1px solid #00d4ff55; }
-        hr { border: 0; height: 1px; background: #2a2a2a; margin: 30px 0; }
-        .job-card { background: #1a1a2a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; transition: 0.3s; }
-        .job-card:hover { border-color: #00d4ff; transform: translateY(-2px); }
-        .job-card h3 { margin-top: 0; color: #00d4ff; font-size: 20px; }
+
+        /* ===== KUTULAR ===== */
+        .highlight-box { background: #1a1a2a; border-left: 6px solid #00ff88; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
+        .important-box { background: #1a0a0a; border-left: 6px solid #ff6b6b; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
+        .info-box { background: #0a1a1a; border-left: 6px solid #ffb700; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
+
+        /* ===== İŞ KARTLARI ===== */
+        .job-card { background: #1a1a2a; border: 1px solid #2a2a2a; border-radius: 16px; padding: 24px; margin-bottom: 24px; transition: 0.3s; }
+        .job-card:hover { border-color: #00d4ff; transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,212,255,0.08); }
+        .job-card h3 { margin-top: 0; color: #00d4ff; font-size: 22px; }
         .job-card .meta { font-size: 13px; color: #888; margin-bottom: 10px; }
-        .job-card .meta span { margin-right: 15px; }
+        .job-card .meta span { margin-right: 18px; }
         .job-card p { color: #b0b8c0; }
-        .job-card .apply-btn { display: inline-block; padding: 8px 24px; background: #00d4ff; color: #0a0a0a; border: none; border-radius: 30px; font-weight: 700; cursor: pointer; transition: 0.3s; text-decoration: none; }
-        .job-card .apply-btn:hover { transform: scale(1.05); background: #00e8ff; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .value-item { background: #1a1a2a; border-left: 4px solid #00d4ff; padding: 16px 20px; border-radius: 6px; }
-        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
-        .tag { display: inline-block; background: #00d4ff22; color: #00d4ff; padding: 2px 10px; border-radius: 20px; font-size: 11px; border: 1px solid #00d4ff44; margin-right: 6px; }
-        .highlight-box { background: #1a1a2a; border-left: 4px solid #00ff88; padding: 15px 20px; margin: 20px 0; border-radius: 8px; }
+        .job-card .apply-btn { display: inline-block; padding: 10px 28px; background: #00d4ff; color: #0a0a0a; border: none; border-radius: 40px; font-weight: 700; cursor: pointer; transition: 0.3s; text-decoration: none; margin-top: 6px; }
+        .job-card .apply-btn:hover { transform: scale(1.05); background: #00e8ff; box-shadow: 0 0 30px rgba(0,212,255,0.3); }
+        .tag { display: inline-block; background: #00d4ff22; color: #00d4ff; padding: 2px 12px; border-radius: 20px; font-size: 12px; border: 1px solid #00d4ff44; margin-right: 6px; margin-bottom: 4px; }
+
+        /* ===== DEĞER KARTLARI ===== */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .value-item { background: #1a1a2a; border-left: 4px solid #00d4ff; padding: 18px 22px; border-radius: 8px; }
+        .value-item h4 { color: #00d4ff; margin-top: 0; font-size: 18px; }
+
+        /* ===== BUTON ===== */
+        .back-link { display: inline-block; margin-top: 30px; color: #00d4ff; text-decoration: none; border: 2px solid #00d4ff; padding: 12px 32px; border-radius: 40px; transition: 0.3s; font-weight: 600; font-size: 16px; }
+        .back-link:hover { background: #00d4ff; color: #0a0a0a; box-shadow: 0 0 40px rgba(0,212,255,0.3); }
+        .badge { display: inline-block; background: #00d4ff22; color: #00d4ff; padding: 4px 16px; border-radius: 30px; font-size: 14px; border: 1px solid #00d4ff55; margin-right: 8px; margin-bottom: 6px; }
+        hr { border: 0; height: 1px; background: #2a2a2a; margin: 45px 0; }
+
+        /* ===== FOOTER ===== */
+        .legal-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a2a; font-size: 13px; color: #666; text-align: center; }
+        .legal-footer a { color: #00d4ff; text-decoration: none; }
+        .legal-footer a:hover { text-decoration: underline; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) { .container { padding: 20px; } h1 { font-size: 28px; } h2 { font-size: 22px; } .grid-2 { grid-template-columns: 1fr; } .lang-selector { justify-content: center; } }
+        @media (max-width: 480px) { body { padding: 10px; } .container { padding: 14px; } h1 { font-size: 22px; } .job-card { padding: 16px; } .job-card .meta span { display: block; margin-bottom: 4px; } }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>💼 Kariyer - Vizyon2027</h1>
-    <p><span class="badge">🚀 Geleceği İnşa Eden Ekibe Katıl</span> <span class="badge" style="margin-left:10px;">📍 İstanbul / Uzaktan</span></p>
+<div class="container" id="mainContainer">
 
-    <p><strong>Vizyon2027</strong> olarak, yapay zeka ekosisteminde devrim yaratıyoruz. Siz de bu yolculuğun bir parçası olmak, yeteneklerinizi geliştirmek ve dünyanın en güçlü yapay zeka platformunu inşa etmek istiyorsanız, doğru yerdesiniz!</p>
-
-    <div class="highlight-box">
-        <strong>✅ Neden Vizyon2027?</strong><br>
-        🧠 Dünyanın en gelişmiş AI modelleriyle çalışma fırsatı<br>
-        💡 Yenilikçi ve dinamik bir ekip ortamı<br>
-        📈 Kariyer gelişimi ve sürekli öğrenme imkanı<br>
-        🌍 Uzaktan veya hibrit çalışma esnekliği<br>
-        🚀 Gerçek kullanıcılara dokunan ürünler geliştirme
+    <!-- ===== DİL SEÇİCİ ===== -->
+    <div class="lang-selector">
+        <button class="lang-btn active" data-lang="tr" onclick="switchLanguage('tr')">🇹🇷 Türkçe</button>
+        <button class="lang-btn" data-lang="en" onclick="switchLanguage('en')">🇬🇧 English</button>
+        <button class="lang-btn" data-lang="ar" onclick="switchLanguage('ar')">🇸🇦 العربية</button>
     </div>
 
-    <hr>
+    <!-- ===== TÜRKÇE ===== -->
+    <div id="lang-tr" class="lang-content active">
+        <h1>💼 Kariyer – Vizyon2027</h1>
+        <p><span class="badge">🚀 Geleceği İnşa Eden Ekibe Katıl</span> <span class="badge" style="margin-left:10px;">📍 İstanbul / Uzaktan</span></p>
 
-    <h2>🎯 Açık Pozisyonlar</h2>
-    <p>Aşağıda şu an açık olan pozisyonları görebilirsiniz. Her pozisyon için başvuru koşulları ve detaylar mevcuttur.</p>
+        <p><strong>Vizyon2027</strong> olarak, yapay zeka ekosisteminde devrim yaratıyoruz. Siz de bu yolculuğun bir parçası olmak, yeteneklerinizi geliştirmek ve dünyanın en güçlü yapay zeka platformunu inşa etmek istiyorsanız, doğru yerdesiniz!</p>
 
-    <!-- ===== İŞ İLANLARI ===== -->
-
-    <!-- 1 -->
-    <div class="job-card">
-        <h3>🧑‍💻 Full Stack Geliştirici</h3>
-        <div class="meta">
-            <span>📅 28 Ağustos 2026</span>
-            <span>📍 İstanbul / Uzaktan</span>
-            <span>⏳ Tam Zamanlı</span>
+        <div class="highlight-box">
+            <strong>✅ Neden Vizyon2027?</strong><br>
+            🧠 Dünyanın en gelişmiş AI modelleriyle çalışma fırsatı<br>
+            💡 Yenilikçi ve dinamik bir ekip ortamı<br>
+            📈 Kariyer gelişimi ve sürekli öğrenme imkanı<br>
+            🌍 Uzaktan veya hibrit çalışma esnekliği<br>
+            🚀 Gerçek kullanıcılara dokunan ürünler geliştirme
         </div>
-        <p>Vizyon2027'nin web ve mobil platformlarını geliştirecek, Back4App Cloud Code, JavaScript, React ve Node.js teknolojilerinde uzman bir geliştirici arıyoruz. Yapay zeka entegrasyonları ve büyük ölçekli sistemlerle çalışma fırsatı.</p>
-        <p><strong>Gerekenler:</strong> <span class="tag">JavaScript</span> <span class="tag">React</span> <span class="tag">Node.js</span> <span class="tag">Back4App</span> <span class="tag">MongoDB</span></p>
-        <a href="mailto:vizyon2027.info@gmail.com?subject=Başvuru: Full Stack Geliştirici" class="apply-btn">📩 Başvur</a>
+
+        <hr>
+
+        <h2>🎯 Açık Pozisyonlar</h2>
+        <p>Aşağıda şu an açık olan pozisyonları görebilirsiniz. Her pozisyon için başvuru koşulları ve detaylar mevcuttur.</p>
+
+        <!-- 1 -->
+        <div class="job-card">
+            <h3>🧑‍💻 Full Stack Geliştirici</h3>
+            <div class="meta">
+                <span>📅 28 Ağustos 2026</span>
+                <span>📍 İstanbul / Uzaktan</span>
+                <span>⏳ Tam Zamanlı</span>
+            </div>
+            <p>Vizyon2027'nin web ve mobil platformlarını geliştirecek, Back4App Cloud Code, JavaScript, React ve Node.js teknolojilerinde uzman bir geliştirici arıyoruz. Yapay zeka entegrasyonları ve büyük ölçekli sistemlerle çalışma fırsatı.</p>
+            <p><strong>Gerekenler:</strong> <span class="tag">JavaScript</span> <span class="tag">React</span> <span class="tag">Node.js</span> <span class="tag">Back4App</span> <span class="tag">MongoDB</span></p>
+            <a href="mailto:vizyon2027.info@gmail.com?subject=Başvuru: Full Stack Geliştirici" class="apply-btn">📩 Başvur</a>
+        </div>
+
+        <!-- 2 -->
+        <div class="job-card">
+            <h3>🤖 Yapay Zeka Mühendisi</h3>
+            <div class="meta">
+                <span>📅 27 Ağustos 2026</span>
+                <span>📍 Uzaktan</span>
+                <span>⏳ Tam Zamanlı</span>
+            </div>
+            <p>AI modellerini (Groq, OpenAI, DeepSeek, Cohere, Gemini vb.) entegre edecek, performans optimizasyonları yapacak ve yeni model entegrasyonları geliştirecek bir AI mühendisi arıyoruz. Python, TensorFlow/PyTorch ve API deneyimi olan adaylar tercih edilir.</p>
+            <p><strong>Gerekenler:</strong> <span class="tag">Python</span> <span class="tag">TensorFlow</span> <span class="tag">PyTorch</span> <span class="tag">AI/ML</span> <span class="tag">API</span></p>
+            <a href="mailto:vizyon2027.info@gmail.com?subject=Başvuru: Yapay Zeka Mühendisi" class="apply-btn">📩 Başvur</a>
+        </div>
+
+        <!-- 3 -->
+        <div class="job-card">
+            <h3>🎨 UI/UX Tasarımcısı</h3>
+            <div class="meta">
+                <span>📅 26 Ağustos 2026</span>
+                <span>📍 İstanbul / Uzaktan</span>
+                <span>⏳ Yarı Zamanlı</span>
+            </div>
+            <p>Vizyon2027'nin kullanıcı deneyimini sıfırdan tasarlayacak, modern ve kullanıcı dostu arayüzler oluşturacak bir UI/UX tasarımcısı arıyoruz. Figma, Adobe XD veya benzeri araçlara hakim, kullanıcı araştırmaları ve prototipleme deneyimi olan adaylar tercih edilir.</p>
+            <p><strong>Gerekenler:</strong> <span class="tag">Figma</span> <span class="tag">Adobe XD</span> <span class="tag">UI/UX</span> <span class="tag">Prototip</span> <span class="tag">Kullanıcı Araştırması</span></p>
+            <a href="mailto:vizyon2027.info@gmail.com?subject=Başvuru: UI/UX Tasarımcısı" class="apply-btn">📩 Başvur</a>
+        </div>
+
+        <!-- 4 -->
+        <div class="job-card">
+            <h3>📱 Flutter Geliştirici</h3>
+            <div class="meta">
+                <span>📅 25 Ağustos 2026</span>
+                <span>📍 Uzaktan</span>
+                <span>⏳ Tam Zamanlı</span>
+            </div>
+            <p>Vizyon2027'nin mobil uygulamasını Flutter ile geliştirecek, iOS ve Android platformlarına yayınlayacak deneyimli bir mobil geliştirici arıyoruz. REST API, Firebase ve Parse SDK ile çalışma deneyimi tercih edilir.</p>
+            <p><strong>Gerekenler:</strong> <span class="tag">Flutter</span> <span class="tag">Dart</span> <span class="tag">iOS</span> <span class="tag">Android</span> <span class="tag">REST API</span></p>
+            <a href="mailto:vizyon2027.info@gmail.com?subject=Başvuru: Flutter Geliştirici" class="apply-btn">📩 Başvur</a>
+        </div>
+
+        <!-- 5 -->
+        <div class="job-card">
+            <h3>📊 Veri Analisti</h3>
+            <div class="meta">
+                <span>📅 24 Ağustos 2026</span>
+                <span>📍 İstanbul / Uzaktan</span>
+                <span>⏳ Yarı Zamanlı</span>
+            </div>
+            <p>Kullanıcı verilerini analiz edecek, anlamlı içgörüler çıkaracak ve ürün kararlarına yön verecek bir veri analisti arıyoruz. SQL, Python (pandas, numpy) ve veri görselleştirme araçlarına hakim adaylar tercih edilir.</p>
+            <p><strong>Gerekenler:</strong> <span class="tag">SQL</span> <span class="tag">Python</span> <span class="tag">Pandas</span> <span class="tag">Power BI</span> <span class="tag">Veri Görselleştirme</span></p>
+            <a href="mailto:vizyon2027.info@gmail.com?subject=Başvuru: Veri Analisti" class="apply-btn">📩 Başvur</a>
+        </div>
+
+        <!-- 6 – YENİ -->
+        <div class="job-card">
+            <h3>🛡️ Güvenlik Uzmanı</h3>
+            <div class="meta">
+                <span>📅 23 Ağustos 2026</span>
+                <span>📍 Uzaktan</span>
+                <span>⏳ Tam Zamanlı</span>
+            </div>
+            <p>Vizyon2027 platformunun güvenliğini sağlayacak, siber saldırılara karşı savunma mekanizmaları geliştirecek, güvenlik testleri yapacak ve KVKK/GDPR uyumluluğunu denetleyecek bir güvenlik uzmanı arıyoruz.</p>
+            <p><strong>Gerekenler:</strong> <span class="tag">Siber Güvenlik</span> <span class="tag">KVKK/GDPR</span> <span class="tag">Penetrasyon Testi</span> <span class="tag">OWASP</span> <span class="tag">Bulut Güvenliği</span></p>
+            <a href="mailto:vizyon2027.info@gmail.com?subject=Başvuru: Güvenlik Uzmanı" class="apply-btn">📩 Başvur</a>
+        </div>
+
+        <hr>
+
+        <h2>🌟 Vizyon2027'de Çalışma Kültürü</h2>
+        <div class="grid-2">
+            <div class="value-item"><h4>🚀 Yenilikçilik</h4><p>Yapay zeka, yazılım ve tasarımda sürekli yenilik peşindeyiz. Fikirlerinize değer veriyoruz.</p></div>
+            <div class="value-item"><h4>🤝 Takım Ruhu</h4><p>Birlikte öğreniyor, birlikte büyüyoruz. Herkesin sesi eşit derecede önemlidir.</p></div>
+            <div class="value-item"><h4>📈 Sürekli Gelişim</h4><p>Kendini geliştirmek ve yeni teknolojiler öğrenmek için her türlü desteği sağlıyoruz.</p></div>
+            <div class="value-item"><h4>🌍 Küresel Vizyon</h4><p>Dünyanın her yerinden insanlara ulaşan bir ürün geliştiriyoruz. Uluslararası düşünüyoruz.</p></div>
+            <div class="value-item"><h4>🔒 Güvenlik Odaklı</h4><p>Kullanıcı verilerini korumak en önemli önceliğimizdir.</p></div>
+            <div class="value-item"><h4>⚡ Hızlı Karar Alma</h4><p>Hızlı düşünür, hızlı hareket eder, sürekli iterasyon yaparız.</p></div>
+        </div>
+
+        <hr>
+
+        <h2>📋 Başvuru Süreci</h2>
+        <ol>
+            <li><strong>Başvuru Gönder:</strong> İlgilendiğiniz pozisyon için yukarıdaki <strong>"📩 Başvur"</strong> butonuna tıklayarak e-posta gönderin. Lütfen konu kısmına pozisyon adını yazın.</li>
+            <li><strong>Ön Değerlendirme:</strong> Ekibimiz başvurunuzu inceler ve uygun adaylarla iletişime geçer.</li>
+            <li><strong>Teknik Mülakat:</strong> Yeteneklerinizi ve uyumunuzu değerlendirmek için teknik bir görüşme yapılır.</li>
+            <li><strong>Kültür Mülakatı:</strong> Ekibimizle tanışma ve değerlerimizi paylaşıp paylaşmadığınızı anlama fırsatı.</li>
+            <li><strong>Teklif ve Başlangıç:</strong> Başarılı adaylara resmi teklif sunulur ve onboarding süreci başlar.</li>
+        </ol>
+
+        <div class="info-box">
+            <strong>💡 İpucu:</strong> Başvurunuzda GitHub, LinkedIn veya portföy linkinizi eklemeyi unutmayın. Ayrıca, Vizyon2027 ile ilgili düşüncelerinizi veya neden bu ekibin bir parçası olmak istediğinizi kısa bir notla belirtmeniz, başvurunuzun öne çıkmasını sağlayacaktır.
+        </div>
+
+        <div class="important-box">
+            <strong>⚠️ YASAL UYARI:</strong> Vizyon2027, eşit fırsat eşitliğine inanır. Irk, cinsiyet, yaş, din, etnik köken veya engellilik durumu gözetmeksizin tüm başvuruları değerlendirir. Başvuru sürecinde paylaştığınız tüm veriler KVKK ve GDPR kapsamında gizli tutulur ve yalnızca değerlendirme amacıyla kullanılır.
+        </div>
+
+        <hr>
+
+        <h2>📞 İletişim</h2>
+        <p>Kariyer fırsatları hakkında sorularınız varsa, lütfen aşağıdaki adreslerden bize ulaşın:</p>
+        <ul>
+            <li><strong>📧 E-posta:</strong> <a href="mailto:vizyon2027.info@gmail.com" style="color:#00d4ff;">vizyon2027.info@gmail.com</a></li>
+            <li><strong>🌐 Web:</strong> <a href="https://vizyon2026.vercel.app" style="color:#00d4ff;">https://vizyon2026.vercel.app</a></li>
+            <li><strong>📱 WhatsApp Kanalı:</strong> <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" style="color:#25D366;">Tıklayın</a></li>
+            <li><strong>📸 Instagram:</strong> <a href="https://www.instagram.com/vizyon2027.info" target="_blank" style="color:#E4405F;">@vizyon2027.info</a></li>
+        </ul>
+
+        <hr>
+
+        <div class="legal-footer">
+            <p>
+                <strong>© 2026 Vizyon2027</strong> – Tüm Hakları Saklıdır.<br>
+                Bu platform ve içeriği, uluslararası telif hakkı, marka ve fikri mülkiyet yasaları tarafından korunmaktadır.<br>
+                İzinsiz kullanım, kopyalama, dağıtım veya türev çalışma oluşturma <strong>kesinlikle yasaktır</strong>.<br>
+                <span style="color:#ff6b6b;">⚠️ YASAL UYARI:</span> AI çıktıları bilgilendirme amaçlıdır. Vizyon2027 olası zararlardan sorumlu değildir.
+            </p>
+            <p style="margin-top:8px;">
+                <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">Kullanıcı Sözleşmesi</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/bana-ogret.html" target="_blank">Bana Öğret</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/dokumantasyon.html" target="_blank">Dokümantasyon</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/api.html" target="_blank">API</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/blog.html" target="_blank">Blog</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/hakkimizda.html" target="_blank">Hakkımızda</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/iletisim.html" target="_blank">İletişim</a>
+            </p>
+            <p style="font-size:12px; color:#555;">
+                Bu sayfa, 6698 sayılı KVKK ve GDPR'ye uygun olarak hazırlanmıştır.
+            </p>
+        </div>
+
+        <hr>
+        <a href="index.html" class="back-link">⬅️ Ana Sayfaya Dön</a>
     </div>
 
-    <!-- 2 -->
-    <div class="job-card">
-        <h3>🤖 Yapay Zeka Mühendisi</h3>
-        <div class="meta">
-            <span>📅 27 Ağustos 2026</span>
-            <span>📍 Uzaktan</span>
-            <span>⏳ Tam Zamanlı</span>
+    <!-- ===== ENGLISH ===== -->
+    <div id="lang-en" class="lang-content">
+        <h1>💼 Careers – Vizyon2027</h1>
+        <p><span class="badge">🚀 Join the Team Building the Future</span> <span class="badge" style="margin-left:10px;">📍 Istanbul / Remote</span></p>
+
+        <p><strong>Vizyon2027</strong> is revolutionizing the AI ecosystem. If you want to be part of this journey, develop your skills, and build the world's most powerful AI platform, you're in the right place!</p>
+
+        <div class="highlight-box">
+            <strong>✅ Why Vizyon2027?</strong><br>
+            🧠 Work with the world's most advanced AI models<br>
+            💡 Innovative and dynamic team environment<br>
+            📈 Career growth and continuous learning opportunities<br>
+            🌍 Remote or hybrid work flexibility<br>
+            🚀 Build products that reach real users
         </div>
-        <p>AI modellerini (Groq, OpenAI, DeepSeek, Cohere vb.) entegre edecek, performans optimizasyonları yapacak ve yeni model entegrasyonları geliştirecek bir AI mühendisi arıyoruz. Python, TensorFlow/PyTorch ve API deneyimi olan adaylar tercih edilir.</p>
-        <p><strong>Gerekenler:</strong> <span class="tag">Python</span> <span class="tag">TensorFlow</span> <span class="tag">PyTorch</span> <span class="tag">AI/ML</span> <span class="tag">API</span></p>
-        <a href="mailto:vizyon2027.info@gmail.com?subject=Başvuru: Yapay Zeka Mühendisi" class="apply-btn">📩 Başvur</a>
+
+        <hr>
+
+        <h2>🎯 Open Positions</h2>
+        <p>Below are the currently open positions. Each position includes requirements and details.</p>
+
+        <div class="job-card">
+            <h3>🧑‍💻 Full Stack Developer</h3>
+            <div class="meta"><span>📅 Aug 28, 2026</span> <span>📍 Istanbul / Remote</span> <span>⏳ Full-Time</span></div>
+            <p>Looking for an expert developer to build Vizyon2027's web and mobile platforms using Back4App Cloud Code, JavaScript, React, and Node.js. Opportunity to work with AI integrations and large-scale systems.</p>
+            <p><strong>Requirements:</strong> <span class="tag">JavaScript</span> <span class="tag">React</span> <span class="tag">Node.js</span> <span class="tag">Back4App</span> <span class="tag">MongoDB</span></p>
+            <a href="mailto:vizyon2027.info@gmail.com?subject=Application: Full Stack Developer" class="apply-btn">📩 Apply</a>
+        </div>
+
+        <div class="job-card">
+            <h3>🤖 AI Engineer</h3>
+            <div class="meta"><span>📅 Aug 27, 2026</span> <span>📍 Remote</span> <span>⏳ Full-Time</span></div>
+            <p>Looking for an AI engineer to integrate AI models (Groq, OpenAI, DeepSeek, Cohere, Gemini, etc.), optimize performance, and develop new model integrations. Python, TensorFlow/PyTorch, and API experience preferred.</p>
+            <p><strong>Requirements:</strong> <span class="tag">Python</span> <span class="tag">TensorFlow</span> <span class="tag">PyTorch</span> <span class="tag">AI/ML</span> <span class="tag">API</span></p>
+            <a href="mailto:vizyon2027.info@gmail.com?subject=Application: AI Engineer" class="apply-btn">📩 Apply</a>
+        </div>
+
+        <div class="job-card">
+            <h3>🎨 UI/UX Designer</h3>
+            <div class="meta"><span>📅 Aug 26, 2026</span> <span>📍 Istanbul / Remote</span> <span>⏳ Part-Time</span></div>
+            <p>Looking for a UI/UX designer to design Vizyon2027's user experience from scratch, creating modern and user-friendly interfaces. Figma, Adobe XD, user research, and prototyping experience preferred.</p>
+            <p><strong>Requirements:</strong> <span class="tag">Figma</span> <span class="tag">Adobe XD</span> <span class="tag">UI/UX</span> <span class="tag">Prototyping</span> <span class="tag">User Research</span></p>
+            <a href="mailto:vizyon2027.info@gmail.com?subject=Application: UI/UX Designer" class="apply-btn">📩 Apply</a>
+        </div>
+
+        <div class="job-card">
+            <h3>📱 Flutter Developer</h3>
+            <div class="meta"><span>📅 Aug 25, 2026</span> <span>📍 Remote</span> <span>⏳ Full-Time</span></div>
+            <p>Looking for an experienced mobile developer to build Vizyon2027's mobile app with Flutter and publish to iOS and Android. REST API, Firebase, and Parse SDK experience preferred.</p>
+            <p><strong>Requirements:</strong> <span class="tag">Flutter</span> <span class="tag">Dart</span> <span class="tag">iOS</span> <span class="tag">Android</span> <span class="tag">REST API</span></p>
+            <a href="mailto:vizyon2027.info@gmail.com?subject=Application: Flutter Developer" class="apply-btn">📩 Apply</a>
+        </div>
+
+        <div class="job-card">
+            <h3>📊 Data Analyst</h3>
+            <div class="meta"><span>📅 Aug 24, 2026</span> <span>📍 Istanbul / Remote</span> <span>⏳ Part-Time</span></div>
+            <p>Looking for a data analyst to analyze user data, extract meaningful insights, and guide product decisions. SQL, Python (pandas, numpy), and data visualization tools required.</p>
+            <p><strong>Requirements:</strong> <span class="tag">SQL</span> <span class="tag">Python</span> <span class="tag">Pandas</span> <span class="tag">Power BI</span> <span class="tag">Data Visualization</span></p>
+            <a href="mailto:vizyon2027.info@gmail.com?subject=Application: Data Analyst" class="apply-btn">📩 Apply</a>
+        </div>
+
+        <div class="job-card">
+            <h3>🛡️ Security Specialist</h3>
+            <div class="meta"><span>📅 Aug 23, 2026</span> <span>📍 Remote</span> <span>⏳ Full-Time</span></div>
+            <p>Looking for a security specialist to ensure the security of the Vizyon2027 platform, develop defense mechanisms against cyber attacks, perform security tests, and ensure KVKK/GDPR compliance.</p>
+            <p><strong>Requirements:</strong> <span class="tag">Cybersecurity</span> <span class="tag">KVKK/GDPR</span> <span class="tag">Penetration Testing</span> <span class="tag">OWASP</span> <span class="tag">Cloud Security</span></p>
+            <a href="mailto:vizyon2027.info@gmail.com?subject=Application: Security Specialist" class="apply-btn">📩 Apply</a>
+        </div>
+
+        <hr>
+
+        <h2>🌟 Culture at Vizyon2027</h2>
+        <div class="grid-2">
+            <div class="value-item"><h4>🚀 Innovation</h4><p>We constantly pursue innovation in AI, software, and design. We value your ideas.</p></div>
+            <div class="value-item"><h4>🤝 Team Spirit</h4><p>We learn and grow together. Everyone's voice matters equally.</p></div>
+            <div class="value-item"><h4>📈 Continuous Growth</h4><p>We provide all the support for self-improvement and learning new technologies.</p></div>
+            <div class="value-item"><h4>🌍 Global Vision</h4><p>We are building a product that reaches people from all over the world. We think globally.</p></div>
+            <div class="value-item"><h4>🔒 Security-First</h4><p>Protecting user data is our top priority.</p></div>
+            <div class="value-item"><h4>⚡ Fast Decision-Making</h4><p>We think fast, move fast, and iterate continuously.</p></div>
+        </div>
+
+        <hr>
+
+        <h2>📋 Application Process</h2>
+        <ol>
+            <li><strong>Submit Application:</strong> Click the <strong>"📩 Apply"</strong> button for the position you're interested in. Please include the position name in the subject line.</li>
+            <li><strong>Initial Review:</strong> Our team reviews your application and contacts suitable candidates.</li>
+            <li><strong>Technical Interview:</strong> A technical interview to assess your skills and fit.</li>
+            <li><strong>Culture Interview:</strong> Meet our team and see if we share the same values.</li>
+            <li><strong>Offer & Onboarding:</strong> Successful candidates receive a formal offer and begin the onboarding process.</li>
+        </ol>
+
+        <div class="info-box">
+            <strong>💡 Tip:</strong> Don't forget to include your GitHub, LinkedIn, or portfolio link. A short note about your thoughts on Vizyon2027 or why you want to join will make your application stand out.
+        </div>
+
+        <div class="important-box">
+            <strong>⚠️ LEGAL NOTICE:</strong> Vizyon2027 believes in equal opportunity. All applications are evaluated regardless of race, gender, age, religion, ethnicity, or disability. All data shared during the application process is kept confidential under KVKK and GDPR and used only for evaluation purposes.
+        </div>
+
+        <hr>
+
+        <h2>📞 Contact</h2>
+        <p>If you have any questions about career opportunities, please reach out to us:</p>
+        <ul>
+            <li><strong>📧 Email:</strong> <a href="mailto:vizyon2027.info@gmail.com" style="color:#00d4ff;">vizyon2027.info@gmail.com</a></li>
+            <li><strong>🌐 Web:</strong> <a href="https://vizyon2026.vercel.app" style="color:#00d4ff;">https://vizyon2026.vercel.app</a></li>
+            <li><strong>📱 WhatsApp Channel:</strong> <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" style="color:#25D366;">Click here</a></li>
+            <li><strong>📸 Instagram:</strong> <a href="https://www.instagram.com/vizyon2027.info" target="_blank" style="color:#E4405F;">@vizyon2027.info</a></li>
+        </ul>
+
+        <hr>
+
+        <div class="legal-footer">
+            <p>
+                <strong>© 2026 Vizyon2027</strong> – All Rights Reserved.<br>
+                This platform and its content are protected by international copyright, trademark, and intellectual property laws.<br>
+                Unauthorized use, copying, distribution, or derivative works are <strong>strictly prohibited</strong>.<br>
+                <span style="color:#ff6b6b;">⚠️ LEGAL DISCLAIMER:</span> All AI outputs are for informational purposes only. Vizyon2027 is not responsible for any damages.
+            </p>
+            <p style="margin-top:8px;">
+                <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Privacy Policy</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">Terms of Service</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/bana-ogret.html" target="_blank">Teach Me</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/dokumantasyon.html" target="_blank">Documentation</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/api.html" target="_blank">API</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/blog.html" target="_blank">Blog</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/hakkimizda.html" target="_blank">About Us</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/iletisim.html" target="_blank">Contact</a>
+            </p>
+            <p style="font-size:12px; color:#555;">
+                This page complies with Turkish Law No. 6698 (KVKK) and EU GDPR.
+            </p>
+        </div>
+
+        <hr>
+        <a href="index.html" class="back-link">⬅️ Back to Home</a>
     </div>
 
-    <!-- 3 -->
-    <div class="job-card">
-        <h3>🎨 UI/UX Tasarımcısı</h3>
-        <div class="meta">
-            <span>📅 26 Ağustos 2026</span>
-            <span>📍 İstanbul / Uzaktan</span>
-            <span>⏳ Yarı Zamanlı</span>
+    <!-- ===== ARAPÇA (ÖZET) ===== -->
+    <div id="lang-ar" class="lang-content" dir="rtl">
+        <h1>💼 الوظائف – فيجن 2027</h1>
+        <p><span class="badge">🚀 انضم إلى الفريق الذي يبني المستقبل</span> <span class="badge" style="margin-left:10px;">📍 اسطنبول / عن بُعد</span></p>
+
+        <p><strong>فيجن 2027</strong> تُحدث ثورة في نظام الذكاء الاصطناعي. إذا كنت تريد أن تكون جزءًا من هذه الرحلة، وتطوير مهاراتك، وبناء أقوى منصة ذكاء اصطناعي في العالم، فأنت في المكان الصحيح!</p>
+
+        <div class="highlight-box">
+            <strong>✅ لماذا فيجن 2027؟</strong><br>
+            🧠 العمل مع أحدث نماذج الذكاء الاصطناعي في العالم<br>
+            💡 بيئة فريق مبتكرة وديناميكية<br>
+            📈 فرص للنمو المهني والتعلم المستمر<br>
+            🌍 مرونة العمل عن بُعد أو الهجين<br>
+            🚀 بناء منتجات تصل إلى مستخدمين حقيقيين
         </div>
-        <p>Vizyon2027'nin kullanıcı deneyimini sıfırdan tasarlayacak, modern ve kullanıcı dostu arayüzler oluşturacak bir UI/UX tasarımcısı arıyoruz. Figma, Adobe XD veya benzeri araçlara hakim, kullanıcı araştırmaları ve prototipleme deneyimi olan adaylar tercih edilir.</p>
-        <p><strong>Gerekenler:</strong> <span class="tag">Figma</span> <span class="tag">Adobe XD</span> <span class="tag">UI/UX</span> <span class="tag">Prototip</span> <span class="tag">Kullanıcı Araştırması</span></p>
-        <a href="mailto:vizyon2027.info@gmail.com?subject=Başvuru: UI/UX Tasarımcısı" class="apply-btn">📩 Başvur</a>
+
+        <hr>
+
+        <h2>🎯 الوظائف الشاغرة</h2>
+
+        <div class="job-card">
+            <h3>🧑‍💻 مطور Full Stack</h3>
+            <div class="meta"><span>📅 28 أغسطس 2026</span> <span>📍 اسطنبول / عن بُعد</span> <span>⏳ دوام كامل</span></div>
+            <p>نبحث عن مطور خبير لتطوير منصات الويب والجوال في فيجن 2027 باستخدام Back4App Cloud Code و JavaScript و React و Node.js. فرصة للعمل مع تكاملات الذكاء الاصطناعي والأنظمة واسعة النطاق.</p>
+            <p><strong>المتطلبات:</strong> <span class="tag">JavaScript</span> <span class="tag">React</span> <span class="tag">Node.js</span> <span class="tag">Back4App</span> <span class="tag">MongoDB</span></p>
+            <a href="mailto:vizyon2027.info@gmail.com?subject=Application: Full Stack Developer" class="apply-btn">📩 تقدم الآن</a>
+        </div>
+
+        <div class="job-card">
+            <h3>🤖 مهندس ذكاء اصطناعي</h3>
+            <div class="meta"><span>📅 27 أغسطس 2026</span> <span>📍 عن بُعد</span> <span>⏳ دوام كامل</span></div>
+            <p>نبحث عن مهندس ذكاء اصطناعي لتكامل نماذج الذكاء الاصطناعي (Groq، OpenAI، DeepSeek، Cohere، Gemini، إلخ)، وتحسين الأداء، وتطوير تكاملات جديدة. الخبرة في Python و TensorFlow/PyTorch و API مطلوبة.</p>
+            <p><strong>المتطلبات:</strong> <span class="tag">Python</span> <span class="tag">TensorFlow</span> <span class="tag">PyTorch</span> <span class="tag">AI/ML</span> <span class="tag">API</span></p>
+            <a href="mailto:vizyon2027.info@gmail.com?subject=Application: AI Engineer" class="apply-btn">📩 تقدم الآن</a>
+        </div>
+
+        <hr>
+
+        <h2>🌟 ثقافة العمل في فيجن 2027</h2>
+        <div class="grid-2">
+            <div class="value-item"><h4>🚀 الابتكار</h4><p>نسعى باستمرار للابتكار في الذكاء الاصطناعي والبرمجيات والتصميم.</p></div>
+            <div class="value-item"><h4>🤝 روح الفريق</h4><p>نتعلم وننمو معًا. صوت الجميع مهم بالتساوي.</p></div>
+            <div class="value-item"><h4>📈 النمو المستمر</h4><p>نقدم كل الدعم للتطوير الذاتي وتعلم تقنيات جديدة.</p></div>
+            <div class="value-item"><h4>🌍 رؤية عالمية</h4><p>نحن نبني منتجًا يصل إلى الناس في جميع أنحاء العالم.</p></div>
+        </div>
+
+        <hr>
+
+        <h2>📋 عملية التقديم</h2>
+        <ol>
+            <li><strong>إرسال الطلب:</strong> انقر على زر <strong>"📩 تقدم الآن"</strong> للوظيفة التي تهتم بها.</li>
+            <li><strong>المراجعة الأولية:</strong> يقوم فريقنا بمراجعة طلبك والتواصل مع المرشحين المناسبين.</li>
+            <li><strong>المقابلة التقنية:</strong> مقابلة تقنية لتقييم مهاراتك وملاءمتك.</li>
+            <li><strong>مقابلة الثقافة:</strong> لقاء مع فريقنا لمعرفة ما إذا كنا نشارك نفس القيم.</li>
+            <li><strong>العرض والانضمام:</strong> يتلقى المرشحون الناجحون عرضًا رسميًا وتبدأ عملية الانضمام.</li>
+        </ol>
+
+        <div class="info-box">
+            <strong>💡 نصيحة:</strong> لا تنسَ إضافة رابط GitHub أو LinkedIn أو محفظة أعمالك. ملاحظة قصيرة عن أفكارك حول فيجن 2027 أو سبب رغبتك في الانضمام ستجعل طلبك مميزًا.
+        </div>
+
+        <div class="important-box">
+            <strong>⚠️ إشعار قانوني:</strong> تؤمن فيجن 2027 بتكافؤ الفرص. يتم تقييم جميع الطلبات بغض النظر عن العرق أو الجنس أو العمر أو الدين أو الأصل العرقي أو الإعاقة. جميع البيانات التي تتم مشاركتها أثناء عملية التقديم تبقى سرية بموجب KVKK و GDPR وتستخدم فقط لأغراض التقييم.
+        </div>
+
+        <hr>
+
+        <h2>📞 اتصل بنا</h2>
+        <ul>
+            <li><strong>📧 البريد الإلكتروني:</strong> <a href="mailto:vizyon2027.info@gmail.com" style="color:#00d4ff;">vizyon2027.info@gmail.com</a></li>
+            <li><strong>🌐 الويب:</strong> <a href="https://vizyon2026.vercel.app" style="color:#00d4ff;">https://vizyon2026.vercel.app</a></li>
+        </ul>
+
+        <hr>
+
+        <div class="legal-footer">
+            <p>
+                <strong>© 2026 فيجن 2027</strong> – جميع الحقوق محفوظة.<br>
+                هذه المنصة ومحتواها محميان بموجب قوانين حقوق النشر والعلامات التجارية والملكية الفكرية الدولية.<br>
+                الاستخدام غير المصرح به أو النسخ أو التوزيع أو إنشاء أعمال مشتقة <strong>ممنوع تمامًا</strong>.<br>
+                <span style="color:#ff6b6b;">⚠️ إخلاء المسؤولية القانوني:</span> جميع مخرجات الذكاء الاصطناعي لأغراض إعلامية فقط. فيجن 2027 ليست مسؤولة عن أي أضرار.
+            </p>
+            <p style="margin-top:8px;">
+                <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">سياسة الخصوصية</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">اتفاقية المستخدم</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/bana-ogret.html" target="_blank">علمني</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/dokumantasyon.html" target="_blank">التوثيق</a>
+            </p>
+        </div>
+
+        <hr>
+        <a href="index.html" class="back-link">⬅️ العودة إلى الصفحة الرئيسية</a>
     </div>
 
-    <!-- 4 -->
-    <div class="job-card">
-        <h3>📱 Flutter Geliştirici</h3>
-        <div class="meta">
-            <span>📅 25 Ağustos 2026</span>
-            <span>📍 Uzaktan</span>
-            <span>⏳ Tam Zamanlı</span>
-        </div>
-        <p>Vizyon2027'nin mobil uygulamasını Flutter ile geliştirecek, iOS ve Android platformlarına yayınlayacak deneyimli bir mobil geliştirici arıyoruz. REST API, Firebase ve Parse SDK ile çalışma deneyimi tercih edilir.</p>
-        <p><strong>Gerekenler:</strong> <span class="tag">Flutter</span> <span class="tag">Dart</span> <span class="tag">iOS</span> <span class="tag">Android</span> <span class="tag">REST API</span></p>
-        <a href="mailto:vizyon2027.info@gmail.com?subject=Başvuru: Flutter Geliştirici" class="apply-btn">📩 Başvur</a>
-    </div>
-
-    <!-- 5 -->
-    <div class="job-card">
-        <h3>📊 Veri Analisti</h3>
-        <div class="meta">
-            <span>📅 24 Ağustos 2026</span>
-            <span>📍 İstanbul / Uzaktan</span>
-            <span>⏳ Yarı Zamanlı</span>
-        </div>
-        <p>Kullanıcı verilerini analiz edecek, anlamlı içgörüler çıkaracak ve ürün kararlarına yön verecek bir veri analisti arıyoruz. SQL, Python (pandas, numpy) ve veri görselleştirme araçlarına hakim adaylar tercih edilir.</p>
-        <p><strong>Gerekenler:</strong> <span class="tag">SQL</span> <span class="tag">Python</span> <span class="tag">Pandas</span> <span class="tag">Power BI</span> <span class="tag">Veri Görselleştirme</span></p>
-        <a href="mailto:vizyon2027.info@gmail.com?subject=Başvuru: Veri Analisti" class="apply-btn">📩 Başvur</a>
-    </div>
-
-    <hr>
-
-    <h2>🌟 Vizyon2027'de Çalışma Kültürü</h2>
-    <div class="grid-2">
-        <div class="value-item">
-            <h3 style="color:#00d4ff; margin-top:0;">🚀 Yenilikçilik</h3>
-            <p>Yapay zeka, yazılım ve tasarımda sürekli yenilik peşindeyiz. Fikirlerinize değer veriyoruz.</p>
-        </div>
-        <div class="value-item">
-            <h3 style="color:#00d4ff; margin-top:0;">🤝 Takım Ruhu</h3>
-            <p>Birlikte öğreniyor, birlikte büyüyoruz. Herkesin sesi eşit derecede önemlidir.</p>
-        </div>
-        <div class="value-item">
-            <h3 style="color:#00d4ff; margin-top:0;">📈 Sürekli Gelişim</h3>
-            <p>Kendini geliştirmek ve yeni teknolojiler öğrenmek için her türlü desteği sağlıyoruz.</p>
-        </div>
-        <div class="value-item">
-            <h3 style="color:#00d4ff; margin-top:0;">🌍 Küresel Vizyon</h3>
-            <p>Dünyanın her yerinden insanlara ulaşan bir ürün geliştiriyoruz. Uluslararası düşünüyoruz.</p>
-        </div>
-    </div>
-
-    <hr>
-
-    <h2>📋 Başvuru Süreci</h2>
-    <ol>
-        <li><strong>Başvuru Gönder:</strong> İlgilendiğiniz pozisyon için yukarıdaki <strong>"📩 Başvur"</strong> butonuna tıklayarak e-posta gönderin. Lütfen konu kısmına pozisyon adını yazın.</li>
-        <li><strong>Ön Değerlendirme:</strong> Ekibimiz başvurunuzu inceler ve uygun adaylarla iletişime geçer.</li>
-        <li><strong>Teknik Mülakat:</strong> Yeteneklerinizi ve uyumunuzu değerlendirmek için teknik bir görüşme yapılır.</li>
-        <li><strong>Kültür Mülakatı:</strong> Ekibimizle tanışma ve değerlerimizi paylaşıp paylaşmadığınızı anlama fırsatı.</li>
-        <li><strong>Teklif ve Başlangıç:</strong> Başarılı adaylara resmi teklif sunulur ve onboarding süreci başlar.</li>
-    </ol>
-
-    <div class="highlight-box">
-        <strong>💡 İpucu:</strong> Başvurunuzda GitHub, LinkedIn veya portföy linkinizi eklemeyi unutmayın. Ayrıca, Vizyon2027 ile ilgili düşüncelerinizi veya neden bu ekibin bir parçası olmak istediğinizi kısa bir notla belirtmeniz, başvurunuzun öne çıkmasını sağlayacaktır.
-    </div>
-
-    <hr>
-
-    <h2>📞 İletişim</h2>
-    <p>Kariyer fırsatları hakkında sorularınız varsa, lütfen aşağıdaki adreslerden bize ulaşın:</p>
-    <ul>
-        <li><strong>📧 E-posta:</strong> <a href="mailto:vizyon2027.info@gmail.com" style="color:#00d4ff;">vizyon2027.info@gmail.com</a></li>
-        <li><strong>🌐 Web:</strong> <a href="https://vizyon2026.vercel.app" style="color:#00d4ff;">https://vizyon2026.vercel.app</a></li>
-        <li><strong>📱 Sosyal Medya:</strong> Instagram, WhatsApp kanalımız üzerinden de bize ulaşabilirsiniz.</li>
-    </ul>
-
-    <hr>
-    <a href="index.html" class="back-link">⬅️ Ana Sayfaya Dön</a>
 </div>
+
+<script>
+    function switchLanguage(lang) {
+        document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active'));
+        const target = document.getElementById('lang-' + lang);
+        if (target) target.classList.add('active');
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.lang === lang) btn.classList.add('active');
+        });
+        const container = document.getElementById('mainContainer');
+        container.style.direction = (lang === 'ar') ? 'rtl' : 'ltr';
+        localStorage.setItem('preferred_lang', lang);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedLang = localStorage.getItem('preferred_lang');
+        if (savedLang && (savedLang === 'tr' || savedLang === 'en' || savedLang === 'ar')) {
+            switchLanguage(savedLang);
+        } else {
+            switchLanguage('tr');
+        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlLang = urlParams.get('lang');
+        if (urlLang && (urlLang === 'tr' || urlLang === 'en' || urlLang === 'ar')) {
+            switchLanguage(urlLang);
+        }
+    });
+</script>
 </body>
 </html>
