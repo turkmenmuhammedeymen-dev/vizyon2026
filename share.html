@@ -4,10 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Paylaşılan Sohbet | VİZYON 2027</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet" />
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             background: #050a0f;
             color: #ccdeee;
@@ -19,8 +25,14 @@
             align-items: center;
             padding: 40px 20px;
         }
-        a { color: #00d4ff; text-decoration: none; transition: color 0.2s; }
-        a:hover { color: #a855f7; }
+        a {
+            color: #00d4ff;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        a:hover {
+            color: #a855f7;
+        }
         .container {
             max-width: 900px;
             width: 100%;
@@ -103,7 +115,9 @@
             color: #8ab4cc;
             margin-bottom: 24px;
         }
-        .chat-subtitle i { color: #00d4ff; }
+        .chat-subtitle i {
+            color: #00d4ff;
+        }
         .messages-container {
             display: flex;
             flex-direction: column;
@@ -126,14 +140,29 @@
         .messages-container::-webkit-scrollbar-thumb:hover {
             background: rgba(0, 212, 255, 0.5);
         }
+
+        /* === MESAJ KUTULARI === */
         .message-item {
             display: flex;
             flex-direction: column;
             padding: 12px 18px;
-            background: rgba(255, 255, 255, 0.03);
             border-radius: 16px;
-            border-left: 3px solid rgba(0, 212, 255, 0.2);
+            max-width: 85%;
+            word-break: break-word;
+            white-space: pre-wrap;
             transition: background 0.2s;
+        }
+        .message-item.own {
+            align-self: flex-end;
+            background: rgba(0, 212, 255, 0.12);
+            border-left: 3px solid #00d4ff;
+            border-radius: 16px 16px 4px 16px;
+        }
+        .message-item.other {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.04);
+            border-left: 3px solid rgba(0, 212, 255, 0.2);
+            border-radius: 16px 16px 16px 4px;
         }
         .message-item:hover {
             background: rgba(255, 255, 255, 0.06);
@@ -153,8 +182,6 @@
         .message-text {
             font-size: 15px;
             color: #e8f0f8;
-            word-break: break-word;
-            white-space: pre-wrap;
         }
         .message-file {
             margin-top: 6px;
@@ -173,8 +200,19 @@
         .message-file:hover {
             background: rgba(0, 212, 255, 0.15);
         }
-        .message-file a { color: #00d4ff; }
-        .message-file a:hover { color: #a855f7; }
+        .message-file a {
+            color: #00d4ff;
+        }
+        .message-file a:hover {
+            color: #a855f7;
+        }
+        .message-image {
+            margin-top: 6px;
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, 0.15);
+        }
         .loading-state {
             text-align: center;
             padding: 40px 20px;
@@ -192,7 +230,9 @@
             margin-bottom: 12px;
         }
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
         .error-state {
             text-align: center;
@@ -213,34 +253,87 @@
             color: #5a7a8a;
             font-size: 13px;
         }
-        .page-footer a { color: #00d4ff; }
-        .page-footer a:hover { color: #a855f7; }
+        .page-footer a {
+            color: #00d4ff;
+        }
+        .page-footer a:hover {
+            color: #a855f7;
+        }
+
         @media (max-width: 768px) {
-            body { padding: 20px 12px; }
-            .container { padding: 24px 18px; border-radius: 20px; }
-            .header { flex-direction: column; align-items: flex-start; gap: 10px; }
-            .logo-text { font-size: 18px; }
-            .chat-title { font-size: 20px; }
-            .message-item { padding: 10px 14px; }
-            .message-text { font-size: 14px; }
+            body {
+                padding: 20px 12px;
+            }
+            .container {
+                padding: 24px 18px;
+                border-radius: 20px;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .logo-text {
+                font-size: 18px;
+            }
+            .chat-title {
+                font-size: 20px;
+            }
+            .message-item {
+                padding: 10px 14px;
+                max-width: 95%;
+            }
+            .message-text {
+                font-size: 14px;
+            }
         }
         @media (max-width: 480px) {
-            body { padding: 12px 8px; }
-            .container { padding: 16px 12px; border-radius: 16px; }
-            .logo-icon { width: 36px; height: 36px; font-size: 16px; }
-            .logo-text { font-size: 16px; }
-            .back-link { font-size: 12px; padding: 6px 14px; }
-            .chat-title { font-size: 18px; }
-            .chat-subtitle { font-size: 12px; }
-            .message-item { padding: 8px 12px; }
-            .message-sender { font-size: 13px; }
-            .message-text { font-size: 13px; }
-            .message-file { font-size: 12px; padding: 3px 10px; }
+            body {
+                padding: 12px 8px;
+            }
+            .container {
+                padding: 16px 12px;
+                border-radius: 16px;
+            }
+            .logo-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+            }
+            .logo-text {
+                font-size: 16px;
+            }
+            .back-link {
+                font-size: 12px;
+                padding: 6px 14px;
+            }
+            .chat-title {
+                font-size: 18px;
+            }
+            .chat-subtitle {
+                font-size: 12px;
+            }
+            .message-item {
+                padding: 8px 12px;
+                max-width: 98%;
+            }
+            .message-sender {
+                font-size: 13px;
+            }
+            .message-text {
+                font-size: 13px;
+            }
+            .message-file {
+                font-size: 12px;
+                padding: 3px 10px;
+            }
         }
     </style>
 </head>
 <body>
+
     <div class="container" id="app">
+
         <header class="header">
             <div class="logo-area">
                 <div class="logo-icon">💬</div>
@@ -263,7 +356,7 @@
             <div id="chatContent" style="display:none;">
                 <div class="chat-title" id="chatTitle">Paylaşılan Sohbet</div>
                 <div class="chat-subtitle">
-                    <i class="fas fa-lock" style="margin-right:4px;"></i> Salt okunur · 
+                    <i class="fas fa-lock" style="margin-right:4px;"></i> Salt okunur ·
                     <span id="messageCount">0</span> mesaj
                 </div>
                 <div class="messages-container" id="messagesContainer"></div>
@@ -277,10 +370,15 @@
                 <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">Kullanıcı Sözleşmesi</a>
             </p>
         </footer>
+
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/parse/5.0.0/parse.min.js"></script>
     <script>
+        // ================================================================
+        // PAYLAŞILAN SOHBET SAYFASI – VİZYON 2027
+        // ================================================================
+
         Parse.initialize(
             "ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8",
             "mur4DtLsGOsQhykTnFVNGxYOeNbvjPbAkl6xPQGp"
@@ -302,6 +400,12 @@
                 hour: '2-digit',
                 minute: '2-digit'
             });
+        }
+
+        // ---- Kullanıcı adını güvenli göster ----
+        function getDisplayName(user) {
+            if (!user) return 'Kullanıcı';
+            return user.name || user.username || user.email || 'Kullanıcı';
         }
 
         async function loadSharedConversation() {
@@ -345,24 +449,34 @@
                     return;
                 }
 
+                // ---- Mesajları render et ----
                 let html = '';
+                // currentUserId'yi al (eğer oturum açık değilse null)
+                let currentUserId = null;
+                try {
+                    const user = Parse.User.current();
+                    if (user) currentUserId = user.id;
+                } catch (e) {}
+
                 result.messages.forEach((msg) => {
-                    const sender = msg.name || 'Kullanıcı';
+                    const senderName = msg.name || 'Kullanıcı';
                     const text = msg.text || '';
                     const file = msg.file || null;
                     const fileName = msg.fileName || 'Dosya';
                     const time = msg.createdAt ? formatTime(msg.createdAt) : '';
+                    const fromUserId = msg.from_user_id || null;
 
-                    html += `<div class="message-item">`;
-                    html += `<div class="message-sender">${sender} <span class="time">${time}</span></div>`;
+                    // Eğer mesajı gönderen kişi mevcut kullanıcıysa "own", değilse "other"
+                    const isOwn = (currentUserId && fromUserId && fromUserId === currentUserId);
+
+                    html += `<div class="message-item ${isOwn ? 'own' : 'other'}">`;
+                    html += `<div class="message-sender">${senderName} <span class="time">${time}</span></div>`;
                     html += `<div class="message-text">${text}</div>`;
 
                     if (file) {
                         const isImage = file.match(/\.(jpeg|jpg|gif|png|webp|bmp|svg)$/i);
                         if (isImage) {
-                            html += `<div style="margin-top:6px;">
-                                <img src="${file}" alt="Görsel" style="max-width:100%;max-height:300px;border-radius:8px;border:1px solid rgba(0,212,255,0.15);" />
-                            </div>`;
+                            html += `<img src="${file}" alt="Görsel" class="message-image" />`;
                         } else {
                             html += `<div class="message-file">
                                 <i class="fas fa-paperclip"></i>
@@ -388,5 +502,6 @@
             loadSharedConversation();
         });
     </script>
+
 </body>
 </html>
