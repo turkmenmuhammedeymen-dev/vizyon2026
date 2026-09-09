@@ -3,72 +3,552 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Topluluk - Vizyon2027</title>
+    <title>Topluluk – Vizyon2027</title>
     <style>
+        /* ===== GENEL ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0a0a0a; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; line-height: 1.7; }
-        .container { max-width: 900px; margin: 0 auto; background: #141414; padding: 40px; border-radius: 16px; border: 1px solid #2a2a2a; }
-        h1 { color: #00d4ff; font-size: 32px; border-bottom: 2px solid #00d4ff; padding-bottom: 15px; }
-        .back-link { display: inline-block; margin-top: 30px; color: #00d4ff; text-decoration: none; border: 1px solid #00d4ff; padding: 10px 20px; border-radius: 30px; transition: 0.3s; }
-        .back-link:hover { background: #00d4ff; color: #0a0a0a; }
-        .testimonial { background: #1a1a2a; border-left: 4px solid #00d4ff; padding: 20px 24px; margin-bottom: 20px; border-radius: 8px; }
+        .container { max-width: 1200px; margin: 0 auto; background: #141414; padding: 40px; border-radius: 20px; border: 1px solid #2a2a2a; box-shadow: 0 0 60px rgba(0,212,255,0.05); }
+
+        /* ===== DİL SEÇİCİ ===== */
+        .lang-selector { display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
+        .lang-btn { padding: 8px 20px; border-radius: 40px; border: 2px solid #2a2a2a; background: transparent; color: #aaa; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .lang-btn:hover { border-color: #00d4ff; color: #00d4ff; }
+        .lang-btn.active { border-color: #00d4ff; background: #00d4ff22; color: #00d4ff; }
+        .lang-content { display: none; }
+        .lang-content.active { display: block; }
+
+        /* ===== BAŞLIKLAR ===== */
+        h1 { color: #00d4ff; font-size: 36px; border-bottom: 3px solid #00d4ff; padding-bottom: 18px; font-family: 'Syne', sans-serif; }
+        h2 { color: #00d4ff; font-size: 28px; margin-top: 45px; border-left: 6px solid #00d4ff; padding-left: 20px; font-family: 'Syne', sans-serif; }
+        h3 { color: #a0c4e0; font-size: 20px; margin-top: 20px; }
+        p, li { color: #c8d0d8; font-size: 16px; margin-bottom: 10px; }
+        ul, ol { padding-left: 28px; margin: 12px 0; }
+        li { margin-bottom: 8px; }
+
+        /* ===== KUTULAR ===== */
+        .highlight-box { background: #1a1a2a; border-left: 6px solid #00ff88; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
+        .important-box { background: #1a0a0a; border-left: 6px solid #ff6b6b; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
+        .info-box { background: #0a1a1a; border-left: 6px solid #ffb700; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
+
+        /* ===== İSTATİSTİKLER ===== */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin: 30px 0; }
+        .stat-item { background: #1a1a2a; border: 1px solid #2a2a2a; border-radius: 16px; padding: 24px; text-align: center; transition: 0.3s; }
+        .stat-item:hover { border-color: #00d4ff; transform: translateY(-4px); }
+        .stat-item .number { font-size: 38px; font-weight: 700; color: #00d4ff; display: block; }
+        .stat-item .label { font-size: 14px; color: #888; margin-top: 6px; }
+
+        /* ===== YORUM KARTLARI ===== */
+        .testimonial-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 30px 0; }
+        .testimonial { background: #1a1a2a; border-left: 6px solid #00d4ff; padding: 24px; border-radius: 16px; transition: 0.3s; }
+        .testimonial:hover { transform: translateY(-4px); border-color: #00ff88; box-shadow: 0 8px 30px rgba(0,212,255,0.06); }
+        .testimonial .avatar { font-size: 42px; display: block; margin-bottom: 6px; }
         .testimonial .name { font-weight: 700; color: #00d4ff; font-size: 18px; }
-        .testimonial .role { font-size: 13px; color: #8ab4cc; }
-        .testimonial .quote { margin-top: 8px; font-style: italic; color: #c8d0d8; }
-        .badge { display: inline-block; background: #00d4ff22; color: #00d4ff; padding: 2px 12px; border-radius: 20px; font-size: 13px; border: 1px solid #00d4ff55; }
-        hr { border: 0; height: 1px; background: #2a2a2a; margin: 30px 0; }
+        .testimonial .role { font-size: 13px; color: #8ab4cc; margin-top: 2px; }
+        .testimonial .quote { margin-top: 12px; font-style: italic; color: #c8d0d8; font-size: 15px; line-height: 1.6; }
+        .testimonial .stars { color: #ffb700; margin-top: 8px; letter-spacing: 2px; }
+
+        /* ===== CANLI YORUM AKIŞI ===== */
+        .live-feed { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 16px; padding: 20px; max-height: 400px; overflow-y: auto; margin: 20px 0; }
+        .live-feed::-webkit-scrollbar { width: 6px; }
+        .live-feed::-webkit-scrollbar-track { background: #1a1a2a; border-radius: 10px; }
+        .live-feed::-webkit-scrollbar-thumb { background: #00d4ff33; border-radius: 10px; }
+        .live-comment { display: flex; align-items: flex-start; gap: 16px; padding: 14px 0; border-bottom: 1px solid #2a2a2a; }
+        .live-comment:last-child { border-bottom: none; }
+        .live-comment .c-avatar { font-size: 32px; flex-shrink: 0; }
+        .live-comment .c-body { flex: 1; }
+        .live-comment .c-name { font-weight: 600; color: #00d4ff; font-size: 15px; }
+        .live-comment .c-role { font-size: 11px; color: #888; margin-left: 10px; }
+        .live-comment .c-text { color: #c8d0d8; font-size: 14px; margin-top: 2px; }
+        .live-comment .c-time { font-size: 11px; color: #666; margin-top: 4px; }
+
+        /* ===== SOSYAL BUTONLAR ===== */
+        .social-links { display: flex; gap: 16px; flex-wrap: wrap; margin: 20px 0; }
+        .social-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; border-radius: 40px; font-weight: 700; text-decoration: none; transition: 0.3s; font-size: 15px; }
+        .social-btn.instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: #fff; }
+        .social-btn.whatsapp { background: #25D366; color: #fff; }
+        .social-btn.website { background: #00d4ff; color: #0a0a0a; }
+        .social-btn:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+
+        /* ===== DİĞER ===== */
+        .back-link { display: inline-block; margin-top: 30px; color: #00d4ff; text-decoration: none; border: 2px solid #00d4ff; padding: 12px 32px; border-radius: 40px; transition: 0.3s; font-weight: 600; font-size: 16px; }
+        .back-link:hover { background: #00d4ff; color: #0a0a0a; box-shadow: 0 0 40px rgba(0,212,255,0.3); }
+        .badge { display: inline-block; background: #00d4ff22; color: #00d4ff; padding: 4px 16px; border-radius: 30px; font-size: 14px; border: 1px solid #00d4ff55; margin-right: 8px; margin-bottom: 6px; }
+        hr { border: 0; height: 1px; background: #2a2a2a; margin: 45px 0; }
+
+        .legal-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a2a; font-size: 13px; color: #666; text-align: center; }
+        .legal-footer a { color: #00d4ff; text-decoration: none; }
+        .legal-footer a:hover { text-decoration: underline; }
+
+        .rules-list { list-style: none; padding: 0; }
+        .rules-list li { padding: 10px 0; border-bottom: 1px solid #2a2a2a; display: flex; align-items: center; gap: 12px; }
+        .rules-list li:last-child { border-bottom: none; }
+        .rules-list li .icon { font-size: 24px; width: 40px; text-align: center; }
+
+        @media (max-width: 768px) {
+            .container { padding: 20px; }
+            h1 { font-size: 28px; }
+            h2 { font-size: 22px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .testimonial-grid { grid-template-columns: 1fr; }
+            .lang-selector { justify-content: center; }
+            .social-links { flex-direction: column; align-items: stretch; }
+            .social-btn { justify-content: center; }
+        }
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .container { padding: 14px; }
+            h1 { font-size: 22px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .testimonial { padding: 16px; }
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>💬 Topluluk Yorumları</h1>
-    <p><span class="badge">📢 Üyelerimiz ne diyor?</span></p>
+<div class="container" id="mainContainer">
 
-    <div class="testimonial">
-        <div class="name">👑 Eymen</div>
-        <div class="role">Kurucu & CEO</div>
-        <div class="quote">“Vizyon2027, benim hayalimdi. Yapay zekayı herkes için erişilebilir kılmak istedim. Bugün bu ekosistemi kuran herkese teşekkür ederim. Birlikte daha büyük işler başaracağız.”</div>
+    <!-- ===== DİL SEÇİCİ ===== -->
+    <div class="lang-selector">
+        <button class="lang-btn active" data-lang="tr" onclick="switchLanguage('tr')">🇹🇷 Türkçe</button>
+        <button class="lang-btn" data-lang="en" onclick="switchLanguage('en')">🇬🇧 English</button>
+        <button class="lang-btn" data-lang="ar" onclick="switchLanguage('ar')">🇸🇦 العربية</button>
     </div>
 
-    <div class="testimonial">
-        <div class="name">⚙️ İbrahim Admin</div>
-        <div class="role">Admin & Geliştirici</div>
-        <div class="quote">“Vizyon2027 sayesinde yapay zeka ile çalışmayı öğrendim. Artık kendi projelerimi geliştirebiliyorum. Back4App Cloud Code ile API yazmak çok keyifli.”</div>
+    <!-- ===== TÜRKÇE ===== -->
+    <div id="lang-tr" class="lang-content active">
+        <h1>💬 Topluluk</h1>
+        <p><span class="badge">🌍 Vizyon2027 Ailesi</span> <span class="badge" style="margin-left:10px;">📢 Sen de katıl!</span></p>
+
+        <p><strong>Vizyon2027</strong> topluluğu, yapay zeka, kodlama, girişimcilik ve teknoloji tutkunlarının buluşma noktasıdır. Burada fikirlerini paylaşabilir, projeler geliştirebilir, takım kurabilir ve birlikte büyüyebilirsin. Aşağıda topluluğumuza dair istatistikleri, üye yorumlarını ve canlı etkinlik akışını bulabilirsin.</p>
+
+        <div class="highlight-box">
+            <strong>🚀 Topluluk Sözü:</strong> Saygı, yardımseverlik ve iş birliği temel değerlerimizdir. Her üye, diğerlerine destek olmayı ve bilgi paylaşımını teşvik eder.
+        </div>
+
+        <!-- ===== İSTATİSTİKLER ===== -->
+        <h2>📊 Topluluk İstatistikleri</h2>
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-item"><span class="number" id="statUsers">0</span><span class="label">Aktif Kullanıcı</span></div>
+            <div class="stat-item"><span class="number" id="statComments">0</span><span class="label">Toplam Yorum</span></div>
+            <div class="stat-item"><span class="number" id="statTeams">0</span><span class="label">Aktif Takım</span></div>
+            <div class="stat-item"><span class="number" id="statProjects">0</span><span class="label">Oluşturulan Proje</span></div>
+        </div>
+
+        <!-- ===== TOPLULUK KURALLARI ===== -->
+        <h2>📋 Topluluk Kuralları</h2>
+        <ul class="rules-list">
+            <li><span class="icon">🤝</span> <strong>Saygı:</strong> Her üyeye saygılı davran, kişisel saldırılardan kaçın.</li>
+            <li><span class="icon">📚</span> <strong>Bilgi Paylaşımı:</strong> Öğrendiklerini paylaş, başkalarının öğrenmesine yardımcı ol.</li>
+            <li><span class="icon">🔞</span> <strong>Uygunsuz İçerik:</strong> Küfür, taciz, nefret söylemi ve yasa dışı içerik kesinlikle yasaktır.</li>
+            <li><span class="icon">🔒</span> <strong>Gizlilik:</strong> Başkalarının özel bilgilerini izinsiz paylaşma.</li>
+            <li><span class="icon">⚡</span> <strong>Yapıcı Ol:</strong> Eleştirilerini yapıcı ve nazik bir dille ifade et.</li>
+            <li><span class="icon">🚫</span> <strong>Spam Yok:</strong> Gereksiz mesajlar, reklam veya tekrarlayan içerik gönderme.</li>
+        </ul>
+
+        <!-- ===== ÜYE YORUMLARI (STATİK + CANLI) ===== -->
+        <h2>💬 Üye Yorumları</h2>
+        <p>Topluluğumuzdan gelen bazı yorumlar:</p>
+        <div class="testimonial-grid">
+            <div class="testimonial">
+                <span class="avatar">👑</span>
+                <div class="name">Eymen</div>
+                <div class="role">Kurucu & CEO</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="quote">“Vizyon2027, benim hayalimdi. Yapay zekayı herkes için erişilebilir kılmak istedim. Bugün bu ekosistemi kuran herkese teşekkür ederim. Birlikte daha büyük işler başaracağız.”</div>
+            </div>
+            <div class="testimonial">
+                <span class="avatar">⚙️</span>
+                <div class="name">İbrahim Admin</div>
+                <div class="role">Admin & Geliştirici</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="quote">“Vizyon2027 sayesinde yapay zeka ile çalışmayı öğrendim. Artık kendi projelerimi geliştirebiliyorum. Back4App Cloud Code ile API yazmak çok keyifli.”</div>
+            </div>
+            <div class="testimonial">
+                <span class="avatar">🧪</span>
+                <div class="name">Eymen Beta</div>
+                <div class="role">Beta Tester</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="quote">“Takım özellikleri sayesinde arkadaşlarımla birlikte projeler yapabiliyoruz. Çok eğlenceli ve öğretici. Ayrıca VİZYON AI gerçekten çok güçlü.”</div>
+            </div>
+            <div class="testimonial">
+                <span class="avatar">👤</span>
+                <div class="name">İbrahim Admin.</div>
+                <div class="role">Vizyon2027 Geliştirici/Admin</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="quote">“Vizyon2027'nin AI asistanı sayesinde iş akışımı tamamen değiştirdim. Artık daha az hata yapıyorum ve çok daha hızlı kod yazıyorum.”</div>
+            </div>
+            <div class="testimonial">
+                <span class="avatar">👤</span>
+                <div class="name">Eymen Kurucu</div>
+                <div class="role">Vizyon2027 Sistem Kurucusu</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="quote">“Takım sohbetinde @vizyonal kullanmak çok pratik. Projelerimizi AI ile yönetmek, ekip içi iletişimi güçlendirdi.”</div>
+            </div>
+            <div class="testimonial">
+                <span class="avatar">👤</span>
+                <div class="name">Admin İbrahim</div>
+                <div class="role">Vizyon2027 Geliştirici/Admin</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="quote">“VİZYON AI gerçekten çok güçlü. Kod yazarken bana saatler kazandırıyor. Özellikle web arama ve dosya analizi özellikleri harika.”</div>
+            </div>
+        </div>
+
+        <!-- ===== CANLI YORUM AKIŞI ===== -->
+        <h2>📢 Canlı Yorum Akışı</h2>
+        <p>Platformda paylaşılan son yorumlar:</p>
+        <div class="live-feed" id="liveFeed">
+            <div style="color: #888; text-align: center; padding: 20px;">⏳ Yorumlar yükleniyor...</div>
+        </div>
+
+        <div class="info-box">
+            <strong>💡 Kendi yorumunu ekle:</strong> Ana sayfada veya Dashboard'da yorum bırakarak topluluğa katkıda bulunabilirsin!
+        </div>
+
+        <!-- ===== SOSYAL BAĞLANTILAR ===== -->
+        <h2>🔗 Bizi Takip Edin</h2>
+        <div class="social-links">
+            <a href="https://www.instagram.com/vizyon2027.info" target="_blank" class="social-btn instagram">📸 Instagram</a>
+            <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" class="social-btn whatsapp">💬 WhatsApp Kanalı</a>
+            <a href="https://vizyon2026.vercel.app" target="_blank" class="social-btn website">🌐 Web Sitemiz</a>
+        </div>
+
+        <hr>
+
+        <!-- ===== YASAL FOOTER ===== -->
+        <div class="legal-footer">
+            <p>
+                <strong>© 2026 Vizyon2027</strong> – Tüm Hakları Saklıdır.<br>
+                Bu platform ve içeriği, uluslararası telif hakkı, marka ve fikri mülkiyet yasaları tarafından korunmaktadır.<br>
+                İzinsiz kullanım, kopyalama, dağıtım veya türev çalışma oluşturma <strong>kesinlikle yasaktır</strong>.<br>
+                <span style="color:#ff6b6b;">⚠️ YASAL UYARI:</span> AI çıktıları bilgilendirme amaçlıdır. Vizyon2027 olası zararlardan sorumlu değildir.
+            </p>
+            <p style="margin-top:8px;">
+                <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">Kullanıcı Sözleşmesi</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/bana-ogret.html" target="_blank">Bana Öğret</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/dokumantasyon.html" target="_blank">Dokümantasyon</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/api.html" target="_blank">API</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/blog.html" target="_blank">Blog</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/hakkimizda.html" target="_blank">Hakkımızda</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/iletisim.html" target="_blank">İletişim</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/kariyer.html" target="_blank">Kariyer</a>
+            </p>
+            <p style="font-size:12px; color:#555;">
+                Bu sayfa, 6698 sayılı KVKK ve GDPR'ye uygun olarak hazırlanmıştır.
+            </p>
+        </div>
+
+        <hr>
+        <a href="index.html" class="back-link">⬅️ Ana Sayfaya Dön</a>
     </div>
 
-    <div class="testimonial">
-        <div class="name">🔬 Eymen Beta</div>
-        <div class="role">Beta Tester</div>
-        <div class="quote">“Takım özellikleri sayesinde arkadaşlarımla birlikte projeler yapabiliyoruz. Çok eğlenceli ve öğretici. Ayrıca VİZYON AI gerçekten çok güçlü, kod yazarken bana saatler kazandırıyor.”</div>
+    <!-- ===== ENGLISH ===== -->
+    <div id="lang-en" class="lang-content">
+        <h1>💬 Community</h1>
+        <p><span class="badge">🌍 Vizyon2027 Family</span> <span class="badge" style="margin-left:10px;">📢 Join us!</span></p>
+        <p><strong>Vizyon2027</strong> community is the meeting point for AI, coding, entrepreneurship, and technology enthusiasts. Share your ideas, develop projects, form teams, and grow together. Below you can find statistics, member testimonials, and a live comment feed.</p>
+
+        <div class="highlight-box">
+            <strong>🚀 Community Pledge:</strong> Respect, helpfulness, and collaboration are our core values. Every member encourages support and knowledge sharing.
+        </div>
+
+        <h2>📊 Community Stats</h2>
+        <div class="stats-grid">
+            <div class="stat-item"><span class="number" id="statUsersEn">0</span><span class="label">Active Users</span></div>
+            <div class="stat-item"><span class="number" id="statCommentsEn">0</span><span class="label">Total Comments</span></div>
+            <div class="stat-item"><span class="number" id="statTeamsEn">0</span><span class="label">Active Teams</span></div>
+            <div class="stat-item"><span class="number" id="statProjectsEn">0</span><span class="label">Projects Created</span></div>
+        </div>
+
+        <h2>📋 Community Rules</h2>
+        <ul class="rules-list">
+            <li><span class="icon">🤝</span> <strong>Respect:</strong> Be respectful to all members; avoid personal attacks.</li>
+            <li><span class="icon">📚</span> <strong>Knowledge Sharing:</strong> Share what you learn and help others.</li>
+            <li><span class="icon">🔞</span> <strong>No Inappropriate Content:</strong> No swearing, harassment, hate speech, or illegal content.</li>
+            <li><span class="icon">🔒</span> <strong>Privacy:</strong> Do not share others' private information without permission.</li>
+            <li><span class="icon">⚡</span> <strong>Be Constructive:</strong> Express criticisms politely and helpfully.</li>
+            <li><span class="icon">🚫</span> <strong>No Spam:</strong> No unnecessary messages, ads, or repetitive content.</li>
+        </ul>
+
+        <h2>💬 Member Testimonials</h2>
+        <div class="testimonial-grid">
+            <div class="testimonial">
+                <span class="avatar">👑</span>
+                <div class="name">Eymen</div>
+                <div class="role">Founder & CEO</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="quote">“Vizyon2027 was my dream. I wanted to make AI accessible to everyone. Thank you to everyone building this ecosystem. Together we will achieve greater things.”</div>
+            </div>
+            <div class="testimonial">
+                <span class="avatar">⚙️</span>
+                <div class="name">İbrahim Admin</div>
+                <div class="role">Admin & Developer</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="quote">“Thanks to Vizyon2027, I learned to work with AI. Now I can develop my own projects. Writing APIs with Back4App Cloud Code is really enjoyable.”</div>
+            </div>
+            <div class="testimonial">
+                <span class="avatar">🧪</span>
+                <div class="name">Eymen Beta</div>
+                <div class="role">Beta Tester</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="quote">“Team features allow me to work on projects with friends. It's fun and educational. VİZYON AI is truly powerful, saving me hours when coding.”</div>
+            </div>
+            <div class="testimonial">
+                <span class="avatar">👤</span>
+                <div class="name">İbrahim Admin.</div>
+                <div class="role">Developer/Admin</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="quote">“The AI assistant in Vizyon2027 completely changed my workflow. I make fewer mistakes and code much faster now. Highly recommended.”</div>
+            </div>
+            <div class="testimonial">
+                <span class="avatar">👤</span>
+                <div class="name">Eymen Kurucu</div>
+                <div class="role">System Founder</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="quote">“Using @vizyonal in team chat is very practical. Managing projects with AI has strengthened team communication.”</div>
+            </div>
+            <div class="testimonial">
+                <span class="avatar">👤</span>
+                <div class="name">Admin İbrahim</div>
+                <div class="role">Developer/Admin</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="quote">“VİZYON AI is truly powerful. It saves me hours when writing code. Web search and file analysis features are amazing.”</div>
+            </div>
+        </div>
+
+        <h2>📢 Live Comment Feed</h2>
+        <div class="live-feed" id="liveFeedEn">
+            <div style="color: #888; text-align: center; padding: 20px;">⏳ Loading comments...</div>
+        </div>
+
+        <div class="info-box">
+            <strong>💡 Add your comment:</strong> Contribute to the community by leaving a comment on the homepage or Dashboard!
+        </div>
+
+        <h2>🔗 Follow Us</h2>
+        <div class="social-links">
+            <a href="https://www.instagram.com/vizyon2027.info" target="_blank" class="social-btn instagram">📸 Instagram</a>
+            <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" class="social-btn whatsapp">💬 WhatsApp Channel</a>
+            <a href="https://vizyon2026.vercel.app" target="_blank" class="social-btn website">🌐 Our Website</a>
+        </div>
+
+        <hr>
+        <div class="legal-footer">
+            <p><strong>© 2026 Vizyon2027</strong> – All Rights Reserved.</p>
+            <p><a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Privacy Policy</a> | <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">Terms</a> | <a href="https://vizyon2026.vercel.app/bana-ogret.html" target="_blank">Teach Me</a></p>
+        </div>
+        <hr>
+        <a href="index.html" class="back-link">⬅️ Back to Home</a>
     </div>
 
-    <div class="testimonial">
-        <div class="name">👤 İbrahim Admin.</div>
-        <div class="role">Vizyon2027 Geliştirici/Admin</div>
-        <div class="quote">“Vizyon2027'nin AI asistanı sayesinde iş akışımı tamamen değiştirdim. Artık daha az hata yapıyorum ve çok daha hızlı kod yazıyorum. Kesinlikle tavsiye ederim.”</div>
+    <!-- ===== ARAPÇA ===== -->
+    <div id="lang-ar" class="lang-content" dir="rtl">
+        <h1>💬 المجتمع</h1>
+        <p><span class="badge">🌍 عائلة فيجن 2027</span> <span class="badge" style="margin-left:10px;">📢 انضم إلينا!</span></p>
+        <p><strong>فيجن 2027</strong> هو نقطة التقاء لعشاق الذكاء الاصطناعي والبرمجة وريادة الأعمال والتكنولوجيا. شارك أفكارك، طوّر مشاريع، شكّل فرقًا، وانمو معًا. ستجد أدناه الإحصائيات، وشهادات الأعضاء، وتدفق التعليقات المباشر.</p>
+
+        <div class="highlight-box">
+            <strong>🚀 تعهد المجتمع:</strong> الاحترام، التعاون، والعون هي قيمنا الأساسية. كل عضو يشجع مشاركة المعرفة ودعم الآخرين.
+        </div>
+
+        <h2>📊 إحصائيات المجتمع</h2>
+        <div class="stats-grid">
+            <div class="stat-item"><span class="number" id="statUsersAr">0</span><span class="label">المستخدمين النشطين</span></div>
+            <div class="stat-item"><span class="number" id="statCommentsAr">0</span><span class="label">إجمالي التعليقات</span></div>
+            <div class="stat-item"><span class="number" id="statTeamsAr">0</span><span class="label">الفرق النشطة</span></div>
+            <div class="stat-item"><span class="number" id="statProjectsAr">0</span><span class="label">المشاريع المنشأة</span></div>
+        </div>
+
+        <h2>📋 قواعد المجتمع</h2>
+        <ul class="rules-list">
+            <li><span class="icon">🤝</span> <strong>الاحترام:</strong> كن محترمًا مع جميع الأعضاء، تجنب الهجمات الشخصية.</li>
+            <li><span class="icon">📚</span> <strong>مشاركة المعرفة:</strong> شارك ما تتعلمه وساعد الآخرين.</li>
+            <li><span class="icon">🔞</span> <strong>ممنوع المحتوى غير اللائق:</strong> لا للشتائم، التحرش، خطاب الكراهية، أو المحتوى غير القانوني.</li>
+            <li><span class="icon">🔒</span> <strong>الخصوصية:</strong> لا تشارك المعلومات الخاصة للآخرين دون إذن.</li>
+            <li><span class="icon">⚡</span> <strong>كن بناءً:</strong> عبر عن انتقاداتك بلطف وبشكل مفيد.</li>
+            <li><span class="icon">🚫</span> <strong>لا للبريد العشوائي:</strong> لا ترسل رسائل غير ضرورية، إعلانات، أو محتوى مكرر.</li>
+        </ul>
+
+        <h2>💬 شهادات الأعضاء</h2>
+        <div class="testimonial-grid">
+            <div class="testimonial">
+                <span class="avatar">👑</span>
+                <div class="name">Eymen</div>
+                <div class="role">المؤسس والرئيس التنفيذي</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="quote">“فيجن 2027 كان حلمي. أردت جعل الذكاء الاصطناعي متاحًا للجميع. شكرًا لكل من يبني هذا النظام البيئي. معًا سنحقق أشياء أكبر.”</div>
+            </div>
+            <div class="testimonial">
+                <span class="avatar">⚙️</span>
+                <div class="name">İbrahim Admin</div>
+                <div class="role">مشرف ومطور</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="quote">“بفضل فيجن 2027، تعلمت العمل مع الذكاء الاصطناعي. الآن أستطيع تطوير مشاريعي الخاصة. كتابة واجهات API باستخدام Back4App Cloud Code ممتعة جدًا.”</div>
+            </div>
+            <div class="testimonial">
+                <span class="avatar">🧪</span>
+                <div class="name">Eymen Beta</div>
+                <div class="role">مختبر بيتا</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="quote">“ميزات الفريق تسمح لي بالعمل مع الأصدقاء على المشاريع. ممتع وتعليمي. VİZYON AI قوي حقًا، يوفر لي ساعات عند البرمجة.”</div>
+            </div>
+            <div class="testimonial">
+                <span class="avatar">👤</span>
+                <div class="name">İbrahim Admin.</div>
+                <div class="role">مطور/مشرف</div>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <div class="quote">“مساعد الذكاء الاصطناعي في فيجن 2027 غيّر سير عملي تمامًا. أصبحت أقل خطأ وأكتب الكود بشكل أسرع بكثير. أوصي به بشدة.”</div>
+            </div>
+        </div>
+
+        <h2>📢 تدفق التعليقات المباشر</h2>
+        <div class="live-feed" id="liveFeedAr">
+            <div style="color: #888; text-align: center; padding: 20px;">⏳ جاري تحميل التعليقات...</div>
+        </div>
+
+        <div class="info-box">
+            <strong>💡 أضف تعليقك:</strong> ساهم في المجتمع من خلال ترك تعليق على الصفحة الرئيسية أو لوحة التحكم!
+        </div>
+
+        <h2>🔗 تابعنا</h2>
+        <div class="social-links">
+            <a href="https://www.instagram.com/vizyon2027.info" target="_blank" class="social-btn instagram">📸 إنستغرام</a>
+            <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" class="social-btn whatsapp">💬 قناة واتساب</a>
+            <a href="https://vizyon2026.vercel.app" target="_blank" class="social-btn website">🌐 موقعنا</a>
+        </div>
+
+        <hr>
+        <div class="legal-footer">
+            <p><strong>© 2026 فيجن 2027</strong> – جميع الحقوق محفوظة.</p>
+        </div>
+        <hr>
+        <a href="index.html" class="back-link">⬅️ العودة إلى الصفحة الرئيسية</a>
     </div>
 
-    <div class="testimonial">
-        <div class="name">👤 Eymen Kurucu</div>
-        <div class="role">Vizyon2027 Sistem Kurucusu</div>
-        <div class="quote">“Takım sohbetinde @vizyonal kullanmak çok pratik. Projelerimizi AI ile yönetmek, ekip içi iletişimi güçlendirdi. Herkese öneririm.”</div>
-    </div>
-
-    <div class="testimonial">
-        <div class="name">👤 Admin İbrahim</div>
-        <div class="role">Vizyon2027 Geliştirici/Admin</div>
-        <div class="quote">“VİZYON AI gerçekten çok güçlü. Kod yazarken bana saatler kazandırıyor. Özellikle web arama ve dosya analizi özellikleri harika.”</div>
-    </div>
-
-    <hr>
-    <p style="text-align:center; color:#8ab4cc;">🔔 Topluluğumuz büyüyor! Siz de yorumlarınızı paylaşmak için <a href="index.html" style="color:#00d4ff;">ana sayfaya</a> gidip yorum bırakabilirsiniz.</p>
-
-    <!-- Abone olma butonu (blog sayfasındaki gibi çalışacak) -->
-    <div style="text-align:center; margin-top:30px;">
-        <a href="blog.html" style="display:inline-block; padding:12px 30px; background:#00d4ff; color:#0a0a0a; border-radius:40px; text-decoration:none; font-weight:700; transition:0.3s;">📩 Yeni yazılardan haberdar olmak için tıklayın</a>
-    </div>
-
-    <hr>
-    <a href="index.html" class="back-link">⬅️ Ana Sayfaya Dön</a>
 </div>
+
+<!-- ===== PARSE SDK VE SCRIPTS ===== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/parse/5.0.0/parse.min.js"></script>
+<script>
+    // ===== PARSE BAŞLAT =====
+    Parse.initialize(
+        "ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8",
+        "mur4DtLsGOsQhykTnFVNGxYOeNbvjPbAkl6xPQGp"
+    );
+    Parse.serverURL = "https://parseapi.back4app.com";
+
+    // ===== DİL DEĞİŞTİRME =====
+    function switchLanguage(lang) {
+        document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active'));
+        const target = document.getElementById('lang-' + lang);
+        if (target) target.classList.add('active');
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.lang === lang) btn.classList.add('active');
+        });
+        const container = document.getElementById('mainContainer');
+        container.style.direction = (lang === 'ar') ? 'rtl' : 'ltr';
+        localStorage.setItem('preferred_lang', lang);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedLang = localStorage.getItem('preferred_lang');
+        if (savedLang && (savedLang === 'tr' || savedLang === 'en' || savedLang === 'ar')) {
+            switchLanguage(savedLang);
+        } else {
+            switchLanguage('tr');
+        }
+        // URL'den dil parametresi
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlLang = urlParams.get('lang');
+        if (urlLang && (urlLang === 'tr' || urlLang === 'en' || urlLang === 'ar')) {
+            switchLanguage(urlLang);
+        }
+        // Sayfa yüklenince istatistikleri ve yorumları çek
+        updateStats();
+        loadComments();
+    });
+
+    // ===== İSTATİSTİKLER =====
+    async function updateStats() {
+        try {
+            const userQuery = new Parse.Query(Parse.User);
+            const userCount = await userQuery.count();
+            document.getElementById('statUsers').textContent = userCount || 0;
+            document.getElementById('statUsersEn').textContent = userCount || 0;
+            document.getElementById('statUsersAr').textContent = userCount || 0;
+
+            const commentQuery = new Parse.Query('Comment');
+            const commentCount = await commentQuery.count();
+            document.getElementById('statComments').textContent = commentCount || 0;
+            document.getElementById('statCommentsEn').textContent = commentCount || 0;
+            document.getElementById('statCommentsAr').textContent = commentCount || 0;
+
+            const teamQuery = new Parse.Query('Team');
+            const teamCount = await teamQuery.count();
+            document.getElementById('statTeams').textContent = teamCount || 0;
+            document.getElementById('statTeamsEn').textContent = teamCount || 0;
+            document.getElementById('statTeamsAr').textContent = teamCount || 0;
+
+            const projectQuery = new Parse.Query('Project');
+            const projectCount = await projectQuery.count();
+            document.getElementById('statProjects').textContent = projectCount || 0;
+            document.getElementById('statProjectsEn').textContent = projectCount || 0;
+            document.getElementById('statProjectsAr').textContent = projectCount || 0;
+        } catch(e) {
+            console.log('İstatistikler güncellenemedi:', e);
+        }
+    }
+
+    // ===== CANLI YORUM AKIŞI =====
+    async function loadComments() {
+        const feeds = ['liveFeed', 'liveFeedEn', 'liveFeedAr'];
+        try {
+            const result = await Parse.Cloud.run('getComments', {});
+            let comments = [];
+            if (result && result.success) comments = result.comments || [];
+            const html = comments.length === 0 ?
+                '<div style="color: #888; text-align: center; padding: 20px;">📭 Henüz yorum yok. İlk yorumu sen yap!</div>' :
+                comments.slice(0, 10).map(c => {
+                    const name = c.user_name || 'Kullanıcı';
+                    const role = c.user_role ? c.user_role.toUpperCase() : 'KULLANICI';
+                    const text = c.comment || '';
+                    const time = c.createdAt ? new Date(c.createdAt).toLocaleString('tr-TR') : '';
+                    const stars = '⭐'.repeat(Math.min(5, c.rating || 0)) + '☆'.repeat(5 - Math.min(5, c.rating || 0));
+                    return `
+                        <div class="live-comment">
+                            <div class="c-avatar">👤</div>
+                            <div class="c-body">
+                                <div class="c-name">${name} <span class="c-role">${role}</span></div>
+                                <div class="c-text">${text}</div>
+                                <div style="display:flex; gap:10px; align-items:center; margin-top:4px;">
+                                    <span style="color:#ffb700; font-size:13px;">${stars}</span>
+                                    <span class="c-time">${time}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            feeds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = html;
+            });
+        } catch(e) {
+            console.error('Yorumlar yüklenirken hata:', e);
+            const errHtml = '<div style="color: #ff6b6b; text-align: center; padding: 20px;">⚠️ Yorumlar yüklenemedi: ' + e.message + '</div>';
+            feeds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = errHtml;
+            });
+        }
+    }
+
+    // Her 30 saniyede bir yenile
+    setInterval(() => {
+        updateStats();
+        loadComments();
+    }, 30000);
+</script>
+
 </body>
 </html>
