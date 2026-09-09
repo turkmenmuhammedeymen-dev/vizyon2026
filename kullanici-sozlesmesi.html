@@ -3,135 +3,457 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kullanıcı Sözleşmesi - Vizyon2027</title>
+    <title>Kullanıcı Sözleşmesi – Vizyon2027</title>
     <style>
+        /* ===== GENEL ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0a0a0a; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; line-height: 1.7; }
-        .container { max-width: 900px; margin: 0 auto; background: #141414; padding: 40px; border-radius: 16px; border: 1px solid #2a2a2a; }
-        h1 { color: #00d4ff; font-size: 32px; border-bottom: 2px solid #00d4ff; padding-bottom: 15px; }
-        h2 { color: #00d4ff; font-size: 22px; margin-top: 35px; border-left: 4px solid #00d4ff; padding-left: 15px; }
-        h3 { color: #a0c4e0; font-size: 18px; margin-top: 25px; }
-        p, li { color: #c8d0d8; font-size: 15px; }
-        ul { padding-left: 25px; }
+        .container { max-width: 1100px; margin: 0 auto; background: #141414; padding: 40px; border-radius: 20px; border: 1px solid #2a2a2a; box-shadow: 0 0 60px rgba(0,212,255,0.05); }
+
+        /* ===== DİL SEÇİCİ ===== */
+        .lang-selector { display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
+        .lang-btn { padding: 8px 20px; border-radius: 40px; border: 2px solid #2a2a2a; background: transparent; color: #aaa; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .lang-btn:hover { border-color: #00d4ff; color: #00d4ff; }
+        .lang-btn.active { border-color: #00d4ff; background: #00d4ff22; color: #00d4ff; }
+        .lang-content { display: none; }
+        .lang-content.active { display: block; }
+
+        /* ===== BAŞLIKLAR ===== */
+        h1 { color: #00d4ff; font-size: 36px; border-bottom: 3px solid #00d4ff; padding-bottom: 18px; font-family: 'Syne', sans-serif; }
+        h2 { color: #00d4ff; font-size: 28px; margin-top: 45px; border-left: 6px solid #00d4ff; padding-left: 20px; font-family: 'Syne', sans-serif; }
+        h3 { color: #a0c4e0; font-size: 20px; margin-top: 25px; }
+        h4 { color: #8ab4cc; font-size: 18px; margin-top: 20px; }
+        p, li { color: #c8d0d8; font-size: 16px; margin-bottom: 10px; }
+        ul, ol { padding-left: 28px; margin: 12px 0; }
         li { margin-bottom: 8px; }
-        .highlight-box { background: #1a1a2a; border-left: 4px solid #00ff88; padding: 15px 20px; margin: 20px 0; border-radius: 8px; }
-        .important { color: #ffb347; font-weight: bold; }
-        hr { border: 0; height: 1px; background: #2a2a2a; margin: 30px 0; }
-        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 13px; border-top: 1px solid #2a2a2a; padding-top: 20px; }
-        .badge { display: inline-block; background: #00d4ff22; color: #00d4ff; padding: 2px 12px; border-radius: 20px; font-size: 13px; border: 1px solid #00d4ff55; }
+
+        /* ===== KUTULAR ===== */
+        .highlight-box { background: #1a1a2a; border-left: 6px solid #00ff88; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
+        .important-box { background: #1a0a0a; border-left: 6px solid #ff6b6b; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
+        .info-box { background: #0a1a1a; border-left: 6px solid #ffb700; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
+
+        /* ===== DİĞER ===== */
+        .back-link { display: inline-block; margin-top: 30px; color: #00d4ff; text-decoration: none; border: 2px solid #00d4ff; padding: 12px 32px; border-radius: 40px; transition: 0.3s; font-weight: 600; font-size: 16px; }
+        .back-link:hover { background: #00d4ff; color: #0a0a0a; box-shadow: 0 0 40px rgba(0,212,255,0.3); }
+        .badge { display: inline-block; background: #00d4ff22; color: #00d4ff; padding: 4px 16px; border-radius: 30px; font-size: 14px; border: 1px solid #00d4ff55; margin-right: 8px; margin-bottom: 6px; }
+        hr { border: 0; height: 1px; background: #2a2a2a; margin: 45px 0; }
         a { color: #00d4ff; text-decoration: none; }
         a:hover { text-decoration: underline; }
+
+        .legal-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a2a; font-size: 13px; color: #666; text-align: center; }
+        .legal-footer a { color: #00d4ff; text-decoration: none; }
+        .legal-footer a:hover { text-decoration: underline; }
+        .section-num { display: inline-block; color: #00d4ff; font-weight: 700; margin-right: 6px; }
+
+        @media (max-width: 768px) { .container { padding: 20px; } h1 { font-size: 28px; } h2 { font-size: 22px; } .lang-selector { justify-content: center; } }
+        @media (max-width: 480px) { body { padding: 10px; } .container { padding: 14px; } h1 { font-size: 22px; } h2 { font-size: 18px; padding-left: 12px; } }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>📜 Kullanıcı Sözleşmesi</h1>
-    <p><span class="badge">Son Güncelleme: 29 Ağustos 2026</span> <span class="badge" style="margin-left:10px;">📱 Vizyon2027 v1.0</span></p>
+<div class="container" id="mainContainer">
 
-    <p><strong>Vizyon2027</strong> uygulamasını (“Uygulama”) kullanarak, aşağıdaki şartları (“Sözleşme”) okuduğunuzu, anladığınızı ve kabul ettiğinizi beyan edersiniz. Bu sözleşme, <strong>Vizyon2027</strong> (“Şirket”) ile siz (“Kullanıcı”) arasında yapılmıştır.</p>
-
-    <div class="highlight-box">
-        <strong>✅ KISA ÖZET:</strong> Vizyon2027, ücretsiz ve ücretli planlarıyla yapay zeka, takım çalışması ve sosyal özellikler sunan bir platformdur. Bu sözleşme, kullanım kurallarını, hesap güvenliğini, fikri mülkiyet haklarını, sorumluluk sınırlarını ve diğer önemli hükümleri içerir. <span class="important">Uygulamayı kullanarak bu sözleşmeyi kabul etmiş sayılırsınız.</span>
+    <!-- ===== DİL SEÇİCİ ===== -->
+    <div class="lang-selector">
+        <button class="lang-btn active" data-lang="tr" onclick="switchLanguage('tr')">🇹🇷 Türkçe</button>
+        <button class="lang-btn" data-lang="en" onclick="switchLanguage('en')">🇬🇧 English</button>
+        <button class="lang-btn" data-lang="ar" onclick="switchLanguage('ar')">🇸🇦 العربية</button>
     </div>
 
-    <h2>1. Hüküm ve Koşullar</h2>
-    <p>Bu sözleşme, Uygulamaya erişiminiz ve Uygulamayı kullanımınız ile ilgili tüm koşulları düzenler. Uygulamayı kullanmaya başlamadan önce bu sözleşmeyi dikkatlice okumanız önemle tavsiye edilir.</p>
+    <!-- ===== TÜRKÇE ===== -->
+    <div id="lang-tr" class="lang-content active">
+        <h1>📜 Kullanıcı Sözleşmesi</h1>
+        <p>
+            <span class="badge">📌 Son Güncelleme: 29 Ağustos 2026</span>
+            <span class="badge" style="margin-left:10px;">⚡ Sürüm 6.02.1</span>
+            <span class="badge">📱 Vizyon2027</span>
+        </p>
 
-    <h2>2. Hesap Oluşturma ve Güvenlik</h2>
-    <ul>
-        <li><strong>Hesap Bilgileri:</strong> Hesap oluştururken doğru, güncel ve eksiksiz bilgi vermekle yükümlüsünüz.</li>
-        <li><strong>Şifre Güvenliği:</strong> Hesabınıza ait şifre ve diğer giriş bilgilerinin gizliliğinden siz sorumlusunuz. Şifrenizi kimseyle paylaşmayın.</li>
-        <li><strong>Hesap Sorumluluğu:</strong> Hesabınız üzerinden yapılan tüm işlemlerden (AI sorguları, mesajlar, takım aktiviteleri vb.) siz sorumlusunuz.</li>
-        <li><strong>Yaş Sınırı:</strong> Uygulamamızı kullanmak için en az <strong>13 yaşında</strong> olmanız gerekmektedir. 13 yaşın altındaki kullanıcılar ebeveyn izni olmadan hesap oluşturamaz.</li>
-    </ul>
+        <p><strong>Vizyon2027</strong> platformunu (“Platform”) kullanarak, aşağıdaki şartları (“Sözleşme”) okuduğunuzu, anladığınızı ve kabul ettiğinizi beyan edersiniz. Bu sözleşme, <strong>Vizyon2027 Ekibi</strong> (“Şirket”, “Biz”, “Vizyon2027”) ile siz (“Kullanıcı”, “Üye”) arasında yapılmıştır. Lütfen dikkatlice okuyun.</p>
 
-    <h2>3. Kullanım Kuralları</h2>
-    <p>Uygulamayı kullanırken aşağıdaki kurallara uymak zorundasınız:</p>
-    <ul>
-        <li>❌ <strong>Yasa Dışı Faaliyetler:</strong> Uygulamayı yasa dışı, tehdit edici, taciz edici, iftira niteliğinde veya herhangi bir yasayı ihlal edecek şekilde kullanamazsınız.</li>
-        <li>❌ <strong>Zararlı Yazılımlar:</strong> Uygulamaya virüs, solucan, truva atı veya başka zararlı kodlar yükleyemezsiniz.</li>
-        <li>❌ <strong>Hack ve Sömürü:</strong> Uygulamanın güvenlik açıklarını sömüremez, başkalarının hesaplarına yetkisiz erişemez veya Uygulamanın işleyişini bozamazsınız.</li>
-        <li>❌ <strong>Spam ve Taciz:</strong> Diğer kullanıcılara spam mesaj gönderemez, taciz edici veya rahatsız edici içerik paylaşamazsınız.</li>
-        <li>❌ <strong>Telif Hakkı İhlali:</strong> Telif hakkıyla korunan materyalleri izinsiz paylaşamazsınız.</li>
-        <li>❌ <strong>Sahte Hesap:</strong> Başka bir kişi veya kurum adına sahte hesap oluşturamazsınız.</li>
-    </ul>
-    <p>Bu kurallara uymadığınız takdirde, hesabınız <strong>geçici veya kalıcı olarak askıya alınabilir veya silinebilir</strong>.</p>
+        <div class="highlight-box">
+            <strong>✅ KISA ÖZET:</strong> Vizyon2027, yapay zeka, takım çalışması, proje yönetimi, puan sistemi ve sosyal özellikler sunan bir platformdur. Bu sözleşme, kullanım kurallarını, hesap güvenliğini, fikri mülkiyet haklarını, sorumluluk sınırlarını, gizlilik taahhütlerini ve diğer önemli hükümleri içerir. <span style="color:#ffb700; font-weight:bold;">Platformu kullanarak bu sözleşmeyi koşulsuz olarak kabul etmiş sayılırsınız.</span>
+        </div>
 
-    <h2>4. Fikri Mülkiyet Hakları</h2>
-    <ul>
-        <li><strong>Uygulama İçeriği:</strong> Uygulamanın tüm kodları, tasarımı, metinleri, grafikleri, logoları, simgeleri, ses ve video dosyaları, yazılımı ve diğer materyalleri (“İçerik”), <strong>Vizyon2027</strong>’nin mülkiyetindedir ve uluslararası telif hakkı, marka, patent ve diğer fikri mülkiyet yasaları tarafından korunmaktadır.</li>
-        <li><strong>Kullanıcı Tarafından Oluşturulan İçerik:</strong> Uygulama üzerinden paylaştığınız metinler, dosyalar, projeler, yorumlar ve diğer içerikler (“Kullanıcı İçeriği”) size aittir. Ancak, Uygulamayı kullanarak bu içeriği <strong>Vizyon2027</strong>'ye, hizmetleri sağlamak, geliştirmek ve pazarlamak amacıyla sınırsız, geri alınamaz, dünya çapında, telifsiz bir lisans vermiş olursunuz.</li>
-        <li><strong>İzinsiz Kullanım:</strong> Uygulama İçeriğini, Vizyon2027’nin açık yazılı izni olmadan kopyalayamaz, dağıtamaz, değiştiremez, yeniden yayınlayamaz veya türev çalışmalar oluşturamazsınız.</li>
-    </ul>
+        <hr>
 
-    <h2>5. Kullanıcı İçeriği ve Sorumluluk</h2>
-    <ul>
-        <li>Uygulama üzerinden paylaştığınız tüm içerikten (metin, dosya, proje, yorum vb.) <strong>tamamen siz sorumlusunuz</strong>.</li>
-        <li>Paylaştığınız içeriğin, üçüncü şahısların telif hakkı, gizlilik, kişilik veya diğer haklarını ihlal etmediğini garanti edersiniz.</li>
-        <li><strong>Vizyon2027</strong>, kullanıcı içeriğini önceden inceleme yükümlülüğü taşımaz. Ancak, uygun gördüğü takdirde herhangi bir içeriği, herhangi bir zamanda ve herhangi bir nedenle, önceden bildirimde bulunmaksızın kaldırma veya reddetme hakkını saklı tutar.</li>
-    </ul>
-
-    <h2>6. Hizmetler ve Değişiklikler</h2>
-    <ul>
-        <li><strong>Hizmet Kapsamı:</strong> Vizyon2027, AI asistan, takım yönetimi, proje araçları, puan sistemi, mağaza, sosyal özellikler ve diğer hizmetleri sunar.</li>
-        <li><strong>Değişiklik Hakkı:</strong> Vizyon2027, hizmetleri (özellikler, fiyatlandırma, planlar vb.) herhangi bir zamanda, önceden bildirimde bulunarak veya bulunmayarak değiştirme, askıya alma veya durdurma hakkını saklı tutar.</li>
-        <li><strong>Bakım ve Kesintiler:</strong> Zaman zaman sistem bakımı, güncellemeler veya teknik nedenlerle hizmet kesintileri yaşanabilir. Vizyon2027, bu kesintilerden doğan zararlardan sorumlu değildir.</li>
-    </ul>
-
-    <h2>7. Ücretlendirme ve Ödemeler</h2>
-    <ul>
-        <li><strong>Ücretsiz Plan:</strong> Vizyon2027, sınırlı özelliklerle ücretsiz bir plan sunar.</li>
-        <li><strong>Ücretli Planlar:</strong> "Pro" ve "Takım" planları belirli bir ücret karşılığında sunulur. Ücretler ve plan detayları <a href="https://vizyon2026.vercel.app" target="_blank">https://vizyon2026.vercel.app</a> adresinde yayınlanır.</li>
-        <li><strong>Ödeme Yükümlülüğü:</strong> Ücretli bir plana kaydolduğunuzda, belirtilen ücreti zamanında ödemeyi kabul edersiniz. Ödemelerin yapılmaması durumunda hesabınız askıya alınabilir.</li>
-        <li><strong>İade Politikası:</strong> Dijital hizmetler olduğu için, satın alınan planlar için <strong>para iadesi yapılmamaktadır</strong>.</li>
-    </ul>
-
-    <h2>8. Hesap İptali ve Fesih</h2>
-    <ul>
-        <li><strong>Kullanıcı Tarafından Fesih:</strong> Hesabınızı istediğiniz zaman Uygulama içinden veya <strong>vizyon2027.info@gmail.com</strong> adresine e-posta göndererek silebilirsiniz. Hesabınız silindiğinde, tüm verileriniz (projeler, mesajlar, puanlar vb.) <strong>kalıcı olarak silinir</strong>.</li>
-        <li><strong>Vizyon2027 Tarafından Fesih:</strong> Vizyon2027, bu sözleşmeyi ihlal etmeniz, yasa dışı faaliyetlerde bulunmanız veya başka bir nedenle, önceden bildirimde bulunarak veya bulunmayarak hesabınızı askıya alma veya kalıcı olarak silme hakkını saklı tutar.</li>
-        <li><strong>Fesih Sonrası:</strong> Hesabınızın feshi durumunda, Uygulamaya erişiminiz sona erer ve tüm kullanıcı içeriğiniz silinir.</li>
-    </ul>
-
-    <h2>9. Sorumluluk Reddi ve Sınırlamalar</h2>
-    <div class="highlight-box" style="border-left-color: #ff6b6b;">
+        <h2>1. TANIMLAR</h2>
+        <p>Bu sözleşmede geçen terimler aşağıdaki anlamları taşır:</p>
         <ul>
-            <li><strong>“Olduğu Gibi” Sağlanır:</strong> Vizyon2027, Uygulamayı “olduğu gibi” ve “mevcut olduğu haliyle” sunar. Uygulamanın kesintisiz, hatasız veya güvenli olacağına dair herhangi bir garanti vermez.</li>
-            <li><strong>Sonuçların Sorumluluğu:</strong> Uygulama üzerinden elde ettiğiniz AI yanıtları, öneriler, kodlar ve diğer çıktılar <strong>bilgilendirme amaçlıdır</strong>. Bu çıktıların doğruluğu, güvenilirliği veya uygunluğu konusunda hiçbir garanti verilmez. Kullanıcı, bu çıktıları kendi sorumluluğunda kullanır.</li>
-            <li><strong>Zarar Sınırlaması:</strong> Hiçbir durumda Vizyon2027, Uygulamanın kullanımı veya kullanılamamasından kaynaklanan dolaylı, arızi, özel, cezai veya sonuç olarak ortaya çıkan zararlardan (kâr kaybı, veri kaybı, iş kesintisi vb.) sorumlu değildir.</li>
-            <li><strong>Maksimum Sorumluluk:</strong> Vizyon2027’nin bu sözleşmeden doğan toplam sorumluluğu, sizin son 12 ayda ödediğiniz toplam ücreti (varsa) geçmez.</li>
+            <li><strong>Platform:</strong> Vizyon2027 web sitesi, mobil uygulama, API ve ilgili tüm hizmetler.</li>
+            <li><strong>Kullanıcı / Üye:</strong> Platforma kayıtlı gerçek veya tüzel kişi.</li>
+            <li><strong>İçerik:</strong> Platform üzerinde paylaşılan metin, kod, görsel, video, ses, dosya, proje, yorum, mesaj ve diğer tüm veriler.</li>
+            <li><strong>AI Hizmetleri:</strong> Platformda sunulan yapay zeka modelleri (Groq, DeepSeek, OpenAI, OpenRouter, Cohere, Cerebras, Gemini) ve ilgili çıktılar.</li>
+            <li><strong>Puan:</strong> Platform içinde kullanılan, görevlerle kazanılan ve mağazada harcanabilen sanal birim.</li>
+            <li><strong>Takım:</strong> Platform üzerinde oluşturulan, birden fazla üyenin ortak çalışabildiği grup.</li>
+            <li><strong>Kullanıcı İçeriği:</strong> Kullanıcı tarafından oluşturulan ve Platforma yüklenen tüm içerik.</li>
         </ul>
+
+        <h2>2. HESAP OLUŞTURMA VE GÜVENLİK</h2>
+        <h3>2.1. Hesap Bilgileri</h3>
+        <p>Hesap oluştururken doğru, güncel ve eksiksiz bilgi vermekle yükümlüsünüz. Yanlış veya eksik bilgilerden doğan sorunlardan Vizyon2027 sorumlu değildir.</p>
+
+        <h3>2.2. Şifre Güvenliği</h3>
+        <p>Hesabınıza ait şifre ve diğer giriş bilgilerinin gizliliğinden <strong>tamamen siz sorumlusunuz</strong>. Şifrenizi kimseyle paylaşmayın, güvenli bir yerde saklayın. Şifrenizin ele geçirildiğini düşünüyorsanız derhal değiştirin ve bize bildirin.</p>
+
+        <h3>2.3. Hesap Sorumluluğu</h3>
+        <p>Hesabınız üzerinden yapılan tüm işlemlerden (AI sorguları, mesajlar, takım aktiviteleri, alışverişler, puan harcamaları vb.) <strong>siz sorumlusunuz</strong>. Hesabınızın başkaları tarafından kullanılması durumunda, Vizyon2027 hiçbir sorumluluk kabul etmez.</p>
+
+        <h3>2.4. Yaş Sınırı</h3>
+        <p>Platformumuzu kullanmak için en az <strong>13 yaşında</strong> olmanız gerekmektedir. 13 yaşın altındaki kullanıcılar, ebeveyn veya yasal vasinin açık izni olmadan hesap oluşturamaz. Ebeveynler, çocuklarının platform kullanımından sorumludur.</p>
+
+        <h3>2.5. Birden Fazla Hesap</h3>
+        <p>Her kullanıcı yalnızca bir hesap açabilir. Birden fazla hesap açmak, sahte hesap oluşturmak veya başkaları adına hesap açmak <strong>yasaktır</strong>. Tespit edilmesi halinde tüm hesaplar kalıcı olarak kapatılır.</p>
+
+        <div class="info-box">
+            <strong>🔐 Güvenlik İpucu:</strong> Güçlü bir şifre kullanın (büyük/küçük harf, sayı ve özel karakter içeren). İki faktörlü kimlik doğrulama (2FA) yakında sunulacaktır.
+        </div>
+
+        <h2>3. KULLANIM KURALLARI</h2>
+        <p>Platformu kullanırken aşağıdaki kurallara <strong>kesinlikle uymak zorundasınız</strong>. İhlal durumunda hesabınız askıya alınabilir veya kalıcı olarak silinebilir:</p>
+
+        <ul>
+            <li><span style="color:#ff6b6b;">❌</span> <strong>Yasa Dışı Faaliyetler:</strong> Platformu yasa dışı, tehdit edici, taciz edici, iftira niteliğinde, müstehcen veya herhangi bir yasayı ihlal edecek şekilde kullanamazsınız.</li>
+            <li><span style="color:#ff6b6b;">❌</span> <strong>Zararlı Yazılımlar:</strong> Platforma virüs, solucan, truva atı, kötü amaçlı yazılım veya başka zararlı kodlar yükleyemezsiniz.</li>
+            <li><span style="color:#ff6b6b;">❌</span> <strong>Hack ve Sömürü:</strong> Platformun güvenlik açıklarını sömüremez, başkalarının hesaplarına yetkisiz erişemez, şifre kıramaz veya Platformun işleyişini bozamazsınız.</li>
+            <li><span style="color:#ff6b6b;">❌</span> <strong>Spam ve Taciz:</strong> Diğer kullanıcılara spam mesaj gönderemez, taciz edici, rahatsız edici veya nefret söylemi içeren içerik paylaşamazsınız.</li>
+            <li><span style="color:#ff6b6b;">❌</span> <strong>Telif Hakkı İhlali:</strong> Telif hakkıyla korunan materyalleri izinsiz paylaşamaz, dağıtamaz veya kullanamazsınız.</li>
+            <li><span style="color:#ff6b6b;">❌</span> <strong>Sahte Hesap:</strong> Başka bir kişi, kurum veya kuruluş adına sahte hesap oluşturamaz veya başkasının kimliğine bürünemezsiniz.</li>
+            <li><span style="color:#ff6b6b;">❌</span> <strong>Veri Madenciliği:</strong> Platformu, diğer kullanıcıların verilerini toplamak, kazımak (scraping) veya analiz etmek amacıyla kullanamazsınız.</li>
+            <li><span style="color:#ff6b6b;">❌</span> <strong>Puan Manipülasyonu:</strong> Puan sistemini hileli yollarla (bot, otomasyon, sahte hesap) manipüle edemezsiniz.</li>
+            <li><span style="color:#ff6b6b;">❌</span> <strong>Siyasi veya Dini Propaganda:</strong> Platformu siyasi, dini veya ideolojik propaganda amacıyla kullanamazsınız.</li>
+        </ul>
+
+        <div class="important-box">
+            <strong>⚠️ YAPTIRIMLAR:</strong> Yukarıdaki kuralları ihlal ettiğiniz takdirde, hesabınız <strong>geçici olarak askıya alınabilir, kalıcı olarak silinebilir</strong> ve hukuki yollara başvurulabilir. Puanlarınız ve kazanımlarınız iptal edilebilir.
+        </div>
+
+        <h2>4. FİKRİ MÜLKİYET HAKLARI</h2>
+
+        <h3>4.1. Platform İçeriği</h3>
+        <p>Platformun tüm kodları, tasarımı, metinleri, grafikleri, logoları, simgeleri, ses ve video dosyaları, yazılımı ve diğer materyalleri (“Platform İçeriği”), <strong>Vizyon2027 Ekibi</strong>'nin mülkiyetindedir ve uluslararası telif hakkı, marka, patent, ticari sır ve diğer fikri mülkiyet yasaları tarafından korunmaktadır. Hiçbir Platform İçeriği, Vizyon2027'nin açık yazılı izni olmadan kopyalanamaz, dağıtılamaz, değiştirilemez, yeniden yayınlanamaz veya türev çalışmalar oluşturulamaz.</p>
+
+        <h3>4.2. Kullanıcı Tarafından Oluşturulan İçerik</h3>
+        <p>Platform üzerinden paylaştığınız metinler, dosyalar, projeler, yorumlar, kodlar, görseller ve diğer içerikler (“Kullanıcı İçeriği”) <strong>size aittir</strong>. Ancak, Platformu kullanarak bu içeriği <strong>Vizyon2027</strong>'ye, hizmetleri sağlamak, geliştirmek, iyileştirmek, pazarlamak ve Platformu tanıtmak amacıyla <strong>sınırsız, geri alınamaz, dünya çapında, telifsiz, alt lisans verilebilir bir lisans</strong> vermiş olursunuz.</p>
+
+        <h3>4.3. Markalar</h3>
+        <p>“Vizyon2027”, “VİZYON AI” ve ilgili logolar, Vizyon2027 Ekibi'nin tescilli veya tescilsiz markalarıdır. Bu markalar, Vizyon2027'nin önceden yazılı izni olmadan kullanılamaz, taklit edilemez veya benzer şekilde kullanılamaz.</p>
+
+        <h3>4.4. İhlal Bildirimi</h3>
+        <p>Telif hakkı veya diğer fikri mülkiyet haklarınızın ihlal edildiğini düşünüyorsanız, lütfen <strong>vizyon2027.info@gmail.com</strong> adresine aşağıdaki bilgileri içeren bir bildirim gönderin: (a) ihlal edilen eserin tanımı, (b) ihlal eden içeriğin Platform'daki konumu, (c) iletişim bilgileriniz, (d) iyi niyet beyanı, (e) doğruluk beyanı ve (f) imzanız.</p>
+
+        <h2>5. KULLANICI İÇERİĞİ VE SORUMLULUK</h2>
+        <ul>
+            <li>Platform üzerinden paylaştığınız tüm Kullanıcı İçeriğinden <strong>tamamen siz sorumlusunuz</strong>.</li>
+            <li>Paylaştığınız içeriğin, üçüncü şahısların telif hakkı, gizlilik, kişilik veya diğer haklarını ihlal etmediğini garanti edersiniz.</li>
+            <li><strong>Vizyon2027</strong>, Kullanıcı İçeriğini önceden inceleme yükümlülüğü taşımaz. Ancak, uygun gördüğü takdirde herhangi bir içeriği, herhangi bir zamanda ve herhangi bir nedenle, önceden bildirimde bulunmaksızın kaldırma veya reddetme hakkını saklı tutar.</li>
+            <li>Platform, AI hizmetleri aracılığıyla üretilen içerikler (“AI Çıktıları”) de dahil olmak üzere, tüm içerikler <strong>olduğu gibi</strong> sunulur. AI Çıktılarının doğruluğu, güvenilirliği veya uygunluğu konusunda hiçbir garanti verilmez.</li>
+        </ul>
+
+        <div class="info-box">
+            <strong>💡 Öneri:</strong> Hassas veya özel bilgilerinizi Platformda paylaşırken dikkatli olun. AI sorguları, takım mesajları ve proje dosyaları, ilgili kullanıcılar tarafından görülebilir.
+        </div>
+
+        <h2>6. HİZMETLER VE DEĞİŞİKLİKLER</h2>
+
+        <h3>6.1. Hizmet Kapsamı</h3>
+        <p>Vizyon2027, AI asistan (7 model), takım yönetimi, proje araçları, puan sistemi, mağaza, V27 Pazarı, sosyal özellikler (DM, takip, yorum), anketler, duyurular, akademi, iş ilanları, 3D/ Görsel üretim, video analiz, savaş modu, ebeveyn kontrolleri ve diğer hizmetleri sunar.</p>
+
+        <h3>6.2. Değişiklik Hakkı</h3>
+        <p>Vizyon2027, hizmetleri (özellikler, fiyatlandırma, planlar, kullanıcı arayüzü, API vb.) herhangi bir zamanda, önceden bildirimde bulunarak veya bulunmayarak <strong>değiştirme, askıya alma veya durdurma</strong> hakkını saklı tutar. Bu tür değişiklikler, Platformda yayınlandığı tarihte yürürlüğe girer.</p>
+
+        <h3>6.3. Bakım ve Kesintiler</h3>
+        <p>Zaman zaman sistem bakımı, güncellemeler, güvenlik yamaları veya teknik nedenlerle hizmet kesintileri yaşanabilir. Vizyon2027, bu kesintilerden doğan zararlardan sorumlu değildir. Planlı bakımlar önceden duyurulacaktır.</p>
+
+        <h2>7. ÜCRETLENDİRME VE ÖDEMELER</h2>
+
+        <h3>7.1. Ücretsiz Plan</h3>
+        <p>Vizyon2027, sınırlı özelliklerle (günlük 100 AI sorgusu, 3 proje vb.) <strong>ücretsiz</strong> bir plan sunar.</p>
+
+        <h3>7.2. Ücretli Planlar</h3>
+        <p>"Pro" (2000 sorgu/gün) ve "Takım" (sınırsız sorgu) planları belirli bir ücret karşılığında sunulur. Ücretler ve plan detayları <a href="https://vizyon2026.vercel.app" target="_blank">https://vizyon2026.vercel.app</a> adresinde yayınlanır ve önceden haber verilmeksizin değiştirilebilir.</p>
+
+        <h3>7.3. Ödeme Yükümlülüğü</h3>
+        <p>Ücretli bir plana kaydolduğunuzda, belirtilen ücreti zamanında ödemeyi kabul edersiniz. Ödemelerin yapılmaması durumunda hesabınız askıya alınabilir ve ücretli plan avantajları kaldırılabilir.</p>
+
+        <h3>7.4. İade Politikası</h3>
+        <p>Dijital hizmetler olduğu için, satın alınan planlar için <strong>para iadesi yapılmamaktadır</strong>. Aboneliğinizi istediğiniz zaman iptal edebilirsiniz, ancak iptal tarihine kadar kullanılmamış süre için geri ödeme yapılmaz.</p>
+
+        <h2>8. HESAP İPTALİ VE FESHİH</h2>
+
+        <h3>8.1. Kullanıcı Tarafından Fesih</h3>
+        <p>Hesabınızı istediğiniz zaman Platform içinden (“Hesabımı Sil” butonu) veya <strong>vizyon2027.info@gmail.com</strong> adresine e-posta göndererek silebilirsiniz. Hesabınız silindiğinde, tüm verileriniz (projeler, mesajlar, puanlar, takım üyelikleri vb.) <strong>kalıcı olarak silinir</strong> ve geri getirilemez.</p>
+
+        <h3>8.2. Vizyon2027 Tarafından Fesih</h3>
+        <p>Vizyon2027, bu sözleşmeyi ihlal etmeniz, yasa dışı faaliyetlerde bulunmanız, Platforma zarar vermeniz veya başka bir geçerli nedenle, önceden bildirimde bulunarak veya bulunmayarak hesabınızı <strong>askıya alma veya kalıcı olarak silme</strong> hakkını saklı tutar.</p>
+
+        <h3>8.3. Fesih Sonrası</h3>
+        <p>Hesabınızın feshi durumunda, Platforma erişiminiz sona erer ve tüm Kullanıcı İçeriğiniz silinir. Puanlarınız ve kazanımlarınız iptal edilir. Fesih öncesinde oluşan yükümlülükleriniz (varsa) devam eder.</p>
+
+        <h2>9. SORUMLULUK REDDİ VE SINIRLAMALAR</h2>
+
+        <div class="important-box">
+            <h3 style="color:#ff6b6b; margin-top:0;">⚠️ ÖNEMLİ SORUMLULUK REDDİ</h3>
+            <ul>
+                <li><strong>“Olduğu Gibi” Sağlanır:</strong> Vizyon2027, Platformu “olduğu gibi” ve “mevcut olduğu haliyle” sunar. Platformun kesintisiz, hatasız, güvenli veya belirli bir amaca uygun olacağına dair <strong>hiçbir garanti vermez</strong>.</li>
+                <li><strong>AI Çıktılarının Sorumluluğu:</strong> Platform üzerinden elde ettiğiniz AI yanıtları, öneriler, kodlar, analizler ve diğer çıktılar <strong>bilgilendirme amaçlıdır</strong>. Bu çıktıların doğruluğu, güvenilirliği, güncelliği veya uygunluğu konusunda <strong>hiçbir garanti verilmez</strong>. Kullanıcı, bu çıktıları <strong>tamamen kendi sorumluluğunda kullanır</strong>.</li>
+                <li><strong>Zarar Sınırlaması:</strong> Hiçbir durumda Vizyon2027, Platformun kullanımı veya kullanılamamasından kaynaklanan dolaylı, arızi, özel, cezai veya sonuç olarak ortaya çıkan zararlardan (kâr kaybı, veri kaybı, iş kesintisi, itibar kaybı vb.) <strong>sorumlu değildir</strong>.</li>
+                <li><strong>Maksimum Sorumluluk:</strong> Vizyon2027’nin bu sözleşmeden doğan toplam sorumluluğu, sizin son 12 ayda ödediğiniz toplam ücreti (varsa) <strong>geçmez</strong>. Ücretsiz kullanıcılar için sorumluluk sıfırdır.</li>
+                <li><strong>Üçüncü Taraf Hizmetler:</strong> Platform, üçüncü taraf hizmetlere (Back4App, SerpApi, Giphy, Hugging Face, vb.) bağlanabilir. Bu hizmetlerin gizlilik politikaları, kullanım koşulları ve güvenilirliğinden Vizyon2027 <strong>sorumlu değildir</strong>.</li>
+            </ul>
+        </div>
+
+        <h2>10. GİZLİLİK VE VERİ KORUMA</h2>
+        <p>Kişisel verilerinizin nasıl toplandığı, kullanıldığı, saklandığı ve korunduğu hakkında detaylı bilgi için lütfen <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a> sayfamızı inceleyiniz. Bu sözleşme, Gizlilik Politikası ile birlikte değerlendirilmelidir.</p>
+        <ul>
+            <li>Vizyon2027, <strong>6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK)</strong> ve <strong>Avrupa Birliği Genel Veri Koruma Tüzüğü (GDPR)</strong> hükümlerine tam uyumludur.</li>
+            <li>Verileriniz, yalnızca hizmet kalitesini artırmak ve size özel deneyim sunmak için kullanılır.</li>
+            <li>Verileriniz <strong>hiçbir üçüncü tarafla paylaşılmaz, satılmaz veya kiralanmaz</strong>.</li>
+            <li>Hesap silindiğinde, tüm verileriniz kalıcı olarak yok edilir.</li>
+        </ul>
+
+        <h2>11. ÜÇÜNCÜ TARAF HİZMETLER VE BAĞLANTILAR</h2>
+        <p>Platform, üçüncü taraf hizmetlere (Back4App, SerpApi, Giphy, Hugging Face, Google, Facebook, vb.) ve web sitelerine bağlantılar içerebilir. Bu hizmetlerin gizlilik politikaları, kullanım koşulları ve içeriklerinden Vizyon2027 <strong>sorumlu değildir</strong>. Bu bağlantıları kullanmadan önce ilgili hizmetlerin koşullarını okumanız önerilir.</p>
+
+        <h2>12. SÖZLEŞME DEĞİŞİKLİKLERİ</h2>
+        <p>Vizyon2027, bu sözleşmeyi herhangi bir zamanda güncelleme hakkını saklı tutar. Değişiklikler Platform içinde veya web sitemizde yayınlandığı tarihte yürürlüğe girer. Önemli değişiklikler durumunda, size e-posta veya Platform içi bildirim gönderilebilir. Değişikliklerin yürürlüğe girmesinden sonra Platformu kullanmaya devam etmeniz, <strong>güncellenmiş sözleşmeyi kabul ettiğiniz</strong> anlamına gelir. Bu sayfayı düzenli olarak kontrol etmeniz önerilir.</p>
+
+        <h2>13. GEÇERLİ HUKUK VE UYUŞMAZLIK ÇÖZÜMÜ</h2>
+        <ul>
+            <li>Bu sözleşme, <strong>Türkiye Cumhuriyeti yasalarına</strong> tabidir ve bu yasalara göre yorumlanır.</li>
+            <li>Bu sözleşmeden doğan veya bu sözleşmeyle ilgili herhangi bir uyuşmazlık, öncelikle dostane yollarla çözülmeye çalışılır. Çözülememesi durumunda, uyuşmazlık <strong>İstanbul Mahkemeleri ve İcra Daireleri</strong>'nin münhasır yetkisine tabidir.</li>
+            <li>Kullanıcı, Türkiye dışından erişim sağlıyorsa, kendi ülkesinin yasalarına da uymakla yükümlüdür. Vizyon2027, erişimin yasal olup olmadığını garanti etmez.</li>
+        </ul>
+
+        <h2>14. BÖLÜNEBİLİRLİK</h2>
+        <p>Bu sözleşmenin herhangi bir hükmü, yetkili bir mahkeme tarafından geçersiz veya uygulanamaz bulunursa, bu hüküm, sözleşmeden ayrılabilir ve sözleşmenin geri kalan hükümleri <strong>tam olarak yürürlükte kalmaya devam eder</strong>.</p>
+
+        <h2>15. TAM ANLAŞMA</h2>
+        <p>Bu sözleşme, taraflar arasındaki tam anlaşmayı oluşturur ve önceki tüm yazılı veya sözlü anlaşmaların, görüşmelerin ve tekliflerin yerine geçer. Bu sözleşmenin hiçbir hükmünün uygulanmaması, o hükmün veya başka bir hükmün feragat edildiği anlamına gelmez.</p>
+
+        <h2>16. BİLDİRİMLER</h2>
+        <p>Vizyon2027 tarafından yapılacak tüm bildirimler, kayıtlı e-posta adresinize veya Platform içi bildirim olarak gönderilecektir. Kullanıcı, Vizyon2027'ye bildirimlerini <strong>vizyon2027.info@gmail.com</strong> adresine e-posta göndererek yapabilir.</p>
+
+        <h2>17. İLETİŞİM</h2>
+        <p>Bu sözleşme veya Platform ile ilgili her türlü soru, görüş, şikayet veya talep için bize ulaşabilirsiniz:</p>
+        <ul>
+            <li><strong>📧 E-posta:</strong> <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a></li>
+            <li><strong>🌐 Web:</strong> <a href="https://vizyon2026.vercel.app" target="_blank">https://vizyon2026.vercel.app</a></li>
+            <li><strong>📱 WhatsApp Kanalı:</strong> <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank">Tıklayın</a></li>
+            <li><strong>📸 Instagram:</strong> <a href="https://www.instagram.com/vizyon2027.info" target="_blank">@vizyon2027.info</a></li>
+        </ul>
+
+        <hr>
+
+        <div class="legal-footer">
+            <p>
+                <strong>© 2026 Vizyon2027</strong> – Tüm Hakları Saklıdır.<br>
+                Bu sözleşme, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) ve Avrupa Birliği Genel Veri Koruma Tüzüğü'ne (GDPR) tam uyumlu olarak hazırlanmıştır.<br>
+                <span style="color:#ff6b6b;">⚠️ YASAL UYARI:</span> Bu sözleşme, Vizyon2027 Ekibi tarafından hazırlanmış olup, izinsiz kopyalanması, dağıtılması veya türev çalışma oluşturulması <strong>kesinlikle yasaktır</strong>.
+            </p>
+            <p style="margin-top:8px;">
+                <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/bana-ogret.html" target="_blank">Bana Öğret</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/dokumantasyon.html" target="_blank">Dokümantasyon</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/api.html" target="_blank">API</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/blog.html" target="_blank">Blog</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/hakkimizda.html" target="_blank">Hakkımızda</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/iletisim.html" target="_blank">İletişim</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/kariyer.html" target="_blank">Kariyer</a>
+            </p>
+            <p style="font-size:12px; color:#555;">
+                Son Güncelleme: 29 Ağustos 2026 – Sürüm 6.02.1
+            </p>
+        </div>
+
+        <hr>
+        <a href="index.html" class="back-link">⬅️ Ana Sayfaya Dön</a>
     </div>
 
-    <h2>10. Gizlilik ve Veri Koruma</h2>
-    <p>Kişisel verilerinizin nasıl toplandığı, kullanıldığı ve korunduğu hakkında detaylı bilgi için lütfen <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a> sayfamızı inceleyiniz. Bu sözleşme, Gizlilik Politikası ile birlikte değerlendirilmelidir.</p>
+    <!-- ===== ENGLISH (KISA) ===== -->
+    <div id="lang-en" class="lang-content">
+        <h1>📜 Terms of Service</h1>
+        <p><span class="badge">📌 Last Updated: August 29, 2026</span> <span class="badge" style="margin-left:10px;">⚡ Version 6.02.1</span></p>
 
-    <h2>11. Üçüncü Taraf Hizmetler ve Bağlantılar</h2>
-    <p>Uygulama, üçüncü taraf hizmetlere (Back4App, SerpApi, Giphy vb.) ve web sitelerine bağlantılar içerebilir. Bu hizmetlerin gizlilik politikaları ve kullanım koşullarından Vizyon2027 sorumlu değildir. Bu bağlantıları kullanmadan önce ilgili hizmetlerin koşullarını okumanız önerilir.</p>
+        <p><strong>Vizyon2027</strong> (“Platform”) is provided by <strong>Vizyon2027 Team</strong>. By using the Platform, you agree to these Terms of Service. Please read them carefully.</p>
 
-    <h2>12. Sözleşme Değişiklikleri</h2>
-    <p>Vizyon2027, bu sözleşmeyi herhangi bir zamanda güncelleme hakkını saklı tutar. Değişiklikler Uygulama içinde veya web sitemizde yayınlandığı tarihte yürürlüğe girer. Önemli değişiklikler durumunda, size e-posta veya Uygulama içi bildirim gönderilebilir. Değişikliklerin yürürlüğe girmesinden sonra Uygulamayı kullanmaya devam etmeniz, güncellenmiş sözleşmeyi kabul ettiğiniz anlamına gelir.</p>
+        <div class="highlight-box">
+            <strong>✅ SUMMARY:</strong> Vizyon2027 offers AI, team collaboration, project management, points system, store, and social features. These terms cover usage rules, account security, intellectual property, liability limits, and privacy commitments. <span style="color:#ffb700; font-weight:bold;">By using the Platform, you unconditionally accept these terms.</span>
+        </div>
 
-    <h2>13. Geçerli Hukuk ve Uyuşmazlık Çözümü</h2>
-    <ul>
-        <li>Bu sözleşme, <strong>Türkiye Cumhuriyeti yasalarına</strong> tabidir ve bu yasalara göre yorumlanır.</li>
-        <li>Bu sözleşmeden doğan veya bu sözleşmeyle ilgili herhangi bir uyuşmazlık, öncelikle dostane yollarla çözülmeye çalışılır. Çözülememesi durumunda, uyuşmazlık <strong>İstanbul Mahkemeleri ve İcra Daireleri</strong>’nin münhasır yetkisine tabidir.</li>
-    </ul>
+        <hr>
 
-    <h2>14. Bölünebilirlik</h2>
-    <p>Bu sözleşmenin herhangi bir hükmü, yetkili bir mahkeme tarafından geçersiz veya uygulanamaz bulunursa, bu hüküm, sözleşmeden ayrılabilir ve sözleşmenin geri kalan hükümleri tam olarak yürürlükte kalmaya devam eder.</p>
+        <h2>1. Account Creation and Security</h2>
+        <ul>
+            <li><strong>Account Info:</strong> You must provide accurate and complete information during registration.</li>
+            <li><strong>Password Security:</strong> You are <strong>fully responsible</strong> for maintaining the confidentiality of your password.</li>
+            <li><strong>Account Responsibility:</strong> All activities under your account (AI queries, messages, team activities, purchases, points spending) are your responsibility.</li>
+            <li><strong>Age Limit:</strong> You must be at least <strong>13 years old</strong> to use the Platform. Users under 13 require parental consent.</li>
+            <li><strong>Multiple Accounts:</strong> Each user may have only one account. Creating multiple or fake accounts is <strong>prohibited</strong>.</li>
+        </ul>
 
-    <h2>15. İletişim</h2>
-    <p>Bu sözleşme veya Uygulama ile ilgili her türlü soru, görüş veya şikayetiniz için bize ulaşabilirsiniz:</p>
-    <ul>
-        <li><strong>📧 E-posta:</strong> <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a></li>
-        <li><strong>🌐 Web:</strong> <a href="https://vizyon2026.vercel.app" target="_blank">https://vizyon2026.vercel.app</a></li>
-    </ul>
+        <h2>2. Usage Rules – Prohibited Activities</h2>
+        <ul>
+            <li>❌ Illegal, threatening, harassing, defamatory, or obscene content</li>
+            <li>❌ Uploading viruses, worms, or malicious code</li>
+            <li>❌ Hacking, exploiting security vulnerabilities, or unauthorized access</li>
+            <li>❌ Spam, harassment, or hate speech</li>
+            <li>❌ Copyright infringement</li>
+            <li>❌ Impersonation or fake accounts</li>
+            <li>❌ Data scraping or mining</li>
+            <li>❌ Points manipulation (bots, automation, fake accounts)</li>
+            <li>❌ Political or religious propaganda</li>
+        </ul>
+        <div class="important-box">
+            <strong>⚠️ PENALTIES:</strong> Violations may result in <strong>temporary suspension, permanent deletion</strong> of your account, and legal action.
+        </div>
 
-    <hr>
-    <div class="footer">
-        <p>© 2026 Vizyon2027 - Tüm Hakları Saklıdır.</p>
-        <p style="font-size:12px; color:#555;">Bu belge, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) ve Avrupa Birliği Genel Veri Koruma Tüzüğü'ne (GDPR) uygun olarak hazırlanmıştır.</p>
+        <h2>3. Intellectual Property</h2>
+        <ul>
+            <li><strong>Platform Content:</strong> All code, design, text, graphics, logos, software, and materials are owned by <strong>Vizyon2027 Team</strong> and protected by copyright, trademark, and other IP laws.</li>
+            <li><strong>User Content:</strong> You retain ownership of content you upload, but grant Vizyon2027 a <strong>worldwide, irrevocable, royalty-free, sublicensable license</strong> to use, modify, and distribute it for Platform purposes.</li>
+            <li><strong>Trademarks:</strong> "Vizyon2027", "VİZYON AI" and related logos are trademarks of Vizyon2027. Unauthorized use is prohibited.</li>
+        </ul>
+
+        <h2>4. Disclaimer and Liability Limits</h2>
+        <div class="important-box">
+            <ul>
+                <li><strong>“As Is”:</strong> The Platform is provided “as is” and “as available.” No warranty of uninterrupted, error-free, or secure service.</li>
+                <li><strong>AI Outputs:</strong> AI-generated responses are for <strong>informational purposes only</strong>. No guarantee of accuracy or reliability. Use at your own risk.</li>
+                <li><strong>Liability Limit:</strong> Vizyon2027 is <strong>not liable</strong> for indirect, incidental, special, punitive, or consequential damages. Maximum liability is limited to the total fees paid by you in the last 12 months (if any).</li>
+                <li><strong>Third-Party Services:</strong> Vizyon2027 is <strong>not responsible</strong> for third-party services (Back4App, SerpApi, Giphy, Hugging Face, etc.) linked through the Platform.</li>
+            </ul>
+        </div>
+
+        <h2>5. Privacy and Data Protection</h2>
+        <p>Your personal data is processed in accordance with <strong>Turkish Law No. 6698 (KVKK)</strong> and <strong>EU GDPR</strong>. For details, see our <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Privacy Policy</a>.</p>
+
+        <h2>6. Termination</h2>
+        <ul>
+            <li><strong>By User:</strong> You may delete your account anytime via the Platform or by emailing <strong>vizyon2027.info@gmail.com</strong>. All data is permanently deleted.</li>
+            <li><strong>By Vizyon2027:</strong> We may suspend or permanently delete your account for violating these terms, illegal activities, or other reasons.</li>
+        </ul>
+
+        <h2>7. Governing Law</h2>
+        <p>These terms are governed by the laws of <strong>the Republic of Türkiye</strong>. Any dispute shall be resolved in <strong>Istanbul Courts</strong>.</p>
+
+        <h2>8. Changes to Terms</h2>
+        <p>Vizyon2027 may update these terms at any time. Changes are effective upon posting. Continued use after changes constitutes acceptance.</p>
+
+        <h2>9. Contact</h2>
+        <ul>
+            <li><strong>📧 Email:</strong> <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a></li>
+            <li><strong>🌐 Web:</strong> <a href="https://vizyon2026.vercel.app" target="_blank">https://vizyon2026.vercel.app</a></li>
+            <li><strong>📱 WhatsApp:</strong> <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank">Channel</a></li>
+            <li><strong>📸 Instagram:</strong> <a href="https://www.instagram.com/vizyon2027.info" target="_blank">@vizyon2027.info</a></li>
+        </ul>
+
+        <hr>
+        <div class="legal-footer">
+            <p><strong>© 2026 Vizyon2027</strong> – All Rights Reserved.</p>
+            <p><a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Privacy Policy</a> | <a href="https://vizyon2026.vercel.app/bana-ogret.html" target="_blank">Teach Me</a> | <a href="https://vizyon2026.vercel.app/dokumantasyon.html" target="_blank">Documentation</a></p>
+        </div>
+        <hr>
+        <a href="index.html" class="back-link">⬅️ Back to Home</a>
     </div>
+
+    <!-- ===== ARAPÇA (KISA) ===== -->
+    <div id="lang-ar" class="lang-content" dir="rtl">
+        <h1>📜 اتفاقية المستخدم</h1>
+        <p><span class="badge">📌 آخر تحديث: 29 أغسطس 2026</span> <span class="badge" style="margin-left:10px;">⚡ الإصدار 6.02.1</span></p>
+
+        <p><strong>فيجن 2027</strong> ("المنصة") مقدمة من <strong>فريق فيجن 2027</strong>. باستخدام المنصة، فإنك توافق على هذه الاتفاقية. يرجى قراءتها بعناية.</p>
+
+        <div class="highlight-box">
+            <strong>✅ ملخص:</strong> تقدم فيجن 2027 الذكاء الاصطناعي، العمل الجماعي، إدارة المشاريع، نظام النقاط، المتجر، والميزات الاجتماعية. تغطي هذه الاتفاقية قواعد الاستخدام، أمان الحساب، حقوق الملكية الفكرية، حدود المسؤولية، والتزامات الخصوصية. <span style="color:#ffb700; font-weight:bold;">باستخدام المنصة، فإنك تقبل هذه الاتفاقية دون قيد أو شرط.</span>
+        </div>
+
+        <hr>
+
+        <h2>1. إنشاء الحساب والأمان</h2>
+        <ul>
+            <li><strong>معلومات الحساب:</strong> يجب تقديم معلومات دقيقة وكاملة أثناء التسجيل.</li>
+            <li><strong>أمان كلمة المرور:</strong> أنت <strong>مسؤول بالكامل</strong> عن الحفاظ على سرية كلمة المرور الخاصة بك.</li>
+            <li><strong>مسؤولية الحساب:</strong> جميع الأنشطة تحت حسابك (استعلامات الذكاء الاصطناعي، الرسائل، أنشطة الفريق، المشتريات، إنفاق النقاط) هي مسؤوليتك.</li>
+            <li><strong>الحد الأدنى للعمر:</strong> يجب أن تكون <strong>13 عامًا</strong> على الأقل لاستخدام المنصة. المستخدمون دون 13 عامًا يحتاجون إلى موافقة الوالدين.</li>
+        </ul>
+
+        <h2>2. قواعد الاستخدام – الأنشطة المحظورة</h2>
+        <ul>
+            <li>❌ محتوى غير قانوني، تهديدي، تحرشي، تشهيري، أو فاحش</li>
+            <li>❌ تحميل فيروسات أو برمجيات ضارة</li>
+            <li>❌ اختراق أو استغلال ثغرات أمنية أو وصول غير مصرح به</li>
+            <li>❌ بريد عشوائي أو تحرش أو خطاب كراهية</li>
+            <li>❌ انتهاك حقوق النشر</li>
+            <li>❌ انتحال الشخصية أو حسابات مزيفة</li>
+            <li>❌ استخراج البيانات أو التعدين</li>
+            <li>❌ التلاعب بنظام النقاط (بوتات، أتمتة، حسابات مزيفة)</li>
+        </ul>
+        <div class="important-box">
+            <strong>⚠️ العقوبات:</strong> قد تؤدي الانتهاكات إلى <strong>تعليق مؤقت، حذف دائم</strong> للحساب، وإجراءات قانونية.
+        </div>
+
+        <h2>3. الملكية الفكرية</h2>
+        <ul>
+            <li><strong>محتوى المنصة:</strong> جميع الأكواد والتصاميم والنصوص والرسومات والشعارات مملوكة لـ <strong>فريق فيجن 2027</strong> ومحمية بقوانين حقوق النشر والعلامات التجارية.</li>
+            <li><strong>محتوى المستخدم:</strong> تحتفظ بملكية المحتوى الذي ترفعه، لكن تمنح فيجن 2027 <strong>ترخيصًا عالميًا غير قابل للإلغاء وخاليًا من حقوق الملكية</strong> لاستخدامه وتعديله وتوزيعه لأغراض المنصة.</li>
+        </ul>
+
+        <h2>4. إخلاء المسؤولية وحدود المسؤولية</h2>
+        <div class="important-box">
+            <ul>
+                <li><strong>"كما هي":</strong> تُقدم المنصة "كما هي" و"كما هي متاحة". لا يوجد ضمان لخدمة متواصلة أو خالية من الأخطاء.</li>
+                <li><strong>مخرجات الذكاء الاصطناعي:</strong> الردود المولدة بواسطة الذكاء الاصطناعي هي <strong>لأغراض إعلامية فقط</strong>. لا يوجد ضمان للدقة أو الموثوقية. الاستخدام على مسؤوليتك الخاصة.</li>
+                <li><strong>حد المسؤولية:</strong> فيجن 2027 <strong>ليست مسؤولة</strong> عن الأضرار غير المباشرة أو العرضية أو الخاصة أو العقابية أو التبعية. الحد الأقصى للمسؤولية يقتصر على إجمالي الرسوم التي دفعتها في آخر 12 شهرًا (إن وجدت).</li>
+            </ul>
+        </div>
+
+        <h2>5. الخصوصية وحماية البيانات</h2>
+        <p>تتم معالجة بياناتك الشخصية وفقًا لـ <strong>قانون حماية البيانات الشخصية التركي رقم 6698 (KVKK)</strong> و <strong>اللائحة العامة لحماية البيانات (GDPR)</strong>. للتفاصيل، راجع <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">سياسة الخصوصية</a>.</p>
+
+        <h2>6. الاتصال</h2>
+        <ul>
+            <li><strong>📧 البريد الإلكتروني:</strong> <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a></li>
+            <li><strong>🌐 الويب:</strong> <a href="https://vizyon2026.vercel.app" target="_blank">https://vizyon2026.vercel.app</a></li>
+        </ul>
+
+        <hr>
+        <div class="legal-footer">
+            <p><strong>© 2026 فيجن 2027</strong> – جميع الحقوق محفوظة.</p>
+        </div>
+        <hr>
+        <a href="index.html" class="back-link">⬅️ العودة إلى الصفحة الرئيسية</a>
+    </div>
+
 </div>
+
+<script>
+    function switchLanguage(lang) {
+        document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active'));
+        const target = document.getElementById('lang-' + lang);
+        if (target) target.classList.add('active');
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.lang === lang) btn.classList.add('active');
+        });
+        const container = document.getElementById('mainContainer');
+        container.style.direction = (lang === 'ar') ? 'rtl' : 'ltr';
+        localStorage.setItem('preferred_lang', lang);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedLang = localStorage.getItem('preferred_lang');
+        if (savedLang && (savedLang === 'tr' || savedLang === 'en' || savedLang === 'ar')) {
+            switchLanguage(savedLang);
+        } else {
+            switchLanguage('tr');
+        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlLang = urlParams.get('lang');
+        if (urlLang && (urlLang === 'tr' || urlLang === 'en' || urlLang === 'ar')) {
+            switchLanguage(urlLang);
+        }
+    });
+</script>
+
 </body>
 </html>
