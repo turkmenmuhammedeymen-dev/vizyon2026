@@ -10332,30 +10332,35 @@ window.assignAdminByEmail = async function() {
 window.loadUserList = async function() {
     if (!currentUser) return;
     try {
-        var query = new Parse.Query(Parse.User);
-        var users = await query.find({ useMasterKey: true });
+        // Cloud Code üzerinden tüm kullanıcıları çek
+        const result = await Parse.Cloud.run('getAllUsers', {});
+        const users = result; // result zaten dizi olarak gelir
+
         var container = document.getElementById('userList');
         if (!container) return;
         var html = '';
         users.forEach(function(u) {
-            var role = u.get('role') || 'user';
-            var plan = u.get('plan') || 'free';
+            var role = u.role || 'user';
+            var plan = u.plan || 'free';
             var planLabel = plan === 'pro' ? '🌟 Pro' : plan === 'team' ? '👥 Takım' : '🆓 Ücretsiz';
             var roleLabel = role === 'founder' ? '👑 Kurucu' : role === 'admin' ? '⚙️ Admin' : role === 'beta' ? '🔬 Beta' : '👤 Kullanıcı';
             html += `<div class="user-item" style="border-left-color: ${role === 'founder' ? 'var(--gold)' : role === 'admin' ? 'var(--accent)' : role === 'beta' ? 'var(--purple)' : 'var(--border)'};">`;
-            html += `<span class="user-email">${u.get('email')}</span>`;
+            html += `<span class="user-email">${u.email}</span>`;
             html += `<span style="font-size:11px;color:var(--text3);">${roleLabel} | ${planLabel}</span>`;
             html += `<div class="user-actions">`;
-            html += `<button class="btn-admin" onclick="window.assignAdminEmail('${u.get('email')}')">Admin Yap</button>`;
-            html += `<button class="btn-user" onclick="window.setUserRole('${u.get('email')}','user')">Kullanıcı Yap</button>`;
-            html += `<button class="btn-ban" onclick="window.banUserEmail('${u.get('email')}')">Yasakla</button>`;
-            html += `<button class="btn-gift" onclick="window.giftUserEmail('${u.get('email')}')">🎁</button>`;
+            html += `<button class="btn-admin" onclick="window.assignAdminEmail('${u.email}')">Admin Yap</button>`;
+            html += `<button class="btn-user" onclick="window.setUserRole('${u.email}','user')">Kullanıcı Yap</button>`;
+            html += `<button class="btn-ban" onclick="window.banUserEmail('${u.email}')">Yasakla</button>`;
+            html += `<button class="btn-gift" onclick="window.giftUserEmail('${u.email}')">🎁</button>`;
             html += `</div>`;
             html += `</div>`;
         });
         container.innerHTML = html;
         window.applyTranslations(currentLanguage);
-    } catch(e) { console.error('Kullanıcı listesi yüklenirken hata:', e); }
+    } catch(e) {
+        console.error('Kullanıcı listesi yüklenirken hata:', e);
+        showNotification('Kullanıcı listesi yüklenirken hata oluştu.', 'error');
+    }
 };
 
 window.searchAllUsers = async function() {
