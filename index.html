@@ -10294,6 +10294,7 @@ window.handleRequest = async function(requestId, action) {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
+// ---- ADMIN İŞLEMLERİ (GÜNCELLENMİŞ) ----
 window.sendGiftByEmail = async function() {
     if (!currentUser || (currentUser.get('role') !== 'founder' && currentUser.get('role') !== 'admin')) return showNotification('Yetkiniz yok!', 'error');
     var email = document.getElementById('giftEmailInput').value.trim();
@@ -10315,27 +10316,97 @@ window.assignBetaByEmail = async function() {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-window.assignAdminByEmail = async function() {
-    if (!currentUser || currentUser.get('role') !== 'founder') return showNotification('Sadece kurucu admin atayabilir!', 'error');
-    var email = document.getElementById('adminEmailInput').value.trim();
-    if (!email) return showNotification('E-posta girin!', 'error');
+// === YENİ / GÜNCELLENEN FONKSİYONLAR ===
+window.assignAdminEmail = async function(email) {
+    if (!currentUser || currentUser.get('role') !== 'founder') {
+        showNotification('Sadece kurucu admin atayabilir!', 'error');
+        return;
+    }
     try {
-        var result = await Parse.Cloud.run('sendRoleRequest', { email: email, role: 'admin' });
+        var result = await Parse.Cloud.run('assignAdmin', { email: email });
         showNotification(result.message, 'success');
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
+        await loadUserList();
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+window.setUserRole = async function(email, role) {
+    if (!currentUser || currentUser.get('role') !== 'founder') {
+        showNotification('Sadece kurucu rol değiştirebilir!', 'error');
+        return;
+    }
+    try {
+        var result = await Parse.Cloud.run('setUserRole', { email: email, role: role });
+        showNotification(result.message, 'success');
+        await loadUserList();
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+window.banUserEmail = async function(email) {
+    if (!currentUser || !['admin', 'founder'].includes(currentUser.get('role'))) {
+        showNotification('Yetkiniz yok!', 'error');
+        return;
+    }
+    try {
+        var result = await Parse.Cloud.run('banUser', { targetEmail: email });
+        showNotification(result.message, 'success');
+        await loadUserList();
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+window.unbanUserByEmail = async function(email) {
+    if (!currentUser || !['admin', 'founder'].includes(currentUser.get('role'))) {
+        showNotification('Yetkiniz yok!', 'error');
+        return;
+    }
+    try {
+        var result = await Parse.Cloud.run('unbanUser', { targetEmail: email });
+        showNotification(result.message, 'success');
+        await loadUserList();
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+window.assignAdmin = function() {
+    var email = document.getElementById('assignAdminEmail').value.trim();
+    if (!email) return showNotification('E-posta girin!', 'error');
+    window.assignAdminEmail(email);
+};
+
+window.sendGift = function() {
+    var email = document.getElementById('giftEmail').value.trim();
+    var pkg = document.getElementById('giftPackage').value;
+    if (!email) return showNotification('E-posta girin!', 'error');
+    window.giftUserEmail(email, pkg);
+};
+
+window.banUser = function() {
+    var email = document.getElementById('banUserEmail').value.trim();
+    if (!email) return showNotification('E-posta girin!', 'error');
+    window.banUserEmail(email);
+};
+
+window.unbanUser = function() {
+    var email = document.getElementById('banUserEmailUnban').value.trim() || document.getElementById('unbanEmailInput').value.trim();
+    if (!email) return showNotification('Lütfen e-posta girin!', 'error');
+    window.unbanUserByEmail(email);
 };
 
 // ================================================================
-// ========== ADMIN FONKSİYONLARI ==========
+// ========== KULLANICI LİSTESİ (GÜNCELLENMİŞ) ==========
 // ================================================================
 
 window.loadUserList = async function() {
     if (!currentUser) return;
     try {
-        // Cloud Code üzerinden tüm kullanıcıları çek
         const result = await Parse.Cloud.run('getAllUsers', {});
-        const users = result; // result zaten dizi olarak gelir
-
+        const users = result;
         var container = document.getElementById('userList');
         if (!container) return;
         var html = '';
@@ -10352,6 +10423,7 @@ window.loadUserList = async function() {
             html += `<button class="btn-user" onclick="window.setUserRole('${u.email}','user')">Kullanıcı Yap</button>`;
             html += `<button class="btn-ban" onclick="window.banUserEmail('${u.email}')">Yasakla</button>`;
             html += `<button class="btn-gift" onclick="window.giftUserEmail('${u.email}')">🎁</button>`;
+            html += `<button class="btn-success" onclick="window.unbanUserByEmail('${u.email}')" style="background:var(--success);color:#000;">🔓</button>`;
             html += `</div>`;
             html += `</div>`;
         });
@@ -10362,6 +10434,10 @@ window.loadUserList = async function() {
         showNotification('Kullanıcı listesi yüklenirken hata oluştu.', 'error');
     }
 };
+
+// ================================================================
+// ========== KULLANICI ARA (GÜNCELLENMİŞ) ==========
+// ================================================================
 
 window.searchAllUsers = async function() {
     if (!currentUser || currentUser.get('role') !== 'founder') return showNotification('Sadece kurucu arayabilir!', 'error');
@@ -10394,6 +10470,7 @@ window.searchAllUsers = async function() {
             html += `<button class="btn-user" onclick="window.setUserRole('${u.get('email')}','user')">Kullanıcı Yap</button>`;
             html += `<button class="btn-ban" onclick="window.banUserEmail('${u.get('email')}')">Yasakla</button>`;
             html += `<button class="btn-gift" onclick="window.giftUserEmail('${u.get('email')}')">🎁</button>`;
+            html += `<button class="btn-success" onclick="window.unbanUserByEmail('${u.get('email')}')" style="background:var(--success);color:#000;">🔓</button>`;
             html += `</div>`;
             html += `</div>`;
         });
@@ -10401,107 +10478,9 @@ window.searchAllUsers = async function() {
     } catch(e) { console.error('Kullanıcı arama hatası:', e); showNotification('Arama hatası: ' + e.message, 'error'); }
 };
 
-window.assignAdminEmail = async function(email) {
-    try {
-        var query = new Parse.Query(Parse.User);
-        query.equalTo('email', email);
-        var user = await query.first({ useMasterKey: true });
-        if (!user) return showNotification('Kullanıcı bulunamadı!', 'error');
-        user.set('role', 'admin');
-        await user.save(null, { useMasterKey: true });
-        var Inbox = Parse.Object.extend('Inbox');
-        var inbox = new Inbox();
-        inbox.set('sender_email', currentUser.get('email'));
-        inbox.set('receiver_email', email);
-        inbox.set('type', 'role_request');
-        inbox.set('role', 'admin');
-        inbox.set('request_id', Math.random().toString(36).substring(2, 15));
-        inbox.set('status', 'pending');
-        inbox.set('message', currentUser.get('name') + ' sizi ⚙️ Admin yapmak istiyor.');
-        await inbox.save(null, { useMasterKey: true });
-        showNotification(email + ' adresine admin teklifi gönderildi!', 'success');
-        await loadUserList();
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
-};
-
-window.setUserRole = async function(email, role) {
-    try {
-        var query = new Parse.Query(Parse.User);
-        query.equalTo('email', email);
-        var user = await query.first({ useMasterKey: true });
-        if (!user) return showNotification('Kullanıcı bulunamadı!', 'error');
-        user.set('role', role);
-        await user.save(null, { useMasterKey: true });
-        showNotification(email + ' rolü ' + role + ' olarak değiştirildi!', 'success');
-        await loadUserList();
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
-};
-
-window.banUserEmail = async function(email) {
-    try {
-        var query = new Parse.Query(Parse.User);
-        query.equalTo('email', email);
-        var user = await query.first({ useMasterKey: true });
-        if (!user) return showNotification('Kullanıcı bulunamadı!', 'error');
-        user.set('isBanned', true);
-        await user.save(null, { useMasterKey: true });
-        showNotification(email + ' yasaklandı!', 'success');
-        await loadUserList();
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
-};
-
-window.unbanUser = async function() {
-    var email = document.getElementById('banUserEmailUnban').value.trim() || document.getElementById('unbanEmailInput').value.trim();
-    if (!email) return showNotification('Lütfen e-posta girin!', 'error');
-    await window.unbanUserByEmail(email);
-};
-
-window.unbanUserByEmail = async function(email) {
-    if (!email) return showNotification('Lütfen e-posta girin!', 'error');
-    try {
-        var result = await Parse.Cloud.run('unbanUser', { targetEmail: email });
-        showNotification(result.message, 'success');
-        await loadUserList();
-    } catch(e) {
-        if (e.message && e.message.includes('bulunamadı')) {
-            showNotification('❌ Bu kullanıcı sisteme kayıtlı değil veya engellenmemiş.', 'error');
-        } else {
-            showNotification('Hata: ' + e.message, 'error');
-        }
-    }
-};
-
-window.banUserByEmail = async function(email) {
-    if (!email) return showNotification('Lütfen e-posta girin!', 'error');
-    try {
-        var result = await Parse.Cloud.run('banUser', { targetEmail: email });
-        showNotification(result.message, 'success');
-        await loadUserList();
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
-};
-
-window.giftUserEmail = async function(email, pkg) {
-    try {
-        var query = new Parse.Query(Parse.User);
-        query.equalTo('email', email);
-        var user = await query.first({ useMasterKey: true });
-        if (!user) return showNotification('Kullanıcı bulunamadı!', 'error');
-        var Gift = Parse.Object.extend('Gift');
-        var gift = new Gift();
-        gift.set('sender_email', currentUser?.get('email') || 'system@vizyon2027.com');
-        gift.set('receiver_email', email);
-        gift.set('package', pkg);
-        await gift.save(null, { useMasterKey: true });
-        var Inbox = Parse.Object.extend('Inbox');
-        var inbox = new Inbox();
-        inbox.set('sender_email', 'system@vizyon2027.com');
-        inbox.set('receiver_email', email);
-        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takım Paketi') + ' hediye edildi!');
-        await inbox.save(null, { useMasterKey: true });
-        showNotification(email + ' adresine ' + pkg + ' paketi hediye edildi!', 'success');
-        await loadUserList();
-    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
-};
+// ================================================================
+// ========== DİĞER FONKSİYONLAR (ÖNCEKİ GİBİ) ==========
+// ================================================================
 
 window.showAdminsList = async function() {
     try {
@@ -10603,34 +10582,40 @@ window.setAdminPassword = async function() {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-window.assignAdmin = function() {
-    var email = document.getElementById('assignAdminEmail').value.trim();
-    if (!email) return showNotification('E-posta girin!', 'error');
-    window.assignAdminEmail(email);
-};
-
-window.sendGift = function() {
-    var email = document.getElementById('giftEmail').value.trim();
-    var pkg = document.getElementById('giftPackage').value;
-    if (!email) return showNotification('E-posta girin!', 'error');
-    window.giftUserEmail(email, pkg);
-};
-
-window.banUser = function() {
-    var email = document.getElementById('banUserEmail').value.trim();
-    if (!email) return showNotification('E-posta girin!', 'error');
-    window.banUserEmail(email);
+window.giftUserEmail = async function(email, pkg) {
+    if (!currentUser || !['admin', 'founder'].includes(currentUser.get('role'))) {
+        showNotification('Yetkiniz yok!', 'error');
+        return;
+    }
+    try {
+        var query = new Parse.Query(Parse.User);
+        query.equalTo('email', email);
+        var user = await query.first({ useMasterKey: true });
+        if (!user) return showNotification('Kullanıcı bulunamadı!', 'error');
+        var Gift = Parse.Object.extend('Gift');
+        var gift = new Gift();
+        gift.set('sender_email', currentUser.get('email'));
+        gift.set('receiver_email', email);
+        gift.set('package', pkg);
+        await gift.save(null, { useMasterKey: true });
+        var Inbox = Parse.Object.extend('Inbox');
+        var inbox = new Inbox();
+        inbox.set('sender_email', 'system@vizyon2027.com');
+        inbox.set('receiver_email', email);
+        inbox.set('message', '🎁 ' + (pkg === 'pro' ? '🌟 Pro Paket' : '👥 Takım Paketi') + ' hediye edildi!');
+        await inbox.save(null, { useMasterKey: true });
+        showNotification(email + ' adresine ' + pkg + ' paketi hediye edildi!', 'success');
+        await loadUserList();
+    } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
 // ================================================================
-// ========== YENİ ÖZELLİKLER ==========
+// ========== YENİ ÖZELLİKLER (GÜNCELLEMELER) ==========
 // ================================================================
 
-// ---- PUAN ----
 window.updatePointsBadge = function(points) { var badge = document.getElementById('dashboardPointsDisplay'); if (badge) badge.textContent = points || 0; };
 window.loadUserPoints = async function() { if (!currentUser) return; try { var result = await Parse.Cloud.run('getUserPoints', {}); window.updatePointsBadge(result.points || 0); } catch(e) {} };
 
-// ---- MAĞAZA ----
 window.loadStore = async function() {
     if (!currentUser) return;
     try {
@@ -10783,7 +10768,7 @@ window.completeDailyTask = async function(taskId) {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ---- TOPLULUK GÖREVLERİ (DASHBOARD) ----
+// ---- TOPLULUK GÖREVLERİ ----
 window.loadSocialTasks = async function() {
     if (!currentUser) return;
     try {
@@ -10830,7 +10815,7 @@ window.verifySocialFollow = async function(taskId) {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ---- TAKIM GÖREVLERİ (DASHBOARD) ----
+// ---- TAKIM GÖREVLERİ ----
 window.loadTeamTasks = async function() {
     if (!currentUser) return;
     var teamId = currentUser.get('teamId');
@@ -11508,10 +11493,7 @@ window.viewProfile = async function(userId) {
     } catch(e) { showNotification('Profil yüklenemedi: ' + e.message, 'error'); }
 };
 
-// ================================================================
-// ========== EBEVEYN AYARLARI (DÜZELTİLDİ) ==========
-// ================================================================
-
+// ---- EBEVEYN AYARLARI (KISALTILMIŞ) ----
 window.openParentSettings = function() {
     var modal = document.getElementById('parentSettingsModal');
     if (!modal) {
@@ -11751,7 +11733,6 @@ window.verifyParentCode = async function() {
     try {
         var result = await Parse.Cloud.run('verifyParentCode', { code: code });
         if (result.success) {
-            // Ebeveyn modu aktif, PIN gerektirmez (şifre zaten belirlendi)
             document.getElementById('parentVerificationSection').style.display = 'none';
             document.getElementById('parentCreateSection').style.display = 'none';
             document.getElementById('parentLoginSection').style.display = 'block';
@@ -11806,12 +11787,10 @@ window.loginParent = async function() {
     try {
         var settings = await Parse.Cloud.run('getParentSettings', {});
         if (settings.parent_pin) {
-            // Eski PIN sistemi varsa, şifre kontrolü yap
             if (settings.parent_pin !== password) {
                 return showNotification('❌ Şifre yanlış!', 'error');
             }
         } else {
-            // Şifre kontrolü için parent_temp_password'yi kontrol et
             if (currentUser.get('parent_temp_password') !== password) {
                 return showNotification('❌ Şifre yanlış!', 'error');
             }
@@ -11828,7 +11807,6 @@ window.loginParent = async function() {
     }
 };
 
-// ---- DİĞER EBEVEYN FONKSİYONLARI ----
 window.requestParentReset = async function() {
     if (!currentUser) return showNotification('Giriş yapın!', 'error');
     try {
@@ -12087,7 +12065,6 @@ window.loadReferralLeaderboard = async function() {
             var medals = ['🥇', '🥈', '🥉'];
             result.forEach(function(item, index) {
                 var medal = index < 3 ? medals[index] : (index + 1) + '.';
-                // Kurucu veya kullanıcının kendi hesabı ise sansürsüz, değilse sansürlü
                 var displayName = (isFounderUser || (isLoggedIn && item.email === currentUser.get('email'))) ? 
                     item.name : censorName(item.name, false);
                 var displayEmail = (isFounderUser || (isLoggedIn && item.email === currentUser.get('email'))) ? 
@@ -12519,7 +12496,6 @@ window.openAccountInfo = function() {
     modal.classList.add('open');
     modal.style.display = 'flex';
     
-    // Bilgileri doldur
     document.getElementById('accName').textContent = currentUser.get('name') || 'İsimsiz';
     document.getElementById('accEmail').textContent = currentUser.get('email');
     var role = currentUser.get('role');
@@ -12527,7 +12503,6 @@ window.openAccountInfo = function() {
     document.getElementById('accDate').textContent = new Date(currentUser.get('createdAt')).toLocaleString('tr-TR');
     document.getElementById('accLastLogin').textContent = new Date(currentUser.get('updatedAt')).toLocaleString('tr-TR');
     document.getElementById('accDevice').textContent = navigator.userAgent || 'Bilinmiyor';
-    // IP ve konum için basit tahmin
     fetch('https://api.ipify.org?format=json')
         .then(res => res.json())
         .then(data => {
