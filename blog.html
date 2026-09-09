@@ -15,12 +15,15 @@
         .back-link:hover { background: #00d4ff; color: #0a0a0a; }
         .badge { display: inline-block; background: #00d4ff22; color: #00d4ff; padding: 2px 12px; border-radius: 20px; font-size: 13px; border: 1px solid #00d4ff55; }
         hr { border: 0; height: 1px; background: #2a2a2a; margin: 30px 0; }
-        .blog-post { background: #1a1a2a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 24px; margin-bottom: 30px; }
+        .blog-post { background: #1a1a2a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 24px; margin-bottom: 30px; transition: 0.2s; }
+        .blog-post:hover { border-color: #00d4ff44; }
         .blog-post h3 { margin-top: 0; color: #00d4ff; }
         .blog-post .meta { font-size: 13px; color: #888; margin-bottom: 10px; }
         .blog-post .meta span { margin-right: 15px; }
         .blog-post p { color: #b0b8c0; }
         .category-tag { display: inline-block; background: #00d4ff22; color: #00d4ff; padding: 2px 10px; border-radius: 20px; font-size: 11px; border: 1px solid #00d4ff44; margin-right: 6px; }
+        .read-more { color: #00d4ff; text-decoration: none; font-weight: 600; border-bottom: 1px solid transparent; transition: 0.3s; display: inline-block; margin-top: 8px; }
+        .read-more:hover { border-bottom-color: #00d4ff; }
         .subscribe-box { background: #0d1a26; border: 2px solid #00d4ff; border-radius: 16px; padding: 30px; text-align: center; margin-top: 40px; }
         .subscribe-box input { padding: 14px 20px; border-radius: 40px; border: 1px solid #2a2a2a; background: #0a0a0a; color: #fff; font-size: 16px; width: 70%; margin-right: 10px; }
         .subscribe-box button { padding: 14px 30px; border-radius: 40px; background: #00d4ff; color: #0a0a0a; border: none; font-weight: 700; cursor: pointer; font-size: 16px; transition: 0.3s; }
@@ -29,9 +32,13 @@
         #subscribeMessage { margin-top: 12px; font-weight: 600; }
         .success { color: #00ff88; }
         .error { color: #ff6b6b; }
+        .legal-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a2a; font-size: 13px; color: #666; text-align: center; }
+        .legal-footer a { color: #00d4ff; text-decoration: none; }
+        .legal-footer a:hover { text-decoration: underline; }
         @media (max-width: 768px) {
             .subscribe-box input { width: 100%; margin-bottom: 10px; }
             .subscribe-box button { width: 100%; }
+            .blog-post { padding: 16px; }
         }
     </style>
 </head>
@@ -52,13 +59,13 @@
             <span>👤 Eymen</span>
             <span>🏷️ <span class="category-tag">Yapay Zeka</span> <span class="category-tag">Verimlilik</span></span>
         </div>
-        <p>Günümüz iş dünyasında zaman en değerli kaynaktır. VİZYON AI, 7 farklı yapay zeka modelini (Groq, DeepSeek, OpenAI, OpenRouter, Cohere, Cerebras, GitHub Models) tek bir platformda birleştirerek iş akışınızı kökten değiştirir. Kod yazmaktan içerik üretmeye, veri analizinden takım çalışmasına kadar her alanda size nasıl yardımcı olacağını keşfedin.</p>
+        <p>Günümüz iş dünyasında zaman en değerli kaynaktır. VİZYON AI, 7 farklı yapay zeka modelini (Groq, DeepSeek, OpenAI, OpenRouter, Cohere, Cerebras, Gemini) tek bir platformda birleştirerek iş akışınızı kökten değiştirir. Kod yazmaktan içerik üretmeye, veri analizinden takım çalışmasına kadar her alanda size nasıl yardımcı olacağını keşfedin.</p>
         <p>Örneğin, karmaşık bir Python betiği yazmak yerine VİZYON AI'ya "Python'da bir web scraper yaz" diyebilir, saniyeler içinde çalışan bir kod alabilirsiniz. Aynı şekilde, "React ile bir dashboard tasarla" dediğinizde size hazır bir bileşen yapısı sunar. Bu, yazılım geliştirme süresini %80 oranında azaltır.</p>
         <p>Ayrıca, VİZYON AI web arama özelliği ile anlık dolar kuru, hava durumu, güncel haberler gibi bilgileri size getirir. Bu sayede araştırma yapmak için saatler harcamazsınız. Takım çalışmasında ise, ekip üyelerinizle ortak projeler yürütebilir, AI'ya takım sohbetinde sorular sorabilirsiniz.</p>
         <p>Verimlilik artışı sadece hız değil, aynı zamanda kalite demektir. VİZYON AI, kod hatalarını bulup düzeltir, öneriler sunar ve en iyi uygulamaları size gösterir. Bu sayede hem daha az hata yaparsınız hem de daha temiz kod yazarsınız.</p>
         <p>Kısacası, VİZYON AI sizin kişisel asistanınız, kod yazma ortağınız ve fikir üretme motorunuzdur. Günlük iş yükünüzü hafifletir, yaratıcılığınızı ön plana çıkarır. Henüz denemediyseniz, hemen bugün ücretsiz plana kaydolun ve farkı görün!</p>
         <p><em>VİZYON AI ile üretkenliğinizin sınırlarını zorlayın.</em></p>
-        <a href="#" class="read-more" style="color:#00d4ff; text-decoration:none; font-weight:600; border-bottom:1px solid transparent; transition:0.3s;" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
+        <a href="#" class="read-more" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
     </div>
 
     <!-- 2 -->
@@ -71,7 +78,7 @@
         </div>
         <p>Back4App, Parse Server tabanlı bir Backend-as-a-Service platformudur. Cloud Code, sunucu tarafında çalışan JavaScript fonksiyonlarıdır. Bu rehberde, Cloud Code kullanarak nasıl kendi API fonksiyonlarınızı yazacağınızı, test edeceğinizi ve canlıya alacağınızı adım adım anlatacağım.</p>
         <p>Öncelikle, Back4App Dashboard'da Cloud Code bölümüne gidin. `main.js` dosyasını düzenleyerek yeni fonksiyonlar ekleyebilirsiniz. Örneğin, basit bir "merhaba dünya" fonksiyonu:</p>
-        <pre style="background:#0a0a0a; padding:12px; border-radius:8px; color:#00ff88;">
+        <pre style="background:#0a0a0a; padding:12px; border-radius:8px; color:#00ff88; overflow-x:auto;">
 Parse.Cloud.define("hello", async (request) => {
     return "Merhaba, Dünya!";
 });</pre>
@@ -79,7 +86,7 @@ Parse.Cloud.define("hello", async (request) => {
         <p>Cloud Code'un en büyük avantajı, güvenli bir ortamda çalışmasıdır. API anahtarlarınızı ve hassas bilgileri istemci tarafında değil, Cloud Code içinde saklayabilirsiniz. Ayrıca, oturum kontrolü yaparak yalnızca yetkili kullanıcıların belirli fonksiyonlara erişmesini sağlayabilirsiniz.</p>
         <p>Bu rehberde, gerçek dünya örnekleriyle Cloud Code'un tüm inceliklerini öğreneceksiniz. Hata yönetimi, asenkron işlemler, veritabanı ilişkileri ve daha fazlası.</p>
         <p>Back4App Cloud Code, ölçeklenebilir ve güvenilir bir arka uç çözümüdür. Vizyon2027'nin tüm arka uç işlemleri Cloud Code üzerinden çalışmaktadır. Siz de kendi projelerinizde bu güçlü aracı kullanabilirsiniz.</p>
-        <a href="#" class="read-more" style="color:#00d4ff; text-decoration:none; font-weight:600; border-bottom:1px solid transparent; transition:0.3s;" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
+        <a href="#" class="read-more" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
     </div>
 
     <!-- 3 -->
@@ -95,7 +102,7 @@ Parse.Cloud.define("hello", async (request) => {
         <p>2027 vizyonumuz, yapay zekanın sadece büyük şirketlerin değil, bireylerin, girişimcilerin ve küçük işletmelerin de günlük hayatının bir parçası haline gelmesidir. Bu doğrultuda, eğitim içerikleri, topluluk etkinlikleri ve açık kaynak projeleriyle ekosistemi büyütüyoruz.</p>
         <p>Gelecekte, VİZYON AI'nın daha da akıllı hale gelmesi, kullanıcı ihtiyaçlarını öngörmesi ve proaktif öneriler sunması hedefleniyor. Ayrıca, mobil uygulama, donanım entegrasyonları ve oyunlaştırma gibi yeni alanlara açılmayı planlıyoruz.</p>
         <p>Siz de bu yolculuğun bir parçası olun. Birlikte, yapay zekanın sınırsız potansiyelini keşfedelim ve 2027'de dünyayı değiştirelim.</p>
-        <a href="#" class="read-more" style="color:#00d4ff; text-decoration:none; font-weight:600; border-bottom:1px solid transparent; transition:0.3s;" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
+        <a href="#" class="read-more" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
     </div>
 
     <!-- 4 -->
@@ -110,7 +117,7 @@ Parse.Cloud.define("hello", async (request) => {
         <p>Takım sohbetinde, @vizyonal komutuyla AI'ya sorular sorabilir, takım üyeleriyle fikir alışverişi yapabilirsiniz. AI, takımın geçmiş mesajlarını analiz ederek bağlama uygun cevaplar verir. Ayrıca, dosya paylaşımı, GIF gönderme ve sesli komut gibi özellikler iletişimi hızlandırır.</p>
         <p>Ortak projelerde, her takım üyesi kendi görevlerini görür, ilerlemeyi takip edebilir ve proje sahibiyle yöneticiler kontrolü elinde tutar. Sahiplik devri, üye atama ve yetkilendirme gibi işlemler kolayca yapılır.</p>
         <p>Vizyon2027, yapay zekayı takım çalışmasının merkezine koyarak, ekiplerin daha hızlı, daha organize ve daha yaratıcı olmasını sağlar. Gerçek kullanıcı deneyimlerine dayanan bu yazıda, en iyi uygulamaları ve ipuçlarını bulacaksınız.</p>
-        <a href="#" class="read-more" style="color:#00d4ff; text-decoration:none; font-weight:600; border-bottom:1px solid transparent; transition:0.3s;" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
+        <a href="#" class="read-more" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
     </div>
 
     <!-- 5 -->
@@ -125,7 +132,7 @@ Parse.Cloud.define("hello", async (request) => {
         <p>Örneğin, VİZYON AI ile müşterileriniz için otomatik kod yazabilir, web siteleri veya mobil uygulamalar geliştirebilirsiniz. Ayrıca, AI destekli içerik üretimi (blog yazısı, sosyal medya gönderisi, e-posta) ile dijital pazarlama hizmetleri sunabilirsiniz.</p>
         <p>Veri analizi ve raporlama, AI'nın en güçlü olduğu alanlardan biridir. Şirketlere, müşteri davranışlarını analiz eden, satış tahminleri yapan ve stratejik öneriler sunan AI çözümleri geliştirebilirsiniz.</p>
         <p>Vizyon2027, bu fırsatları değerlendirmeniz için size hem altyapı hem de topluluk desteği sağlar. Kendi AI tabanlı ürünlerinizi geliştirebilir, vizyon2027 pazarında satabilirsiniz. Bu yazıda, başarılı girişimcilerden ilham alacak ve harekete geçeceksiniz.</p>
-        <a href="#" class="read-more" style="color:#00d4ff; text-decoration:none; font-weight:600; border-bottom:1px solid transparent; transition:0.3s;" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
+        <a href="#" class="read-more" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
     </div>
 
     <!-- 6 -->
@@ -137,10 +144,82 @@ Parse.Cloud.define("hello", async (request) => {
             <span>🏷️ <span class="category-tag">Mobil</span> <span class="category-tag">Güncelleme</span></span>
         </div>
         <p>Vizyon2027 mobil uygulaması geliştirme sürecinde! Bu yazıda, hangi özelliklerin geleceğini, ne zaman yayınlanacağını ve beta test sürecine nasıl katılabileceğinizi tüm detaylarıyla anlatıyorum.</p>
-        <p>Mobil uygulama, web platformunun tüm özelliklerini (AI asistan, takım sohbeti, proje yönetimi, puan sistemi, mağaza, anketler, duyurular, vb.) yanınızda taşımanızı sağlayacak. Ayrıca, mobil özel özellikler (push bildirimleri, kamera entegrasyonu, konum tabanlı hizmetler) de planlanıyor.</p>
+        <p>Mobil uygulama, web platformunun tüm özelliklerini (AI asistan, takım sohbeti, proje yönetimi, puan sistemi, mağaza, anketler, duyurular, vb.) yanınızda taşımanızı sağlayacak. Ayrıca, mobil özel özellikler (push bildirimleri, kamera entegrasyonu, konum tabanlı hizmetler) da planlanıyor.</p>
         <p>Beta test sürecine katılmak için topluluk kanallarımızı takip edin. İlk 100 beta kullanıcısına özel sürpriz ödüller var. Uygulama, hem iOS hem de Android platformlarında yayınlanacak.</p>
         <p>Mobil uygulama ile yapay zeka gücü cebinizde! Tüm güncellemeleri blogdan takip edebilir, abone olarak anında haberdar olabilirsiniz.</p>
-        <a href="#" class="read-more" style="color:#00d4ff; text-decoration:none; font-weight:600; border-bottom:1px solid transparent; transition:0.3s;" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
+        <a href="#" class="read-more" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
+    </div>
+
+    <!-- 7 - YENİ: Veri Güvenliği -->
+    <div class="blog-post">
+        <h3>🔒 Veri Güvenliği ve Gizlilik Politikası</h3>
+        <div class="meta">
+            <span>📅 30 Ağustos 2026</span>
+            <span>👤 Vizyon Ekibi</span>
+            <span>🏷️ <span class="category-tag">Güvenlik</span> <span class="category-tag">Yasal</span></span>
+        </div>
+        <p>Vizyon2027 olarak, kullanıcılarımızın verilerinin güvenliği bizim için en önemli önceliktir. Bu yazıda, hangi verileri topladığımızı, nasıl kullandığımızı ve hangi haklara sahip olduğunuzu şeffaf bir şekilde açıklıyoruz.</p>
+        <p><strong>Toplanan Veriler:</strong> E-posta adresi, kullanıcı adı, AI sorguları, takım mesajları, cihaz bilgileri (cihaz modeli, işletim sistemi).</p>
+        <p><strong>Toplanmayan Veriler:</strong> Konum (yalnızca IP adresi, konum bilgisi toplanmaz), fotoğraflar, rehber, SMS, arama kayıtları, biyometrik veriler, finansal bilgiler. Bu veriler <strong>kesinlikle toplanmaz</strong>.</p>
+        <p><strong>Veri Kullanımı:</strong> Toplanan veriler, yalnızca hizmet kalitesini artırmak, size özel deneyim sunmak ve platformu geliştirmek için kullanılır.</p>
+        <p><strong>Veri Paylaşımı:</strong> Hiçbir 3. tarafla paylaşılmaz, satılmaz veya kiralanmaz.</p>
+        <p><strong>Veri Saklama:</strong> Hesabınız aktif olduğu sürece verileriniz saklanır. Hesap silindiğinde, tüm verileriniz kalıcı olarak yok edilir.</p>
+        <p><strong>Kullanıcı Hakları:</strong> KVKK ve GDPR kapsamında, verilerinize erişme, düzeltme, silme (unutulma hakkı), işlemeye itiraz etme ve veri taşınabilirliği haklarına sahipsiniz.</p>
+        <p>Detaylı bilgi için <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a> sayfamızı ziyaret edebilirsiniz.</p>
+        <a href="#" class="read-more" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
+    </div>
+
+    <!-- 8 - YENİ: Yeni Özellikler -->
+    <div class="blog-post">
+        <h3>🛠️ Yeni Özellikler: 3D Model, Görsel Üretim, Savaş Modu</h3>
+        <div class="meta">
+            <span>📅 29 Ağustos 2026</span>
+            <span>👤 Eymen</span>
+            <span>🏷️ <span class="category-tag">Özellik</span> <span class="category-tag">Yenilik</span></span>
+        </div>
+        <p>Vizyon2027, yapay zekanın gücünü daha da ileri taşıyan yeni özelliklerle büyümeye devam ediyor. Bu yazıda, yakın zamanda eklenen <strong>3D Model Üretimi, Görsel Üretim (AI) ve Savaş Modu</strong> özelliklerini detaylıca anlatıyorum.</p>
+        <p><strong>🧊 3D Model Üretimi:</strong> Artık VİZYON AI'ya "kırmızı küp" veya "modern bir bina" gibi komutlar vererek üç boyutlu modeller oluşturabilirsiniz. Oluşturulan modelleri .glb formatında indirebilir, kendi projelerinizde kullanabilirsiniz.</p>
+        <p><strong>🖼️ Görsel Üretim:</strong> "Dağ manzarası" veya "cyberpunk şehir" gibi açıklamalarla AI destekli görseller oluşturabilirsiniz. Görseller doğrudan dashboard üzerinden oluşturulur ve indirilebilir.</p>
+        <p><strong>⚔️ Savaş Modu:</strong> İki farklı AI modelini aynı konuda karşılaştırabilirsiniz. Örneğin, "Yapay zeka tehlikeli mi?" sorusunu Groq ve DeepSeek'e sorup yanıtlarını karşılaştırabilir, hangi modelin daha iyi cevap verdiğini görebilirsiniz.</p>
+        <p>Ayrıca, <strong>Çoklu AI</strong> özelliği ile 4 farklı modele aynı soruyu sorup tüm cevapları tek ekranda görebilirsiniz. Bu özellikler, hem eğlenceli hem de öğretici deneyimler sunar.</p>
+        <p>Yeni özellikleri hemen keşfetmek için Dashboard'ınızı ziyaret edin!</p>
+        <a href="#" class="read-more" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
+    </div>
+
+    <!-- 9 - YENİ: Ebeveyn Kontrolleri -->
+    <div class="blog-post">
+        <h3>👨‍👩‍👧‍👦 Ebeveyn Kontrolleri ile Çocuğunuzu Güvende Tutun</h3>
+        <div class="meta">
+            <span>📅 28 Ağustos 2026</span>
+            <span>👤 Vizyon Ekibi</span>
+            <span>🏷️ <span class="category-tag">Ebeveyn</span> <span class="category-tag">Güvenlik</span></span>
+        </div>
+        <p>Vizyon2027, çocukların güvenliğini ön planda tutar. <strong>Ebeveyn Kontrolleri</strong> özelliği ile çocuğunuzun platformdaki etkinliklerini izleyebilir ve sınırlayabilirsiniz.</p>
+        <p><strong>Ebeveyn Hesabı Oluşturma:</strong> Ayrı bir e-posta ve şifre ile ebeveyn modunu aktifleştirin. Doğrulama kodu ebeveyn e-postasına gönderilir.</p>
+        <p><strong>Canlı Takip:</strong> Çocuğunuzun anlık aktivite durumunu görebilirsiniz.</p>
+        <p><strong>Günlük/Haftalık/Aylık Limit:</strong> Belirli bir TL limiti aşmasını engelleyerek harcamaları kontrol altında tutun.</p>
+        <p><strong>Özellik Kapatma:</strong> Sohbet, mağaza, oyun, akademi, proje, yarışma ve DM gibi özellikleri tek tek kapatabilirsiniz.</p>
+        <p><strong>Oturum Geçmişi:</strong> Çocuğun hangi cihaz ve IP'lerden giriş yaptığını görebilirsiniz.</p>
+        <p><strong>Haftalık Rapor:</strong> E-posta ile çocuğun etkinlik raporunu alabilirsiniz.</p>
+        <p>Ebeveyn kontrol ayarlarına Dashboard'da "Ebeveyn Ayarları" butonundan ulaşabilirsiniz.</p>
+        <a href="#" class="read-more" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
+    </div>
+
+    <!-- 10 - YENİ: Proje Yönetimi ve İş Akışı -->
+    <div class="blog-post">
+        <h3>📈 Vizyon2027 ile Proje Yönetimi ve İş Akışı</h3>
+        <div class="meta">
+            <span>📅 27 Ağustos 2026</span>
+            <span>👤 Eymen</span>
+            <span>🏷️ <span class="category-tag">Proje</span> <span class="category-tag">Yönetim</span></span>
+        </div>
+        <p>Vizyon2027, projelerinizi yönetmek, taleplerinizi iletmek ve iş akışınızı optimize etmek için güçlü araçlar sunar. Bu yazıda, proje yönetimi özelliklerini adım adım anlatıyorum.</p>
+        <p><strong>Proje Oluşturma (Wizard):</strong> 3D Tasarım, Kod Yazma veya Görsel Oluşturma türlerinde proje oluşturabilirsiniz. Wizard, sizi adım adım yönlendirir.</p>
+        <p><strong>Proje Talebi Oluşturma:</strong> Admin veya kurucudan bir proje talebinde bulunabilirsiniz. Talebiniz değerlendirilir ve onaylandığında proje tamamlanır.</p>
+        <p><strong>Mağazada Satış:</strong> Projelerinizi puan karşılığında satabilirsiniz. %20 komisyon kesilir, geri kalan puan size verilir.</p>
+        <p><strong>Proje Yönetimi:</strong> Favorileme, arşivleme, çöp kutusu ve kalıcı silme işlemleriyle projelerinizi düzenli tutun.</p>
+        <p>Bu özellikler, bireysel geliştiricilerden takımlara kadar her seviyede verimliliği artırır.</p>
+        <a href="#" class="read-more" onclick="alert('📖 Bu yazı yakında tam metin olarak yayınlanacak!')">Devamını Oku →</a>
     </div>
 
     <hr>
@@ -158,6 +237,25 @@ Parse.Cloud.define("hello", async (request) => {
     </div>
 
     <hr>
+
+    <!-- ===== YASAL UYARI VE TELİF ===== -->
+    <div class="legal-footer">
+        <p>
+            <strong>© 2026 Vizyon2027</strong> – Tüm Hakları Saklıdır.<br>
+            Bu blog içeriği ve platformdaki tüm kodlar, tasarımlar, metinler ve grafikler <strong>Vizyon2027 Ekibi</strong>'nin mülkiyetindedir.<br>
+            Uluslararası telif hakkı, marka ve fikri mülkiyet yasaları tarafından korunmaktadır.<br>
+            İzinsiz kullanım, kopyalama, dağıtım veya türev çalışma oluşturma <strong>kesinlikle yasaktır</strong> ve yasal yaptırımlara tabidir.<br>
+            <span style="color:#ff6b6b;">⚠️ YASAL UYARI:</span> Bu platformda üretilen tüm AI çıktıları bilgilendirme amaçlıdır. Kullanıcı, bu çıktıları kendi sorumluluğunda kullanır. Vizyon2027, olası zararlardan sorumlu değildir.
+        </p>
+        <p style="margin-top:8px;">
+            <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a> &nbsp;|&nbsp;
+            <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">Kullanıcı Sözleşmesi</a> &nbsp;|&nbsp;
+            <a href="https://vizyon2026.vercel.app/bana-ogret.html" target="_blank">Bana Öğret</a> &nbsp;|&nbsp;
+            <a href="https://vizyon2026.vercel.app/api.html" target="_blank">API Dokümantasyonu</a>
+        </p>
+    </div>
+
+    <hr>
     <a href="index.html" class="back-link">⬅️ Ana Sayfaya Dön</a>
 </div>
 
@@ -168,27 +266,24 @@ Parse.Cloud.define("hello", async (request) => {
         const msgDiv = document.getElementById('subscribeMessage');
         const email = emailInput.value.trim();
 
-        // Boş kontrol
         if (!email) {
             msgDiv.innerHTML = '<span class="error">⚠️ Lütfen e-posta adresinizi girin.</span>';
             return;
         }
 
-        // Basit e-posta format kontrolü
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             msgDiv.innerHTML = '<span class="error">⚠️ Geçerli bir e-posta adresi girin (örnek: kullanici@domain.com).</span>';
             return;
         }
 
-        // Back4App Cloud Code'a abone kaydı gönder
         try {
             const result = await Parse.Cloud.run('subscribeToBlog', { email: email });
             if (result.success) {
                 msgDiv.innerHTML = '<span class="success">✅ Başarıyla abone oldunuz! Yeni yazılardan haberdar olacaksınız.</span>';
                 emailInput.value = '';
             } else {
-                msgDiv.innerHTML = '<span class="error">❌ ' + result.error + '</span>';
+                msgDiv.innerHTML = '<span class="error">❌ ' + (result.error || 'Bilinmeyen bir hata oluştu.') + '</span>';
             }
         } catch (error) {
             console.error('Abone olma hatası:', error);
@@ -197,10 +292,9 @@ Parse.Cloud.define("hello", async (request) => {
     });
 </script>
 
-<!-- Parse SDK (Back4App için) -->
+<!-- Parse SDK -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/parse/5.0.0/parse.min.js"></script>
 <script>
-    // Back4App başlatma (bu kısım zaten index.html'de var, ama blog sayfası için de ekleyelim)
     Parse.initialize(
         "ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8",
         "mur4DtLsGOsQhykTnFVNGxYOeNbvjPbAkl6xPQGp"
