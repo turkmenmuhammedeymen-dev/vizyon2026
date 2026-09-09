@@ -107,7 +107,7 @@
         .messages-container {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             max-height: 600px;
             overflow-y: auto;
             padding-right: 8px;
@@ -129,21 +129,20 @@
         .message-item {
             display: flex;
             flex-direction: column;
-            max-width: 80%;
             padding: 12px 18px;
             border-radius: 16px;
             transition: background 0.2s;
+            max-width: 80%;
+            word-break: break-word;
         }
         .message-item.user {
             align-self: flex-end;
-            background: rgba(0, 212, 255, 0.08);
-            border-bottom-right-radius: 4px;
+            background: rgba(0, 212, 255, 0.12);
             border-left: 3px solid #00d4ff;
         }
         .message-item.ai {
             align-self: flex-start;
-            background: rgba(0, 255, 136, 0.05);
-            border-bottom-left-radius: 4px;
+            background: rgba(0, 255, 136, 0.08);
             border-left: 3px solid #00ff88;
         }
         .message-item:hover {
@@ -154,27 +153,19 @@
             font-size: 14px;
             margin-bottom: 2px;
         }
-        .message-item.user .message-sender {
-            color: #00d4ff;
-            text-align: right;
-        }
-        .message-item.ai .message-sender {
-            color: #00ff88;
-        }
         .message-sender .time {
             font-weight: 400;
             color: #5a7a8a;
             font-size: 11px;
             margin-left: 10px;
         }
+        .message-sender.user-sender { color: #00d4ff; }
+        .message-sender.ai-sender { color: #00ff88; }
         .message-text {
             font-size: 15px;
             color: #e8f0f8;
             word-break: break-word;
             white-space: pre-wrap;
-        }
-        .message-item.user .message-text {
-            text-align: right;
         }
         .message-file {
             margin-top: 6px;
@@ -189,9 +180,6 @@
             color: #00d4ff;
             transition: background 0.2s;
             width: fit-content;
-        }
-        .message-item.user .message-file {
-            align-self: flex-end;
         }
         .message-file:hover {
             background: rgba(0, 212, 255, 0.15);
@@ -244,7 +232,7 @@
             .header { flex-direction: column; align-items: flex-start; gap: 10px; }
             .logo-text { font-size: 18px; }
             .chat-title { font-size: 20px; }
-            .message-item { max-width: 90%; padding: 10px 14px; }
+            .message-item { padding: 10px 14px; max-width: 90%; }
             .message-text { font-size: 14px; }
         }
         @media (max-width: 480px) {
@@ -255,7 +243,7 @@
             .back-link { font-size: 12px; padding: 6px 14px; }
             .chat-title { font-size: 18px; }
             .chat-subtitle { font-size: 12px; }
-            .message-item { max-width: 95%; padding: 8px 12px; }
+            .message-item { padding: 8px 12px; max-width: 95%; }
             .message-sender { font-size: 13px; }
             .message-text { font-size: 13px; }
             .message-file { font-size: 12px; padding: 3px 10px; }
@@ -377,13 +365,11 @@
                     const time = msg.createdAt ? formatTime(msg.createdAt) : '';
                     const isAI = msg.isAI || false;
 
-                    // Eğer isAI true ise AI mesajı, değilse kullanıcı mesajı
                     const cls = isAI ? 'ai' : 'user';
-                    // AI ise "🧠 VİZYON AI" göster, değilse normal isim
-                    const displayName = isAI ? '🧠 VİZYON AI' : sender;
+                    const senderCls = isAI ? 'ai-sender' : 'user-sender';
 
                     html += `<div class="message-item ${cls}">`;
-                    html += `<div class="message-sender">${displayName} <span class="time">${time}</span></div>`;
+                    html += `<div class="message-sender ${senderCls}">${sender} <span class="time">${time}</span></div>`;
                     html += `<div class="message-text">${text}</div>`;
 
                     if (file) {
