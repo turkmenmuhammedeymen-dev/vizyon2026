@@ -3,136 +3,387 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İletişim - Vizyon2027</title>
+    <title>İletişim – Vizyon2027</title>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0a0a0a; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; line-height: 1.7; }
-        .container { max-width: 1000px; margin: 0 auto; background: #141414; padding: 40px; border-radius: 16px; border: 1px solid #2a2a2a; }
-        h1 { color: #00d4ff; font-size: 32px; border-bottom: 2px solid #00d4ff; padding-bottom: 15px; }
-        h2 { color: #00d4ff; font-size: 22px; margin-top: 35px; border-left: 4px solid #00d4ff; padding-left: 15px; }
-        p, li { color: #c8d0d8; font-size: 15px; }
-        ul { padding-left: 25px; }
+        .container { max-width: 1100px; margin: 0 auto; background: #141414; padding: 40px; border-radius: 20px; border: 1px solid #2a2a2a; box-shadow: 0 0 60px rgba(0,212,255,0.05); }
+        
+        .lang-selector { display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
+        .lang-btn { padding: 8px 20px; border-radius: 40px; border: 2px solid #2a2a2a; background: transparent; color: #aaa; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .lang-btn:hover { border-color: #00d4ff; color: #00d4ff; }
+        .lang-btn.active { border-color: #00d4ff; background: #00d4ff22; color: #00d4ff; }
+        .lang-content { display: none; }
+        .lang-content.active { display: block; }
+        
+        h1 { color: #00d4ff; font-size: 36px; border-bottom: 3px solid #00d4ff; padding-bottom: 18px; font-family: 'Syne', sans-serif; }
+        h2 { color: #00d4ff; font-size: 28px; margin-top: 45px; border-left: 6px solid #00d4ff; padding-left: 20px; font-family: 'Syne', sans-serif; }
+        h3 { color: #a0c4e0; font-size: 20px; margin-top: 20px; }
+        p, li { color: #c8d0d8; font-size: 16px; margin-bottom: 10px; }
+        ul { padding-left: 28px; }
         li { margin-bottom: 8px; }
-        .back-link { display: inline-block; margin-top: 30px; color: #00d4ff; text-decoration: none; border: 1px solid #00d4ff; padding: 10px 20px; border-radius: 30px; transition: 0.3s; }
-        .back-link:hover { background: #00d4ff; color: #0a0a0a; }
-        .badge { display: inline-block; background: #00d4ff22; color: #00d4ff; padding: 2px 12px; border-radius: 20px; font-size: 13px; border: 1px solid #00d4ff55; }
-        hr { border: 0; height: 1px; background: #2a2a2a; margin: 30px 0; }
-        .contact-card { background: #1a1a2a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; transition: 0.3s; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-        .contact-card:hover { border-color: #00d4ff; transform: translateY(-2px); }
-        .contact-card .icon { font-size: 40px; width: 60px; text-align: center; }
+        .back-link { display: inline-block; margin-top: 30px; color: #00d4ff; text-decoration: none; border: 2px solid #00d4ff; padding: 12px 32px; border-radius: 40px; transition: 0.3s; font-weight: 600; font-size: 16px; }
+        .back-link:hover { background: #00d4ff; color: #0a0a0a; box-shadow: 0 0 40px rgba(0,212,255,0.3); }
+        .badge { display: inline-block; background: #00d4ff22; color: #00d4ff; padding: 4px 16px; border-radius: 30px; font-size: 14px; border: 1px solid #00d4ff55; margin-right: 8px; margin-bottom: 6px; }
+        hr { border: 0; height: 1px; background: #2a2a2a; margin: 45px 0; }
+        
+        .highlight-box { background: #1a1a2a; border-left: 6px solid #00ff88; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
+        .important-box { background: #1a0a0a; border-left: 6px solid #ff6b6b; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
+        
+        .contact-card { background: #1a1a2a; border: 1px solid #2a2a2a; border-radius: 16px; padding: 24px; margin-bottom: 24px; transition: 0.3s; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+        .contact-card:hover { border-color: #00d4ff; transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,212,255,0.08); }
+        .contact-card .icon { font-size: 48px; width: 70px; text-align: center; }
+        .contact-card .info { flex: 1; }
         .contact-card .info h3 { margin: 0 0 4px 0; color: #00d4ff; }
         .contact-card .info p { margin: 0; color: #b0b8c0; }
         .contact-card .info a { color: #00d4ff; text-decoration: none; font-weight: 600; }
         .contact-card .info a:hover { text-decoration: underline; }
-        .social-btn { display: inline-block; padding: 10px 24px; border-radius: 30px; font-weight: 700; text-decoration: none; transition: 0.3s; margin-right: 10px; }
+        
+        .social-btn { display: inline-block; padding: 10px 24px; border-radius: 30px; font-weight: 700; text-decoration: none; transition: 0.3s; margin-right: 10px; margin-top: 6px; }
         .social-btn.instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: #fff; border: 1px solid #dc2743; }
         .social-btn.whatsapp { background: #25D366; color: #fff; border: 1px solid #25D366; }
         .social-btn.email { background: #00d4ff; color: #0a0a0a; border: 1px solid #00d4ff; }
-        .social-btn:hover { transform: scale(1.05); }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
-        .highlight-box { background: #1a1a2a; border-left: 4px solid #00ff88; padding: 15px 20px; margin: 20px 0; border-radius: 8px; }
+        .social-btn.support { background: #a855f7; color: #fff; border: 1px solid #a855f7; }
+        .social-btn.founder { background: #ffd700; color: #0a0a0a; border: 1px solid #ffd700; }
+        .social-btn:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 20px 0; }
+        .info-card { background: #1a1a2a; border-radius: 12px; padding: 20px; border: 1px solid #2a2a2a; }
+        .info-card h4 { color: #00d4ff; margin-top: 0; }
+        
+        .legal-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a2a; font-size: 13px; color: #666; text-align: center; }
+        .legal-footer a { color: #00d4ff; text-decoration: none; }
+        .legal-footer a:hover { text-decoration: underline; }
+        
+        @media (max-width: 768px) { .container { padding: 20px; } h1 { font-size: 28px; } h2 { font-size: 22px; } .grid-2 { grid-template-columns: 1fr; } .contact-card { flex-direction: column; text-align: center; } .contact-card .icon { width: auto; } .lang-selector { justify-content: center; } }
+        @media (max-width: 480px) { body { padding: 10px; } .container { padding: 14px; } h1 { font-size: 22px; } .social-btn { display: block; margin-right: 0; text-align: center; } }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>📬 İletişim</h1>
-    <p><span class="badge">📧 Her Zaman Ulaşabilirsiniz</span> <span class="badge" style="margin-left:10px;">⚡ Hızlı Yanıt</span></p>
+<div class="container" id="mainContainer">
 
-    <p>Vizyon2027 olarak, kullanıcılarımızla iletişimi çok önemsiyoruz. Sorularınız, önerileriniz, şikayetleriniz veya iş birliği teklifleriniz için aşağıdaki kanallardan bize ulaşabilirsiniz. En kısa sürede size dönüş yapacağız.</p>
-
-    <div class="highlight-box">
-        <strong>📢 Hızlı İletişim:</strong> Acil durumlar veya anlık sorularınız için WhatsApp kanalımızı veya Instagram hesabımızı kullanabilirsiniz. E-posta yanıt süresi genellikle 24-48 saat içindedir.
+    <!-- Dil Seçici -->
+    <div class="lang-selector">
+        <button class="lang-btn active" data-lang="tr" onclick="switchLanguage('tr')">🇹🇷 Türkçe</button>
+        <button class="lang-btn" data-lang="en" onclick="switchLanguage('en')">🇬🇧 English</button>
+        <button class="lang-btn" data-lang="ar" onclick="switchLanguage('ar')">🇸🇦 العربية</button>
     </div>
 
-    <hr>
+    <!-- TÜRKÇE -->
+    <div id="lang-tr" class="lang-content active">
+        <h1>📬 İletişim</h1>
+        <p><span class="badge">📧 Her Zaman Ulaşabilirsiniz</span> <span class="badge" style="margin-left:10px;">⚡ Hızlı Yanıt</span></p>
+        <p>Vizyon2027 olarak, kullanıcılarımızla iletişimi çok önemsiyoruz. Sorularınız, önerileriniz, şikayetleriniz veya iş birliği teklifleriniz için aşağıdaki kanallardan bize ulaşabilirsiniz. En kısa sürede size dönüş yapacağız.</p>
 
-    <h2>📨 İletişim Kanalları</h2>
-
-    <!-- ===== E-POSTA ===== -->
-    <div class="contact-card">
-        <div class="icon">📧</div>
-        <div class="info">
-            <h3>E-posta</h3>
-            <p>Genel iletişim, destek, iş birliği ve geri bildirimler için:</p>
-            <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a>
-            <br><br>
-            <a href="mailto:vizyon2027.info@gmail.com" class="social-btn email">📩 E-posta Gönder</a>
+        <div class="highlight-box">
+            <strong>📢 Hızlı İletişim:</strong> Acil durumlar veya anlık sorularınız için WhatsApp kanalımızı veya Instagram hesabımızı kullanabilirsiniz. E-posta yanıt süresi genellikle 24-48 saat içindedir.
         </div>
-    </div>
 
-    <!-- ===== WHATSAPP KANALI ===== -->
-    <div class="contact-card">
-        <div class="icon">💬</div>
-        <div class="info">
-            <h3>WhatsApp Kanalı</h3>
-            <p>Anlık duyurular, güncellemeler ve topluluk iletişimi için WhatsApp kanalımıza katılın:</p>
-            <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank">WhatsApp Kanalımıza Katıl</a>
-            <br><br>
-            <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" class="social-btn whatsapp">💬 WhatsApp Kanalı</a>
+        <hr>
+
+        <h2>📨 İletişim Kanalları</h2>
+
+        <div class="contact-card">
+            <div class="icon">📧</div>
+            <div class="info">
+                <h3>E-posta</h3>
+                <p>Genel iletişim, destek, iş birliği ve geri bildirimler için:</p>
+                <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a><br><br>
+                <a href="mailto:vizyon2027.info@gmail.com" class="social-btn email">📩 E-posta Gönder</a>
+            </div>
         </div>
-    </div>
 
-    <!-- ===== INSTAGRAM ===== -->
-    <div class="contact-card">
-        <div class="icon">📸</div>
-        <div class="info">
-            <h3>Instagram</h3>
-            <p>Güncel paylaşımlar, görsel içerikler ve etkileşim için Instagram hesabımızı takip edin:</p>
-            <a href="https://www.instagram.com/vizyon2027.info?igsh=MXcxNnR2anQ2aW1rNA==" target="_blank">@vizyon2027.info</a>
-            <br><br>
-            <a href="https://www.instagram.com/vizyon2027.info?igsh=MXcxNnR2anQ2aW1rNA==" target="_blank" class="social-btn instagram">📸 Instagram</a>
+        <div class="contact-card">
+            <div class="icon">💬</div>
+            <div class="info">
+                <h3>WhatsApp Kanalı</h3>
+                <p>Anlık duyurular, güncellemeler ve topluluk iletişimi için:</p>
+                <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank">WhatsApp Kanalımıza Katıl</a><br><br>
+                <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" class="social-btn whatsapp">💬 WhatsApp Kanalı</a>
+            </div>
         </div>
-    </div>
 
-    <hr>
-
-    <h2>📋 Ne Zaman Hangi Kanadı Kullanmalı?</h2>
-    <div class="grid-2">
-        <div style="background:#1a1a2a; border-radius:8px; padding:16px;">
-            <h3 style="color:#00d4ff; margin-top:0;">📧 E-posta</h3>
-            <ul>
-                <li>🔹 Uzun ve detaylı sorular</li>
-                <li>🔹 İş birliği ve ortaklık teklifleri</li>
-                <li>🔹 Resmi başvurular ve şikayetler</li>
-                <li>🔹 Gizlilik ve veri talepleri</li>
-            </ul>
+        <div class="contact-card">
+            <div class="icon">📸</div>
+            <div class="info">
+                <h3>Instagram</h3>
+                <p>Güncel paylaşımlar, görsel içerikler ve etkileşim için:</p>
+                <a href="https://www.instagram.com/vizyon2027.info" target="_blank">@vizyon2027.info</a><br><br>
+                <a href="https://www.instagram.com/vizyon2027.info" target="_blank" class="social-btn instagram">📸 Instagram</a>
+            </div>
         </div>
-        <div style="background:#1a1a2a; border-radius:8px; padding:16px;">
-            <h3 style="color:#00d4ff; margin-top:0;">💬 WhatsApp / Instagram</h3>
-            <ul>
-                <li>🔹 Hızlı sorular ve anlık geri bildirim</li>
-                <li>🔹 Topluluk etkileşimi</li>
-                <li>🔹 Duyurular ve güncellemeler</li>
-                <li>🔹 Sosyal etkinlikler ve kampanyalar</li>
-            </ul>
+
+        <div class="contact-card">
+            <div class="icon">🤖</div>
+            <div class="info">
+                <h3>📢 Vizyon Destek (AI Asistan)</h3>
+                <p>Platform içinden canlı AI desteği almak için Dashboard'daki "Vizyon Destek" butonunu kullanın veya doğrudan tıklayın.</p>
+                <button onclick="window.openVizyonSupport && window.openVizyonSupport(); window.location.href='index.html';" class="social-btn support">🤖 Vizyon Destek</button>
+            </div>
         </div>
+
+        <div class="contact-card">
+            <div class="icon">👑</div>
+            <div class="info">
+                <h3>Kurucu ile İletişim</h3>
+                <p>Doğrudan kurucuya iletmek istediğiniz özel mesajlar için:</p>
+                <button onclick="window.contactFounder && window.contactFounder();" class="social-btn founder">👑 Kurucuya Mesaj Gönder</button>
+            </div>
+        </div>
+
+        <hr>
+
+        <h2>📋 Ne Zaman Hangi Kanadı Kullanmalı?</h2>
+        <div class="grid-2">
+            <div class="info-card"><h4>📧 E-posta</h4><ul><li>🔹 Uzun ve detaylı sorular</li><li>🔹 İş birliği ve ortaklık teklifleri</li><li>🔹 Resmi başvurular ve şikayetler</li><li>🔹 Gizlilik ve veri talepleri (KVKK/GDPR)</li></ul></div>
+            <div class="info-card"><h4>💬 WhatsApp / Instagram</h4><ul><li>🔹 Hızlı sorular ve anlık geri bildirim</li><li>🔹 Topluluk etkileşimi</li><li>🔹 Duyurular ve güncellemeler</li><li>🔹 Sosyal etkinlikler ve kampanyalar</li></ul></div>
+        </div>
+
+        <hr>
+
+        <h2>🕒 Yanıt Süreleri</h2>
+        <ul>
+            <li><strong>E-posta Yanıt Süresi:</strong> 24-48 saat (hafta içi)</li>
+            <li><strong>WhatsApp / Instagram Yanıt Süresi:</strong> 1-4 saat (aktif saatlerde)</li>
+            <li><strong>Vizyon Destek (AI):</strong> Anında (7/24)</li>
+            <li><strong>Resmi Tatiller:</strong> Yanıt süreleri uzayabilir, anlayışınız için teşekkür ederiz.</li>
+        </ul>
+
+        <div class="important-box">
+            <strong>⚠️ Önemli Not:</strong> Spam, taciz veya uygunsuz içerik içeren mesajlar dikkate alınmayacak ve gerekli durumlarda yasal işlem başlatılacaktır. Lütfen iletişim kurarken saygılı ve yapıcı olun.
+        </div>
+
+        <hr>
+        <a href="index.html" class="back-link">⬅️ Ana Sayfaya Dön</a>
     </div>
 
-    <hr>
+    <!-- ENGLISH -->
+    <div id="lang-en" class="lang-content">
+        <h1>📬 Contact Us</h1>
+        <p><span class="badge">📧 Always Reachable</span> <span class="badge" style="margin-left:10px;">⚡ Fast Response</span></p>
+        <p>At Vizyon2027, we value communication with our users. You can reach us via the channels below for your questions, suggestions, complaints, or collaboration proposals. We will get back to you as soon as possible.</p>
 
-    <h2>📞 Diğer Bağlantılar</h2>
-    <ul>
-        <li><strong>🌐 Web Sitemiz:</strong> <a href="https://vizyon2026.vercel.app" style="color:#00d4ff;">https://vizyon2026.vercel.app</a></li>
-        <li><strong>📖 Yardım ve Rehber:</strong> Ana sayfadaki "Bana Öğret" butonu ile rehber sayfamıza ulaşabilirsiniz.</li>
-        <li><strong>👑 Kurucu ile İletişim:</strong> Dashboard'daki "Kurucu ile İletişime Geç" butonu ile doğrudan kurucumuza mesaj gönderebilirsiniz.</li>
-        <li><strong>📢 Vizyon Destek:</strong> Dashboard'daki "Vizyon Destek" butonu ile AI destek asistanımıza soru sorabilirsiniz.</li>
-    </ul>
+        <div class="highlight-box">
+            <strong>📢 Quick Contact:</strong> For urgent matters or instant questions, you can use our WhatsApp channel or Instagram account. Email response time is typically 24-48 hours.
+        </div>
 
-    <hr>
+        <hr>
 
-    <h2>🕒 Çalışma Saatleri ve Yanıt Süreleri</h2>
-    <ul>
-        <li><strong>E-posta Yanıt Süresi:</strong> 24-48 saat (hafta içi)</li>
-        <li><strong>WhatsApp / Instagram Yanıt Süresi:</strong> 1-4 saat (aktif saatlerde)</li>
-        <li><strong>Resmi Tatiller:</strong> Yanıt süreleri uzayabilir, sabrınız için teşekkür ederiz.</li>
-    </ul>
+        <h2>📨 Contact Channels</h2>
 
-    <div class="highlight-box">
-        <strong>⚠️ Önemli Not:</strong> Spam, taciz veya uygunsuz içerik içeren mesajlar dikkate alınmayacak ve gerekli durumlarda yasal işlem başlatılacaktır. Lütfen iletişim kurarken saygılı ve yapıcı olun.
+        <div class="contact-card">
+            <div class="icon">📧</div>
+            <div class="info">
+                <h3>Email</h3>
+                <p>For general communication, support, collaboration, and feedback:</p>
+                <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a><br><br>
+                <a href="mailto:vizyon2027.info@gmail.com" class="social-btn email">📩 Send Email</a>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <div class="icon">💬</div>
+            <div class="info">
+                <h3>WhatsApp Channel</h3>
+                <p>For instant announcements, updates, and community communication:</p>
+                <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank">Join our WhatsApp Channel</a><br><br>
+                <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" class="social-btn whatsapp">💬 WhatsApp Channel</a>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <div class="icon">📸</div>
+            <div class="info">
+                <h3>Instagram</h3>
+                <p>For latest posts, visual content, and interaction:</p>
+                <a href="https://www.instagram.com/vizyon2027.info" target="_blank">@vizyon2027.info</a><br><br>
+                <a href="https://www.instagram.com/vizyon2027.info" target="_blank" class="social-btn instagram">📸 Instagram</a>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <div class="icon">🤖</div>
+            <div class="info">
+                <h3>📢 Vision Support (AI Assistant)</h3>
+                <p>Use the "Vision Support" button in the Dashboard for live AI support within the platform.</p>
+                <button onclick="window.openVizyonSupport && window.openVizyonSupport(); window.location.href='index.html';" class="social-btn support">🤖 Vision Support</button>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <div class="icon">👑</div>
+            <div class="info">
+                <h3>Contact Founder</h3>
+                <p>For special messages you want to send directly to the founder:</p>
+                <button onclick="window.contactFounder && window.contactFounder();" class="social-btn founder">👑 Send Message to Founder</button>
+            </div>
+        </div>
+
+        <hr>
+
+        <h2>📋 When to Use Which Channel?</h2>
+        <div class="grid-2">
+            <div class="info-card"><h4>📧 Email</h4><ul><li>🔹 Long and detailed questions</li><li>🔹 Collaboration and partnership proposals</li><li>🔹 Formal applications and complaints</li><li>🔹 Privacy and data requests (KVKK/GDPR)</li></ul></div>
+            <div class="info-card"><h4>💬 WhatsApp / Instagram</h4><ul><li>🔹 Quick questions and instant feedback</li><li>🔹 Community interaction</li><li>🔹 Announcements and updates</li><li>🔹 Social events and campaigns</li></ul></div>
+        </div>
+
+        <hr>
+
+        <h2>🕒 Response Times</h2>
+        <ul>
+            <li><strong>Email Response Time:</strong> 24-48 hours (weekdays)</li>
+            <li><strong>WhatsApp / Instagram Response Time:</strong> 1-4 hours (active hours)</li>
+            <li><strong>Vision Support (AI):</strong> Instant (24/7)</li>
+            <li><strong>Public Holidays:</strong> Response times may be longer, thank you for your understanding.</li>
+        </ul>
+
+        <div class="important-box">
+            <strong>⚠️ Important Note:</strong> Messages containing spam, harassment, or inappropriate content will not be considered and legal action may be taken if necessary. Please be respectful and constructive when contacting us.
+        </div>
+
+        <hr>
+        <a href="index.html" class="back-link">⬅️ Back to Home</a>
     </div>
 
-    <hr>
-    <a href="index.html" class="back-link">⬅️ Ana Sayfaya Dön</a>
+    <!-- ARAPÇA -->
+    <div id="lang-ar" class="lang-content" dir="rtl">
+        <h1>📬 اتصل بنا</h1>
+        <p><span class="badge">📧 يمكنك الوصول إلينا دائمًا</span> <span class="badge" style="margin-left:10px;">⚡ رد سريع</span></p>
+        <p>في فيجن 2027، نولي أهمية كبيرة للتواصل مع مستخدمينا. يمكنك التواصل معنا عبر القنوات أدناه لأسئلتك أو اقتراحاتك أو شكواك أو عروض التعاون. سوف نرد عليك في أقرب وقت ممكن.</p>
+
+        <div class="highlight-box">
+            <strong>📢 تواصل سريع:</strong> للطلبات العاجلة أو الأسئلة الفورية، يمكنك استخدام قناة واتساب أو حساب إنستغرام. وقت الرد على البريد الإلكتروني عادة ما يكون من 24 إلى 48 ساعة.
+        </div>
+
+        <hr>
+
+        <h2>📨 قنوات التواصل</h2>
+
+        <div class="contact-card">
+            <div class="icon">📧</div>
+            <div class="info">
+                <h3>البريد الإلكتروني</h3>
+                <p>للتواصل العام والدعم والتعاون والملاحظات:</p>
+                <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a><br><br>
+                <a href="mailto:vizyon2027.info@gmail.com" class="social-btn email">📩 إرسال بريد إلكتروني</a>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <div class="icon">💬</div>
+            <div class="info">
+                <h3>قناة واتساب</h3>
+                <p>للإعلانات الفورية والتحديثات والتواصل المجتمعي:</p>
+                <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank">انضم إلى قناة واتساب</a><br><br>
+                <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" class="social-btn whatsapp">💬 قناة واتساب</a>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <div class="icon">📸</div>
+            <div class="info">
+                <h3>إنستغرام</h3>
+                <p>لأحدث المنشورات والمحتوى المرئي والتفاعل:</p>
+                <a href="https://www.instagram.com/vizyon2027.info" target="_blank">@vizyon2027.info</a><br><br>
+                <a href="https://www.instagram.com/vizyon2027.info" target="_blank" class="social-btn instagram">📸 إنستغرام</a>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <div class="icon">🤖</div>
+            <div class="info">
+                <h3>📢 دعم فيجن (مساعد الذكاء الاصطناعي)</h3>
+                <p>استخدم زر "دعم فيجن" في لوحة التحكم للحصول على دعم الذكاء الاصطناعي المباشر داخل المنصة.</p>
+                <button onclick="window.openVizyonSupport && window.openVizyonSupport(); window.location.href='index.html';" class="social-btn support">🤖 دعم فيجن</button>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <div class="icon">👑</div>
+            <div class="info">
+                <h3>اتصل بالمؤسس</h3>
+                <p>للرسائل الخاصة التي تريد إرسالها مباشرة إلى المؤسس:</p>
+                <button onclick="window.contactFounder && window.contactFounder();" class="social-btn founder">👑 أرسل رسالة إلى المؤسس</button>
+            </div>
+        </div>
+
+        <hr>
+
+        <h2>📋 متى تستخدم أي قناة؟</h2>
+        <div class="grid-2">
+            <div class="info-card"><h4>📧 البريد الإلكتروني</h4><ul><li>🔹 أسئلة طويلة ومفصلة</li><li>🔹 عروض التعاون والشراكة</li><li>🔹 الطلبات الرسمية والشكاوى</li><li>🔹 طلبات الخصوصية والبيانات (KVKK/GDPR)</li></ul></div>
+            <div class="info-card"><h4>💬 واتساب / إنستغرام</h4><ul><li>🔹 أسئلة سريعة وملاحظات فورية</li><li>🔹 التفاعل المجتمعي</li><li>🔹 الإعلانات والتحديثات</li><li>🔹 الفعاليات والحملات الاجتماعية</li></ul></div>
+        </div>
+
+        <hr>
+
+        <h2>🕒 أوقات الرد</h2>
+        <ul>
+            <li><strong>وقت الرد على البريد الإلكتروني:</strong> 24-48 ساعة (أيام الأسبوع)</li>
+            <li><strong>وقت الرد على واتساب / إنستغرام:</strong> 1-4 ساعات (ساعات النشاط)</li>
+            <li><strong>دعم فيجن (AI):</strong> فوري (24/7)</li>
+            <li><strong>العطلات الرسمية:</strong> قد تطول أوقات الرد، نشكركم على تفهمكم.</li>
+        </ul>
+
+        <div class="important-box">
+            <strong>⚠️ ملاحظة مهمة:</strong> لن يتم النظر في الرسائل التي تحتوي على بريد عشوائي أو مضايقة أو محتوى غير لائق، وقد يتم اتخاذ إجراءات قانونية إذا لزم الأمر. يرجى أن تكون محترمًا وبناءً عند التواصل معنا.
+        </div>
+
+        <hr>
+        <a href="index.html" class="back-link">⬅️ العودة إلى الصفحة الرئيسية</a>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="legal-footer">
+        <p>
+            <strong>© 2026 Vizyon2027</strong> – Tüm Hakları Saklıdır.<br>
+            Bu platform ve içeriği, uluslararası telif hakkı, marka ve fikri mülkiyet yasaları tarafından korunmaktadır.<br>
+            İzinsiz kullanım, kopyalama, dağıtım veya türev çalışma oluşturma <strong>kesinlikle yasaktır</strong>.<br>
+            <span style="color:#ff6b6b;">⚠️ YASAL UYARI:</span> AI çıktıları bilgilendirme amaçlıdır. Vizyon2027 olası zararlardan sorumlu değildir.
+        </p>
+        <p style="margin-top:8px;">
+            <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a> &nbsp;|&nbsp;
+            <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">Kullanıcı Sözleşmesi</a> &nbsp;|&nbsp;
+            <a href="https://vizyon2026.vercel.app/bana-ogret.html" target="_blank">Bana Öğret</a> &nbsp;|&nbsp;
+            <a href="https://vizyon2026.vercel.app/dokumantasyon.html" target="_blank">Dokümantasyon</a> &nbsp;|&nbsp;
+            <a href="https://vizyon2026.vercel.app/api.html" target="_blank">API</a> &nbsp;|&nbsp;
+            <a href="https://vizyon2026.vercel.app/blog.html" target="_blank">Blog</a> &nbsp;|&nbsp;
+            <a href="https://vizyon2026.vercel.app/hakkimizda.html" target="_blank">Hakkımızda</a>
+        </p>
+        <p style="font-size:12px; color:#555;">
+            Bu sayfa, 6698 sayılı KVKK ve GDPR'ye uygun olarak hazırlanmıştır.
+        </p>
+    </div>
+
 </div>
+
+<script>
+    function switchLanguage(lang) {
+        document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active'));
+        const target = document.getElementById('lang-' + lang);
+        if (target) target.classList.add('active');
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.lang === lang) btn.classList.add('active');
+        });
+        const container = document.getElementById('mainContainer');
+        container.style.direction = (lang === 'ar') ? 'rtl' : 'ltr';
+        localStorage.setItem('preferred_lang', lang);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedLang = localStorage.getItem('preferred_lang');
+        if (savedLang && (savedLang === 'tr' || savedLang === 'en' || savedLang === 'ar')) {
+            switchLanguage(savedLang);
+        } else {
+            switchLanguage('tr');
+        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlLang = urlParams.get('lang');
+        if (urlLang && (urlLang === 'tr' || urlLang === 'en' || urlLang === 'ar')) {
+            switchLanguage(urlLang);
+        }
+    });
+</script>
 </body>
 </html>
