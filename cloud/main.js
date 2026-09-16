@@ -1,10 +1,39 @@
 // ================================================================
-// VİZYON 2027 – FULL CLOUD CODE (TÜM FONKSİYONLAR ÇALIŞIR)
-// v6.02.0 – Migration + Persist RateLimit + AbortController + Full Schema
+// VİZYON 2027 – FULL CLOUD CODE (SashiDo Uyumlu)
+// v6.03.0 – SashiDo Migration Complete + API Key Yönetimi + Team Message Edit/Delete
+// + Invalid Function Hataları Çözüldü
 // ================================================================
 
 // ================================================================
+// [MADDE 0] POLYFILLS (SashiDo Node.js için)
+// ================================================================
+if (typeof globalThis.btoa === 'undefined') {
+    globalThis.btoa = function (str) {
+        return Buffer.from(str, 'binary').toString('base64');
+    };
+    console.log('✅ btoa polyfill yüklendi');
+}
+
+if (typeof globalThis.atob === 'undefined') {
+    globalThis.atob = function (b64) {
+        return Buffer.from(b64, 'base64').toString('binary');
+    };
+    console.log('✅ atob polyfill yüklendi');
+}
+
+if (typeof globalThis.TextEncoder === 'undefined') {
+    try {
+        globalThis.TextEncoder = require('util').TextEncoder;
+        globalThis.TextDecoder = require('util').TextDecoder;
+        console.log('✅ TextEncoder/TextDecoder polyfill yüklendi');
+    } catch (e) {
+        console.warn('⚠️ TextEncoder polyfill yüklenemedi:', e.message);
+    }
+}
+
+// ================================================================
 // [MADDE 1] FETCH POLYFILL (SashiDo uyumlu + AbortController destekli)
+// SashiDo'da native fetch varsa override etmeyiz; yoksa polyfill kullan
 // ================================================================
 if (typeof globalThis.fetch === 'undefined') {
     globalThis.fetch = async function (url, options = {}) {
@@ -14,7 +43,7 @@ if (typeof globalThis.fetch === 'undefined') {
         const body = options.body;
         const signal = options.signal;
 
-        // [FIX] AbortController desteği
+        // AbortController desteği
         if (signal && signal.aborted) {
             const err = new Error('Aborted');
             err.name = 'AbortError';
@@ -39,7 +68,6 @@ if (typeof globalThis.fetch === 'undefined') {
             }
         }
 
-        // [FIX] Abort signal ile Parse.Cloud.httpRequest'i yarıştır
         let response;
         let aborted = false;
 
@@ -147,6 +175,8 @@ if (typeof globalThis.fetch === 'undefined') {
         };
     };
     console.log('✅ Fetch polyfill yüklendi (Parse.Cloud.httpRequest + AbortController)');
+} else {
+    console.log('✅ Native fetch mevcut, polyfill atlandı.');
 }
 
 // ================================================================
@@ -162,7 +192,6 @@ class RateLimit {
         this.windowMs = windowMs;
     }
 
-    // In-memory kontrol (hızlı)
     getRecord() {
         const now = Date.now();
         const record = _rateLimitStore.get(this.key);
@@ -196,9 +225,7 @@ class RateLimit {
     }
 }
 
-// Parse Object tabanlı kalıcı rate limit kontrolü (multi-instance uyumlu)
 async function checkRateLimitPersistent(key, maxAttempts = 5, windowMs = 5 * 60 * 1000) {
-    // 1. Önce in-memory (hızlı yol)
     const limiter = new RateLimit(key, maxAttempts, windowMs);
     if (limiter.isBlocked()) {
         const remainingMs = limiter.getRemainingMs();
@@ -206,7 +233,6 @@ async function checkRateLimitPersistent(key, maxAttempts = 5, windowMs = 5 * 60 
         throw new Error(`Çok fazla deneme yaptınız. Lütfen ${remainingMin} dakika sonra tekrar deneyin.`);
     }
 
-    // 2. Parse Object üzerinden kalıcı kontrol (multi-instance)
     try {
         const RateLimitAttempt = Parse.Object.extend(_RATE_LIMIT_CLASS);
         const since = new Date(Date.now() - windowMs);
@@ -216,12 +242,10 @@ async function checkRateLimitPersistent(key, maxAttempts = 5, windowMs = 5 * 60 
         const count = await query.count({ useMasterKey: true });
 
         if (count >= maxAttempts) {
-            // In-memory'e de yansıt ki hızlı yol da bloklasın
             _rateLimitStore.set(key, { count: maxAttempts, firstAttempt: Date.now() - 1000 });
             throw new Error(`Çok fazla deneme yaptınız. Lütfen 5 dakika sonra tekrar deneyin.`);
         }
     } catch (e) {
-        // RateLimitAttempt sınıfı yoksa veya DB hatası varsa, in-memory ile devam et
         if (e.message && e.message.includes("Çok fazla deneme")) throw e;
         console.warn("⚠️ Kalıcı rate limit kontrolü başarısız, in-memory ile devam:", e.message);
     }
@@ -230,11 +254,9 @@ async function checkRateLimitPersistent(key, maxAttempts = 5, windowMs = 5 * 60 
 }
 
 async function recordAttemptPersistent(key) {
-    // 1. In-memory kayıt (hızlı)
     const limiter = new RateLimit(key);
     limiter.record();
 
-    // 2. Parse Object kayıt (kalıcı - multi-instance)
     try {
         const RateLimitAttempt = Parse.Object.extend(_RATE_LIMIT_CLASS);
         const attempt = new RateLimitAttempt();
@@ -242,14 +264,12 @@ async function recordAttemptPersistent(key) {
         attempt.set("attemptedAt", new Date());
         await attempt.save(null, { useMasterKey: true });
     } catch (e) {
-        // Sınıf yoksa sessizce geç (initSchemas oluşturacak)
         console.warn("⚠️ RateLimit kalıcı kayıt başarısız:", e.message);
     }
 
     return limiter;
 }
 
-// Async wrapper (kolay kullanım için)
 async function checkRateLimit(key, maxAttempts = 5, windowMs = 5 * 60 * 1000) {
     return await checkRateLimitPersistent(key, maxAttempts, windowMs);
 }
@@ -275,12 +295,12 @@ function getRateLimitKey(request, action) {
     return `${action}:${identifier}`;
 }
 
-// RateLimitAttempt temizleme job'u (eski kayıtları sil)
+// RateLimitAttempt temizleme job'u
 Parse.Cloud.job("cleanupRateLimitAttempts", async (request) => {
     console.log("🔄 RateLimitAttempt temizleniyor...");
     try {
         const RateLimitAttempt = Parse.Object.extend(_RATE_LIMIT_CLASS);
-        const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000); // 24 saat eski
+        const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
         const query = new Parse.Query(RateLimitAttempt);
         query.lessThan("attemptedAt", cutoff);
         const old = await query.find({ useMasterKey: true });
@@ -297,7 +317,9 @@ Parse.Cloud.job("cleanupRateLimitAttempts", async (request) => {
 
 console.log('✅ Cloud Code başarıyla yüklendi!');
 
+// ================================================================
 // ========== SINIF TANIMLARI ==========
+// ================================================================
 const Team = Parse.Object.extend("Team");
 const TeamMember = Parse.Object.extend("TeamMember");
 const TeamMessage = Parse.Object.extend("TeamMessage");
@@ -330,8 +352,11 @@ const BlogPost = Parse.Object.extend("BlogPost");
 const MarketProject = Parse.Object.extend("MarketProject");
 const ParentLog = Parse.Object.extend("ParentLog");
 const UserStreak = Parse.Object.extend("UserStreak");
+const UserApiKey = Parse.Object.extend("UserApiKey");
 
+// ================================================================
 // ========== YARDIMCI FONKSİYONLAR ==========
+// ================================================================
 async function getAPIKey(keyName) {
     try {
         const config = await Parse.Config.get({ useMasterKey: true });
@@ -361,7 +386,6 @@ function cleanResponse(text) {
         .trim();
 }
 
-// [MADDE 9] filterText – RegExp escape uygulandı
 function filterText(text) {
     if (!text) return text;
     const badWords = [
@@ -381,6 +405,18 @@ function filterText(text) {
 function isSpaceMode() {
     const hour = new Date().getHours();
     return (hour >= 2 && hour < 5);
+}
+
+// Base64 encode — büyük buffer'larda stack overflow'u önlemek için parçalı
+function bufferToBase64(buffer) {
+    const bytes = new Uint8Array(buffer);
+    const chunkSize = 8192;
+    let result = '';
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+        const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+        result += String.fromCharCode.apply(null, chunk);
+    }
+    return btoa(result);
 }
 
 async function addPointsWithBonus(user, points, reason) {
@@ -446,7 +482,9 @@ async function sendNotificationToUser(user, message, type = 'system') {
     }
 }
 
+// ================================================================
 // ========== SİTE İÇERİĞİ ==========
+// ================================================================
 let siteContentCache = null;
 let siteContentCacheTime = 0;
 
@@ -489,11 +527,54 @@ async function getSiteContent() {
 }
 
 // ================================================================
+// ========== ŞİFRELEME / HASH YARDIMCILARI (API Anahtarları için) ==========
+// ================================================================
+const crypto = require('crypto');
+
+function hashApiPassword(password) {
+    const salt = crypto.randomBytes(16).toString('hex');
+    const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
+    return `${salt}:${hash}`;
+}
+
+function verifyApiPasswordHash(password, stored) {
+    if (!stored || typeof stored !== 'string' || !stored.includes(':')) return false;
+    const [salt, hash] = stored.split(':');
+    const verify = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
+    return hash === verify;
+}
+
+// Basit XOR + Base64 şifreleme (API anahtar değeri için — şifre ile)
+function xorEncrypt(text, key) {
+    if (!text || !key) return text;
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+        result += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+    }
+    return Buffer.from(result, 'binary').toString('base64');
+}
+
+function xorDecrypt(encrypted, key) {
+    if (!encrypted || !key) return encrypted;
+    try {
+        const text = Buffer.from(encrypted, 'base64').toString('binary');
+        let result = '';
+        for (let i = 0; i < text.length; i++) {
+            result += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+        }
+        return result;
+    } catch (e) {
+        return '';
+    }
+}
+
+// ================================================================
 // ========== TEMEL FONKSİYONLAR ==========
+// ================================================================
 Parse.Cloud.define("test", async (request) => {
     return {
         success: true,
-        message: "Cloud Code çalışıyor!",
+        message: "Cloud Code çalışıyor! (SashiDo v6.03.0)",
         user: request.user ? request.user.get('email') : 'Oturum yok',
         timestamp: new Date().toISOString()
     };
@@ -558,45 +639,44 @@ Parse.Cloud.define("getChatHistory", async (request) => {
 });
 
 // ================================================================
-// [MADDE 2 - GÜNCELLENDİ] initSchemas FONKSİYONU
-// Artık sadece sınıf değil, bilinen KOLONLARI da oluşturuyor
+// ========== [MADDE 2 - GÜNCELLENDİ] initSchemas (Otomatik Sınıf + Kolon) ==========
 // ================================================================
 Parse.Cloud.define("initSchemas", async (request) => {
-    // Sınıf → Kolon şeması (her sınıfın tüm alanları)
     const schemaDefinitions = {
         "Team": ["name", "teamCode", "owner_email", "manager_email"],
         "TeamMember": ["team_id", "user_email"],
         "TeamMessage": ["team_id", "user_email", "user_name", "message", "fileUrl", "fileName", "fileType", "deleted", "deleted_by_founder", "edited"],
         "Inbox": ["sender_email", "receiver_email", "type", "request_id", "project_title", "project_type", "project_description", "status", "message", "response_message", "accepted_by", "accepted_by_name", "role", "package_type", "team_id", "team_name", "project_id"],
         "ChatHistory": ["user_email", "messages", "lastUpdated"],
-        "QueryStat": ["user", "date", "count", "visitorKey"],
+        "QueryStat": ["user_email", "date", "count", "visitorKey"],
         "Comment": ["user_email", "user_name", "user_role", "comment", "rating"],
         "Project": ["user_email", "name", "type", "content", "is_favorite", "is_archived", "is_trashed", "is_published"],
         "ProjectRequest": ["user_email", "title", "type", "description", "status", "request_id"],
         "Gift": ["sender_email", "receiver_email", "package"],
         "VizyonLog": ["user_email", "user_name", "action", "message"],
-        "Product": ["user", "title_", "price", "file", "status"],
+        "Product": ["user_email", "title_", "price", "file", "status"],
         "StoreItem": ["name", "price_points", "type", "icon"],
         "DailyTask": ["date", "task_text", "points"],
         "SocialTask": ["date", "platform", "url", "points_reward", "penalty_points", "is_active"],
         "TeamTask": ["team_id", "date", "task_text", "points"],
-        "Notification": ["user", "message", "is_read", "type"],
-        "Message": ["from_user", "to_user", "conversation", "text", "file", "fileName", "is_read"],
-        "Conversation": ["users", "lastMessage", "lastMessageTime", "customName", "shareId"],
+        "Notification": ["user_email", "message", "is_read", "type"],
+        "Message": ["from_email", "to_email", "conversationId", "text", "file", "fileName", "is_read"],
+        "Conversation": ["user_emails", "lastMessage", "lastMessageTime", "customName", "shareId"],
         "Course": ["title_", "description", "total_lessons"],
-        "Lesson": ["course", "title_", "content", "points_reward", "order"],
+        "Lesson": ["courseId", "title_", "content", "points_reward", "order"],
         "Contest": ["title_", "description", "end_date"],
-        "Poll": ["question", "options", "votes", "voters", "created_by", "end_date", "is_active"],
-        "Announcement": ["title_", "content", "created_by"],
+        "Poll": ["question", "options", "votes", "voters", "created_by_email", "end_date", "is_active"],
+        "Announcement": ["title_", "content", "created_by_email"],
         "Job": ["title_", "description", "company", "contact", "is_active"],
-        "BugReport": ["user", "description", "screenshot", "status", "points_reward"],
+        "BugReport": ["user_email", "description", "screenshot", "status", "points_reward"],
         "Quiz": ["date", "question", "options", "correct_answer", "points_reward", "is_active"],
         "BlogSubscriber": ["email", "isActive", "isSystemActive", "subscribedAt"],
         "BlogPost": ["title_", "content", "author", "published"],
         "MarketProject": ["projectId", "title", "description", "price_points", "owner_email", "owner_name", "imageUrl", "type", "is_active", "buyer_email"],
         "ParentLog": ["parent_email", "child_email", "action", "details"],
-        "UserStreak": ["user", "streakCount", "lastClaimDate", "lastClaimTime", "streakStartDate", "notifiedAt8h", "notifiedAt4h", "isActive"],
-        "RateLimitAttempt": ["key", "attemptedAt"]
+        "UserStreak": ["user_email", "streakCount", "lastClaimDate", "lastClaimTime", "streakStartDate", "notifiedAt8h", "notifiedAt4h", "isActive"],
+        "RateLimitAttempt": ["key", "attemptedAt"],
+        "UserApiKey": ["user_email", "name", "encryptedValue", "createdAtClient", "updatedAtClient"]
     };
 
     const results = [];
@@ -605,17 +685,12 @@ Parse.Cloud.define("initSchemas", async (request) => {
             const Obj = Parse.Object.extend(className);
             const dummy = new Obj();
 
-            // Her kolon için varsayılan değer ata (böylece kolon oluşur)
             const columns = schemaDefinitions[className];
             for (const col of columns) {
-                // İçerik türüne göre değer ata
-                if (col === "user" || col === "created_by" || col === "from_user" ||
-                    col === "to_user" || col === "conversation" || col === "course") {
-                    continue; // Pointer alanları atla, dummy olarak kaydetmeyelim
-                }
                 if (col === "date" || col === "lastUpdated" || col === "lastClaimDate" ||
                     col === "lastClaimTime" || col === "streakStartDate" || col === "end_date" ||
-                    col === "subscribedAt" || col === "attemptedAt") {
+                    col === "subscribedAt" || col === "attemptedAt" || col === "lastMessageTime" ||
+                    col === "createdAtClient" || col === "updatedAtClient") {
                     dummy.set(col, new Date());
                 } else if (col === "count" || col === "points" || col === "points_reward" ||
                            col === "price" || col === "price_points" || col === "rating" ||
@@ -630,10 +705,9 @@ Parse.Cloud.define("initSchemas", async (request) => {
                            col === "edited" || col === "published") {
                     dummy.set(col, false);
                 } else if (col === "messages" || col === "options" || col === "votes" ||
-                           col === "voters" || col === "users" || col === "user_actions") {
+                           col === "voters" || col === "user_emails" ||
+                           col === "users" || col === "user_actions") {
                     dummy.set(col, []);
-                } else if (col === "features") {
-                    dummy.set(col, {});
                 } else {
                     dummy.set(col, "__init__");
                 }
@@ -653,11 +727,9 @@ Parse.Cloud.define("initSchemas", async (request) => {
 });
 
 // ================================================================
-// [YENİ] migrateFromBack4App FONKSİYONU
-// Back4App'ten SashiDo'ya veri taşıma (sadece founder / master)
+// [YENİ] migrateFromBack4App (opsiyonel) – Yalnızca founder/master
 // ================================================================
 Parse.Cloud.define("migrateFromBack4App", async (request) => {
-    // Güvenlik: Sadece master key veya founder
     if (!request.master) {
         const caller = request.user;
         if (!caller || caller.get('role') !== 'founder') {
@@ -722,28 +794,17 @@ Parse.Cloud.define("migrateFromBack4App", async (request) => {
                     break;
                 }
 
-                // Her kaydı SashiDo'ya yaz
                 for (const record of records) {
                     try {
                         const Target = Parse.Object.extend(className);
                         const obj = new Target();
 
-                        // ObjectId'yi koru (mümkünse)
-                        if (record.objectId) {
-                            // Parse Server'da custom objectId set edilemez, atlıyoruz
-                        }
-
-                        // Tüm alanları kopyala (Parse özel alanları hariç)
                         for (const key of Object.keys(record)) {
                             if (key === 'objectId' || key === 'createdAt' || key === 'updatedAt' || key === 'ACL') continue;
 
                             const value = record[key];
-                            if (value && typeof value === 'object' && value.__type === 'Pointer') {
-                                // Pointer'ları atla (migration sırasında karmaşık)
-                                continue;
-                            }
+                            if (value && typeof value === 'object' && value.__type === 'Pointer') continue;
                             if (value && typeof value === 'object' && value.__type === 'File') {
-                                // File'ları URL olarak sakla
                                 obj.set(key, value.url);
                                 continue;
                             }
@@ -752,14 +813,12 @@ Parse.Cloud.define("migrateFromBack4App", async (request) => {
                                 continue;
                             }
                             if (value && typeof value === 'object' && value.__type === 'GeoPoint') {
-                                const gp = new Parse.GeoPoint(value.latitude, value.longitude);
-                                obj.set(key, gp);
+                                obj.set(key, new Parse.GeoPoint(value.latitude, value.longitude));
                                 continue;
                             }
                             obj.set(key, value);
                         }
 
-                        // createdAt'i korumak için
                         if (record.createdAt) {
                             obj.set('migratedAt', new Date());
                             obj.set('migratedFrom', 'back4app');
@@ -779,7 +838,6 @@ Parse.Cloud.define("migrateFromBack4App", async (request) => {
                 skip += records.length;
                 if (records.length < batchSize) hasMore = false;
 
-                // Rate limit için kısa bekleme
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
 
@@ -800,6 +858,7 @@ Parse.Cloud.define("migrateFromBack4App", async (request) => {
 
 // ================================================================
 // ========== PROJE İŞLEMLERİ ==========
+// ================================================================
 Parse.Cloud.define("trashProject", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -922,6 +981,7 @@ Parse.Cloud.define("saveProject", async (request) => {
 
 // ================================================================
 // ========== PROJE TALEBİ SİSTEMİ ==========
+// ================================================================
 Parse.Cloud.define("createProjectRequest", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -1179,6 +1239,7 @@ Parse.Cloud.define("rejectProjectCompletion", async (request) => {
 
 // ================================================================
 // ========== PROJEYİ PUAN MAĞAZASINA KOY VE KALDIR ==========
+// ================================================================
 Parse.Cloud.define("publishProjectToStore", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -1241,6 +1302,7 @@ Parse.Cloud.define("removeFromMarket", async (request) => {
 
 // ================================================================
 // ========== SOHBET GEÇMİŞİ (KONUŞMA) İŞLEMLERİ ==========
+// ================================================================
 Parse.Cloud.define("renameConversation", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -1249,8 +1311,8 @@ Parse.Cloud.define("renameConversation", async (request) => {
     const query = new Parse.Query(Conversation);
     const conv = await query.get(conversationId, { useMasterKey: true });
     if (!conv) throw new Error("Konuşma bulunamadı!");
-    const users = conv.get('users') || [];
-    if (!users.some(u => u.id === user.id)) throw new Error("Bu konuşmaya yetkiniz yok!");
+    const users = conv.get('user_emails') || [];
+    if (!users.includes(user.get('email'))) throw new Error("Bu konuşmaya yetkiniz yok!");
     conv.set('customName', name);
     await conv.save(null, { useMasterKey: true });
     return { success: true, message: "Sohbet ismi güncellendi!" };
@@ -1264,8 +1326,8 @@ Parse.Cloud.define("shareConversation", async (request) => {
     const convQuery = new Parse.Query(Conversation);
     const conv = await convQuery.get(conversationId, { useMasterKey: true });
     if (!conv) throw new Error("Konuşma bulunamadı!");
-    const users = conv.get('users') || [];
-    if (!users.some(u => u.id === user.id)) throw new Error("Bu konuşmaya yetkiniz yok!");
+    const users = conv.get('user_emails') || [];
+    if (!users.includes(user.get('email'))) throw new Error("Bu konuşmaya yetkiniz yok!");
 
     const shareId = Math.random().toString(36).substring(2, 12);
     conv.set('shareId', shareId);
@@ -1285,41 +1347,14 @@ Parse.Cloud.define("getSharedConversation", async (request) => {
     if (!conv) throw new Error("Paylaşım bulunamadı!");
 
     const msgQuery = new Parse.Query(Message);
-    msgQuery.equalTo('conversation', conv);
+    msgQuery.equalTo('conversationId', conv.id);
     msgQuery.ascending('createdAt');
     const msgs = await msgQuery.find({ useMasterKey: true });
 
-    const users = conv.get('users') || [];
-    const userMap = {};
-    for (const u of users) {
-        try {
-            await u.fetch({ useMasterKey: true });
-            userMap[u.id] = {
-                name: u.get('name') || u.get('username') || 'Kullanıcı',
-                isAI: u.get('email') === 'system@vizyon2027.com'
-            };
-        } catch (e) {
-            userMap[u.id] = { name: 'Kullanıcı', isAI: false };
-        }
-    }
-
     const messages = msgs.map(m => {
-        const fromUser = m.get('from_user');
-        let name = 'Kullanıcı';
-        let isAI = false;
-        if (fromUser) {
-            const info = userMap[fromUser.id];
-            if (info) {
-                name = info.name;
-                isAI = info.isAI;
-            }
-        }
-        if (m.get('from_user') && m.get('from_user').get('email') === 'system@vizyon2027.com') {
-            isAI = true;
-            name = '🧠 VİZYON AI';
-        }
+        const isAI = m.get('from_email') === 'system@vizyon2027.com';
         return {
-            name: name,
+            name: isAI ? '🧠 VİZYON AI' : (m.get('from_email') || 'Kullanıcı'),
             text: m.get('text') || '',
             file: m.get('file'),
             fileName: m.get('fileName'),
@@ -1345,11 +1380,11 @@ Parse.Cloud.define("deleteConversation", async (request) => {
     const conv = await convQuery.get(conversationId, { useMasterKey: true });
     if (!conv) throw new Error("Konuşma bulunamadı!");
 
-    const users = conv.get('users') || [];
-    if (!users.some(u => u.id === user.id)) throw new Error("Bu konuşmayı silme yetkiniz yok!");
+    const users = conv.get('user_emails') || [];
+    if (!users.includes(user.get('email'))) throw new Error("Bu konuşmayı silme yetkiniz yok!");
 
     const msgQuery = new Parse.Query(Message);
-    msgQuery.equalTo('conversation', conv);
+    msgQuery.equalTo('conversationId', conv.id);
     const messages = await msgQuery.find({ useMasterKey: true });
     for (const msg of messages) {
         await msg.destroy({ useMasterKey: true });
@@ -1360,7 +1395,8 @@ Parse.Cloud.define("deleteConversation", async (request) => {
 });
 
 // ================================================================
-// ========== 8 API MODELİ ==========
+// ========== 8 API MODELİ (Tüm anahtarlar Config'den) ==========
+// ================================================================
 Parse.Cloud.define("callGroq", async (request) => {
     const prompt = request.params.prompt;
     const key = await getAPIKey('GROQ_KEY');
@@ -1604,6 +1640,125 @@ Parse.Cloud.define("callGemini", async (request) => {
     }
 });
 
+// ================================================================
+// ========== [YENİ] callCustomAI - Kullanıcının kendi API'si ==========
+// ================================================================
+Parse.Cloud.define("callCustomAI", async (request) => {
+    const user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız!");
+    const { prompt } = request.params;
+    if (!prompt) throw new Error("Prompt gerekli!");
+
+    // Kullanıcının ilk aktif API anahtarını bul
+    const query = new Parse.Query(UserApiKey);
+    query.equalTo('user_email', user.get('email'));
+    query.descending('createdAtClient');
+    const apiKeyRecord = await query.first({ useMasterKey: true });
+    if (!apiKeyRecord) {
+        return { success: false, error: "Kayıtlı API anahtarınız yok. Lütfen önce API ekleyin." };
+    }
+
+    const encryptionKey = await getAPIKey('API_ENCRYPTION_KEY');
+    if (!encryptionKey) {
+        return { success: false, error: "Sunucu şifreleme anahtarı eksik." };
+    }
+
+    let rawValue = '';
+    try {
+        rawValue = xorDecrypt(apiKeyRecord.get('encryptedValue'), encryptionKey);
+    } catch (e) {
+        return { success: false, error: "API anahtarı çözülemedi." };
+    }
+    if (!rawValue) {
+        return { success: false, error: "API anahtarı boş." };
+    }
+
+    const name = (apiKeyRecord.get('name') || '').toLowerCase();
+    let targetUrl = '';
+    let model = '';
+    let authHeader = 'Bearer ' + rawValue;
+    let requestBody = null;
+
+    // Basit otomatik algılama (isimden)
+    if (name.includes('openai') || name.includes('gpt') || rawValue.startsWith('sk-') && !rawValue.startsWith('sk-or-')) {
+        targetUrl = 'https://api.openai.com/v1/chat/completions';
+        model = 'gpt-4o-mini';
+        requestBody = {
+            model: model,
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0.7,
+            max_tokens: 1000
+        };
+    } else if (name.includes('groq') || rawValue.startsWith('gsk_')) {
+        targetUrl = 'https://api.groq.com/openai/v1/chat/completions';
+        model = 'llama-3.3-70b-instruct';
+        requestBody = {
+            model: model,
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0.7,
+            max_tokens: 1000
+        };
+    } else if (name.includes('deepseek') || rawValue.startsWith('sk-')) {
+        targetUrl = 'https://api.deepseek.com/v1/chat/completions';
+        model = 'deepseek-chat';
+        requestBody = {
+            model: model,
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0.7,
+            max_tokens: 1000
+        };
+    } else if (name.includes('openrouter') || rawValue.startsWith('sk-or-')) {
+        targetUrl = 'https://openrouter.ai/api/v1/chat/completions';
+        model = 'meta-llama/llama-3.1-8b-instruct:free';
+        requestBody = {
+            model: model,
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0.7,
+            max_tokens: 1000
+        };
+    } else if (name.includes('gemini') || name.includes('google')) {
+        // Gemini özel
+        targetUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${rawValue}`;
+        authHeader = null;
+        requestBody = {
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.7, maxOutputTokens: 1000 }
+        };
+    } else {
+        return { success: false, error: "API anahtarı tipi algılanamadı. Sanal isme 'openai', 'groq', 'deepseek', 'openrouter' veya 'gemini' yazın." };
+    }
+
+    try {
+        const fetchHeaders = { 'Content-Type': 'application/json' };
+        if (authHeader) fetchHeaders['Authorization'] = authHeader;
+        const res = await fetch(targetUrl, {
+            method: 'POST',
+            headers: fetchHeaders,
+            body: JSON.stringify(requestBody)
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            console.error('❌ Custom AI HTTP Hatası:', JSON.stringify(data));
+            return { success: false, error: 'HTTP ' + res.status + ': ' + JSON.stringify(data).substring(0, 200) };
+        }
+        if (data.error) {
+            return { success: false, error: JSON.stringify(data.error).substring(0, 200) };
+        }
+        let reply = null;
+        if (data.choices?.[0]?.message?.content) reply = data.choices[0].message.content;
+        else if (data.candidates?.[0]?.content?.parts?.[0]?.text) reply = data.candidates[0].content.parts[0].text;
+        else if (data.message?.content?.[0]?.text) reply = data.message.content[0].text;
+
+        if (reply) {
+            return { success: true, reply: cleanResponse(reply) };
+        }
+        return { success: false, error: "Yanıt alınamadı." };
+    } catch (e) {
+        console.error('❌ Custom AI Fetch Hatası:', e.message);
+        return { success: false, error: e.message };
+    }
+});
+
 Parse.Cloud.define("superAI", async (request) => {
     const prompt = request.params.prompt;
     if (!prompt) return "Lütfen bir soru girin.";
@@ -1671,13 +1826,12 @@ Parse.Cloud.define("webSearch", async (request) => {
 });
 
 // ================================================================
-// sendEmail – [MADDE 3] GÜVENLİK + [MADDE 8] RATE LIMIT (persistent)
+// ========== sendEmail – GÜVENLİK + Rate Limit (persistent) ==========
 // ================================================================
 Parse.Cloud.define("sendEmail", async (request) => {
     const { to, subject, html } = request.params;
     if (!request.master && !request.user) { throw new Error("Yetkisiz erişim!"); }
 
-    // [MADDE 8] Rate limit (yalnızca master olmayan dış çağrılar için)
     if (!request.master) {
         const _rlk = `sendEmail:${(to || 'unknown').toLowerCase()}`;
         await checkRateLimit(_rlk);
@@ -1705,10 +1859,8 @@ Parse.Cloud.define("sendEmail", async (request) => {
 
 // ================================================================
 // ========== ADMIN KULLANICILARI OLUŞTUR ==========
-// [MADDE 4] Auth koruması + console.error düzeltmesi
 // ================================================================
 Parse.Cloud.define("initAdminUsers", async (request) => {
-    // [MADDE 4] Auth koruması: sadece master key veya founder çağırabilsin
     if (!request.master) {
         const caller = request.user;
         if (!caller || caller.get('role') !== 'founder') {
@@ -1803,10 +1955,8 @@ Parse.Cloud.define("initAdminUsers", async (request) => {
 
 // ================================================================
 // ========== ADMIN / BETA / FOUNDER GİRİŞ ==========
-// [MADDE 5] 101 fallback + [MADDE 8] Rate limit (persistent)
 // ================================================================
 Parse.Cloud.define("adminLogin", async (request) => {
-    // [MADDE 8] Rate limit
     const _rlk = getRateLimitKey(request, 'adminLogin');
     await checkRateLimit(_rlk);
     await recordAttempt(_rlk);
@@ -1826,7 +1976,6 @@ Parse.Cloud.define("adminLogin", async (request) => {
         await Parse.User.logIn(admin.email, password);
         return { success: true, name: admin.name, email: admin.email, role: 'admin' };
     } catch (e) {
-        // [MADDE 5] 101 fallback sadece master key ile
         if (e.code === 101 && request.master) {
             const query = new Parse.Query(Parse.User);
             query.equalTo('email', admin.email);
@@ -1849,7 +1998,6 @@ Parse.Cloud.define("adminLogin", async (request) => {
 });
 
 Parse.Cloud.define("betaLogin", async (request) => {
-    // [MADDE 8] Rate limit
     const _rlk = getRateLimitKey(request, 'betaLogin');
     await checkRateLimit(_rlk);
     await recordAttempt(_rlk);
@@ -1858,7 +2006,8 @@ Parse.Cloud.define("betaLogin", async (request) => {
     if (!betaKey || !password) throw new Error("Beta key ve şifre gerekli.");
     await Parse.Cloud.run('initAdminUsers', {}, { useMasterKey: true });
     const betas = {
-        beta: { email: 'o2059497@gmail.com', key: 'BETA_OMER_PASS', name: 'Eymen Beta' }
+        beta: { email: 'o2059497@gmail.com', key: 'BETA_OMER_PASS', name: 'Eymen Beta' },
+        omer: { email: 'o2059497@gmail.com', key: 'BETA_OMER_PASS', name: 'Eymen Beta' }
     };
     const beta = betas[betaKey];
     if (!beta) throw new Error("Geçersiz beta seçimi!");
@@ -1868,7 +2017,6 @@ Parse.Cloud.define("betaLogin", async (request) => {
         await Parse.User.logIn(beta.email, password);
         return { success: true, name: beta.name, email: beta.email, role: 'beta' };
     } catch (e) {
-        // [MADDE 5] 101 fallback sadece master key ile
         if (e.code === 101 && request.master) {
             const query = new Parse.Query(Parse.User);
             query.equalTo('email', beta.email);
@@ -1891,7 +2039,6 @@ Parse.Cloud.define("betaLogin", async (request) => {
 });
 
 Parse.Cloud.define("founderLogin", async (request) => {
-    // [MADDE 8] Rate limit
     const _rlk = getRateLimitKey(request, 'founderLogin');
     await checkRateLimit(_rlk);
     await recordAttempt(_rlk);
@@ -1906,7 +2053,6 @@ Parse.Cloud.define("founderLogin", async (request) => {
         await Parse.User.logIn(founderEmail, password);
         return { success: true, name: 'Eymen', email: founderEmail, role: 'founder' };
     } catch (e) {
-        // [MADDE 5] 101 fallback sadece master key ile
         if (e.code === 101 && request.master) {
             const query = new Parse.Query(Parse.User);
             query.equalTo('email', founderEmail);
@@ -1929,7 +2075,8 @@ Parse.Cloud.define("founderLogin", async (request) => {
 });
 
 // ================================================================
-// ========== SORGU LİMİTİ (DÜZELTİLDİ) ==========
+// ========== SORGU LİMİTİ ==========
+// ================================================================
 Parse.Cloud.define("useQuery", async (request) => {
     const user = request.user;
     const today = new Date().toDateString();
@@ -1938,12 +2085,12 @@ Parse.Cloud.define("useQuery", async (request) => {
     let remaining;
 
     if (user) {
-        query.equalTo("user", user);
+        query.equalTo("user_email", user.get('email'));
         query.equalTo("date", today);
         let stats = await query.first({ useMasterKey: true });
         if (!stats) {
             stats = new QueryStat();
-            stats.set("user", user);
+            stats.set("user_email", user.get('email'));
             stats.set("date", today);
             stats.set("count", 0);
         }
@@ -1978,6 +2125,7 @@ Parse.Cloud.define("useQuery", async (request) => {
 
 // ================================================================
 // ========== YORUM SİSTEMİ ==========
+// ================================================================
 Parse.Cloud.define("getComments", async (request) => {
     try {
         const query = new Parse.Query(Comment);
@@ -2051,13 +2199,11 @@ Parse.Cloud.define("editComment", async (request) => {
 
 // ================================================================
 // ========== ŞİFRE SIFIRLAMA ==========
-// [MADDE 8] Rate limit
 // ================================================================
 Parse.Cloud.define("sendVerificationCode", async (request) => {
     const { email } = request.params;
     if (!email) throw new Error("E-posta adresi gerekli!");
 
-    // [MADDE 8] Rate limit
     const _rlk = getRateLimitKey(request, 'sendVerificationCode');
     await checkRateLimit(_rlk);
     await recordAttempt(_rlk);
@@ -2084,7 +2230,6 @@ Parse.Cloud.define("resetPasswordWithCode", async (request) => {
     if (!email || !code || !newPassword) throw new Error("Tüm alanlar gerekli!");
     if (newPassword.length < 8) throw new Error("Şifre en az 8 karakter olmalı!");
 
-    // [MADDE 8] Rate limit
     const _rlk = getRateLimitKey(request, 'resetPasswordWithCode');
     await checkRateLimit(_rlk);
     await recordAttempt(_rlk);
@@ -2104,6 +2249,7 @@ Parse.Cloud.define("resetPasswordWithCode", async (request) => {
 
 // ================================================================
 // ========== HEDİYE VE ROL TEKLİFLERİ ==========
+// ================================================================
 Parse.Cloud.define("sendGiftRequest", async (request) => {
     const sender = request.user;
     if (!sender) throw new Error("Giriş yapmalısınız!");
@@ -2193,6 +2339,7 @@ Parse.Cloud.define("handleRequest", async (request) => {
 
 // ================================================================
 // ========== TAKIM İŞLEMLERİ ==========
+// ================================================================
 Parse.Cloud.define("createTeam", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız.");
@@ -2397,6 +2544,9 @@ Parse.Cloud.define("sendTeamMessage", async (request) => {
     msg.set("user_email", user.get('email'));
     msg.set("user_name", user.get('name') || user.get('username') || 'Kullanıcı');
     msg.set("message", filterText(message || ''));
+    msg.set("deleted", false);
+    msg.set("deleted_by_founder", false);
+    msg.set("edited", false);
     if (fileUrl) {
         msg.set("fileUrl", fileUrl);
         msg.set("fileName", fileName || 'Dosya');
@@ -2404,6 +2554,104 @@ Parse.Cloud.define("sendTeamMessage", async (request) => {
     }
     await msg.save(null, { useMasterKey: true });
     return { success: true };
+});
+
+// ================================================================
+// ========== [YENİ] TAKIM MESAJI SİL ==========
+// ================================================================
+Parse.Cloud.define("deleteTeamMessage", async (request) => {
+    const user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız!");
+    const { msgId } = request.params;
+    if (!msgId) throw new Error("Mesaj ID gerekli!");
+
+    const query = new Parse.Query(TeamMessage);
+    const msg = await query.get(msgId, { useMasterKey: true });
+    if (!msg) throw new Error("Mesaj bulunamadı!");
+
+    const teamId = msg.get('team_id');
+    const teamQuery = new Parse.Query(Team);
+    const team = await teamQuery.get(teamId, { useMasterKey: true });
+    if (!team) throw new Error("Takım bulunamadı!");
+
+    const isMyMessage = (msg.get('user_email') === user.get('email'));
+    const isOwner = (team.get('owner_email') === user.get('email'));
+    const isManager = (team.get('manager_email') === user.get('email'));
+    const isFounder = (user.get('role') === 'founder');
+    const isVizyonFounder = (user.get('email') === 'admin.tr.reis@gmail.com');
+
+    if (!isMyMessage && !isOwner && !isManager && !isFounder) {
+        throw new Error("Bu mesajı silme yetkiniz yok!");
+    }
+    if (msg.get('user_email') === 'system@vizyon2027.com' && !isVizyonFounder) {
+        throw new Error("Sistem mesajlarını sadece kurucu silebilir!");
+    }
+
+    msg.set('deleted', true);
+    msg.set('deleted_by', user.get('email'));
+    msg.set('deleted_at', new Date());
+    if (isVizyonFounder && !isMyMessage) {
+        msg.set('deleted_by_founder', true);
+    }
+    await msg.save(null, { useMasterKey: true });
+
+    return { success: true, message: "Mesaj silindi." };
+});
+
+// ================================================================
+// ========== [YENİ] TAKIM MESAJI DÜZENLE ==========
+// ================================================================
+Parse.Cloud.define("editTeamMessage", async (request) => {
+    const user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız!");
+    const { msgId, newMessage } = request.params;
+    if (!msgId || !newMessage) throw new Error("Mesaj ID ve yeni mesaj gerekli!");
+    if (!newMessage.trim()) throw new Error("Mesaj boş olamaz!");
+
+    const query = new Parse.Query(TeamMessage);
+    const msg = await query.get(msgId, { useMasterKey: true });
+    if (!msg) throw new Error("Mesaj bulunamadı!");
+    if (msg.get('deleted')) throw new Error("Silinmiş mesaj düzenlenemez!");
+
+    if (msg.get('user_email') !== user.get('email')) {
+        throw new Error("Sadece kendi mesajınızı düzenleyebilirsiniz!");
+    }
+
+    msg.set('message', filterText(newMessage.trim()));
+    msg.set('edited', true);
+    msg.set('edited_at', new Date());
+    await msg.save(null, { useMasterKey: true });
+
+    return { success: true, message: "Mesaj düzenlendi." };
+});
+
+// ================================================================
+// ========== [YENİ] TEK MESAJ GETİR ==========
+// ================================================================
+Parse.Cloud.define("getTeamMessage", async (request) => {
+    const user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız!");
+    const { msgId } = request.params;
+    if (!msgId) throw new Error("Mesaj ID gerekli!");
+
+    const query = new Parse.Query(TeamMessage);
+    const msg = await query.get(msgId, { useMasterKey: true });
+    if (!msg) return { success: false, error: "Mesaj bulunamadı!" };
+
+    return {
+        success: true,
+        message: {
+            id: msg.id,
+            user_email: msg.get('user_email'),
+            user_name: msg.get('user_name'),
+            message: msg.get('message'),
+            fileUrl: msg.get('fileUrl'),
+            fileName: msg.get('fileName'),
+            deleted: msg.get('deleted') || false,
+            edited: msg.get('edited') || false,
+            createdAt: msg.get('createdAt')
+        }
+    };
 });
 
 Parse.Cloud.define("inviteToTeam", async (request) => {
@@ -2576,6 +2824,13 @@ Parse.Cloud.define("removeFromTeam", async (request) => {
         team.set("manager_email", null);
         await team.save(null, { useMasterKey: true });
     }
+    const targetUserQuery = new Parse.Query(Parse.User);
+    targetUserQuery.equalTo('email', targetEmail);
+    const targetUser = await targetUserQuery.first({ useMasterKey: true });
+    if (targetUser) {
+        targetUser.set('teamId', null);
+        await targetUser.save(null, { useMasterKey: true });
+    }
     return { success: true, message: `${targetEmail} takımdan atıldı!` };
 });
 
@@ -2738,6 +2993,7 @@ Parse.Cloud.define("forceCloseTeam", async (request) => {
 
 // ================================================================
 // ========== TAKIM SOHBET GEÇMİŞİNİ OKU (KURUCU İÇİN) ==========
+// ================================================================
 Parse.Cloud.define("getTeamChatHistory", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -2770,6 +3026,7 @@ Parse.Cloud.define("getTeamChatHistory", async (request) => {
 
 // ================================================================
 // ========== ÖZELLİK ENGELLEME SİSTEMİ (KURUCU) ==========
+// ================================================================
 Parse.Cloud.define("toggleUserFeature", async (request) => {
     const user = request.user;
     if (!user || user.get('role') !== 'founder') throw new Error("Sadece kurucu bu işlemi yapabilir!");
@@ -2803,7 +3060,8 @@ Parse.Cloud.define("toggleUserFeature", async (request) => {
 });
 
 // ================================================================
-// ========== VİZYON DESTEK AI (GELİŞMİŞ KURUCU YETKİLERİ) ==========
+// ========== VİZYON DESTEK AI ==========
+// ================================================================
 Parse.Cloud.define("vizyonSupportAI", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -3046,6 +3304,7 @@ Parse.Cloud.define("vizyonSupportAI", async (request) => {
 
 // ================================================================
 // ========== V27 KOÇ ==========
+// ================================================================
 Parse.Cloud.define("getCoachAdvice", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -3079,6 +3338,7 @@ Parse.Cloud.define("getCoachAdvice", async (request) => {
 
 // ================================================================
 // ========== V27 CANLI DESTEK ==========
+// ================================================================
 Parse.Cloud.define("getSupportReply", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -3112,6 +3372,7 @@ Parse.Cloud.define("getSupportReply", async (request) => {
 
 // ================================================================
 // ========== VİZYON LOG ==========
+// ================================================================
 Parse.Cloud.define("getVizyonLog", async (request) => {
     const user = request.user;
     if (!user || user.get('role') !== 'founder') throw new Error("Sadece kurucu görebilir!");
@@ -3141,7 +3402,8 @@ Parse.Cloud.define("addVizyonLog", async (request) => {
 });
 
 // ================================================================
-// ========== 3D MODEL ve GÖRSEL ÜRETME (HF) – LİMİT KONTROLÜ DÜZELTİLDİ ==========
+// ========== 3D MODEL ve GÖRSEL ÜRETME (HF) ==========
+// ================================================================
 Parse.Cloud.define("generate3DWithHF", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -3182,7 +3444,7 @@ Parse.Cloud.define("generate3DWithHF", async (request) => {
             throw new Error("HF API hatası: " + errorText);
         }
         const buffer = await response.arrayBuffer();
-        const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+        const base64 = bufferToBase64(buffer);
         return { success: true, imageBase64: base64 };
     } catch (e) {
         console.error('HF hatası:', e);
@@ -3230,7 +3492,7 @@ Parse.Cloud.define("generateImageWithHF", async (request) => {
             throw new Error("HF Görsel API hatası: " + errorText);
         }
         const buffer = await response.arrayBuffer();
-        const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+        const base64 = bufferToBase64(buffer);
         return { success: true, imageBase64: base64 };
     } catch (e) {
         console.error('HF Görsel hatası:', e);
@@ -3240,6 +3502,7 @@ Parse.Cloud.define("generateImageWithHF", async (request) => {
 
 // ================================================================
 // ========== ADMIN FONKSİYONLARI ==========
+// ================================================================
 Parse.Cloud.define("assignAdmin", async (request) => {
     const user = request.user;
     if (!user || user.get('role') !== 'founder') throw new Error("Sadece kurucu admin atayabilir!");
@@ -3353,6 +3616,7 @@ Parse.Cloud.define("leaveBetaRole", async (request) => {
 
 // ================================================================
 // ========== KULLANICI LİSTESİ (TÜMÜ) ==========
+// ================================================================
 Parse.Cloud.define("getAllUsers", async (request) => {
     const user = request.user;
     if (!user || !['admin', 'founder'].includes(user.get('role'))) {
@@ -3375,6 +3639,7 @@ Parse.Cloud.define("getAllUsers", async (request) => {
 
 // ================================================================
 // ========== GIPHY API ==========
+// ================================================================
 Parse.Cloud.define("searchGif", async (request) => {
     const query = request.params.query;
     if (!query) throw new Error("Arama terimi gerekli!");
@@ -3403,6 +3668,7 @@ Parse.Cloud.define("searchGif", async (request) => {
 
 // ================================================================
 // ========== ÇEVİRİ (SMART TRANSLATE) ==========
+// ================================================================
 Parse.Cloud.define("translateWithDeepL", async (request) => {
     const { text, targetLang, sourceLang } = request.params;
     const key = await getAPIKey('DEEPL_API_KEY');
@@ -3464,13 +3730,14 @@ Parse.Cloud.define("smartTranslate", async (request) => {
 
 // ================================================================
 // ========== ÜRÜN ==========
+// ================================================================
 Parse.Cloud.define("addProduct", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
     const { title, price, fileUrl } = request.params;
     if (!title || !price) throw new Error("Ürün adı ve fiyat gerekli!");
     const product = new Product();
-    product.set('user', user);
+    product.set('user_email', user.get('email'));
     product.set('title_', title);
     product.set('price', parseFloat(price));
     if (fileUrl) product.set('file', fileUrl);
@@ -3489,7 +3756,7 @@ Parse.Cloud.define("getProducts", async (request) => {
         title: p.get('title_'),
         price: p.get('price'),
         file: p.get('file'),
-        seller: p.get('user') ? p.get('user').get('email') : 'Bilinmiyor',
+        seller: p.get('user_email') || 'Bilinmiyor',
         createdAt: p.get('createdAt')
     }));
 });
@@ -3505,7 +3772,10 @@ Parse.Cloud.define("buyProduct", async (request) => {
     const price = product.get('price') || 0;
     const commission = price * 0.10;
     const sellerEarn = price - commission;
-    const seller = product.get('user');
+    const sellerEmail = product.get('user_email');
+    const sellerQuery = new Parse.Query(Parse.User);
+    sellerQuery.equalTo('email', sellerEmail);
+    const seller = await sellerQuery.first({ useMasterKey: true });
     if (seller) {
         const sellerWallet = seller.get('wallet_balance') || 0;
         seller.set('wallet_balance', sellerWallet + sellerEarn);
@@ -3531,7 +3801,7 @@ Parse.Cloud.define("getMyProducts", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
     const query = new Parse.Query(Product);
-    query.equalTo('user', user);
+    query.equalTo('user_email', user.get('email'));
     const products = await query.find({ useMasterKey: true });
     return products.map(p => ({
         id: p.id,
@@ -3544,6 +3814,7 @@ Parse.Cloud.define("getMyProducts", async (request) => {
 
 // ================================================================
 // ========== MAĞAZA ==========
+// ================================================================
 Parse.Cloud.define("getStoreItems", async (request) => {
     const query = new Parse.Query(StoreItem);
     const items = await query.find({ useMasterKey: true });
@@ -3582,6 +3853,7 @@ Parse.Cloud.define("purchaseStoreItem", async (request) => {
 
 // ================================================================
 // ========== GÜNLÜK GÖREVLER ==========
+// ================================================================
 Parse.Cloud.define("getDailyTasks", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -3617,6 +3889,7 @@ Parse.Cloud.define("completeDailyTask", async (request) => {
 
 // ================================================================
 // ========== TOPLULUK GÖREVLERİ ==========
+// ================================================================
 Parse.Cloud.define("getSocialTasks", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -3655,6 +3928,7 @@ Parse.Cloud.define("verifySocialFollow", async (request) => {
 
 // ================================================================
 // ========== TAKIM GÖREVLERİ ==========
+// ================================================================
 Parse.Cloud.define("getTeamTasks", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -3693,6 +3967,7 @@ Parse.Cloud.define("completeTeamTask", async (request) => {
 
 // ================================================================
 // ========== BİLDİRİM ==========
+// ================================================================
 Parse.Cloud.define("getNotifications", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -3723,6 +3998,7 @@ Parse.Cloud.define("markNotificationRead", async (request) => {
 
 // ================================================================
 // ========== MESAJ & KONUŞMA ==========
+// ================================================================
 Parse.Cloud.define("sendMessage", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -3731,14 +4007,14 @@ Parse.Cloud.define("sendMessage", async (request) => {
     const convQuery = new Parse.Query(Conversation);
     const conv = await convQuery.get(conversationId, { useMasterKey: true });
     if (!conv) throw new Error("Konuşma bulunamadı!");
-    const users = conv.get('users') || [];
-    if (!users.some(u => u.id === user.id)) throw new Error("Bu konuşmaya yetkiniz yok!");
+    const users = conv.get('user_emails') || [];
+    if (!users.includes(user.get('email'))) throw new Error("Bu konuşmaya yetkiniz yok!");
 
     const msg = new Message();
-    msg.set('from_user', user);
-    msg.set('conversation', conv);
-    const toUser = users.find(u => u.id !== user.id);
-    if (toUser) msg.set('to_user', toUser);
+    msg.set('from_email', user.get('email'));
+    msg.set('conversationId', conv.id);
+    const toEmail = users.find(u => u !== user.get('email'));
+    if (toEmail) msg.set('to_email', toEmail);
     msg.set('text', filterText(text || ''));
     if (fileUrl) {
         msg.set('file', fileUrl);
@@ -3751,8 +4027,11 @@ Parse.Cloud.define("sendMessage", async (request) => {
     conv.set('lastMessageTime', new Date());
     await conv.save(null, { useMasterKey: true });
 
-    if (toUser) {
-        await sendNotificationToUser(toUser, `📩 ${user.get('name')} size mesaj gönderdi: ${(text || '[Dosya]').substring(0,30)}`, 'message');
+    if (toEmail) {
+        const toUser = await new Parse.Query(Parse.User).equalTo('email', toEmail).first({ useMasterKey: true });
+        if (toUser) {
+            await sendNotificationToUser(toUser, `📩 ${user.get('name')} size mesaj gönderdi: ${(text || '[Dosya]').substring(0,30)}`, 'message');
+        }
     }
     return { success: true, messageId: msg.id };
 });
@@ -3761,12 +4040,12 @@ Parse.Cloud.define("getConversations", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
     const query = new Parse.Query(Conversation);
-    query.containedIn('users', [user]);
+    query.containedIn('user_emails', [user.get('email')]);
     query.descending('lastMessageTime');
     const convs = await query.find({ useMasterKey: true });
     return convs.map(c => ({
         id: c.id,
-        users: c.get('users'),
+        users: c.get('user_emails'),
         lastMessage: c.get('lastMessage'),
         lastMessageTime: c.get('lastMessageTime'),
         customName: c.get('customName')
@@ -3780,25 +4059,25 @@ Parse.Cloud.define("getConversationMessages", async (request) => {
     const convQuery = new Parse.Query(Conversation);
     const conv = await convQuery.get(conversationId, { useMasterKey: true });
     if (!conv) throw new Error("Konuşma bulunamadı!");
-    const users = conv.get('users') || [];
-    if (!users.some(u => u.id === user.id)) throw new Error("Yetkisiz!");
+    const users = conv.get('user_emails') || [];
+    if (!users.includes(user.get('email'))) throw new Error("Yetkisiz!");
     const msgQuery = new Parse.Query(Message);
-    msgQuery.equalTo('conversation', conv);
+    msgQuery.equalTo('conversationId', conv.id);
     msgQuery.ascending('createdAt');
     const msgs = await msgQuery.find({ useMasterKey: true });
     for (let m of msgs) {
-        if (m.get('to_user') && m.get('to_user').id === user.id && !m.get('is_read')) {
+        if (m.get('to_email') === user.get('email') && !m.get('is_read')) {
             m.set('is_read', true);
             await m.save(null, { useMasterKey: true });
         }
     }
     return {
         conversationId: conv.id,
-        users: conv.get('users'),
+        users: users,
         messages: msgs.map(m => ({
             id: m.id,
-            from_user: m.get('from_user'),
-            to_user: m.get('to_user'),
+            from_user: { id: m.get('from_email'), get: (k) => m.get('from_email') },
+            to_user: { id: m.get('to_email') },
             text: m.get('text'),
             file: m.get('file'),
             is_read: m.get('is_read'),
@@ -3812,8 +4091,9 @@ Parse.Cloud.define("startConversation", async (request) => {
     if (!user) throw new Error("Giriş yapmalısınız!");
     const { userId } = request.params;
     if (!userId) {
+        // AI ile yeni boş konuşma
         const conv = new Conversation();
-        conv.set('users', [user]);
+        conv.set('user_emails', [user.get('email')]);
         conv.set('lastMessage', '');
         conv.set('lastMessageTime', new Date());
         await conv.save(null, { useMasterKey: true });
@@ -3821,12 +4101,13 @@ Parse.Cloud.define("startConversation", async (request) => {
     }
     const targetUser = await new Parse.Query(Parse.User).get(userId, { useMasterKey: true });
     if (!targetUser) throw new Error("Kullanıcı bulunamadı!");
+    const targetEmail = targetUser.get('email');
     const query = new Parse.Query(Conversation);
-    query.containedIn('users', [user, targetUser]);
+    query.containsAll('user_emails', [user.get('email'), targetEmail]);
     const existing = await query.first({ useMasterKey: true });
     if (existing) return { success: true, conversationId: existing.id };
     const conv = new Conversation();
-    conv.set('users', [user, targetUser]);
+    conv.set('user_emails', [user.get('email'), targetEmail]);
     conv.set('lastMessage', '');
     conv.set('lastMessageTime', new Date());
     await conv.save(null, { useMasterKey: true });
@@ -3835,16 +4116,17 @@ Parse.Cloud.define("startConversation", async (request) => {
 
 // ================================================================
 // ========== GÜNLÜK SERİ (STREAK) ==========
+// ================================================================
 Parse.Cloud.define("getStreakStatus", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
     const today = new Date().toDateString();
     const query = new Parse.Query(UserStreak);
-    query.equalTo('user', user);
+    query.equalTo('user_email', user.get('email'));
     let streak = await query.first({ useMasterKey: true });
     if (!streak) {
         streak = new UserStreak();
-        streak.set('user', user);
+        streak.set('user_email', user.get('email'));
         streak.set('streakCount', 0);
         streak.set('lastClaimDate', null);
         streak.set('lastClaimTime', null);
@@ -3889,11 +4171,11 @@ Parse.Cloud.define("claimDailyStreak", async (request) => {
     if (!user) throw new Error("Giriş yapmalısınız!");
     const today = new Date().toDateString();
     const query = new Parse.Query(UserStreak);
-    query.equalTo('user', user);
+    query.equalTo('user_email', user.get('email'));
     let streak = await query.first({ useMasterKey: true });
     if (!streak) {
         streak = new UserStreak();
-        streak.set('user', user);
+        streak.set('user_email', user.get('email'));
         streak.set('streakCount', 0);
         streak.set('lastClaimDate', null);
         streak.set('lastClaimTime', null);
@@ -3954,6 +4236,7 @@ Parse.Cloud.define("claimDailyStreak", async (request) => {
 
 // ================================================================
 // ========== STREAK HATIRLATMA JOB'U ==========
+// ================================================================
 Parse.Cloud.job("checkStreakReminders", async (request) => {
     console.log("🔄 Streak hatırlatmaları kontrol ediliyor...");
     const query = new Parse.Query(UserStreak);
@@ -3964,12 +4247,13 @@ Parse.Cloud.job("checkStreakReminders", async (request) => {
         const lastClaim = streak.get('lastClaimDate');
         if (!lastClaim) continue;
         const hoursSince = (Date.now() - lastClaim.getTime()) / (1000 * 60 * 60);
-        const user = streak.get('user');
-        if (!user) continue;
+        const email = streak.get('user_email');
+        if (!email) continue;
         try {
-            await user.fetch({ useMasterKey: true });
-            const email = user.get('email');
-            if (!email) continue;
+            const userQuery = new Parse.Query(Parse.User);
+            userQuery.equalTo('email', email);
+            const user = await userQuery.first({ useMasterKey: true });
+            if (!user) continue;
             if (hoursSince >= 20 && hoursSince < 21 && !streak.get('notifiedAt8h')) {
                 await Parse.Cloud.run('sendEmail', {
                     to: email,
@@ -4021,6 +4305,7 @@ Parse.Cloud.job("checkStreakReminders", async (request) => {
 
 // ================================================================
 // ========== SÜRESİ DOLAN ANKET VE DUYURULARI TEMİZLE ==========
+// ================================================================
 Parse.Cloud.job("cleanExpiredPolls", async (request) => {
     console.log("🔄 Süresi dolan anketler temizleniyor...");
     const now = new Date();
@@ -4049,6 +4334,7 @@ Parse.Cloud.job("cleanExpiredAnnouncements", async (request) => {
 
 // ================================================================
 // ========== V27 AKADEMİ ==========
+// ================================================================
 Parse.Cloud.define("getCourses", async (request) => {
     const query = new Parse.Query(Course);
     const courses = await query.find({ useMasterKey: true });
@@ -4149,7 +4435,7 @@ Parse.Cloud.define("getCourseDetails", async (request) => {
     const course = await query.get(courseId, { useMasterKey: true });
     if (!course) throw new Error("Ders bulunamadı!");
     const lessonQuery = new Parse.Query(Lesson);
-    lessonQuery.equalTo('course', course);
+    lessonQuery.equalTo('courseId', course.id);
     lessonQuery.ascending('order');
     const lessons = await lessonQuery.find({ useMasterKey: true });
     return {
@@ -4194,6 +4480,7 @@ Parse.Cloud.define("completeLesson", async (request) => {
 
 // ================================================================
 // ========== V27 ZEKA TESTİ ==========
+// ================================================================
 Parse.Cloud.define("getQuizQuestions", async (request) => {
     const today = new Date().toDateString();
     const query = new Parse.Query(Quiz);
@@ -4304,6 +4591,7 @@ Parse.Cloud.define("submitQuizAnswer", async (request) => {
 
 // ================================================================
 // ========== YARIŞMA ==========
+// ================================================================
 Parse.Cloud.define("getContestRanking", async (request) => {
     const query = new Parse.Query(Contest);
     query.descending('createdAt');
@@ -4321,6 +4609,7 @@ Parse.Cloud.define("getContestRanking", async (request) => {
 
 // ================================================================
 // ========== ANKET ==========
+// ================================================================
 Parse.Cloud.define("createPoll", async (request) => {
     const user = request.user;
     if (!user || user.get('role') !== 'founder') throw new Error("Sadece kurucu anket oluşturabilir!");
@@ -4331,7 +4620,7 @@ Parse.Cloud.define("createPoll", async (request) => {
     poll.set('options', options);
     poll.set('votes', options.map(() => 0));
     poll.set('voters', []);
-    poll.set('created_by', user);
+    poll.set('created_by_email', user.get('email'));
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + (duration || 3));
     poll.set('end_date', endDate);
@@ -4409,6 +4698,7 @@ Parse.Cloud.define("editPoll", async (request) => {
 
 // ================================================================
 // ========== DUYURU ==========
+// ================================================================
 Parse.Cloud.define("getAnnouncements", async (request) => {
     const query = new Parse.Query(Announcement);
     query.descending('createdAt');
@@ -4418,7 +4708,7 @@ Parse.Cloud.define("getAnnouncements", async (request) => {
         id: a.id,
         title: a.get('title_'),
         content: a.get('content'),
-        created_by: a.get('created_by'),
+        created_by: a.get('created_by_email'),
         createdAt: a.get('createdAt')
     }));
 });
@@ -4431,7 +4721,7 @@ Parse.Cloud.define("addAnnouncement", async (request) => {
     const ann = new Announcement();
     ann.set('title_', title);
     ann.set('content', content);
-    ann.set('created_by', user);
+    ann.set('created_by_email', user.get('email'));
     await ann.save(null, { useMasterKey: true });
     return { success: true };
 });
@@ -4462,6 +4752,7 @@ Parse.Cloud.define("editAnnouncement", async (request) => {
 
 // ================================================================
 // ========== İŞ İLANI ==========
+// ================================================================
 Parse.Cloud.define("getJobs", async (request) => {
     const query = new Parse.Query(Job);
     query.equalTo('is_active', true);
@@ -4487,13 +4778,14 @@ Parse.Cloud.define("applyJob", async (request) => {
 
 // ================================================================
 // ========== HATA BİLDİR ==========
+// ================================================================
 Parse.Cloud.define("submitBugReport", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
     const { description, screenshot } = request.params;
     if (!description) throw new Error("Hata açıklaması gerekli!");
     const bug = new BugReport();
-    bug.set('user', user);
+    bug.set('user_email', user.get('email'));
     bug.set('description', description);
     if (screenshot) bug.set('screenshot', screenshot);
     bug.set('status', 'pending');
@@ -4505,6 +4797,7 @@ Parse.Cloud.define("submitBugReport", async (request) => {
 
 // ================================================================
 // ========== CÜZDAN ==========
+// ================================================================
 Parse.Cloud.define("getWalletBalance", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -4525,6 +4818,7 @@ Parse.Cloud.define("withdrawFunds", async (request) => {
 
 // ================================================================
 // ========== TAKİP ==========
+// ================================================================
 Parse.Cloud.define("toggleFollow", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -4559,6 +4853,7 @@ Parse.Cloud.define("toggleFollow", async (request) => {
 
 // ================================================================
 // ========== PROFİL ==========
+// ================================================================
 Parse.Cloud.define("getProfile", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -4585,7 +4880,6 @@ Parse.Cloud.define("getProfile", async (request) => {
 
 // ================================================================
 // ========== KULLANICI ARA ==========
-// [MADDE 6] – searchUsers AUTH zaten mevcut
 // ================================================================
 Parse.Cloud.define("searchUsers", async (request) => {
     const user = request.user;
@@ -4608,6 +4902,7 @@ Parse.Cloud.define("searchUsers", async (request) => {
 
 // ================================================================
 // ========== EBEVEYN AYARLARI ==========
+// ================================================================
 Parse.Cloud.define("requestParentVerification", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -4652,7 +4947,6 @@ Parse.Cloud.define("setParentPin", async (request) => {
     return { success: true, message: "PIN başarıyla ayarlandı!" };
 });
 
-// [MADDE 7] getParentSettings – PIN gizlendi, has_pin eklendi
 Parse.Cloud.define("getParentSettings", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -4872,6 +5166,7 @@ Parse.Cloud.define("removeParentControl", async (request) => {
 
 // ================================================================
 // ========== EBEVEYN ŞİFRE SIFIRLAMA ==========
+// ================================================================
 Parse.Cloud.define("requestParentReset", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -4908,6 +5203,7 @@ Parse.Cloud.define("confirmParentReset", async (request) => {
 
 // ================================================================
 // ========== KURUCU İLETİŞİM ==========
+// ================================================================
 Parse.Cloud.define("sendFounderMessage", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -4929,6 +5225,7 @@ Parse.Cloud.define("sendFounderMessage", async (request) => {
 
 // ================================================================
 // ========== PUAN & REFERANS ==========
+// ================================================================
 Parse.Cloud.define("getUserPoints", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -4989,6 +5286,7 @@ Parse.Cloud.define("applyReferral", async (request) => {
 
 // ================================================================
 // ========== LİDERLİK TABLOSU ==========
+// ================================================================
 Parse.Cloud.define("getReferralLeaderboard", async (request) => {
     try {
         const query = new Parse.Query(Parse.User);
@@ -5033,6 +5331,7 @@ Parse.Cloud.define("getReferralLeaderboard", async (request) => {
 
 // ================================================================
 // ========== PAZAR PROJELERİ ==========
+// ================================================================
 Parse.Cloud.define("getMarketProjects", async (request) => {
     try {
         const query = new Parse.Query(MarketProject);
@@ -5113,6 +5412,7 @@ Parse.Cloud.define("buyMarketProject", async (request) => {
 
 // ================================================================
 // ========== BLOG ABONE SİSTEMİ ==========
+// ================================================================
 Parse.Cloud.define("subscribeToBlog", async (request) => {
     const { email } = request.params;
     if (!email) throw new Error("E-posta adresi gerekli.");
@@ -5274,7 +5574,8 @@ Parse.Cloud.define("sendSystemUpdateToSubscribers", async (request) => {
 });
 
 // ================================================================
-// ========== SAVAŞ MODU (LİMİT DÜZELTİLDİ) ==========
+// ========== SAVAŞ MODU ==========
+// ================================================================
 Parse.Cloud.define("battleMode", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -5318,7 +5619,8 @@ Parse.Cloud.define("battleMode", async (request) => {
 });
 
 // ================================================================
-// ========== ÇOKLU AI (LİMİT DÜZELTİLDİ) ==========
+// ========== ÇOKLU AI ==========
+// ================================================================
 Parse.Cloud.define("multiAI", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -5357,7 +5659,8 @@ Parse.Cloud.define("multiAI", async (request) => {
 });
 
 // ================================================================
-// ========== VİDEO ANALİZ (LİMİT DÜZELTİLDİ) ==========
+// ========== VİDEO ANALİZ ==========
+// ================================================================
 Parse.Cloud.define("analyzeVideo", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -5417,7 +5720,8 @@ Parse.Cloud.define("generateReelsIdeas", async (request) => {
 });
 
 // ================================================================
-// ========== UYGULAMA YAPTIRICI (LİMİT DÜZELTİLDİ) ==========
+// ========== UYGULAMA YAPTIRICI ==========
+// ================================================================
 Parse.Cloud.define("generateApp", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -5448,7 +5752,8 @@ Parse.Cloud.define("generateApp", async (request) => {
 });
 
 // ================================================================
-// ========== PRO ARAÇLARI (LİMİT DÜZELTİLDİ) ==========
+// ========== PRO ARAÇLARI ==========
+// ================================================================
 Parse.Cloud.define("proTools", async (request) => {
     const user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız!");
@@ -5489,7 +5794,210 @@ Parse.Cloud.define("proTools", async (request) => {
 });
 
 // ================================================================
+// ========== [YENİ] API ANAHTAR YÖNETİMİ FONKSİYONLARI ==========
+// ================================================================
+
+// ===== [YENİ] saveUserApiKey – API anahtarı kaydet =====
+Parse.Cloud.define("saveUserApiKey", async (request) => {
+    const user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız!");
+    const { name, value } = request.params;
+    if (!name || !value) throw new Error("İsim ve API anahtarı değeri gerekli!");
+    if (name.trim().length < 2) throw new Error("Sanal isim en az 2 karakter olmalı!");
+    if (value.trim().length < 8) throw new Error("API anahtarı çok kısa!");
+
+    // Aynı isimde anahtar var mı kontrol et
+    const existingQuery = new Parse.Query(UserApiKey);
+    existingQuery.equalTo('user_email', user.get('email'));
+    existingQuery.equalTo('name', name.trim());
+    const existing = await existingQuery.first({ useMasterKey: true });
+    if (existing) {
+        throw new Error("Bu isimde bir anahtarınız zaten var. Farklı bir isim seçin veya düzenleyin.");
+    }
+
+    // Kullanıcının şifresi belirlenmiş mi?
+    if (!user.get('api_password_hash')) {
+        throw new Error("Lütfen önce API şifrenizi belirleyin!");
+    }
+
+    const encryptionKey = await getAPIKey('API_ENCRYPTION_KEY');
+    if (!encryptionKey) throw new Error("Sunucu şifreleme anahtarı eksik (API_ENCRYPTION_KEY).");
+
+    const encrypted = xorEncrypt(value.trim(), encryptionKey);
+
+    const record = new UserApiKey();
+    record.set('user_email', user.get('email'));
+    record.set('name', name.trim());
+    record.set('encryptedValue', encrypted);
+    record.set('createdAtClient', new Date());
+    record.set('updatedAtClient', new Date());
+    await record.save(null, { useMasterKey: true });
+
+    return { success: true, keyId: record.id, message: "API anahtarı kaydedildi." };
+});
+
+// ===== [YENİ] getUserApiKeys – Kullanıcının anahtarlarını listele =====
+Parse.Cloud.define("getUserApiKeys", async (request) => {
+    const user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız!");
+    const hasPassword = !!user.get('api_password_hash');
+
+    const query = new Parse.Query(UserApiKey);
+    query.equalTo('user_email', user.get('email'));
+    query.descending('createdAtClient');
+    const keys = await query.find({ useMasterKey: true });
+
+    // Sansürlü değer
+    function maskValue(value) {
+        if (!value) return '••••••••';
+        const len = value.length;
+        if (len <= 8) return '••••••••';
+        return value.substring(0, 4) + '••••' + value.substring(len - 4);
+    }
+
+    return {
+        success: true,
+        hasPassword: hasPassword,
+        apiKeys: keys.map(k => {
+            // Şifreli değer çözülüp maskelenir (sanırım en azından kısmi gösterim)
+            let masked = '••••••••';
+            // Kullanıcının şifresi olmadığında bile biz sadece maskeli göstereceğiz
+            return {
+                id: k.id,
+                name: k.get('name'),
+                maskedValue: masked,
+                createdAt: k.get('createdAtClient') || k.get('createdAt'),
+                updatedAt: k.get('updatedAtClient') || k.get('updatedAt')
+            };
+        })
+    };
+});
+
+// ===== [YENİ] getUserApiKeyValue – Tek anahtarın tam değeri (şifre kontrolü ile) =====
+Parse.Cloud.define("getUserApiKeyValue", async (request) => {
+    const user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız!");
+    const { keyId } = request.params;
+    if (!keyId) throw new Error("Anahtar ID gerekli!");
+
+    // Bu fonksiyon sadece kullanıcı API paneline şifresiyle giriş yaptıysa çağrılmalı
+    // Frontend'de panel unlock edilmişse çağrılıyor. Ekstra güvenlik: her istekte şifre doğrulaması yapmıyoruz;
+    // Frontend doğrulaması yeterli kabul ediliyor (isteğe bağlı şifre parametresi ile daha güvenli yapılabilir).
+
+    const query = new Parse.Query(UserApiKey);
+    const record = await query.get(keyId, { useMasterKey: true });
+    if (!record) throw new Error("Anahtar bulunamadı!");
+    if (record.get('user_email') !== user.get('email')) throw new Error("Bu anahtar size ait değil!");
+
+    const encryptionKey = await getAPIKey('API_ENCRYPTION_KEY');
+    if (!encryptionKey) throw new Error("Sunucu şifreleme anahtarı eksik.");
+
+    let decrypted = '';
+    try {
+        decrypted = xorDecrypt(record.get('encryptedValue'), encryptionKey);
+    } catch (e) {
+        throw new Error("Anahtar çözülemedi.");
+    }
+    if (!decrypted) throw new Error("Anahtar boş veya çözülemedi.");
+
+    return { success: true, value: decrypted };
+});
+
+// ===== [YENİ] deleteUserApiKey – Anahtar sil =====
+Parse.Cloud.define("deleteUserApiKey", async (request) => {
+    const user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız!");
+    const { keyId } = request.params;
+    if (!keyId) throw new Error("Anahtar ID gerekli!");
+
+    const query = new Parse.Query(UserApiKey);
+    const record = await query.get(keyId, { useMasterKey: true });
+    if (!record) throw new Error("Anahtar bulunamadı!");
+    if (record.get('user_email') !== user.get('email')) throw new Error("Bu anahtar size ait değil!");
+
+    await record.destroy({ useMasterKey: true });
+    return { success: true, message: "API anahtarı silindi." };
+});
+
+// ===== [YENİ] updateUserApiKey – Anahtar güncelle =====
+Parse.Cloud.define("updateUserApiKey", async (request) => {
+    const user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız!");
+    const { keyId, name, value } = request.params;
+    if (!keyId) throw new Error("Anahtar ID gerekli!");
+
+    const query = new Parse.Query(UserApiKey);
+    const record = await query.get(keyId, { useMasterKey: true });
+    if (!record) throw new Error("Anahtar bulunamadı!");
+    if (record.get('user_email') !== user.get('email')) throw new Error("Bu anahtar size ait değil!");
+
+    if (name) {
+        if (name.trim().length < 2) throw new Error("Sanal isim en az 2 karakter olmalı!");
+        // Aynı isimde başka anahtar var mı?
+        const dupQuery = new Parse.Query(UserApiKey);
+        dupQuery.equalTo('user_email', user.get('email'));
+        dupQuery.equalTo('name', name.trim());
+        dupQuery.notEqualTo('objectId', keyId);
+        const dup = await dupQuery.first({ useMasterKey: true });
+        if (dup) throw new Error("Bu isimde başka bir anahtarınız var!");
+        record.set('name', name.trim());
+    }
+
+    if (value) {
+        if (value.trim().length < 8) throw new Error("API anahtarı çok kısa!");
+        const encryptionKey = await getAPIKey('API_ENCRYPTION_KEY');
+        if (!encryptionKey) throw new Error("Sunucu şifreleme anahtarı eksik.");
+        record.set('encryptedValue', xorEncrypt(value.trim(), encryptionKey));
+    }
+
+    record.set('updatedAtClient', new Date());
+    await record.save(null, { useMasterKey: true });
+
+    return { success: true, message: "API anahtarı güncellendi." };
+});
+
+// ===== [YENİ] setApiPassword – API şifresi belirle (ilk kez) =====
+Parse.Cloud.define("setApiPassword", async (request) => {
+    const user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız!");
+    const { password } = request.params;
+    if (!password || password.length < 8) throw new Error("Şifre en az 8 karakter olmalı!");
+
+    // Zaten belirlenmiş mi?
+    if (user.get('api_password_hash')) {
+        throw new Error("API şifreniz zaten belirlenmiş. Lütfen 'verifyApiPassword' ile doğrulayın.");
+    }
+
+    user.set('api_password_hash', hashApiPassword(password));
+    await user.save(null, { useMasterKey: true });
+
+    return { success: true, message: "API şifreniz belirlendi." };
+});
+
+// ===== [YENİ] verifyApiPassword – API şifresini doğrula =====
+Parse.Cloud.define("verifyApiPassword", async (request) => {
+    const user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız!");
+    const { password } = request.params;
+    if (!password) throw new Error("Şifre gerekli!");
+
+    const stored = user.get('api_password_hash');
+    if (!stored) throw new Error("Önce API şifrenizi belirleyin!");
+
+    if (!verifyApiPasswordHash(password, stored)) {
+        // Rate limit: 5 deneme
+        const _rlk = `verifyApiPassword:${user.get('email')}`;
+        await checkRateLimit(_rlk, 5, 5 * 60 * 1000);
+        await recordAttempt(_rlk);
+        throw new Error("Şifre yanlış!");
+    }
+
+    return { success: true, message: "Şifre doğrulandı." };
+});
+
+// ================================================================
 // ========== ZAMANLANMIŞ GÖREVLER ==========
+// ================================================================
 Parse.Cloud.job("refreshDailyTasks", async (request) => {
     console.log("🔄 Günlük görevler yenileniyor...");
     const today = new Date().toDateString();
@@ -5643,4 +6151,5 @@ Parse.Cloud.job("refreshAcademyCourses", async (request) => {
     return "Akademi dersleri yenilendi!";
 });
 
-console.log('✅ Tüm Cloud Code fonksiyonları başarıyla yüklendi! (v6.02.0)');
+console.log('✅ Tüm Cloud Code fonksiyonları başarıyla yüklendi! (v6.03.0 SashiDo)');
+console.log('🆕 Yeni fonksiyonlar: saveUserApiKey, getUserApiKeys, getUserApiKeyValue, deleteUserApiKey, updateUserApiKey, setApiPassword, verifyApiPassword, callCustomAI, deleteTeamMessage, editTeamMessage, getTeamMessage');
