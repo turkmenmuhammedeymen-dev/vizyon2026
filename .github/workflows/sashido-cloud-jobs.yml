@@ -1,0 +1,200 @@
+name: SashiDo Cloud Jobs (11 Job - Ücretsiz)
+
+on:
+  schedule:
+    # ─────────────────────────────────────────────────────────
+    # TÜM CRON ZAMANLARI UTC'DİR (TR = UTC+3)
+    # ─────────────────────────────────────────────────────────
+    
+    # Her 30 dakikada bir → checkStreakReminders (hatırlatma hassas)
+    - cron: '*/30 * * * *'
+    
+    # Her gün UTC 21:00 = TR 00:00 → günlük yenilemeler (5 job)
+    - cron: '0 21 * * *'
+    
+    # Her gün UTC 00:00 = TR 03:00 → gece temizlikleri (3 job)
+    - cron: '0 0 * * *'
+    
+    # Her Pazar UTC 00:00 = TR 03:00 → haftalık akademi (1 job)
+    - cron: '0 0 * * 0'
+    
+    # Her ayın 1'i UTC 00:00 = TR 03:00 → aylık yarışma (1 job)
+    - cron: '0 0 1 * *'
+
+  # Manuel tetikleme butonu (test için)
+  workflow_dispatch:
+    inputs:
+      manual_job:
+        description: 'Manuel çalıştırılacak job adı (boş = hepsi)'
+        required: false
+        default: ''
+
+jobs:
+  # ═══════════════════════════════════════════════════════════
+  # HER 30 DAKİKADA BİR → checkStreakReminders
+  # ═══════════════════════════════════════════════════════════
+  streak-reminders:
+    if: github.event.schedule == '*/30 * * * *' || github.event.inputs.manual_job == 'checkStreakReminders'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Streak hatırlatmalarını kontrol et
+        run: |
+          curl -sS -X POST \
+            -H "X-Parse-Application-Id: ${{ secrets.PARSE_APP_ID }}" \
+            -H "X-Parse-Master-Key: ${{ secrets.PARSE_MASTER_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            "${{ secrets.PARSE_SERVER_URL }}/jobs/checkStreakReminders" \
+            && echo "✅ checkStreakReminders tamamlandı"
+
+  # ═══════════════════════════════════════════════════════════
+  # HER GÜN TR 00:00 (UTC 21:00) → 5 GÜNLÜK YENİLEME
+  # ═══════════════════════════════════════════════════════════
+  refresh-daily-tasks:
+    if: github.event.schedule == '0 21 * * *' || github.event.inputs.manual_job == 'refreshDailyTasks'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Günlük görevleri yenile
+        run: |
+          curl -sS -X POST \
+            -H "X-Parse-Application-Id: ${{ secrets.PARSE_APP_ID }}" \
+            -H "X-Parse-Master-Key: ${{ secrets.PARSE_MASTER_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            "${{ secrets.PARSE_SERVER_URL }}/jobs/refreshDailyTasks" \
+            && echo "✅ refreshDailyTasks tamamlandı"
+
+  refresh-team-tasks:
+    if: github.event.schedule == '0 21 * * *' || github.event.inputs.manual_job == 'refreshTeamTasks'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Takım görevlerini yenile
+        run: |
+          curl -sS -X POST \
+            -H "X-Parse-Application-Id: ${{ secrets.PARSE_APP_ID }}" \
+            -H "X-Parse-Master-Key: ${{ secrets.PARSE_MASTER_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            "${{ secrets.PARSE_SERVER_URL }}/jobs/refreshTeamTasks" \
+            && echo "✅ refreshTeamTasks tamamlandı"
+
+  refresh-social-tasks:
+    if: github.event.schedule == '0 21 * * *' || github.event.inputs.manual_job == 'refreshSocialTasks'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Topluluk görevlerini yenile
+        run: |
+          curl -sS -X POST \
+            -H "X-Parse-Application-Id: ${{ secrets.PARSE_APP_ID }}" \
+            -H "X-Parse-Master-Key: ${{ secrets.PARSE_MASTER_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            "${{ secrets.PARSE_SERVER_URL }}/jobs/refreshSocialTasks" \
+            && echo "✅ refreshSocialTasks tamamlandı"
+
+  reset-daily-queries:
+    if: github.event.schedule == '0 21 * * *' || github.event.inputs.manual_job == 'resetDailyQueries'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sorgu limitlerini sıfırla
+        run: |
+          curl -sS -X POST \
+            -H "X-Parse-Application-Id: ${{ secrets.PARSE_APP_ID }}" \
+            -H "X-Parse-Master-Key: ${{ secrets.PARSE_MASTER_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            "${{ secrets.PARSE_SERVER_URL }}/jobs/resetDailyQueries" \
+            && echo "✅ resetDailyQueries tamamlandı"
+
+  refresh-quiz-questions:
+    if: github.event.schedule == '0 21 * * *' || github.event.inputs.manual_job == 'refreshQuizQuestions'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Zeka testi sorularını yenile
+        run: |
+          curl -sS -X POST \
+            -H "X-Parse-Application-Id: ${{ secrets.PARSE_APP_ID }}" \
+            -H "X-Parse-Master-Key: ${{ secrets.PARSE_MASTER_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            "${{ secrets.PARSE_SERVER_URL }}/jobs/refreshQuizQuestions" \
+            && echo "✅ refreshQuizQuestions tamamlandı"
+
+  # ═══════════════════════════════════════════════════════════
+  # HER GÜN TR 03:00 (UTC 00:00) → 3 GECE TEMİZLİĞİ
+  # ═══════════════════════════════════════════════════════════
+  cleanup-rate-limit:
+    if: github.event.schedule == '0 0 * * *' || github.event.inputs.manual_job == 'cleanupRateLimitAttempts'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rate limit kayıtlarını temizle
+        run: |
+          curl -sS -X POST \
+            -H "X-Parse-Application-Id: ${{ secrets.PARSE_APP_ID }}" \
+            -H "X-Parse-Master-Key: ${{ secrets.PARSE_MASTER_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            "${{ secrets.PARSE_SERVER_URL }}/jobs/cleanupRateLimitAttempts" \
+            && echo "✅ cleanupRateLimitAttempts tamamlandı"
+
+  clean-expired-polls:
+    if: github.event.schedule == '0 0 * * *' || github.event.inputs.manual_job == 'cleanExpiredPolls'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Süresi dolan anketleri temizle
+        run: |
+          curl -sS -X POST \
+            -H "X-Parse-Application-Id: ${{ secrets.PARSE_APP_ID }}" \
+            -H "X-Parse-Master-Key: ${{ secrets.PARSE_MASTER_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            "${{ secrets.PARSE_SERVER_URL }}/jobs/cleanExpiredPolls" \
+            && echo "✅ cleanExpiredPolls tamamlandı"
+
+  clean-expired-announcements:
+    if: github.event.schedule == '0 0 * * *' || github.event.inputs.manual_job == 'cleanExpiredAnnouncements'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Süresi dolan duyuruları temizle
+        run: |
+          curl -sS -X POST \
+            -H "X-Parse-Application-Id: ${{ secrets.PARSE_APP_ID }}" \
+            -H "X-Parse-Master-Key: ${{ secrets.PARSE_MASTER_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            "${{ secrets.PARSE_SERVER_URL }}/jobs/cleanExpiredAnnouncements" \
+            && echo "✅ cleanExpiredAnnouncements tamamlandı"
+
+  # ═══════════════════════════════════════════════════════════
+  # HER PAZAR TR 03:00 (UTC 00:00 Pazar) → HAFTALIK AKADEMİ
+  # ═══════════════════════════════════════════════════════════
+  refresh-academy-courses:
+    if: github.event.schedule == '0 0 * * 0' || github.event.inputs.manual_job == 'refreshAcademyCourses'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Akademi derslerini yenile
+        run: |
+          curl -sS -X POST \
+            -H "X-Parse-Application-Id: ${{ secrets.PARSE_APP_ID }}" \
+            -H "X-Parse-Master-Key: ${{ secrets.PARSE_MASTER_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            "${{ secrets.PARSE_SERVER_URL }}/jobs/refreshAcademyCourses" \
+            && echo "✅ refreshAcademyCourses tamamlandı"
+
+  # ═══════════════════════════════════════════════════════════
+  # HER AYIN 1'İ TR 03:00 (UTC 00:00) → AYLIK YARIŞMA
+  # ═══════════════════════════════════════════════════════════
+  finalize-monthly-contest:
+    if: github.event.schedule == '0 0 1 * *' || github.event.inputs.manual_job == 'finalizeMonthlyContest'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Aylık yarışmayı bitir
+        run: |
+          curl -sS -X POST \
+            -H "X-Parse-Application-Id: ${{ secrets.PARSE_APP_ID }}" \
+            -H "X-Parse-Master-Key: ${{ secrets.PARSE_MASTER_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            "${{ secrets.PARSE_SERVER_URL }}/jobs/finalizeMonthlyContest" \
+            && echo "✅ finalizeMonthlyContest tamamlandı"
