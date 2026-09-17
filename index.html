@@ -290,16 +290,19 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+/* ✅ FIX 1: html ve body overflow-x: hidden eklendi (yatay titreme önlenir) */
+html { scroll-behavior: smooth; overflow-x: hidden; }
 body { background: var(--bg-body); color: var(--text-body); font-family: var(--font-body); overflow-x: hidden; min-height: 100vh; transition: background 0.3s, color 0.3s; }
 
 /* ===== ÖZEL İMLEÇ ===== */
-.custom-cursor { width: 12px; height: 12px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 99999; box-shadow: 0 0 15px var(--accent); transition: width 0.1s, height 0.1s; }
+.custom-cursor { width: 12px; height: 12px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 99999; box-shadow: 0 0 15px var(--accent); transition: width 0.1s, height 0.1s; will-change: transform, left, top; }
 .custom-cursor.hover { width: 24px; height: 24px; background: rgba(0,212,255,0.3); backdrop-filter: blur(2px); }
-.custom-cursor-ring { width: 36px; height: 36px; border: 2px solid var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 99998; transition: 0.08s linear; opacity: 0.7; }
+/* ✅ FIX 2: transition: 0.08s linear; KALDIRILDI → sürekli repaint titremesi bitti */
+/* ✅ FIX 3: will-change: transform; eklendi → GPU'ya alındı */
+.custom-cursor-ring { width: 36px; height: 36px; border: 2px solid var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 99998; opacity: 0.7; will-change: transform, left, top; }
 
 /* ===== PARÇACIKLAR ===== */
-.particles { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.particles { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; contain: strict; }
 .particle { position: absolute; width: 2px; height: 2px; background: var(--accent); border-radius: 50%; animation: float-up linear infinite; opacity: 0; }
 .particle:nth-child(odd) { background: var(--accent2); width: 3px; height: 3px; }
 .particle:nth-child(3n) { background: var(--purple); width: 4px; height: 4px; }
@@ -1566,13 +1569,55 @@ footer {
 <!-- ============================================================ -->
 <!-- CSS-3: DASHBOARD, MODALLAR, WIDGET, FULL PANEL, TAKIM SAYFASI -->
 <!-- MOBİL FIX: Header 2 satır, modal flex-start, team page sütun -->
+<!-- GÜNCELLEME: scrollbar-gutter + fixed ::before + contest page -->
+<!-- + [v7.2.1] MODAL Z-INDEX FIX (contest + modal çakışması) -->
+<!-- + [v7.2.1] SALLANMA/TİTREME FIX (scrollbar + repaint) -->
 <!-- ============================================================ -->
 <style>
 /* ============================================================ */
 /* CSS-3: DASHBOARD, MODALLAR, WIDGET, FULL PANEL, TAKIM SAYFASI */
 /* ============================================================ */
 
+/* ============================================================ */
+/* ========== [v7.2.1] GLOBAL SALLANMA/TİTREME FIX ============ */
+/* ============================================================ */
+/* 1) Body'ye her zaman scrollbar alanı ayır (sağ kenar oynaması bitti) */
+html {
+    scrollbar-gutter: stable;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+body {
+    scrollbar-gutter: stable;
+    /* 2) Momentum scroll'un dışarı sızmasını engelle */
+    overscroll-behavior-y: none;
+    overscroll-behavior-x: none;
+    /* 3) GPU katmanına al (repaint titremesi bitti) */
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+/* 4) Deprecated iOS smooth-scroll kaldır (titreme yapıyordu) */
+* {
+    -webkit-overflow-scrolling: auto;
+}
+/* 5) Tüm backdrop-filter'lı elementlere GPU hızlandırma zorunlu */
+.dashboard-header,
+.modal-overlay,
+.legal-banner,
+.dashboard-card,
+.ai-panel,
+.team-page-overlay,
+.contest-page-overlay,
+.admin-login-screen {
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
 /* ========== DASHBOARD ========== */
+/* ✅ FIX 1: overflow-x: hidden eklendi (yatay titreme önlenir) */
+/* ✅ FIX 3 (YENİ): scrollbar-gutter: stable eklendi (scrollbar oynaması bitti) */
 .dashboard-container {
     position: fixed;
     top: 0;
@@ -1582,23 +1627,35 @@ footer {
     background: #000000;
     z-index: 10000;
     overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+    /* ✅ [v7.2.1] Momentum scroll dışarı sızmasın */
+    overscroll-behavior: contain;
     padding: 0 !important;
     display: none;
+    /* ✅ [v7.2.1] Deprecated iOS smooth-scroll kaldırıldı */
+    contain: layout style;
 }
 [data-theme="light"] .dashboard-container { background: #f0f4f8; }
+/* ✅ FIX 3 (YENİ): position: fixed yapıldı → repaint titremesi bitti */
 .dashboard-container::before {
     content: '';
-    position: absolute;
+    position: fixed;
     inset: 0;
     background: radial-gradient(ellipse 120% 60% at 50% 0%, rgba(0,212,255,0.04) 0%, transparent 60%);
     z-index: -1;
+    pointer-events: none;
+    /* ✅ [v7.2.1] GPU katmanı */
+    transform: translateZ(0);
 }
+/* ✅ FIX 2: will-change + translateZ(0) eklendi (backdrop-filter repaint titremesi bitti) */
 .dashboard-header {
     position: sticky !important;
     top: 0 !important;
     z-index: 1000 !important;
     background: rgba(10,10,10,0.95) !important;
     backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
     border-bottom: 2px solid var(--accent) !important;
     padding: 12px 24px !important;
     display: flex;
@@ -1607,6 +1664,8 @@ footer {
     flex-wrap: wrap;
     gap: 10px;
     min-height: 70px;
+    will-change: transform;
+    transform: translateZ(0);
 }
 [data-theme="light"] .dashboard-header { background: rgba(255,255,255,0.95) !important; }
 .dashboard-content-wrapper {
@@ -1707,13 +1766,20 @@ footer {
 .level-badge.level-efsane { background: #9f7aea; color: #faf5ff; }
 
 /* ========== AI CHAT ========== */
+/* ✅ FIX 3: overflow-x: hidden eklendi */
+/* ✅ FIX 3 (YENİ): scroll-behavior: auto eklendi (yumuşak kayma bitti) */
 .ai-chat-messages {
     height: 350px;
     overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: auto;
+    /* ✅ [v7.2.1] Momentum scroll dışarı sızmasın */
+    overscroll-behavior: contain;
     background: rgba(0,0,0,0.4);
     border-radius: 16px;
     padding: 16px;
     margin-bottom: 16px;
+    contain: content;
 }
 [data-theme="light"] .ai-chat-messages { background: rgba(0,0,0,0.05); }
 .ai-message {
@@ -1809,6 +1875,8 @@ footer {
     gap: 8px;
     max-height: 200px;
     overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
 }
 .project-item {
     background: #0a0a0a;
@@ -1850,6 +1918,8 @@ footer {
     gap: 8px;
     max-height: 200px;
     overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
 }
 .inbox-item {
     background: #0a0a0a;
@@ -1877,6 +1947,8 @@ footer {
 .user-list {
     max-height: 200px;
     overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
 }
 .user-item {
     background: #0a0a0a;
@@ -1937,6 +2009,8 @@ footer {
 }
 
 /* ========== MODAL ========== */
+/* ✅ FIX 5: will-change eklendi */
+/* ✅ [v7.2.1] GPU katmanı + overscroll contain */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -1944,9 +2018,16 @@ footer {
     background: rgba(5,10,15,0.96);
     z-index: 99999;
     backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     align-items: center;
     justify-content: center;
     padding: 20px;
+    will-change: opacity;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 .modal-overlay.open {
     display: flex;
@@ -1961,6 +2042,8 @@ footer {
     animation: modalFadeIn 0.3s ease;
     max-height: 90vh;
     overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
 }
 [data-theme="light"] .modal { background: #ffffff; }
 @keyframes modalFadeIn {
@@ -2090,6 +2173,7 @@ footer {
     transform: scale(1.1);
     box-shadow: 0 0 40px rgba(0,212,255,0.6);
 }
+/* ✅ FIX 6: will-change eklendi */
 .ai-panel {
     display: none;
     position: absolute;
@@ -2101,6 +2185,8 @@ footer {
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    will-change: transform;
+    transform: translateZ(0);
 }
 .ai-panel.open {
     display: flex;
@@ -2109,6 +2195,9 @@ footer {
 .ai-messages {
     height: 280px;
     overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: auto;
+    overscroll-behavior: contain;
     padding: 16px;
     display: flex;
     flex-direction: column;
@@ -2333,6 +2422,9 @@ footer {
     align-items: center !important;
     justify-content: center !important;
     padding: 20px !important;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 .admin-login-screen.active {
     display: flex !important;
@@ -2359,6 +2451,8 @@ footer {
 }
 
 /* ===== TAKIM SAYFASI (TAM EKRAN) ===== */
+/* ✅ FIX 4: overflow-x: hidden eklendi */
+/* ✅ [v7.2.1] overscroll contain + GPU katmanı */
 .team-page-overlay {
     position: fixed;
     top: 0;
@@ -2371,6 +2465,12 @@ footer {
     flex-direction: column;
     padding: 20px;
     overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+    overscroll-behavior: contain;
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 .team-page-overlay.open {
     display: flex;
@@ -2428,6 +2528,9 @@ footer {
 .team-page-chat .team-chat-messages {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: auto;
+    overscroll-behavior: contain;
     max-height: none;
     height: auto;
     min-height: 200px;
@@ -2464,6 +2567,8 @@ footer {
     padding: 12px;
     max-height: 200px;
     overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
 }
 .team-page-card h4 {
     color: var(--accent);
@@ -2551,6 +2656,8 @@ footer {
     margin-top: 8px;
     max-height: 200px;
     overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
     background: var(--surface);
     border-radius: 12px;
     padding: 8px;
@@ -2559,6 +2666,8 @@ footer {
 #vizyonLogContainer {
     max-height: 180px;
     overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
     background: var(--surface);
     border-radius: 12px;
     padding: 8px;
@@ -2873,6 +2982,249 @@ footer {
 /* ========== [YENİ EKLEME SONU] ========== */
 
 /* ============================================================ */
+/* ========== [YENİ EKLEME] AYLIK YARIŞMA TAM EKRAN SAYFASI === */
+/* ========== [SORUN 4] Yarışma sayfası stilleri ============== */
+/* ========== [v7.2.1] z-index 999999 → 99998 (modal fix) ===== */
+/* ============================================================ */
+.contest-page-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg);
+    /* ✅ [v7.2.1] z-index 999999 → 99998 yapıldı; modallar (99999) artık üstte görünür */
+    z-index: 99998;
+    display: none;
+    flex-direction: column;
+    padding: 24px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+    overscroll-behavior: contain;
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+.contest-page-overlay.open {
+    display: flex;
+}
+.contest-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--gold);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.contest-page-header h2 {
+    margin: 0;
+    color: var(--gold);
+    font-family: var(--font-display);
+    font-size: 24px;
+}
+.contest-page-close {
+    background: none;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.contest-page-close:hover {
+    background: rgba(255,71,87,0.15);
+    color: #fff;
+}
+.contest-page-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+.contest-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+}
+.contest-section h3 {
+    color: var(--accent);
+    font-family: var(--font-display);
+    font-size: 18px;
+    margin: 0 0 12px 0;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+}
+.contest-ranking-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--bg);
+    border-radius: 10px;
+    margin-bottom: 6px;
+    border-left: 3px solid var(--border);
+    transition: all 0.15s ease;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.contest-ranking-row.rank-1 { border-left-color: var(--gold); background: rgba(255,215,0,0.06); }
+.contest-ranking-row.rank-2 { border-left-color: #c0c0c0; background: rgba(192,192,192,0.05); }
+.contest-ranking-row.rank-3 { border-left-color: #cd7f32; background: rgba(205,127,50,0.05); }
+.contest-ranking-row.my-row { outline: 2px solid var(--accent); }
+.contest-ranking-name { font-weight: 700; color: var(--text); font-size: 14px; }
+.contest-ranking-email { font-size: 11px; color: var(--text3); }
+.contest-ranking-points { color: var(--gold); font-weight: 800; font-size: 16px; }
+.contest-action-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 16px 0;
+}
+.contest-action-row .btn {
+    min-width: 200px;
+}
+.contest-warning-box {
+    background: rgba(255,183,0,0.08);
+    border: 2px solid var(--warning);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 16px 0;
+    line-height: 1.7;
+}
+.contest-warning-box h4 {
+    color: var(--warning);
+    margin: 0 0 12px 0;
+    font-size: 16px;
+}
+.contest-warning-box .user-info-row {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin: 8px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+.contest-warning-box .user-info-label { color: var(--text3); font-weight: 500; }
+.contest-warning-box .user-info-value { color: var(--accent); font-weight: 700; word-break: break-all; }
+.contest-project-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.contest-project-card .project-info {
+    flex: 1;
+    min-width: 200px;
+}
+.contest-project-card .project-info-name {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+.contest-project-card .project-info-meta {
+    font-size: 12px;
+    color: var(--text3);
+}
+.contest-project-card .project-info-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.contest-review-content {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 16px 0;
+    max-height: 60vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+}
+.contest-review-content pre {
+    background: #0a0a0a;
+    border: 1px solid rgba(0,212,255,0.15);
+    border-radius: 8px;
+    padding: 14px;
+    font-family: var(--font-code);
+    font-size: 13px;
+    color: var(--accent2);
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 8px 0;
+    overflow-x: auto;
+}
+.contest-project-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.contest-project-form label {
+    font-size: 13px;
+    color: var(--text2);
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: block;
+}
+.contest-project-form textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-family: var(--font-code);
+    font-size: 13px;
+    min-height: 250px;
+    resize: vertical;
+    line-height: 1.6;
+}
+.contest-project-form textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(0,212,255,0.2);
+}
+.contest-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text3);
+    font-size: 14px;
+}
+/* ========== [YENİ EKLEME SONU - CONTEST] ========== */
+
+/* ============================================================ */
+/* ===== [v7.2.1] CONTEST MODAL Z-INDEX GARANTİSİ ============= */
+/* ============================================================ */
+/* Bu 4 modal, yarışma sayfası açıkken de KESİNLİKLE üstte görünür */
+#contestJoinWarningModal,
+#contestProjectFormModal,
+#contestReviewModal,
+#contestScoreModal {
+    z-index: 9999999 !important;
+}
+/* ============================================================ */
+
+/* ============================================================ */
 /* ========== TABLET UYUMLULUĞU (max-width: 768px) ============ */
 /* ============================================================ */
 @media (max-width: 768px) {
@@ -3060,6 +3412,16 @@ footer {
     .api-password-screen .lock-icon { font-size: 52px !important; }
     .api-password-screen h3 { font-size: 18px !important; }
     .ai-msg-actions button { font-size: 9px !important; padding: 3px 8px !important; }
+
+    /* [YENİ] Contest page tablet */
+    .contest-page-overlay { padding: 14px; }
+    .contest-page-header h2 { font-size: 20px !important; }
+    .contest-ranking-row { padding: 8px 10px !important; }
+    .contest-ranking-name { font-size: 13px !important; }
+    .contest-ranking-points { font-size: 14px !important; }
+    .contest-action-row .btn { min-width: 140px; font-size: 13px !important; }
+    .contest-project-card { padding: 12px !important; }
+    .contest-review-content pre { font-size: 12px !important; }
 }
 
 /* ============================================================ */
@@ -3308,6 +3670,29 @@ footer {
     /* [YENİ] Takım mesaj aksiyonları mobil */
     .team-msg-actions { gap: 2px !important; }
     .team-msg-actions button { font-size: 10px !important; padding: 2px 5px !important; }
+
+    /* [YENİ] Contest page mobil */
+    .contest-page-overlay { padding: 10px !important; }
+    .contest-page-header { padding-bottom: 10px !important; gap: 8px !important; margin-bottom: 10px !important; }
+    .contest-page-header h2 { font-size: 16px !important; }
+    .contest-page-close { font-size: 11px !important; padding: 4px 12px !important; }
+    .contest-section { padding: 12px !important; border-radius: 12px !important; }
+    .contest-section h3 { font-size: 14px !important; margin-bottom: 8px !important; }
+    .contest-ranking-row { padding: 6px 8px !important; font-size: 11px !important; }
+    .contest-ranking-name { font-size: 11px !important; }
+    .contest-ranking-email { font-size: 9px !important; }
+    .contest-ranking-points { font-size: 12px !important; }
+    .contest-action-row { flex-direction: column !important; gap: 8px !important; }
+    .contest-action-row .btn { width: 100% !important; min-width: unset !important; font-size: 12px !important; padding: 10px !important; }
+    .contest-warning-box { padding: 14px !important; }
+    .contest-warning-box h4 { font-size: 14px !important; }
+    .contest-warning-box .user-info-row { font-size: 11px !important; padding: 8px 10px !important; flex-direction: column !important; align-items: flex-start !important; gap: 4px !important; }
+    .contest-project-card { padding: 10px !important; flex-direction: column !important; align-items: stretch !important; }
+    .contest-project-card .project-info-actions { flex-direction: column !important; }
+    .contest-project-card .project-info-actions .btn { width: 100% !important; }
+    .contest-review-content pre { font-size: 11px !important; padding: 10px !important; }
+    .contest-project-form textarea { font-size: 12px !important; min-height: 180px !important; }
+    .contest-project-form label { font-size: 12px !important; }
 }
 
 /* ============================================================ */
@@ -3326,6 +3711,12 @@ footer {
     .api-key-card .api-key-value { font-size: 9px !important; }
     .api-key-card .api-key-actions button { font-size: 9px !important; padding: 3px 8px !important; }
     .api-password-screen .lock-icon { font-size: 38px !important; }
+
+    /* [YENİ] Contest çok küçük ekran */
+    .contest-page-header h2 { font-size: 14px !important; }
+    .contest-section h3 { font-size: 13px !important; }
+    .contest-ranking-name { font-size: 10px !important; }
+    .contest-ranking-points { font-size: 11px !important; }
 }
 
 /* ===== FOUNDER PANELİ İÇİN ÖZEL DÜZENLEME ===== */
@@ -3370,6 +3761,8 @@ footer {
     margin-top: 8px;
     max-height: 200px;
     overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
     background: var(--surface);
     border-radius: 12px;
     padding: 8px;
@@ -3379,6 +3772,8 @@ footer {
 #vizyonLogContainer {
     max-height: 180px;
     overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
     background: var(--surface);
     border-radius: 12px;
     padding: 8px;
@@ -3399,6 +3794,7 @@ footer {
 /* ============================================================ */
 
 /* ===== BUTONLAR BÜYÜK ve BELİRGİN ===== */
+/* ✅ FIX 2: will-change + translateZ(0) eklendi */
 .btn-primary {
     font-size: 18px !important;
     padding: 14px 32px !important;
@@ -3407,12 +3803,14 @@ footer {
     border: none !important;
     border-radius: 60px !important;
     box-shadow: 0 0 20px rgba(0,212,255,0.4) !important;
+    will-change: transform;
 }
 .btn-primary:hover {
-    transform: scale(1.05) !important;
+    transform: scale(1.05) translateZ(0) !important;
     box-shadow: 0 0 30px rgba(0,212,255,0.6) !important;
 }
 
+/* ✅ FIX 3: will-change + translateZ(0) eklendi */
 .btn-secondary {
     font-size: 18px !important;
     padding: 14px 32px !important;
@@ -3420,10 +3818,12 @@ footer {
     color: #00d4ff !important;
     background: transparent !important;
     border-radius: 60px !important;
+    will-change: transform;
 }
 .btn-secondary:hover {
     background: rgba(0,212,255,0.1) !important;
     box-shadow: 0 0 20px rgba(0,212,255,0.3) !important;
+    transform: translateZ(0) !important;
 }
 
 /* ===== HERO BUTONLARI ===== */
@@ -3440,18 +3840,22 @@ footer {
 }
 
 /* ===== HERO BAŞLIK ===== */
+/* ✅ FIX 4: will-change: auto; eklendi (text-shadow titremesi önlenir) */
 .hero-title .line1 {
     font-size: clamp(56px, 10vw, 110px) !important;
     text-shadow: 0 0 40px rgba(0,212,255,0.5) !important;
+    will-change: auto;
 }
 .hero-title .line2 {
     font-size: clamp(48px, 8vw, 90px) !important;
     -webkit-text-stroke: 3px #00d4ff !important;
+    will-change: auto;
 }
 .hero-title .line3 {
     font-size: clamp(20px, 3vw, 36px) !important;
     color: #00ff88 !important;
     text-shadow: 0 0 20px rgba(0,255,136,0.3) !important;
+    will-change: auto;
 }
 
 /* ===== AI WIDGET (SAĞ ALT) ===== */
@@ -3461,9 +3865,10 @@ footer {
     font-size: 28px !important;
     background: linear-gradient(135deg, #00d4ff, #a855f7) !important;
     box-shadow: 0 0 40px rgba(0,212,255,0.5) !important;
+    will-change: transform, box-shadow;
 }
 .ai-widget-btn:hover {
-    transform: scale(1.1) !important;
+    transform: scale(1.1) translateZ(0) !important;
     box-shadow: 0 0 60px rgba(0,212,255,0.8) !important;
 }
 
@@ -3472,8 +3877,11 @@ footer {
     width: 420px !important;
     background: rgba(13,26,38,0.95) !important;
     backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
     border: 1px solid #00d4ff !important;
     border-radius: 24px !important;
+    will-change: transform;
+    transform: translateZ(0);
 }
 .ai-msg.bot {
     font-size: 14px !important;
@@ -3485,6 +3893,7 @@ footer {
 }
 
 /* ===== GOOGLE BUTONU ===== */
+/* ✅ FIX 5: will-change: transform; eklendi */
 .btn-google {
     width: 100%;
     padding: 14px;
@@ -3501,9 +3910,10 @@ footer {
     justify-content: center;
     gap: 10px;
     margin-bottom: 12px;
+    will-change: transform;
 }
 .btn-google:hover {
-    transform: scale(1.02);
+    transform: scale(1.02) translateZ(0);
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 .btn-google i {
@@ -3512,6 +3922,7 @@ footer {
 }
 
 /* ===== FACEBOOK BUTONU ===== */
+/* ✅ FIX 5: will-change: transform; eklendi */
 .btn-facebook {
     width: 100%;
     padding: 14px;
@@ -3528,9 +3939,10 @@ footer {
     justify-content: center;
     gap: 10px;
     margin-bottom: 12px;
+    will-change: transform;
 }
 .btn-facebook:hover {
-    transform: scale(1.02);
+    transform: scale(1.02) translateZ(0);
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 .btn-facebook i {
@@ -3635,6 +4047,7 @@ footer {
     animation: scrollComments 30s linear infinite;
     gap: 20px;
     width: max-content;
+    will-change: transform;
 }
 .comments-track:hover {
     animation-play-state: paused;
@@ -3737,6 +4150,7 @@ button[onclick*="togglePassword"] i {
 }
 
 /* ----- 2. SPLASH INTRO EKRANI (GELİŞMİŞ) ----- */
+/* ✅ FIX 6: contain: layout style paint; eklendi */
 .splash-screen {
     position: fixed;
     top: 0;
@@ -3751,6 +4165,7 @@ button[onclick*="togglePassword"] i {
     z-index: 999999;
     transition: opacity 0.8s ease, visibility 0.8s ease;
     overflow: hidden;
+    contain: layout style paint;
 }
 .splash-screen.hidden {
     opacity: 0;
@@ -3768,6 +4183,7 @@ button[onclick*="togglePassword"] i {
                 radial-gradient(ellipse at 50% 20%, rgba(255,107,53,0.08) 0%, transparent 40%);
     animation: splashBgPulse 6s ease-in-out infinite alternate;
     z-index: 0;
+    will-change: opacity, transform;
 }
 @keyframes splashBgPulse {
     0% { opacity: 0.6; transform: scale(1); }
@@ -3789,6 +4205,7 @@ button[onclick*="togglePassword"] i {
     background: rgba(0,212,255,0.4);
     border-radius: 50%;
     animation: floatParticle linear infinite;
+    will-change: transform;
 }
 .splash-particle:nth-child(odd) {
     background: rgba(168,85,247,0.3);
@@ -3803,6 +4220,7 @@ button[onclick*="togglePassword"] i {
 }
 
 /* Logo / Amblem */
+/* ✅ FIX 7: will-change: transform, box-shadow; eklendi */
 .splash-logo {
     width: 120px;
     height: 120px;
@@ -3817,6 +4235,7 @@ button[onclick*="togglePassword"] i {
     animation: splashPulse 1.8s ease-in-out infinite, logoSpin 6s linear infinite;
     position: relative;
     z-index: 2;
+    will-change: transform, box-shadow;
 }
 @keyframes splashPulse {
     0% { transform: scale(1); box-shadow: 0 0 40px rgba(0,212,255,0.4); }
@@ -3829,6 +4248,7 @@ button[onclick*="togglePassword"] i {
 }
 
 /* Ana başlık */
+/* ✅ FIX 8: will-change: background-position; eklendi */
 .splash-title {
     margin-top: 30px;
     font-family: var(--font-display);
@@ -3843,6 +4263,7 @@ button[onclick*="togglePassword"] i {
     position: relative;
     z-index: 2;
     letter-spacing: 2px;
+    will-change: background-position;
 }
 @keyframes gradientMove {
     0% { background-position: 0% 50%; }
@@ -3890,6 +4311,7 @@ button[onclick*="togglePassword"] i {
     border-radius: 4px;
     transition: width 0.3s ease;
     animation: progressGlow 1.5s ease-in-out infinite alternate;
+    will-change: width, box-shadow;
 }
 @keyframes progressGlow {
     0% { box-shadow: 0 0 10px rgba(0,212,255,0.3); }
@@ -3926,10 +4348,12 @@ button[onclick*="togglePassword"] i {
     inset: 0;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     z-index: 99999;
     align-items: flex-end;
     justify-content: center;
     padding: 20px;
+    overflow-x: hidden;
 }
 .download-modal-overlay.active {
     display: flex;
@@ -3943,6 +4367,7 @@ button[onclick*="togglePassword"] i {
     padding: 32px 24px 40px;
     animation: slideUp 0.4s ease;
     box-shadow: 0 -8px 40px rgba(0,0,0,0.6);
+    will-change: transform;
 }
 @keyframes slideUp {
     from { transform: translateY(100%); opacity: 0; }
@@ -3971,9 +4396,10 @@ button[onclick*="togglePassword"] i {
     font-size: 16px;
     font-weight: 700;
     transition: all 0.2s;
+    will-change: transform;
 }
 .download-btn-group .btn:hover {
-    transform: scale(1.02);
+    transform: scale(1.02) translateZ(0);
 }
 .btn-download-play {
     background: #0f0f0f;
@@ -4033,9 +4459,10 @@ button[onclick*="togglePassword"] i {
     text-align: center;
     transition: all 0.25s;
     cursor: pointer;
+    will-change: transform;
 }
 .store-item:hover {
-    transform: translateY(-4px);
+    transform: translateY(-4px) translateZ(0);
     border-color: var(--accent);
     box-shadow: 0 8px 30px rgba(0,212,255,0.15);
 }
@@ -4162,6 +4589,7 @@ button[onclick*="togglePassword"] i {
     background: var(--bg2);
     border-right: 1px solid var(--border);
     overflow-y: auto;
+    overflow-x: hidden;
     flex-shrink: 0;
 }
 .dm-conversation-item {
@@ -4215,6 +4643,7 @@ button[onclick*="togglePassword"] i {
 .dm-messages {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -4304,6 +4733,8 @@ button[onclick*="togglePassword"] i {
     align-items: center;
     gap: 16px;
 }
+
+/* ✅ FIX 11: will-change: left; eklendi */
 .toggle-switch {
     width: 48px;
     height: 26px;
@@ -4326,6 +4757,7 @@ button[onclick*="togglePassword"] i {
     top: 3px;
     left: 3px;
     transition: 0.3s;
+    will-change: left;
 }
 .toggle-switch.active::after {
     left: 25px;
@@ -4342,17 +4774,20 @@ button[onclick*="togglePassword"] i {
     z-index: 99999;
     overflow: hidden;
 }
+/* ✅ FIX 9: will-change: transform, opacity; eklendi */
 .confetti-piece {
     position: absolute;
     width: 10px;
     height: 10px;
     opacity: 0;
     animation: confettiFall 3s ease-in forwards;
+    will-change: transform, opacity;
 }
 @keyframes confettiFall {
     0% { transform: translateY(-10vh) rotate(0deg) scale(1); opacity: 1; }
     100% { transform: translateY(110vh) rotate(720deg) scale(0.2); opacity: 0; }
 }
+/* ✅ FIX 10: will-change: transform; eklendi */
 .level-up-modal {
     position: fixed;
     top: 50%;
@@ -4366,6 +4801,7 @@ button[onclick*="togglePassword"] i {
     text-align: center;
     box-shadow: 0 0 80px rgba(255, 215, 0, 0.3);
     animation: levelUpPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    will-change: transform;
 }
 @keyframes levelUpPop {
     0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
@@ -4426,6 +4862,7 @@ body.space-mode .space-stars::after {
     background-repeat: repeat;
     opacity: 0.6;
     animation: twinkle 4s ease-in-out infinite alternate;
+    will-change: opacity;
 }
 @keyframes twinkle {
     0% { opacity: 0.4; }
@@ -4449,6 +4886,7 @@ body.space-mode .space-stars::after {
     font-size: 11px;
     font-weight: 800;
     animation: pulseX2 1.2s infinite;
+    will-change: transform;
 }
 @keyframes pulseX2 {
     0% { transform: scale(1); }
@@ -4495,6 +4933,7 @@ body.light-theme .legal-banner {
 /* ============================================================ */
 
 /* Küçük toggle switch (API modu için) */
+/* ✅ FIX 11: will-change: left; eklendi */
 .toggle-switch-sm {
     width: 36px;
     height: 20px;
@@ -4519,12 +4958,14 @@ body.light-theme .legal-banner {
     top: 2px;
     left: 2px;
     transition: 0.3s;
+    will-change: left;
 }
 .toggle-switch-sm.active::after {
     left: 18px;
 }
 
 /* Mikro toggle (dashboard başlık için) */
+/* ✅ FIX 11: will-change: left; eklendi */
 .toggle-switch-xs {
     width: 28px;
     height: 16px;
@@ -4549,6 +4990,7 @@ body.light-theme .legal-banner {
     top: 2px;
     left: 2px;
     transition: 0.3s;
+    will-change: left;
 }
 .toggle-switch-xs.active::after {
     left: 14px;
@@ -4690,7 +5132,7 @@ body.light-theme .legal-banner {
 }
 .btn-gradient-border:hover {
     box-shadow: 0 0 20px rgba(0,212,255,0.3);
-    transform: scale(1.02);
+    transform: scale(1.02) translateZ(0);
 }
 
 /* Ghost buton (çok hafif) */
@@ -4863,6 +5305,7 @@ body.light-theme .legal-banner {
     background: var(--accent);
     border-radius: 50%;
     animation: thinkingDot 1.4s infinite ease-in-out both;
+    will-change: transform, opacity;
 }
 .ai-thinking-indicator .dot:nth-child(1) { animation-delay: -0.32s; }
 .ai-thinking-indicator .dot:nth-child(2) { animation-delay: -0.16s; }
@@ -4980,6 +5423,7 @@ body.light-theme .legal-banner {
     animation: apiIndicatorPulse 2s infinite;
     margin-left: 4px;
     vertical-align: middle;
+    will-change: transform, opacity;
 }
 @keyframes apiIndicatorPulse {
     0%, 100% { opacity: 1; transform: scale(1); }
@@ -5722,7 +6166,6 @@ body.light-theme .legal-banner {
     .toggle-switch-sm.active::after { left: 14px !important; }
 }
 </style>
-
 </head>
 <body>
 
@@ -6152,11 +6595,13 @@ body.light-theme .legal-banner {
                     </div>
                 </div>
 
-                <!-- ===== [YENİ] API MODU TOGGLE (SADECE YETKİLİ KULLANICILAR) ===== -->
-                <div id="apiModeToggleWrapper" style="display:none; margin-bottom:12px; text-align:center;">
+                <!-- ===== [YENİ] API MODU TOGGLE (HERKESE AÇIK) ===== -->
+                <!-- ✅ GÜNCELLEME (Sorun 5): display:block yapıldı - rol kontrolü kaldırıldı -->
+                <div id="apiModeToggleWrapper" style="display:block; margin-bottom:12px; text-align:center;">
                     <div class="api-mode-toggle-large" id="apiModeToggle">
                         <button id="btnSiteAI" class="active" onclick="window.switchToSiteAI()">🌐 8 Model Tek Çatı — Site Vizyon AI</button>
-                        <button id="btnCustomAI" onclick="window.switchToCustomAI()">🔑 Kendi API Anahtarımı Kullan</button>
+                        <!-- ✅ FIX (Sorun 2): switchToCustomAI yerine 3 seçenekli modal açılıyor -->
+                        <button id="btnCustomAI" onclick="window.openApiKeySelectionModal()">🔑 Kendi API Anahtarımı Kullan</button>
                     </div>
                     <div id="apiModeStatus" style="margin-top:6px; font-size:11px; color:var(--text3);">
                         Aktif mod: <span style="color:var(--accent2); font-weight:700;">🌐 Site Vizyon AI (8 Model Tek Çatı)</span>
@@ -6320,10 +6765,21 @@ body.light-theme .legal-banner {
                 <div id="teamTasksList" style="font-size:13px;">Yükleniyor...</div>
             </div>
 
-            <!-- Aylık Yarışma -->
+            <!-- ✅ GÜNCELLEME (Sorun 4): Aylık Yarışma - Yeni Kart -->
             <div class="dashboard-card full-width">
                 <h3>🏆 Aylık Yarışma</h3>
-                <div id="contestRanking" style="max-height:200px;overflow-y:auto;"></div>
+                <div style="text-align:center; padding:16px 0;">
+                    <p style="color:var(--text2); font-size:14px; margin-bottom:16px;">
+                        🎉 Bu ayki yarışmaya katıl, projeni yap, puanla ve ödül kazan!
+                    </p>
+                    <p style="color:var(--text3); font-size:12px; margin-bottom:20px;">
+                        🥇 1. Ödül: Takım Paketi · 🥈 2. Ödül: Pro Paketi · 🥉 3. Ödül: 5000 V27 Puan
+                    </p>
+                    <button class="btn-primary" onclick="window.openContestPage()" style="font-size:16px; padding:14px 32px;">
+                        🏆 Yarışma Ekranına Git
+                    </button>
+                </div>
+                <div id="contestRanking" style="max-height:200px;overflow-y:auto; margin-top:12px;"></div>
             </div>
 
             <!-- İş İlanları -->
@@ -6596,8 +7052,8 @@ body.light-theme .legal-banner {
         </div>
 
         <!-- ===== [YENİ] API ANAHTAR YÖNETİMİ BUTONLARI (EN ALTTA) ===== -->
-        <!-- Sadece takım paketi olanlarda ve tüm admin/beta/kurucu rolleri görebilir -->
-        <div id="apiKeyManagementWrapper" class="dashboard-card full-width" style="display:none; margin-top:16px; text-align:center;">
+        <!-- ✅ GÜNCELLEME (Sorun 5): display:block yapıldı - artık herkes görebilir -->
+        <div id="apiKeyManagementWrapper" class="dashboard-card full-width" style="display:block; margin-top:16px; text-align:center;">
             <h3 style="margin-bottom:12px;">🔑 API Anahtar Yönetimi</h3>
             <p style="font-size:12px; color:var(--text3); margin-bottom:12px;">
                 Kendi API anahtarınızı (OpenAI, Groq, DeepSeek, Gemini vb.) ekleyerek VİZYON AI'ya alternatif olarak kendi modelinizi kullanabilirsiniz.
@@ -6614,9 +7070,105 @@ body.light-theme .legal-banner {
 
         <div id="extraAdminCard" class="dashboard-card full-width" style="display:none; margin-top:24px;"></div>
 
+        <!-- ===== [YENİ – SORUN 4] YARIŞMA PROJELERİ (SADECE FOUNDER) ===== -->
+        <!-- Founder tarafından ekranın en altında görünür -->
+        <div id="contestProjectsFounderSection" class="dashboard-card full-width" style="display:none; margin-top:24px;">
+            <h3 style="color:var(--gold);">🏆 Yarışma Projeleri (Kurucu)</h3>
+            <p style="font-size:12px; color:var(--text3); margin-bottom:12px;">
+                Yarışmaya katılan kullanıcıların gönderdiği projeler. Projeyi görüntüle ve puanla.
+            </p>
+            <div id="contestProjectsFounderList">
+                <div style="text-align:center; padding:20px; color:var(--text3); font-size:13px;">⏳ Yükleniyor...</div>
+            </div>
+        </div>
+
     </div> <!-- dashboard-content-wrapper sonu -->
 </div>
 <!-- ===== DASHBOARD SONU ===== -->
+
+
+<!-- ============================================================ -->
+<!-- ===== [YENİ – SORUN 2 FIX] API ANAHTAR SEÇİM MODALI ======== -->
+<!-- ============================================================ -->
+<!-- Bu modal, kullanıcı "Kendi API Anahtarımı Kullan" butonuna bastığında açılır. -->
+<!-- 3 seçenek sunar: 1) Tüm anahtarları kullan  2) Seç  3) İptal -->
+<!-- "Seç" seçeneğinde sadece anahtar adları görünür (değer gizli), checkbox ile işaretlenir. -->
+<div id="apiKeySelectionModal" class="modal-overlay" onclick="if(event.target===this) window.closeApiKeySelectionModal()">
+    <div class="modal" style="max-width:560px;">
+        <div class="modal-header">
+            <h3>🔑 Kendi API Anahtarımı Kullan</h3>
+            <button class="modal-close" onclick="window.closeApiKeySelectionModal()">×</button>
+        </div>
+
+        <!-- ===== AŞAMA 1: 3 SEÇENEK EKRANI ===== -->
+        <div id="apiKeySelectionStage1" style="padding:10px 0;">
+            <p style="color:var(--text2); font-size:13px; margin-bottom:16px; text-align:center;">
+                Nasıl kullanmak istersiniz? Aşağıdaki seçeneklerden birini seçin:
+            </p>
+
+            <!-- Seçenek 1: Tüm anahtarları kullan -->
+            <button class="btn-primary" onclick="window.useAllApiKeys()" style="width:100%; margin-bottom:10px; padding:16px; display:flex; align-items:center; justify-content:center; gap:10px; font-size:14px;">
+                <span style="font-size:20px;">🌐</span>
+                <span>Tüm API Anahtarlarını Kullan</span>
+                <span style="font-size:11px; opacity:0.85; display:block; margin-left:6px;">(Sırayla dener, ilk cevap veren kazanır)</span>
+            </button>
+
+            <!-- Seçenek 2: Seç -->
+            <button class="btn-secondary" onclick="window.showApiKeySelector()" style="width:100%; margin-bottom:10px; padding:16px; display:flex; align-items:center; justify-content:center; gap:10px; font-size:14px; border:2px solid var(--accent);">
+                <span style="font-size:20px;">☑️</span>
+                <span>API Anahtarı / Anahtarları Seç</span>
+                <span style="font-size:11px; opacity:0.85; display:block; margin-left:6px;">(Belirli anahtarları seçersiniz)</span>
+            </button>
+
+            <!-- Seçenek 3: İptal -->
+            <button class="btn-danger" onclick="window.closeApiKeySelectionModal()" style="width:100%; padding:12px; font-size:13px;">
+                ❌ İptal (Site moduna dön)
+            </button>
+
+            <div style="margin-top:16px; padding:10px 14px; background:rgba(0,212,255,0.05); border:1px solid rgba(0,212,255,0.2); border-radius:12px; font-size:12px; color:#8ab4cc; line-height:1.6;">
+                <strong>💡 Bilgi:</strong> "Tüm Anahtarlar" modunda sistem tüm kayıtlı API anahtarlarınızı sırayla dener, ilk başarılı cevabı size gösterir. <br>
+                "Seç" modunda ise sadece işaretlediğiniz anahtarlar denenir.
+            </div>
+        </div>
+
+        <!-- ===== AŞAMA 2: ANAHTAR SEÇİM LİSTESİ ===== -->
+        <div id="apiKeySelectionStage2" style="display:none; padding:10px 0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                <p style="color:var(--text2); font-size:13px; margin:0;">
+                    Kullanmak istediğiniz anahtarları işaretleyin:
+                </p>
+                <button class="btn-secondary btn-sm" onclick="window.toggleSelectAllApiKeys()" style="font-size:11px; padding:4px 12px;">
+                    ☑️ Tümünü Seç / Kaldır
+                </button>
+            </div>
+
+            <div id="apiKeySelectionList" style="max-height:320px; overflow-y:auto; padding:4px; background:rgba(0,0,0,0.15); border-radius:12px; border:1px solid var(--border);">
+                <div style="text-align:center; padding:20px; color:var(--text3); font-size:12px;">⏳ Yükleniyor...</div>
+            </div>
+
+            <div id="apiKeySelectionCount" style="margin-top:10px; text-align:center; font-size:12px; color:var(--text3);">
+                0 anahtar seçildi
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:14px;">
+                <button class="btn-secondary" onclick="window.backToApiKeySelectionStage1()" style="flex:1; padding:12px; font-size:13px;">
+                    ⬅️ Geri
+                </button>
+                <button class="btn-primary" onclick="window.confirmSelectedApiKeys()" style="flex:2; padding:12px; font-size:13px;">
+                    ✅ Seçilenlerle Devam Et
+                </button>
+            </div>
+
+            <div style="margin-top:12px; padding:10px 14px; background:rgba(255,71,87,0.05); border:1px solid rgba(255,71,87,0.2); border-radius:12px; font-size:11px; color:#ffb0b0; line-height:1.6;">
+                <strong>🔒 Güvenlik:</strong> Anahtar değerleri güvenlik nedeniyle burada gösterilmez. Sadece isimleri listelenir. Tüm anahtar değerleri sunucuda şifrelenmiş olarak saklanır.
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- ===== [YENİ – SORUN 2 FIX] API ANAHTAR SEÇİM MODALI SONU ===== -->
+
+<!-- ===== HTML-2 SONU ===== -->
 
 
 <!-- ============================================================ -->
@@ -7371,7 +7923,7 @@ body.light-theme .legal-banner {
                 <button type="button" class="password-toggle-btn" onclick="togglePassword('apiValueInput', this)"><i class="fas fa-eye"></i></button>
             </div>
             <div class="api-input-hint">
-                Desteklenen servisler: OpenAI, Groq, DeepSeek, Gemini, OpenRouter, Cohere, Cerebras.
+                Desteklenen servisler: OpenAI, Groq, DeepSeek, Gemini, OpenRouter, Cohere, Cerebras, Anthropic (Claude), Mistral, Perplexity.
                 Doğru formatta girdiğinizden emin olun.
             </div>
 
@@ -7496,6 +8048,162 @@ body.light-theme .legal-banner {
 </div>
 
 <!-- ============================================================ -->
+<!-- ===== [YENİ – SORUN 4] AYLIK YARIŞMA TAM EKRAN SAYFASI ===== -->
+<!-- ============================================================ -->
+<div id="contestPage" class="contest-page-overlay">
+    <div class="contest-page-header">
+        <h2>🏆 Aylık Yarışma</h2>
+        <button class="contest-page-close" onclick="window.closeContestPage()">✕ Kapat</button>
+    </div>
+    <div class="contest-page-body">
+
+        <!-- ===== En üstte: Proje Yap butonu ===== -->
+        <div class="contest-section" style="text-align:center;">
+            <h3 style="border:none; padding:0;">🎯 Projeni Gönder</h3>
+            <p style="color:var(--text2); font-size:13px; margin-bottom:16px;">
+                Yarışmaya katıldıysan projeni yap ve kurucuya gönder. Kurucu puanlayacak ve sıralamada yükseleceksin!
+            </p>
+            <div class="contest-action-row">
+                <button class="btn-primary" id="contestSubmitProjectBtn" onclick="window.openContestProjectForm()" style="display:none;">
+                    📝 Proje Yap
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== Katılım durumu (Katılmadıysa uyarı + onayla) ===== -->
+        <div class="contest-section" id="contestJoinSection">
+            <h3>🎯 Yarışmaya Katılım</h3>
+            <div id="contestJoinStatusContent">
+                <div class="contest-empty-state">
+                    ⏳ Kontrol ediliyor...
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== Sıralama (Ranking) ===== -->
+        <div class="contest-section">
+            <h3>🥇 Sıralama</h3>
+            <div id="contestRankingList">
+                <div class="contest-empty-state">
+                    ⏳ Yükleniyor...
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ===== Yarışmaya Katılım Uyarı Modalı ===== -->
+<div id="contestJoinWarningModal" class="modal-overlay" onclick="if(event.target===this) window.closeContestJoinWarning()">
+    <div class="modal" style="max-width:560px;">
+        <div class="modal-header">
+            <h3>⚠️ Katılım Onayı</h3>
+            <button class="modal-close" onclick="window.closeContestJoinWarning()">×</button>
+        </div>
+        <div class="contest-warning-box">
+            <h4>🔒 GÜVENLİK UYARISI</h4>
+            <p style="color:var(--text2); font-size:13px; line-height:1.7; margin-bottom:14px;">
+                Bu sitedeki giriş yaptığınız hesabın <strong style="color:var(--accent);">maili</strong> ve <strong style="color:var(--accent);">ismini</strong> görmemize izin verir. Hiçbir risk yoktur.
+            </p>
+            <div style="font-size:12px; color:var(--text3); margin-bottom:12px;">
+                Aşağıdaki bilgiler yarışmaya katılım için kullanılacaktır:
+            </div>
+            <div class="user-info-row">
+                <span class="user-info-label">📧 E-posta:</span>
+                <span class="user-info-value" id="contestJoinEmail">-</span>
+            </div>
+            <div class="user-info-row">
+                <span class="user-info-label">👤 Site İsmi:</span>
+                <span class="user-info-value" id="contestJoinName">-</span>
+            </div>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:16px;">
+            <button class="btn-secondary" onclick="window.closeContestJoinWarning()" style="flex:1;">❌ İptal</button>
+            <button class="btn-primary" onclick="window.confirmContestJoin()" style="flex:1;">✅ Onayla ve Bitir</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Proje Gönderme Formu ===== -->
+<div id="contestProjectFormModal" class="modal-overlay" onclick="if(event.target===this) window.closeContestProjectForm()">
+    <div class="modal" style="max-width:800px; max-height:90vh; overflow-y:auto;">
+        <div class="modal-header">
+            <h3>📝 Proje Gönder</h3>
+            <button class="modal-close" onclick="window.closeContestProjectForm()">×</button>
+        </div>
+        <div class="contest-project-form">
+            <div>
+                <label>📌 Proje Adı</label>
+                <input type="text" id="contestProjectNameInput" class="form-input" placeholder="Projenize bir isim verin..." style="margin-bottom:0;">
+            </div>
+            <div>
+                <label>💻 Kod / İçerik</label>
+                <textarea id="contestProjectCodeInput" placeholder="Kodunuzu buraya yazın...&#10;&#10;Örnek:&#10;function hesapla(a, b) {&#10;  return a + b;&#10;}"></textarea>
+            </div>
+            <div style="background:rgba(0,212,255,0.05); border:1px solid rgba(0,212,255,0.2); border-radius:12px; padding:10px 14px; font-size:12px; color:#8ab4cc; line-height:1.6;">
+                <strong>💡 Not:</strong> Projeniz kurucuya gönderilecek ve kurucu tarafından puanlanacaktır. Yanlış veya zararlı içerik paylaşmayın.
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-secondary" onclick="window.closeContestProjectForm()" style="flex:1;">❌ İptal</button>
+                <button class="btn-primary" onclick="window.submitContestProject()" style="flex:2;">📤 Onayla ve Gönder</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Proje İnceleme Modalı (Founder) ===== -->
+<div id="contestReviewModal" class="modal-overlay" onclick="if(event.target===this) window.closeContestReview()">
+    <div class="modal" style="max-width:800px; max-height:90vh; overflow-y:auto;">
+        <div class="modal-header">
+            <h3>🔍 Proje İncelemesi</h3>
+            <button class="modal-close" onclick="window.closeContestReview()">×</button>
+        </div>
+        <div style="margin-bottom:12px;">
+            <div style="font-size:14px; color:var(--text2); margin-bottom:6px;">
+                <strong>📧 Kullanıcı:</strong> <span id="contestReviewEmail">-</span>
+            </div>
+            <div style="font-size:14px; color:var(--text2); margin-bottom:6px;">
+                <strong>👤 İsim:</strong> <span id="contestReviewName">-</span>
+            </div>
+            <div style="font-size:14px; color:var(--text2); margin-bottom:6px;">
+                <strong>📌 Proje:</strong> <span id="contestReviewProjectName">-</span>
+            </div>
+        </div>
+        <div class="contest-review-content">
+            <div style="font-size:13px; color:var(--text3); margin-bottom:6px;">💻 Kod / İçerik:</div>
+            <pre id="contestReviewCode">-</pre>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:16px;">
+            <button class="btn-primary" onclick="window.closeContestReview()" style="flex:1; font-size:15px; padding:14px;">✅ İnceleme Bitir</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Proje Puanlama Modalı (Founder) ===== -->
+<div id="contestScoreModal" class="modal-overlay" onclick="if(event.target===this) window.closeContestScore()">
+    <div class="modal" style="max-width:500px;">
+        <div class="modal-header">
+            <h3>⭐ Projeyi Puanla</h3>
+            <button class="modal-close" onclick="window.closeContestScore()">×</button>
+        </div>
+        <div style="padding:10px 0;">
+            <p style="color:var(--text2); font-size:14px; margin-bottom:12px;">
+                <strong>📌 Proje:</strong> <span id="contestScoreProjectName">-</span>
+            </p>
+            <p style="color:var(--text2); font-size:14px; margin-bottom:16px;">
+                <strong>👤 Kullanıcı:</strong> <span id="contestScoreUserName">-</span>
+            </p>
+            <label style="font-size:13px; color:var(--text3); display:block; margin-bottom:6px;">🎯 Puan (1-10000 arası):</label>
+            <input type="number" id="contestScoreInput" class="form-input" placeholder="Örn: 500" min="1" max="10000" style="font-size:18px; text-align:center;">
+            <div style="display:flex; gap:10px; margin-top:16px;">
+                <button class="btn-secondary" onclick="window.closeContestScore()" style="flex:1;">İptal</button>
+                <button class="btn-primary" onclick="window.saveContestScore()" style="flex:1;">✅ Puanı Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
 <!-- ===================== HTML-3 SONU =========================== -->
 <!-- ============================================================ -->
 
@@ -7515,6 +8223,11 @@ body.light-theme .legal-banner {
 <!-- [YENİ] API ANAHTARLARIM MODALI -->
 <!-- [YENİ] API ŞİFRE BELİRLE MODALI -->
 <!-- [YENİ] API ŞİFRE GİR MODALI -->
+<!-- [YENİ] AYLIK YARIŞMA TAM EKRAN SAYFASI -->
+<!-- [YENİ] YARIŞMA KATILIM UYARI MODALI -->
+<!-- [YENİ] YARIŞMA PROJE FORMU MODALI -->
+<!-- [YENİ] YARIŞMA İNCELEME MODALI -->
+<!-- [YENİ] YARIŞMA PUANLAMA MODALI -->
 
    
     <!-- ============================================================ -->
@@ -8773,19 +9486,28 @@ console.log('🔒 GÜVENLİK: Sahte Google/Facebook authData girişleri devre d�
     
 <!-- ============================================================ -->
 <!-- JS-3: TAKIM VE AI (Cloud Code + Dosya Yükleme + Kopyala + 3D/Görsel + SES) -->
-<!-- YENİ: AI Durdur/Düzenle + Kendi API Modu (callCustomAI) + SwitchToSiteAI/SwitchToCustomAI -->
+<!-- YENİ: AI Durdur/Düzenle + Kendi API Modu + 3-Seçenek Modal + Sohbet Kaydetme + İsim Gösterimi -->
+<!-- + [SORUN 5] Genişletilmiş API model desteği (Anthropic, Mistral, Perplexity) -->
 <!-- ============================================================ -->
 <script>
 // ================================================================
 // JS-3: TAKIM VE AI (Cloud Code + Dosya Yükleme + Kopyala + 3D/Görsel HF + SES + GIF + ÇEVİRİ + SANSÜR + AI KOÇ + CANLI DESTEK)
-// + [YENİ] AI Durdurma / Düzenleme (window.currentAIRequestId + stopAIResponse)
-// + [YENİ] Kendi API Modu (switchToSiteAI / switchToCustomAI / callCustomAI)
+// + [SORUN 2] API 3-Seçenek Modalı (Tümü / Seç / İptal)
+// + [SORUN 3] callCustomAIWithKeys (sırayla dener, ilk cevap veren)
+// + [SORUN 4] Sohbet geçmişi kaydetme (sendAIMessage) + localStorage kalıcılık
+// + [SORUN 5] Mesaj hizalaması + isim gösterimi (👤 / 🧠)
+// + [SORUN 5] Genişletilmiş API model desteği
 // ================================================================
 
 // ========== [YENİ] AI İSTEK KONTROL DEĞİŞKENLERİ ==========
 window.currentAIRequestId = null;
 window.currentAIMode = 'site'; // 'site' veya 'custom'
 window.fullAIConversationId = null;
+
+// ========== [SORUN 2] API SEÇİM DURUMLARI ==========
+window.apiKeySelectionMode = null;   // 'all' veya 'selected'
+window.selectedApiKeyIds = [];       // Seçilen anahtar ID'leri
+window.customAIKeyIds = null;        // 'all' veya array of IDs
 
 // ========== TAKIM BİLGİSİNİ YÜKLE ==========
 async function loadTeamInfo() {
@@ -8841,7 +9563,7 @@ async function loadTeamInfo() {
         messages.forEach(msg => {
             var cls = (msg.get('user_email') === userEmail) ? 'user' : 'bot';
             var name = (msg.get('user_email') === userEmail) ? 'Ben' : msg.get('user_email').split('@')[0];
-            chatHtml += `<div class="ai-message ${cls}"><strong>${name}</strong>: ${msg.get('message')}</div>`;
+            chatHtml += `<div class="ai-message ${cls}"><div class="role">${cls === 'user' ? '👤' : '🧠'} ${name}</div>${msg.get('message')}</div>`;
         });
         if (chatContainer) {
             chatContainer.innerHTML = chatHtml || '<div>Henüz mesaj yok</div>';
@@ -9064,10 +9786,206 @@ function fallbackCopy(code, btn) {
 }
 
 // ================================================================
-// ========== [YENİ] AI MODU YÖNETİMİ (Site / Custom) =============
+// ========== [SORUN 2] API SEÇİM MODALI FONKSİYONLARI ============
 // ================================================================
+window.openApiKeySelectionModal = function() {
+    if (!currentUser) {
+        showNotification('Bu özelliği kullanmak için giriş yapmalısınız!', 'error');
+        return;
+    }
+    // Aşamaları sıfırla
+    var stage1 = document.getElementById('apiKeySelectionStage1');
+    var stage2 = document.getElementById('apiKeySelectionStage2');
+    if (stage1) stage1.style.display = 'block';
+    if (stage2) stage2.style.display = 'none';
+    window.selectedApiKeyIds = [];
+    window.apiKeySelectionMode = null;
+
+    var modal = document.getElementById('apiKeySelectionModal');
+    if (modal) {
+        modal.classList.add('open');
+        modal.style.display = 'flex';
+    }
+};
+
+window.closeApiKeySelectionModal = function() {
+    var modal = document.getElementById('apiKeySelectionModal');
+    if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = '';
+    }
+};
+
+window.backToApiKeySelectionStage1 = function() {
+    var stage1 = document.getElementById('apiKeySelectionStage1');
+    var stage2 = document.getElementById('apiKeySelectionStage2');
+    if (stage1) stage1.style.display = 'block';
+    if (stage2) stage2.style.display = 'none';
+};
+
+// ===== SEÇENEK 1: Tüm anahtarları kullan =====
+window.useAllApiKeys = async function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    // Anahtar var mı kontrol et
+    try {
+        var result = await Parse.Cloud.run('getUserApiKeys', {});
+        if (!result || !result.success || !result.apiKeys || result.apiKeys.length === 0) {
+            showNotification('⚠️ Önce bir API anahtarı eklemelisiniz!', 'warning');
+            return;
+        }
+        window.currentAIMode = 'custom';
+        window.customAIMode = 'all';
+        window.customAIKeyIds = 'all';
+
+        var btnSite = document.getElementById('btnSiteAI');
+        var btnCustom = document.getElementById('btnCustomAI');
+        var status = document.getElementById('apiModeStatus');
+        if (btnSite) btnSite.classList.remove('active');
+        if (btnCustom) btnCustom.classList.add('active');
+        if (status) {
+            status.innerHTML = 'Aktif mod: <span style="color:var(--accent); font-weight:700;">🔑 Tüm API Anahtarlarım</span> (' + result.apiKeys.length + ' anahtar sırayla denenecek)';
+        }
+        showNotification('🔑 Tüm API anahtarları moduna geçildi (' + result.apiKeys.length + ' anahtar)', 'success');
+        window.closeApiKeySelectionModal();
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+// ===== SEÇENEK 2: Anahtar seçim listesini göster =====
+window.showApiKeySelector = async function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    var stage1 = document.getElementById('apiKeySelectionStage1');
+    var stage2 = document.getElementById('apiKeySelectionStage2');
+    var listContainer = document.getElementById('apiKeySelectionList');
+    var countEl = document.getElementById('apiKeySelectionCount');
+    if (!listContainer) return;
+
+    if (stage1) stage1.style.display = 'none';
+    if (stage2) stage2.style.display = 'block';
+
+    listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text3); font-size:12px;">⏳ Yükleniyor...</div>';
+
+    try {
+        var result = await Parse.Cloud.run('getUserApiKeys', {});
+        if (!result || !result.success || !result.apiKeys || result.apiKeys.length === 0) {
+            listContainer.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text3); font-size:13px;">📭 Henüz API anahtarınız yok.<br><br>Lütfen önce "API Ekle" butonundan bir anahtar ekleyin.</div>';
+            if (countEl) countEl.textContent = '0 anahtar';
+            return;
+        }
+
+        window.selectedApiKeyIds = [];
+        var html = '';
+        result.apiKeys.forEach(function(key) {
+            // ✅ GÜNCELLEME (Sorun 5): Genişletilmiş model desteği
+            var keyType = '';
+            var lname = (key.name || '').toLowerCase();
+            if (lname.indexOf('openai') !== -1 || lname.indexOf('gpt') !== -1) keyType = 'OpenAI';
+            else if (lname.indexOf('anthropic') !== -1 || lname.indexOf('claude') !== -1) keyType = 'Anthropic';
+            else if (lname.indexOf('groq') !== -1) keyType = 'Groq';
+            else if (lname.indexOf('deepseek') !== -1 || lname.indexOf('deep') !== -1) keyType = 'DeepSeek';
+            else if (lname.indexOf('gemini') !== -1 || lname.indexOf('google') !== -1) keyType = 'Gemini';
+            else if (lname.indexOf('openrouter') !== -1 || lname.indexOf('router') !== -1) keyType = 'OpenRouter';
+            else if (lname.indexOf('cohere') !== -1) keyType = 'Cohere';
+            else if (lname.indexOf('cerebras') !== -1) keyType = 'Cerebras';
+            else if (lname.indexOf('mistral') !== -1) keyType = 'Mistral';
+            else if (lname.indexOf('perplexity') !== -1) keyType = 'Perplexity';
+            else if (lname.indexOf('together') !== -1) keyType = 'Together';
+            else if (lname.indexOf('fireworks') !== -1) keyType = 'Fireworks';
+            else if (lname.indexOf('anyscale') !== -1) keyType = 'Anyscale';
+
+            html += '<label style="display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:6px; background:var(--bg); border:1px solid var(--border); border-radius:12px; cursor:pointer; transition:all 0.15s ease;" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\'">';
+            html += '<input type="checkbox" class="api-key-checkbox" data-key-id="' + key.id + '" onchange="window.updateSelectedApiKeyCount()" style="width:20px; height:20px; accent-color:var(--accent); cursor:pointer;">';
+            html += '<div style="flex:1; min-width:0;">';
+            html += '<div style="font-weight:600; color:var(--text); font-size:14px; word-break:break-word;">🔑 ' + window.escapeHtml(key.name) + '</div>';
+            html += '<div style="font-size:11px; color:var(--text3); margin-top:2px;">';
+            if (keyType) html += '<span style="color:var(--accent); font-weight:600;">' + keyType + '</span> · ';
+            html += '🔒 Değer gizli';
+            html += '</div>';
+            html += '</div>';
+            html += '</label>';
+        });
+        listContainer.innerHTML = html;
+        window.updateSelectedApiKeyCount();
+    } catch(e) {
+        listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--danger); font-size:12px;">❌ Yüklenemedi: ' + window.escapeHtml(e.message) + '</div>';
+    }
+};
+
+window.escapeHtml = function(text) {
+    if (text === null || text === undefined) return '';
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+};
+
+// ===== Tümünü Seç / Kaldır =====
+window.toggleSelectAllApiKeys = function() {
+    var checkboxes = document.querySelectorAll('.api-key-checkbox');
+    if (!checkboxes.length) return;
+    var allChecked = true;
+    checkboxes.forEach(function(cb) { if (!cb.checked) allChecked = false; });
+    checkboxes.forEach(function(cb) { cb.checked = !allChecked; });
+    window.updateSelectedApiKeyCount();
+};
+
+// ===== Seçim sayacı güncelle =====
+window.updateSelectedApiKeyCount = function() {
+    var checkboxes = document.querySelectorAll('.api-key-checkbox');
+    var selected = [];
+    checkboxes.forEach(function(cb) {
+        if (cb.checked) selected.push(cb.getAttribute('data-key-id'));
+    });
+    window.selectedApiKeyIds = selected;
+    var countEl = document.getElementById('apiKeySelectionCount');
+    if (countEl) {
+        if (selected.length === 0) {
+            countEl.textContent = '0 anahtar seçildi';
+            countEl.style.color = 'var(--text3)';
+        } else {
+            countEl.textContent = '✅ ' + selected.length + ' anahtar seçildi (sırayla denenecek)';
+            countEl.style.color = 'var(--accent2)';
+        }
+    }
+};
+
+// ===== Seçilenlerle devam et =====
+window.confirmSelectedApiKeys = function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    var checkboxes = document.querySelectorAll('.api-key-checkbox');
+    var selected = [];
+    checkboxes.forEach(function(cb) {
+        if (cb.checked) selected.push(cb.getAttribute('data-key-id'));
+    });
+    if (selected.length === 0) {
+        showNotification('⚠️ Lütfen en az bir anahtar seçin!', 'warning');
+        return;
+    }
+
+    window.currentAIMode = 'custom';
+    window.customAIMode = 'selected';
+    window.customAIKeyIds = selected;
+
+    var btnSite = document.getElementById('btnSiteAI');
+    var btnCustom = document.getElementById('btnCustomAI');
+    var status = document.getElementById('apiModeStatus');
+    if (btnSite) btnSite.classList.remove('active');
+    if (btnCustom) btnCustom.classList.add('active');
+    if (status) {
+        status.innerHTML = 'Aktif mod: <span style="color:var(--accent); font-weight:700;">🔑 Seçili API Anahtarlarım</span> (' + selected.length + ' anahtar sırayla denenecek)';
+    }
+    showNotification('🔑 ' + selected.length + ' seçili anahtarla devam ediliyor', 'success');
+    window.closeApiKeySelectionModal();
+};
+
+// ========== [LEGACY] switchToSiteAI / switchToCustomAI ==========
 window.switchToSiteAI = function() {
     window.currentAIMode = 'site';
+    window.customAIMode = null;
+    window.customAIKeyIds = null;
     var btnSite = document.getElementById('btnSiteAI');
     var btnCustom = document.getElementById('btnCustomAI');
     var status = document.getElementById('apiModeStatus');
@@ -9079,43 +9997,18 @@ window.switchToSiteAI = function() {
     showNotification('🌐 Site Vizyon AI moduna geçildi (8 model tek çatı)', 'success');
 };
 
-window.switchToCustomAI = async function() {
-    if (!currentUser) {
-        showNotification('Bu modu kullanmak için giriş yapmalısınız!', 'error');
-        return;
-    }
-    // Kullanıcının en az 1 API anahtarı var mı kontrol et
-    try {
-        var result = await Parse.Cloud.run('getUserApiKeys', {});
-        if (!result || !result.success || !result.apiKeys || result.apiKeys.length === 0) {
-            showNotification('⚠️ Önce bir API anahtarı eklemelisiniz! "API Ekle" butonunu kullanın.', 'warning');
-            // Site modunda kal
-            window.switchToSiteAI();
-            return;
-        }
-        window.currentAIMode = 'custom';
-        var btnSite = document.getElementById('btnSiteAI');
-        var btnCustom = document.getElementById('btnCustomAI');
-        var status = document.getElementById('apiModeStatus');
-        if (btnSite) btnSite.classList.remove('active');
-        if (btnCustom) btnCustom.classList.add('active');
-        if (status) {
-            status.innerHTML = 'Aktif mod: <span style="color:var(--accent); font-weight:700;">🔑 Kendi API Anahtarım</span> (' + result.apiKeys.length + ' anahtar)';
-        }
-        showNotification('🔑 Kendi API moduna geçildi', 'success');
-    } catch(e) {
-        showNotification('API anahtarları kontrol edilemedi: ' + e.message, 'error');
-        window.switchToSiteAI();
-    }
+// Legacy: artık doğrudan moda geçmiyor, yeni modalı açıyor
+window.switchToCustomAI = function() {
+    window.openApiKeySelectionModal();
 };
 
+// ========== API EKLE / LİSTE MODALLARI ==========
 window.openApiEkle = function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     var modal = document.getElementById('apiEkleModal');
     if (modal) {
         modal.classList.add('open');
         modal.style.display = 'flex';
-        // Alanları temizle
         var nameInput = document.getElementById('apiNameInput');
         var valueInput = document.getElementById('apiValueInput');
         if (nameInput) nameInput.value = '';
@@ -9130,37 +10023,30 @@ window.openApiAnahtarlarim = async function() {
     modal.classList.add('open');
     modal.style.display = 'flex';
 
-    // Hangi ekranın gösterileceğini belirle
     var passwordCreateEl = document.getElementById('apiAnahtarlarimPasswordCreate');
     var passwordVerifyEl = document.getElementById('apiAnahtarlarimPasswordVerify');
     var listEl = document.getElementById('apiAnahtarlarimList');
 
-    // Tümünü gizle
     if (passwordCreateEl) passwordCreateEl.style.display = 'none';
     if (passwordVerifyEl) passwordVerifyEl.style.display = 'none';
     if (listEl) listEl.style.display = 'none';
 
     try {
         var result = await Parse.Cloud.run('getUserApiKeys', {});
-        // Şifre belirlenmiş mi?
         var hasPassword = result && result.hasPassword;
-
         if (!hasPassword) {
-            // Şifre belirleme ekranı
             if (passwordCreateEl) passwordCreateEl.style.display = 'flex';
         } else {
-            // Şifre girme ekranı
             if (passwordVerifyEl) passwordVerifyEl.style.display = 'flex';
             var verifyInput = document.getElementById('apiVerifyPassword');
             if (verifyInput) verifyInput.value = '';
         }
     } catch(e) {
-        // Hata olursa şifre belirleme ekranını göster
         if (passwordCreateEl) passwordCreateEl.style.display = 'flex';
     }
 };
 
-// ========== AI MODELLERİ (GELİŞTİRİLMİŞ HAFIZA İLE - Master Key Hatası Giderildi) ==========
+// ========== AI MODELLERİ (HAFIZA + CUSTOM MOD + SORUN 3 FIX) ==========
 async function callAllAIModels(prompt, conversationId) {
     try {
         var history = [];
@@ -9169,7 +10055,7 @@ async function callAllAIModels(prompt, conversationId) {
                 const result = await Parse.Cloud.run('getConversationMessages', { conversationId: conversationId });
                 if (result && result.messages) {
                     history = result.messages.map(m => ({
-                        role: (m.from_user && m.from_user.id === currentUser.id) ? 'user' : 'assistant',
+                        role: (m.from_user && m.from_user.id === currentUser.get('email')) ? 'user' : 'assistant',
                         content: m.text || ''
                     }));
                 }
@@ -9184,22 +10070,34 @@ async function callAllAIModels(prompt, conversationId) {
             fullPrompt = context + "\nKullanıcının son sorusu: " + prompt;
         }
 
-        // ===== [YENİ] Mod kontrolü: Custom AI mı? =====
+        // ===== [SORUN 3 FIX] Custom AI modu =====
         if (window.currentAIMode === 'custom') {
             try {
-                const customResult = await Parse.Cloud.run('callCustomAI', { prompt: fullPrompt });
+                var keyIdsParam = window.customAIKeyIds === 'all' ? 'all' : (window.customAIKeyIds || 'all');
+                var customResult = await Parse.Cloud.run('callCustomAIWithKeys', {
+                    prompt: fullPrompt,
+                    keyIds: keyIdsParam
+                });
                 if (customResult && customResult.success && customResult.reply) {
                     return customResult.reply;
                 } else if (customResult && customResult.reply) {
                     return customResult.reply;
                 } else {
-                    // Custom başarısızsa site moduna fallback
                     console.warn('Custom AI yanıt vermedi, site moduna geçiliyor.');
                     showNotification('⚠️ Kendi API başarısız, site modu kullanılıyor', 'warning');
                     return await callSiteAI(fullPrompt);
                 }
             } catch(e) {
                 console.warn('Custom AI hatası:', e);
+                // Eski callCustomAI'yi dene (fallback)
+                try {
+                    var fallbackResult = await Parse.Cloud.run('callCustomAI', { prompt: fullPrompt });
+                    if (fallbackResult && fallbackResult.success && fallbackResult.reply) {
+                        return fallbackResult.reply;
+                    } else if (fallbackResult && fallbackResult.reply) {
+                        return fallbackResult.reply;
+                    }
+                } catch(e2) { console.warn('Fallback custom AI hatası:', e2); }
                 showNotification('⚠️ Kendi API hatası: ' + e.message + ' — site modu denenecek', 'warning');
                 return await callSiteAI(fullPrompt);
             }
@@ -9213,7 +10111,7 @@ async function callAllAIModels(prompt, conversationId) {
     }
 }
 
-// ========== [YENİ] SITE AI ÇAĞRISI (8 Model) ==========
+// ========== SITE AI ÇAĞRISI (8 Model) ==========
 async function callSiteAI(prompt) {
     try {
         const result = await Parse.Cloud.run('superAI', { prompt: prompt });
@@ -9234,17 +10132,84 @@ async function webSearch(query) {
 }
 
 // ================================================================
-// ========== [YENİ] AI DURDURMA FONKSİYONU =======================
+// ========== [SORUN 4 FIX] SOHBET GEÇMİŞİ KAYDETME ===============
+// ================================================================
+// Kullanıcı mesajı → sendMessage (from_email: user)
+// AI cevabı → sendAIMessage (from_email: system@vizyon2027.com)
+async function saveAIMessageToConversation(conversationId, userText, aiText) {
+    if (!conversationId || !currentUser) return;
+    try {
+        // Kullanıcı mesajı
+        await Parse.Cloud.run('sendMessage', {
+            conversationId: conversationId,
+            text: userText,
+            fileUrl: null,
+            fileName: null
+        });
+    } catch(e) { console.warn('Kullanıcı mesajı kaydedilemedi:', e); }
+
+    try {
+        // AI cevabı — yeni cloud fonksiyon
+        await Parse.Cloud.run('sendAIMessage', {
+            conversationId: conversationId,
+            text: aiText,
+            fromEmail: 'system@vizyon2027.com',
+            fromName: '🧠 VİZYON AI'
+        });
+    } catch(e) {
+        console.warn('AI mesajı sendAIMessage ile kaydedilemedi, fallback:', e);
+        // Fallback: sendMessage ile dene (AI mesajı user gibi görünür ama en azından kaydedilir)
+        try {
+            await Parse.Cloud.run('sendMessage', {
+                conversationId: conversationId,
+                text: aiText,
+                fileUrl: null,
+                fileName: null
+            });
+        } catch(e2) { console.warn('Fallback de başarısız:', e2); }
+    }
+}
+
+// ================================================================
+// ========== [SORUN 5 FIX] MESAJ RENDER (İsim + Hizalama) ========
+// ================================================================
+function getUserDisplayName() {
+    if (!currentUser) return 'Misafir';
+    return currentUser.get('name') || currentUser.get('username') || 'Kullanıcı';
+}
+
+function renderUserMessage(text) {
+    var userName = getUserDisplayName();
+    return '<div class="ai-message user">' +
+           '<div class="role">👤 ' + window.escapeHtml(userName) + '</div>' +
+           text.replace(/</g, '&lt;') +
+           '</div>';
+}
+
+function renderBotMessage(cleanedHtml, msgId) {
+    var idAttr = msgId ? ' id="' + msgId + '"' : '';
+    var actions = msgId ? (
+        '<div class="ai-msg-actions-container">' +
+        '<button class="btn-edit" onclick="window.editAIMessage(\'' + msgId + '\', \'dashboard\')" title="Bu cevabı sil ve mesajı düzenle">✏️ Düzenle</button>' +
+        '<button class="btn-copy" onclick="window.copyAIMessageText(\'' + msgId + '\')" title="Cevabı kopyala">📋 Kopyala</button>' +
+        '</div>'
+    ) : '';
+    return '<div class="ai-message bot"' + idAttr + '>' +
+           '<div class="role">🧠 VİZYON AI</div>' +
+           cleanedHtml + actions +
+           '</div>';
+}
+
+// ================================================================
+// ========== AI DURDURMA FONKSİYONU ==============================
 // ================================================================
 window.stopAIResponse = function(source) {
     window.currentAIRequestId = null;
-    // Durdur butonunu gizle
     var stopBtnDashboard = document.getElementById('dashboardStopAIResponseBtn');
     if (stopBtnDashboard) stopBtnDashboard.style.display = 'none';
     var stopBtnFull = document.getElementById('fullAIStopBtn');
     if (stopBtnFull) stopBtnFull.style.display = 'none';
 
-    // Düşünüyor animasyonunu kaldır
     var thinking = document.querySelector('.ai-thinking-indicator');
     if (thinking) thinking.remove();
 
@@ -9252,16 +10217,14 @@ window.stopAIResponse = function(source) {
 };
 
 // ================================================================
-// ========== [YENİ] AI MESAJ DÜZENLEME FONKSİYONU ===============
+// ========== AI MESAJ DÜZENLEME FONKSİYONU ======================
 // ================================================================
 window.editAIMessage = function(msgId, source) {
-    // Önce o anki isteği durdur
     window.stopAIResponse(source);
 
     var container = (source === 'full') ? document.getElementById('fullAIChat') : document.getElementById('dashboardAiMessages');
     if (!container) return;
 
-    // Son kullanıcı mesajını bul ve input'a geri koy
     var userMessages = container.querySelectorAll('.ai-message.user, .ai-msg.user');
     if (userMessages.length === 0) {
         showNotification('Düzenlenecek mesaj bulunamadı!', 'warning');
@@ -9269,21 +10232,22 @@ window.editAIMessage = function(msgId, source) {
     }
     var lastUserMsg = userMessages[userMessages.length - 1];
     var originalText = lastUserMsg.textContent.trim();
+    // "👤 KullanıcıAdı" ön ekini temizle
+    var roleDiv = lastUserMsg.querySelector('.role');
+    if (roleDiv) {
+        originalText = originalText.replace(roleDiv.textContent, '').trim();
+    }
 
-    // AI cevabını (son bot mesajını) DOM'dan kaldır
     var botMessages = container.querySelectorAll('.ai-message.bot, .ai-msg.bot');
     if (botMessages.length > 0) {
         var lastBotMsg = botMessages[botMessages.length - 1];
-        // Sadece en son bot mesajını (kullanıcı mesajından sonra olanı) kaldır
         if (lastBotMsg.compareDocumentPosition(lastUserMsg) & Node.DOCUMENT_POSITION_PRECEDING) {
             lastBotMsg.remove();
         }
     }
 
-    // Kullanıcı mesajını DOM'dan da kaldır (yeniden yazılacak)
     lastUserMsg.remove();
 
-    // Input'a geri koy
     var input = (source === 'full') ? document.getElementById('fullAIInput') : document.getElementById('dashboardAiInput');
     if (input) {
         input.value = originalText;
@@ -9294,7 +10258,7 @@ window.editAIMessage = function(msgId, source) {
 };
 
 // ================================================================
-// ========== DASHBOARD AI MESAJ GÖNDER (HAFIZA + DURDURMA) =======
+// ========== DASHBOARD AI MESAJ GÖNDER ===========================
 // ================================================================
 window.sendDashboardAI = async function () {
     if (!await useQuery()) return;
@@ -9302,16 +10266,15 @@ window.sendDashboardAI = async function () {
     var msg = inp.value.trim();
     if (!msg) return;
 
-    // ===== [YENİ] Her istekte yeni requestId ata =====
     var thisRequestId = 'req_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
     window.currentAIRequestId = thisRequestId;
 
     var container = document.getElementById('dashboardAiMessages');
-    container.innerHTML += '<div class="ai-message user">' + msg.replace(/</g, '&lt;') + '</div>';
+    // [SORUN 5 FIX] İsimli mesaj render
+    container.innerHTML += renderUserMessage(msg);
     inp.value = '';
     container.scrollTop = container.scrollHeight;
 
-    // ===== [YENİ] Düşünüyor animasyonu ve Durdur butonu göster =====
     var stopBtn = document.getElementById('dashboardStopAIResponseBtn');
     if (stopBtn) stopBtn.style.display = 'inline-block';
 
@@ -9319,11 +10282,20 @@ window.sendDashboardAI = async function () {
     container.innerHTML += '<div class="ai-message bot ai-thinking-indicator" id="' + thinkingId + '"><span class="dot"></span><span class="dot"></span><span class="dot"></span> <span style="margin-left:6px;">VİZYON AI düşünüyor...</span></div>';
     container.scrollTop = container.scrollHeight;
 
+    // [SORUN 4 FIX] localStorage'dan konuşma ID'yi al
     if (!currentConversationId) {
-        try {
-            var result = await Parse.Cloud.run('startConversation', {});
-            if (result.success) currentConversationId = result.conversationId;
-        } catch(e) { console.log('Konuşma başlatılamadı:', e); }
+        var storedConvId = localStorage.getItem('vizyon_ai_conv_id');
+        if (storedConvId) {
+            currentConversationId = storedConvId;
+        } else {
+            try {
+                var result = await Parse.Cloud.run('startConversation', {});
+                if (result.success) {
+                    currentConversationId = result.conversationId;
+                    localStorage.setItem('vizyon_ai_conv_id', currentConversationId);
+                }
+            } catch(e) { console.log('Konuşma başlatılamadı:', e); }
+        }
     }
 
     var response;
@@ -9333,58 +10305,44 @@ window.sendDashboardAI = async function () {
         response = await callAllAIModels(msg, currentConversationId);
     }
 
-    // ===== [YENİ] Durdurulmuş mu kontrol et =====
     if (window.currentAIRequestId !== thisRequestId) {
-        // Bu istek durdurulmuş — düşünüyor animasyonunu kaldır, cevabı gösterme
         var thinkingEl = document.getElementById(thinkingId);
         if (thinkingEl) thinkingEl.remove();
         return;
     }
 
-    // Düşünüyor animasyonunu kaldır
     var thinkingEl2 = document.getElementById(thinkingId);
     if (thinkingEl2) thinkingEl2.remove();
 
-    // Durdur butonunu gizle
     if (stopBtn) stopBtn.style.display = 'none';
 
-    // Yanıtı göster
     var cleaned = cleanClientResponse(response);
     var botMsgId = 'botmsg_' + thisRequestId;
-    container.innerHTML += '<div class="ai-message bot" id="' + botMsgId + '">' + cleaned +
-        '<div class="ai-msg-actions-container">' +
-        '<button class="btn-edit" onclick="window.editAIMessage(\'' + botMsgId + '\', \'dashboard\')" title="Bu cevabı sil ve mesajı düzenle">✏️ Düzenle</button>' +
-        '<button class="btn-copy" onclick="window.copyAIMessageText(\'' + botMsgId + '\')" title="Cevabı kopyala">📋 Kopyala</button>' +
-        '</div>' +
-        '</div>';
+    // [SORUN 5 FIX] İsimli bot mesajı
+    container.innerHTML += renderBotMessage(cleaned, botMsgId);
     container.scrollTop = container.scrollHeight;
 
+    // [SORUN 4 FIX] Konuşmayı kaydet
     if (currentConversationId) {
-        try {
-            await Parse.Cloud.run('sendMessage', {
-                conversationId: currentConversationId,
-                text: msg,
-                fileUrl: null,
-                fileName: null
-            });
-            await Parse.Cloud.run('sendMessage', {
-                conversationId: currentConversationId,
-                text: response,
-                fileUrl: null,
-                fileName: null
-            });
-        } catch(e) { console.log('Mesaj kaydedilemedi:', e); }
+        await saveAIMessageToConversation(currentConversationId, msg, response);
+        // Konuşma geçmişini yenile (JS-4'te)
+        if (typeof window.loadConversationHistory === 'function') {
+            try { window.loadConversationHistory(); } catch(e) {}
+        }
     }
 };
 
-// ========== [YENİ] AI MESAJ METNİNİ KOPYALA ==========
+// ================================================================
+// ========== AI MESAJ METNİNİ KOPYALA ============================
+// ================================================================
 window.copyAIMessageText = function(msgId) {
     var el = document.getElementById(msgId);
     if (!el) return;
-    // Aksiyon butonlarını hariç tutarak metni al
     var clone = el.cloneNode(true);
     var actions = clone.querySelector('.ai-msg-actions-container');
     if (actions) actions.remove();
+    var roleEl = clone.querySelector('.role');
+    if (roleEl) roleEl.remove();
     var text = clone.textContent.trim();
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(function() {
@@ -9414,7 +10372,9 @@ function fallbackCopyText(text) {
     document.body.removeChild(textarea);
 }
 
-// ========== TAM EKRAN AI PANELİ ==========
+// ================================================================
+// ========== TAM EKRAN AI PANELİ =================================
+// ================================================================
 function openFullAIPanel() {
     var panel = document.getElementById('fullAIPanel');
     if (!panel) {
@@ -9442,7 +10402,7 @@ function openFullAIPanel() {
                 </div>
             </div>
             <div id="fullAIChat" class="vizyon-ai-chat" style="flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
-                <div class="ai-msg bot" style="padding:10px 14px;font-size:13px;max-width:90%;border-radius:12px;background:rgba(0,255,136,0.06);border-left:3px solid #00ff88;border:1px solid rgba(0,255,136,0.08);">🧠 <strong>VİZYON AI</strong>: Merhaba! Günlük 25 sorgu hakkınız var. Size nasıl yardımcı olabilirim?</div>
+                <div class="ai-msg bot" style="padding:10px 14px;font-size:13px;max-width:90%;border-radius:12px;background:rgba(0,255,136,0.06);border-left:3px solid #00ff88;border:1px solid rgba(0,255,136,0.08);"><div class="role">🧠 VİZYON AI</div>Merhaba! Günlük 25 sorgu hakkınız var. Size nasıl yardımcı olabilirim?</div>
             </div>
             <div id="filePreviewContainer" style="display:flex; flex-wrap:wrap; gap:10px; padding:8px 12px; background:rgba(0,0,0,0.2); min-height:0; border-top:1px solid #1a3350;"></div>
             <div class="vizyon-ai-input-area" style="display:flex;gap:8px;padding:12px;border-top:1px solid #1a3350;background:rgba(0,0,0,0.3);align-items:center;flex-shrink:0;">
@@ -9459,7 +10419,8 @@ function openFullAIPanel() {
     if (currentUser) {
         document.getElementById('dashboardArea').style.display = 'none';
         document.getElementById('mainSite').style.display = 'none';
-        document.getElementById('userPanel').style.display = 'none';
+        var userPanel = document.getElementById('userPanel');
+        if (userPanel) userPanel.style.display = 'none';
         var widget = document.querySelector('.ai-widget');
         if (widget) widget.style.display = 'none';
     } else {
@@ -9480,7 +10441,8 @@ function closeFullAIPanel() {
     document.getElementById('mainSite').style.display = 'block';
     if (currentUser) {
         document.getElementById('dashboardArea').style.display = 'none';
-        document.getElementById('userPanel').style.display = 'none';
+        var userPanel = document.getElementById('userPanel');
+        if (userPanel) userPanel.style.display = 'none';
     }
     var widget = document.querySelector('.ai-widget');
     if (widget) widget.style.display = 'block';
@@ -9516,7 +10478,7 @@ function updateGuestQueryBadge(result) {
     }
 }
 
-// ========== TAM EKRAN AI MESAJ GÖNDER (HAFIZA + DURDURMA) ==========
+// ========== TAM EKRAN AI MESAJ GÖNDER (HAFIZA + DURDURMA + KAYDETME) ==========
 async function sendFullAI() {
     try {
         var result = await Parse.Cloud.run('useQuery', {});
@@ -9549,15 +10511,15 @@ async function sendFullAI() {
         return;
     }
 
-    // ===== [YENİ] Her istekte yeni requestId ata =====
     var thisRequestId = 'req_full_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
     window.currentAIRequestId = thisRequestId;
 
-    chat.innerHTML += '<div class="ai-msg user" style="padding:10px 14px;font-size:13px;max-width:90%;border-radius:12px;background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.15);align-self:flex-end;text-align:right;">' + msg.replace(/</g, '&lt;') + '</div>';
+    // [SORUN 5 FIX] İsimli mesaj
+    var userName = getUserDisplayName();
+    chat.innerHTML += '<div class="ai-msg user" style="padding:10px 14px;font-size:13px;max-width:90%;border-radius:12px;background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.15);align-self:flex-end;text-align:right;"><div class="role">👤 ' + window.escapeHtml(userName) + '</div>' + msg.replace(/</g, '&lt;') + '</div>';
     inp.value = '';
     chat.scrollTop = chat.scrollHeight;
 
-    // ===== [YENİ] Düşünüyor animasyonu ve Durdur butonu göster =====
     var stopBtn = document.getElementById('fullAIStopBtn');
     if (stopBtn) stopBtn.style.display = 'inline-block';
 
@@ -9565,11 +10527,20 @@ async function sendFullAI() {
     chat.innerHTML += '<div class="ai-msg bot ai-thinking-indicator" id="' + thinkingId + '" style="align-self:flex-start;"><span class="dot"></span><span class="dot"></span><span class="dot"></span> <span style="margin-left:6px;">VİZYON AI düşünüyor...</span></div>';
     chat.scrollTop = chat.scrollHeight;
 
+    // [SORUN 4 FIX] localStorage'dan full AI konuşma ID
     if (!window.fullAIConversationId) {
-        try {
-            var result2 = await Parse.Cloud.run('startConversation', {});
-            if (result2.success) window.fullAIConversationId = result2.conversationId;
-        } catch(e) { console.log('Konuşma başlatılamadı:', e); }
+        var storedFullConvId = localStorage.getItem('vizyon_full_ai_conv_id');
+        if (storedFullConvId) {
+            window.fullAIConversationId = storedFullConvId;
+        } else {
+            try {
+                var result2 = await Parse.Cloud.run('startConversation', {});
+                if (result2.success) {
+                    window.fullAIConversationId = result2.conversationId;
+                    localStorage.setItem('vizyon_full_ai_conv_id', window.fullAIConversationId);
+                }
+            } catch(e) { console.log('Konuşma başlatılamadı:', e); }
+        }
     }
 
     var response;
@@ -9579,24 +10550,21 @@ async function sendFullAI() {
         response = await callAllAIModels(msg, window.fullAIConversationId);
     }
 
-    // ===== [YENİ] Durdurulmuş mu kontrol et =====
     if (window.currentAIRequestId !== thisRequestId) {
         var thinkingEl = document.getElementById(thinkingId);
         if (thinkingEl) thinkingEl.remove();
         return;
     }
 
-    // Düşünüyor animasyonunu kaldır
     var thinkingEl2 = document.getElementById(thinkingId);
     if (thinkingEl2) thinkingEl2.remove();
 
-    // Durdur butonunu gizle
     if (stopBtn) stopBtn.style.display = 'none';
 
-    // Yanıtı göster
     var cleaned = cleanClientResponse(response);
     var botMsgId = 'botmsg_full_' + thisRequestId;
-    chat.innerHTML += '<div class="ai-msg bot" id="' + botMsgId + '" style="padding:10px 14px;font-size:13px;max-width:90%;border-radius:12px;background:rgba(0,255,136,0.06);border-left:3px solid #00ff88;border:1px solid rgba(0,255,136,0.08);">🧠 ' + cleaned +
+    // [SORUN 5 FIX] İsimli bot mesajı
+    chat.innerHTML += '<div class="ai-msg bot" id="' + botMsgId + '" style="padding:10px 14px;font-size:13px;max-width:90%;border-radius:12px;background:rgba(0,255,136,0.06);border-left:3px solid #00ff88;border:1px solid rgba(0,255,136,0.08);"><div class="role">🧠 VİZYON AI</div>' + cleaned +
         '<div class="ai-msg-actions-container">' +
         '<button class="btn-edit" onclick="window.editAIMessage(\'' + botMsgId + '\', \'full\')" title="Bu cevabı sil ve mesajı düzenle">✏️ Düzenle</button>' +
         '<button class="btn-copy" onclick="window.copyAIMessageText(\'' + botMsgId + '\')" title="Cevabı kopyala">📋 Kopyala</button>' +
@@ -9604,21 +10572,12 @@ async function sendFullAI() {
         '</div>';
     chat.scrollTop = chat.scrollHeight;
 
-    if (window.fullAIConversationId) {
-        try {
-            await Parse.Cloud.run('sendMessage', {
-                conversationId: window.fullAIConversationId,
-                text: msg,
-                fileUrl: null,
-                fileName: null
-            });
-            await Parse.Cloud.run('sendMessage', {
-                conversationId: window.fullAIConversationId,
-                text: response,
-                fileUrl: null,
-                fileName: null
-            });
-        } catch(e) { console.log('Mesaj kaydedilemedi:', e); }
+    // [SORUN 4 FIX] Konuşmayı kaydet
+    if (window.fullAIConversationId && currentUser) {
+        await saveAIMessageToConversation(window.fullAIConversationId, msg, response);
+        if (typeof window.loadConversationHistory === 'function') {
+            try { window.loadConversationHistory(); } catch(e) {}
+        }
     }
 }
 
@@ -9638,7 +10597,7 @@ async function sendAiMessage() {
     var msg = inp.value.trim();
     if (!msg) return;
     var msgs = document.getElementById('aiMessages');
-    msgs.innerHTML += '<div class="ai-msg user">' + msg.replace(/</g, '&lt;') + '</div>';
+    msgs.innerHTML += '<div class="ai-msg user"><div class="role">👤 Sen</div>' + msg.replace(/</g, '&lt;') + '</div>';
     inp.value = '';
     msgs.scrollTop = msgs.scrollHeight;
     var response;
@@ -9648,7 +10607,7 @@ async function sendAiMessage() {
         response = await callAllAIModels(msg);
     }
     var cleaned = cleanClientResponse(response);
-    msgs.innerHTML += '<div class="ai-msg bot">' + cleaned + '</div>';
+    msgs.innerHTML += '<div class="ai-msg bot"><div class="role">🧠 VİZYON AI</div>' + cleaned + '</div>';
     msgs.scrollTop = msgs.scrollHeight;
 }
 
@@ -9672,7 +10631,8 @@ async function uploadFullFile(input) {
             if (inputArea) {
                 inputArea.parentNode.insertBefore(container, inputArea);
             } else {
-                document.getElementById('fullAIChat')?.appendChild(container);
+                var fullAIChat = document.getElementById('fullAIChat');
+                if (fullAIChat) fullAIChat.appendChild(container);
             }
         }
 
@@ -9796,7 +10756,6 @@ window.generateImage = async function() {
 // ===================== 3D SİSTEM (HF + YEDEK) ===================
 // ================================================================
 
-// === TÜM DEĞİŞKENLER KONTROLLÜ TANIMLANIYOR (HATA DÜZELTİLDİ) ===
 if (typeof scene === 'undefined') {
     var scene, camera, renderer, controls;
 }
@@ -10284,7 +11243,7 @@ document.addEventListener('DOMContentLoaded', function () {
 })();
 
 // ================================================================
-// ========== SESLİ KOMUT (SPEECH TO TEXT) ==========
+// ========== SESLİ KOMUT (SPEECH TO TEXT) ========================
 // ================================================================
 window.startVoiceInput = function() {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -10321,7 +11280,7 @@ window.startVoiceInput = function() {
 };
 
 // ================================================================
-// ========== METİN OKUMA (TEXT TO SPEECH) ==========
+// ========== METİN OKUMA (TEXT TO SPEECH) ========================
 // ================================================================
 window.speakText = function(text) {
     if (!text) {
@@ -10354,7 +11313,12 @@ window.speakLastAIResponse = function() {
     if (!container) return;
     var lastMsg = container.querySelector('.ai-message.bot:last-child, .ai-msg.bot:last-child');
     if (lastMsg) {
-        var text = lastMsg.textContent;
+        var clone = lastMsg.cloneNode(true);
+        var roleEl = clone.querySelector('.role');
+        if (roleEl) roleEl.remove();
+        var actionsEl = clone.querySelector('.ai-msg-actions-container');
+        if (actionsEl) actionsEl.remove();
+        var text = clone.textContent;
         if (text.startsWith('🧠')) text = text.replace('🧠', '').trim();
         window.speakText(text);
     } else {
@@ -10363,7 +11327,7 @@ window.speakLastAIResponse = function() {
 };
 
 // ================================================================
-// ========== YENİ EKLENEN ÖZELLİKLER ============================
+// ========== YENİ EKLENEN ÖZELLİKLER =============================
 // ================================================================
 
 // ----- 1. GIF ARAMA (Giphy API) -----
@@ -10432,7 +11396,7 @@ window.askCoach = async function(question) {
         if (result && result.advice) {
             var container = document.getElementById('dashboardAiMessages');
             if (container) {
-                container.innerHTML += '<div class="ai-message bot">🧠 <strong>V27 KOÇ</strong>: ' + cleanClientResponse(result.advice) + '</div>';
+                container.innerHTML += '<div class="ai-message bot"><div class="role">🧠 V27 KOÇ</div>' + cleanClientResponse(result.advice) + '</div>';
                 container.scrollTop = container.scrollHeight;
             }
             showNotification('💬 V27 Koç yanıtladı!', 'success');
@@ -10455,7 +11419,7 @@ window.askSupport = async function(question) {
         if (result && result.reply) {
             var container = document.getElementById('vizyonSupportMessages');
             if (container) {
-                container.innerHTML += '<div class="ai-message bot">🛟 <strong>V27 Asistan</strong>: ' + cleanClientResponse(result.reply) + '</div>';
+                container.innerHTML += '<div class="ai-message bot"><div class="role">🛟 V27 ASISTAN</div>' + cleanClientResponse(result.reply) + '</div>';
                 container.scrollTop = container.scrollHeight;
             }
             showNotification('✅ Destek asistanı yanıtladı!', 'success');
@@ -10499,18 +11463,31 @@ window.contactFounder = async function() {
 };
 
 console.log('✅ JS-3 yüklendi (Takım, AI, 3D HF, Görsel HF, Dosya Yükleme, Kopyala, Ses, GIF, Çeviri, Sansür, AI Koç, Canlı Destek)');
-console.log('🆕 JS-3 [YENİ]: AI Durdurma (stopAIResponse) + AI Düzenleme (editAIMessage) + Kendi API Modu (switchToSiteAI/switchToCustomAI/callCustomAI)');
+console.log('🆕 JS-3 [SORUN 2]: API 3-Seçenek Modalı (openApiKeySelectionModal, useAllApiKeys, showApiKeySelector, confirmSelectedApiKeys)');
+console.log('🆕 JS-3 [SORUN 3]: callAllAIModels → callCustomAIWithKeys (sırayla dener)');
+console.log('🆕 JS-3 [SORUN 4]: saveAIMessageToConversation + localStorage kalıcılık (vizyon_ai_conv_id, vizyon_full_ai_conv_id)');
+console.log('🆕 JS-3 [SORUN 5]: Mesaj hizalaması + isim (renderUserMessage, renderBotMessage, getUserDisplayName)');
+console.log('🆕 JS-3 [SORUN 5 - GÜNCELLEME]: Genişletilmiş API model desteği (Anthropic, Mistral, Perplexity, Together, Fireworks, Anyscale)');
 </script>
 <!-- ===== JS-3 SONU ===== -->
 
 <!-- ============================================================ -->
 <!-- ===================== JS-4: TÜM İSTEMCİ TARAFI FONKSİYONLAR (FULL) ===================== -->
-<!-- YENİ: API Yönetimi (saveUserApiKey, loadApiKeys, toggleApiKeyVisibility, copyApiKey, deleteApiKey, editApiKey, setApiPassword, verifyApiPassword, lockApiKeysPanel) -->
+<!-- FIX: Sohbet geçmişi (Sorun 4/7) + İsim gösterimi (Sorun 5) -->
+<!-- + [SORUN 1+2] initSchemas otomatik çağrı -->
+<!-- + [SORUN 4] Aylık Yarışma sistemi (12 yeni fonksiyon) -->
+<!-- + [SORUN 5] Kendi API herkese + genişletilmiş model desteği -->
 <!-- ============================================================ -->
 <script>
 // ================================================================
 // JS-4: TÜM İSTEMCİ TARAFI FONKSİYONLAR (FULL – HATASIZ, EKSİKSİZ)
-// + [YENİ] API Yönetimi Fonksiyonları
+// + [SORUN 4 FIX] loadConversationHistory / loadConversationById (email bazlı)
+// + [SORUN 5 FIX] Mesajlara .role div eklendi (👤 / 🧠)
+// + [SORUN 7 FIX] Geçmiş tıklama düzeltildi
+// + API Yönetimi Fonksiyonları
+// + [SORUN 1+2] initSchemas otomatik çağrı
+// + [SORUN 4] Aylık Yarışma sistemi
+// + [SORUN 5] Kendi API herkese + genişletilmiş model desteği
 // ================================================================
 
 // ========== GLOBAL DEĞİŞKENLER ==========
@@ -10534,10 +11511,20 @@ var commentFilter = 0;
 var isDashboardVisible = false;
 var currentImageData = null;
 var isFounder = false;
+var schemaInitDone = false;
 
-// ===== [YENİ] API YÖNETİMİ GLOBAL DEĞİŞKENLERİ =====
+// ===== API YÖNETİMİ GLOBAL DEĞİŞKENLERİ =====
 window.apiKeysCache = [];
 window.apiKeysUnlocked = false;
+
+// ================================================================
+// ============ [SORUN 4] YARIŞMA GLOBAL DEĞİŞKENLERİ ============
+// ================================================================
+window.currentContestData = null;          // Aktif yarışma bilgisi
+window.contestIsParticipant = false;        // Kullanıcı yarışmaya katıldı mı?
+window.contestProjectsFounderCache = [];    // Founder için proje listesi
+window.currentReviewingProject = null;      // İncelenen proje
+window.currentScoringProject = null;        // Puanlanan proje
 
 // ========== SANSÜR YARDIMCI FONKSİYONLARI ==========
 function censorName(name, isLoggedIn) {
@@ -10726,7 +11713,6 @@ var translations = {
         'Kullanıcı Listesi': 'Kullanıcı Listesi',
         'Admin Yap': 'Admin Yap',
         'Kullanıcı Yap': 'Kullanıcı Yap',
-        'Profil': 'Profil',
         'Geri': 'Geri',
         'Dosya yükleniyor': 'Dosya yükleniyor',
         'Dosya yüklendi': 'Dosya yüklendi',
@@ -10834,7 +11820,14 @@ window.applyTranslations = function(lang) {
     });
     var dashboardMsg = document.querySelector('#dashboardAiMessages .ai-message.bot');
     if (dashboardMsg && dict['Merhaba! Size nasıl yardımcı olabilirim?']) {
-        dashboardMsg.textContent = dict['Merhaba! Size nasıl yardımcı olabilirim?'];
+        var msgRole = dashboardMsg.querySelector('.role');
+        if (msgRole) {
+            dashboardMsg.innerHTML = '';
+            dashboardMsg.appendChild(msgRole);
+            dashboardMsg.appendChild(document.createTextNode(dict['Merhaba! Size nasıl yardımcı olabilirim?']));
+        } else {
+            dashboardMsg.textContent = dict['Merhaba! Size nasıl yardımcı olabilirim?'];
+        }
     }
     localStorage.setItem('vizyon_language', lang);
     currentLanguage = lang;
@@ -10864,6 +11857,28 @@ async function initSashiDo() {
         showNotification('❌ Parse bağlantı hatası: ' + e.message, 'error');
     }
 }
+
+// ================================================================
+// [SORUN 1+2] initSchemas OTOMATİK ÇAĞRI
+// Sınıflar yoksa otomatik oluşturur. Bir kez çalışır.
+// ================================================================
+window.ensureSchemasInitialized = async function() {
+    if (schemaInitDone) return;
+    if (!currentUser) return;
+    var role = currentUser.get('role');
+    if (role !== 'founder' && role !== 'admin') return;
+    try {
+        var result = await Parse.Cloud.run('initSchemas', {});
+        if (result && result.success) {
+            schemaInitDone = true;
+            console.log('✅ Schema init tamamlandı. Toplam:', result.results ? result.results.length : 0, 'sınıf');
+        } else {
+            console.warn('⚠️ Schema init başarısız:', result);
+        }
+    } catch(e) {
+        console.warn('Schema init hatası:', e.message);
+    }
+};
 
 // ========== OTOMATİK OTURUM ==========
 async function checkSession() {
@@ -10915,26 +11930,35 @@ function updateQueryBadge(result) {
 // ========== GERÇEK SAYAÇLAR ==========
 async function updateStats() {
     if (!currentUser) {
-        document.getElementById('counter1').innerHTML = '0';
-        document.getElementById('counter2').innerHTML = '0';
-        document.getElementById('counter3').innerHTML = '0';
+        var c1 = document.getElementById('counter1');
+        var c2 = document.getElementById('counter2');
+        var c3 = document.getElementById('counter3');
+        if (c1) c1.innerHTML = '0';
+        if (c2) c2.innerHTML = '0';
+        if (c3) c3.innerHTML = '0';
         return;
     }
     try {
         var userQuery = new Parse.Query(Parse.User);
         var userCount = await userQuery.count();
-        document.getElementById('counter1').innerHTML = userCount || 0;
+        var c1b = document.getElementById('counter1');
+        if (c1b) c1b.innerHTML = userCount || 0;
         var projectQuery = new Parse.Query('Project');
         var projectCount = await projectQuery.count();
-        document.getElementById('counter3').innerHTML = projectCount || 0;
+        var c3b = document.getElementById('counter3');
+        if (c3b) c3b.innerHTML = projectCount || 0;
         var queryQuery = new Parse.Query('QueryStat');
         var totalQueries = await queryQuery.count();
-        document.getElementById('counter2').innerHTML = totalQueries || 0;
+        var c2b = document.getElementById('counter2');
+        if (c2b) c2b.innerHTML = totalQueries || 0;
     } catch(e) {
         console.log('İstatistikler güncellenemedi:', e);
-        document.getElementById('counter1').innerHTML = '0';
-        document.getElementById('counter2').innerHTML = '0';
-        document.getElementById('counter3').innerHTML = '0';
+        var c1c = document.getElementById('counter1');
+        var c2c = document.getElementById('counter2');
+        var c3c = document.getElementById('counter3');
+        if (c1c) c1c.innerHTML = '0';
+        if (c2c) c2c.innerHTML = '0';
+        if (c3c) c3c.innerHTML = '0';
     }
 }
 
@@ -11095,38 +12119,17 @@ window.handleLogin = async function() {
 };
 
 // ---- GOOGLE / FACEBOOK ----
+// 🔒 GÜVENLİK FIX: Sahte authData ('google_' + Date.now()) KALDIRILDI.
 window.loginWithGoogle = async function() {
     try {
         showNotification('Google ile giriş başlatılıyor...', 'success');
-        var user = await Parse.User.logInWith('google', {
-            authData: {
-                id: 'google_' + Date.now(),
-                access_token: 'temp_token'
-            }
-        });
-        if (user.get('isBanned')) { await Parse.User.logOut(); showNotification('Hesabınız yasaklanmıştır!', 'error'); return; }
-        if (!user.get('isVerified')) {
-            user.set('isVerified', true);
-            await user.save(null, { useMasterKey: true });
-        }
-        currentUser = user;
-        localStorage.setItem('vizyon_user', JSON.stringify({
-            id: user.id,
-            name: user.get('name') || user.get('username') || 'Google Kullanıcısı',
-            email: user.get('email'),
-            role: user.get('role') || 'user',
-            plan: user.get('plan') || 'free',
-            teamId: user.get('teamId'),
-            points: user.get('points') || 0,
-            username: user.get('username_display')
-        }));
-        closeModal('authModal');
-        await showDashboard();
-        updateCommentUI();
-        await loadComments();
-        updatePointsDisplay(user.get('points') || 0);
-        try { await checkStreakStatus(); } catch(e) {}
-        showNotification('Google ile giriş başarılı! Hoş geldin ' + (user.get('name') || 'Kullanıcı'), 'success');
+        showNotification(
+            '❌ Google ile giriş şu anda kullanılamıyor. ' +
+            'Lütfen e-posta ile kayıt olun veya yöneticiye başvurun.',
+            'error'
+        );
+        console.warn('⚠️ Güvenlik: Sahte Google authData ile giriş denemesi engellendi.');
+        return;
     } catch(e) {
         console.error('Google giriş hatası:', e);
         showNotification('Google giriş hatası: ' + e.message, 'error');
@@ -11136,35 +12139,13 @@ window.loginWithGoogle = async function() {
 window.loginWithFacebook = async function() {
     try {
         showNotification('Facebook ile giriş başlatılıyor...', 'success');
-        var user = await Parse.User.logInWith('facebook', {
-            authData: {
-                id: 'facebook_' + Date.now(),
-                access_token: 'temp_token'
-            }
-        });
-        if (user.get('isBanned')) { await Parse.User.logOut(); showNotification('Hesabınız yasaklanmıştır!', 'error'); return; }
-        if (!user.get('isVerified')) {
-            user.set('isVerified', true);
-            await user.save(null, { useMasterKey: true });
-        }
-        currentUser = user;
-        localStorage.setItem('vizyon_user', JSON.stringify({
-            id: user.id,
-            name: user.get('name') || user.get('username') || 'Facebook Kullanıcısı',
-            email: user.get('email'),
-            role: user.get('role') || 'user',
-            plan: user.get('plan') || 'free',
-            teamId: user.get('teamId'),
-            points: user.get('points') || 0,
-            username: user.get('username_display')
-        }));
-        closeModal('authModal');
-        await showDashboard();
-        updateCommentUI();
-        await loadComments();
-        updatePointsDisplay(user.get('points') || 0);
-        try { await checkStreakStatus(); } catch(e) {}
-        showNotification('Facebook ile giriş başarılı! Hoş geldin ' + (user.get('name') || 'Kullanıcı'), 'success');
+        showNotification(
+            '❌ Facebook ile giriş şu anda kullanılamıyor. ' +
+            'Lütfen e-posta ile kayıt olun veya yöneticiye başvurun.',
+            'error'
+        );
+        console.warn('⚠️ Güvenlik: Sahte Facebook authData ile giriş denemesi engellendi.');
+        return;
     } catch(e) {
         console.error('Facebook giriş hatası:', e);
         showNotification('Facebook giriş hatası: ' + e.message, 'error');
@@ -11178,9 +12159,14 @@ window.logout = function() {
     localStorage.removeItem('vizyon_user');
     currentUser = null;
     stopStatsInterval();
-    document.getElementById('mainSite').style.display = 'block';
-    document.getElementById('dashboardArea').style.display = 'none';
+    var mainSite = document.getElementById('mainSite');
+    if (mainSite) mainSite.style.display = 'block';
+    var dashboardArea = document.getElementById('dashboardArea');
+    if (dashboardArea) dashboardArea.style.display = 'none';
+    var userPanel = document.getElementById('userPanel');
+    if (userPanel) userPanel.style.display = 'none';
     if (typeof closeFullAIPanel === 'function') closeFullAIPanel();
+    if (typeof window.closeContestPage === 'function') window.closeContestPage();
     var logoutBtn = document.querySelector('.logout-btn');
     if (logoutBtn) logoutBtn.style.display = 'none';
     updateCommentUI();
@@ -11220,7 +12206,7 @@ window.switchTab = function(tab) {
 window.openProfileModal = function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     var role = currentUser.get('role');
-    var isAdmin = (role === 'admin'), isBeta = (role === 'beta'), isFounder = (role === 'founder');
+    var isAdmin = (role === 'admin'), isBeta = (role === 'beta'), isFounderLocal = (role === 'founder');
     var leaveBtn = '';
     if (isAdmin) leaveBtn = `<button class="btn-danger btn-sm" onclick="window.leaveAdminRole()" style="margin-top:10px;">🚪 Admin'den Ayrıl</button>`;
     else if (isBeta) leaveBtn = `<button class="btn-danger btn-sm" onclick="window.leaveBetaRole()" style="margin-top:10px;">🚪 Beta'dan Ayrıl</button>`;
@@ -11228,7 +12214,7 @@ window.openProfileModal = function() {
         `<p><strong>Ad:</strong> ${currentUser.get('name')}</p>
         <p><strong>E-posta:</strong> ${currentUser.get('email')}</p>
         <p><strong>Plan:</strong> ${currentUser.get('plan') === 'pro' ? '🌟 Pro' : (currentUser.get('plan') === 'team' ? '👥 Takım' : '🆓 Ücretsiz')}</p>
-        <p><strong>Rol:</strong> ${isFounder ? '👑 Kurucu' : (isAdmin ? '⚙️ Admin' : (isBeta ? '🔬 Beta' : '👤 Kullanıcı'))}</p>
+        <p><strong>Rol:</strong> ${isFounderLocal ? '👑 Kurucu' : (isAdmin ? '⚙️ Admin' : (isBeta ? '🔬 Beta' : '👤 Kullanıcı'))}</p>
         <p><strong>Puan:</strong> ${currentUser.get('points') || 0}</p>
         <p><strong>Seviye:</strong> ${currentUser.get('level') || 'Çaylak'}</p>
         <p><strong>Davet Kodu:</strong> ${currentUser.get('referral_code') || 'Henüz oluşturulmamış'}</p>
@@ -11476,11 +12462,14 @@ window.shareSite = function() {
         showNotification('Site linki kopyalandı!', 'success');
     }
 };
-window.openSettingsModal = function() { document.getElementById('settingsModal').classList.add('open'); document.getElementById('settingsModal').style.display = 'flex'; };
+window.openSettingsModal = function() { 
+    var m = document.getElementById('settingsModal');
+    if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+};
 window.toggleChatHistory = function() { window.toggleConversationHistory(); };
 
 // ================================================================
-// ========== ABONELİK KARTI ==========
+// ========== ABONELİK KARTI ======================================
 // ================================================================
 window.checkAndShowSubscriptionCard = async function() {
     if (!currentUser) return;
@@ -11499,7 +12488,7 @@ window.checkAndShowSubscriptionCard = async function() {
 };
 
 // ================================================================
-// ========== BİLDİRİM PANELİ ==========
+// ========== BİLDİRİM PANELİ =====================================
 // ================================================================
 window.toggleNotificationPanel = function() {
     var modal = document.getElementById('notificationModal');
@@ -11546,8 +12535,11 @@ window.markNotificationRead = async function(notificationId) {
 };
 
 // ================================================================
-// ========== AI SOHBET GEÇMİŞİ YÖNETİMİ ==========
+// ========== [SORUN 4/7 FIX] AI SOHBET GEÇMİŞİ YÖNETİMİ ==========
 // ================================================================
+// Cloud `getConversations` dönüşü: { id, users: [emailStrings], lastMessage, ... }
+// Cloud `getConversationMessages` dönüşü: { users: [emailStrings], messages: [{from_user: {id: email}, ...}] }
+// Bu yüzden email bazlı karşılaştırma yapıyoruz.
 
 window.newConversation = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
@@ -11555,8 +12547,11 @@ window.newConversation = async function() {
         var result = await Parse.Cloud.run('startConversation', {});
         if (result.success) {
             currentConversationId = result.conversationId;
+            window.fullAIConversationId = result.conversationId;
+            localStorage.setItem('vizyon_ai_conv_id', currentConversationId);
+            localStorage.setItem('vizyon_full_ai_conv_id', currentConversationId);
             var container = document.getElementById('dashboardAiMessages');
-            container.innerHTML = '<div class="ai-message bot">🆕 Yeni sohbet başlatıldı. Size nasıl yardımcı olabilirim?</div>';
+            if (container) container.innerHTML = '<div class="ai-message bot"><div class="role">🧠 VİZYON AI</div>🆕 Yeni sohbet başlatıldı. Size nasıl yardımcı olabilirim?</div>';
             showNotification('✅ Yeni sohbet oluşturuldu!', 'success');
             await window.loadConversationHistory();
         } else {
@@ -11588,23 +12583,36 @@ window.loadConversationHistory = async function() {
             container.innerHTML = '<div style="color:var(--text3); padding:8px;">📭 Henüz sohbet yok.</div>';
             return;
         }
+        var userEmail = currentUser.get('email');
+        var userName = currentUser.get('name') || currentUser.get('username') || 'Kullanıcı';
         var html = '';
         result.forEach(function(conv) {
-            var otherUser = conv.users.find(u => u.id !== currentUser.id);
-            var name = otherUser ? otherUser.get('name') || otherUser.get('username') || 'İsimsiz' : 'Bilinmiyor';
+            var users = conv.users || [];
+            var isAIConv = (users.length === 1 && users[0] === userEmail);
+            var displayName;
+            if (isAIConv) {
+                displayName = conv.customName || '🧠 VİZYON AI';
+            } else {
+                var otherEmail = users.find(function(u) { return u !== userEmail; });
+                if (otherEmail) {
+                    var parts = otherEmail.split('@');
+                    displayName = conv.customName || parts[0];
+                } else {
+                    displayName = conv.customName || 'İsimsiz';
+                }
+            }
             var lastMsg = conv.lastMessage || 'Yeni sohbet';
-            var isActive = (conv.id === currentConversationId);
-            var customName = conv.customName || name;
+            var isActive = (conv.id === currentConversationId || conv.id === window.fullAIConversationId);
             html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-bottom:1px solid var(--border); background:${isActive ? 'rgba(0,212,255,0.1)' : 'transparent'}; border-radius:4px;">`;
-            html += `<div onclick="window.loadConversationById('${conv.id}')" style="cursor:pointer; flex:1;">
-                <div style="font-weight:600;">${customName}</div>
-                <div style="font-size:12px; color:var(--text3);">${lastMsg.substring(0,40)}</div>
-            </div>`;
-            html += `<div style="display:flex; gap:6px;">
-                <button class="btn-secondary btn-sm" onclick="window.renameConversation('${conv.id}')" style="font-size:9px; padding:2px 6px;">✏️</button>
-                <button class="btn-secondary btn-sm" onclick="window.shareConversation('${conv.id}')" style="font-size:9px; padding:2px 6px;">🔗</button>
-                <button class="btn-danger btn-sm" onclick="window.deleteConversation('${conv.id}')" style="font-size:9px; padding:2px 6px;">🗑️</button>
-            </div>`;
+            html += `<div onclick="window.loadConversationById('${conv.id}')" style="cursor:pointer; flex:1; min-width:0;">`;
+            html += `<div style="font-weight:600; font-size:13px; word-break:break-word;">${window.escapeHtml(displayName)}</div>`;
+            html += `<div style="font-size:11px; color:var(--text3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${window.escapeHtml(lastMsg.substring(0, 40))}</div>`;
+            html += `</div>`;
+            html += `<div style="display:flex; gap:6px; flex-shrink:0;">`;
+            html += `<button class="btn-secondary btn-sm" onclick="event.stopPropagation(); window.renameConversation('${conv.id}')" style="font-size:9px; padding:2px 6px;">✏️</button>`;
+            html += `<button class="btn-secondary btn-sm" onclick="event.stopPropagation(); window.shareConversation('${conv.id}')" style="font-size:9px; padding:2px 6px;">🔗</button>`;
+            html += `<button class="btn-danger btn-sm" onclick="event.stopPropagation(); window.deleteConversation('${conv.id}')" style="font-size:9px; padding:2px 6px;">🗑️</button>`;
+            html += `</div>`;
             html += `</div>`;
         });
         container.innerHTML = html;
@@ -11614,23 +12622,36 @@ window.loadConversationHistory = async function() {
     }
 };
 
+// [SORUN 4/5/7 FIX] loadConversationById — email bazlı + role div
 window.loadConversationById = async function(convId) {
     if (!currentUser) return;
     try {
         var result = await Parse.Cloud.run('getConversationMessages', { conversationId: convId });
         if (!result) return showNotification('Konuşma bulunamadı!', 'error');
         currentConversationId = convId;
+        window.fullAIConversationId = convId;
+        localStorage.setItem('vizyon_ai_conv_id', convId);
+        localStorage.setItem('vizyon_full_ai_conv_id', convId);
+
+        var userEmail = currentUser.get('email');
+        var userName = currentUser.get('name') || currentUser.get('username') || 'Kullanıcı';
+
         var container = document.getElementById('dashboardAiMessages');
         var msgs = result.messages || [];
         if (msgs.length === 0) {
-            container.innerHTML = '<div class="ai-message bot">📭 Bu sohbette henüz mesaj yok.</div>';
+            container.innerHTML = '<div class="ai-message bot"><div class="role">🧠 VİZYON AI</div>📭 Bu sohbette henüz mesaj yok.</div>';
         } else {
             var html = '';
             msgs.forEach(function(msg) {
-                var isUser = (msg.from_user && msg.from_user.id === currentUser.id);
+                // from_user.id = email (cloud'dan gelir)
+                var fromEmail = (msg.from_user && msg.from_user.id) ? msg.from_user.id : null;
+                var isUser = (fromEmail === userEmail);
                 var cls = isUser ? 'user' : 'bot';
+                var roleHtml = isUser
+                    ? '<div class="role">👤 ' + window.escapeHtml(userName) + '</div>'
+                    : '<div class="role">🧠 VİZYON AI</div>';
                 var content = msg.text || '';
-                html += `<div class="ai-message ${cls}">${content}</div>`;
+                html += `<div class="ai-message ${cls}">${roleHtml}${window.escapeHtml(content).replace(/\n/g, '<br>')}</div>`;
             });
             container.innerHTML = html;
         }
@@ -11665,6 +12686,7 @@ window.renameCurrentConversation = function() {
     window.renameConversation(currentConversationId);
 };
 
+// [SORUN 6] shareConversation — URL doğru üretiliyor, share.html'de Parse credentials düzeltilecek
 window.shareConversation = async function(convId) {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     if (!convId) convId = currentConversationId;
@@ -11704,7 +12726,10 @@ window.deleteConversation = async function(convId) {
         if (result.success) {
             if (convId === currentConversationId) {
                 currentConversationId = null;
-                document.getElementById('dashboardAiMessages').innerHTML = '<div class="ai-message bot">🗑️ Sohbet silindi. Yeni sohbet başlatın.</div>';
+                window.fullAIConversationId = null;
+                localStorage.removeItem('vizyon_ai_conv_id');
+                localStorage.removeItem('vizyon_full_ai_conv_id');
+                document.getElementById('dashboardAiMessages').innerHTML = '<div class="ai-message bot"><div class="role">🧠 VİZYON AI</div>🗑️ Sohbet silindi. Yeni sohbet başlatın.</div>';
             }
             await window.loadConversationHistory();
             showNotification('✅ Sohbet silindi.', 'success');
@@ -11721,7 +12746,7 @@ window.deleteCurrentConversation = function() {
 };
 
 // ================================================================
-// ========== GÜNLÜK SERİ (STREAK) ==========
+// ========== GÜNLÜK SERİ (STREAK) ================================
 // ================================================================
 
 window.loadStreak = async function() {
@@ -11765,7 +12790,7 @@ window.claimDailyStreak = async function() {
 };
 
 // ================================================================
-// ========== SAVAŞ MODU (AI vs AI) ==========
+// ========== SAVAŞ MODU (AI vs AI) ===============================
 // ================================================================
 
 window.startBattle = async function() {
@@ -11802,7 +12827,7 @@ window.startBattle = async function() {
 };
 
 // ================================================================
-// ========== ÇOKLU AI (4 MODEL) ==========
+// ========== ÇOKLU AI (4 MODEL) ==================================
 // ================================================================
 
 window.runMultiAI = async function() {
@@ -11839,7 +12864,7 @@ window.runMultiAI = async function() {
 };
 
 // ================================================================
-// ========== VİDEO ANALİZ ==========
+// ========== VİDEO ANALİZ ========================================
 // ================================================================
 
 window.analyzeVideo = async function() {
@@ -11877,7 +12902,7 @@ window.generateReelsIdeas = async function() {
 };
 
 // ================================================================
-// ========== UYGULAMA YAPTIRICI ==========
+// ========== UYGULAMA YAPTIRICI ==================================
 // ================================================================
 
 window.generateApp = async function() {
@@ -11901,7 +12926,7 @@ window.generateApp = async function() {
 };
 
 // ================================================================
-// ========== PRO ARAÇLARI (/kod, /yazi, /ceviri) ==========
+// ========== PRO ARAÇLARI (/kod, /yazi, /ceviri) ================
 // ================================================================
 
 var selectedProTool = 'kod';
@@ -11937,7 +12962,7 @@ window.runProTool = async function() {
 };
 
 // ================================================================
-// ========== DASHBOARD ==========
+// ========== DASHBOARD ===========================================
 // ================================================================
 
 window.showDashboard = async function() {
@@ -11969,7 +12994,6 @@ window.showDashboard = async function() {
         if (nameEl) nameEl.innerHTML = name || 'Kullanıcı';
         if (roleEl) roleEl.innerHTML = role === 'founder' ? '👑 KURUCU' : role === 'admin' ? '⚙️ ADMIN' : role === 'beta' ? '🔬 BETA' : '👤 KULLANICI';
 
-        // Kurucu kontrolü
         isFounder = (role === 'founder');
 
         if (currentUser) {
@@ -11980,6 +13004,9 @@ window.showDashboard = async function() {
         var isAdmin = (role === 'admin' || role === 'founder');
         var isFounderOnly = (role === 'founder');
 
+        // [SORUN 1+2] Schema'yı otomatik oluştur (sadece admin/founder için)
+        await window.ensureSchemasInitialized();
+
         var adminActionsCard = document.getElementById('adminActionsCard');
         if (adminActionsCard) adminActionsCard.style.display = isAdmin ? 'block' : 'none';
         var betaAssignSection = document.getElementById('betaAssignSection');
@@ -11988,7 +13015,6 @@ window.showDashboard = async function() {
         if (adminAssignSection) adminAssignSection.style.display = isFounderOnly ? 'block' : 'none';
         var adminPanelCard = document.getElementById('adminPanelCard');
         if (adminPanelCard) adminPanelCard.style.display = isFounderOnly ? 'block' : 'none';
-        // Tüm Adminler butonu sadece kurucuda
         var showAdminsBtn = document.getElementById('showAdminsBtn');
         if (showAdminsBtn) showAdminsBtn.style.display = isFounderOnly ? 'inline-block' : 'none';
 
@@ -12000,16 +13026,23 @@ window.showDashboard = async function() {
         var pollManage = document.getElementById('pollManage');
         if (pollManage) pollManage.style.display = isFounderOnly ? 'flex' : 'none';
 
-        // ===== [YENİ] API Yönetim Alanı Görünürlüğü =====
-        // Sadece takım paketi olanlar veya admin/beta/kurucu rolü olanlar görebilir
+        // ✅ GÜNCELLEME (Sorun 5): Kendi API herkese açık - rol kontrolü kaldırıldı
         var apiKeyManagementWrapper = document.getElementById('apiKeyManagementWrapper');
         var apiModeToggleWrapper = document.getElementById('apiModeToggleWrapper');
-        var canUseCustomAPI = ['admin', 'founder', 'beta'].includes(role) || plan === 'team';
         if (apiKeyManagementWrapper) {
-            apiKeyManagementWrapper.style.display = canUseCustomAPI ? 'block' : 'none';
+            apiKeyManagementWrapper.style.display = 'block';
         }
         if (apiModeToggleWrapper) {
-            apiModeToggleWrapper.style.display = canUseCustomAPI ? 'block' : 'none';
+            apiModeToggleWrapper.style.display = 'block';
+        }
+
+        // ✅ GÜNCELLEME (Sorun 4): Yarışma Projeleri (sadece founder)
+        var contestFounderSection = document.getElementById('contestProjectsFounderSection');
+        if (contestFounderSection) {
+            contestFounderSection.style.display = isFounderOnly ? 'block' : 'none';
+            if (isFounderOnly) {
+                try { window.loadContestProjectsForFounder(); } catch(e) { console.warn('Yarışma projeleri yüklenemedi:', e); }
+            }
         }
 
         if (isFounderOnly) await window.loadUserList();
@@ -12046,7 +13079,6 @@ window.showDashboard = async function() {
 
         await checkAndShowSubscriptionCard();
 
-        // ========== extraAdminCard DÜZELTMESİ ==========
         var extraCard = document.getElementById('extraAdminCard');
         if (!extraCard) {
             extraCard = document.createElement('div');
@@ -12091,7 +13123,7 @@ window.showDashboard = async function() {
 };
 
 // ================================================================
-// ========== PROJE İŞLEMLERİ ==========
+// ========== PROJE İŞLEMLERİ =====================================
 // ================================================================
 
 window.loadProjects = async function() {
@@ -12114,7 +13146,7 @@ window.loadProjects = async function() {
             });
             container.innerHTML = html;
         }
-    } catch(e) { console.error('Projeler yüklenirken hata:', e); document.getElementById('projectsList').innerHTML = '<div class="project-item">⚠️ Projeler yüklenemedi.</div>'; }
+    } catch(e) { console.error('Projeler yüklenirken hata:', e); var pc = document.getElementById('projectsList'); if (pc) pc.innerHTML = '<div class="project-item">⚠️ Projeler yüklenemedi.</div>'; }
 };
 
 window.editProject = async function(id) {
@@ -12273,17 +13305,20 @@ window.loadProjectRequests = async function() {
             requests.forEach(function(r) {
                 var name = r.get('title') || r.get('name') || 'İsimsiz Proje';
                 var status = r.get('status') || 'Beklemede';
-                html += `<div class="project-item" style="border-left-color: ${status === 'pending' ? 'var(--gold)' : status === 'accepted' ? 'var(--accent2)' : 'var(--danger)'};">
-                    <span>📨 ${name.substring(0, 25)}</span>
-                    <span style="font-size:10px;color:var(--text3);">${status === 'pending' ? '⏳ Beklemede' : status === 'accepted' ? '✅ Kabul Edildi' : status === 'rejected' ? '❌ Reddedildi' : status === 'completed' ? '✅ Tamamlandı' : status}</span>
-                    ${status === 'pending' ? `<button class="btn-danger btn-sm" onclick="window.cancelProjectRequest('${r.id}')" style="font-size:9px;padding:2px 8px;">🗑️ İptal</button>` : ''}
-                </div>`;
+                html += `<div class="project-item" style="border-left-color: ${status === 'pending' ? 'var(--gold)' : status === 'accepted' ? 'var(--accent2)' : 'var(--danger)'};">`;
+                html += `<span>📨 ${name.substring(0, 25)}</span>`;
+                html += `<span style="font-size:10px;color:var(--text3);">${status === 'pending' ? '⏳ Beklemede' : status === 'accepted' ? '✅ Kabul Edildi' : status === 'rejected' ? '❌ Reddedildi' : status === 'completed' ? '✅ Tamamlandı' : status}</span>`;
+                if (status === 'pending') {
+                    html += `<button class="btn-danger btn-sm" onclick="window.cancelProjectRequest('${r.id}')" style="font-size:9px;padding:2px 8px;">🗑️ İptal</button>`;
+                }
+                html += `</div>`;
             });
             container.innerHTML = html;
         }
     } catch(e) {
         console.error('Proje talepleri yüklenirken hata:', e);
-        document.getElementById('projectRequestsList').innerHTML = '<div class="project-item">⚠️ Talepler yüklenemedi.</div>';
+        var prc = document.getElementById('projectRequestsList');
+        if (prc) prc.innerHTML = '<div class="project-item">⚠️ Talepler yüklenemedi.</div>';
     }
 };
 
@@ -12341,7 +13376,7 @@ window.publishProjectToStore = async function(projectId) {
 };
 
 // ================================================================
-// ========== YORUMLAR (SANSÜR EKLENDİ + HATA YÖNETİMİ) ==========
+// ========== YORUMLAR ============================================
 // ================================================================
 
 window.updateCommentUI = function() {
@@ -12386,7 +13421,7 @@ window.loadComments = async function() {
         document.querySelectorAll('#mainCommentsList, #commentsList').forEach(function(el) { if (el) el.innerHTML = errorHtml; });
         showNotification('Yorumlar yüklenirken bir sorun oluştu.', 'error');
     } finally {
-        window.hideSplash();
+        if (typeof window.hideSplash === 'function') window.hideSplash();
     }
 };
 
@@ -12494,7 +13529,7 @@ window.filterComments = function(rating) {
 };
 
 // ================================================================
-// ========== GELEN KUTUSU (DÜZELTİLDİ - PROJE TALEBİ BUTONLARI EKLENDİ) ==========
+// ========== GELEN KUTUSU ========================================
 // ================================================================
 
 window.loadInbox = async function() {
@@ -12537,7 +13572,6 @@ window.loadInbox = async function() {
                 html += `<button class="btn-danger btn-sm" onclick="window.handleRequest('${reqId}','reject')" style="padding:4px 12px; font-size:11px;">❌ Red</button>`;
                 html += `</div>`;
             } else if (isPending && type === 'project_request') {
-                // === PROJE TALEBİ İÇİN KABUL / REDDET / DEVRET ===
                 const reqId = m.get('request_id');
                 const projTitle = m.get('project_title') || 'Proje';
                 const projType = m.get('project_type') || '';
@@ -12564,11 +13598,11 @@ window.loadInbox = async function() {
             html += `</div>`;
         });
         container.innerHTML = html;
-    } catch(e) { console.error('Gelen kutusu yüklenirken hata:', e); document.getElementById('inboxList').innerHTML = '<div class="inbox-item">⚠️ Mesajlar yüklenemedi.</div>'; }
+    } catch(e) { console.error('Gelen kutusu yüklenirken hata:', e); var ic = document.getElementById('inboxList'); if (ic) ic.innerHTML = '<div class="inbox-item">⚠️ Mesajlar yüklenemedi.</div>'; }
 };
 
 // ================================================================
-// ========== PROJE TALEBİ HANDLER (YENİ EKLENDİ) ==========
+// ========== PROJE TALEBİ HANDLER ================================
 // ================================================================
 window.acceptProjectRequest = async function(requestId, title, type, description) {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
@@ -12589,7 +13623,6 @@ window.acceptProjectRequest = async function(requestId, title, type, description
         showNotification('✅ Talep kabul edildi! Proje oluşturma ekranı açılıyor...', 'success');
         await window.loadInbox();
 
-        // Proje oluşturma sihirbazını aç (önceden doldurulmuş)
         window.createProjectWizardFromRequest(requestId, title, type, description);
     } catch(e) {
         console.error('Proje talebi kabul hatası:', e);
@@ -12646,23 +13679,20 @@ window.delegateProjectRequest = async function(requestId) {
 };
 
 // ================================================================
-// ========== PROJE SİHİRBAZI (Talep Kabul Edilince Açılır) ==========
+// ========== PROJE SİHİRBAZI =====================================
 // ================================================================
 window.createProjectWizardFromRequest = function(requestId, title, type, description) {
-    // Proje sihirbazını aç ve önceden doldur
     window.createProjectWizard();
 
-    // Türü önceden seç
     var typeMap = {
         '3D': '3d',
         'Kod': 'code',
         'Görsel': 'image'
     };
-    var wizardType = typeMap[type] || 'code';
+    var wizardTypeLocal = typeMap[type] || 'code';
 
-    // Kısa bir gecikme ile sihirbazı doldur
     setTimeout(function() {
-        window.wizardSelectType(wizardType);
+        window.wizardSelectType(wizardTypeLocal);
 
         setTimeout(function() {
             var nameInput = document.getElementById('wizardProjectName');
@@ -12674,10 +13704,6 @@ window.createProjectWizardFromRequest = function(requestId, title, type, descrip
         }, 300);
     }, 300);
 };
-
-// ================================================================
-// ========== DİĞER GELEN KUTUSU HANDLERLARI ==========
-// ================================================================
 
 window.acceptProjectCompletion = async function(inboxId) {
     try {
@@ -12772,7 +13798,7 @@ window.handleRequest = async function(requestId, action) {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ---- ADMIN İŞLEMLERİ (GÜNCELLENMİŞ) ----
+// ---- ADMIN İŞLEMLERİ ----
 window.sendGiftByEmail = async function() {
     if (!currentUser || (currentUser.get('role') !== 'founder' && currentUser.get('role') !== 'admin')) return showNotification('Yetkiniz yok!', 'error');
     var email = document.getElementById('giftEmailInput').value.trim();
@@ -12794,7 +13820,6 @@ window.assignBetaByEmail = async function() {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// === YENİ / GÜNCELLENEN FONKSİYONLAR ===
 window.assignAdminEmail = async function(email) {
     if (!currentUser || currentUser.get('role') !== 'founder') {
         showNotification('Sadece kurucu admin atayabilir!', 'error');
@@ -12877,7 +13902,7 @@ window.unbanUser = function() {
 };
 
 // ================================================================
-// ========== KULLANICI LİSTESİ (GÜNCELLENMİŞ) ==========
+// ========== KULLANICI LİSTESİ ===================================
 // ================================================================
 
 window.loadUserList = async function() {
@@ -12914,7 +13939,7 @@ window.loadUserList = async function() {
 };
 
 // ================================================================
-// ========== KULLANICI ARA (GÜNCELLENMİŞ) ==========
+// ========== KULLANICI ARA =======================================
 // ================================================================
 
 window.searchAllUsers = async function() {
@@ -12957,7 +13982,7 @@ window.searchAllUsers = async function() {
 };
 
 // ================================================================
-// ========== DİĞER FONKSİYONLAR (ÖNCEKİ GİBİ) ==========
+// ========== DİĞER FONKSİYONLAR ==================================
 // ================================================================
 
 window.showAdminsList = async function() {
@@ -13088,7 +14113,7 @@ window.giftUserEmail = async function(email, pkg) {
 };
 
 // ================================================================
-// ========== YENİ ÖZELLİKLER (GÜNCELLEMELER) ==========
+// ========== YENİ ÖZELLİKLER =====================================
 // ================================================================
 
 window.updatePointsBadge = function(points) { var badge = document.getElementById('dashboardPointsDisplay'); if (badge) badge.textContent = points || 0; };
@@ -13160,8 +14185,8 @@ window.loadStore = async function() {
         container.innerHTML = html;
     } catch(e) {
         console.error('Mağaza yüklenirken hata:', e);
-        var container = document.getElementById('storeItems');
-        if (container) container.innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center;">⚠️ Mağaza yüklenemedi.</div>';
+        var container2 = document.getElementById('storeItems');
+        if (container2) container2.innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center;">⚠️ Mağaza yüklenemedi.</div>';
     }
 };
 
@@ -13639,33 +14664,358 @@ window.answerQuiz = async function(quizId, answerIndex) {
     } catch(e) { showNotification('Hata: ' + e.message, 'error'); }
 };
 
-// ---- YARIŞMA ----
-window.loadContestRanking = async function() {
+// ================================================================
+// ========== [SORUN 4] AYLIK YARIŞMA SİSTEMİ ====================
+// ================================================================
+
+// [SORUN 4] Yarışma sayfasını aç
+window.openContestPage = function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    var page = document.getElementById('contestPage');
+    if (!page) {
+        console.error('contestPage elementi bulunamadı!');
+        showNotification('Yarışma sayfası bulunamadı!', 'error');
+        return;
+    }
+    page.classList.add('open');
+    page.style.display = 'flex';
+    window.loadContestPageData();
+};
+
+// [SORUN 4] Yarışma sayfasını kapat
+window.closeContestPage = function() {
+    var page = document.getElementById('contestPage');
+    if (page) {
+        page.classList.remove('open');
+        page.style.display = 'none';
+    }
+    window.loadContestRanking();
+};
+
+// [SORUN 4] Yarışma sayfası verilerini yükle
+window.loadContestPageData = async function() {
+    if (!currentUser) return;
     try {
-        var result = await Parse.Cloud.run('getContestRanking', {});
-        var container = document.getElementById('contestRanking');
-        if (!container) return;
-        if (!result || result.length === 0) {
-            container.innerHTML = '<div style="color:var(--text3);padding:12px;text-align:center;">🏆 Henüz yarışma yok.</div>';
+        // Aktif yarışmayı al
+        var result = await Parse.Cloud.run('getActiveContest', {});
+        window.currentContestData = result;
+
+        // Kullanıcının katılım durumunu kontrol et
+        try {
+            var participantCheck = await Parse.Cloud.run('checkContestParticipation', {});
+            window.contestIsParticipant = participantCheck && participantCheck.isParticipant;
+        } catch(e) {
+            window.contestIsParticipant = false;
+        }
+
+        // Katılım durumu bölümünü güncelle
+        var joinSection = document.getElementById('contestJoinStatusContent');
+        var submitBtn = document.getElementById('contestSubmitProjectBtn');
+        if (joinSection) {
+            if (window.contestIsParticipant) {
+                joinSection.innerHTML = `
+                    <div style="text-align:center; padding:20px;">
+                        <div style="font-size:48px; margin-bottom:12px;">✅</div>
+                        <div style="font-size:18px; font-weight:700; color:var(--accent2); margin-bottom:8px;">Yarışmaya Katıldınız!</div>
+                        <p style="color:var(--text2); font-size:13px; margin-bottom:16px;">Artık projenizi gönderebilirsiniz.</p>
+                    </div>
+                `;
+                if (submitBtn) submitBtn.style.display = 'inline-block';
+            } else {
+                joinSection.innerHTML = `
+                    <div style="text-align:center; padding:20px;">
+                        <div style="font-size:48px; margin-bottom:12px;">🎯</div>
+                        <div style="font-size:16px; font-weight:600; margin-bottom:16px;">Henüz katılmadınız</div>
+                        <button class="btn-primary" onclick="window.openContestJoinWarning()" style="font-size:15px; padding:14px 32px;">
+                            🚀 Yarışmaya Katıl
+                        </button>
+                    </div>
+                `;
+                if (submitBtn) submitBtn.style.display = 'none';
+            }
+        }
+
+        // Sıralamayı yükle
+        await window.loadContestRankingV2();
+    } catch(e) {
+        console.error('Yarışma sayfası yüklenemedi:', e);
+        showNotification('Yarışma verileri yüklenemedi: ' + e.message, 'error');
+    }
+};
+
+// [SORUN 4] Yarışma sıralamasını yükle (yeni V2)
+window.loadContestRankingV2 = async function() {
+    var container = document.getElementById('contestRankingList');
+    if (!container) return;
+    try {
+        var result = await Parse.Cloud.run('getContestRankingV2', {});
+        if (!result || !result.ranking || result.ranking.length === 0) {
+            container.innerHTML = '<div class="contest-empty-state">📭 Henüz yarışmaya katılan yok. İlk sen katıl!</div>';
+            return;
+        }
+        var html = '';
+        var myEmail = currentUser ? currentUser.get('email') : null;
+        result.ranking.forEach(function(item, index) {
+            var medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : (index + 1) + '.';
+            var rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
+            var isMyRow = (item.user_email === myEmail) ? 'my-row' : '';
+            var displayEmail = item.user_email;
+            var displayName = item.user_name || item.user_email.split('@')[0];
+            html += `<div class="contest-ranking-row ${rankClass} ${isMyRow}">`;
+            html += `<div><span class="contest-ranking-name">${medal} ${displayName}</span><br><span class="contest-ranking-email">${displayEmail}</span></div>`;
+            html += `<div class="contest-ranking-points">${item.total_points || 0} Puan</div>`;
+            html += `</div>`;
+        });
+        container.innerHTML = html;
+    } catch(e) {
+        console.error('Sıralama yüklenemedi:', e);
+        container.innerHTML = '<div class="contest-empty-state">⚠️ Sıralama yüklenemedi.</div>';
+    }
+};
+
+// [SORUN 4] Eski loadContestRanking (dashboard kartı için)
+window.loadContestRanking = async function() {
+    var container = document.getElementById('contestRanking');
+    if (!container) return;
+    try {
+        var result = await Parse.Cloud.run('getContestRankingV2', {});
+        if (!result || !result.ranking || result.ranking.length === 0) {
+            container.innerHTML = '<div style="color:var(--text3);padding:12px;text-align:center;">📊 Henüz katılımcı yok.</div>';
             return;
         }
         var html = '<div style="font-size:13px;">';
         var medals = ['🥇', '🥈', '🥉'];
-        result.forEach(function(item, index) {
+        result.ranking.slice(0, 5).forEach(function(item, index) {
             var medal = index < 3 ? medals[index] : (index + 1) + '.';
             html += `
                 <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);">
-                    <span>${medal} ${item.name}</span>
-                    <span style="color:var(--gold);font-weight:600;">${item.points} puan</span>
+                    <span>${medal} ${item.user_name || item.user_email.split('@')[0]}</span>
+                    <span style="color:var(--gold);font-weight:600;">${item.total_points || 0} puan</span>
                 </div>
             `;
         });
         html += '</div>';
         container.innerHTML = html;
-    } catch(e) { console.error('Yarışma yüklenirken hata:', e); }
+    } catch(e) {
+        console.error('Yarışma sıralaması yüklenemedi:', e);
+        container.innerHTML = '<div style="color:var(--text3);padding:12px;text-align:center;">⚠️ Yüklenemedi.</div>';
+    }
 };
 
-// ---- İŞ İLANI ----
+// [SORUN 4] Katılım uyarı modalını aç
+window.openContestJoinWarning = function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    var emailEl = document.getElementById('contestJoinEmail');
+    var nameEl = document.getElementById('contestJoinName');
+    if (emailEl) emailEl.textContent = currentUser.get('email') || '-';
+    if (nameEl) nameEl.textContent = currentUser.get('name') || currentUser.get('username') || '-';
+    var modal = document.getElementById('contestJoinWarningModal');
+    if (modal) {
+        modal.classList.add('open');
+        modal.style.display = 'flex';
+    }
+};
+
+// [SORUN 4] Katılım uyarı modalını kapat
+window.closeContestJoinWarning = function() {
+    var modal = document.getElementById('contestJoinWarningModal');
+    if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+    }
+};
+
+// [SORUN 4] Katılımı onayla
+window.confirmContestJoin = async function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    try {
+        var result = await Parse.Cloud.run('joinContest', {});
+        if (result.success) {
+            showNotification('🎉 Yarışmaya katıldınız!', 'success');
+            window.contestIsParticipant = true;
+            window.closeContestJoinWarning();
+            await window.loadContestPageData();
+        } else {
+            showNotification('❌ ' + (result.error || result.message), 'error');
+        }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+// [SORUN 4] Proje gönderme formunu aç
+window.openContestProjectForm = function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    if (!window.contestIsParticipant) {
+        return showNotification('Önce yarışmaya katılmalısınız!', 'warning');
+    }
+    var modal = document.getElementById('contestProjectFormModal');
+    if (modal) {
+        modal.classList.add('open');
+        modal.style.display = 'flex';
+        var nameInput = document.getElementById('contestProjectNameInput');
+        var codeInput = document.getElementById('contestProjectCodeInput');
+        if (nameInput) nameInput.value = '';
+        if (codeInput) codeInput.value = '';
+    }
+};
+
+// [SORUN 4] Proje formunu kapat
+window.closeContestProjectForm = function() {
+    var modal = document.getElementById('contestProjectFormModal');
+    if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+    }
+};
+
+// [SORUN 4] Projeyi gönder
+window.submitContestProject = async function() {
+    if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
+    var nameInput = document.getElementById('contestProjectNameInput');
+    var codeInput = document.getElementById('contestProjectCodeInput');
+    var projectName = nameInput ? nameInput.value.trim() : '';
+    var code = codeInput ? codeInput.value.trim() : '';
+    if (!projectName) return showNotification('Lütfen proje adı girin!', 'error');
+    if (!code) return showNotification('Lütfen kod yazın!', 'error');
+    try {
+        var result = await Parse.Cloud.run('createContestProject', {
+            projectName: projectName,
+            code: code
+        });
+        if (result.success) {
+            showNotification('✅ Projeniz kurucuya gönderildi!', 'success');
+            window.closeContestProjectForm();
+        } else {
+            showNotification('❌ ' + (result.error || result.message), 'error');
+        }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+// [SORUN 4] Founder için yarışma projelerini yükle
+window.loadContestProjectsForFounder = async function() {
+    if (!currentUser || currentUser.get('role') !== 'founder') return;
+    var container = document.getElementById('contestProjectsFounderList');
+    if (!container) return;
+    try {
+        var result = await Parse.Cloud.run('getContestProjectsForFounder', {});
+        if (!result || !result.projects || result.projects.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text3); font-size:13px;">📭 Henüz yarışma projesi gönderilmedi.</div>';
+            return;
+        }
+        window.contestProjectsFounderCache = result.projects;
+        var html = '';
+        result.projects.forEach(function(p) {
+            html += `<div class="contest-project-card">
+                <div class="project-info">
+                    <div class="project-info-name">📌 ${p.project_name || 'İsimsiz Proje'}</div>
+                    <div class="project-info-meta">👤 ${p.user_name || 'Kullanıcı'} · 📧 ${p.user_email} · ⭐ ${p.points || 0} Puan</div>
+                </div>
+                <div class="project-info-actions">
+                    <button class="btn-secondary btn-sm" onclick="window.reviewContestProject('${p.id}')">🔍 Projeyi Görüntüle</button>
+                    <button class="btn-primary btn-sm" onclick="window.openContestScore('${p.id}')">⭐ Projeyi Puanla</button>
+                </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    } catch(e) {
+        console.error('Yarışma projeleri yüklenemedi:', e);
+        container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--danger); font-size:13px;">⚠️ Yüklenemedi: ' + e.message + '</div>';
+    }
+};
+
+// [SORUN 4] Projeyi incele (founder)
+window.reviewContestProject = function(projectId) {
+    var proj = window.contestProjectsFounderCache.find(function(p) { return p.id === projectId; });
+    if (!proj) return showNotification('Proje bulunamadı!', 'error');
+    window.currentReviewingProject = proj;
+    var emailEl = document.getElementById('contestReviewEmail');
+    var nameEl = document.getElementById('contestReviewName');
+    var projNameEl = document.getElementById('contestReviewProjectName');
+    var codeEl = document.getElementById('contestReviewCode');
+    if (emailEl) emailEl.textContent = proj.user_email || '-';
+    if (nameEl) nameEl.textContent = proj.user_name || '-';
+    if (projNameEl) projNameEl.textContent = proj.project_name || '-';
+    if (codeEl) codeEl.textContent = proj.code || '-';
+    var modal = document.getElementById('contestReviewModal');
+    if (modal) {
+        modal.classList.add('open');
+        modal.style.display = 'flex';
+    }
+};
+
+// [SORUN 4] İnceleme modalını kapat
+window.closeContestReview = function() {
+    var modal = document.getElementById('contestReviewModal');
+    if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+    }
+    window.currentReviewingProject = null;
+};
+
+// [SORUN 4] Puanlama modalını aç (founder)
+window.openContestScore = function(projectId) {
+    var proj = window.contestProjectsFounderCache.find(function(p) { return p.id === projectId; });
+    if (!proj) return showNotification('Proje bulunamadı!', 'error');
+    window.currentScoringProject = proj;
+    var projNameEl = document.getElementById('contestScoreProjectName');
+    var userNameEl = document.getElementById('contestScoreUserName');
+    var input = document.getElementById('contestScoreInput');
+    if (projNameEl) projNameEl.textContent = proj.project_name || '-';
+    if (userNameEl) userNameEl.textContent = (proj.user_name || 'Kullanıcı') + ' (' + proj.user_email + ')';
+    if (input) input.value = proj.points || '';
+    var modal = document.getElementById('contestScoreModal');
+    if (modal) {
+        modal.classList.add('open');
+        modal.style.display = 'flex';
+    }
+};
+
+// [SORUN 4] Puanlama modalını kapat
+window.closeContestScore = function() {
+    var modal = document.getElementById('contestScoreModal');
+    if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+    }
+    window.currentScoringProject = null;
+};
+
+// [SORUN 4] Puanı kaydet
+window.saveContestScore = async function() {
+    if (!currentUser || currentUser.get('role') !== 'founder') {
+        return showNotification('Sadece kurucu puan verebilir!', 'error');
+    }
+    if (!window.currentScoringProject) return showNotification('Proje seçilmedi!', 'error');
+    var input = document.getElementById('contestScoreInput');
+    var points = parseInt(input.value);
+    if (isNaN(points) || points < 1 || points > 10000) {
+        return showNotification('Lütfen 1-10000 arası geçerli bir puan girin!', 'error');
+    }
+    try {
+        var result = await Parse.Cloud.run('scoreContestProject', {
+            projectId: window.currentScoringProject.id,
+            points: points
+        });
+        if (result.success) {
+            showNotification('✅ Puan kaydedildi!', 'success');
+            window.closeContestScore();
+            await window.loadContestProjectsForFounder();
+        } else {
+            showNotification('❌ ' + (result.error || result.message), 'error');
+        }
+    } catch(e) {
+        showNotification('Hata: ' + e.message, 'error');
+    }
+};
+
+// ================================================================
+// ========== YARIŞMA SONU (eski) =================================
+// ================================================================
+
 window.loadJobs = async function() {
     try {
         var result = await Parse.Cloud.run('getJobs', {});
@@ -13802,6 +15152,7 @@ window.openDmModal = function(userId) {
     if (userId) window.startConversation(userId);
 };
 
+// [SORUN 4 FIX] DM — email bazlı karşılaştırma
 window.loadConversations = async function() {
     if (!currentUser) return;
     try {
@@ -13812,20 +15163,29 @@ window.loadConversations = async function() {
             container.innerHTML = '<div style="padding:12px;color:var(--text3);text-align:center;">📭 Henüz konuşma yok.</div>';
             return;
         }
+        var userEmail = currentUser.get('email');
         var html = '';
         result.forEach(function(conv) {
-            var otherUser = conv.users.find(u => u.id !== currentUser.id);
-            var name = otherUser ? otherUser.get('name') || otherUser.get('username') || 'İsimsiz' : 'Bilinmiyor';
+            var users = conv.users || [];
+            var otherEmail = users.find(function(u) { return u !== userEmail; });
+            var name;
+            if (otherEmail) {
+                var parts = otherEmail.split('@');
+                name = parts[0];
+            } else {
+                name = 'Sadece Sen';
+            }
             var lastMsg = conv.lastMessage || 'Yeni konuşma';
             html += `<div class="dm-conversation-item" onclick="window.loadConversation('${conv.id}')">`;
             html += `<div class="dm-avatar">${name.charAt(0).toUpperCase()}</div>`;
-            html += `<div><div class="dm-name">${name}</div><div class="dm-last-msg">${lastMsg.substring(0,30)}</div></div>`;
+            html += `<div><div class="dm-name">${window.escapeHtml(name)}</div><div class="dm-last-msg">${window.escapeHtml(lastMsg.substring(0,30))}</div></div>`;
             html += `</div>`;
         });
         container.innerHTML = html;
     } catch(e) { console.error('Konuşmalar yüklenirken hata:', e); }
 };
 
+// [SORUN 4 FIX] DM — email bazlı
 window.loadConversation = async function(conversationId) {
     if (!currentUser) return;
     try {
@@ -13833,8 +15193,16 @@ window.loadConversation = async function(conversationId) {
         var container = document.getElementById('dmMessages');
         var header = document.getElementById('dmChatHeader');
         if (!container || !header) return;
-        var otherUser = result.users.find(u => u.id !== currentUser.id);
-        var name = otherUser ? otherUser.get('name') || otherUser.get('username') || 'İsimsiz' : 'Bilinmiyor';
+        var userEmail = currentUser.get('email');
+        var users = result.users || [];
+        var otherEmail = users.find(function(u) { return u !== userEmail; });
+        var name;
+        if (otherEmail) {
+            var parts = otherEmail.split('@');
+            name = parts[0];
+        } else {
+            name = 'Kendin';
+        }
         header.textContent = '💬 ' + name;
         currentDmConversation = conversationId;
         var messages = result.messages || [];
@@ -13844,13 +15212,15 @@ window.loadConversation = async function(conversationId) {
         }
         var html = '';
         messages.forEach(function(msg) {
-            var isSent = msg.from_user.id === currentUser.id;
+            // msg.from_user.id = email
+            var fromEmail = (msg.from_user && msg.from_user.id) ? msg.from_user.id : null;
+            var isSent = (fromEmail === userEmail);
             var cls = isSent ? 'sent' : 'received';
             var content = msg.text || '';
             if (msg.file) {
                 content += `<br><a href="${msg.file}" target="_blank" class="dm-file">📎 Dosyayı Gör</a>`;
             }
-            html += `<div class="dm-msg ${cls}">${content}</div>`;
+            html += `<div class="dm-msg ${cls}">${window.escapeHtml(content).replace(/\n/g, '<br>')}</div>`;
         });
         container.innerHTML = html;
         container.scrollTop = container.scrollHeight;
@@ -14151,15 +15521,18 @@ window.openParentSettings = function() {
     modal.style.visibility = 'visible';
     modal.style.opacity = '1';
 
-    document.getElementById('parentCreateSection').style.display = 'block';
-    document.getElementById('parentLoginSection').style.display = 'block';
-    document.getElementById('parentControls').style.display = 'none';
-    document.getElementById('parentVerificationSection').style.display = 'none';
+    var pcs = document.getElementById('parentCreateSection');
+    var pls = document.getElementById('parentLoginSection');
+    var pctl = document.getElementById('parentControls');
+    var pvs = document.getElementById('parentVerificationSection');
+    if (pcs) pcs.style.display = 'block';
+    if (pls) pls.style.display = 'block';
+    if (pctl) pctl.style.display = 'none';
+    if (pvs) pvs.style.display = 'none';
     window.loadParentSettings();
     window.loadSessions();
 };
 
-// ---- EBEVEYN HESAP OLUŞTUR (DÜZELTİLDİ) ----
 window.createParentAccount = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     var email = document.getElementById('parentCreateEmail').value.trim();
@@ -14169,8 +15542,8 @@ window.createParentAccount = async function() {
         if (warning) warning.classList.add('show');
         return showNotification('Ebeveyn e-postası kendi e-postanız ile aynı olamaz!', 'error');
     } else {
-        var warning = document.getElementById('parentEmailWarning');
-        if (warning) warning.classList.remove('show');
+        var warning2 = document.getElementById('parentEmailWarning');
+        if (warning2) warning2.classList.remove('show');
     }
     var pass = document.getElementById('parentCreatePass').value;
     var pass2 = document.getElementById('parentCreatePass2').value;
@@ -14204,7 +15577,6 @@ window.createParentAccount = async function() {
     }
 };
 
-// ---- EBEVEYN DOĞRULAMA ----
 window.verifyParentCode = async function() {
     var code = document.getElementById('parentCodeInput').value.trim();
     if (!code) return showNotification('Kodu girin!', 'error');
@@ -14231,14 +15603,20 @@ window.loadParentSettings = async function() {
     try {
         const result = await Parse.Cloud.run('getParentSettings', {});
         if (result.parent_mode) {
-            document.getElementById('parentEmailDisplay').textContent = result.parent_email || currentUser.get('email');
-            document.getElementById('liveTrackingStatus').textContent = result.live_tracking ? '🟢 Açık' : '🔴 Kapalı';
-            document.getElementById('dailyLimitInput').value = result.daily_limit || 0;
+            var ped = document.getElementById('parentEmailDisplay');
+            if (ped) ped.textContent = result.parent_email || currentUser.get('email');
+            var lts = document.getElementById('liveTrackingStatus');
+            if (lts) lts.textContent = result.live_tracking ? '🟢 Açık' : '🔴 Kapalı';
+            var dli = document.getElementById('dailyLimitInput');
+            if (dli) dli.value = result.daily_limit || 0;
             try {
                 const full = await Parse.Cloud.run('getFullParentSettings', { childEmail: currentUser.get('email') });
-                document.getElementById('weeklyLimitInput').value = full.weekly_limit || 0;
-                document.getElementById('monthlyLimitInput').value = full.monthly_limit || 0;
-                document.getElementById('accountStatus').textContent = full.is_suspended ? '⛔ Askıda' : '✅ Aktif';
+                var wli = document.getElementById('weeklyLimitInput');
+                if (wli) wli.value = full.weekly_limit || 0;
+                var mli = document.getElementById('monthlyLimitInput');
+                if (mli) mli.value = full.monthly_limit || 0;
+                var acs = document.getElementById('accountStatus');
+                if (acs) acs.textContent = full.is_suspended ? '⛔ Askıda' : '✅ Aktif';
                 const features = full.features || {};
                 for (const [key, val] of Object.entries(features)) {
                     const toggle = document.getElementById('feature' + key.charAt(0).toUpperCase() + key.slice(1));
@@ -14248,10 +15626,14 @@ window.loadParentSettings = async function() {
                 console.warn('Full ayarlar yüklenemedi:', e);
             }
         } else {
-            document.getElementById('parentControls').style.display = 'none';
-            document.getElementById('parentLoginSection').style.display = 'block';
-            document.getElementById('parentVerificationSection').style.display = 'none';
-            document.getElementById('parentCreateSection').style.display = 'block';
+            var pctl2 = document.getElementById('parentControls');
+            if (pctl2) pctl2.style.display = 'none';
+            var pls2 = document.getElementById('parentLoginSection');
+            if (pls2) pls2.style.display = 'block';
+            var pvs2 = document.getElementById('parentVerificationSection');
+            if (pvs2) pvs2.style.display = 'none';
+            var pcs2 = document.getElementById('parentCreateSection');
+            if (pcs2) pcs2.style.display = 'block';
         }
     } catch(e) {
         console.error('Ebeveyn ayarları yüklenemedi:', e);
@@ -14464,7 +15846,8 @@ window.loadSessions = async function() {
         list.innerHTML = html;
     } catch(e) {
         console.error('Oturum geçmişi yüklenemedi:', e);
-        document.getElementById('sessionList').innerHTML = '⚠️ Yüklenemedi.';
+        var sl = document.getElementById('sessionList');
+        if (sl) sl.innerHTML = '⚠️ Yüklenemedi.';
     }
 };
 
@@ -14505,7 +15888,7 @@ window.removeParentControl = async function() {
 };
 
 // ================================================================
-// ========== LİDERLİK TABLOSU (SANSÜR KONTROLLÜ) ==========
+// ========== LİDERLİK TABLOSU ====================================
 // ================================================================
 
 window.loadReferralLeaderboard = async function() {
@@ -14534,7 +15917,7 @@ window.loadReferralLeaderboard = async function() {
         containers.forEach(function(container) {
             if (!container) return;
             var isLoggedIn = !!currentUser;
-            var isFounderUser = currentUser && currentUser.get('email') === 'admin.tr.reis@gmail.com';
+            var isFounderLocal = currentUser && currentUser.get('email') === 'admin.tr.reis@gmail.com';
             if (!result || result.length === 0) {
                 container.innerHTML = '<div style="color:var(--text3); text-align:center; padding:20px;">📊 Henüz kimse davet edilmedi.</div>';
                 return;
@@ -14543,9 +15926,9 @@ window.loadReferralLeaderboard = async function() {
             var medals = ['🥇', '🥈', '🥉'];
             result.forEach(function(item, index) {
                 var medal = index < 3 ? medals[index] : (index + 1) + '.';
-                var displayName = (isFounderUser || (isLoggedIn && item.email === currentUser.get('email'))) ? 
+                var displayName = (isFounderLocal || (isLoggedIn && item.email === currentUser.get('email'))) ? 
                     item.name : censorName(item.name, false);
-                var displayEmail = (isFounderUser || (isLoggedIn && item.email === currentUser.get('email'))) ? 
+                var displayEmail = (isFounderLocal || (isLoggedIn && item.email === currentUser.get('email'))) ? 
                     item.email : censorEmail(item.email, false);
                 html += `
                     <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border);">
@@ -14564,7 +15947,7 @@ window.loadReferralLeaderboard = async function() {
 };
 
 // ================================================================
-// ========== DAVET KODU ==========
+// ========== DAVET KODU ==========================================
 // ================================================================
 
 window.showMyReferralCode = function() {
@@ -14633,7 +16016,7 @@ window.generateReferralCode = async function() {
 };
 
 // ================================================================
-// ========== PROJE SİHİRBAZI ==========
+// ========== PROJE SİHİRBAZI =====================================
 // ================================================================
 
 window.createProjectWizard = function() {
@@ -14836,7 +16219,7 @@ window.wizardFinish = async function() {
 };
 
 // ================================================================
-// ========== PAZAR (MARKET) ==========
+// ========== PAZAR (MARKET) ======================================
 // ================================================================
 
 window.openMarket = function() {
@@ -14940,7 +16323,7 @@ window.removeFromMarket = async function(marketId) {
 };
 
 // ================================================================
-// ========== HESAP BİLGİLERİM ==========
+// ========== HESAP BİLGİLERİM ====================================
 // ================================================================
 
 window.openAccountInfo = function() {
@@ -15004,7 +16387,7 @@ window.openAccountInfo = function() {
 };
 
 // ================================================================
-// ========== GÖRSEL İNDİR ==========
+// ========== GÖRSEL İNDİR ========================================
 // ================================================================
 
 window.downloadCurrentImage = function() {
@@ -15019,7 +16402,7 @@ window.downloadCurrentImage = function() {
 };
 
 // ================================================================
-// ========== 3D MODEL İNDİR ==========
+// ========== 3D MODEL İNDİR ======================================
 // ================================================================
 
 window.downloadModel = function() {
@@ -15053,7 +16436,7 @@ window.downloadModel = function() {
 };
 
 // ================================================================
-// ========== BLOG/SİSTEM ABONELİKLERİ ==========
+// ========== BLOG/SİSTEM ABONELİKLERİ ============================
 // ================================================================
 
 window.mainSubscribe = async function() {
@@ -15163,7 +16546,7 @@ window.subscribeSystem = async function() {
 };
 
 // ================================================================
-// ========== GIF SEÇİCİ ==========
+// ========== GIF SEÇİCİ ==========================================
 // ================================================================
 
 window.openGifPicker = function() {
@@ -15234,12 +16617,9 @@ window.selectGif = function(gifUrl) {
 };
 
 // ================================================================
-// ================================================================
-// ========== [YENİ] API YÖNETİMİ FONKSİYONLARI ===================
-// ================================================================
+// ========== API YÖNETİMİ FONKSİYONLARI ==========================
 // ================================================================
 
-// ===== [YENİ] saveUserApiKey - API kaydet =====
 window.saveUserApiKey = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
 
@@ -15263,7 +16643,6 @@ window.saveUserApiKey = async function() {
         if (result.success) {
             showNotification('✅ API anahtarı kaydedildi: ' + name, 'success');
             closeModal('apiEkleModal');
-            // Eğer anahtar listesi açıksa yenile
             if (window.apiKeysUnlocked) {
                 window.loadApiKeys();
             }
@@ -15275,7 +16654,6 @@ window.saveUserApiKey = async function() {
     }
 };
 
-// ===== [YENİ] loadApiKeys - API listesini yükle =====
 window.loadApiKeys = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     var container = document.getElementById('apiKeysListContainer');
@@ -15322,21 +16700,26 @@ window.loadApiKeys = async function() {
     }
 };
 
-// ===== [YENİ] detectApiKeyType - API anahtar tipini algıla =====
+// [SORUN 5] Genişletilmiş API model tespiti
 window.detectApiKeyType = function(name) {
     var lower = (name || '').toLowerCase();
     if (lower.includes('openai') || lower.includes('gpt')) return 'OpenAI';
+    if (lower.includes('anthropic') || lower.includes('claude')) return 'Anthropic';
     if (lower.includes('groq')) return 'Groq';
     if (lower.includes('deepseek') || lower.includes('deep')) return 'DeepSeek';
     if (lower.includes('gemini') || lower.includes('google')) return 'Gemini';
     if (lower.includes('openrouter') || lower.includes('router')) return 'OpenRouter';
     if (lower.includes('cohere')) return 'Cohere';
     if (lower.includes('cerebras')) return 'Cerebras';
+    if (lower.includes('mistral')) return 'Mistral';
+    if (lower.includes('perplexity')) return 'Perplexity';
+    if (lower.includes('together')) return 'Together';
+    if (lower.includes('fireworks')) return 'Fireworks';
+    if (lower.includes('anyscale')) return 'Anyscale';
     return '';
 };
 
-// ===== [YENİ] escapeHtml - XSS koruma =====
-window.escapeHtml = function(text) {
+window.escapeHtml = window.escapeHtml || function(text) {
     if (text === null || text === undefined) return '';
     return String(text)
         .replace(/&/g, '&amp;')
@@ -15346,7 +16729,6 @@ window.escapeHtml = function(text) {
         .replace(/'/g, '&#39;');
 };
 
-// ===== [YENİ] toggleApiKeyVisibility - API anahtarını göster/gizle =====
 window.toggleApiKeyVisibility = async function(keyId) {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     var valueEl = document.getElementById('apiKeyValue_' + keyId);
@@ -15356,7 +16738,6 @@ window.toggleApiKeyVisibility = async function(keyId) {
     var isRevealed = valueEl.classList.contains('revealed');
 
     if (isRevealed) {
-        // Gizle
         var keyData = window.apiKeysCache.find(k => k.id === keyId);
         valueEl.textContent = keyData ? (keyData.maskedValue || '••••••••') : '••••••••';
         valueEl.classList.remove('revealed');
@@ -15365,7 +16746,6 @@ window.toggleApiKeyVisibility = async function(keyId) {
         return;
     }
 
-    // Göster — API'den tam değeri al
     try {
         btn.innerHTML = '⏳...';
         var result = await Parse.Cloud.run('getUserApiKeyValue', { keyId: keyId });
@@ -15384,7 +16764,6 @@ window.toggleApiKeyVisibility = async function(keyId) {
     }
 };
 
-// ===== [YENİ] copyApiKey - API anahtarını kopyala =====
 window.copyApiKey = async function(keyId) {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     try {
@@ -15413,7 +16792,6 @@ window.copyApiKey = async function(keyId) {
     }
 };
 
-// ===== [YENİ] deleteApiKey - API anahtarını sil =====
 window.deleteApiKey = async function(keyId) {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     var keyData = window.apiKeysCache.find(k => k.id === keyId);
@@ -15424,7 +16802,6 @@ window.deleteApiKey = async function(keyId) {
         if (result.success) {
             showNotification('🗑️ API anahtarı silindi.', 'success');
             window.loadApiKeys();
-            // Eğer başka anahtar kalmadıysa ve custom moddaysa site moduna geç
             if (window.apiKeysCache.length === 0 && window.currentAIMode === 'custom') {
                 window.switchToSiteAI();
             }
@@ -15436,7 +16813,6 @@ window.deleteApiKey = async function(keyId) {
     }
 };
 
-// ===== [YENİ] editApiKey - API anahtarını düzenle =====
 window.editApiKey = async function(keyId) {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     var keyData = window.apiKeysCache.find(k => k.id === keyId);
@@ -15473,11 +16849,9 @@ window.editApiKey = async function(keyId) {
     }
 };
 
-// ===== [YENİ] setApiPassword - API şifresi belirle =====
 window.setApiPassword = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
 
-    // Hem modal içindeki hem de yedekteki input'ları kontrol et
     var pass1 = document.getElementById('apiCreatePassword');
     var pass2 = document.getElementById('apiCreatePassword2');
     if (!pass1 || !pass1.value) {
@@ -15495,7 +16869,6 @@ window.setApiPassword = async function() {
         var result = await Parse.Cloud.run('setApiPassword', { password: p1 });
         if (result.success) {
             showNotification('✅ API şifreniz belirlendi!', 'success');
-            // Şifre belirleme ekranını gizle, listeyi göster
             var createEl = document.getElementById('apiAnahtarlarimPasswordCreate');
             var verifyEl = document.getElementById('apiAnahtarlarimPasswordVerify');
             var listEl = document.getElementById('apiAnahtarlarimList');
@@ -15512,11 +16885,9 @@ window.setApiPassword = async function() {
     }
 };
 
-// ===== [YENİ] verifyApiPassword - API şifresini doğrula =====
 window.verifyApiPassword = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
 
-    // Hem modal içindeki hem de yedekteki input'ları kontrol et
     var passEl = document.getElementById('apiVerifyPassword');
     if (!passEl || !passEl.value) {
         passEl = document.getElementById('apiEnterPass');
@@ -15530,7 +16901,6 @@ window.verifyApiPassword = async function() {
         var result = await Parse.Cloud.run('verifyApiPassword', { password: password });
         if (result.success) {
             showNotification('✅ Şifre doğrulandı!', 'success');
-            // Doğrulama ekranını gizle, listeyi göster
             var createEl = document.getElementById('apiAnahtarlarimPasswordCreate');
             var verifyEl = document.getElementById('apiAnahtarlarimPasswordVerify');
             var listEl = document.getElementById('apiAnahtarlarimList');
@@ -15547,12 +16917,10 @@ window.verifyApiPassword = async function() {
     }
 };
 
-// ===== [YENİ] lockApiKeysPanel - API panelini kilitle =====
 window.lockApiKeysPanel = function() {
     window.apiKeysUnlocked = false;
     window.apiKeysCache = [];
     showNotification('🔒 API paneli kilitlendi.', 'success');
-    // Doğrulama ekranına dön
     var createEl = document.getElementById('apiAnahtarlarimPasswordCreate');
     var verifyEl = document.getElementById('apiAnahtarlarimPasswordVerify');
     var listEl = document.getElementById('apiAnahtarlarimList');
@@ -15562,7 +16930,7 @@ window.lockApiKeysPanel = function() {
 };
 
 // ================================================================
-// ========== SAYFA YÜKLENİNCE ==========
+// ========== SAYFA YÜKLENİNCE ====================================
 // ================================================================
 
 window.addEventListener('load', async function() {
@@ -15645,25 +17013,25 @@ window.addEventListener('load', async function() {
         await window.loadComments();
         await window.updateStats();
         window.startStatsInterval();
-        window.applyTheme();
-        window.checkSpaceMode();
-        window.updateVersion('V6.01.1');
-        setInterval(window.checkSpaceMode, 60000);
+        if (typeof window.applyTheme === 'function') window.applyTheme();
+        if (typeof window.checkSpaceMode === 'function') window.checkSpaceMode();
+        if (typeof window.updateVersion === 'function') window.updateVersion('V6.01.1');
+        setInterval(function() { if (typeof window.checkSpaceMode === 'function') window.checkSpaceMode(); }, 60000);
 
-        window.hideSplash();
+        if (typeof window.hideSplash === 'function') window.hideSplash();
         setTimeout(function() {
-            window.hideSplash();
+            if (typeof window.hideSplash === 'function') window.hideSplash();
         }, 3000);
         showNotification('✨ VİZYON 2027 Sistemi Aktif!', 'success');
     } catch(e) {
         console.error('🚨 Sayfa yüklenirken beklenmeyen hata:', e);
-        var mainSite = document.getElementById('mainSite');
-        if (mainSite) mainSite.style.display = 'block';
-        var dashboardArea = document.getElementById('dashboardArea');
-        if (dashboardArea) dashboardArea.style.display = 'none';
-        var userPanel = document.getElementById('userPanel');
-        if (userPanel) userPanel.style.display = 'none';
-        window.hideSplash();
+        var mainSite2 = document.getElementById('mainSite');
+        if (mainSite2) mainSite2.style.display = 'block';
+        var dashboardArea2 = document.getElementById('dashboardArea');
+        if (dashboardArea2) dashboardArea2.style.display = 'none';
+        var userPanel2 = document.getElementById('userPanel');
+        if (userPanel2) userPanel2.style.display = 'none';
+        if (typeof window.hideSplash === 'function') window.hideSplash();
         showNotification('Sayfa yüklenirken hata oluştu: ' + e.message, 'error');
     } finally {
         var splash = document.getElementById('splashScreen');
@@ -15679,7 +17047,12 @@ window.addEventListener('load', async function() {
 });
 
 console.log('✅ JS-4 tamamen yüklendi ve tüm fonksiyonlar global!');
-console.log('🆕 JS-4 [YENİ]: API Yönetimi (saveUserApiKey, loadApiKeys, toggleApiKeyVisibility, copyApiKey, deleteApiKey, editApiKey, setApiPassword, verifyApiPassword, lockApiKeysPanel, detectApiKeyType, escapeHtml)');
+console.log('🆕 JS-4 [SORUN 1+2]: ensureSchemasInitialized + showDashboard içinde otomatik çağrı');
+console.log('🆕 JS-4 [SORUN 4]: Aylık Yarışma sistemi (openContestPage, loadContestPageData, loadContestRankingV2, confirmContestJoin, submitContestProject, loadContestProjectsForFounder, reviewContestProject, saveContestScore)');
+console.log('🆕 JS-4 [SORUN 5]: Kendi API herkese açık (canUseCustomAPI kaldırıldı) + genişletilmiş model desteği');
+console.log('🆕 JS-4 [SORUN 4/7 FIX]: loadConversationHistory / loadConversationById (email bazlı)');
+console.log('🆕 JS-4 [SORUN 5 FIX]: Mesajlara .role div eklendi (👤 / 🧠)');
+console.log('🆕 JS-4 [YENİ]: API Yönetimi (saveUserApiKey, loadApiKeys, toggleApiKeyVisibility, copyApiKey, deleteApiKey, editApiKey, setApiPassword, verifyApiPassword, lockApiKeysPanel, detectApiKeyType)');
 </script>
 <!-- ============================================================ -->
 <!-- ===================== JS-4 SONU ============================= -->
