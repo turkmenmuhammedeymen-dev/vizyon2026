@@ -18,6 +18,7 @@
             flex-direction: column;
             align-items: center;
             padding: 40px 20px;
+            overflow-x: hidden;
         }
         a { color: #00d4ff; text-decoration: none; transition: color 0.2s; }
         a:hover { color: #a855f7; }
@@ -26,6 +27,7 @@
             width: 100%;
             background: rgba(13, 26, 38, 0.6);
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(0, 212, 255, 0.12);
             border-radius: 28px;
             padding: 40px 36px;
@@ -110,6 +112,7 @@
             gap: 10px;
             max-height: 600px;
             overflow-y: auto;
+            overflow-x: hidden;
             padding-right: 8px;
         }
         .messages-container::-webkit-scrollbar {
@@ -292,11 +295,16 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/parse/5.0.0/parse.min.js"></script>
     <script>
+        // ============================================================
+        // [SORUN 6 FIX] SashiDo Credentials (index.html ile aynı)
+        // Önceden Back4App credentials kullanılıyordu, bu yüzden
+        // paylaşılan sohbetler bulunamıyordu. Artık SashiDo'ya bağlanıyor.
+        // ============================================================
         Parse.initialize(
-            "ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8",
-            "mur4DtLsGOsQhykTnFVNGxYOeNbvjPbAkl6xPQGp"
+            "gLhVZnYkpq33B9Js5Npld1V8aTcA7UXRUEPAU3AA",
+            "tDlQ5PPy6nl9o7iDM0fxvQ0cUEEA7AgUXalRATPE"
         );
-        Parse.serverURL = "https://parseapi.back4app.com";
+        Parse.serverURL = "https://pg-app-6df09qci1t4ee3qrqce800a5fc81y4.scalabl.cloud/1/";
 
         function getShareId() {
             const params = new URLSearchParams(window.location.search);
@@ -313,6 +321,16 @@
                 hour: '2-digit',
                 minute: '2-digit'
             });
+        }
+
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
         async function loadSharedConversation() {
@@ -336,7 +354,7 @@
                 const result = await Parse.Cloud.run('getSharedConversation', { shareId: shareId });
 
                 if (!result || !result.success || !result.messages) {
-                    throw new Error(result?.message || 'Sohbet bulunamadı.');
+                    throw new Error((result && result.message) || 'Sohbet bulunamadı.');
                 }
 
                 loadingEl.style.display = 'none';
@@ -369,19 +387,19 @@
                     const senderCls = isAI ? 'ai-sender' : 'user-sender';
 
                     html += `<div class="message-item ${cls}">`;
-                    html += `<div class="message-sender ${senderCls}">${sender} <span class="time">${time}</span></div>`;
-                    html += `<div class="message-text">${text}</div>`;
+                    html += `<div class="message-sender ${senderCls}">${escapeHtml(sender)} <span class="time">${time}</span></div>`;
+                    html += `<div class="message-text">${escapeHtml(text)}</div>`;
 
                     if (file) {
                         const isImage = file.match(/\.(jpeg|jpg|gif|png|webp|bmp|svg)$/i);
                         if (isImage) {
                             html += `<div style="margin-top:6px;">
-                                <img src="${file}" alt="Görsel" style="max-width:100%;max-height:300px;border-radius:8px;border:1px solid rgba(0,212,255,0.15);" />
+                                <img src="${escapeHtml(file)}" alt="Görsel" style="max-width:100%;max-height:300px;border-radius:8px;border:1px solid rgba(0,212,255,0.15);" />
                             </div>`;
                         } else {
                             html += `<div class="message-file">
                                 <i class="fas fa-paperclip"></i>
-                                <a href="${file}" target="_blank">${fileName}</a>
+                                <a href="${escapeHtml(file)}" target="_blank">${escapeHtml(fileName)}</a>
                             </div>`;
                         }
                     }
