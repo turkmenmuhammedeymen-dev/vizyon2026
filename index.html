@@ -464,9 +464,23 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
 /* ✅ FIX 1: html ve body overflow-x: hidden eklendi (yatay titreme önlenir) */
-html { scroll-behavior: smooth; overflow-x: hidden; }
-body { background: var(--bg-body); color: var(--text-body); font-family: var(--font-body); overflow-x: hidden; min-height: 100vh; transition: background 0.3s, color 0.3s; }
+/* ✅ MOBİL FIX: html scroll'u sahiplenir, body scroll etmez */
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+body {
+    background: var(--bg-body);
+    color: var(--text-body);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    /* ✅ MOBİL FIX: body overflow-y KALDIRILDI (html sahiplensin) */
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+}
 
 /* ===== ÖZEL İMLEÇ ===== */
 .custom-cursor { width: 12px; height: 12px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 99999; box-shadow: 0 0 15px var(--accent); transition: width 0.1s, height 0.1s; will-change: transform, left, top; }
@@ -1751,6 +1765,7 @@ footer {
 <!-- + [v7.4.0] TAKIM SAYFASI İÇ İÇE GEÇME FIX (grid layout) -->
 <!-- + [v7.4.0] BANNER OVERLAP FIX (navbar top offset) -->
 <!-- + [v7.4.0] TÜM SORUNLAR GİDERİLDİ (scroll + banner + team) -->
+<!-- + [v7.5.0 MOBİL FIX] html/body scroll çakışması giderildi -->
 <!-- ============================================================ -->
 <style>
 /* ============================================================ */
@@ -1760,31 +1775,50 @@ footer {
 /* ============================================================ */
 /* ========== [v7.2.1] GLOBAL SALLANMA/TİTREME FIX ============ */
 /* ========== [v7.3.0] SCROLL BUG FIX (Mobil/Tablet) ========== */
+/* ========== [v7.5.0 MOBİL FIX] html/body scroll çakışması === */
 /* ============================================================ */
 /* ⚠️ ÖNEMLİ: body'de transform: translateZ(0) ve               */
 /* overscroll-behavior: none MOBİLDE KAYDIRMAYI ENGELLİYORDU.   */
 /* Bu kurallar KALDIRILDI. Titreme fix'i dashboard ve modal     */
 /* gibi iç katmanlarda kalmaya devam ediyor.                    */
+/*                                                               */
+/* ✅ [v7.5.0 FIX] MOBİL SCROLL ÇÖZÜMÜ:                        */
+/*   - html height: 100% → auto (URL bar yüksekliği sorunu)     */
+/*   - body overflow-y: auto KALDIRILDI (çift scroll önlendi)   */
+/*   - scrollbar-gutter SADECE masaüstünde aktif                */
+/*   - -webkit-overflow-scrolling: touch iOS için               */
 /* ============================================================ */
 
-/* 1) Body'ye her zaman scrollbar alanı ayır (sağ kenar oynaması bitti) */
+/* 1) html scroll'u sahiplenir (mobil-uyumlu) */
 html {
-    scrollbar-gutter: stable;
-    overflow-y: auto;    /* ⚠️ ESKİ: scroll → YENİ: auto (mobil kaydırma için) */
+    overflow-y: auto;
     overflow-x: hidden;
-    height: 100%;
+    height: auto;
+    min-height: 100vh;
+    -webkit-overflow-scrolling: touch;
 }
 body {
-    scrollbar-gutter: stable;
     overflow-x: hidden;
-    overflow-y: auto;
+    /* ✅ MOBİL FIX: body'de overflow-y KALDIRILDI */
     min-height: 100vh;
+    -webkit-overflow-scrolling: touch;
     /* ⚠️ KALDIRILDI: transform: translateZ(0) — mobil scroll'u kilitliyordu */
     /* ⚠️ KALDIRILDI: overscroll-behavior-y: none — momentum scroll'u kesiyordu */
     /* ⚠️ KALDIRILDI: overscroll-behavior-x: none */
     /* ⚠️ KALDIRILDI: -webkit-backface-visibility: hidden (mobil scroll bug) */
     /* ⚠️ KALDIRILDI: backface-visibility: hidden (mobil scroll bug) */
 }
+
+/* ✅ scrollbar-gutter SADECE masaüstünde (mobilde scrollbar yok, layout bozar) */
+@media (min-width: 769px) {
+    html {
+        scrollbar-gutter: stable;
+    }
+    body {
+        scrollbar-gutter: stable;
+    }
+}
+
 /* 4) Deprecated iOS smooth-scroll kaldır (titreme yapıyordu) */
 * {
     -webkit-overflow-scrolling: auto;
