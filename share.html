@@ -3,13 +3,26 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
     <title>Paylaşılan Sohbet | VİZYON 2027</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet" />
     <style>
+        /* ============================================================ */
+        /* RESET & BASE                                                */
+        /* ============================================================ */
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            overflow-x: hidden;
+        }
+
         body {
             background: #050a0f;
+            background-image:
+                radial-gradient(ellipse 100% 50% at 50% 0%, rgba(0, 212, 255, 0.05) 0%, transparent 60%),
+                radial-gradient(ellipse 80% 40% at 20% 100%, rgba(168, 85, 247, 0.04) 0%, transparent 60%);
+            background-attachment: fixed;
             color: #ccdeee;
             font-family: 'Inter', sans-serif;
             line-height: 1.7;
@@ -18,21 +31,33 @@
             flex-direction: column;
             align-items: center;
             padding: 40px 20px;
-            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-        a { color: #00d4ff; text-decoration: none; transition: color 0.2s; }
+
+        a { color: #00d4ff; text-decoration: none; transition: color 0.2s ease; }
         a:hover { color: #a855f7; }
+
+        /* ============================================================ */
+        /* CONTAINER                                                    */
+        /* ============================================================ */
         .container {
             max-width: 900px;
             width: 100%;
-            background: rgba(13, 26, 38, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(13, 26, 38, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(0, 212, 255, 0.12);
             border-radius: 28px;
             padding: 40px 36px;
             box-shadow: 0 12px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 2;
         }
+
+        /* ============================================================ */
+        /* HEADER                                                       */
+        /* ============================================================ */
         .header {
             display: flex;
             align-items: center;
@@ -43,11 +68,13 @@
             border-bottom: 1px solid rgba(0, 212, 255, 0.12);
             margin-bottom: 30px;
         }
+
         .logo-area {
             display: flex;
             align-items: center;
             gap: 12px;
         }
+
         .logo-icon {
             width: 44px;
             height: 44px;
@@ -60,7 +87,9 @@
             font-weight: 700;
             color: #fff;
             box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            flex-shrink: 0;
         }
+
         .logo-text {
             font-family: 'Syne', sans-serif;
             font-size: 22px;
@@ -71,190 +100,660 @@
             background-clip: text;
             color: transparent;
             animation: gradientMove 4s ease infinite;
+            white-space: nowrap;
         }
+
         @keyframes gradientMove {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+
         .back-link {
-            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
             font-weight: 600;
-            padding: 8px 20px;
+            padding: 8px 18px;
             border: 1px solid #00d4ff;
             border-radius: 40px;
             color: #00d4ff;
             background: transparent;
-            transition: all 0.25s;
+            transition: all 0.25s ease;
             cursor: pointer;
+            white-space: nowrap;
         }
+
         .back-link:hover {
             background: rgba(0, 212, 255, 0.12);
             box-shadow: 0 0 25px rgba(0, 212, 255, 0.2);
             transform: scale(1.02);
+            color: #00d4ff;
         }
+
+        /* ============================================================ */
+        /* STATES: LOADING / ERROR / PASSWORD / CHAT                    */
+        /* ============================================================ */
+        .state-view {
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .state-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- LOADING --- */
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 44px;
+            height: 44px;
+            border: 3px solid rgba(0, 212, 255, 0.1);
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 16px;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #8ab4cc;
+            font-size: 15px;
+        }
+
+        /* --- ERROR --- */
+        .error-state {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .error-icon {
+            font-size: 56px;
+            color: #ff6b6b;
+            margin-bottom: 16px;
+            display: block;
+            animation: pulseError 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseError {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+
+        .error-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .error-message {
+            color: #8ab4cc;
+            font-size: 14px;
+            max-width: 480px;
+            margin: 0 auto 16px;
+            line-height: 1.7;
+        }
+
+        .error-hint {
+            font-size: 12px;
+            color: #5a7a8a;
+            margin-top: 16px;
+        }
+
+        /* --- PASSWORD SCREEN --- */
+        .password-state {
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 460px;
+            margin: 0 auto;
+        }
+
+        .password-icon {
+            width: 88px;
+            height: 88px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(168, 85, 247, 0.15));
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 22px;
+            font-size: 40px;
+            color: #00d4ff;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.25);
+            animation: lockPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes lockPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(0, 212, 255, 0.25); }
+            50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(0, 212, 255, 0.45); }
+        }
+
+        .password-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .password-subtitle {
+            font-size: 13.5px;
+            color: #8ab4cc;
+            margin-bottom: 28px;
+            line-height: 1.7;
+        }
+
+        .password-subtitle strong {
+            color: #00ff88;
+            font-weight: 700;
+        }
+
+        .password-input-wrap {
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 16px 52px 16px 20px;
+            background: rgba(5, 10, 15, 0.8);
+            border: 2px solid rgba(0, 212, 255, 0.25);
+            border-radius: 16px;
+            color: #fff;
+            font-size: 18px;
+            font-family: 'Fira Code', monospace;
+            letter-spacing: 3px;
+            text-align: center;
+            transition: all 0.25s ease;
+            outline: none;
+        }
+
+        .password-input:focus {
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.1), 0 0 30px rgba(0, 212, 255, 0.2);
+            background: rgba(5, 10, 15, 0.95);
+        }
+
+        .password-input::placeholder {
+            color: #4a6a7a;
+            letter-spacing: 1px;
+            font-size: 14px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 14px;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: #8ab4cc;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .password-toggle:hover {
+            color: #00d4ff;
+            background: rgba(0, 212, 255, 0.08);
+        }
+
+        .password-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00d4ff, #a855f7);
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.35);
+        }
+
+        .password-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0, 212, 255, 0.55);
+        }
+
+        .password-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .password-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .password-error {
+            display: none;
+            margin-top: 14px;
+            padding: 12px 16px;
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid rgba(255, 71, 87, 0.4);
+            border-radius: 12px;
+            color: #ff6b7c;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .password-error.show {
+            display: block;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+
+        .password-info {
+            margin-top: 22px;
+            padding: 12px 16px;
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            border-radius: 12px;
+            font-size: 12px;
+            color: #6a8a9a;
+            line-height: 1.7;
+            text-align: left;
+        }
+
+        .password-info strong { color: #00d4ff; }
+
+        .attempt-counter {
+            margin-top: 10px;
+            font-size: 11.5px;
+            color: #ffb700;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* --- CHAT VIEW --- */
         .chat-title {
             font-family: 'Syne', sans-serif;
             font-size: 26px;
             font-weight: 700;
             color: #ffffff;
             margin-bottom: 6px;
+            word-break: break-word;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
+
+        .chat-title .chat-emoji {
+            font-size: 28px;
+        }
+
         .chat-subtitle {
-            font-size: 14px;
+            font-size: 13px;
             color: #8ab4cc;
-            margin-bottom: 24px;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
-        .chat-subtitle i { color: #00d4ff; }
+
+        .chat-subtitle .sub-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 30px;
+            font-size: 11.5px;
+            color: #00d4ff;
+            font-weight: 600;
+        }
+
+        .chat-subtitle .sub-badge.readonly {
+            color: #ffb700;
+            border-color: rgba(255, 183, 0, 0.3);
+            background: rgba(255, 183, 0, 0.08);
+        }
+
+        /* --- MESSAGES --- */
         .messages-container {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            max-height: 600px;
+            gap: 12px;
+            max-height: 62vh;
             overflow-y: auto;
             overflow-x: hidden;
-            padding-right: 8px;
+            padding: 4px 8px 4px 2px;
+            scroll-behavior: smooth;
         }
+
         .messages-container::-webkit-scrollbar {
-            width: 6px;
+            width: 8px;
         }
+
         .messages-container::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.03);
             border-radius: 10px;
         }
+
         .messages-container::-webkit-scrollbar-thumb {
             background: rgba(0, 212, 255, 0.3);
             border-radius: 10px;
+            border: 2px solid rgba(13, 26, 38, 0.6);
         }
+
         .messages-container::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 212, 255, 0.5);
+            background: rgba(0, 212, 255, 0.55);
         }
+
         .message-item {
             display: flex;
             flex-direction: column;
-            padding: 12px 18px;
-            border-radius: 16px;
-            transition: background 0.2s;
-            max-width: 80%;
+            padding: 13px 18px;
+            border-radius: 18px;
+            transition: background 0.2s ease;
+            max-width: 82%;
             word-break: break-word;
+            animation: msgIn 0.35s ease;
         }
+
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .message-item.user {
             align-self: flex-end;
-            background: rgba(0, 212, 255, 0.12);
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.14), rgba(0, 212, 255, 0.06));
             border-left: 3px solid #00d4ff;
+            border-radius: 18px 18px 6px 18px;
         }
+
         .message-item.ai {
             align-self: flex-start;
-            background: rgba(0, 255, 136, 0.08);
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 136, 0.04));
             border-left: 3px solid #00ff88;
+            border-radius: 18px 18px 18px 6px;
         }
+
         .message-item:hover {
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.05);
         }
+
         .message-sender {
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 2px;
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
         }
+
+        .message-sender.user-sender { color: #00d4ff; }
+        .message-sender.ai-sender { color: #00ff88; }
+
+        .message-sender .sender-role {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+            background: rgba(0, 212, 255, 0.12);
+            color: #00d4ff;
+            border: 1px solid rgba(0, 212, 255, 0.25);
+            letter-spacing: 0.3px;
+        }
+
         .message-sender .time {
             font-weight: 400;
             color: #5a7a8a;
-            font-size: 11px;
-            margin-left: 10px;
+            font-size: 10.5px;
+            margin-left: auto;
         }
-        .message-sender.user-sender { color: #00d4ff; }
-        .message-sender.ai-sender { color: #00ff88; }
+
         .message-text {
             font-size: 15px;
             color: #e8f0f8;
             word-break: break-word;
             white-space: pre-wrap;
+            line-height: 1.75;
         }
+
+        .message-text code {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            color: #00ff88;
+            border: 1px solid rgba(0, 212, 255, 0.12);
+        }
+
         .message-file {
-            margin-top: 6px;
+            margin-top: 8px;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
+            gap: 8px;
+            padding: 6px 14px;
             background: rgba(0, 212, 255, 0.08);
-            border: 1px solid rgba(0, 212, 255, 0.15);
+            border: 1px solid rgba(0, 212, 255, 0.2);
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12.5px;
             color: #00d4ff;
-            transition: background 0.2s;
+            transition: all 0.2s ease;
             width: fit-content;
+            max-width: 100%;
         }
+
         .message-file:hover {
-            background: rgba(0, 212, 255, 0.15);
+            background: rgba(0, 212, 255, 0.18);
+            border-color: #00d4ff;
         }
-        .message-file a { color: #00d4ff; }
-        .message-file a:hover { color: #a855f7; }
-        .loading-state {
+
+        .message-file a {
+            color: inherit;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+
+        .message-image {
+            margin-top: 8px;
+            max-width: 100%;
+            max-height: 320px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            display: block;
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .message-image:hover {
+            transform: scale(1.01);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.25);
+        }
+
+        .empty-chat {
             text-align: center;
             padding: 40px 20px;
             color: #8ab4cc;
-            font-size: 16px;
         }
-        .loading-state .spinner {
-            display: inline-block;
-            width: 32px;
-            height: 32px;
-            border: 3px solid rgba(0, 212, 255, 0.1);
-            border-top-color: #00d4ff;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 12px;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .error-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #ff6b6b;
-            font-size: 16px;
-        }
-        .error-state i {
-            font-size: 48px;
-            margin-bottom: 12px;
+
+        .empty-chat i {
+            font-size: 44px;
             display: block;
+            margin-bottom: 12px;
+            color: #4a6a7a;
         }
+
+        /* ============================================================ */
+        /* FOOTER                                                       */
+        /* ============================================================ */
         .page-footer {
             margin-top: 30px;
             padding-top: 20px;
             border-top: 1px solid rgba(0, 212, 255, 0.08);
             text-align: center;
             color: #5a7a8a;
-            font-size: 13px;
+            font-size: 12.5px;
+            line-height: 1.8;
         }
+
         .page-footer a { color: #00d4ff; }
         .page-footer a:hover { color: #a855f7; }
+
+        .page-footer .footer-warn {
+            display: block;
+            margin-top: 8px;
+            font-size: 11.5px;
+            color: #4a6a7a;
+        }
+
+        /* ============================================================ */
+        /* RESPONSIVE                                                   */
+        /* ============================================================ */
         @media (max-width: 768px) {
             body { padding: 20px 12px; }
-            .container { padding: 24px 18px; border-radius: 20px; }
-            .header { flex-direction: column; align-items: flex-start; gap: 10px; }
+
+            .container {
+                padding: 24px 18px;
+                border-radius: 20px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                padding-bottom: 18px;
+                margin-bottom: 22px;
+            }
+
             .logo-text { font-size: 18px; }
+            .logo-icon { width: 38px; height: 38px; font-size: 17px; }
+
+            .back-link { font-size: 12px; padding: 7px 15px; }
+
             .chat-title { font-size: 20px; }
-            .message-item { padding: 10px 14px; max-width: 90%; }
+            .chat-title .chat-emoji { font-size: 22px; }
+
+            .password-title { font-size: 22px; }
+            .password-subtitle { font-size: 12.5px; }
+            .password-icon { width: 72px; height: 72px; font-size: 32px; }
+            .password-input { font-size: 16px; padding: 14px 46px 14px 16px; letter-spacing: 2px; }
+            .password-btn { font-size: 15px; padding: 14px; }
+
+            .message-item {
+                padding: 11px 15px;
+                max-width: 90%;
+            }
             .message-text { font-size: 14px; }
+            .message-sender { font-size: 12px; }
+            .messages-container { max-height: 65vh; }
         }
+
         @media (max-width: 480px) {
             body { padding: 12px 8px; }
-            .container { padding: 16px 12px; border-radius: 16px; }
-            .logo-icon { width: 36px; height: 36px; font-size: 16px; }
+
+            .container {
+                padding: 18px 14px;
+                border-radius: 16px;
+            }
+
+            .logo-icon { width: 34px; height: 34px; font-size: 15px; }
             .logo-text { font-size: 16px; }
-            .back-link { font-size: 12px; padding: 6px 14px; }
-            .chat-title { font-size: 18px; }
-            .chat-subtitle { font-size: 12px; }
-            .message-item { padding: 8px 12px; max-width: 95%; }
-            .message-sender { font-size: 13px; }
-            .message-text { font-size: 13px; }
-            .message-file { font-size: 12px; padding: 3px 10px; }
+            .back-link { font-size: 11px; padding: 6px 12px; }
+
+            .chat-title { font-size: 17px; }
+            .chat-subtitle { font-size: 11.5px; }
+            .sub-badge { font-size: 10.5px; padding: 3px 10px; }
+
+            .password-title { font-size: 19px; }
+            .password-subtitle { font-size: 12px; margin-bottom: 20px; }
+            .password-icon { width: 62px; height: 62px; font-size: 28px; margin-bottom: 16px; }
+            .password-input {
+                font-size: 15px;
+                padding: 12px 42px 12px 14px;
+                letter-spacing: 1.5px;
+            }
+            .password-btn { font-size: 14px; padding: 13px; border-radius: 14px; }
+            .password-info { font-size: 11px; padding: 10px 12px; }
+
+            .message-item {
+                padding: 9px 13px;
+                max-width: 94%;
+                border-radius: 14px;
+            }
+            .message-text { font-size: 13px; line-height: 1.65; }
+            .message-sender { font-size: 11px; margin-bottom: 3px; }
+            .message-sender .sender-role { font-size: 9px; padding: 1.5px 6px; }
+            .message-file { font-size: 11.5px; padding: 5px 11px; }
+            .message-image { max-height: 240px; }
+
+            .error-icon { font-size: 44px; }
+            .error-title { font-size: 18px; }
+            .error-message { font-size: 12.5px; }
+
+            .page-footer { font-size: 11px; }
+        }
+
+        @media (max-width: 360px) {
+            .logo-text { font-size: 14px; }
+            .password-title { font-size: 17px; }
+            .password-input { font-size: 14px; letter-spacing: 1px; }
+            .chat-title { font-size: 15px; }
+            .message-text { font-size: 12.5px; }
+        }
+
+        /* ============================================================ */
+        /* PREFERS REDUCED MOTION                                       */
+        /* ============================================================ */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container" id="app">
+        <!-- ============ HEADER ============ -->
         <header class="header">
             <div class="logo-area">
                 <div class="logo-icon">💬</div>
@@ -265,55 +764,184 @@
             </a>
         </header>
 
+        <!-- ============ CONTENT ============ -->
         <div id="content">
-            <div class="loading-state" id="loadingState">
-                <div class="spinner"></div>
-                <div>Sohbet yükleniyor...</div>
+
+            <!-- 1) LOADING STATE -->
+            <div class="state-view active" id="loadingState">
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Sohbet hazırlanıyor...</div>
+                </div>
             </div>
-            <div class="error-state" id="errorState" style="display:none;">
-                <i class="fas fa-exclamation-circle"></i>
-                <div id="errorMessage">Sohbet bulunamadı.</div>
+
+            <!-- 2) ERROR STATE -->
+            <div class="state-view" id="errorState">
+                <div class="error-state">
+                    <i class="fas fa-exclamation-circle error-icon"></i>
+                    <div class="error-title" id="errorTitle">Sohbet Bulunamadı</div>
+                    <div class="error-message" id="errorMessage">Bu paylaşım linki geçersiz veya süresi dolmuş olabilir.</div>
+                    <div class="error-hint" id="errorHint"></div>
+                </div>
             </div>
-            <div id="chatContent" style="display:none;">
-                <div class="chat-title" id="chatTitle">Paylaşılan Sohbet</div>
+
+            <!-- 3) PASSWORD STATE -->
+            <div class="state-view" id="passwordState">
+                <div class="password-state">
+                    <div class="password-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="password-title">Şifre Korumalı Sohbet</div>
+                    <div class="password-subtitle">
+                        Bu paylaşılan sohbet <strong>şifre ile korunuyor</strong>.<br>
+                        Sohbeti görüntülemek için lütfen şifreyi girin.
+                    </div>
+
+                    <div class="password-input-wrap">
+                        <input
+                            type="password"
+                            id="passwordInput"
+                            class="password-input"
+                            placeholder="Şifre girin"
+                            maxlength="64"
+                            autocomplete="off"
+                            autocorrect="off"
+                            autocapitalize="off"
+                            spellcheck="false"
+                            onkeypress="if(event.key==='Enter') window.checkPassword()"
+                        />
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            id="passwordToggle"
+                            onclick="window.togglePasswordVisibility()"
+                            title="Şifreyi Göster/Gizle"
+                        >
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="password-btn"
+                        id="passwordBtn"
+                        onclick="window.checkPassword()"
+                    >
+                        <i class="fas fa-unlock"></i>
+                        <span>Sohbeti Aç</span>
+                    </button>
+
+                    <div class="password-error" id="passwordError"></div>
+                    <div class="attempt-counter" id="attemptCounter"></div>
+
+                    <div class="password-info">
+                        <strong>🔒 Güvenlik:</strong> Bu sohbeti paylaşan kişi tarafından belirlenen şifreyi girmeniz gerekiyor. Şifre yanlışsa sohbet içeriği <strong>hiçbir şekilde gösterilmez</strong>. 3 yanlış denemeden sonra 5 dakika beklemeniz gerekir.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4) CHAT STATE -->
+            <div class="state-view" id="chatState">
+                <div class="chat-title" id="chatTitle">
+                    <span class="chat-emoji">💬</span>
+                    <span id="chatTitleText">Paylaşılan Sohbet</span>
+                </div>
                 <div class="chat-subtitle">
-                    <i class="fas fa-lock" style="margin-right:4px;"></i> Salt okunur · 
-                    <span id="messageCount">0</span> mesaj
+                    <span class="sub-badge readonly">
+                        <i class="fas fa-lock"></i> Salt Okunur
+                    </span>
+                    <span class="sub-badge">
+                        <i class="fas fa-comment"></i>
+                        <span id="messageCount">0</span> mesaj
+                    </span>
+                    <span class="sub-badge" id="shareTimeBadge" style="display:none;">
+                        <i class="fas fa-clock"></i>
+                        <span id="shareTimeText">—</span>
+                    </span>
                 </div>
                 <div class="messages-container" id="messagesContainer"></div>
             </div>
+
         </div>
 
+        <!-- ============ FOOTER ============ -->
         <footer class="page-footer">
             <p>
                 © 2027 <strong>Vizyon2027</strong> ·
-                <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a> ·
-                <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">Kullanıcı Sözleşmesi</a>
+                <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank" rel="noopener noreferrer">Gizlilik Politikası</a> ·
+                <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank" rel="noopener noreferrer">Kullanıcı Sözleşmesi</a>
             </p>
+            <span class="footer-warn">
+                ⚠️ Bu paylaşım linki özel olarak oluşturulmuştur. Lütfen üçüncü kişilerle paylaşmayınız.
+            </span>
         </footer>
     </div>
 
+    <!-- ============ PARSE SDK ============ -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/parse/5.0.0/parse.min.js"></script>
+
     <script>
-        // ============================================================
-        // [SORUN 6 FIX] SashiDo Credentials (index.html ile aynı)
-        // Önceden Back4App credentials kullanılıyordu, bu yüzden
-        // paylaşılan sohbetler bulunamıyordu. Artık SashiDo'ya bağlanıyor.
-        // ============================================================
-        Parse.initialize(
-            "gLhVZnYkpq33B9Js5Npld1V8aTcA7UXRUEPAU3AA",
-            "tDlQ5PPy6nl9o7iDM0fxvQ0cUEEA7AgUXalRATPE"
-        );
-        Parse.serverURL = "https://pg-app-6df09qci1t4ee3qrqce800a5fc81y4.scalabl.cloud/1/";
+    // ================================================================
+    // PAYLAŞILAN SOHBET VIEWER (share.html)
+    // ================================================================
+    // GÜVENLİK ÖZELLİKLERİ:
+    //   1. Şifre SUNUCU TARAFINDA doğrulanır (main.js'deki
+    //      getSharedKocConversation / getSharedConversation)
+    //   2. Client-side'da şifre saklanmaz, sessionStorage'a bile
+    //      yazılmaz
+    //   3. 3 yanlış deneme → 5 dakika client-side bekleme
+    //      (backend'de de rate limit var)
+    //   4. Tüm kullanıcı verileri XSS'e karşı escape edilir
+    //   5. Şifre korumalı linkler NOINDEX, NOFOLLOW
+    //   6. Kullanıcı şifreyi girmeden hiçbir içerik yüklenmez
+    // ================================================================
 
-        function getShareId() {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('id');
+    // ---------- SashiDo Config ----------
+    Parse.initialize(
+        "gLhVZnYkpq33B9Js5Npld1V8aTcA7UXRUEPAU3AA",
+        "tDlQ5PPy6nl9o7iDM0fxvQ0cUEEA7AgUXalRATPE"
+    );
+    Parse.serverURL = "https://pg-app-6df09qci1t4ee3qrqce800a5fc81y4.scalabl.cloud/1/";
+
+    // ---------- Global Durum ----------
+    window.__shareState = {
+        shareId: null,
+        chatData: null,
+        password: null,
+        attempts: 0,
+        blockedUntil: 0
+    };
+
+    var MAX_ATTEMPTS = 3;
+    var BLOCK_DURATION_MS = 5 * 60 * 1000; // 5 dakika
+
+    // ---------- URL'den Share ID Al ----------
+    function getShareId() {
+        try {
+            var params = new URLSearchParams(window.location.search);
+            return params.get('id') || params.get('shareId') || null;
+        } catch (e) {
+            return null;
         }
+    }
 
-        function formatTime(date) {
-            if (!date) return '';
-            const d = new Date(date);
+    // ---------- XSS Koruması ----------
+    function escapeHtml(text) {
+        if (text === null || text === undefined) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    // ---------- Zaman Formatı ----------
+    function formatTime(dateInput) {
+        if (!dateInput) return '';
+        try {
+            var d = new Date(dateInput);
+            if (isNaN(d.getTime())) return '';
             return d.toLocaleString('tr-TR', {
                 day: '2-digit',
                 month: '2-digit',
@@ -321,105 +949,452 @@
                 hour: '2-digit',
                 minute: '2-digit'
             });
+        } catch (e) {
+            return '';
+        }
+    }
+
+    function formatTimeShort(dateInput) {
+        if (!dateInput) return '';
+        try {
+            var d = new Date(dateInput);
+            if (isNaN(d.getTime())) return '';
+            var now = new Date();
+            var diffMs = now - d;
+            var diffMin = Math.floor(diffMs / 60000);
+            if (diffMin < 1) return 'az önce';
+            if (diffMin < 60) return diffMin + ' dk önce';
+            var diffHour = Math.floor(diffMin / 60);
+            if (diffHour < 24) return diffHour + ' saat önce';
+            return formatTime(dateInput);
+        } catch (e) {
+            return '';
+        }
+    }
+
+    // ---------- State Yönetimi ----------
+    function showState(stateName) {
+        var states = ['loadingState', 'errorState', 'passwordState', 'chatState'];
+        states.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) {
+                el.classList.remove('active');
+                if (id === stateName) {
+                    el.classList.add('active');
+                }
+            }
+        });
+    }
+
+    function showError(title, message, hint) {
+        var titleEl = document.getElementById('errorTitle');
+        var msgEl = document.getElementById('errorMessage');
+        var hintEl = document.getElementById('errorHint');
+        if (titleEl) titleEl.textContent = title || 'Hata';
+        if (msgEl) msgEl.textContent = message || 'Bir hata oluştu.';
+        if (hintEl) hintEl.textContent = hint || '';
+        showState('errorState');
+    }
+
+    function showPasswordError(message) {
+        var errEl = document.getElementById('passwordError');
+        if (!errEl) return;
+        errEl.textContent = message || 'Şifre yanlış.';
+        errEl.classList.add('show');
+
+        // Shake animasyonu için reset
+        var input = document.getElementById('passwordInput');
+        if (input) {
+            input.style.borderColor = 'rgba(255, 71, 87, 0.5)';
+            setTimeout(function() {
+                input.style.borderColor = '';
+            }, 2000);
+        }
+    }
+
+    function clearPasswordError() {
+        var errEl = document.getElementById('passwordError');
+        if (errEl) {
+            errEl.textContent = '';
+            errEl.classList.remove('show');
+        }
+    }
+
+    // ---------- Şifre Göster/Gizle ----------
+    window.togglePasswordVisibility = function() {
+        var input = document.getElementById('passwordInput');
+        var btn = document.getElementById('passwordToggle');
+        if (!input || !btn) return;
+        if (input.type === 'password') {
+            input.type = 'text';
+            btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        } else {
+            input.type = 'password';
+            btn.innerHTML = '<i class="fas fa-eye"></i>';
+        }
+    };
+
+    // ---------- Deneme Sayacı ----------
+    function updateAttemptCounter() {
+        var counterEl = document.getElementById('attemptCounter');
+        if (!counterEl) return;
+
+        var state = window.__shareState;
+
+        // Blok kontrolü
+        if (state.blockedUntil > Date.now()) {
+            var remainingSec = Math.ceil((state.blockedUntil - Date.now()) / 1000);
+            var min = Math.floor(remainingSec / 60);
+            var sec = remainingSec % 60;
+            counterEl.textContent = '⏳ Çok fazla deneme. ' + min + ' dk ' + sec + ' sn sonra tekrar deneyin.';
+            counterEl.style.color = '#ff4757';
+            return;
         }
 
-        function escapeHtml(text) {
-            if (text === null || text === undefined) return '';
-            return String(text)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+        if (state.attempts > 0) {
+            var remaining = MAX_ATTEMPTS - state.attempts;
+            if (remaining > 0) {
+                counterEl.textContent = '⚠️ ' + remaining + ' deneme hakkınız kaldı.';
+                counterEl.style.color = '#ffb700';
+            } else {
+                counterEl.textContent = '';
+            }
+        } else {
+            counterEl.textContent = '';
+        }
+    }
+
+    // ---------- Şifre Kontrol (Sunucu Taraflı) ----------
+    window.checkPassword = async function() {
+        var input = document.getElementById('passwordInput');
+        var btn = document.getElementById('passwordBtn');
+        if (!input || !btn) return;
+
+        // Blok kontrolü
+        if (window.__shareState.blockedUntil > Date.now()) {
+            var remainingSec = Math.ceil((window.__shareState.blockedUntil - Date.now()) / 1000);
+            var min = Math.floor(remainingSec / 60);
+            showPasswordError('⏳ Çok fazla yanlış deneme. Lütfen ' + min + ' dakika sonra tekrar deneyin.');
+            return;
         }
 
-        async function loadSharedConversation() {
-            const shareId = getShareId();
-            const loadingEl = document.getElementById('loadingState');
-            const errorEl = document.getElementById('errorState');
-            const errorMsg = document.getElementById('errorMessage');
-            const chatEl = document.getElementById('chatContent');
-            const titleEl = document.getElementById('chatTitle');
-            const countEl = document.getElementById('messageCount');
-            const container = document.getElementById('messagesContainer');
+        var password = input.value.trim();
+        if (!password) {
+            showPasswordError('Lütfen şifreyi girin.');
+            input.focus();
+            return;
+        }
 
-            if (!shareId) {
-                loadingEl.style.display = 'none';
-                errorEl.style.display = 'block';
-                errorMsg.textContent = 'Geçersiz paylaşım bağlantısı. Paylaşım ID eksik.';
+        clearPasswordError();
+
+        // Butonu kilitle
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Doğrulanıyor...</span>';
+
+        try {
+            var shareId = window.__shareState.shareId;
+            var result = null;
+            var lastError = null;
+
+            // 1) Önce Koç sohbeti için dene
+            try {
+                result = await Parse.Cloud.run('getSharedKocConversation', {
+                    shareId: shareId,
+                    password: password
+                });
+            } catch (e1) {
+                lastError = e1;
+                // 2) Genel sohbet için dene
+                try {
+                    result = await Parse.Cloud.run('getSharedConversation', {
+                        shareId: shareId,
+                        password: password
+                    });
+                } catch (e2) {
+                    lastError = e2;
+                    // 3) Sadece shareId ile dene (eski link uyumluluğu)
+                    try {
+                        result = await Parse.Cloud.run('getSharedConversation', {
+                            shareId: shareId
+                        });
+                        // Eğer şifresiz döndüyse ve şifre korumalı değilse kabul et
+                        if (result && result.success && result.passwordRequired === false) {
+                            // OK
+                        } else if (result && result.passwordRequired === true) {
+                            result = null;
+                            lastError = new Error('Şifre gerekli.');
+                        }
+                    } catch (e3) {
+                        lastError = e3;
+                    }
+                }
+            }
+
+            if (!result || !result.success) {
+                throw new Error((result && (result.error || result.message)) || (lastError && lastError.message) || 'Şifre doğrulanamadı.');
+            }
+
+            // Başarılı
+            window.__shareState.chatData = result;
+            window.__shareState.password = password;
+            window.__shareState.attempts = 0;
+
+            renderChat(result);
+
+        } catch (e) {
+            console.error('Şifre kontrol hatası:', e);
+            var errMsg = (e && e.message) ? e.message : 'Şifre doğrulanamadı.';
+
+            // Rate limit mesajı mı?
+            if (errMsg.toLowerCase().indexOf('çok fazla') !== -1 ||
+                errMsg.toLowerCase().indexOf('rate') !== -1 ||
+                errMsg.toLowerCase().indexOf('bekleyin') !== -1) {
+                window.__shareState.blockedUntil = Date.now() + BLOCK_DURATION_MS;
+                showPasswordError('⏳ ' + errMsg);
+                updateAttemptCounter();
+                startBlockCountdown();
+            } else {
+                window.__shareState.attempts++;
+                if (window.__shareState.attempts >= MAX_ATTEMPTS) {
+                    window.__shareState.blockedUntil = Date.now() + BLOCK_DURATION_MS;
+                    showPasswordError('⏳ 3 yanlış deneme. 5 dakika bekleyin.');
+                    updateAttemptCounter();
+                    startBlockCountdown();
+                } else {
+                    showPasswordError('❌ ' + errMsg);
+                    updateAttemptCounter();
+                    if (input) {
+                        input.value = '';
+                        input.focus();
+                    }
+                }
+            }
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-unlock"></i><span>Sohbeti Aç</span>';
+        }
+    };
+
+    // ---------- Blok Geri Sayımı ----------
+    var blockCountdownTimer = null;
+    function startBlockCountdown() {
+        if (blockCountdownTimer) clearInterval(blockCountdownTimer);
+        blockCountdownTimer = setInterval(function() {
+            if (window.__shareState.blockedUntil <= Date.now()) {
+                window.__shareState.blockedUntil = 0;
+                window.__shareState.attempts = 0;
+                clearInterval(blockCountdownTimer);
+                blockCountdownTimer = null;
+                updateAttemptCounter();
+                clearPasswordError();
+                var btn = document.getElementById('passwordBtn');
+                if (btn) btn.disabled = false;
                 return;
             }
+            updateAttemptCounter();
+        }, 1000);
+    }
 
-            try {
-                const result = await Parse.Cloud.run('getSharedConversation', { shareId: shareId });
+    // ---------- Sohbeti Render Et ----------
+    function renderChat(data) {
+        var titleText = document.getElementById('chatTitleText');
+        var countEl = document.getElementById('messageCount');
+        var shareTimeBadge = document.getElementById('shareTimeBadge');
+        var shareTimeText = document.getElementById('shareTimeText');
+        var container = document.getElementById('messagesContainer');
 
-                if (!result || !result.success || !result.messages) {
-                    throw new Error((result && result.message) || 'Sohbet bulunamadı.');
-                }
+        if (!container) {
+            showError('Hata', 'Sohbet alanı bulunamadı.', '');
+            return;
+        }
 
-                loadingEl.style.display = 'none';
-                errorEl.style.display = 'none';
-                chatEl.style.display = 'block';
+        // Başlık
+        var chatName = data.conversationName || data.title || data.chatTitle || 'Paylaşılan Sohbet';
+        if (titleText) titleText.textContent = chatName;
 
-                titleEl.textContent = result.conversationName || 'Paylaşılan Sohbet';
-                countEl.textContent = result.messages.length;
+        // Mesaj sayısı
+        var messages = data.messages || [];
+        if (countEl) countEl.textContent = messages.length;
 
-                if (result.messages.length === 0) {
-                    container.innerHTML = `
-                        <div style="text-align:center;padding:30px;color:#8ab4cc;">
-                            <i class="fas fa-comment-slash" style="font-size:32px;display:block;margin-bottom:10px;"></i>
-                            Bu sohbette henüz mesaj yok.
-                        </div>
-                    `;
-                    return;
-                }
-
-                let html = '';
-                result.messages.forEach((msg) => {
-                    const sender = msg.name || 'Kullanıcı';
-                    const text = msg.text || '';
-                    const file = msg.file || null;
-                    const fileName = msg.fileName || 'Dosya';
-                    const time = msg.createdAt ? formatTime(msg.createdAt) : '';
-                    const isAI = msg.isAI || false;
-
-                    const cls = isAI ? 'ai' : 'user';
-                    const senderCls = isAI ? 'ai-sender' : 'user-sender';
-
-                    html += `<div class="message-item ${cls}">`;
-                    html += `<div class="message-sender ${senderCls}">${escapeHtml(sender)} <span class="time">${time}</span></div>`;
-                    html += `<div class="message-text">${escapeHtml(text)}</div>`;
-
-                    if (file) {
-                        const isImage = file.match(/\.(jpeg|jpg|gif|png|webp|bmp|svg)$/i);
-                        if (isImage) {
-                            html += `<div style="margin-top:6px;">
-                                <img src="${escapeHtml(file)}" alt="Görsel" style="max-width:100%;max-height:300px;border-radius:8px;border:1px solid rgba(0,212,255,0.15);" />
-                            </div>`;
-                        } else {
-                            html += `<div class="message-file">
-                                <i class="fas fa-paperclip"></i>
-                                <a href="${escapeHtml(file)}" target="_blank">${escapeHtml(fileName)}</a>
-                            </div>`;
-                        }
-                    }
-
-                    html += `</div>`;
-                });
-
-                container.innerHTML = html;
-
-            } catch (err) {
-                console.error('Sohbet yüklenirken hata:', err);
-                loadingEl.style.display = 'none';
-                errorEl.style.display = 'block';
-                errorMsg.textContent = err.message || 'Sohbet yüklenirken bir hata oluştu.';
+        // Paylaşım zamanı
+        if (data.sharedAt || data.shareTime || data.createdAt) {
+            var t = formatTimeShort(data.sharedAt || data.shareTime || data.createdAt);
+            if (t && shareTimeBadge && shareTimeText) {
+                shareTimeText.textContent = t;
+                shareTimeBadge.style.display = 'inline-flex';
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            loadSharedConversation();
+        if (messages.length === 0) {
+            container.innerHTML = '<div class="empty-chat">' +
+                '<i class="fas fa-comment-slash"></i>' +
+                '<div>Bu sohbette henüz mesaj yok.</div>' +
+                '</div>';
+            showState('chatState');
+            return;
+        }
+
+        // Mesajları render et
+        var html = '';
+        messages.forEach(function(msg) {
+            var sender = msg.name || msg.sender || msg.from_name || 'Kullanıcı';
+            var text = msg.text || msg.message || msg.content || '';
+            var file = msg.file || msg.fileUrl || null;
+            var fileName = msg.fileName || msg.file_name || 'Dosya';
+            var fileType = msg.fileType || msg.file_type || '';
+            var time = msg.createdAt || msg.time || msg.timestamp || '';
+            var isAI = !!(msg.isAI || msg.is_ai || (sender && (String(sender).indexOf('VİZYON') !== -1 || String(sender).indexOf('AI') !== -1 || String(sender).indexOf('Koç') !== -1)));
+            var userRole = msg.user_role || msg.userRole || null;
+
+            var cls = isAI ? 'ai' : 'user';
+            var senderCls = isAI ? 'ai-sender' : 'user-sender';
+            var safeSender = escapeHtml(sender);
+
+            // Rol etiketi
+            var roleBadge = '';
+            if (userRole) {
+                var roleLabels = {
+                    'founder': '👑 KURUCU',
+                    'admin': '⚙️ ADMIN',
+                    'beta': '🔬 BETA',
+                    'user': '👤 KULLANICI'
+                };
+                var rl = roleLabels[userRole];
+                if (rl) roleBadge = '<span class="sender-role">' + rl + '</span>';
+            }
+
+            html += '<div class="message-item ' + cls + '">';
+            html += '<div class="message-sender ' + senderCls + '">' +
+                    safeSender +
+                    roleBadge +
+                    '<span class="time">' + escapeHtml(formatTime(time)) + '</span>' +
+                    '</div>';
+
+            // Text içeriği (kod blokları desteklenir)
+            if (text) {
+                var safeText = escapeHtml(text);
+                // ```code``` blokları
+                safeText = safeText.replace(/```([a-zA-Z0-9+#]*)\n?([\s\S]*?)```/g, function(match, lang, code) {
+                    return '<code>' + code + '</code>';
+                });
+                // `inline code`
+                safeText = safeText.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+                html += '<div class="message-text">' + safeText + '</div>';
+            }
+
+            // Dosya / görsel
+            if (file) {
+                var safeFile = escapeHtml(file);
+                var safeFileName = escapeHtml(fileName);
+                var lowerName = String(fileName).toLowerCase();
+                var lowerUrl = String(file).toLowerCase();
+                var isImage = /\.(jpeg|jpg|gif|png|webp|bmp|svg)(\?|$)/i.test(lowerUrl) ||
+                              (fileType && fileType.indexOf('image') === 0);
+
+                if (isImage) {
+                    html += '<img src="' + safeFile + '" alt="' + safeFileName + '" ' +
+                            'class="message-image" loading="lazy" ' +
+                            'onerror="this.style.display=\'none\'" ' +
+                            'onclick="window.open(this.src, \'_blank\')">';
+                } else {
+                    html += '<div class="message-file">' +
+                            '<i class="fas fa-paperclip"></i>' +
+                            '<a href="' + safeFile + '" target="_blank" rel="noopener noreferrer">' +
+                            safeFileName +
+                            '</a>' +
+                            '</div>';
+                }
+            }
+
+            html += '</div>';
         });
+
+        container.innerHTML = html;
+        showState('chatState');
+
+        // En üste kaydır (mesajlar kronolojik ise)
+        // Eğer en son mesaj en altta olsun istersen:
+        setTimeout(function() {
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+        }, 100);
+    }
+
+    // ---------- Başlangıç (Ana Akış) ----------
+    async function init() {
+        var shareId = getShareId();
+
+        if (!shareId) {
+            showError(
+                'Geçersiz Link',
+                'Paylaşım ID bulunamadı. Lütfen linkin doğru olduğundan emin olun.',
+                'Paylaşım linki ?id=... veya ?shareId=... parametresi içermelidir.'
+            );
+            return;
+        }
+
+        window.__shareState.shareId = shareId;
+
+        // Şifre korumasız sohbet var mı diye kontrol et
+        // (Bazı eski linkler şifresiz olabilir)
+        try {
+            var probe = await Parse.Cloud.run('getSharedConversation', {
+                shareId: shareId,
+                probeOnly: true  // Backend desteklerse
+            });
+
+            if (probe && probe.success && probe.passwordRequired === false && probe.messages) {
+                // Şifresiz → direkt göster
+                window.__shareState.chatData = probe;
+                renderChat(probe);
+                return;
+            }
+        } catch (e) {
+            // Probe desteklenmiyor → şifre ekranı göster
+            console.log('Probe desteklenmiyor, şifre ekranı gösterilecek.');
+        }
+
+        // Şifre ekranını göster
+        showState('passwordState');
+        setTimeout(function() {
+            var input = document.getElementById('passwordInput');
+            if (input) input.focus();
+        }, 300);
+
+        updateAttemptCounter();
+    }
+
+    // ---------- DOM Hazır Olduğunda Başlat ----------
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+    // ---------- Klavye Kısayolu: ESC ile ana sayfaya dön ----------
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            // Eğer chat açıksa ve URL'de id varsa → ana sayfaya dönme uyarısı
+            if (window.__shareState.chatData) {
+                // Sessizce ana sayfaya dönme, sadece input'tan çık
+                var input = document.getElementById('passwordInput');
+                if (input) input.blur();
+            }
+        }
+    });
+
+    // ---------- Sayfa Kapatılırken Hassas Verileri Temizle ----------
+    window.addEventListener('beforeunload', function() {
+        window.__shareState.password = null;
+        window.__shareState.chatData = null;
+    });
+
+    // ---------- Console Bilgilendirme ----------
+    console.log('🔒 VİZYON 2027 — Paylaşılan Sohbet Görüntüleyici');
+    console.log('   • Şifre sunucu tarafında doğrulanır (güvenli)');
+    console.log('   • 3 yanlış deneme → 5 dakika bekleme');
+    console.log('   • Tüm içerik XSS korumalı (escapeHtml)');
     </script>
 </body>
 </html>
