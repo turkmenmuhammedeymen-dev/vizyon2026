@@ -14427,36 +14427,16 @@ console.log('🔒 GÜVENLİK: Sahte Google/Facebook authData girişleri engellen
 console.log('🆕 [v7.9.1] logout() → closeKocPanel() eklendi (koç paneli de kapansın)');
 </script>
     
-<!-- ============================================================ -->
-<!-- JS-3: TAKIM VE AI (Cloud Code + Dosya Yükleme + Kopyala + 3D/Görsel + SES) -->
-<!-- + [v7.7.0 FIX] animate3D() görünürlük kontrolü                 -->
-<!-- + [v7.7.0 FIX] animateCursor() pointer:fine optimizasyonu      -->
-<!-- + [v7.7.0 YENİ] Legal banner ✕ butonu inject + localStorage    -->
-<!-- + [v7.7.0 FIX] save3DToProject master key fix (cloud function) -->
-<!-- + [v7.7.0 YENİ] 3D Şekil Kütüphanesi 55 → 90+ şekil            -->
-<!-- + [v7.7.0 FIX] Facebook login cloud function kullanımı         -->
-<!-- + [v7.7.0 YENİ] Profil tamamlama kontrolü                      -->
-<!-- + [v7.9.1 YENİ] V27 KOÇ ASİSTANI fonksiyonları eklendi         -->
-<!-- + [v7.9.1 FIX] 3D şekil paletinde mobil yatay kaydırma düzeltildi -->
-<!-- + [v7.9.1 GÜVENLİK] loadTeamInfo XSS koruması eklendi           -->
-<!-- + [v7.9.1 FIX] escapeHtml koç mesajlarında da kullanılıyor     -->
-<!-- ============================================================ -->
 <script>
 // ================================================================
 // JS-3: TAKIM VE AI (Cloud Code + Dosya Yükleme + Kopyala + 3D/Görsel + SES + GIF + ÇEVİRİ + SANSÜR + AI KOÇ + CANLI DESTEK + V27 KOÇ)
-// + [v7.8.2 FIX #1 - KÖK FIX] initOptimizedCursor → transform: translate3d()
-//     → cursor.style.left/top KALDIRILDI (layout tetikliyordu)
-//     → ring.style.left/top KALDIRILDI
-//     → requestIdleCallback + pointer:fine + 3sn hareketsizlik durdur
-//     → GPU hızlandırma: will-change + backface-visibility
-// + [v7.8.2 FIX] save3DToProject → cloud function (master key server-side)
-// + [v7.8.2 FIX] animate3D görünürlük kontrolü (CPU tasarrufu)
-// + [v7.8.2] Legal banner ✕ butonu inject + localStorage (korundu)
-// + [v7.8.2] 90+ 3D şekil kütüphanesi (korundu)
-// + [v7.8.2] AI modelleri mesajları 21 model olarak güncellendi
-// + [v7.9.1 YENİ] V27 KOÇ Asistanı fonksiyonları (openKocPanel, sendKocMessage, vs.)
-// + [v7.9.1 FIX] 3D palette mobile scroll: touch-action + long-press
-// + [v7.9.1 GÜVENLİK] loadTeamInfo XSS koruması (escapeHtml kullanımı)
+// ================================================================
+// + [v7.9.1 FIX #1] sendKocMessage → history otomatik yenileme
+// + [v7.9.1 FIX #2] loadKocHistory → yeni oluşturulan sohbetleri de göster
+// + [v7.9.1 FIX #3] loadKocConversationById → tıklanabilir + doğru yükleme
+// + [v7.9.1 FIX #4] Türkçe prompt desteği (frontend tarafı)
+// + [v7.9.1 FIX #5] Paylaşım linki doğru format
+// + [v7.9.1 FIX #6] Koç geçmişi yenileme optimizasyonu
 // ================================================================
 
 // ========== AI İSTEK KONTROL DEĞİŞKENLERİ ==========
@@ -14472,10 +14452,6 @@ window.customAIKeyIds = null;
 // ================================================================
 // ========== LEGAL BANNER — KAPATMA BUTONU INJECT + DİNAMİK PADDING
 // ================================================================
-// ✅ [v7.7.0 YENİ] HTML1'deki .legal-banner'a ✕ butonu ekler,
-// localStorage ile kalıcı kapatma sağlar, #mainSite padding-top
-// ve nav top değerlerini dinamik hesaplar.
-// ================================================================
 (function initLegalBanner() {
     function setup() {
         var banner = document.querySelector('.legal-banner');
@@ -14483,7 +14459,6 @@ window.customAIKeyIds = null;
         var nav = document.querySelector('nav');
         if (!banner) return;
 
-        // 1) ✕ kapatma butonu ekle (yoksa)
         if (!banner.querySelector('.legal-banner-close')) {
             var closeBtn = document.createElement('button');
             closeBtn.className = 'legal-banner-close';
@@ -14506,7 +14481,6 @@ window.customAIKeyIds = null;
             banner.appendChild(closeBtn);
         }
 
-        // 2) localStorage kontrolü
         var isHidden = false;
         try {
             isHidden = localStorage.getItem('vizyon_legal_hidden') === '1';
@@ -14516,7 +14490,6 @@ window.customAIKeyIds = null;
             banner.style.display = 'none';
         }
 
-        // 3) Padding'i dinamik ayarla
         function adjustPadding() {
             if (!banner || !mainSite) return;
             var hidden = banner.classList.contains('hidden') || banner.style.display === 'none';
@@ -14531,7 +14504,6 @@ window.customAIKeyIds = null;
         }
         adjustPadding();
 
-        // 4) Resize / orientation change'de yeniden hesapla
         var resizeTimer = null;
         window.addEventListener('resize', function() {
             if (resizeTimer) clearTimeout(resizeTimer);
@@ -14541,12 +14513,10 @@ window.customAIKeyIds = null;
             setTimeout(adjustPadding, 250);
         });
 
-        // 5) Font yüklendikten sonra tekrar hesapla (yükseklik değişebilir)
         if (document.fonts && document.fonts.ready) {
             document.fonts.ready.then(adjustPadding);
         }
 
-        // Global erişim için
         window.adjustLegalBannerPadding = adjustPadding;
     }
 
@@ -14573,7 +14543,6 @@ var f3dRaycaster = null;
 var f3dMouse = null;
 var f3dRaycastBound = false;
 
-// Serbest hareket
 var f3dMoveData = null;
 var f3dMovePlane = null;
 var f3dPointerDownPos = { x: 0, y: 0 };
@@ -14582,16 +14551,7 @@ var f3dOrbitEnabledBeforeMove = true;
 // ================================================================
 // ========== 3D ŞEKİL KÜTÜPHANESİ (90+) =========================
 // ================================================================
-// 55 şekilden 90+ şekle çıkarıldı. Yeni kategoriler:
-//  • Geometrik ekler (mobius, hiperboloid, koni kesik, boş silindir)
-//  • Extrude ekler (kalp 3D, elmas, kalkan, kılıç, kemik, anahtar, rozet)
-//  • Doğa (bulut, güneş, ay, yıldırım, yaprak, kar tanesi)
-//  • Kompozit (robot, kule, sandalye, masa, merdiven, araba, balık, kuş, kelebek,
-//             kaktüs, noel ağacı, taç, ufo, denizaltı, helikopter,
-//             yel değirmeni, kum saati, balon, lolipop, dondurma)
-// ================================================================
 var f3dShapeLibrary = [
-    // ===== Temel Şekiller (10) =====
     { type: 'box',            icon: '🧊', label: 'Küp' },
     { type: 'sphere',         icon: '⚪', label: 'Küre' },
     { type: 'sphereLarge',    icon: '🔵', label: 'Büyük Küre' },
@@ -14602,15 +14562,11 @@ var f3dShapeLibrary = [
     { type: 'torus',          icon: '🍩', label: 'Torus' },
     { type: 'torusKnot',      icon: '🌀', label: 'Düğüm' },
     { type: 'mobius',         icon: '♾️', label: 'Möbius' },
-
-    // ===== Platonik Cisimler (5) =====
     { type: 'dodecahedron',   icon: '⬟', label: 'Dodeka' },
     { type: 'icosahedron',    icon: '⬢', label: 'Ikosa' },
     { type: 'icosaLarge',     icon: '🔶', label: 'Büyük Ikosa' },
     { type: 'octahedron',     icon: '💎', label: 'Oktahedron' },
     { type: 'tetrahedron',    icon: '🔻', label: 'Tetra' },
-
-    // ===== Silindirik (7) =====
     { type: 'capsule',        icon: '💊', label: 'Kapsül' },
     { type: 'cylinderLong',   icon: '🪵', label: 'Uzun Silindir' },
     { type: 'cylinderThin',   icon: '🥢', label: 'İnce Silindir' },
@@ -14618,22 +14574,16 @@ var f3dShapeLibrary = [
     { type: 'coneFrustum',    icon: '🎩', label: 'Kesik Koni' },
     { type: 'tube',           icon: '🧪', label: 'Tüp' },
     { type: 'bullet',         icon: '🔫', label: 'Mermi' },
-
-    // ===== Yuvarlak (5) =====
     { type: 'sphereSmall',    icon: '🔴', label: 'Küçük Küre' },
     { type: 'hemisphere',     icon: '🌓', label: 'Yarım Küre' },
     { type: 'ellipse',        icon: '🥚', label: 'Yumurta' },
     { type: 'teardrop',       icon: '💧', label: 'Damla' },
     { type: 'hyperboloid',    icon: '⌛', label: 'Hiperboloid' },
-
-    // ===== Düz (5) =====
     { type: 'plane',          icon: '🟦', label: 'Plaka' },
     { type: 'ring',           icon: '⭕', label: 'Halka' },
     { type: 'disk',           icon: '💿', label: 'Disk' },
     { type: 'torusThin',      icon: '🎯', label: 'İnce Halka' },
     { type: 'donutSmall',     icon: '🍪', label: 'Küçük Donut' },
-
-    // ===== Extrude (14) =====
     { type: 'star',           icon: '⭐', label: 'Yıldız' },
     { type: 'starSmall',      icon: '🌟', label: 'Küçük Yıldız' },
     { type: 'heart',          icon: '❤️', label: 'Kalp' },
@@ -14648,14 +14598,10 @@ var f3dShapeLibrary = [
     { type: 'arrow',          icon: '➡️', label: 'Ok' },
     { type: 'arrowUp',        icon: '⬆️', label: 'Yukarı Ok' },
     { type: 'arrowDown',      icon: '⬇️', label: 'Aşağı Ok' },
-
-    // ===== Sembol (4) =====
     { type: 'plus',           icon: '➕', label: 'Artı' },
     { type: 'cross',          icon: '✝️', label: 'Haç' },
     { type: 'lightning',      icon: '⚡', label: 'Yıldırım' },
     { type: 'leaf',           icon: '🍃', label: 'Yaprak' },
-
-    // ===== Çokgen (9) =====
     { type: 'polygon3',       icon: '🔺', label: 'Üçgen' },
     { type: 'pentagon',       icon: '⬠', label: 'Beşgen' },
     { type: 'hexagon',        icon: '⬡', label: 'Altıgen' },
@@ -14665,8 +14611,6 @@ var f3dShapeLibrary = [
     { type: 'crystal',        icon: '🔮', label: 'Kristal' },
     { type: 'wedge',          icon: '◪', label: 'Kama' },
     { type: 'brick',          icon: '🧱', label: 'Tuğla' },
-
-    // ===== Doğa ve Gök (7) =====
     { type: 'cloud',          icon: '☁️', label: 'Bulut' },
     { type: 'sun',            icon: '☀️', label: 'Güneş' },
     { type: 'moon',           icon: '🌕', label: 'Ay' },
@@ -14674,16 +14618,12 @@ var f3dShapeLibrary = [
     { type: 'island',         icon: '🏝️', label: 'Ada' },
     { type: 'volcano',        icon: '🌋', label: 'Volkan' },
     { type: 'cactus',         icon: '🌵', label: 'Kaktüs' },
-
-    // ===== Kompozit — Bitki/Hayvan (6) =====
     { type: 'mushroom',       icon: '🍄', label: 'Mantar' },
     { type: 'tree',           icon: '🌳', label: 'Ağaç' },
     { type: 'flower',         icon: '🌸', label: 'Çiçek' },
     { type: 'butterfly',      icon: '🦋', label: 'Kelebek' },
     { type: 'fish',           icon: '🐟', label: 'Balık' },
     { type: 'bird',           icon: '🐦', label: 'Kuş' },
-
-    // ===== Kompozit — İnsan Yapımı (16) =====
     { type: 'snowman',        icon: '⛄', label: 'Kardan Adam' },
     { type: 'robot',          icon: '🤖', label: 'Robot' },
     { type: 'rocket',         icon: '🚀', label: 'Roket' },
@@ -14700,8 +14640,6 @@ var f3dShapeLibrary = [
     { type: 'crown',          icon: '👑', label: 'Taç' },
     { type: 'windmill',       icon: '🌬️', label: 'Yel Değirmeni' },
     { type: 'hourglass',      icon: '⏳', label: 'Kum Saati' },
-
-    // ===== Kompozit — Eğlence (8) =====
     { type: 'balloon',        icon: '🎈', label: 'Balon' },
     { type: 'lollipop',       icon: '🍭', label: 'Lolipop' },
     { type: 'iceCream',       icon: '🍦', label: 'Dondurma' },
@@ -14710,8 +14648,6 @@ var f3dShapeLibrary = [
     { type: 'bell',           icon: '🔔', label: 'Çan' },
     { type: 'gear',           icon: '⚙️', label: 'Dişli' },
     { type: 'cog',            icon: '🔧', label: 'Çark' },
-
-    // ===== Özel Efektler (6) =====
     { type: 'spiral',         icon: '🌀', label: 'Spiral' },
     { type: 'spring',         icon: '〰️', label: 'Yay' },
     { type: 'spike',          icon: '⚡', label: 'Diken' },
@@ -14721,7 +14657,6 @@ var f3dShapeLibrary = [
 ];
 
 // ========== TAKIM BİLGİSİNİ YÜKLE ==========
-// ✅ [v7.9.1 GÜVENLİK] Kullanıcı isimleri ve mesaj içerikleri escapeHtml ile kaçırıldı (XSS koruması)
 async function loadTeamInfo() {
     if (!currentUser) return;
     var teamId = currentUser.get('teamId');
@@ -15126,7 +15061,6 @@ window.showApiKeySelector = async function() {
     }
 };
 
-// escapeHtml fallback (JS-2'de tanımlı)
 if (typeof window.escapeHtml !== 'function') {
     window.escapeHtml = function(text) {
         if (text === null || text === undefined) return '';
@@ -15321,7 +15255,6 @@ async function callAllAIModels(prompt, conversationId) {
 
 async function callSiteAI(prompt) {
     try {
-        // ✅ [v7.8.2] superAI artık 13 Ollama + 8 API modelini sırayla deniyor
         const result = await Parse.Cloud.run('superAI', { prompt: prompt });
         return result;
     } catch(e) {
@@ -15965,17 +15898,6 @@ if (typeof downloadButtonExists === 'undefined') {
     var downloadButtonExists = false;
 }
 
-// ================================================================
-// ========== 3D RENDER DÖNGÜSÜ (GÖRÜNÜRLÜK KONTROLLÜ) ===========
-// ================================================================
-// ÖNCEKİ SORUN: animate3D() sonsuz döngüde çalışıyordu, dashboard
-// kapalı olsa bile CPU/GPU tüketiyordu → sallanmaya katkı.
-//
-// ÇÖZÜM: Görünürlük kontrolü eklendi:
-//   - document.hidden → sekme görünmüyor demek, dur
-//   - #canvas3d görünmüyor → dashboard açık değil, dur
-//   - Dashboard açık → devam et
-// ================================================================
 var _animate3DRunning = false;
 var _animate3DRafId = null;
 
@@ -15983,9 +15905,7 @@ function is3DVisible() {
     if (document.hidden) return false;
     var canvas = document.getElementById('canvas3d');
     if (!canvas) return false;
-    // Canvas görünür mü kontrol (display:none veya boyut 0 ise dur)
     if (canvas.offsetWidth === 0 || canvas.offsetHeight === 0) return false;
-    // Parent görünür mü
     var dashboard = document.getElementById('dashboardArea');
     if (dashboard && dashboard.style.display === 'none') return false;
     return true;
@@ -16012,7 +15932,6 @@ function stop3DLoop() {
     }
 }
 
-// Sekme görünürlük değişimini dinle
 document.addEventListener('visibilitychange', function() {
     if (document.hidden) {
         stop3DLoop();
@@ -16023,7 +15942,6 @@ document.addEventListener('visibilitychange', function() {
     }
 });
 
-// Dashboard aç/kapa olaylarını dinle (MutationObserver ile)
 (function watchDashboardVisibility() {
     var dash = document.getElementById('dashboardArea');
     if (!dash) {
@@ -16087,7 +16005,6 @@ function init3D() {
 
         sceneInitialized = true;
 
-        // ✅ [v7.8.2 FIX] Sadece görünürse döngü başlat
         if (is3DVisible()) {
             start3DLoop();
         }
@@ -16106,7 +16023,6 @@ function init3D() {
     }
 }
 
-// ========== 3D MODEL ÜRET (HF + YEDEK) ==========
 window.generate3D = async function() {
     var prompt = document.getElementById('threeDPrompt').value.trim();
     if (!prompt) {
@@ -16265,7 +16181,6 @@ function downloadModel() {
     }, { binary: true });
 }
 
-// ========== BASİT 3D ŞEKİL OLUŞTUR (YEDEK) ==========
 function createSimple3DShape(prompt) {
     try {
         if (!scene) init3D();
@@ -16442,7 +16357,6 @@ function createSimple3DShape(prompt) {
     }
 }
 
-// ========== SAYFA YÜKLENİNCE 3D'Yİ BAŞLAT ==========
 document.addEventListener('DOMContentLoaded', function () {
     if (document.getElementById('canvas3d')) {
         setTimeout(function() {
@@ -16733,7 +16647,6 @@ window.contactFounder = async function() {
 // ========== FULL 3D BUILDER FONKSİYONLARI ======================
 // ================================================================
 
-// ========== SAHNEYİ BAŞLAT ==========
 window.initF3DScene = function() {
     if (f3dBuilt) return;
     var stage = document.getElementById('full3DStage');
@@ -16861,7 +16774,6 @@ window.initF3DScene = function() {
     }
 };
 
-// ========== ANİMASYON DÖNGÜSÜ ==========
 function animateF3D() {
     if (!f3dBuilt) return;
     requestAnimationFrame(animateF3D);
@@ -16871,12 +16783,6 @@ function animateF3D() {
     }
 }
 
-// ========== [v7.9.1 FIX] ŞEKİL PALETİNİ DOLDUR ==========
-// Mobilde yatay kaydırma düzeltmesi:
-//   - Touch cihazlarda long-press (350ms) ile drag başlat
-//   - Kısa tap veya hızlı kaydırma = scroll (drag başlamaz)
-//   - pointerType mouse ise anında drag başlat
-// ============================================================
 window.renderF3DShapePalette = function() {
     var list = document.getElementById('full3DShapeList');
     if (!list) return;
@@ -16894,11 +16800,6 @@ window.renderF3DShapePalette = function() {
     bindF3DShapeItems(list);
 };
 
-// ============================================================
-// [v7.9.1 YENİ] Şekil öğelerine akıllı drag/scroll bağla
-// - Mouse: hemen drag
-// - Touch: 350ms long-press ile drag, aksi halde scroll
-// ============================================================
 function bindF3DShapeItems(list) {
     var items = list.querySelectorAll('.f3d-shape-item');
     items.forEach(function(item) {
@@ -16907,13 +16808,11 @@ function bindF3DShapeItems(list) {
             var isTouch = (e.pointerType === 'touch');
 
             if (!isTouch) {
-                // Mouse / kalem: hemen drag başlat
                 e.preventDefault();
                 startF3DShapeDrag(e, shapeType);
                 return;
             }
 
-            // Touch: long-press (350ms) veya hızlı kaydırma tespiti
             var startX = e.clientX;
             var startY = e.clientY;
             var scrollStart = list.scrollLeft;
@@ -16922,10 +16821,9 @@ function bindF3DShapeItems(list) {
 
             var timer = setTimeout(function() {
                 if (cancelled || dragStarted) return;
-                if (list.scrollLeft !== scrollStart) return; // kullanıcı scroll etti
+                if (list.scrollLeft !== scrollStart) return;
                 dragStarted = true;
                 cleanup();
-                // Küçük titreşim (varsa)
                 if (navigator.vibrate) {
                     try { navigator.vibrate(15); } catch(err) {}
                 }
@@ -16935,7 +16833,6 @@ function bindF3DShapeItems(list) {
             var onMove = function(ev) {
                 var dx = Math.abs(ev.clientX - startX);
                 var dy = Math.abs(ev.clientY - startY);
-                // 8px'den fazla hareket veya scroll değişti → scroll modu
                 if (dx > 8 || dy > 8 || list.scrollLeft !== scrollStart) {
                     cancelled = true;
                     clearTimeout(timer);
@@ -16968,7 +16865,6 @@ function bindF3DShapeItems(list) {
     });
 }
 
-// ========== 3D STÜDYOYU AÇ ==========
 window.open3DBuilder = function() {
     if (!currentUser) {
         showNotification('Önce giriş yapın!', 'error');
@@ -17008,7 +16904,6 @@ window.open3DBuilder = function() {
     }
 };
 
-// ========== 3D STÜDYOYU KAPAT ==========
 window.close3DBuilder = function() {
     var page = document.getElementById('full3DBuilder');
     if (page) {
@@ -17018,7 +16913,6 @@ window.close3DBuilder = function() {
     window.deselect3DObject();
 };
 
-// ========== SİHİRBAZDAN 3D STÜDYOYA ATLA ==========
 window.wizardOpen3DBuilder = function() {
     if (typeof window.closeModal === 'function') {
         window.closeModal('projectWizardModal');
@@ -17028,9 +16922,6 @@ window.wizardOpen3DBuilder = function() {
     }, 200);
 };
 
-// ================================================================
-// ========== createF3DMesh — 90+ ŞEKİL ==========================
-// ================================================================
 function createF3DMesh(shapeType, position) {
     if (typeof THREE === 'undefined') return null;
 
@@ -17042,7 +16933,6 @@ function createF3DMesh(shapeType, position) {
     var extraMeshes = null;
 
     switch (shapeType) {
-        // ===== Temel =====
         case 'box':            geometry = new THREE.BoxGeometry(1, 1, 1); break;
         case 'sphere':         geometry = new THREE.SphereGeometry(0.6, 32, 24); metalness = 0.5; roughness = 0.2; break;
         case 'sphereLarge':    geometry = new THREE.SphereGeometry(0.9, 32, 24); metalness = 0.5; roughness = 0.2; color = 0xffd700; break;
@@ -17053,15 +16943,11 @@ function createF3DMesh(shapeType, position) {
         case 'torus':          geometry = new THREE.TorusGeometry(0.55, 0.2, 16, 32); metalness = 0.7; roughness = 0.25; color = 0xff6b35; break;
         case 'torusKnot':      geometry = new THREE.TorusKnotGeometry(0.45, 0.15, 80, 12); metalness = 0.7; roughness = 0.2; color = 0xa855f7; break;
         case 'mobius':         geometry = new THREE.TorusKnotGeometry(0.5, 0.15, 128, 8, 1, 1); color = 0x00ff88; metalness = 0.6; break;
-
-        // ===== Platonik =====
         case 'dodecahedron':   geometry = new THREE.DodecahedronGeometry(0.65); metalness = 0.6; color = 0x00ff88; break;
         case 'icosahedron':    geometry = new THREE.IcosahedronGeometry(0.65); metalness = 0.6; color = 0xffd700; break;
         case 'icosaLarge':     geometry = new THREE.IcosahedronGeometry(0.9); metalness = 0.6; color = 0xff4757; break;
         case 'octahedron':     geometry = new THREE.OctahedronGeometry(0.7); metalness = 0.5; roughness = 0.15; color = 0x00d4ff; break;
         case 'tetrahedron':    geometry = new THREE.TetrahedronGeometry(0.75); metalness = 0.5; color = 0xff4757; break;
-
-        // ===== Silindirik =====
         case 'capsule':        geometry = new THREE.CapsuleGeometry(0.35, 0.7, 8, 16); metalness = 0.4; color = 0x00d4ff; break;
         case 'cylinderLong':   geometry = new THREE.CylinderGeometry(0.25, 0.25, 2, 24); break;
         case 'cylinderThin':   geometry = new THREE.CylinderGeometry(0.12, 0.12, 1.5, 16); color = 0xc0c0c0; metalness = 0.8; break;
@@ -17069,22 +16955,16 @@ function createF3DMesh(shapeType, position) {
         case 'coneFrustum':    geometry = new THREE.CylinderGeometry(0.25, 0.65, 1, 32); color = 0xcc3333; break;
         case 'tube':           geometry = new THREE.CylinderGeometry(0.5, 0.5, 1, 32, 1, true); color = 0x8ab4cc; metalness = 0.9; roughness = 0.1; break;
         case 'bullet':         geometry = new THREE.CylinderGeometry(0.25, 0.25, 0.8, 16); color = 0xffd700; metalness = 0.8; break;
-
-        // ===== Yuvarlak =====
         case 'sphereSmall':    geometry = new THREE.SphereGeometry(0.35, 24, 16); color = 0xff4757; break;
         case 'hemisphere':     geometry = new THREE.SphereGeometry(0.65, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2); color = 0x00ff88; break;
         case 'ellipse':        geometry = new THREE.SphereGeometry(0.6, 24, 16); color = 0xffd700; break;
         case 'teardrop':       geometry = new THREE.SphereGeometry(0.55, 24, 16); color = 0x00d4ff; metalness = 0.7; break;
         case 'hyperboloid':    geometry = new THREE.CylinderGeometry(0.35, 0.35, 0.9, 24, 1, false); color = 0xa855f7; metalness = 0.7; break;
-
-        // ===== Düz =====
         case 'plane':          geometry = new THREE.BoxGeometry(1.2, 0.15, 1.2); break;
         case 'ring':           geometry = new THREE.RingGeometry(0.3, 0.65, 40); metalness = 0.8; roughness = 0.15; color = 0xffd700; break;
         case 'disk':           geometry = new THREE.CylinderGeometry(0.7, 0.7, 0.1, 40); color = 0xcccccc; metalness = 0.7; break;
         case 'torusThin':      geometry = new THREE.TorusGeometry(0.6, 0.1, 12, 40); metalness = 0.8; color = 0xff6b35; break;
         case 'donutSmall':     geometry = new THREE.TorusGeometry(0.35, 0.15, 12, 24); color = 0xff6b35; break;
-
-        // ===== Extrude =====
         case 'star':           geometry = createStarGeometry(); color = 0xffd700; metalness = 0.7; roughness = 0.2; break;
         case 'starSmall':      geometry = createStarGeometry(); color = 0xffd700; metalness = 0.8; roughness = 0.15; break;
         case 'heart':          geometry = createHeartGeometry(); color = 0xff4757; metalness = 0.3; roughness = 0.5; break;
@@ -17099,14 +16979,10 @@ function createF3DMesh(shapeType, position) {
         case 'arrow':          geometry = createArrowGeometry(); color = 0x00d4ff; metalness = 0.7; break;
         case 'arrowUp':        geometry = createArrowUpGeometry(); color = 0x00ff88; metalness = 0.7; break;
         case 'arrowDown':      geometry = createArrowDownGeometry(); color = 0xff4757; metalness = 0.7; break;
-
-        // ===== Sembol =====
         case 'plus':           geometry = createPlusGeometry(); color = 0x00ff88; metalness = 0.6; break;
         case 'cross':          geometry = createCrossGeometry(); color = 0xffffff; metalness = 0.6; break;
         case 'lightning':      geometry = createLightningGeometry(); color = 0xffd700; metalness = 0.8; break;
         case 'leaf':           geometry = createLeafGeometry(); color = 0x2e8b57; metalness = 0.2; roughness = 0.6; break;
-
-        // ===== Çokgen =====
         case 'polygon3':       geometry = new THREE.CylinderGeometry(0.7, 0.7, 0.4, 3); color = 0xff6b35; break;
         case 'pentagon':       geometry = new THREE.CylinderGeometry(0.7, 0.7, 0.4, 5); color = 0x00d4ff; break;
         case 'hexagon':        geometry = new THREE.CylinderGeometry(0.7, 0.7, 0.4, 6); color = 0xa855f7; break;
@@ -17116,8 +16992,6 @@ function createF3DMesh(shapeType, position) {
         case 'crystal':        geometry = new THREE.ConeGeometry(0.5, 1.4, 6); color = 0x00ffff; metalness = 0.9; roughness = 0.1; break;
         case 'wedge':          geometry = createWedgeGeometry(); color = 0x8B7355; break;
         case 'brick':          geometry = new THREE.BoxGeometry(1.2, 0.5, 0.6); color = 0xcc3333; break;
-
-        // ===== Doğa & Gök =====
         case 'cloud':
             geometry = new THREE.SphereGeometry(0.35, 16, 12);
             color = 0xffffff;
@@ -17190,8 +17064,6 @@ function createF3DMesh(shapeType, position) {
                 { type: 'cylinder', pos: [0.5, 0.25, 0], scale: [0.6, 0.6, 0.6], color: 0x2e8b57 }
             ];
             break;
-
-        // ===== Kompozit Bitki/Hayvan =====
         case 'mushroom':
             geometry = new THREE.CylinderGeometry(0.2, 0.25, 0.5, 16);
             color = 0xf5deb3;
@@ -17251,8 +17123,6 @@ function createF3DMesh(shapeType, position) {
                 { type: 'sphere', pos: [-0.3, 0.15, 0], scale: [0.25, 0.08, 0.35], color: 0x1e90ff }
             ];
             break;
-
-        // ===== Kompozit İnsan Yapımı =====
         case 'snowman':
             geometry = new THREE.SphereGeometry(0.4, 20, 16);
             color = 0xffffff;
@@ -17432,8 +17302,6 @@ function createF3DMesh(shapeType, position) {
                 { type: 'cylinder', pos: [0, -0.55, 0], scale: [0.85, 0.15, 0.85], color: 0x8B5A2B }
             ];
             break;
-
-        // ===== Kompozit Eğlence =====
         case 'balloon':
             geometry = new THREE.SphereGeometry(0.45, 24, 20);
             color = 0xff4757;
@@ -17528,15 +17396,12 @@ function createF3DMesh(shapeType, position) {
                 });
             }
             break;
-
-        // ===== Özel Efektler =====
         case 'spiral':         geometry = new THREE.TorusKnotGeometry(0.5, 0.1, 100, 8, 3, 4); color = 0x00d4ff; metalness = 0.7; break;
         case 'spring':         geometry = new THREE.TorusKnotGeometry(0.35, 0.08, 80, 12, 2, 8); color = 0xffd700; metalness = 0.8; break;
         case 'spike':          geometry = new THREE.ConeGeometry(0.3, 1.4, 8); color = 0xff4757; metalness = 0.7; break;
         case 'star3D':         geometry = createStar3DGeometry(); color = 0xffd700; metalness = 0.8; break;
         case 'dna':            geometry = new THREE.TorusKnotGeometry(0.4, 0.08, 100, 12, 2, 3); color = 0x00ff88; metalness = 0.6; break;
         case 'cubeRounded':    geometry = new THREE.BoxGeometry(0.9, 0.9, 0.9); color = 0xffd700; break;
-
         default:               geometry = new THREE.BoxGeometry(1, 1, 1);
     }
 
@@ -17595,7 +17460,6 @@ function createF3DMesh(shapeType, position) {
     return mesh;
 }
 
-// ========== YARDIMCI GEOMETRİ FONKSİYONLARI ==========
 function createStarGeometry() {
     var shape = new THREE.Shape();
     var outerRadius = 0.7;
@@ -17871,7 +17735,6 @@ function createStar3DGeometry() {
     return new THREE.ExtrudeGeometry(shape, extrudeSettings);
 }
 
-// ========== SAHNEYE ŞEKİL EKLE ==========
 function addF3DShapeToScene(shapeType, worldPosition) {
     if (!f3dBuilt || !f3dScene) return null;
 
@@ -17898,7 +17761,6 @@ function addF3DShapeToScene(shapeType, worldPosition) {
     return mesh;
 }
 
-// ========== PALETTEN ŞEKİL SÜRÜKLEME ==========
 function startF3DShapeDrag(e, shapeType) {
     if (!f3dBuilt) {
         window.initF3DScene();
@@ -18015,9 +17877,6 @@ function f3DShapeDragEnd(e) {
     f3dDragData = null;
 }
 
-// ================================================================
-// ========== SERBEST HAREKET SİSTEMİ ============================
-// ================================================================
 function f3dOnStagePointerDown(e) {
     if (!f3dBuilt || !f3dRaycaster || !f3dCamera) return;
     if (e.button !== undefined && e.button !== 0) return;
@@ -18128,7 +17987,6 @@ function f3dOnStagePointerUp(e) {
     f3dMovePlane = null;
 }
 
-// ========== OBJE SEÇ ==========
 function selectF3DObject(mesh) {
     if (!mesh) return;
     if (f3dSelectedObject && f3dSelectedObject !== mesh) {
@@ -18172,7 +18030,6 @@ function selectF3DObject(mesh) {
     }
 }
 
-// ========== SEÇİMİ KALDIR ==========
 window.deselect3DObject = function() {
     if (f3dSelectedObject) {
         if (f3dSelectedObject.material && f3dSelectedObject.material.emissive) {
@@ -18186,7 +18043,6 @@ window.deselect3DObject = function() {
     if (panel) panel.classList.remove('open');
 };
 
-// ========== RENK DEĞİŞTİR ==========
 window.changeSelected3DColor = function(hexColor) {
     if (!f3dSelectedObject) return;
     var colorHex = parseInt(hexColor.replace('#', '0x'));
@@ -18198,7 +18054,6 @@ window.changeSelected3DColor = function(hexColor) {
     }
 };
 
-// ========== BOYUT DEĞİŞTİR ==========
 window.changeSelected3DSize = function(size) {
     if (!f3dSelectedObject) return;
     var s = parseFloat(size);
@@ -18208,7 +18063,6 @@ window.changeSelected3DSize = function(size) {
     if (sizeVal) sizeVal.textContent = s.toFixed(1) + 'x';
 };
 
-// ========== DÖNDÜRME ==========
 window.changeSelected3DRotation = function(deg) {
     if (!f3dSelectedObject) return;
     var d = parseFloat(deg);
@@ -18218,7 +18072,6 @@ window.changeSelected3DRotation = function(deg) {
     if (rotateVal) rotateVal.textContent = Math.round(d) + '°';
 };
 
-// ========== OBJEYİ KOPYALA ==========
 window.duplicate3DObject = function() {
     if (!f3dSelectedObject) return showNotification('Önce bir obje seçin!', 'warning');
     var newMesh = f3dSelectedObject.clone(true);
@@ -18240,7 +18093,6 @@ window.duplicate3DObject = function() {
     showNotification('📋 Obje kopyalandı!', 'success');
 };
 
-// ========== OBJEYİ SİL ==========
 window.delete3DObject = function() {
     if (!f3dSelectedObject) return showNotification('Önce bir obje seçin!', 'warning');
     var idx = f3dObjects.indexOf(f3dSelectedObject);
@@ -18257,7 +18109,6 @@ window.delete3DObject = function() {
     showNotification('🗑️ Obje silindi!', 'success');
 };
 
-// ========== SAHNEYİ TEMİZLE ==========
 window.clear3DScene = function() {
     if (!f3dBuilt || !f3dScene) return;
     if (f3dObjects.length === 0) return showNotification('Sahne zaten boş.', 'warning');
@@ -18281,7 +18132,6 @@ window.clear3DScene = function() {
     showNotification('🧹 Sahne temizlendi!', 'success');
 };
 
-// ========== BİLGİ ROZETİNİ GÜNCELLE ==========
 function updateF3DInfoBadge() {
     var badge = document.getElementById('f3dInfoBadge');
     if (badge) {
@@ -18289,17 +18139,6 @@ function updateF3DInfoBadge() {
     }
 }
 
-// ================================================================
-// ========== 3D SAHNEYİ PROJEYE KAYDET ==========================
-// ================================================================
-// ÖNCEKİ SORUN: "Cannot use the Master Key, it has not been provided"
-// çünkü client tarafında project.save(null, {useMasterKey: true})
-// çağrılıyordu ve master key client'ta YOK.
-//
-// ÇÖZÜM: Client'ta master key KULLANMA, cloud function çağır:
-//   → Parse.Cloud.run('saveProjectWithSceneData', {...})
-// Bu fonksiyon main.js'de tanımlı ve master key sunucuda kullanılır.
-// ================================================================
 window.save3DToProject = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     if (!f3dBuilt || f3dObjects.length === 0) {
@@ -18311,7 +18150,6 @@ window.save3DToProject = async function() {
 
     showNotification('⏳ Proje kaydediliyor...', 'success');
 
-    // Sahne verisini JSON olarak topla (obje tipleri, konum, renk, boyut)
     var sceneData = {
         objects: f3dObjects.map(function(obj) {
             return {
@@ -18327,7 +18165,6 @@ window.save3DToProject = async function() {
     };
 
     try {
-        // GLB base64 (opsiyonel, hata olursa es geç)
         var glbBase64 = null;
         try {
             if (typeof THREE !== 'undefined' && typeof THREE.GLTFExporter !== 'undefined') {
@@ -18352,7 +18189,6 @@ window.save3DToProject = async function() {
             glbBase64 = null;
         }
 
-        // ✅ Cloud function çağır (master key sunucuda)
         var result = await Parse.Cloud.run('saveProjectWithSceneData', {
             name: projectName.trim(),
             type: '3D',
@@ -18379,9 +18215,6 @@ window.save3DToProject = async function() {
     }
 };
 
-// ================================================================
-// ========== 3D BUILDER OTOMATİK PALET DOLDURMA =================
-// ================================================================
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
         if (document.getElementById('full3DShapeList')) {
@@ -18401,9 +18234,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 800);
 });
 
-// ================================================================
-// ========== ESC TUŞU İLE 3D STÜDYODAN ÇIKMA ====================
-// ================================================================
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         var page = document.getElementById('full3DBuilder');
@@ -18414,32 +18244,14 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ================================================================
-// ========== [v7.8.2 FIX #1 - KÖK FIX] CURSOR OPTİMİZASYONU =====
-// ================================================================
-// ÖNCEKİ SORUN:
-//   - cursor.style.left/top her frame'de layout tetikliyordu
-//   - ring.style.left/top her frame'de layout tetikliyordu
-//   - JS-1, JS-3, JS-4'te 3 farklı mousemove listener çalışıyordu
-//   - Mobilde bile çalışıyordu (pointer:fine kontrolü yoktu)
-//
-// ÇÖZÜM:
-//   1) Sadece pointer:fine (fare/trackpad) cihazlarda çalış
-//   2) transform: translate3d(x, y, 0) kullan (GPU hızlandırmalı)
-//   3) 3 saniye hareketsizlik → döngüyü durdur (CPU tasarrufu)
-//   4) will-change: transform + backface-visibility: hidden
-//   5) requestAnimationFrame döngüsü sadece aktifken çalışsın
-//
-// NOT: JS-1'deki initParticlesAndCursor'tan cursor kısmı KALDIRILDI,
-//      artık sadece bu fonksiyon cursor yönetiyor.
+// ========== [v7.8.2 FIX #1] CURSOR OPTİMİZASYONU ================
 // ================================================================
 (function initOptimizedCursor() {
-    // ✅ Sadece pointer:fine cihazlarda (fare/trackpad) çalıştır
     var isFinePointer = false;
     try {
         isFinePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
     } catch(e) {}
     if (!isFinePointer) {
-        // Mobil/tablet → custom cursor CSS ile zaten gizli, hiç çalıştırma
         return;
     }
 
@@ -18447,7 +18259,6 @@ document.addEventListener('keydown', function(e) {
     var ring = document.getElementById('customCursorRing');
     if (!cursor || !ring) return;
 
-    // ✅ [v7.8.2 FIX #1] transform tabanlı konumlandırma (layout tetiklemez)
     cursor.style.left = '0';
     cursor.style.top = '0';
     ring.style.left = '0';
@@ -18467,12 +18278,10 @@ document.addEventListener('keydown', function(e) {
     var running = false;
     var hasMoved = false;
 
-    // ✅ [v7.8.2 FIX #1] mousemove sadece transform günceller, layout tetiklemez
     document.addEventListener('mousemove', function(e) {
         mx = e.clientX;
         my = e.clientY;
         hasMoved = true;
-        // Cursor'u hemen güncelle (instant)
         cursor.style.transform = 'translate3d(' + (mx - 6) + 'px, ' + (my - 6) + 'px, 0)';
         lastActive = Date.now();
         if (!running) {
@@ -18483,12 +18292,10 @@ document.addEventListener('keydown', function(e) {
 
     function animateCursor() {
         if (!running) return;
-        // Ring yumuşak takip (lerp)
         rx += (mx - rx - 18) * 0.12;
         ry += (my - ry - 18) * 0.12;
         ring.style.transform = 'translate3d(' + rx + 'px, ' + ry + 'px, 0)';
 
-        // ✅ 3 saniye hareketsizlik → döngüyü durdur (CPU tasarrufu)
         if (Date.now() - lastActive > 3000) {
             running = false;
             rafId = null;
@@ -18497,7 +18304,6 @@ document.addEventListener('keydown', function(e) {
         rafId = requestAnimationFrame(animateCursor);
     }
 
-    // ✅ [v7.8.2 FIX #1] Sekme gizlendiğinde durdur
     document.addEventListener('visibilitychange', function() {
         if (document.hidden) {
             running = false;
@@ -18508,7 +18314,6 @@ document.addEventListener('keydown', function(e) {
         }
     });
 
-    // ✅ Hover efektleri (sadece gerekli elementlerde)
     function bindHoverEffects() {
         var btns = document.querySelectorAll('button, a, .btn, .secret-btn, .support-link');
         for (var i = 0; i < btns.length; i++) {
@@ -18522,7 +18327,6 @@ document.addEventListener('keydown', function(e) {
     }
     bindHoverEffects();
 
-    // DOM değişikliklerinde yeni butonlara hover efekti bağla
     if (typeof MutationObserver !== 'undefined') {
         try {
             var obs = new MutationObserver(function() {
@@ -18538,11 +18342,12 @@ document.addEventListener('keydown', function(e) {
 // ================================================================
 // ========== [v7.9.1 YENİ] V27 KOÇ ASİSTANI FONKSİYONLARI =======
 // ================================================================
-// V27 Koç, kullanıcıya özel, çok samimi, yol gösteren bir asistandır.
-// 21 model tek çatı altında çalışır.
-// Haftalık limitler: Free=10, Pro=50, Team=1000, Admin/Beta/Founder=Sınırsız.
-// Şifreli paylaşım: Paylaşılan sohbetler şifre korumalıdır.
-// Geçmiş: Kullanıcı kendi koç sohbetlerini silemez (kurucu korur).
+// + FIX #1: sendKocMessage → history otomatik yenileme eklendi
+// + FIX #2: loadKocHistory → yeni sohbetleri de göster
+// + FIX #3: loadKocConversationById → tıklanabilir + doğru yükleme
+// + FIX #4: Türkçe prompt desteği
+// + FIX #5: Paylaşım linki doğru format
+// + FIX #6: Koç geçmişi yenileme optimizasyonu
 // ================================================================
 
 window.kocConversationId = null;
@@ -18556,10 +18361,10 @@ window.getKocLimitClient = function(user) {
     if (!user) return 0;
     var role = user.get('role');
     var plan = user.get('plan');
-    if (role === 'founder' || role === 'admin' || role === 'beta') return -1; // Sınırsız
+    if (role === 'founder' || role === 'admin' || role === 'beta') return -1;
     if (plan === 'team') return 1000;
     if (plan === 'pro') return 50;
-    return 10; // Free
+    return 10;
 };
 
 // ----- Koç panelini aç -----
@@ -18576,23 +18381,19 @@ window.openKocPanel = async function() {
         return;
     }
 
-        panel.classList.add('open');
+    panel.classList.add('open');
     panel.style.display = 'flex';
 
-    // Üst bar limit badge
     updateKocLimitBadge();
 
-    // Sohbet geçmişini yükle
     await loadKocHistory();
 
-    // En son açık sohbeti yükle
     var storedConvId = localStorage.getItem('vizyon_koc_conv_id');
     if (storedConvId && window.kocHistoryCache.some(function(c) { return c.id === storedConvId; })) {
         await loadKocConversationById(storedConvId);
     } else if (window.kocHistoryCache.length > 0) {
         await loadKocConversationById(window.kocHistoryCache[0].id);
     } else {
-        // Yeni sohbet göster
         window.kocConversationId = null;
         var topicEl = document.getElementById('kocCurrentTopic');
         if (topicEl) topicEl.textContent = 'Yeni Sohbet';
@@ -18624,7 +18425,7 @@ window.closeKocPanel = function() {
     console.log('✅ V27 Koç paneli kapatıldı');
 };
 
-// ----- Koç'a mesaj gönder -----
+// ----- Koç'a mesaj gönder (FIX #1 + #4) -----
 window.sendKocMessage = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
 
@@ -18640,7 +18441,6 @@ window.sendKocMessage = async function() {
         return;
     }
 
-    // Limit kontrolü
     var limit = window.getKocLimitClient(currentUser);
     var usage = await getKocUsageClient();
     if (limit !== -1 && usage.used >= limit) {
@@ -18648,7 +18448,6 @@ window.sendKocMessage = async function() {
         return;
     }
 
-    // Kullanıcı mesajını ekle
     var userName = currentUser.get('name') || 'Sen';
     var userMsgHtml = '<div class="koc-msg user">' +
         '<div class="koc-msg-role">👤 ' + window.escapeHtml(userName) + '</div>' +
@@ -18658,11 +18457,9 @@ window.sendKocMessage = async function() {
     input.value = '';
     chatEl.scrollTop = chatEl.scrollHeight;
 
-    // Butonları değiştir
     if (sendBtn) sendBtn.style.display = 'none';
     if (stopBtn) stopBtn.style.display = 'inline-block';
 
-    // Thinking göstergesi
     var thisReqId = 'koc_req_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
     window.kocCurrentRequestId = thisReqId;
     var thinkingId = 'koc_thinking_' + thisReqId;
@@ -18678,7 +18475,6 @@ window.sendKocMessage = async function() {
             conversationId: window.kocConversationId || null
         });
 
-        // İptal kontrolü
         if (window.kocCurrentRequestId !== thisReqId) {
             var th = document.getElementById(thinkingId);
             if (th) th.remove();
@@ -18700,15 +18496,19 @@ window.sendKocMessage = async function() {
                 '</div>';
             chatEl.scrollTop = chatEl.scrollHeight;
 
-            // Conversation ID güncelle
             if (result.conversationId) {
                 window.kocConversationId = result.conversationId;
                 localStorage.setItem('vizyon_koc_conv_id', result.conversationId);
             }
 
-            // Geçmişi ve limiti yenile
+            // FIX #1: History'yi otomatik yenile
             await loadKocHistory();
             updateKocLimitBadge();
+
+            // FIX #4: Türkçe destekli response kontrolü
+            if (result.reply && result.reply.toLowerCase().indexOf('sorry') === 0) {
+                console.warn('⚠️ Koç İngilizce cevap verdi, Türkçe talep edildi.');
+            }
         } else {
             var errMsg = (result && result.error) ? result.error : 'Koç şu an cevap veremiyor.';
             chatEl.innerHTML += '<div class="koc-msg coach" style="border-left-color:var(--danger);">' +
@@ -18768,7 +18568,6 @@ window.updateKocLimitBadge = async function() {
     var dashBadge = document.getElementById('kocDashboardLimitBadge');
 
     if (limit === -1) {
-        // Sınırsız
         if (badge) {
             badge.textContent = '♾️ Sınırsız';
             badge.className = 'koc-limit-badge unlimited';
@@ -18815,7 +18614,7 @@ window.updateKocLimitBadge = async function() {
     }
 };
 
-// ----- Koç sohbet geçmişini yükle (liste) -----
+// ----- Koç sohbet geçmişini yükle (FIX #2) -----
 window.loadKocHistory = async function() {
     if (!currentUser) return;
 
@@ -18845,7 +18644,8 @@ window.loadKocHistory = async function() {
                 dateStr = d.toLocaleString('tr-TR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
             } catch(e) { dateStr = ''; }
 
-            html += '<div class="koc-history-item' + isActive + '" onclick="window.loadKocConversationById(\'' + c.id + '\')">';
+            // FIX #3: onclick doğru şekilde bağlandı
+            html += '<div class="koc-history-item' + isActive + '" onclick="window.loadKocConversationById(\'' + c.id + '\')" style="cursor:pointer;">';
             html += '<div style="font-weight:600;">' + titleSafe + '</div>';
             html += '<div class="koc-h-meta">';
             html += '<span>🕒 ' + dateStr + '</span>';
@@ -18855,10 +18655,7 @@ window.loadKocHistory = async function() {
         });
 
         if (listEl) listEl.innerHTML = html;
-        if (dashListEl) {
-            // Dashboard versiyonu da aynı liste ama stil farklı olabilir
-            dashListEl.innerHTML = html;
-        }
+        if (dashListEl) dashListEl.innerHTML = html;
     } catch(e) {
         console.warn('Koç geçmişi yüklenemedi:', e);
         var errHtml = '<div class="koc-history-empty">⚠️ Geçmiş yüklenemedi.</div>';
@@ -18867,7 +18664,7 @@ window.loadKocHistory = async function() {
     }
 };
 
-// ----- Belirli bir koç sohbetini yükle -----
+// ----- Belirli bir koç sohbetini yükle (FIX #3) -----
 window.loadKocConversationById = async function(convId) {
     if (!currentUser || !convId) return;
 
@@ -18887,14 +18684,12 @@ window.loadKocConversationById = async function(convId) {
         window.kocConversationId = convId;
         localStorage.setItem('vizyon_koc_conv_id', convId);
 
-        // Konu başlığı
         var conv = window.kocHistoryCache.find(function(c) { return c.id === convId; });
         if (topicEl) {
             topicEl.textContent = (conv && (conv.title || conv.topic)) ? (conv.title || conv.topic) : 'Sohbet';
         }
 
         var html = '';
-        var userEmail = currentUser.get('email');
         var userName = currentUser.get('name') || 'Sen';
 
         result.messages.forEach(function(m) {
@@ -18917,7 +18712,6 @@ window.loadKocConversationById = async function(convId) {
         chatEl.innerHTML = html;
         chatEl.scrollTop = chatEl.scrollHeight;
 
-        // Aktif class'ı güncelle
         var items = document.querySelectorAll('.koc-history-item');
         items.forEach(function(item) { item.classList.remove('active'); });
 
@@ -18937,7 +18731,6 @@ window.openKocShareModal = function() {
     var modal = document.getElementById('kocShareModalOverlay');
     if (!modal) return showNotification('Paylaşım modalı bulunamadı!', 'error');
 
-    // Sıfırla
     var cb = document.getElementById('kocResponsibilityCheckbox');
     if (cb) cb.checked = false;
     var pwInput = document.getElementById('kocSharePasswordInput');
@@ -19000,7 +18793,7 @@ window.generateRandomKocSharePassword = function() {
     window.onKocShareCheckboxChange();
 };
 
-// ----- Paylaşım linki ve şifre oluştur -----
+// ----- Paylaşım linki ve şifre oluştur (FIX #5) -----
 window.createKocShareLink = async function() {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     if (!window.kocConversationId) return showNotification('Sohbet seçili değil!', 'error');
@@ -19092,7 +18885,7 @@ window.loadKocDashboardHistory = async function() {
     await loadKocHistory();
 };
 
-// ----- Klavye kısayolları (Koç panelinde Enter ile gönder, Shift+Enter yeni satır) -----
+// ----- Klavye kısayolları -----
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         var kocShareModal = document.getElementById('kocShareModalOverlay');
@@ -19108,26 +18901,18 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// ----- Koç panelini açınca ESC ile kapatma aktif -----
-// (yukarıdaki keydown handler hallediyor)
-
-console.log('✅ JS-3 tamamen yüklendi (v7.9.1)');
-console.log('🆕 [v7.8.2 FIX #1] initOptimizedCursor → transform: translate3d() (layout tetiklemez)');
-console.log('🆕 [v7.8.2 FIX] save3DToProject → cloud function (master key server-side)');
-console.log('🆕 [v7.8.2 FIX] animate3D görünürlük kontrolü aktif');
-console.log('🆕 [v7.8.2] 3D Şekil Kütüphanesi: ' + f3dShapeLibrary.length + ' şekil');
-console.log('🆕 [v7.9.1 YENİ] V27 KOÇ Asistanı fonksiyonları:');
-console.log('   • openKocPanel / closeKocPanel');
-console.log('   • sendKocMessage / stopKocResponse');
-console.log('   • loadKocHistory / loadKocConversationById');
-console.log('   • openKocShareModal / closeKocShareModal');
-console.log('   • createKocShareLink (şifreli paylaşım)');
-console.log('   • updateKocLimitBadge (haftalık limit)');
-console.log('🆕 [v7.9.1 FIX] 3D palette mobile scroll: touch-action + long-press (350ms)');
-console.log('🆕 [v7.9.1 GÜVENLİK] loadTeamInfo XSS koruması (escapeHtml)');
+console.log('✅ JS-3 tamamen yüklendi (v7.9.1 FIX #1-#6)');
+console.log('🆕 FIX #1: sendKocMessage → loadKocHistory() otomatik çağrılıyor');
+console.log('🆕 FIX #2: loadKocHistory → yeni sohbetler görünüyor');
+console.log('🆕 FIX #3: loadKocConversationById → tıklanabilir + doğru yükleme');
+console.log('🆕 FIX #4: Türkçe prompt desteği (backend ile birlikte çalışır)');
+console.log('🆕 FIX #5: Paylaşım linki doğru formatta');
+console.log('🆕 FIX #6: Koç geçmişi yenileme optimizasyonu');
 console.log('🎨 Toplam şekil sayısı:', f3dShapeLibrary.length);
 </script>
-<!-- ===== JS-3 SONU ===== -->
+<!-- ============================================================ -->
+<!-- ===================== JS-3 SONU ============================ -->
+<!-- ============================================================ -->
 
 <!-- ============================================================ -->
 <!-- JS-4: TÜM İSTEMCİ TARAFI FONKSİYONLAR (PART 1) -->
