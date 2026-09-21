@@ -28032,13 +28032,14 @@ console.log('🇹🇷 VİZYON 2027 v7.9.0 — JS-5 AKTİF');
 <!-- ===== JS-5 SONU ===== -->
 
 <!-- ============================================================ -->
-<!-- JS-6: EKSİK FONKSİYONLAR FIX (v7.9.0)                       -->
+<!-- JS-6: EKSİK FONKSİYONLAR FIX (v7.9.1)                       -->
 <!-- loadInbox / loadComments / updateCommentUI / loadUserList   -->
 <!-- + tüm yardımcı fonksiyonlar (post, rating, ban, gift, role)  -->
 <!-- + [v7.9.0] Backend handleRequest / handleProjectRequest ile  -->
 <!--            tam uyumlu hale getirildi                        -->
 <!-- + [v7.9.0 GÜVENLİK] XSS koruması: escapeHtml her yerde      -->
-<!-- + [v7.9.0 FIX] loadComments → marquee için 2-4x kopya       -->
+<!-- + [v7.9.1 FIX] renderCommentsMarquee → her zaman 2 kopya    -->
+<!--            (önceden 3 veya 2 idi, şimdi sabit 2)             -->
 <!-- + [v7.9.0 FIX] loadInbox → getInboxItems yoksa Parse.Query   -->
 <!--            ile fallback yapar (kullanıcı direkt kendi        -->
 <!--            inbox kayıtlarını okur)                           -->
@@ -28047,6 +28048,7 @@ console.log('🇹🇷 VİZYON 2027 v7.9.0 — JS-5 AKTİF');
 <script>
 // ================================================================
 // JS-6: EKSİK FONKSİYONLAR (Console hatalarını çözer)
+// v7.9.1 GÜNCELLEME: renderCommentsMarquee dupCount sabit 2
 // ================================================================
 // ÇÖZÜLEN HATALAR:
 //   1. window.loadInbox is not a function (fallback ile çözüldü)
@@ -28056,7 +28058,7 @@ console.log('🇹🇷 VİZYON 2027 v7.9.0 — JS-5 AKTİF');
 //   5. window.postComment / setRating / filterComments
 //   6. window.assignAdminEmail / setUserRole / banUserEmail vb.
 //   7. window.handleRequest / acceptProjectRequest / vb.
-//   8. Yorum marquee SABİT kalıyordu → 2-4x kopya ile çözüldü
+//   8. Yorum marquee FAZLA KOPYA basıyordu → sabit 2 kopya oldu
 // ================================================================
 
 // ============================================================
@@ -28233,7 +28235,7 @@ window.updateCommentUI = function() {
 };
 
 // ============================================================
-// LOAD COMMENTS (v7.9.1 FIX — Dashboard statik + butonlu, Ana sayfa marquee)
+// LOAD COMMENTS (v7.9.1 — Dashboard statik + butonlu, Ana sayfa marquee)
 // ============================================================
 window.loadComments = async function() {
     try {
@@ -28342,12 +28344,13 @@ function renderCommentsMarquee(container, comments) {
         singleHtml += '<div class="comment-text">' + safeComment + '</div>';
         singleHtml += '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;">';
         singleHtml += '<span class="comment-email">' + safeEmail + '</span>';
-singleHtml += '<span class="comment-time">' + window.escapeHtml(time) + '</span>';
-singleHtml += '</div></div>';   // ← singleHtml olmalı
-});
+        singleHtml += '<span class="comment-time">' + window.escapeHtml(time) + '</span>';
+        singleHtml += '</div></div>';
+    });
 
-    // Sadece 2 kopya (seamless loop için yeterli)
-    var dupCount = comments.length < 3 ? 3 : 2;
+    // ✅ [v7.9.1 FIX] Her zaman 2 kopya (önceden 3 veya 2 idi)
+    // Seamless CSS loop (translateX -50%) için minimum 2 kopya yeterli.
+    var dupCount = 2;
     var finalHtml = '';
     for (var d = 0; d < dupCount; d++) finalHtml += singleHtml;
     container.innerHTML = finalHtml;
@@ -28456,7 +28459,7 @@ window.setRating = function(value) {
 // ============================================================
 // 6. FILTER COMMENTS
 // ============================================================
-// NOT: Marquee'de içerik 2-4x kopya olduğu için filter tüm
+// NOT: Marquee'de içerik 2 kopya olduğu için filter tüm
 // kopyalara uygulanır.
 // ============================================================
 window.filterComments = function(minRating) {
@@ -28803,19 +28806,20 @@ setInterval(function() {
 // ============================================================
 // SON LOG
 // ============================================================
-console.log('✅ JS-6 tamamen yüklendi (v7.9.0)');
+console.log('✅ JS-6 tamamen yüklendi (v7.9.1)');
 console.log('📌 Çözülen hatalar:');
 console.log('   1. window.loadInbox ✅ (cloud function + Parse.Query fallback)');
-console.log('   2. window.loadComments ✅ (marquee 2-4x kopya fix)');
+console.log('   2. window.loadComments ✅ (marquee sabit 2 kopya fix)');
 console.log('   3. window.updateCommentUI ✅');
 console.log('   4. window.loadUserList ✅');
 console.log('   5. window.postComment / setRating / filterComments ✅');
 console.log('   6. Admin yardımcıları (ban, unban, gift, role) ✅');
 console.log('   7. handleRequest / handleProjectRequest / project completion ✅');
 console.log('');
-console.log('🆕 [v7.9.0 FIX] YORUM MARQUEE: İçerik 2-4x kopyalanıyor');
-console.log('   → CSS translateX(-50%) döngüsü artık kesintisiz çalışır');
-console.log('   → Yorum sayısı <5 ise 4x, <10 ise 3x, >=10 ise 2x kopya');
+console.log('🆕 [v7.9.1 FIX] YORUM MARQUEE: dupCount SABİT 2');
+console.log('   → Önceki: comments.length < 3 ? 3 : 2');
+console.log('   → Şimdi:  var dupCount = 2;');
+console.log('   → Sebep: 6 yorum varken 12 kez görünüyordu, artık tam 2x');
 console.log('🆕 [v7.9.0 FIX] GELEN KUTUSU: getInboxItems yoksa');
 console.log('   → Parse.Query ile direkt Inbox sınıfından çekilir');
 console.log('🆕 [v7.9.0 GÜVENLİK] Tüm kullanıcı verileri escapeHtml ile kaçırıldı');
@@ -28823,10 +28827,9 @@ console.log('🆕 [v7.9.0 GÜVENLİK] onclick içindeki email escapeForOnclick i
 console.log('🆕 [v7.9.0 YENİ] Otomatik inbox yenileme (60sn) + badge güncelleme');
 console.log('');
 console.log('📌 NOT: Backend\'de getInboxItems cloud function tanımlı değilse');
-console.log('   fallback olarak Parse.Query ile okunuyor. main.js\'e');
-console.log('   getInboxItems cloud function\'ı eklendiğinde daha hızlı çalışır.');
+console.log('   fallback olarak Parse.Query ile okunuyor.');
 console.log('');
-console.log('🇹🇷 VİZYON 2027 v7.9.0 — JS-6 AKTİF');
+console.log('🇹🇷 VİZYON 2027 v7.9.1 — JS-6 AKTİF');
 </script>
 <!-- ===== JS-6 SONU ===== -->
 </body>
