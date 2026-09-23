@@ -772,7 +772,7 @@
 
     <script>
     // ================================================================
-    // VİZYON 2027 — PAYLAŞILAN SOHBET GÖRÜNTÜLEYİCİ v2.0
+    // VİZYON 2027 — PAYLAŞILAN SOHBET GÖRÜNTÜLEYİCİ v2.0 (v7.9.2)
     // ================================================================
     // ÖZELLİKLER:
     //   1. Şifresiz sohbetler (normal Conversation paylaşımı) → DİREKT AÇILIR
@@ -887,7 +887,7 @@
     // ---------- State Yönetimi ----------
     function showState(stateName) {
         var states = ['loadingState', 'errorState', 'passwordState', 'chatState'];
-        states.forEach(function(id) {
+        states.forEach(function (id) {
             var el = document.getElementById(id);
             if (el) {
                 el.classList.remove('active');
@@ -917,7 +917,7 @@
         var input = document.getElementById('passwordInput');
         if (input) {
             input.style.borderColor = 'rgba(255, 71, 87, 0.5)';
-            setTimeout(function() {
+            setTimeout(function () {
                 input.style.borderColor = '';
             }, 2000);
         }
@@ -932,7 +932,7 @@
     }
 
     // ---------- Şifre Göster/Gizle ----------
-    window.togglePasswordVisibility = function() {
+    window.togglePasswordVisibility = function () {
         var input = document.getElementById('passwordInput');
         var btn = document.getElementById('passwordToggle');
         if (!input || !btn) return;
@@ -1031,7 +1031,7 @@
                 // Şifre gerekli → şifre ekranını göster
                 window.__shareState.shareType = 'koc';
                 showState('passwordState');
-                setTimeout(function() {
+                setTimeout(function () {
                     var input = document.getElementById('passwordInput');
                     if (input) input.focus();
                 }, 300);
@@ -1050,11 +1050,10 @@
         }
 
         // ADIM 3: Hiçbiri olmadı → Şifre ekranı göster (belki normal sohbet şifreli)
-        // Veya bilinmeyen → hata
         if (isPasswordRequiredParam()) {
             window.__shareState.shareType = 'koc';
             showState('passwordState');
-            setTimeout(function() {
+            setTimeout(function () {
                 var input = document.getElementById('passwordInput');
                 if (input) input.focus();
             }, 300);
@@ -1179,7 +1178,7 @@
     }
 
     // ---------- Şifre Kontrol (kullanıcı butona bastığında) ----------
-    window.checkPassword = async function() {
+    window.checkPassword = async function () {
         var input = document.getElementById('passwordInput');
         var btn = document.getElementById('passwordBtn');
         if (!input || !btn) return;
@@ -1222,7 +1221,7 @@
     var blockCountdownTimer = null;
     function startBlockCountdown() {
         if (blockCountdownTimer) clearInterval(blockCountdownTimer);
-        blockCountdownTimer = setInterval(function() {
+        blockCountdownTimer = setInterval(function () {
             if (window.__shareState.blockedUntil <= Date.now()) {
                 window.__shareState.blockedUntil = 0;
                 window.__shareState.attempts = 0;
@@ -1312,7 +1311,7 @@
 
         // Mesajları render et
         var html = '';
-        messages.forEach(function(msg) {
+        messages.forEach(function (msg) {
             var isAI = !!(msg.isAI || msg.is_ai);
             var senderRaw = msg.name || msg.sender || '';
             var text = msg.text || msg.message || msg.content || '';
@@ -1352,7 +1351,7 @@
             if (text) {
                 var safeText = escapeHtml(text);
                 // ```code``` blokları
-                safeText = safeText.replace(/```([a-zA-Z0-9+#]*)\n?([\s\S]*?)```/g, function(match, lang, code) {
+                safeText = safeText.replace(/```([a-zA-Z0-9+#]*)\n?([\s\S]*?)```/g, function (match, lang, code) {
                     return '<code>' + code + '</code>';
                 });
                 // `inline code`
@@ -1403,7 +1402,7 @@
         showState('chatState');
 
         // En son mesaja kaydır
-        setTimeout(function() {
+        setTimeout(function () {
             if (container) {
                 container.scrollTop = container.scrollHeight;
             }
@@ -1427,7 +1426,7 @@
 
         // Normal paylaşım: AI olmayan mesajların en sık geçen adı
         var nameCounts = {};
-        messages.forEach(function(m) {
+        messages.forEach(function (m) {
             if (!m.isAI && !m.is_ai) {
                 var n = m.name || m.sender || m.from_email || '';
                 if (n) {
@@ -1449,12 +1448,12 @@
     }
 
     // ---------- Yardımcı: Linki Kopyala ----------
-    window.copyCurrentUrl = function() {
+    window.copyCurrentUrl = function () {
         var url = window.location.href;
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(url).then(function() {
+            navigator.clipboard.writeText(url).then(function () {
                 showToast('📋 Link kopyalandı!');
-            }).catch(function() {
+            }).catch(function () {
                 fallbackCopy(url);
             });
         } else {
@@ -1488,21 +1487,21 @@
             'box-shadow:0 8px 32px rgba(0,212,255,0.4);animation:fadeIn 0.3s ease;' +
             'font-family:Inter,sans-serif;';
         document.body.appendChild(t);
-        setTimeout(function() {
+        setTimeout(function () {
             t.style.opacity = '0';
             t.style.transition = 'opacity 0.4s ease';
-            setTimeout(function() { t.remove(); }, 400);
+            setTimeout(function () { t.remove(); }, 400);
         }, 2200);
     }
 
     // ---------- Yardımcı: Başa Dön ----------
-    window.scrollToTop = function() {
+    window.scrollToTop = function () {
         var container = document.getElementById('messagesContainer');
         if (container) container.scrollTop = 0;
     };
 
     // ---------- Klavye Kısayolları ----------
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
         // ESC → input'tan çık (chat açıksa)
         if (e.key === 'Escape') {
             if (window.__shareState.chatData) {
@@ -1525,7 +1524,7 @@
     });
 
     // ---------- Sayfa Kapatılırken Temizle ----------
-    window.addEventListener('beforeunload', function() {
+    window.addEventListener('beforeunload', function () {
         window.__shareState.password = null;
         window.__shareState.chatData = null;
     });
@@ -1538,7 +1537,7 @@
     }
 
     // ---------- Console Bilgilendirme ----------
-    console.log('🔒 VİZYON 2027 — Paylaşılan Sohbet Görüntüleyici v2.0');
+    console.log('🔒 VİZYON 2027 — Paylaşılan Sohbet Görüntüleyici v2.0 (v7.9.2)');
     console.log('   • Şifresiz sohbetler → DİREKT AÇILIR');
     console.log('   • Şifreli (V27 Koç) → Şifre ekranı çıkar');
     console.log('   • SAĞDA = Link sahibi (sohbet sahibi)');
