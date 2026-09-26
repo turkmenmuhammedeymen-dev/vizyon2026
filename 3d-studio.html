@@ -3,839 +3,2232 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#080b16">
-<title>3D Studio | VİZYON 2027</title>
-<meta name="description" content="VİZYON 2027 3D Studio: Üç boyutlu tasarımı keşfet, öğren, örnek projeler oluştur ve çalışmalarını kaydet.">
+<meta name="theme-color" content="#03050a">
+<title>🧊 3D Stüdyo | VİZYON 2027</title>
+<meta name="description" content="VİZYON 2027 3D Stüdyo: 21 yapay zeka modeliyle entegre üç boyutlu tasarım alanı. Şekilleri ekle, renklendir, döndür, .glb indir ve Back4App'e kaydet.">
 <meta name="robots" content="index,follow">
 
-<!-- Three.js ve Back4App Parse SDK -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-<script src="https://npmcdn.com/parse@4.3.0/dist/parse.min.js"></script>
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="https://vizyon2026.vercel.app/logo.png" />
+<link rel="apple-touch-icon" href="https://vizyon2026.vercel.app/logo.png" />
+
+<!-- Harici Kütüphaneler -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/parse/5.0.0/parse.min.js"></script>
 
 <style>
-:root{
-  --bg:#080b16;
-  --panel:#101629;
-  --panel2:#151d33;
-  --text:#f4f6ff;
-  --muted:#a5aec7;
-  --line:rgba(255,255,255,.10);
-  --purple:#8b7bff;
-  --cyan:#57e5ff;
-  --green:#62e6b2;
-  --red:#ff7185;
-  --radius:22px;
+/* ============================================================ */
+/* ROOT DEĞİŞKENLER — EFSANE PALET (v7.10.0)                    */
+/* ============================================================ */
+:root {
+    --bg: #03050a;
+    --bg2: #060a14;
+    --bg3: #0a1020;
+    --surface: #0a1020;
+    --surface2: #0e1630;
+    --surface3: #141e40;
+    --border: #1a2a4a;
+    --border2: #24365e;
+
+    --accent: #00e5ff;
+    --accent-hover: #4df0ff;
+    --accent2: #00ff9d;
+    --accent3: #ff5e1a;
+    --accent4: #ff2d92;
+    --gold: #ffd11a;
+    --purple: #b845ff;
+    --pink: #ff2d92;
+
+    --text: #ffffff;
+    --text2: #d4e5ff;
+    --text3: #8aa8d4;
+    --text4: #5a7aa8;
+
+    --danger: #ff4757;
+    --success: #00ff9d;
+    --warning: #ffb700;
+
+    --font-display: 'Syne', sans-serif;
+    --font-code: 'Fira Code', monospace;
+    --font-body: 'Inter', sans-serif;
+
+    --radius: 22px;
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.25s ease;
+    --transition-slow: 0.4s ease;
 }
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-  margin:0;background:
-  radial-gradient(ellipse at 10% 0%,rgba(105,81,255,.15),transparent 36%),
-  radial-gradient(ellipse at 95% 20%,rgba(41,197,255,.09),transparent 30%),
-  var(--bg);
-  color:var(--text);
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  line-height:1.65;
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.7;
 }
-a{color:inherit;text-decoration:none}
-button,input,select{font:inherit}
-button{cursor:pointer}
-button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{
-  outline:2px solid var(--cyan);outline-offset:3px
+
+a { color: inherit; text-decoration: none; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
 }
-.container{width:min(1180px,calc(100% - 36px));margin:auto}
-.topbar{
-  position:sticky;top:0;z-index:20;
-  background:rgba(8,11,22,.86);backdrop-filter:blur(18px);
-  border-bottom:1px solid var(--line)
+
+/* ============================================================ */
+/* AURORA / NEBULA ARKA PLAN                                     */
+/* ============================================================ */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse 80% 50% at 20% 0%, rgba(0, 229, 255, 0.12) 0%, transparent 55%),
+        radial-gradient(ellipse 70% 50% at 80% 10%, rgba(184, 69, 255, 0.10) 0%, transparent 55%),
+        radial-gradient(ellipse 90% 60% at 50% 100%, rgba(255, 45, 146, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 10% 60%, rgba(0, 255, 157, 0.06) 0%, transparent 60%);
+    animation: auroraShift 24s ease-in-out infinite alternate;
 }
-.nav{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:72px}
-.brand{display:flex;align-items:center;gap:11px;font-weight:900;letter-spacing:.5px}
-.logo{
-  display:grid;place-items:center;width:42px;height:42px;border-radius:14px;
-  background:linear-gradient(135deg,var(--purple),#4cdbf5);color:#080b16;font-size:20px
+
+@keyframes auroraShift {
+    0%   { opacity: 0.75; transform: scale(1) rotate(0deg); }
+    50%  { opacity: 1;    transform: scale(1.06) rotate(2deg); }
+    100% { opacity: 0.85; transform: scale(1) rotate(0deg); }
 }
-.navlinks{display:flex;align-items:center;gap:19px;color:var(--muted);font-size:13px}
-.navlinks a:hover{color:white}
-.lang{
-  color:white;background:var(--panel2);border:1px solid var(--line);
-  padding:9px 12px;border-radius:12px
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(0, 229, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 229, 255, 0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 85%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 85%);
+    opacity: 0.6;
+    animation: gridPulse 12s ease-in-out infinite;
 }
-.hero{padding:86px 0 55px}
-.eyebrow{
-  display:inline-flex;align-items:center;gap:8px;padding:7px 12px;
-  border:1px solid rgba(139,123,255,.35);border-radius:100px;
-  color:#c7c0ff;background:rgba(139,123,255,.09);font-size:12px;font-weight:800
+
+@keyframes gridPulse {
+    0%, 100% { opacity: 0.4; }
+    50%      { opacity: 0.75; }
 }
-.hero h1{font-size:clamp(42px,7vw,78px);line-height:1.06;letter-spacing:-2.8px;margin:22px 0}
-.gradient{
-  background:linear-gradient(100deg,#a99cff,#65e8ff 60%,#6cf0c0);
-  -webkit-background-clip:text;background-clip:text;color:transparent
+
+/* ============================================================ */
+/* PARÇACIK SİSTEMİ                                              */
+/* ============================================================ */
+#particles {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
 }
-.hero p{max-width:760px;color:var(--muted);font-size:18px}
-.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
-.btn{
-  border:1px solid var(--line);background:var(--panel2);color:white;
-  border-radius:13px;padding:12px 18px;font-weight:800;transition:.2s
+
+.particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: float-up linear infinite;
+    opacity: 0;
+    box-shadow: 0 0 6px var(--accent);
 }
-.btn:hover{transform:translateY(-2px);border-color:rgba(139,123,255,.7)}
-.btn.primary{background:linear-gradient(110deg,#8b7bff,#5bc9ef);color:#080b16;border:0}
-.btn.small{padding:8px 11px;font-size:13px}
-.section{padding:54px 0}
-.section-head{max-width:780px;margin-bottom:28px}
-.kicker{color:var(--cyan);font-size:12px;font-weight:900;letter-spacing:2px;text-transform:uppercase}
-h2{font-size:clamp(28px,4vw,43px);line-height:1.15;letter-spacing:-1px;margin:9px 0 13px}
-h3{margin:0 0 10px;font-size:19px}
-p{margin:0 0 12px}
-.muted{color:var(--muted)}
-.grid{display:grid;gap:16px}
-.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
-.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
-.grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}
-.card{
-  padding:23px;border:1px solid var(--line);border-radius:var(--radius);
-  background:linear-gradient(145deg,rgba(21,29,51,.95),rgba(12,17,31,.96));
-  min-width:0
+
+.particle:nth-child(2n) { background: var(--accent2); width: 3px; height: 3px; box-shadow: 0 0 8px var(--accent2); }
+.particle:nth-child(3n) { background: var(--purple); box-shadow: 0 0 8px var(--purple); }
+.particle:nth-child(5n) { background: var(--pink); box-shadow: 0 0 10px var(--pink); }
+.particle:nth-child(7n) { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+
+@keyframes float-up {
+    0%   { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10%  { opacity: 0.9; }
+    50%  { opacity: 0.7; }
+    90%  { opacity: 0.35; }
+    100% { transform: translateY(-150px) translateX(30px); opacity: 0; }
 }
-.card p{color:var(--muted);font-size:14px}
-.iconbox{
-  width:45px;height:45px;display:grid;place-items:center;border-radius:14px;
-  background:rgba(139,123,255,.13);font-size:22px;margin-bottom:16px
+
+/* ============================================================ */
+/* CONTAINER                                                     */
+/* ============================================================ */
+.container {
+    width: min(1200px, calc(100% - 36px));
+    margin: auto;
+    position: relative;
+    z-index: 2;
 }
-.tag{
-  display:inline-block;padding:4px 9px;border-radius:8px;
-  background:rgba(87,229,255,.08);color:var(--cyan);font-size:11px;font-weight:800
+
+/* ============================================================ */
+/* TOPBAR / NAVBAR                                              */
+/* ============================================================ */
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(3, 5, 10, 0.78);
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    border-bottom: 1px solid rgba(0, 229, 255, 0.15);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
 }
-.callout{border:1px solid rgba(87,229,255,.22);background:rgba(87,229,255,.05);padding:17px 20px;border-radius:16px;color:#d6f8ff}
-.steps{counter-reset:step}
-.step{position:relative;padding:21px 21px 21px 72px}
-.step:before{
-  counter-increment:step;content:counter(step);
-  position:absolute;left:21px;top:22px;width:34px;height:34px;
-  display:grid;place-items:center;border-radius:11px;
-  color:#080b16;background:linear-gradient(135deg,var(--purple),var(--cyan));font-weight:900
+
+.topbar::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--purple), var(--pink), transparent);
+    opacity: 0.7;
+    animation: headerGlow 4s ease-in-out infinite alternate;
 }
-.demo{
-  display:grid;grid-template-columns:minmax(0,1.6fr) minmax(250px,.8fr);
-  gap:16px;align-items:stretch
+
+@keyframes headerGlow {
+    0%   { opacity: 0.4; }
+    100% { opacity: 0.9; }
 }
-.viewport{
-  position:relative;min-height:390px;overflow:hidden;border-radius:20px;
-  border:1px solid var(--line);background:#080d1c
+
+.nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 76px;
 }
-#stage{position:absolute;inset:0;width:100%;height:100%;display:block}
-.viewport-label{
-  position:absolute;left:15px;top:14px;pointer-events:none;
-  padding:6px 10px;border:1px solid var(--line);border-radius:9px;
-  background:rgba(8,11,22,.7);font-size:11px;color:#cbd5ee
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    text-decoration: none;
 }
-.controls{display:flex;flex-direction:column;gap:12px}
-.controlbox{padding:17px;border:1px solid var(--line);border-radius:16px;background:var(--panel)}
-.controlbox label{display:block;font-size:12px;color:var(--muted);margin-bottom:7px}
-.controlbox select,.controlbox input[type="text"],.controlbox input[type="range"]{
-  width:100%
+
+.logo-svg {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.6));
 }
-.controlbox select,.controlbox input[type="text"]{
-  color:white;background:#0b1020;border:1px solid var(--line);
-  padding:10px;border-radius:10px
+
+.logo-text {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 800;
+    background: linear-gradient(45deg, #00e5ff, #00ff9d, #b845ff, #ff2d92, #ffd11a, #00e5ff);
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradientMove 6s ease infinite;
+    letter-spacing: 1px;
 }
-.controlrow{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.colorinput{width:100%;height:42px;background:transparent;border:0}
-.status{font-size:12px;color:var(--muted);min-height:20px;overflow-wrap:anywhere}
-.project-card{display:flex;flex-direction:column;gap:12px}
-.project-card .btn{align-self:flex-start}
-.faq details{border-bottom:1px solid var(--line);padding:17px 0}
-.faq summary{cursor:pointer;font-weight:800}
-.faq details p{margin-top:12px;color:var(--muted)}
-.footer{padding:35px 0 50px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
-.footer-inner{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
-.notice{font-size:12px;color:var(--muted);margin-top:12px}
-[dir="rtl"]{text-align:right}
-[dir="rtl"] .step{padding:21px 72px 21px 21px}
-[dir="rtl"] .step:before{left:auto;right:21px}
-[dir="rtl"] .viewport-label{left:auto;right:15px}
-[dir="rtl"] .project-card .btn{align-self:flex-start}
-@media(max-width:900px){
- .navlinks{display:none}
- .grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}
- .grid.three{grid-template-columns:repeat(2,minmax(0,1fr))}
- .demo{grid-template-columns:1fr}
- .viewport{min-height:330px}
+
+@keyframes gradientMove {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
 }
-@media(max-width:600px){
- .container{width:min(100% - 24px,1180px)}
- .hero{padding:58px 0 35px}
- .hero p{font-size:16px}
- .grid.two,.grid.three,.grid.four{grid-template-columns:1fr}
- .card{padding:19px}
- .section{padding:38px 0}
- .nav{min-height:62px}
- .brand{font-size:13px}
- .logo{width:36px;height:36px}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: var(--text3);
+    font-size: 13px;
+    font-weight: 600;
 }
-@media(prefers-reduced-motion:reduce){
- *,*::before,*::after{scroll-behavior:auto!important;transition:none!important}
+
+.nav-links a {
+    transition: color 0.2s;
+    position: relative;
+    padding: 4px 0;
+}
+
+.nav-links a:hover { color: var(--accent); }
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    right: 50%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--purple));
+    transition: left 0.3s, right 0.3s;
+    border-radius: 2px;
+    box-shadow: 0 0 10px var(--accent);
+}
+
+.nav-links a:hover::after {
+    left: 0;
+    right: 0;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.lang {
+    color: var(--text2);
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.06), rgba(184, 69, 255, 0.03));
+    border: 1.5px solid var(--border2);
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all var(--transition-fast);
+}
+
+.lang:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+}
+
+.lang option { background: var(--bg); color: var(--text); }
+
+.nav-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    background: transparent;
+    border: 1.5px solid rgba(0, 229, 255, 0.4);
+    color: var(--accent);
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+
+.nav-back-btn:hover {
+    background: rgba(0, 229, 255, 0.12);
+    border-color: var(--accent);
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+/* ============================================================ */
+/* DİL İÇERİK GÖSTERME                                          */
+/* ============================================================ */
+.lang-content { display: none; }
+.lang-content.active { display: block; animation: fadeIn 0.4s ease; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================ */
+/* HERO                                                          */
+/* ============================================================ */
+.hero {
+    padding: 86px 0 55px;
+    position: relative;
+    z-index: 2;
+}
+
+.eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px solid rgba(184, 69, 255, 0.4);
+    border-radius: 100px;
+    color: var(--purple);
+    background: rgba(184, 69, 255, 0.08);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    box-shadow: 0 0 20px rgba(184, 69, 255, 0.2);
+}
+
+.hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(42px, 7vw, 78px);
+    line-height: 1.05;
+    letter-spacing: -2.8px;
+    margin: 22px 0;
+    font-weight: 800;
+}
+
+.gradient {
+    background: linear-gradient(100deg, #00e5ff, #b845ff 40%, #ff2d92 70%, #ffd11a);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradientMove 5s ease infinite;
+}
+
+.hero p {
+    max-width: 760px;
+    color: var(--text2);
+    font-size: 17px;
+    line-height: 1.8;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1.5px solid var(--border2);
+    background: linear-gradient(135deg, rgba(10, 16, 32, 0.9), rgba(6, 10, 20, 0.95));
+    color: var(--text);
+    border-radius: 14px;
+    padding: 13px 22px;
+    font-weight: 700;
+    font-size: 13.5px;
+    transition: all 0.25s ease;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+    pointer-events: none;
+}
+
+.btn:active::before {
+    width: 300px;
+    height: 300px;
+    transition: width 0.3s, height 0.3s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    border-color: rgba(0, 229, 255, 0.7);
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.35);
+}
+
+.btn.primary {
+    background: linear-gradient(135deg, #00e5ff, #b845ff, #ff2d92);
+    background-size: 200% 200%;
+    color: #fff;
+    border: none;
+    animation: btnGradientShift 4s ease infinite;
+    box-shadow: 0 0 30px rgba(0, 229, 255, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.1);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes btnGradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+}
+
+.btn.primary:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 0 50px rgba(0, 229, 255, 0.9), 0 0 80px rgba(184, 69, 255, 0.5);
+}
+
+.btn.small { padding: 9px 14px; font-size: 12.5px; }
+
+/* ============================================================ */
+/* SECTION                                                       */
+/* ============================================================ */
+.section {
+    padding: 60px 0;
+    position: relative;
+    z-index: 2;
+}
+
+.section-head {
+    max-width: 780px;
+    margin-bottom: 32px;
+}
+
+.kicker {
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-family: var(--font-code);
+    text-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+}
+
+h2 {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.15;
+    letter-spacing: -1px;
+    margin: 10px 0 14px;
+    font-weight: 800;
+}
+
+h3 { margin: 0 0 10px; font-size: 19px; font-weight: 700; }
+p { margin: 0 0 12px; }
+.muted { color: var(--text2); }
+
+.grid { display: grid; gap: 18px; }
+.grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.card {
+    padding: 24px;
+    border: 1.5px solid var(--border2);
+    border-radius: var(--radius);
+    background: linear-gradient(145deg, rgba(10, 16, 32, 0.85), rgba(6, 10, 20, 0.9));
+    min-width: 0;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0, 229, 255, 0.08) 0%, transparent 40%);
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none;
+}
+
+.card:hover::before { opacity: 1; }
+
+.card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 229, 255, 0.15);
+}
+
+.card p { color: var(--text2); font-size: 13.5px; line-height: 1.7; }
+
+.iconbox {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.12), rgba(184, 69, 255, 0.08));
+    border: 1.5px solid rgba(0, 229, 255, 0.2);
+    font-size: 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
+    transition: all 0.3s ease;
+}
+
+.card:hover .iconbox {
+    transform: scale(1.08) rotate(-3deg);
+    border-color: var(--accent);
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.5);
+}
+
+.tag {
+    display: inline-block;
+    padding: 5px 11px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.10), rgba(184, 69, 255, 0.05));
+    border: 1px solid rgba(0, 229, 255, 0.25);
+    color: var(--accent);
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.15);
+}
+
+.callout {
+    border: 1.5px solid rgba(0, 255, 157, 0.25);
+    background: linear-gradient(135deg, rgba(0, 255, 157, 0.08), rgba(0, 229, 255, 0.04));
+    padding: 18px 22px;
+    border-radius: 16px;
+    color: #c8ffe4;
+    box-shadow: 0 0 25px rgba(0, 255, 157, 0.1);
+}
+
+.callout strong { color: var(--accent2); }
+
+/* ============================================================ */
+/* STEPS                                                         */
+/* ============================================================ */
+.steps { counter-reset: step; }
+.step { position: relative; padding: 22px 22px 22px 76px; }
+.step::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: 22px;
+    top: 24px;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    color: #03050a;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    font-weight: 900;
+    font-size: 15px;
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+}
+
+/* ============================================================ */
+/* DEMO — 3D VIEWPORT                                            */
+/* ============================================================ */
+.demo {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.85fr);
+    gap: 18px;
+    align-items: stretch;
+}
+
+.viewport {
+    position: relative;
+    min-height: 480px;
+    overflow: hidden;
+    border-radius: 22px;
+    border: 1.5px solid rgba(0, 229, 255, 0.2);
+    background: #050a15;
+    box-shadow: 0 0 40px rgba(0, 229, 255, 0.1), inset 0 0 60px rgba(0, 229, 255, 0.03);
+}
+
+.viewport::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--purple), var(--pink), transparent);
+    animation: headerGlow 3s ease-in-out infinite alternate;
+    z-index: 3;
+}
+
+#stage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: grab;
+}
+
+#stage:active { cursor: grabbing; }
+
+.viewport-label {
+    position: absolute;
+    left: 15px;
+    top: 14px;
+    pointer-events: none;
+    padding: 7px 12px;
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    border-radius: 10px;
+    background: rgba(3, 5, 10, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    font-size: 11px;
+    color: var(--accent);
+    font-family: var(--font-code);
+    letter-spacing: 1px;
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.25);
+    z-index: 2;
+}
+
+.viewport-hint {
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: rgba(3, 5, 10, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    font-size: 10.5px;
+    color: var(--text3);
+    letter-spacing: 0.3px;
+    z-index: 2;
+    white-space: nowrap;
+    max-width: 90%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ============================================================ */
+/* CONTROLS                                                      */
+/* ============================================================ */
+.controls { display: flex; flex-direction: column; gap: 14px; }
+
+.controlbox {
+    padding: 18px;
+    border: 1.5px solid var(--border2);
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(10, 16, 32, 0.9), rgba(6, 10, 20, 0.95));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.controlbox label {
+    display: block;
+    font-size: 11.5px;
+    color: var(--text3);
+    margin-bottom: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.controlbox select,
+.controlbox input[type="text"] {
+    width: 100%;
+    color: var(--text);
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.04), rgba(184, 69, 255, 0.02));
+    border: 1.5px solid var(--border2);
+    padding: 11px 14px;
+    border-radius: 12px;
+    transition: all 0.2s;
+}
+
+.controlbox select:focus,
+.controlbox input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.35);
+}
+
+.controlbox select option {
+    background: var(--bg);
+    color: var(--text);
+}
+
+.controlbox input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.controlrow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.colorinput {
+    width: 100%;
+    height: 44px;
+    background: transparent;
+    border: 1.5px solid var(--border2);
+    border-radius: 12px;
+    cursor: pointer;
+    padding: 3px;
+}
+
+.status {
+    font-size: 11.5px;
+    color: var(--accent2);
+    min-height: 20px;
+    overflow-wrap: anywhere;
+    margin-top: 8px;
+    font-family: var(--font-code);
+    letter-spacing: 0.3px;
+}
+
+.project-card { display: flex; flex-direction: column; gap: 12px; }
+.project-card .btn { align-self: flex-start; }
+
+/* ============================================================ */
+/* FAQ                                                           */
+/* ============================================================ */
+.faq details {
+    border-bottom: 1px solid var(--border2);
+    padding: 18px 0;
+    transition: all 0.2s;
+}
+
+.faq details[open] {
+    padding-bottom: 22px;
+}
+
+.faq summary {
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text);
+    list-style: none;
+    position: relative;
+    padding-right: 30px;
+    transition: color 0.2s;
+}
+
+.faq summary::-webkit-details-marker { display: none; }
+
+.faq summary::before {
+    content: '+';
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent);
+    font-size: 20px;
+    font-weight: 700;
+    transition: transform 0.3s, color 0.3s;
+    line-height: 1;
+}
+
+.faq details[open] summary::before {
+    content: '−';
+    color: var(--purple);
+}
+
+.faq summary:hover { color: var(--accent); }
+
+.faq details p {
+    margin-top: 14px;
+    color: var(--text2);
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+/* ============================================================ */
+/* FOOTER                                                        */
+/* ============================================================ */
+.footer {
+    padding: 44px 0 50px;
+    border-top: 1px solid rgba(0, 229, 255, 0.12);
+    color: var(--text3);
+    font-size: 13px;
+    position: relative;
+    z-index: 2;
+    margin-top: 60px;
+}
+
+.footer::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--purple), var(--pink), transparent);
+    opacity: 0.7;
+    box-shadow: 0 0 25px var(--accent);
+}
+
+.footer-inner {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.footer-col strong {
+    color: var(--text);
+    font-size: 13px;
+    margin-bottom: 6px;
+    font-family: var(--font-display);
+}
+
+.footer-col a {
+    color: var(--text3);
+    transition: color 0.2s;
+}
+
+.footer-col a:hover { color: var(--accent); }
+
+.footer-copy {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(0, 229, 255, 0.08);
+    font-size: 12px;
+    color: var(--text4);
+}
+
+.footer-copy span {
+    background: linear-gradient(135deg, #00e5ff, #b845ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 700;
+}
+
+.notice { font-size: 12px; color: var(--text4); margin-top: 12px; line-height: 1.65; }
+
+/* ============================================================ */
+/* RESPONSIVE                                                    */
+/* ============================================================ */
+@media (max-width: 1000px) {
+    .nav-links { display: none; }
+    .grid.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .demo { grid-template-columns: 1fr; }
+    .viewport { min-height: 420px; }
+}
+
+@media (max-width: 768px) {
+    .container { width: calc(100% - 28px); }
+    .nav { min-height: 68px; gap: 10px; }
+    .logo-svg { width: 42px; height: 42px; }
+    .logo-text { font-size: 18px; }
+    .nav-back-btn { padding: 7px 12px; font-size: 11px; }
+    .nav-back-btn span.full-text { display: none; }
+    .lang { font-size: 11px; padding: 6px 10px; }
+    .hero { padding: 60px 0 40px; }
+    .hero h1 { letter-spacing: -1.5px; }
+    .hero p { font-size: 15px; }
+    .grid.two, .grid.three, .grid.four { grid-template-columns: 1fr; }
+    .card { padding: 20px; }
+    .section { padding: 45px 0; }
+    .step { padding: 20px 20px 20px 68px; }
+    .step::before { left: 20px; top: 22px; width: 32px; height: 32px; font-size: 14px; }
+    .viewport { min-height: 360px; }
+    .footer-inner { flex-direction: column; gap: 20px; }
+    .faq summary { font-size: 14px; }
+}
+
+@media (max-width: 480px) {
+    .container { width: calc(100% - 20px); }
+    .nav { min-height: 62px; gap: 6px; }
+    .logo-svg { width: 36px; height: 36px; }
+    .logo-text { font-size: 15px; letter-spacing: 0.5px; }
+    .lang { font-size: 10px; padding: 5px 8px; }
+    .nav-back-btn { font-size: 10px; padding: 6px 10px; }
+    .hero { padding: 50px 0 32px; }
+    .eyebrow { font-size: 10.5px; padding: 6px 11px; }
+    .hero h1 { letter-spacing: -1px; }
+    .hero p { font-size: 13.5px; }
+    .btn { padding: 11px 16px; font-size: 12.5px; }
+    .card { padding: 18px; border-radius: 18px; }
+    .iconbox { width: 42px; height: 42px; font-size: 20px; }
+    .section { padding: 36px 0; }
+    .viewport { min-height: 300px; }
+    .viewport-label { font-size: 10px; padding: 6px 9px; }
+    .viewport-hint { font-size: 9.5px; }
+    .controlbox { padding: 14px; border-radius: 14px; }
+    .status { font-size: 11px; }
+    .footer { padding: 34px 0 40px; }
+}
+
+/* ============================================================ */
+/* RTL DESTEĞİ                                                   */
+/* ============================================================ */
+[dir="rtl"] { text-align: right; }
+[dir="rtl"] .step { padding: 22px 76px 22px 22px; }
+[dir="rtl"] .step::before { left: auto; right: 22px; }
+[dir="rtl"] .viewport-label { left: auto; right: 15px; }
+[dir="rtl"] .faq summary { padding-right: 0; padding-left: 30px; }
+[dir="rtl"] .faq summary::before { right: auto; left: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    body::before, body::after, .particle { animation: none !important; }
 }
 </style>
 </head>
 
 <body>
+
+<!-- PARÇACIKLAR -->
+<div id="particles"></div>
+
+<!-- NAVBAR -->
 <header class="topbar">
-  <div class="container nav">
-    <a class="brand" href="index.html" aria-label="VİZYON 2027 ana sayfa">
-      <span class="logo">V</span>
-      <span>VİZYON <span class="gradient">2027</span></span>
-    </a>
-    <nav class="navlinks" aria-label="Ana gezinme">
-      <a href="#about" data-i18n="navAbout">3D Studio nedir?</a>
-      <a href="#features" data-i18n="navFeatures">Özellikler</a>
-      <a href="#learn" data-i18n="navLearn">Nasıl kullanılır?</a>
-      <a href="#demo" data-i18n="navDemo">Deneyimle</a>
-    </nav>
-    <select class="lang" id="language" aria-label="Language">
-      <option value="tr">🇹🇷 Türkçe</option>
-      <option value="en">🇬🇧 English</option>
-      <option value="ar">🇸🇦 العربية</option>
-    </select>
-  </div>
+    <div class="container nav">
+        <a href="https://vizyon2026.vercel.app/" class="brand" aria-label="VİZYON 2027 ana sayfa">
+            <svg class="logo-svg" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="vz3dG1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#00e5ff"/>
+                        <stop offset="50%" stop-color="#b845ff"/>
+                        <stop offset="100%" stop-color="#ff2d92"/>
+                    </linearGradient>
+                    <linearGradient id="vz3dG2" x1="0%" y1="100%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#00ff9d"/>
+                        <stop offset="100%" stop-color="#00e5ff"/>
+                    </linearGradient>
+                    <radialGradient id="vz3dGlow">
+                        <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.7"/>
+                        <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+                    </radialGradient>
+                </defs>
+                <circle cx="30" cy="30" r="28" fill="url(#vz3dGlow)"/>
+                <circle cx="30" cy="30" r="25" fill="none" stroke="url(#vz3dG1)" stroke-width="2.5" opacity="0.95"/>
+                <circle cx="30" cy="30" r="21" fill="none" stroke="url(#vz3dG1)" stroke-width="0.8" opacity="0.45" stroke-dasharray="3 3"/>
+                <circle cx="30" cy="30" r="20" fill="rgba(10,16,32,0.78)"/>
+                <path d="M 33 15 A 15 15 0 1 0 33 45 A 12 12 0 1 1 33 15 Z" fill="url(#vz3dG2)" opacity="0.95"/>
+                <polygon points="42,18 43.5,23 48.5,23 44.5,26 46,31 42,28 38,31 39.5,26 35.5,23 40.5,23" fill="#ffd11a"/>
+                <circle cx="12" cy="30" r="1.8" fill="#00e5ff"/>
+                <circle cx="48" cy="30" r="1.8" fill="#00e5ff"/>
+                <circle cx="30" cy="12" r="1.8" fill="#00ff9d"/>
+                <circle cx="30" cy="48" r="1.8" fill="#ff2d92"/>
+            </svg>
+            <span class="logo-text">VİZYON 2027</span>
+        </a>
+
+        <nav class="nav-links" aria-label="Ana gezinme">
+            <a href="#about" data-i18n="navAbout">3D Stüdyo Nedir?</a>
+            <a href="#features" data-i18n="navFeatures">Özellikler</a>
+            <a href="#learn" data-i18n="navLearn">Nasıl Kullanılır?</a>
+            <a href="#examples" data-i18n="navExamples">Örnekler</a>
+            <a href="#demo" data-i18n="navDemo">Deneyimle</a>
+            <a href="#faq" data-i18n="navFaq">SSS</a>
+        </nav>
+
+        <div class="nav-actions">
+            <select class="lang" id="language" aria-label="Dil / Language">
+                <option value="tr">🇹🇷 TR</option>
+                <option value="en">🇬🇧 EN</option>
+                <option value="ar">🇸🇦 AR</option>
+            </select>
+            <a href="https://vizyon2026.vercel.app/" class="nav-back-btn">
+                <i class="fas fa-arrow-left"></i> <span class="full-text">Ana Sayfa</span>
+            </a>
+        </div>
+    </div>
 </header>
 
 <main>
+
+<!-- ============ TÜRKÇE ============ -->
+<div id="lang-tr" class="lang-content active">
+
 <section class="hero">
- <div class="container">
-  <span class="eyebrow" data-i18n="eyebrow">✦ VİZYON 2027 • 3D TASARIM ALANI</span>
-  <h1 data-i18n="heroTitle">Hayal et.<br><span class="gradient">Üç boyutta tasarla.</span></h1>
-  <p data-i18n="heroText">3D Studio, üç boyutlu düşünmeyi keşfedebileceğin, geometrik nesnelerle sahneler kurabileceğin ve tasarım fikirlerini adım adım geliştirebileceğin bir çalışma alanıdır.</p>
-  <div class="actions">
-   <a class="btn primary" href="#demo" data-i18n="heroCta">3D alanını dene ↘</a>
-   <a class="btn" href="#learn" data-i18n="heroSecondary">Kullanım rehberini keşfet</a>
-  </div>
-  <p class="notice" data-i18n="heroNote">Bu sayfa tanıtım, öğrenme ve örnek çalışma alanlarını bir araya getirir. Kullanılabilir özellikler aşağıda açıklanmıştır.</p>
- </div>
+    <div class="container">
+        <span class="eyebrow">✦ VİZYON 2027 • 3D TASARIM ALANI • 21 AI MODELİ ENTEGRE</span>
+        <h1>Hayal et.<br><span class="gradient">Üç boyutta tasarla.</span></h1>
+        <p>3D Stüdyo; üç boyutlu düşünmeyi keşfedebileceğin, 21 yapay zeka modeliyle entegre çalışan, geometrik nesnelerle sahneler kurabileceğin ve tasarım fikirlerini adım adım geliştirebileceğin bir çalışma alanıdır. 13 farklı şekil kütüphanesi, gerçek zamanlı düzenleme ve Back4App bulut kayıt desteği ile.</p>
+        <div class="actions">
+            <a class="btn primary" href="#demo"><i class="fas fa-cube"></i> 3D Sahneyi Dene</a>
+            <a class="btn" href="https://vizyon2026.vercel.app/vizyon-al.html"><i class="fas fa-wand-magic-sparkles"></i> Vizyon Al ile Kod Üret</a>
+            <a class="btn" href="#learn"><i class="fas fa-book"></i> Rehberi Keşfet</a>
+        </div>
+        <p class="notice">Bu sayfa; tanıtım, öğrenme ve örnek çalışma alanlarını bir araya getirir. Sahne verileri Back4App Cloud Code üzerindeki <code>saveProjectWithSceneData</code> fonksiyonuna kaydedilir.</p>
+    </div>
 </section>
 
 <section class="section" id="about">
- <div class="container">
-  <div class="section-head">
-   <div class="kicker" data-i18n="aboutKicker">MODÜLÜ TANI</div>
-   <h2 data-i18n="aboutTitle">3D Studio nedir?</h2>
-   <p class="muted" data-i18n="aboutText">3D Studio, iki boyutlu ekrandaki nesneleri üç boyutlu bir sahnede düşünmeni sağlayan tasarım modülüdür. Nesnelerin konumunu, boyutunu, rengini ve birbirleriyle ilişkisini gözlemleyerek tasarım mantığını öğrenebilirsin.</p>
-  </div>
-  <div class="grid three">
-   <article class="card"><div class="iconbox">🧊</div><h3 data-i18n="about1Title">Geometriyi keşfet</h3><p data-i18n="about1Text">Küp, küre ve silindir gibi temel şekillerle başlayıp nesnelerin hacimsel görünümünü incele.</p></article>
-   <article class="card"><div class="iconbox">🎨</div><h3 data-i18n="about2Title">Fikirlerini görselleştir</h3><p data-i18n="about2Text">Renkleri, ölçekleri ve yerleşimleri değiştirerek kendi sahne fikirlerini geliştir.</p></article>
-   <article class="card"><div class="iconbox">🚀</div><h3 data-i18n="about3Title">Üreterek öğren</h3><p data-i18n="about3Text">Küçük görevler ve örnek projelerle 3D tasarım kavramlarını uygulayarak öğren.</p></article>
-  </div>
- </div>
+    <div class="container">
+        <div class="section-head">
+            <div class="kicker">MODÜLÜ TANI</div>
+            <h2>3D Stüdyo nedir?</h2>
+            <p class="muted">3D Stüdyo, iki boyutlu ekrandaki nesneleri üç boyutlu bir sahnede düşünmeni sağlayan tasarım modülüdür. Nesnelerin konumunu, boyutunu, rengini ve birbirleriyle ilişkisini gözlemleyerek tasarım mantığını öğrenebilirsin. 21 yapay zeka modeliyle entegre çalışır — kod üretmek istediğinde Vizyon Al paneline geçebilirsin.</p>
+        </div>
+        <div class="grid three">
+            <article class="card"><div class="iconbox">🧊</div><h3>Geometriyi keşfet</h3><p>Küp, küre, torus knot, dodekahedron gibi 13 farklı şekille başlayıp nesnelerin hacimsel görünümünü incele.</p></article>
+            <article class="card"><div class="iconbox">🎨</div><h3>Fikirlerini görselleştir</h3><p>Renkleri, ölçekleri ve yerleşimleri değiştirerek kendi sahne fikirlerini geliştir. Gerçek zamanlı düzenleme desteği.</p></article>
+            <article class="card"><div class="iconbox">🚀</div><h3>Üreterek öğren</h3><p>Hazır örnek projeler (gezegen sistemi, geometrik oda, heykel) ile 3D tasarım kavramlarını uygulayarak öğren.</p></article>
+        </div>
+    </div>
 </section>
 
 <section class="section" id="features">
- <div class="container">
-  <div class="section-head">
-   <div class="kicker" data-i18n="featuresKicker">NELER YAPABİLİRSİN?</div>
-   <h2 data-i18n="featuresTitle">Tasarım sürecinin temel araçları</h2>
-   <p class="muted" data-i18n="featuresText">Bir 3D sahne, tek tek nesnelerin bir araya gelmesiyle oluşur. Her nesne üzerinde yaptığın küçük değişiklikler sahnenin bütün görünümünü etkiler.</p>
-  </div>
-  <div class="grid three">
-   <article class="card"><div class="iconbox">🔷</div><h3 data-i18n="f1t">Nesne ve şekiller</h3><p data-i18n="f1">Temel geometrik şekillerle başla. Birden fazla nesneyi bir araya getirerek daha karmaşık kompozisyonlar tasarla.</p></article>
-   <article class="card"><div class="iconbox">↔️</div><h3 data-i18n="f2t">Konum ve ölçek</h3><p data-i18n="f2">Nesnelerin sahnedeki yerini ve büyüklüğünü değiştir. Boyut farklarının tasarıma etkisini gör.</p></article>
-   <article class="card"><div class="iconbox">🌀</div><h3 data-i18n="f3t">Döndürme ve bakış</h3><p data-i18n="f3">Sahneyi farklı açılardan incele. Bir nesnenin görünümünün kamera açısıyla nasıl değiştiğini keşfet.</p></article>
-   <article class="card"><div class="iconbox">🌈</div><h3 data-i18n="f4t">Renk ve materyal</h3><p data-i18n="f4">Renk seçimiyle nesneleri birbirinden ayır. Renk, kontrast ve görsel hiyerarşi üzerine denemeler yap.</p></article>
-   <article class="card"><div class="iconbox">💾</div><h3 data-i18n="f5t">Projeyi kaydetme</h3><p data-i18n="f5">Oturum açmış kullanıcılar, desteklenen kayıt işlemi üzerinden çalışmalarını hesaplarına kaydedebilir.</p></article>
-   <article class="card"><div class="iconbox">📦</div><h3 data-i18n="f6t">Dışa aktarma</h3><p data-i18n="f6">Kullandığın editörün desteklediği dosya biçimlerini kontrol et. Her biçim her uygulamayla aynı şekilde çalışmayabilir.</p></article>
-  </div>
- </div>
+    <div class="container">
+        <div class="section-head">
+            <div class="kicker">NELER YAPABİLİRSİN?</div>
+            <h2>Tasarım sürecinin temel araçları</h2>
+            <p class="muted">Bir 3D sahne, tek tek nesnelerin bir araya gelmesiyle oluşur. Her nesne üzerinde yaptığın küçük değişiklikler sahnenin bütün görünümünü etkiler.</p>
+        </div>
+        <div class="grid three">
+            <article class="card"><div class="iconbox">🔷</div><h3>13 Şekil Kütüphanesi</h3><p>Küp, küre, koni, silindir, torus, torus knot, oktahedron, dodekahedron, ikosahedron, tetrahedron, kapsül ve daha fazlası.</p></article>
+            <article class="card"><div class="iconbox">↔️</div><h3>Konum ve Ölçek</h3><p>Nesnelerin sahnedeki yerini ve büyüklüğünü değiştir. Boyut farklarının tasarıma etkisini gör.</p></article>
+            <article class="card"><div class="iconbox">🌀</div><h3>360° Döndürme</h3><p>Sahneyi fareyle sürükleyerek farklı açılardan incele. Kamera açısının nesne görünümüne etkisini keşfet.</p></article>
+            <article class="card"><div class="iconbox">🌈</div><h3>Renk ve Materyal</h3><p>Renk seçimiyle nesneleri birbirinden ayır. Renk, kontrast ve görsel hiyerarşi üzerine denemeler yap.</p></article>
+            <article class="card"><div class="iconbox">💾</div><h3>Back4App Bulut Kayıt</h3><p>Oturum açmış kullanıcılar, sahne verilerini Back4App hesabına kaydedebilir. Cloud Code entegre.</p></article>
+            <article class="card"><div class="iconbox">📦</div><h3>.glb Dışa Aktarma</h3><p>Sahneni GLB formatında dışa aktar. Ana 3D Stüdyo'da .glb indirme desteklenir (Three.js GLTFExporter).</p></article>
+        </div>
+    </div>
 </section>
 
 <section class="section" id="learn">
- <div class="container">
-  <div class="section-head">
-   <div class="kicker" data-i18n="learnKicker">BAŞLANGIÇ REHBERİ</div>
-   <h2 data-i18n="learnTitle">İlk 3D tasarımını oluştur</h2>
-   <p class="muted" data-i18n="learnText">Daha önce 3D tasarım yapmadıysan sorun değil. Aşağıdaki adımları sırayla takip ederek temel kavramları öğrenebilirsin.</p>
-  </div>
-  <div class="grid two steps">
-   <article class="card step"><h3 data-i18n="s1t">Sahneyi tanı</h3><p data-i18n="s1">Sahne, nesnelerin yer aldığı üç boyutlu çalışma alanıdır. Kamera bu alanı hangi açıdan gördüğünü belirler.</p></article>
-   <article class="card step"><h3 data-i18n="s2t">Bir şekil seç</h3><p data-i18n="s2">Küp veya küre gibi basit bir şekille başla. Önce tek nesnenin görünümünü anlamaya çalış.</p></article>
-   <article class="card step"><h3 data-i18n="s3t">Konumunu değiştir</h3><p data-i18n="s3">X yatay, Y dikey, Z derinlik yönünü temsil eder. Nesnenin konumunu değiştirerek eksenleri keşfet.</p></article>
-   <article class="card step"><h3 data-i18n="s4t">Boyut ve renk ver</h3><p data-i18n="s4">Nesnenin ölçeğini ve rengini değiştir. Tasarımın daha anlaşılır olması için kontrastı kullan.</p></article>
-   <article class="card step"><h3 data-i18n="s5t">Sahneni düzenle</h3><p data-i18n="s5">İkinci bir nesne ekle. Nesneler arasındaki mesafeyi ve boyut ilişkisini gözlemle.</p></article>
-   <article class="card step"><h3 data-i18n="s6t">Kaydet ve gözden geçir</h3><p data-i18n="s6">Çalışmanı kaydetme özelliği varsa kullan. Sonra sahneni yeniden inceleyip geliştirebileceğin noktaları belirle.</p></article>
-  </div>
- </div>
+    <div class="container">
+        <div class="section-head">
+            <div class="kicker">BAŞLANGIÇ REHBERİ</div>
+            <h2>İlk 3D tasarımını oluştur</h2>
+            <p class="muted">Daha önce 3D tasarım yapmadıysan sorun değil. Aşağıdaki adımları sırayla takip ederek temel kavramları öğrenebilirsin.</p>
+        </div>
+        <div class="grid two steps">
+            <article class="card step"><h3>Sahneyi tanı</h3><p>Sahne, nesnelerin yer aldığı üç boyutlu çalışma alanıdır. Kamera bu alanı hangi açıdan gördüğünü belirler.</p></article>
+            <article class="card step"><h3>Bir şekil seç</h3><p>Küp veya küre gibi basit bir şekille başla. Önce tek nesnenin görünümünü anlamaya çalış.</p></article>
+            <article class="card step"><h3>Konumunu değiştir</h3><p>X yatay, Y dikey, Z derinlik yönünü temsil eder. Nesnenin konumunu değiştirerek eksenleri keşfet.</p></article>
+            <article class="card step"><h3>Boyut ve renk ver</h3><p>Nesnenin ölçeğini ve rengini değiştir. Tasarımın daha anlaşılır olması için kontrastı kullan.</p></article>
+            <article class="card step"><h3>Sahneni düzenle</h3><p>İkinci bir nesne ekle. Nesneler arasındaki mesafeyi ve boyut ilişkisini gözlemle.</p></article>
+            <article class="card step"><h3>Kaydet ve gözden geçir</h3><p>Çalışmanı Back4App'e kaydet. Sonra sahneni yeniden inceleyip geliştirebileceğin noktaları belirle.</p></article>
+        </div>
+    </div>
 </section>
 
 <section class="section" id="examples">
- <div class="container">
-  <div class="section-head">
-   <div class="kicker" data-i18n="examplesKicker">UYGULAMALI ÖĞRENME</div>
-   <h2 data-i18n="examplesTitle">Örnek projeler</h2>
-   <p class="muted" data-i18n="examplesText">Aşağıdaki fikirler öğrenme amaçlı örneklerdir. Her birini basit şekillerle kurabilir, sonra kendi yorumunu ekleyebilirsin.</p>
-  </div>
-  <div class="grid three">
-   <article class="card project-card">
-    <span class="tag" data-i18n="beginner">BAŞLANGIÇ</span><div class="iconbox">🪐</div>
-    <h3 data-i18n="p1t">Mini gezegen sistemi</h3>
-    <p data-i18n="p1">Bir büyük küreyi yıldız, küçük küreleri gezegen olarak düşün. Farklı renkler ve boyutlar kullan. Amaç: ölçek ve kompozisyonu öğrenmek.</p>
-    <button class="btn small" data-load-example="planet" data-i18n="tryExample">Örneği sahnede aç</button>
-   </article>
-   <article class="card project-card">
-    <span class="tag" data-i18n="intermediate">ORTA SEVİYE</span><div class="iconbox">🏠</div>
-    <h3 data-i18n="p2t">Geometrik oda</h3>
-    <p data-i18n="p2">Küp ve dikdörtgen biçimlerini kullanarak basit bir oda kompozisyonu oluştur. Amaç: nesnelerin konumlarını ve oranlarını öğrenmek.</p>
-    <button class="btn small" data-load-example="room" data-i18n="tryExample">Örneği sahnede aç</button>
-   </article>
-   <article class="card project-card">
-    <span class="tag" data-i18n="creative">YARATICI GÖREV</span><div class="iconbox">🗿</div>
-    <h3 data-i18n="p3t">Geometrik heykel</h3>
-    <p data-i18n="p3">Farklı şekilleri üst üste veya yan yana yerleştirerek soyut bir heykel tasarla. Amaç: denge, ritim ve görsel bütünlük.</p>
-    <button class="btn small" data-load-example="sculpture" data-i18n="tryExample">Örneği sahnede aç</button>
-   </article>
-  </div>
- </div>
+    <div class="container">
+        <div class="section-head">
+            <div class="kicker">UYGULAMALI ÖĞRENME</div>
+            <h2>Örnek projeler</h2>
+            <p class="muted">Aşağıdaki fikirler öğrenme amaçlı örneklerdir. "Örneği sahnede aç" butonuna basarak hazır sahneyi inceleyebilirsin.</p>
+        </div>
+        <div class="grid three">
+            <article class="card project-card">
+                <span class="tag">BAŞLANGIÇ</span>
+                <div class="iconbox">🪐</div>
+                <h3>Mini gezegen sistemi</h3>
+                <p>Bir büyük küreyi yıldız, küçük küreleri gezegen olarak düşün. Farklı renkler ve boyutlar kullan.</p>
+                <button class="btn small" data-load-example="planet"><i class="fas fa-play"></i> Örneği sahnede aç</button>
+            </article>
+            <article class="card project-card">
+                <span class="tag">ORTA SEVİYE</span>
+                <div class="iconbox">🏠</div>
+                <h3>Geometrik oda</h3>
+                <p>Küp ve dikdörtgen biçimlerini kullanarak basit bir oda kompozisyonu oluştur. Konum ve oran ilişkisini öğren.</p>
+                <button class="btn small" data-load-example="room"><i class="fas fa-play"></i> Örneği sahnede aç</button>
+            </article>
+            <article class="card project-card">
+                <span class="tag">YARATICI GÖREV</span>
+                <div class="iconbox">🗿</div>
+                <h3>Geometrik heykel</h3>
+                <p>Farklı şekilleri üst üste veya yan yana yerleştirerek soyut bir heykel tasarla. Denge ve ritim üzerine çalış.</p>
+                <button class="btn small" data-load-example="sculpture"><i class="fas fa-play"></i> Örneği sahnede aç</button>
+            </article>
+        </div>
+    </div>
 </section>
 
 <section class="section" id="demo">
- <div class="container">
-  <div class="section-head">
-   <div class="kicker" data-i18n="demoKicker">ETKİLEŞİMLİ ÖRNEK</div>
-   <h2 data-i18n="demoTitle">3D sahneyi kendin dene</h2>
-   <p class="muted" data-i18n="demoText">Bu örnek alanında bir şekil ekleyebilir, seçili nesnenin rengini ve boyutunu değiştirebilirsin. Sahneyi fareyle sürükleyerek farklı açılardan incele.</p>
-  </div>
-  <div class="demo">
-   <div class="viewport">
-    <canvas id="stage" aria-label="Interactive 3D scene"></canvas>
-    <span class="viewport-label" data-i18n="sceneLabel">CANLI 3D SAHNE</span>
-   </div>
-   <div class="controls">
-    <div class="controlbox">
-     <label for="shape" data-i18n="shapeLabel">Şekil ekle</label>
-     <select id="shape">
-      <option value="box">Küp</option><option value="sphere">Küre</option>
-      <option value="cone">Koni</option><option value="cylinder">Silindir</option>
-      <option value="torus">Halka</option>
-     </select>
-     <button class="btn primary" id="addShape" style="width:100%;margin-top:10px" data-i18n="addBtn">+ Sahneye ekle</button>
+    <div class="container">
+        <div class="section-head">
+            <div class="kicker">ETKİLEŞİMLİ ÖRNEK</div>
+            <h2>3D sahneyi kendin dene</h2>
+            <p class="muted">Şekil ekleyebilir, seçili nesnenin rengini ve boyutunu değiştirebilirsin. Sahneyi fareyle veya parmağınla sürükleyerek 360° incele.</p>
+        </div>
+        <div class="demo">
+            <div class="viewport">
+                <canvas id="stage" aria-label="İnteraktif 3D sahne"></canvas>
+                <span class="viewport-label">🎨 CANLI 3D SAHNE · v7.10.0</span>
+                <span class="viewport-hint">🖱️ Sürükle: Döndür · Tekerlek: Yakınlaştır</span>
+            </div>
+            <div class="controls">
+                <div class="controlbox">
+                    <label for="shape">Şekil Ekle</label>
+                    <select id="shape">
+                        <option value="box">Küp</option>
+                        <option value="sphere">Küre</option>
+                        <option value="cone">Koni</option>
+                        <option value="cylinder">Silindir</option>
+                        <option value="torus">Halka (Torus)</option>
+                        <option value="torusKnot">Torus Knot</option>
+                        <option value="octahedron">Oktahedron</option>
+                        <option value="dodecahedron">Dodekahedron</option>
+                        <option value="icosahedron">İkosahedron</option>
+                        <option value="tetrahedron">Tetrahedron</option>
+                        <option value="capsule">Kapsül</option>
+                        <option value="pyramid">Piramit</option>
+                        <option value="gem">Elmas</option>
+                    </select>
+                    <button class="btn primary" id="addShape" style="width:100%;margin-top:10px"><i class="fas fa-plus"></i> Sahneye Ekle</button>
+                </div>
+                <div class="controlbox">
+                    <label for="objectSelect">Düzenlenecek Nesne</label>
+                    <select id="objectSelect"></select>
+                    <div style="margin-top:14px">
+                        <label for="color">Nesne Rengi</label>
+                        <input class="colorinput" id="color" type="color" value="#00e5ff">
+                    </div>
+                    <div style="margin-top:12px">
+                        <label for="scale">Boyut</label>
+                        <input id="scale" type="range" min="0.3" max="3" step="0.1" value="1">
+                    </div>
+                    <div class="controlrow" style="margin-top:13px">
+                        <button class="btn small" id="rotate"><i class="fas fa-rotate"></i> Döndür</button>
+                        <button class="btn small" id="delete"><i class="fas fa-trash"></i> Sil</button>
+                    </div>
+                    <div class="controlrow" style="margin-top:10px">
+                        <button class="btn small" id="clearScene"><i class="fas fa-broom"></i> Temizle</button>
+                        <button class="btn small" id="exportGLB"><i class="fas fa-download"></i> .glb İndir</button>
+                    </div>
+                </div>
+                <div class="controlbox">
+                    <label for="projectName">Proje Adı</label>
+                    <input id="projectName" type="text" maxlength="100" value="İlk 3D Projem">
+                    <button class="btn primary" id="save" style="width:100%;margin-top:10px"><i class="fas fa-cloud-upload-alt"></i> Back4App'e Kaydet</button>
+                    <p class="status" id="status" role="status" aria-live="polite"></p>
+                    <p class="notice">Kaydetme için VİZYON hesabınla giriş yapmış olmalısın. Sahne verisi Cloud Code'daki <code>saveProjectWithSceneData</code> fonksiyonuna gönderilir.</p>
+                </div>
+            </div>
+        </div>
+        <div class="callout" style="margin-top:20px">
+            <strong>🎯 Mini görev:</strong> Üç farklı şekil ekle. Birini büyüt, diğerinin rengini değiştir. Sonra sahnede dengeli bir kompozisyon oluştur.
+        </div>
     </div>
-    <div class="controlbox">
-     <label for="objectSelect" data-i18n="objectLabel">Düzenlenecek nesne</label>
-     <select id="objectSelect"></select>
-     <div style="margin-top:14px">
-      <label for="color" data-i18n="colorLabel">Nesne rengi</label>
-      <input class="colorinput" id="color" type="color" value="#8b7bff">
-     </div>
-     <div style="margin-top:10px">
-      <label for="scale" data-i18n="scaleLabel">Boyut</label>
-      <input id="scale" type="range" min="0.4" max="2.5" step="0.1" value="1">
-     </div>
-     <div class="controlrow" style="margin-top:13px">
-      <button class="btn small" id="rotate" data-i18n="rotateBtn">↻ Döndür</button>
-      <button class="btn small" id="delete" data-i18n="deleteBtn">Sil</button>
-     </div>
-    </div>
-    <div class="controlbox">
-     <label for="projectName" data-i18n="projectNameLabel">Proje adı</label>
-     <input id="projectName" type="text" maxlength="100" value="İlk 3D Projem">
-     <button class="btn primary" id="save" style="width:100%;margin-top:10px" data-i18n="saveBtn">☁ Back4App'e kaydet</button>
-     <p class="status" id="status" role="status" aria-live="polite"></p>
-     <p class="notice" data-i18n="saveNote">Kaydetme için VİZYON hesabınla giriş yapmış olmalısın. Bu örnek, sahne verisini mevcut Cloud Code fonksiyonuna gönderir.</p>
-    </div>
-   </div>
-  </div>
-  <div class="callout" style="margin-top:18px">
-   <strong data-i18n="challengeTitle">🎯 Mini görev:</strong>
-   <span data-i18n="challengeText">Üç farklı şekil ekle. Birini büyüt, diğerinin rengini değiştir. Sonra sahnede dengeli bir kompozisyon oluştur.</span>
-  </div>
- </div>
 </section>
 
 <section class="section" id="concepts">
- <div class="container">
-  <div class="section-head">
-   <div class="kicker" data-i18n="conceptKicker">3D TASARIMIN TEMELLERİ</div>
-   <h2 data-i18n="conceptTitle">Bilmen gereken kavramlar</h2>
-  </div>
-  <div class="grid four">
-   <article class="card"><h3 data-i18n="c1t">X / Y / Z</h3><p data-i18n="c1">Üç boyutlu konumun üç eksenidir. X yatay, Y dikey, Z derinlik yönü olarak düşünülebilir.</p></article>
-   <article class="card"><h3 data-i18n="c2t">Geometri</h3><p data-i18n="c2">Nesnenin temel biçimidir. Küre, küp ve koni farklı geometrik yapılara örnektir.</p></article>
-   <article class="card"><h3 data-i18n="c3t">Ölçek</h3><p data-i18n="c3">Nesnenin büyüklüğünü ifade eder. Ölçeği değiştirmek nesnenin sahnedeki etkisini değiştirir.</p></article>
-   <article class="card"><h3 data-i18n="c4t">Kompozisyon</h3><p data-i18n="c4">Nesnelerin sahne içinde nasıl yerleştirildiğidir. Denge ve boşluk kullanımı önemlidir.</p></article>
-  </div>
- </div>
+    <div class="container">
+        <div class="section-head">
+            <div class="kicker">3D TASARIMIN TEMELLERİ</div>
+            <h2>Bilmen gereken kavramlar</h2>
+        </div>
+        <div class="grid four">
+            <article class="card"><h3>X / Y / Z</h3><p>Üç boyutlu konumun üç eksenidir. X yatay, Y dikey, Z derinlik yönü olarak düşünülebilir.</p></article>
+            <article class="card"><h3>Geometri</h3><p>Nesnenin temel biçimidir. Küre, küp ve koni farklı geometrik yapılara örnektir.</p></article>
+            <article class="card"><h3>Ölçek</h3><p>Nesnenin büyüklüğünü ifade eder. Ölçeği değiştirmek nesnenin sahnedeki etkisini değiştirir.</p></article>
+            <article class="card"><h3>Kompozisyon</h3><p>Nesnelerin sahne içinde nasıl yerleştirildiğidir. Denge ve boşluk kullanımı önemlidir.</p></article>
+        </div>
+    </div>
 </section>
 
 <section class="section faq" id="faq">
- <div class="container">
-  <div class="section-head">
-   <div class="kicker" data-i18n="faqKicker">YARDIM MERKEZİ</div>
-   <h2 data-i18n="faqTitle">Sık sorulan sorular</h2>
-  </div>
-  <details><summary data-i18n="q1">3D Studio'yu kullanmak için 3D bilgisi gerekir mi?</summary><p data-i18n="a1">Hayır. Temel şekillerle başlayabilir, rehberdeki örnekleri izleyerek kavramları adım adım öğrenebilirsin.</p></details>
-  <details><summary data-i18n="q2">Projelerim otomatik kaydediliyor mu?</summary><p data-i18n="a2">Bu sayfadaki örnekte otomatik kayıt yapılmaz. Kaydet düğmesine basman ve hesabında oturum açmış olman gerekir.</p></details>
-  <details><summary data-i18n="q3">Kaydetme neden başarısız olabilir?</summary><p data-i18n="a3">Oturum açılmamış olabilir, bağlantı kesilmiş olabilir veya Cloud Code isteği reddetmiş olabilir. Ekrandaki hata mesajını kontrol et.</p></details>
-  <details><summary data-i18n="q4">Bu örnek, ana sitedeki bütün 3D özelliklerini içeriyor mu?</summary><p data-i18n="a4">Hayır. Bu sayfadaki sahne, öğrenme ve entegrasyon için hazırlanmış örnek bir araçtır. Ana editöründeki bütün özelliklerin yerine geçtiği varsayılmamalıdır.</p></details>
-  <details><summary data-i18n="q5">Yaptığım projelerin hakları kime ait?</summary><p data-i18n="a5">Haklar; kullandığın varlıkların lisansına, katkılarına ve geçerli mevzuata bağlıdır. Başkasına ait model, doku, görsel veya markaları izinsiz kullanma. Sitenin kullanım ve gizlilik koşullarını ayrıca incele.</p></details>
- </div>
+    <div class="container">
+        <div class="section-head">
+            <div class="kicker">YARDIM MERKEZİ</div>
+            <h2>Sık sorulan sorular</h2>
+        </div>
+        <details><summary>3D Stüdyo'yu kullanmak için 3D bilgisi gerekir mi?</summary><p>Hayır. Temel şekillerle başlayabilir, rehberdeki örnekleri izleyerek kavramları adım adım öğrenebilirsin. 21 yapay zeka modeli ile entegre çalışır — kod üretmek için Vizyon Al paneline geçebilirsin.</p></details>
+        <details><summary>Projelerim otomatik kaydediliyor mu?</summary><p>Bu sayfadaki örnekte otomatik kayıt yapılmaz. "Back4App'e Kaydet" düğmesine basman ve hesabında oturum açmış olman gerekir.</p></details>
+        <details><summary>Kaydetme neden başarısız olabilir?</summary><p>Oturum açılmamış olabilir, bağlantı kesilmiş olabilir veya Cloud Code isteği reddetmiş olabilir. Ekrandaki hata mesajını kontrol et.</p></details>
+        <details><summary>Bu örnek, ana sitedeki bütün 3D özelliklerini içeriyor mu?</summary><p>Hayır. Bu sayfadaki sahne, öğrenme ve entegrasyon için hazırlanmış örnek bir araçtır. Ana editörde 90+ şekil kütüphanesi ve sürükle-bırak desteği bulunur. Bu sayfada 13 popüler şekil sunulmaktadır.</p></details>
+        <details><summary>.glb dosyası nedir? Ne işe yarar?</summary><p>.glb (GL Binary), 3D modellerin taşınabilir formatıdır. Blender, Unity, Unreal Engine gibi yazılımlarda açılabilir. Sahneni indirip kendi projelerinde kullanabilirsin.</p></details>
+        <details><summary>Yaptığım projelerin hakları kime ait?</summary><p>Haklar; kullandığın varlıkların lisansına, katkılarına ve geçerli mevzuata bağlıdır. Başkasına ait model, doku, görsel veya markaları izinsiz kullanma. Sitenin kullanım ve gizlilik koşullarını ayrıca incele.</p></details>
+    </div>
 </section>
 
 <section class="section">
- <div class="container">
-  <div class="card">
-   <div class="kicker" data-i18n="closingKicker">ŞİMDİ SIRA SENDE</div>
-   <h2 data-i18n="closingTitle">Bir fikirle başla. Onu sahneye taşı.</h2>
-   <p class="muted" data-i18n="closingText">Küçük bir şekil, bir renk ve bir fikir… 3D tasarım öğrenmek denemekle başlar.</p>
-   <div class="actions">
-    <a class="btn primary" href="#demo" data-i18n="closingCta">Sahneye dön</a>
-    <a class="btn" href="index.html" data-i18n="homeCta">VİZYON ana sayfası</a>
-   </div>
-  </div>
- </div>
+    <div class="container">
+        <div class="card">
+            <div class="kicker">ŞİMDİ SIRA SENDE</div>
+            <h2>Bir fikirle başla. Onu sahneye taşı.</h2>
+            <p class="muted">Küçük bir şekil, bir renk ve bir fikir… 3D tasarım öğrenmek denemekle başlar.</p>
+            <div class="actions">
+                <a class="btn primary" href="#demo"><i class="fas fa-cube"></i> Sahneye Dön</a>
+                <a class="btn" href="https://vizyon2026.vercel.app/"><i class="fas fa-home"></i> VİZYON Ana Sayfa</a>
+                <a class="btn" href="https://vizyon2026.vercel.app/vizyon-al.html"><i class="fas fa-wand-magic-sparkles"></i> Vizyon Al Paneli</a>
+            </div>
+        </div>
+    </div>
 </section>
+
+</div>
+
+<!-- ============ ENGLISH ============ -->
+<div id="lang-en" class="lang-content">
+
+<section class="hero">
+    <div class="container">
+        <span class="eyebrow">✦ VİZYON 2027 • 3D DESIGN SPACE • 21 AI MODELS INTEGRATED</span>
+        <h1>Imagine.<br><span class="gradient">Design in 3D.</span></h1>
+        <p>3D Studio is a workspace where you can explore three-dimensional thinking, build scenes with geometric objects, and develop design ideas step by step — integrated with 21 AI models. Features a 13-shape library, real-time editing, and Back4App cloud save support.</p>
+        <div class="actions">
+            <a class="btn primary" href="#demo"><i class="fas fa-cube"></i> Try 3D Scene</a>
+            <a class="btn" href="https://vizyon2026.vercel.app/vizyon-al.html"><i class="fas fa-wand-magic-sparkles"></i> Generate Code with Vizyon Al</a>
+            <a class="btn" href="#learn"><i class="fas fa-book"></i> Explore the Guide</a>
+        </div>
+        <p class="notice">This page brings together an introduction, learning guide, and example workspace. Scene data is saved via the <code>saveProjectWithSceneData</code> function on Back4App Cloud Code.</p>
+    </div>
+</section>
+
+<section class="section" id="about">
+    <div class="container">
+        <div class="section-head">
+            <div class="kicker">GET TO KNOW IT</div>
+            <h2>What is 3D Studio?</h2>
+            <p class="muted">3D Studio is a design module that lets you think about objects in a three-dimensional scene. Explore design by observing position, size, color, and relationships between objects. It works integrated with 21 AI models — jump to the Vizyon Al panel when you want to generate code.</p>
+        </div>
+        <div class="grid three">
+            <article class="card"><div class="iconbox">🧊</div><h3>Explore geometry</h3><p>Start with 13 shapes — cube, sphere, torus knot, dodecahedron — and examine their volumetric appearance.</p></article>
+            <article class="card"><div class="iconbox">🎨</div><h3>Visualize ideas</h3><p>Develop your own scene ideas by changing colors, scales, and placement. Real-time editing support.</p></article>
+            <article class="card"><div class="iconbox">🚀</div><h3>Learn by making</h3><p>Learn 3D design concepts through example projects (planetary system, geometric room, sculpture).</p></article>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="features">
+    <div class="container">
+        <div class="section-head">
+            <div class="kicker">WHAT CAN YOU DO?</div>
+            <h2>Core tools of the design process</h2>
+        </div>
+        <div class="grid three">
+            <article class="card"><div class="iconbox">🔷</div><h3>13 Shape Library</h3><p>Cube, sphere, cone, cylinder, torus, torus knot, octahedron, dodecahedron, icosahedron, tetrahedron, capsule, pyramid, and gem.</p></article>
+            <article class="card"><div class="iconbox">↔️</div><h3>Position & Scale</h3><p>Change the position and size of objects. Observe how proportions affect a design.</p></article>
+            <article class="card"><div class="iconbox">🌀</div><h3>360° Rotation</h3><p>Inspect the scene from different angles by dragging with your mouse. Explore camera perspective effects.</p></article>
+            <article class="card"><div class="iconbox">🌈</div><h3>Color & Material</h3><p>Use color to distinguish objects. Experiment with contrast and visual hierarchy.</p></article>
+            <article class="card"><div class="iconbox">💾</div><h3>Back4App Cloud Save</h3><p>Signed-in users can save scene data to their Back4App account. Cloud Code integrated.</p></article>
+            <article class="card"><div class="iconbox">📦</div><h3>.glb Export</h3><p>Export your scene in GLB format. The main 3D Studio supports .glb download (Three.js GLTFExporter).</p></article>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="learn">
+    <div class="container">
+        <div class="section-head">
+            <div class="kicker">STARTER GUIDE</div>
+            <h2>Create your first 3D design</h2>
+            <p class="muted">New to 3D design? Follow these steps to learn the basics.</p>
+        </div>
+        <div class="grid two steps">
+            <article class="card step"><h3>Explore the scene</h3><p>A scene is the 3D workspace containing objects. The camera determines the viewing angle.</p></article>
+            <article class="card step"><h3>Choose a shape</h3><p>Start with a simple cube or sphere. First, understand a single object's appearance.</p></article>
+            <article class="card step"><h3>Change its position</h3><p>X is horizontal, Y vertical, and Z depth. Explore the axes by moving an object.</p></article>
+            <article class="card step"><h3>Set size and color</h3><p>Change the object's scale and color. Use contrast to make your design easier to read.</p></article>
+            <article class="card step"><h3>Arrange your scene</h3><p>Add a second object. Observe the distance and size relationship between objects.</p></article>
+            <article class="card step"><h3>Save and review</h3><p>Save your work to Back4App. Review your scene and identify ways to improve it.</p></article>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="examples">
+    <div class="container">
+        <div class="section-head">
+            <div class="kicker">LEARN BY DOING</div>
+            <h2>Example projects</h2>
+            <p class="muted">Click "Load example in scene" to inspect a prepared scene.</p>
+        </div>
+        <div class="grid three">
+            <article class="card project-card">
+                <span class="tag">BEGINNER</span>
+                <div class="iconbox">🪐</div>
+                <h3>Mini planetary system</h3>
+                <p>Use a large sphere as a star and smaller spheres as planets. Try different colors and sizes.</p>
+                <button class="btn small" data-load-example="planet"><i class="fas fa-play"></i> Load example in scene</button>
+            </article>
+            <article class="card project-card">
+                <span class="tag">INTERMEDIATE</span>
+                <div class="iconbox">🏠</div>
+                <h3>Geometric room</h3>
+                <p>Create a simple room composition with cubes and rectangular forms. Learn positioning and proportions.</p>
+                <button class="btn small" data-load-example="room"><i class="fas fa-play"></i> Load example in scene</button>
+            </article>
+            <article class="card project-card">
+                <span class="tag">CREATIVE TASK</span>
+                <div class="iconbox">🗿</div>
+                <h3>Geometric sculpture</h3>
+                <p>Arrange different shapes into an abstract sculpture. Explore balance, rhythm, and visual unity.</p>
+                <button class="btn small" data-load-example="sculpture"><i class="fas fa-play"></i> Load example in scene</button>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="demo">
+    <div class="container">
+        <div class="section-head">
+            <div class="kicker">INTERACTIVE EXAMPLE</div>
+            <h2>Try the 3D scene</h2>
+            <p class="muted">Add a shape, change its color and size, and drag the scene to inspect it from different angles.</p>
+        </div>
+        <div class="demo">
+            <div class="viewport">
+                <canvas id="stage-en" aria-label="Interactive 3D scene"></canvas>
+                <span class="viewport-label">🎨 LIVE 3D SCENE · v7.10.0</span>
+                <span class="viewport-hint">🖱️ Drag: Rotate · Wheel: Zoom</span>
+            </div>
+            <div class="controls">
+                <div class="controlbox">
+                    <label for="shape-en">Add a Shape</label>
+                    <select id="shape-en">
+                        <option value="box">Cube</option>
+                        <option value="sphere">Sphere</option>
+                        <option value="cone">Cone</option>
+                        <option value="cylinder">Cylinder</option>
+                        <option value="torus">Torus</option>
+                        <option value="torusKnot">Torus Knot</option>
+                        <option value="octahedron">Octahedron</option>
+                        <option value="dodecahedron">Dodecahedron</option>
+                        <option value="icosahedron">Icosahedron</option>
+                        <option value="tetrahedron">Tetrahedron</option>
+                        <option value="capsule">Capsule</option>
+                        <option value="pyramid">Pyramid</option>
+                        <option value="gem">Gem</option>
+                    </select>
+                    <button class="btn primary" id="addShape-en" style="width:100%;margin-top:10px"><i class="fas fa-plus"></i> Add to Scene</button>
+                </div>
+                <div class="controlbox">
+                    <label for="objectSelect-en">Object to Edit</label>
+                    <select id="objectSelect-en"></select>
+                    <div style="margin-top:14px">
+                        <label for="color-en">Object Color</label>
+                        <input class="colorinput" id="color-en" type="color" value="#00e5ff">
+                    </div>
+                    <div style="margin-top:12px">
+                        <label for="scale-en">Size</label>
+                        <input id="scale-en" type="range" min="0.3" max="3" step="0.1" value="1">
+                    </div>
+                    <div class="controlrow" style="margin-top:13px">
+                        <button class="btn small" id="rotate-en"><i class="fas fa-rotate"></i> Rotate</button>
+                        <button class="btn small" id="delete-en"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
+                    <div class="controlrow" style="margin-top:10px">
+                        <button class="btn small" id="clearScene-en"><i class="fas fa-broom"></i> Clear</button>
+                        <button class="btn small" id="exportGLB-en"><i class="fas fa-download"></i> Download .glb</button>
+                    </div>
+                </div>
+                <div class="controlbox">
+                    <label for="projectName-en">Project Name</label>
+                    <input id="projectName-en" type="text" maxlength="100" value="My First 3D Project">
+                    <button class="btn primary" id="save-en" style="width:100%;margin-top:10px"><i class="fas fa-cloud-upload-alt"></i> Save to Back4App</button>
+                    <p class="status" id="status-en" role="status" aria-live="polite"></p>
+                    <p class="notice">You must be signed in to your VİZYON account. Scene data is sent to the <code>saveProjectWithSceneData</code> function in Cloud Code.</p>
+                </div>
+            </div>
+        </div>
+        <div class="callout" style="margin-top:20px">
+            <strong>🎯 Mini challenge:</strong> Add three different shapes. Enlarge one and change another's color. Create a balanced composition.
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="card">
+            <div class="kicker">YOUR TURN</div>
+            <h2>Start with an idea. Bring it into the scene.</h2>
+            <p class="muted">A simple shape, a color, and an idea… 3D design starts with experimentation.</p>
+            <div class="actions">
+                <a class="btn primary" href="#demo"><i class="fas fa-cube"></i> Back to Scene</a>
+                <a class="btn" href="https://vizyon2026.vercel.app/"><i class="fas fa-home"></i> VİZYON Home</a>
+                <a class="btn" href="https://vizyon2026.vercel.app/vizyon-al.html"><i class="fas fa-wand-magic-sparkles"></i> Vizyon Al Panel</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+</div>
+
+<!-- ============ ARAPÇA ============ -->
+<div id="lang-ar" class="lang-content" dir="rtl">
+
+<section class="hero">
+    <div class="container">
+        <span class="eyebrow">✦ فيجن 2027 • مساحة التصميم ثلاثي الأبعاد • 21 نموذج ذكاء اصطناعي</span>
+        <h1>تخيّل.<br><span class="gradient">صمّم بثلاثة أبعاد.</span></h1>
+        <p>3D Stüdyo مساحة لاستكشاف التفكير ثلاثي الأبعاد، وبناء المشاهد بالأشكال الهندسية، وتطوير أفكار التصميم خطوة بخطوة — متكاملة مع 21 نموذج ذكاء اصطناعي.</p>
+        <div class="actions">
+            <a class="btn primary" href="#demo"><i class="fas fa-cube"></i> جرّب المشهد</a>
+            <a class="btn" href="https://vizyon2026.vercel.app/vizyon-al.html"><i class="fas fa-wand-magic-sparkles"></i> فيجن آل</a>
+            <a class="btn" href="#learn"><i class="fas fa-book"></i> استكشف الدليل</a>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="about">
+    <div class="container">
+        <div class="section-head">
+            <div class="kicker">تعرّف عليه</div>
+            <h2>ما هو 3D Stüdyo؟</h2>
+            <p class="muted">وحدة تصميم تساعدك على تصور العناصر داخل مشهد ثلاثي الأبعاد. يعمل بشكل متكامل مع 21 نموذج ذكاء اصطناعي.</p>
+        </div>
+        <div class="grid three">
+            <article class="card"><div class="iconbox">🧊</div><h3>اكتشف الهندسة</h3><p>ابدأ بـ 13 شكلاً — المكعب، الكرة، عقدة الحلقة، الاثنا عشري الأوجه.</p></article>
+            <article class="card"><div class="iconbox">🎨</div><h3>حوّل الأفكار</h3><p>طوّر أفكارك بتغيير الألوان والمقاييس ومواضع العناصر.</p></article>
+            <article class="card"><div class="iconbox">🚀</div><h3>تعلّم بالتطبيق</h3><p>تعلّم من خلال مشاريع نموذجية (نظام كوكبي، غرفة هندسية، منحوتة).</p></article>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="features">
+    <div class="container">
+        <div class="section-head">
+            <div class="kicker">ماذا يمكنك أن تفعل؟</div>
+            <h2>أدوات أساسية لعملية التصميم</h2>
+        </div>
+        <div class="grid three">
+            <article class="card"><div class="iconbox">🔷</div><h3>مكتبة 13 شكلاً</h3><p>مكعب، كرة، مخروط، أسطوانة، حلقة، وغيرها.</p></article>
+            <article class="card"><div class="iconbox">↔️</div><h3>الموضع والحجم</h3><p>غيّر مواضع العناصر وأحجامها.</p></article>
+            <article class="card"><div class="iconbox">🌀</div><h3>دوران 360°</h3><p>افحص المشهد من زوايا مختلفة بالسحب.</p></article>
+            <article class="card"><div class="iconbox">🌈</div><h3>الألوان والمواد</h3><p>استخدم الألوان للتمييز بين العناصر.</p></article>
+            <article class="card"><div class="iconbox">💾</div><h3>حفظ Back4App</h3><p>يمكن للمستخدم المسجّل حفظ العمل في حسابه.</p></article>
+            <article class="card"><div class="iconbox">📦</div><h3>تصدير .glb</h3><p>صدّر مشهدك بصيغة GLB.</p></article>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="learn">
+    <div class="container">
+        <div class="section-head">
+            <div class="kicker">دليل البداية</div>
+            <h2>أنشئ تصميمك الأول</h2>
+        </div>
+        <div class="grid two steps">
+            <article class="card step"><h3>تعرّف على المشهد</h3><p>المشهد مساحة العمل ثلاثية الأبعاد.</p></article>
+            <article class="card step"><h3>اختر شكلاً</h3><p>ابدأ بمكعب أو كرة بسيطة.</p></article>
+            <article class="card step"><h3>غيّر موضعه</h3><p>X أفقي، Y عمودي، Z للعمق.</p></article>
+            <article class="card step"><h3>حدّد الحجم واللون</h3><p>غيّر مقياس العنصر ولونه.</p></article>
+            <article class="card step"><h3>رتّب المشهد</h3><p>أضف عنصراً ثانياً.</p></article>
+            <article class="card step"><h3>احفظ وراجع</h3><p>احفظ عملك في Back4App.</p></article>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="examples">
+    <div class="container">
+        <div class="section-head">
+            <div class="kicker">تعلّم بالتطبيق</div>
+            <h2>مشاريع نموذجية</h2>
+        </div>
+        <div class="grid three">
+            <article class="card project-card">
+                <span class="tag">مبتدئ</span>
+                <div class="iconbox">🪐</div>
+                <h3>نظام كواكب مصغّر</h3>
+                <p>استخدم كرة كبيرة كنجم وكرات أصغر ككواكب.</p>
+                <button class="btn small" data-load-example="planet"><i class="fas fa-play"></i> افتح المثال</button>
+            </article>
+            <article class="card project-card">
+                <span class="tag">متوسط</span>
+                <div class="iconbox">🏠</div>
+                <h3>غرفة هندسية</h3>
+                <p>أنشئ تكوين غرفة بسيطاً بالمكعبات.</p>
+                <button class="btn small" data-load-example="room"><i class="fas fa-play"></i> افتح المثال</button>
+            </article>
+            <article class="card project-card">
+                <span class="tag">مهمة إبداعية</span>
+                <div class="iconbox">🗿</div>
+                <h3>منحوتة هندسية</h3>
+                <p>رتّب أشكالاً مختلفة لإنشاء منحوتة تجريدية.</p>
+                <button class="btn small" data-load-example="sculpture"><i class="fas fa-play"></i> افتح المثال</button>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="demo">
+    <div class="container">
+        <div class="section-head">
+            <div class="kicker">مثال تفاعلي</div>
+            <h2>جرّب المشهد ثلاثي الأبعاد</h2>
+        </div>
+        <div class="demo">
+            <div class="viewport">
+                <canvas id="stage-ar" aria-label="مشهد ثلاثي الأبعاد"></canvas>
+                <span class="viewport-label">🎨 مشهد مباشر · v7.10.0</span>
+                <span class="viewport-hint">🖱️ اسحب: دوّر · عجلة: تكبير</span>
+            </div>
+            <div class="controls">
+                <div class="controlbox">
+                    <label for="shape-ar">أضف شكلاً</label>
+                    <select id="shape-ar">
+                        <option value="box">مكعب</option>
+                        <option value="sphere">كرة</option>
+                        <option value="cone">مخروط</option>
+                        <option value="cylinder">أسطوانة</option>
+                        <option value="torus">حلقة</option>
+                        <option value="torusKnot">عقدة الحلقة</option>
+                        <option value="octahedron">ثماني الأوجه</option>
+                        <option value="dodecahedron">اثنا عشري الأوجه</option>
+                        <option value="icosahedron">عشروني الأوجه</option>
+                        <option value="tetrahedron">رباعي الأوجه</option>
+                        <option value="capsule">كبسولة</option>
+                        <option value="pyramid">هرم</option>
+                        <option value="gem">جوهرة</option>
+                    </select>
+                    <button class="btn primary" id="addShape-ar" style="width:100%;margin-top:10px"><i class="fas fa-plus"></i> أضف للمشهد</button>
+                </div>
+                <div class="controlbox">
+                    <label for="objectSelect-ar">العنصر المراد تعديله</label>
+                    <select id="objectSelect-ar"></select>
+                    <div style="margin-top:14px">
+                        <label for="color-ar">لون العنصر</label>
+                        <input class="colorinput" id="color-ar" type="color" value="#00e5ff">
+                    </div>
+                    <div style="margin-top:12px">
+                        <label for="scale-ar">الحجم</label>
+                        <input id="scale-ar" type="range" min="0.3" max="3" step="0.1" value="1">
+                    </div>
+                    <div class="controlrow" style="margin-top:13px">
+                        <button class="btn small" id="rotate-ar"><i class="fas fa-rotate"></i> دوّر</button>
+                        <button class="btn small" id="delete-ar"><i class="fas fa-trash"></i> احذف</button>
+                    </div>
+                    <div class="controlrow" style="margin-top:10px">
+                        <button class="btn small" id="clearScene-ar"><i class="fas fa-broom"></i> مسح</button>
+                        <button class="btn small" id="exportGLB-ar"><i class="fas fa-download"></i> .glb</button>
+                    </div>
+                </div>
+                <div class="controlbox">
+                    <label for="projectName-ar">اسم المشروع</label>
+                    <input id="projectName-ar" type="text" maxlength="100" value="مشروعي الأول">
+                    <button class="btn primary" id="save-ar" style="width:100%;margin-top:10px"><i class="fas fa-cloud-upload-alt"></i> احفظ في Back4App</button>
+                    <p class="status" id="status-ar" role="status" aria-live="polite"></p>
+                    <p class="notice">يجب تسجيل الدخول إلى حساب VİZYON للحفظ.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="card">
+            <div class="kicker">حان دورك</div>
+            <h2>ابدأ بفكرة وانقلها إلى المشهد.</h2>
+            <p class="muted">شكل بسيط ولون وفكرة… يبدأ التعلّم بالتجربة.</p>
+            <div class="actions">
+                <a class="btn primary" href="#demo"><i class="fas fa-cube"></i> العودة للمشهد</a>
+                <a class="btn" href="https://vizyon2026.vercel.app/"><i class="fas fa-home"></i> الرئيسية</a>
+                <a class="btn" href="https://vizyon2026.vercel.app/vizyon-al.html"><i class="fas fa-wand-magic-sparkles"></i> فيجن آل</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+</div>
+
 </main>
 
+<!-- FOOTER -->
 <footer class="footer">
- <div class="container footer-inner">
-  <div>© <span id="year"></span> VİZYON 2027 · <span data-i18n="footerText">Öğren, tasarla, geliştir.</span></div>
-  <div><a href="index.html" data-i18n="footerHome">Ana sayfa</a> · <span data-i18n="footerLegal">Üçüncü taraf kütüphaneler kendi lisanslarına tabidir.</span></div>
- </div>
+    <div class="container">
+        <div class="footer-inner">
+            <div class="footer-col">
+                <strong>🧊 VİZYON 3D Stüdyo</strong>
+                <a href="https://vizyon2026.vercel.app/">→ Ana Sayfa</a>
+                <a href="https://vizyon2026.vercel.app/vizyon-al.html">→ Vizyon Al</a>
+                <a href="https://vizyon2026.vercel.app/vizyon-ai.html">→ VİZYON AI (21 Model)</a>
+            </div>
+            <div class="footer-col">
+                <strong>📚 Kaynaklar</strong>
+                <a href="https://vizyon2026.vercel.app/bana-ogret.html">→ Bana Öğret</a>
+                <a href="https://vizyon2026.vercel.app/topluluk.html">→ Topluluk</a>
+                <a href="https://vizyon2026.vercel.app/vizyonekibi.html">→ Vizyon Ekibi</a>
+            </div>
+            <div class="footer-col">
+                <strong>🔗 Bağlantılar</strong>
+                <a href="https://vizyon2026.vercel.app/gizlilik.html">→ Gizlilik</a>
+                <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html">→ Sözleşme</a>
+                <a href="https://www.instagram.com/vizyon2027.info" target="_blank" rel="noopener">→ Instagram</a>
+            </div>
+        </div>
+        <div class="footer-copy">
+            © <span id="year"></span> <span>VİZYON 2027</span> · 3D Stüdyo v7.10.0 · 21 AI Modeli · Back4App Cloud Code
+            <br>
+            <span style="font-size: 11px; opacity: 0.7; color: var(--text4);">Three.js · GLTFExporter · Parse SDK 5.0.0</span>
+        </div>
+    </div>
 </footer>
 
 <script>
-/* =========================================================
-   VİZYON 2027 — 3D STUDIO
-   Frontend example. No Master Key is used here.
-   ========================================================= */
+/* ============================================================
+   VİZYON 2027 — 3D STÜDYO v3.0 (v7.10.0)
+   ✅ Back4App uyumlu (index.html ile aynı App ID/Key)
+   ✅ Parse SDK 5.0.0
+   ✅ 13 şekil (küp, küre, torus knot, dodekahedron, ikosahedron...)
+   ✅ GLB dışa aktarma (GLTFExporter)
+   ✅ 3 dil (TR/EN/AR) + RTL
+   ✅ Aurora arka plan + parçacıklar
+   ============================================================ */
 
-/*
-  Back4App configuration:
-  These values match the client-side configuration in the supplied
-  index.html. A JavaScript key is not a Master Key.
-*/
+// ===== Back4App Config (index.html v7.10.0 ile aynı) =====
 const BACK4APP_APP_ID = "Dr9SODgMburZ54QvC8RnIHc9dbjreozBbKLOpMjX";
 const BACK4APP_JS_KEY = "dCXRvnEcCcOFvpzVDAV9AAJnYvdrqaP1JFRkJzvv";
 const BACK4APP_SERVER = "https://parseapi.back4app.com/";
 
-const translations = {
-tr:{
- navAbout:"3D Studio nedir?",navFeatures:"Özellikler",navLearn:"Nasıl kullanılır?",navDemo:"Deneyimle",
- eyebrow:"✦ VİZYON 2027 • 3D TASARIM ALANI",
- heroTitle:'Hayal et.<br><span class="gradient">Üç boyutta tasarla.</span>',
- heroText:"3D Studio, üç boyutlu düşünmeyi keşfedebileceğin, geometrik nesnelerle sahneler kurabileceğin ve tasarım fikirlerini adım adım geliştirebileceğin bir çalışma alanıdır.",
- heroCta:"3D alanını dene ↘",heroSecondary:"Kullanım rehberini keşfet",
- heroNote:"Bu sayfa tanıtım, öğrenme ve örnek çalışma alanlarını bir araya getirir. Kullanılabilir özellikler aşağıda açıklanmıştır.",
- aboutKicker:"MODÜLÜ TANI",aboutTitle:"3D Studio nedir?",
- aboutText:"3D Studio, iki boyutlu ekrandaki nesneleri üç boyutlu bir sahnede düşünmeni sağlayan tasarım modülüdür. Nesnelerin konumunu, boyutunu, rengini ve birbirleriyle ilişkisini gözlemleyerek tasarım mantığını öğrenebilirsin.",
- about1Title:"Geometriyi keşfet",about1Text:"Küp, küre ve silindir gibi temel şekillerle başlayıp nesnelerin hacimsel görünümünü incele.",
- about2Title:"Fikirlerini görselleştir",about2Text:"Renkleri, ölçekleri ve yerleşimleri değiştirerek kendi sahne fikirlerini geliştir.",
- about3Title:"Üreterek öğren",about3Text:"Küçük görevler ve örnek projelerle 3D tasarım kavramlarını uygulayarak öğren.",
- featuresKicker:"NELER YAPABİLİRSİN?",featuresTitle:"Tasarım sürecinin temel araçları",
- featuresText:"Bir 3D sahne, tek tek nesnelerin bir araya gelmesiyle oluşur. Her nesne üzerinde yaptığın küçük değişiklikler sahnenin bütün görünümünü etkiler.",
- f1t:"Nesne ve şekiller",f1:"Temel geometrik şekillerle başla. Birden fazla nesneyi bir araya getirerek daha karmaşık kompozisyonlar tasarla.",
- f2t:"Konum ve ölçek",f2:"Nesnelerin sahnedeki yerini ve büyüklüğünü değiştir. Boyut farklarının tasarıma etkisini gör.",
- f3t:"Döndürme ve bakış",f3:"Sahneyi farklı açılardan incele. Bir nesnenin görünümünün kamera açısıyla nasıl değiştiğini keşfet.",
- f4t:"Renk ve materyal",f4:"Renk seçimiyle nesneleri birbirinden ayır. Renk, kontrast ve görsel hiyerarşi üzerine denemeler yap.",
- f5t:"Projeyi kaydetme",f5:"Oturum açmış kullanıcılar, desteklenen kayıt işlemi üzerinden çalışmalarını hesaplarına kaydedebilir.",
- f6t:"Dışa aktarma",f6:"Kullandığın editörün desteklediği dosya biçimlerini kontrol et. Her biçim her uygulamayla aynı şekilde çalışmayabilir.",
- learnKicker:"BAŞLANGIÇ REHBERİ",learnTitle:"İlk 3D tasarımını oluştur",learnText:"Daha önce 3D tasarım yapmadıysan sorun değil. Aşağıdaki adımları sırayla takip ederek temel kavramları öğrenebilirsin.",
- s1t:"Sahneyi tanı",s1:"Sahne, nesnelerin yer aldığı üç boyutlu çalışma alanıdır. Kamera bu alanı hangi açıdan gördüğünü belirler.",
- s2t:"Bir şekil seç",s2:"Küp veya küre gibi basit bir şekille başla. Önce tek nesnenin görünümünü anlamaya çalış.",
- s3t:"Konumunu değiştir",s3:"X yatay, Y dikey, Z derinlik yönünü temsil eder. Nesnenin konumunu değiştirerek eksenleri keşfet.",
- s4t:"Boyut ve renk ver",s4:"Nesnenin ölçeğini ve rengini değiştir. Tasarımın daha anlaşılır olması için kontrastı kullan.",
- s5t:"Sahneni düzenle",s5:"İkinci bir nesne ekle. Nesneler arasındaki mesafeyi ve boyut ilişkisini gözlemle.",
- s6t:"Kaydet ve gözden geçir",s6:"Çalışmanı kaydetme özelliği varsa kullan. Sonra sahneni yeniden inceleyip geliştirebileceğin noktaları belirle.",
- examplesKicker:"UYGULAMALI ÖĞRENME",examplesTitle:"Örnek projeler",examplesText:"Aşağıdaki fikirler öğrenme amaçlı örneklerdir. Her birini basit şekillerle kurabilir, sonra kendi yorumunu ekleyebilirsin.",
- beginner:"BAŞLANGIÇ",intermediate:"ORTA SEVİYE",creative:"YARATICI GÖREV",
- p1t:"Mini gezegen sistemi",p1:"Bir büyük küreyi yıldız, küçük küreleri gezegen olarak düşün. Farklı renkler ve boyutlar kullan. Amaç: ölçek ve kompozisyonu öğrenmek.",
- p2t:"Geometrik oda",p2:"Küp ve dikdörtgen biçimlerini kullanarak basit bir oda kompozisyonu oluştur. Amaç: nesnelerin konumlarını ve oranlarını öğrenmek.",
- p3t:"Geometrik heykel",p3:"Farklı şekilleri üst üste veya yan yana yerleştirerek soyut bir heykel tasarla. Amaç: denge, ritim ve görsel bütünlük.",
- tryExample:"Örneği sahnede aç",demoKicker:"ETKİLEŞİMLİ ÖRNEK",demoTitle:"3D sahneyi kendin dene",
- demoText:"Bu örnek alanında bir şekil ekleyebilir, seçili nesnenin rengini ve boyutunu değiştirebilirsin. Sahneyi fareyle sürükleyerek farklı açılardan incele.",
- sceneLabel:"CANLI 3D SAHNE",shapeLabel:"Şekil ekle",addBtn:"+ Sahneye ekle",objectLabel:"Düzenlenecek nesne",
- colorLabel:"Nesne rengi",scaleLabel:"Boyut",rotateBtn:"↻ Döndür",deleteBtn:"Sil",
- projectNameLabel:"Proje adı",saveBtn:"☁ Back4App'e kaydet",
- saveNote:"Kaydetme için VİZYON hesabınla giriş yapmış olmalısın. Bu örnek, sahne verisini mevcut Cloud Code fonksiyonuna gönderir.",
- challengeTitle:"🎯 Mini görev:",challengeText:"Üç farklı şekil ekle. Birini büyüt, diğerinin rengini değiştir. Sonra sahnede dengeli bir kompozisyon oluştur.",
- conceptKicker:"3D TASARIMIN TEMELLERİ",conceptTitle:"Bilmen gereken kavramlar",
- c1t:"X / Y / Z",c1:"Üç boyutlu konumun üç eksenidir. X yatay, Y dikey, Z derinlik yönü olarak düşünülebilir.",
- c2t:"Geometri",c2:"Nesnenin temel biçimidir. Küre, küp ve koni farklı geometrik yapılara örnektir.",
- c3t:"Ölçek",c3:"Nesnenin büyüklüğünü ifade eder. Ölçeği değiştirmek nesnenin sahnedeki etkisini değiştirir.",
- c4t:"Kompozisyon",c4:"Nesnelerin sahne içinde nasıl yerleştirildiğidir. Denge ve boşluk kullanımı önemlidir.",
- faqKicker:"YARDIM MERKEZİ",faqTitle:"Sık sorulan sorular",
- q1:"3D Studio'yu kullanmak için 3D bilgisi gerekir mi?",a1:"Hayır. Temel şekillerle başlayabilir, rehberdeki örnekleri izleyerek kavramları adım adım öğrenebilirsin.",
- q2:"Projelerim otomatik kaydediliyor mu?",a2:"Bu sayfadaki örnekte otomatik kayıt yapılmaz. Kaydet düğmesine basman ve hesabında oturum açmış olman gerekir.",
- q3:"Kaydetme neden başarısız olabilir?",a3:"Oturum açılmamış olabilir, bağlantı kesilmiş olabilir veya Cloud Code isteği reddetmiş olabilir. Ekrandaki hata mesajını kontrol et.",
- q4:"Bu örnek, ana sitedeki bütün 3D özelliklerini içeriyor mu?",a4:"Hayır. Bu sayfadaki sahne, öğrenme ve entegrasyon için hazırlanmış örnek bir araçtır. Ana editöründeki bütün özelliklerin yerine geçtiği varsayılmamalıdır.",
- q5:"Yaptığım projelerin hakları kime ait?",a5:"Haklar; kullandığın varlıkların lisansına, katkılarına ve geçerli mevzuata bağlıdır. Başkasına ait model, doku, görsel veya markaları izinsiz kullanma. Sitenin kullanım ve gizlilik koşullarını ayrıca incele.",
- closingKicker:"ŞİMDİ SIRA SENDE",closingTitle:"Bir fikirle başla. Onu sahneye taşı.",
- closingText:"Küçük bir şekil, bir renk ve bir fikir… 3D tasarım öğrenmek denemekle başlar.",
- closingCta:"Sahneye dön",homeCta:"VİZYON ana sayfası",footerText:"Öğren, tasarla, geliştir.",footerHome:"Ana sayfa",footerLegal:"Üçüncü taraf kütüphaneler kendi lisanslarına tabidir.",
- cube:"Küp",sphere:"Küre",cone:"Koni",cylinder:"Silindir",torus:"Halka",
- statusReady:"Sahne hazır.",statusAdded:"Nesne eklendi.",statusDeleted:"Nesne silindi.",
- statusLogin:"Kaydetmek için önce VİZYON hesabınla giriş yapmalısın.",
- statusSaving:"Proje kaydediliyor…",statusSaved:"Proje başarıyla kaydedildi.",
- statusNoName:"Lütfen bir proje adı yaz.",statusFailed:"Kayıt başarısız: ",statusThree:"3D motoru yüklenemedi. İnternet bağlantını kontrol et.",
- statusEmpty:"Sahnede silinecek nesne yok.",statusRotate:"Nesne döndürüldü.",statusNoSelection:"Önce bir nesne seç."
-},
-en:{
- navAbout:"What is 3D Studio?",navFeatures:"Features",navLearn:"How to use",navDemo:"Try it",
- eyebrow:"✦ VİZYON 2027 • 3D DESIGN SPACE",
- heroTitle:'Imagine.<br><span class="gradient">Design in 3D.</span>',
- heroText:"3D Studio is a workspace for exploring three-dimensional thinking, building scenes with geometric objects, and developing design ideas step by step.",
- heroCta:"Try the 3D space ↘",heroSecondary:"Explore the guide",
- heroNote:"This page brings together an introduction, learning guide, and example workspace. Available features are described below.",
- aboutKicker:"GET TO KNOW IT",aboutTitle:"What is 3D Studio?",
- aboutText:"3D Studio is a design module that lets you think about objects in a three-dimensional scene. Explore design by observing position, size, color, and relationships between objects.",
- about1Title:"Explore geometry",about1Text:"Start with basic shapes such as cubes, spheres, and cylinders, and examine their volume.",
- about2Title:"Visualize ideas",about2Text:"Develop your own scene ideas by changing colors, scales, and placement.",
- about3Title:"Learn by making",about3Text:"Learn 3D design concepts through small tasks and example projects.",
- featuresKicker:"WHAT CAN YOU DO?",featuresTitle:"Core tools of the design process",
- featuresText:"A 3D scene is made by bringing objects together. Small changes to individual objects can affect the whole scene.",
- f1t:"Objects and shapes",f1:"Start with basic geometric shapes. Combine objects to create more complex compositions.",
- f2t:"Position and scale",f2:"Change the position and size of objects. Observe how proportions affect a design.",
- f3t:"Rotation and view",f3:"Inspect the scene from different angles and explore how camera perspective changes an object's appearance.",
- f4t:"Color and material",f4:"Use color to distinguish objects. Experiment with contrast and visual hierarchy.",
- f5t:"Saving projects",f5:"Signed-in users can save their work to their account through the supported save operation.",
- f6t:"Exporting",f6:"Check which file formats your editor supports. Not every format works the same way in every app.",
- learnKicker:"STARTER GUIDE",learnTitle:"Create your first 3D design",learnText:"New to 3D design? Follow these steps to learn the basics.",
- s1t:"Explore the scene",s1:"A scene is the 3D workspace containing objects. The camera determines the viewing angle.",
- s2t:"Choose a shape",s2:"Start with a simple cube or sphere. First, understand a single object's appearance.",
- s3t:"Change its position",s3:"X is horizontal, Y vertical, and Z represents depth. Explore the axes by moving an object.",
- s4t:"Set size and color",s4:"Change the object's scale and color. Use contrast to make your design easier to read.",
- s5t:"Arrange your scene",s5:"Add a second object. Observe the distance and size relationship between objects.",
- s6t:"Save and review",s6:"Use the save feature if available. Review your scene and identify ways to improve it.",
- examplesKicker:"LEARN BY DOING",examplesTitle:"Example projects",examplesText:"These are learning ideas. Build each with simple shapes, then add your own interpretation.",
- beginner:"BEGINNER",intermediate:"INTERMEDIATE",creative:"CREATIVE TASK",
- p1t:"Mini planetary system",p1:"Use a large sphere as a star and smaller spheres as planets. Try different colors and sizes. Goal: learn scale and composition.",
- p2t:"Geometric room",p2:"Create a simple room composition with cubes and rectangular forms. Goal: learn positioning and proportions.",
- p3t:"Geometric sculpture",p3:"Arrange different shapes into an abstract sculpture. Goal: explore balance, rhythm, and visual unity.",
- tryExample:"Load example in scene",demoKicker:"INTERACTIVE EXAMPLE",demoTitle:"Try the 3D scene",
- demoText:"Add a shape, change its color and size, and drag the scene to inspect it from different angles.",
- sceneLabel:"LIVE 3D SCENE",shapeLabel:"Add a shape",addBtn:"+ Add to scene",objectLabel:"Object to edit",
- colorLabel:"Object color",scaleLabel:"Size",rotateBtn:"↻ Rotate",deleteBtn:"Delete",
- projectNameLabel:"Project name",saveBtn:"☁ Save to Back4App",
- saveNote:"You must be signed in to your VİZYON account. This example sends scene data to the existing Cloud Code function.",
- challengeTitle:"🎯 Mini challenge:",challengeText:"Add three different shapes. Enlarge one and change another's color. Create a balanced composition.",
- conceptKicker:"3D DESIGN BASICS",conceptTitle:"Concepts to know",
- c1t:"X / Y / Z",c1:"The three axes of 3D position. X can be thought of as horizontal, Y vertical, and Z depth.",
- c2t:"Geometry",c2:"The basic form of an object. Spheres, cubes, and cones are examples of different geometries.",
- c3t:"Scale",c3:"The size of an object. Changing scale changes its visual impact in the scene.",
- c4t:"Composition",c4:"How objects are arranged in a scene. Balance and negative space matter.",
- faqKicker:"HELP CENTER",faqTitle:"Frequently asked questions",
- q1:"Do I need 3D experience?",a1:"No. Start with basic shapes and follow the examples to learn concepts step by step.",
- q2:"Are my projects saved automatically?",a2:"This example does not save automatically. Click Save and make sure you are signed in.",
- q3:"Why might saving fail?",a3:"You may be signed out, disconnected, or the Cloud Code request may have been rejected. Check the error message.",
- q4:"Does this example include every feature of the main editor?",a4:"No. This is an example tool for learning and integration. It should not be considered a replacement for every feature in your main editor.",
- q5:"Who owns my projects?",a5:"Rights depend on asset licenses, your contributions, and applicable law. Do not use third-party models, textures, images, or trademarks without permission. Review the site's terms and privacy notice.",
- closingKicker:"YOUR TURN",closingTitle:"Start with an idea. Bring it into the scene.",
- closingText:"A simple shape, a color, and an idea… 3D design starts with experimentation.",
- closingCta:"Back to the scene",homeCta:"VİZYON homepage",footerText:"Learn, design, build.",footerHome:"Home",footerLegal:"Third-party libraries are subject to their own licenses.",
- cube:"Cube",sphere:"Sphere",cone:"Cone",cylinder:"Cylinder",torus:"Torus",
- statusReady:"Scene ready.",statusAdded:"Object added.",statusDeleted:"Object deleted.",
- statusLogin:"Sign in to your VİZYON account before saving.",
- statusSaving:"Saving project…",statusSaved:"Project saved successfully.",
- statusNoName:"Please enter a project name.",statusFailed:"Save failed: ",statusEmpty:"There is no object to delete.",
- statusRotate:"Object rotated.",statusNoSelection:"Select an object first.",statusThree:"3D engine could not load. Check your internet connection."
-},
-ar:{
- navAbout:"ما هو 3D Studio؟",navFeatures:"الميزات",navLearn:"طريقة الاستخدام",navDemo:"جرّبه",
- eyebrow:"✦ VİZYON 2027 • مساحة التصميم ثلاثي الأبعاد",
- heroTitle:'تخيّل.<br><span class="gradient">صمّم بثلاثة أبعاد.</span>',
- heroText:"3D Studio مساحة لاستكشاف التفكير ثلاثي الأبعاد، وبناء المشاهد بالأشكال الهندسية، وتطوير أفكار التصميم خطوة بخطوة.",
- heroCta:"جرّب مساحة 3D ↘",heroSecondary:"استكشف الدليل",
- heroNote:"تجمع هذه الصفحة بين التعريف ودليل التعلم ومساحة الأمثلة. ستجد شرح الميزات أدناه.",
- aboutKicker:"تعرّف عليه",aboutTitle:"ما هو 3D Studio؟",
- aboutText:"3D Studio وحدة تصميم تساعدك على تصور العناصر داخل مشهد ثلاثي الأبعاد. تعلّم التصميم من خلال ملاحظة مواضع العناصر وأحجامها وألوانها وعلاقاتها.",
- about1Title:"اكتشف الهندسة",about1Text:"ابدأ بأشكال أساسية مثل المكعب والكرة والأسطوانة، واستكشف مظهرها الحجمي.",
- about2Title:"حوّل الأفكار إلى صور",about2Text:"طوّر أفكارك بتغيير الألوان والمقاييس ومواضع العناصر.",
- about3Title:"تعلّم بالتطبيق",about3Text:"تعلّم مفاهيم التصميم ثلاثي الأبعاد من خلال مهام صغيرة ومشاريع نموذجية.",
- featuresKicker:"ماذا يمكنك أن تفعل؟",featuresTitle:"أدوات أساسية لعملية التصميم",
- featuresText:"يتكوّن المشهد ثلاثي الأبعاد من مجموعة عناصر. وقد تؤثر التغييرات الصغيرة في عنصر واحد على المشهد كله.",
- f1t:"العناصر والأشكال",f1:"ابدأ بالأشكال الهندسية الأساسية واجمع العناصر لإنشاء تكوينات أكثر تعقيداً.",
- f2t:"الموضع والحجم",f2:"غيّر مواضع العناصر وأحجامها ولاحظ أثر النسب في التصميم.",
- f3t:"الدوران والمنظور",f3:"افحص المشهد من زوايا مختلفة واكتشف تأثير زاوية الكاميرا.",
- f4t:"الألوان والمواد",f4:"استخدم الألوان للتمييز بين العناصر وجرّب التباين والتسلسل البصري.",
- f5t:"حفظ المشاريع",f5:"يمكن للمستخدم المسجّل الدخول حفظ عمله عبر عملية الحفظ المدعومة.",
- f6t:"التصدير",f6:"تحقّق من صيغ الملفات التي يدعمها المحرر؛ فقد يختلف التوافق بين التطبيقات.",
- learnKicker:"دليل البداية",learnTitle:"أنشئ تصميمك ثلاثي الأبعاد الأول",learnText:"إذا كنت مبتدئاً، فاتبع الخطوات التالية لتعلّم الأساسيات.",
- s1t:"تعرّف على المشهد",s1:"المشهد مساحة العمل ثلاثية الأبعاد التي تحتوي على العناصر. تحدد الكاميرا زاوية الرؤية.",
- s2t:"اختر شكلاً",s2:"ابدأ بمكعب أو كرة بسيطة وحاول فهم مظهر العنصر الواحد.",
- s3t:"غيّر موضعه",s3:"يمثل X الاتجاه الأفقي، وY العمودي، وZ العمق. استكشف المحاور بتحريك العنصر.",
- s4t:"حدّد الحجم واللون",s4:"غيّر مقياس العنصر ولونه واستخدم التباين لتوضيح التصميم.",
- s5t:"رتّب المشهد",s5:"أضف عنصراً ثانياً ولاحظ المسافة والعلاقة بين الأحجام.",
- s6t:"احفظ وراجع",s6:"استخدم الحفظ إذا كان متاحاً، ثم راجع المشهد وحدد ما يمكن تحسينه.",
- examplesKicker:"تعلّم بالتطبيق",examplesTitle:"مشاريع نموذجية",examplesText:"هذه أفكار تعليمية يمكنك بناؤها بأشكال بسيطة ثم إضافة لمستك الخاصة.",
- beginner:"مبتدئ",intermediate:"متوسط",creative:"مهمة إبداعية",
- p1t:"نظام كواكب مصغّر",p1:"استخدم كرة كبيرة كنجم وكرات أصغر ككواكب. جرّب ألواناً وأحجاماً مختلفة لتعلّم المقياس والتكوين.",
- p2t:"غرفة هندسية",p2:"أنشئ تكوين غرفة بسيطاً باستخدام المكعبات والأشكال المستطيلة. الهدف تعلّم المواضع والنسب.",
- p3t:"منحوتة هندسية",p3:"رتّب أشكالاً مختلفة لإنشاء منحوتة تجريدية. استكشف التوازن والإيقاع والوحدة البصرية.",
- tryExample:"افتح المثال في المشهد",demoKicker:"مثال تفاعلي",demoTitle:"جرّب المشهد ثلاثي الأبعاد",
- demoText:"أضف شكلاً وغيّر لونه وحجمه، واسحب المشهد لفحصه من زوايا مختلفة.",
- sceneLabel:"مشهد ثلاثي الأبعاد مباشر",shapeLabel:"أضف شكلاً",addBtn:"+ أضف إلى المشهد",objectLabel:"العنصر المراد تعديله",
- colorLabel:"لون العنصر",scaleLabel:"الحجم",rotateBtn:"↻ تدوير",deleteBtn:"حذف",
- projectNameLabel:"اسم المشروع",saveBtn:"☁ حفظ في Back4App",
- saveNote:"يجب تسجيل الدخول إلى حساب VİZYON للحفظ. يرسل هذا المثال بيانات المشهد إلى وظيفة Cloud Code الحالية.",
- challengeTitle:"🎯 تحدٍ صغير:",challengeText:"أضف ثلاثة أشكال مختلفة. كبّر أحدها وغيّر لون الآخر، ثم أنشئ تكويناً متوازناً.",
- conceptKicker:"أساسيات التصميم ثلاثي الأبعاد",conceptTitle:"مفاهيم عليك معرفتها",
- c1t:"X / Y / Z",c1:"المحاور الثلاثة للموضع ثلاثي الأبعاد: X أفقي، وY عمودي، وZ للعمق.",
- c2t:"الهندسة",c2:"الشكل الأساسي للعنصر. الكرة والمكعب والمخروط أمثلة على أشكال هندسية مختلفة.",
- c3t:"المقياس",c3:"حجم العنصر. يؤدي تغيير المقياس إلى تغيير تأثيره البصري في المشهد.",
- c4t:"التكوين",c4:"طريقة ترتيب العناصر داخل المشهد. التوازن والمساحات الفارغة مهمان.",
- faqKicker:"مركز المساعدة",faqTitle:"الأسئلة الشائعة",
- q1:"هل أحتاج إلى خبرة ثلاثية الأبعاد؟",a1:"لا. ابدأ بالأشكال الأساسية واتبع الأمثلة لتعلّم المفاهيم خطوة بخطوة.",
- q2:"هل تُحفظ مشاريعي تلقائياً؟",a2:"لا يحفظ هذا المثال تلقائياً. اضغط على زر الحفظ وتأكد من تسجيل الدخول.",
- q3:"لماذا قد يفشل الحفظ؟",a3:"قد تكون غير مسجّل الدخول أو منقطع الاتصال، أو قد ترفض Cloud Code الطلب. راجع رسالة الخطأ.",
- q4:"هل يتضمن المثال جميع ميزات المحرر الرئيسي؟",a4:"لا. هذه أداة نموذجية للتعلم والتكامل، ولا يُفترض أنها بديل لكل ميزات المحرر الرئيسي.",
- q5:"من يملك حقوق مشاريعي؟",a5:"تعتمد الحقوق على تراخيص الأصول ومساهماتك والقانون المعمول به. لا تستخدم نماذج أو صوراً أو علامات تجارية للغير دون إذن. راجع شروط الموقع وإشعار الخصوصية.",
- closingKicker:"حان دورك",closingTitle:"ابدأ بفكرة وانقلها إلى المشهد.",
- closingText:"شكل بسيط ولون وفكرة… يبدأ تعلّم التصميم بالتجربة.",
- closingCta:"العودة إلى المشهد",homeCta:"الصفحة الرئيسية",footerText:"تعلّم وصمّم وطوّر.",footerHome:"الرئيسية",footerLegal:"تخضع المكتبات الخارجية لتراخيصها الخاصة.",
- cube:"مكعب",sphere:"كرة",cone:"مخروط",cylinder:"أسطوانة",torus:"حلقة",
- statusReady:"المشهد جاهز.",statusAdded:"تمت إضافة العنصر.",statusDeleted:"تم حذف العنصر.",
- statusLogin:"سجّل الدخول إلى حساب VİZYON قبل الحفظ.",
- statusSaving:"جارٍ حفظ المشروع…",statusSaved:"تم حفظ المشروع بنجاح.",
- statusNoName:"يرجى إدخال اسم للمشروع.",statusFailed:"فشل الحفظ: ",statusEmpty:"لا يوجد عنصر لحذفه.",
- statusRotate:"تم تدوير العنصر.",statusNoSelection:"اختر عنصراً أولاً.",statusThree:"تعذّر تحميل محرك 3D. تحقق من اتصال الإنترنت."
+// ===== Parse Başlat =====
+let parseReady = false;
+try {
+    if (typeof Parse !== "undefined") {
+        Parse.initialize(BACK4APP_APP_ID, BACK4APP_JS_KEY);
+        Parse.serverURL = BACK4APP_SERVER;
+        parseReady = true;
+        console.log("✅ Back4App bağlantısı kuruldu (3D Stüdyo)");
+    }
+} catch (e) {
+    console.error("❌ Parse başlatma hatası:", e);
 }
-};
 
-let currentLang="tr";
-function t(key){return translations[currentLang][key]||translations.tr[key]||key}
-function applyLanguage(lang){
- currentLang=translations[lang]?lang:"tr";
- document.documentElement.lang=currentLang;
- document.documentElement.dir=currentLang==="ar"?"rtl":"ltr";
- document.querySelectorAll("[data-i18n]").forEach(el=>{
-   const value=t(el.dataset.i18n);
-   if(value!==undefined)el.innerHTML=value;
- });
- const oldShape=document.getElementById("shape").value;
- [...document.getElementById("shape").options].forEach(o=>o.textContent=t(o.value));
- document.getElementById("language").value=currentLang;
- updateObjectOptions();
- setStatus(t("statusReady"));
-}
-document.getElementById("language").addEventListener("change",e=>applyLanguage(e.target.value));
-document.getElementById("year").textContent=new Date().getFullYear();
+// ===== Yıl =====
+document.getElementById("year").textContent = new Date().getFullYear();
 
-/* Initialize Parse only if the SDK is available. */
-let parseReady=false;
-try{
- if(typeof Parse!=="undefined"){
-  Parse.initialize(BACK4APP_APP_ID,BACK4APP_JS_KEY);
-  Parse.serverURL=BACK4APP_SERVER;
-  parseReady=true;
- }
-}catch(e){console.error("Parse initialization error:",e);}
+// ===== Parçacıklar =====
+(function initParticles() {
+    var container = document.getElementById("particles");
+    if (!container) return;
+    var count = 30;
+    try {
+        if (window.matchMedia && window.matchMedia("(max-width: 480px)").matches) count = 14;
+        else if (window.matchMedia && window.matchMedia("(max-width: 768px)").matches) count = 20;
+    } catch (e) {}
+    for (var i = 0; i < count; i++) {
+        var p = document.createElement("div");
+        p.className = "particle";
+        p.style.left = (Math.random() * 100) + "%";
+        p.style.animationDuration = (8 + Math.random() * 22) + "s";
+        p.style.animationDelay = (-Math.random() * 30) + "s";
+        container.appendChild(p);
+    }
+})();
 
-function setStatus(message){document.getElementById("status").textContent=message}
+// ===== Dil Değiştirme (TR/EN/AR) =====
+function changeLanguage(lang) {
+    if (["tr", "en", "ar"].indexOf(lang) === -1) lang = "tr";
 
-/* Three.js demo scene */
-let renderer,scene,camera,rayObjects=[],selected=null,dragging=false,lastX=0,lastY=0;
-const canvas=document.getElementById("stage");
-const objectSelect=document.getElementById("objectSelect");
-const colors=["#8b7bff","#57e5ff","#62e6b2","#ffb86b","#ff7185"];
-let nextId=1;
+    // Aktif dil içeriğini değiştir
+    document.querySelectorAll(".lang-content").forEach(function (el) {
+        el.classList.remove("active");
+    });
+    var target = document.getElementById("lang-" + lang);
+    if (target) target.classList.add("active");
 
-function createGeometry(type){
- switch(type){
-  case "sphere":return new THREE.SphereGeometry(.65,32,24);
-  case "cone":return new THREE.ConeGeometry(.65,1.25,32);
-  case "cylinder":return new THREE.CylinderGeometry(.55,.55,1.2,32);
-  case "torus":return new THREE.TorusGeometry(.55,.19,16,48);
-  default:return new THREE.BoxGeometry(1,1,1);
- }
+    // Yön
+    document.documentElement.dir = (lang === "ar") ? "rtl" : "ltr";
+    document.documentElement.lang = lang;
+
+    // Select'i güncelle
+    var sel = document.getElementById("language");
+    if (sel && sel.value !== lang) sel.value = lang;
+
+    try { localStorage.setItem("preferred_lang", lang); } catch (e) {}
+
+    console.log("🌐 Dil:", lang);
 }
-function addObject(type="box",position){
- if(!scene)return;
- const material=new THREE.MeshStandardMaterial({
-  color:colors[(nextId-1)%colors.length],roughness:.42,metalness:.12
- });
- const mesh=new THREE.Mesh(createGeometry(type),material);
- mesh.userData.id=nextId++;
- mesh.userData.kind=type;
- mesh.position.copy(position||new THREE.Vector3(
-  (Math.random()-.5)*2, .15, (Math.random()-.5)*1.4
- ));
- mesh.castShadow=true;mesh.receiveShadow=true;
- scene.add(mesh);rayObjects.push(mesh);selected=mesh;
- updateObjectOptions();syncControls();setStatus(t("statusAdded"));
-}
-function updateObjectOptions(){
- if(!objectSelect)return;
- const old=selected?.userData.id;
- objectSelect.innerHTML="";
- rayObjects.forEach((obj,i)=>{
-  const opt=document.createElement("option");
-  opt.value=String(obj.userData.id);
-  opt.textContent=(currentLang==="ar"?"عنصر ":"Object ")+(i+1);
-  objectSelect.appendChild(opt);
- });
- if(old&&rayObjects.some(o=>o.userData.id===old))objectSelect.value=String(old);
-}
-function syncControls(){
- if(!selected)return;
- document.getElementById("color").value="#"+selected.material.color.getHexString();
- document.getElementById("scale").value=selected.scale.x;
- objectSelect.value=String(selected.userData.id);
-}
-function getSelected(){
- const id=Number(objectSelect.value);
- selected=rayObjects.find(o=>o.userData.id===id)||null;
- if(selected)syncControls();
-}
-function init3D(){
- if(typeof THREE==="undefined"){setStatus(t("statusThree"));return}
- try{
-  scene=new THREE.Scene();scene.background=new THREE.Color("#080d1c");
-  camera=new THREE.PerspectiveCamera(45,1,.1,100);
-  camera.position.set(4,3.3,6);camera.lookAt(0,0,0);
-  renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
-  renderer.shadowMap.enabled=true;
-  renderer.outputColorSpace=THREE.SRGBColorSpace;
-  scene.add(new THREE.HemisphereLight(0xbacaff,0x1b2140,2));
-  const light=new THREE.DirectionalLight(0xffffff,3);
-  light.position.set(4,7,5);light.castShadow=true;scene.add(light);
-  const floor=new THREE.Mesh(
-   new THREE.PlaneGeometry(200,200),
-   new THREE.MeshStandardMaterial({color:"#10172a",roughness:.9})
-  );
-  floor.rotation.x=-Math.PI/2;floor.position.y=-.9;floor.receiveShadow=true;scene.add(floor);
-  const grid=new THREE.GridHelper(20,20,"#394367","#202943");
-  grid.position.y=-.89;scene.add(grid);
-  addObject("box",new THREE.Vector3(0,0,0));
-  addObject("sphere",new THREE.Vector3(1.5,0,0));
-  addObject("cone",new THREE.Vector3(-1.5,0,0));
-  resizeRenderer();
-  window.addEventListener("resize",resizeRenderer);
-  canvas.addEventListener("pointerdown",onPointerDown);
-  canvas.addEventListener("pointermove",onPointerMove);
-  window.addEventListener("pointerup",()=>dragging=false);
-  animate();
-  setStatus(t("statusReady"));
- }catch(e){console.error(e);setStatus(t("statusThree"))}
-}
-function resizeRenderer(){
- if(!renderer||!camera)return;
- const rect=canvas.getBoundingClientRect();
- const w=Math.max(1,rect.width),h=Math.max(1,rect.height);
- renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
-}
-function animate(){
- requestAnimationFrame(animate);
- if(!renderer||!scene||!camera)return;
- renderer.render(scene,camera);
-}
-function onPointerDown(e){
- dragging=true;lastX=e.clientX;lastY=e.clientY;
- canvas.setPointerCapture?.(e.pointerId);
-}
-function onPointerMove(e){
- if(!dragging||!camera)return;
- const dx=e.clientX-lastX,dy=e.clientY-lastY;
- lastX=e.clientX;lastY=e.clientY;
- const offset=camera.position.clone();
- const spherical=new THREE.Spherical().setFromVector3(offset);
- spherical.theta-=dx*.006;spherical.phi=Math.max(.25,Math.min(Math.PI-.25,spherical.phi+dy*.006));
- spherical.radius=Math.max(3,Math.min(12,spherical.radius));
- camera.position.setFromSpherical(spherical);camera.lookAt(0,0,0);
-}
-document.getElementById("addShape").addEventListener("click",()=>{
- addObject(document.getElementById("shape").value);
-});
-objectSelect.addEventListener("change",getSelected);
-document.getElementById("color").addEventListener("input",e=>{
- getSelected();if(selected)selected.material.color.set(e.target.value);
-});
-document.getElementById("scale").addEventListener("input",e=>{
- getSelected();if(selected)selected.scale.setScalar(Number(e.target.value));
-});
-document.getElementById("rotate").addEventListener("click",()=>{
- getSelected();if(!selected){setStatus(t("statusNoSelection"));return}
- selected.rotation.y+=Math.PI/4;setStatus(t("statusRotate"));
-});
-document.getElementById("delete").addEventListener("click",()=>{
- getSelected();
- if(!selected){setStatus(t("statusEmpty"));return}
- scene.remove(selected);selected.geometry.dispose();selected.material.dispose();
- rayObjects=rayObjects.filter(o=>o!==selected);selected=rayObjects[0]||null;
- updateObjectOptions();if(selected)syncControls();setStatus(t("statusDeleted"));
+
+document.getElementById("language").addEventListener("change", function (e) {
+    changeLanguage(e.target.value);
 });
 
-/* Example scenes */
-document.querySelectorAll("[data-load-example]").forEach(button=>{
- button.addEventListener("click",()=>{
-  if(!scene)return;
-  rayObjects.forEach(o=>{scene.remove(o);o.geometry.dispose();o.material.dispose()});
-  rayObjects=[];selected=null;
-  const kind=button.dataset.loadExample;
-  if(kind==="planet"){
-   addObject("sphere",new THREE.Vector3(0,0,0));
-   selected.material.color.set("#ffbd69");selected.scale.setScalar(1.25);
-   addObject("sphere",new THREE.Vector3(1.7,.2,0));selected.material.color.set("#57e5ff");selected.scale.setScalar(.42);
-   addObject("sphere",new THREE.Vector3(-1.9,-.1,.5));selected.material.color.set("#b69cff");selected.scale.setScalar(.28);
-  }else if(kind==="room"){
-   addObject("box",new THREE.Vector3(0,-.25,0));selected.material.color.set("#6578a8");selected.scale.set(3,.12,3);
-   addObject("box",new THREE.Vector3(0,.3,-1.3));selected.material.color.set("#57e5ff");selected.scale.set(3,1.2,.12);
-   addObject("box",new THREE.Vector3(-1.3,.25,0));selected.material.color.set("#8b7bff");selected.scale.set(.12,1.1,2.6);
-  }else{
-   addObject("cylinder",new THREE.Vector3(0,-.2,0));selected.material.color.set("#57e5ff");selected.scale.set(.8,1.2,.8);
-   addObject("torus",new THREE.Vector3(0,.8,0));selected.material.color.set("#8b7bff");
-   addObject("sphere",new THREE.Vector3(0,1.6,0));selected.material.color.set("#ffb86b");selected.scale.setScalar(.45);
-  }
-  updateObjectOptions();if(selected)syncControls();
-  document.getElementById("demo").scrollIntoView({behavior:"smooth"});
- });
+// URL'den lang parametresi
+try {
+    var urlParams = new URLSearchParams(window.location.search);
+    var urlLang = urlParams.get("lang");
+    var savedLang = null;
+    try { savedLang = localStorage.getItem("preferred_lang"); } catch (e) {}
+    var finalLang = "tr";
+    if (urlLang && ["tr", "en", "ar"].indexOf(urlLang) !== -1) finalLang = urlLang;
+    else if (savedLang && ["tr", "en", "ar"].indexOf(savedLang) !== -1) finalLang = savedLang;
+    changeLanguage(finalLang);
+} catch (e) { changeLanguage("tr"); }
+
+// Klavye kısayolları
+document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey || e.metaKey) {
+        if (e.key === "1") { e.preventDefault(); changeLanguage("tr"); }
+        if (e.key === "2") { e.preventDefault(); changeLanguage("en"); }
+        if (e.key === "3") { e.preventDefault(); changeLanguage("ar"); }
+    }
 });
 
-/* Back4App Cloud Code save integration.
-   Existing function expects: name, type, content; glbBase64 is optional.
-   The backend checks request.user and owns the saved Project record.
-*/
-document.getElementById("save").addEventListener("click",async()=>{
- const name=document.getElementById("projectName").value.trim();
- if(!name){setStatus(t("statusNoName"));return}
- if(!parseReady){setStatus(t("statusFailed")+"Parse SDK başlatılamadı.");return}
- const user=Parse.User.current();
- if(!user){setStatus(t("statusLogin"));return}
- if(!rayObjects.length){setStatus(t("statusEmpty"));return}
+/* ==========================================================
+   3D SAHNE MOTORU — Birden fazla dil canvas'ı için
+   ========================================================== */
 
- const content={
-  format:"vizyon-3d-scene-v1",
-  savedAt:new Date().toISOString(),
-  objects:rayObjects.map(obj=>({
-   id:obj.userData.id,
-   kind:obj.userData.kind,
-   position:{x:obj.position.x,y:obj.position.y,z:obj.position.z},
-   rotation:{x:obj.rotation.x,y:obj.rotation.y,z:obj.rotation.z},
-   scale:{x:obj.scale.x,y:obj.scale.y,z:obj.scale.z},
-   color:"#"+obj.material.color.getHexString()
-  }))
- };
+// Ortak renk paleti (index.html aurora)
+const COLORS = ["#00e5ff", "#00ff9d", "#b845ff", "#ff2d92", "#ffd11a", "#ff5e1a", "#4df0ff"];
 
- const button=document.getElementById("save");
- button.disabled=true;setStatus(t("statusSaving"));
- try{
-  const result=await Parse.Cloud.run("saveProjectWithSceneData",{
-   name:name,
-   type:"3D",
-   content:JSON.stringify(content)
-  });
-  if(result&&result.success){
-   setStatus(t("statusSaved")+(result.projectId?" ID: "+result.projectId:""));
-  }else{
-   setStatus(t("statusFailed")+(result?.error||"Bilinmeyen yanıt"));
-  }
- }catch(error){
-  console.error("3D project save failed:",error);
-  setStatus(t("statusFailed")+(error.message||String(error)));
- }finally{
-  button.disabled=false;
- }
+// Şekil oluşturucu — 13 şekil
+function createGeometry(type) {
+    switch (type) {
+        case "sphere":       return new THREE.SphereGeometry(0.65, 32, 24);
+        case "cone":         return new THREE.ConeGeometry(0.65, 1.25, 32);
+        case "cylinder":     return new THREE.CylinderGeometry(0.55, 0.55, 1.2, 32);
+        case "torus":        return new THREE.TorusGeometry(0.55, 0.19, 16, 48);
+        case "torusKnot":    return new THREE.TorusKnotGeometry(0.5, 0.16, 64, 8);
+        case "octahedron":   return new THREE.OctahedronGeometry(0.7);
+        case "dodecahedron": return new THREE.DodecahedronGeometry(0.65);
+        case "icosahedron":  return new THREE.IcosahedronGeometry(0.65);
+        case "tetrahedron":  return new THREE.TetrahedronGeometry(0.75);
+        case "capsule":      return new THREE.CapsuleGeometry(0.4, 0.6, 8, 16);
+        case "pyramid":      return new THREE.ConeGeometry(0.7, 1.1, 4);
+        case "gem": {
+            // Elmas — özel geometri
+            const geo = new THREE.OctahedronGeometry(0.7);
+            geo.scale(1, 1.4, 1);
+            return geo;
+        }
+        default:             return new THREE.BoxGeometry(1, 1, 1);
+    }
+}
+
+// 3D Sahne kurucu (her dil için ayrı)
+function initScene3D(config) {
+    const { canvasId, selectId, colorId, scaleId, rotateId, deleteId, clearId, exportId, saveId, nameId, statusId, addId, shapeId } = config;
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) { console.warn("Canvas bulunamadı:", canvasId); return null; }
+
+    let scene, camera, renderer, controls, selected = null, objects = [], nextId = 1;
+
+    try {
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050a15);
+        // İnce nebula arka plan
+        const ambientGlow = new THREE.PointLight(0x00e5ff, 0.4, 40);
+        ambientGlow.position.set(0, 3, 0);
+        scene.add(ambientGlow);
+
+        const rect = canvas.getBoundingClientRect();
+        const width = Math.max(1, rect.width);
+        const height = Math.max(1, rect.height);
+
+        camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 200);
+        camera.position.set(5, 4, 7);
+        camera.lookAt(0, 0, 0);
+
+        renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(width, height, false);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+        // OrbitControls (varsa)
+        if (typeof THREE.OrbitControls !== "undefined") {
+            controls = new THREE.OrbitControls(camera, canvas);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.08;
+            controls.minDistance = 3;
+            controls.maxDistance = 20;
+            controls.target.set(0, 0.4, 0);
+            controls.update();
+        }
+
+        // Işıklar
+        const hemi = new THREE.HemisphereLight(0xbacaff, 0x1b2140, 1.6);
+        scene.add(hemi);
+
+        const dir = new THREE.DirectionalLight(0xffffff, 1.4);
+        dir.position.set(5, 8, 5);
+        dir.castShadow = true;
+        scene.add(dir);
+
+        const accent1 = new THREE.PointLight(0x00e5ff, 0.8, 30);
+        accent1.position.set(-4, 3, 4);
+        scene.add(accent1);
+
+        const accent2 = new THREE.PointLight(0xb845ff, 0.8, 30);
+        accent2.position.set(4, 3, -4);
+        scene.add(accent2);
+
+        // Zemin
+        const floor = new THREE.Mesh(
+            new THREE.PlaneGeometry(200, 200),
+            new THREE.MeshStandardMaterial({ color: 0x0a1020, roughness: 0.9, metalness: 0.1 })
+        );
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.y = -0.9;
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        // Aurora grid
+        const grid = new THREE.GridHelper(30, 30, 0x00e5ff, 0x1a2a4a);
+        grid.position.y = -0.89;
+        grid.material.opacity = 0.35;
+        grid.material.transparent = true;
+        scene.add(grid);
+
+        // İlk 3 nesne
+        addObject3D("box", new THREE.Vector3(-1.8, 0, 0));
+        addObject3D("sphere", new THREE.Vector3(0, 0, 0));
+        addObject3D("torusKnot", new THREE.Vector3(1.8, 0, 0));
+
+        // Resize
+        const resize = function () {
+            const r = canvas.getBoundingClientRect();
+            const w = Math.max(1, r.width);
+            const h = Math.max(1, r.height);
+            renderer.setSize(w, h, false);
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+        };
+        window.addEventListener("resize", resize);
+        resize();
+
+        // Animasyon döngüsü
+        function animate() {
+            requestAnimationFrame(animate);
+            if (controls) controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // ===== Obje Yönetimi =====
+        function addObject3D(type, position) {
+            if (!scene) return;
+            const material = new THREE.MeshStandardMaterial({
+                color: COLORS[(nextId - 1) % COLORS.length],
+                roughness: 0.35,
+                metalness: 0.35,
+                emissive: new THREE.Color(COLORS[(nextId - 1) % COLORS.length]).multiplyScalar(0.08)
+            });
+            const mesh = new THREE.Mesh(createGeometry(type), material);
+            mesh.userData.id = nextId++;
+            mesh.userData.kind = type;
+            mesh.position.copy(position || new THREE.Vector3(
+                (Math.random() - 0.5) * 3,
+                0.2,
+                (Math.random() - 0.5) * 2
+            ));
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            scene.add(mesh);
+            objects.push(mesh);
+            selected = mesh;
+            updateSelectOptions();
+            syncControls();
+            setStatusSafe("✅ Nesne eklendi");
+        }
+
+        function updateSelectOptions() {
+            const sel = document.getElementById(selectId);
+            if (!sel) return;
+            const prev = selected ? selected.userData.id : null;
+            sel.innerHTML = "";
+            objects.forEach(function (obj, i) {
+                const opt = document.createElement("option");
+                opt.value = String(obj.userData.id);
+                opt.textContent = "Object " + (i + 1);
+                sel.appendChild(opt);
+            });
+            if (prev && objects.some(function (o) { return o.userData.id === prev; })) {
+                sel.value = String(prev);
+            }
+        }
+
+        function syncControls() {
+            if (!selected) return;
+            const colorInp = document.getElementById(colorId);
+            const scaleInp = document.getElementById(scaleId);
+            const sel = document.getElementById(selectId);
+            if (colorInp) colorInp.value = "#" + selected.material.color.getHexString();
+            if (scaleInp) scaleInp.value = selected.scale.x;
+            if (sel) sel.value = String(selected.userData.id);
+        }
+
+        function getSelected() {
+            const sel = document.getElementById(selectId);
+            if (!sel) return null;
+            const id = Number(sel.value);
+            selected = objects.find(function (o) { return o.userData.id === id; }) || null;
+            if (selected) syncControls();
+            return selected;
+        }
+
+        function setStatusSafe(msg) {
+            const el = document.getElementById(statusId);
+            if (el) el.textContent = msg;
+        }
+
+        // ===== UI Bağlantıları =====
+        const addBtn = document.getElementById(addId);
+        const shapeSel = document.getElementById(shapeId);
+        if (addBtn && shapeSel) {
+            addBtn.addEventListener("click", function () {
+                addObject3D(shapeSel.value);
+            });
+        }
+
+        const objSel = document.getElementById(selectId);
+        if (objSel) objSel.addEventListener("change", getSelected);
+
+        const colorInp = document.getElementById(colorId);
+        if (colorInp) colorInp.addEventListener("input", function (e) {
+            getSelected();
+            if (selected) selected.material.color.set(e.target.value);
+        });
+
+        const scaleInp = document.getElementById(scaleId);
+        if (scaleInp) scaleInp.addEventListener("input", function (e) {
+            getSelected();
+            if (selected) selected.scale.setScalar(Number(e.target.value));
+        });
+
+        const rotateBtn = document.getElementById(rotateId);
+        if (rotateBtn) rotateBtn.addEventListener("click", function () {
+            if (!getSelected()) { setStatusSafe("⚠️ Önce nesne seç"); return; }
+            selected.rotation.y += Math.PI / 4;
+            setStatusSafe("↻ Nesne döndürüldü");
+        });
+
+        const deleteBtn = document.getElementById(deleteId);
+        if (deleteBtn) deleteBtn.addEventListener("click", function () {
+            if (!getSelected()) { setStatusSafe("⚠️ Silinecek nesne yok"); return; }
+            scene.remove(selected);
+            selected.geometry.dispose();
+            selected.material.dispose();
+            objects = objects.filter(function (o) { return o !== selected; });
+            selected = objects[0] || null;
+            updateSelectOptions();
+            if (selected) syncControls();
+            setStatusSafe("🗑️ Nesne silindi");
+        });
+
+        const clearBtn = document.getElementById(clearId);
+        if (clearBtn) clearBtn.addEventListener("click", function () {
+            objects.forEach(function (o) {
+                scene.remove(o);
+                o.geometry.dispose();
+                o.material.dispose();
+            });
+            objects = [];
+            selected = null;
+            updateSelectOptions();
+            setStatusSafe("🧹 Sahne temizlendi");
+        });
+
+        const exportBtn = document.getElementById(exportId);
+        if (exportBtn) exportBtn.addEventListener("click", function () {
+            if (typeof THREE.GLTFExporter === "undefined") {
+                setStatusSafe("⚠️ GLTFExporter yüklü değil");
+                return;
+            }
+            try {
+                const exporter = new THREE.GLTFExporter();
+                exporter.parse(scene, function (glb) {
+                    const blob = new Blob([glb], { type: "application/octet-stream" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "vizyon3d-scene.glb";
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    setStatusSafe("📦 .glb indirildi");
+                }, function (err) {
+                    console.error(err);
+                    setStatusSafe("❌ Dışa aktarma hatası");
+                }, { binary: true });
+            } catch (e) {
+                console.error(e);
+                setStatusSafe("❌ Hata: " + e.message);
+            }
+        });
+
+        const saveBtn = document.getElementById(saveId);
+        const nameInp = document.getElementById(nameId);
+        if (saveBtn && nameInp) {
+            saveBtn.addEventListener("click", async function () {
+                const name = nameInp.value.trim();
+                if (!name) { setStatusSafe("⚠️ Proje adı gir"); return; }
+                if (!parseReady) { setStatusSafe("❌ Parse SDK yüklenmedi"); return; }
+                const user = Parse.User.current();
+                if (!user) { setStatusSafe("🔒 Önce giriş yapın"); return; }
+                if (!objects.length) { setStatusSafe("⚠️ Sahne boş"); return; }
+
+                const content = {
+                    format: "vizyon-3d-scene-v1",
+                    savedAt: new Date().toISOString(),
+                    engine: "three.js-r128",
+                    objects: objects.map(function (obj) {
+                        return {
+                            id: obj.userData.id,
+                            kind: obj.userData.kind,
+                            position: { x: obj.position.x, y: obj.position.y, z: obj.position.z },
+                            rotation: { x: obj.rotation.x, y: obj.rotation.y, z: obj.rotation.z },
+                            scale: { x: obj.scale.x, y: obj.scale.y, z: obj.scale.z },
+                            color: "#" + obj.material.color.getHexString()
+                        };
+                    })
+                };
+
+                saveBtn.disabled = true;
+                setStatusSafe("⏳ Kaydediliyor...");
+
+                try {
+                    const result = await Parse.Cloud.run("saveProjectWithSceneData", {
+                        name: name,
+                        type: "3D",
+                        content: JSON.stringify(content)
+                    });
+                    if (result && result.success) {
+                        setStatusSafe("✅ Kaydedildi" + (result.projectId ? " · ID: " + result.projectId : ""));
+                    } else {
+                        setStatusSafe("❌ " + (result && result.error || "Bilinmeyen hata"));
+                    }
+                } catch (err) {
+                    console.error("Kayıt hatası:", err);
+                    setStatusSafe("❌ " + (err.message || err));
+                } finally {
+                    saveBtn.disabled = false;
+                }
+            });
+        }
+
+        // ===== Örnek Sahneler =====
+        document.querySelectorAll('[data-load-example]').forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                if (!scene) return;
+                // Temizle
+                objects.forEach(function (o) {
+                    scene.remove(o);
+                    o.geometry.dispose();
+                    o.material.dispose();
+                });
+                objects = [];
+                selected = null;
+
+                const kind = btn.dataset.loadExample;
+                if (kind === "planet") {
+                    addObject3D("sphere", new THREE.Vector3(0, 0, 0));
+                    selected.material.color.set("#ffd11a");
+                    selected.scale.setScalar(1.4);
+                    addObject3D("sphere", new THREE.Vector3(2, 0.3, 0));
+                    selected.material.color.set("#00e5ff");
+                    selected.scale.setScalar(0.45);
+                    addObject3D("sphere", new THREE.Vector3(-2.2, -0.2, 0.6));
+                    selected.material.color.set("#b845ff");
+                    selected.scale.setScalar(0.32);
+                    addObject3D("torus", new THREE.Vector3(0, 0, 0));
+                    selected.material.color.set("#ff2d92");
+                    selected.rotation.x = Math.PI / 2;
+                    selected.scale.setScalar(1.8);
+                } else if (kind === "room") {
+                    addObject3D("box", new THREE.Vector3(0, -0.3, 0));
+                    selected.material.color.set("#3a4a70");
+                    selected.scale.set(4, 0.15, 4);
+                    addObject3D("box", new THREE.Vector3(0, 0.4, -1.8));
+                    selected.material.color.set("#00e5ff");
+                    selected.scale.set(4, 1.6, 0.15);
+                    addObject3D("box", new THREE.Vector3(-1.8, 0.4, 0));
+                    selected.material.color.set("#b845ff");
+                    selected.scale.set(0.15, 1.6, 3.6);
+                    addObject3D("box", new THREE.Vector3(1.8, 0.4, 0));
+                    selected.material.color.set("#b845ff");
+                    selected.scale.set(0.15, 1.6, 3.6);
+                    addObject3D("box", new THREE.Vector3(0, 0.3, 1.2));
+                    selected.material.color.set("#00ff9d");
+                    selected.scale.set(1.2, 0.6, 0.8);
+                } else {
+                    addObject3D("cylinder", new THREE.Vector3(0, -0.3, 0));
+                    selected.material.color.set("#00e5ff");
+                    selected.scale.set(0.9, 1.3, 0.9);
+                    addObject3D("torusKnot", new THREE.Vector3(0, 0.9, 0));
+                    selected.material.color.set("#b845ff");
+                    addObject3D("sphere", new THREE.Vector3(0, 1.9, 0));
+                    selected.material.color.set("#ffd11a");
+                    selected.scale.setScalar(0.5);
+                    addObject3D("tetrahedron", new THREE.Vector3(-1.2, 1.4, 0.5));
+                    selected.material.color.set("#ff2d92");
+                    addObject3D("octahedron", new THREE.Vector3(1.2, 1.4, -0.5));
+                    selected.material.color.set("#ff5e1a");
+                }
+
+                updateSelectOptions();
+                if (selected) syncControls();
+                const demoEl = document.getElementById("demo");
+                if (demoEl) demoEl.scrollIntoView({ behavior: "smooth" });
+                setStatusSafe("🎬 Örnek sahne yüklendi");
+            });
+        });
+
+        setStatusSafe("✨ Sahne hazır — başlamak için şekil ekle");
+        return { scene, camera, renderer };
+
+    } catch (e) {
+        console.error("3D sahne hatası:", e);
+        setStatusSafe("❌ 3D motoru yüklenemedi");
+        return null;
+    }
+}
+
+// ===== Tüm dillerin sahnelerini başlat =====
+window.addEventListener("DOMContentLoaded", function () {
+    setTimeout(function () {
+        if (typeof THREE === "undefined") {
+            console.error("❌ Three.js yüklenemedi");
+            return;
+        }
+
+        // Türkçe sahne
+        initScene3D({
+            canvasId: "stage",
+            selectId: "objectSelect",
+            colorId: "color",
+            scaleId: "scale",
+            rotateId: "rotate",
+            deleteId: "delete",
+            clearId: "clearScene",
+            exportId: "exportGLB",
+            saveId: "save",
+            nameId: "projectName",
+            statusId: "status",
+            addId: "addShape",
+            shapeId: "shape"
+        });
+
+        // İngilizce sahne
+        initScene3D({
+            canvasId: "stage-en",
+            selectId: "objectSelect-en",
+            colorId: "color-en",
+            scaleId: "scale-en",
+            rotateId: "rotate-en",
+            deleteId: "delete-en",
+            clearId: "clearScene-en",
+            exportId: "exportGLB-en",
+            saveId: "save-en",
+            nameId: "projectName-en",
+            statusId: "status-en",
+            addId: "addShape-en",
+            shapeId: "shape-en"
+        });
+
+        // Arapça sahne
+        initScene3D({
+            canvasId: "stage-ar",
+            selectId: "objectSelect-ar",
+            colorId: "color-ar",
+            scaleId: "scale-ar",
+            rotateId: "rotate-ar",
+            deleteId: "delete-ar",
+            clearId: "clearScene-ar",
+            exportId: "exportGLB-ar",
+            saveId: "save-ar",
+            nameId: "projectName-ar",
+            statusId: "status-ar",
+            addId: "addShape-ar",
+            shapeId: "shape-ar"
+        });
+
+        console.log("✅ Tüm 3D sahneler başlatıldı (3 dil)");
+    }, 300);
 });
 
-applyLanguage("tr");
-init3D();
+console.log("%c🧊 VİZYON 2027 — 3D Stüdyo v3.0 (v7.10.0)", "color:#00e5ff;font-weight:bold;font-size:14px;");
+console.log("%c✅ Back4App uyumlu · Parse SDK 5.0.0 · 13 şekil · GLB export", "color:#00ff9d;font-size:12px;");
+console.log("%c🌐 3 dil destekli (TR/EN/AR) — Ctrl+1/2/3 ile değiştir", "color:#ffd11a;font-size:11px;");
 </script>
+
 </body>
 </html>
