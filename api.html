@@ -1,602 +1,2654 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>API · Vizyon2027</title>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet" />
-    <style>
-        /* ===== GENEL ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: #050a0f;
-            color: #ccdeee;
-            font-family: 'Inter', sans-serif;
-            line-height: 1.7;
-            min-height: 100vh;
-            padding: 40px 20px;
-        }
-        a { color: #00d4ff; text-decoration: none; transition: color 0.2s; }
-        a:hover { color: #a855f7; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="VİZYON 2027 API Dokümantasyonu - 21 AI modeli, Vizyon Al, V27 API, V27 Koç, Takım Yönetimi ve tüm Cloud Code fonksiyonları.">
+<meta name="theme-color" content="#03050a">
+<title>API Dokümantasyonu | VİZYON 2027</title>
 
-        /* ===== CONTAINER ===== */
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            background: rgba(13, 26, 38, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 212, 255, 0.12);
-            border-radius: 28px;
-            padding: 48px 44px;
-            box-shadow: 0 12px 60px rgba(0, 0, 0, 0.5);
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-        /* ===== HEADER ===== */
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
-            padding-bottom: 28px;
-            border-bottom: 1px solid rgba(0, 212, 255, 0.12);
-            margin-bottom: 32px;
-        }
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #00d4ff, #a855f7, #ff6b35);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            font-weight: 700;
-            color: #fff;
-            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
-        }
-        .logo-text {
-            font-family: 'Syne', sans-serif;
-            font-size: 26px;
-            font-weight: 800;
-            background: linear-gradient(45deg, #00d4ff, #a855f7, #ff6b35, #00d4ff);
-            background-size: 300% 300%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: gradientMove 4s ease infinite;
-        }
-        @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .back-link {
-            font-size: 14px;
-            font-weight: 600;
-            padding: 8px 22px;
-            border: 1px solid #00d4ff;
-            border-radius: 40px;
-            color: #00d4ff;
-            background: transparent;
-            transition: all 0.25s;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .back-link:hover {
-            background: rgba(0, 212, 255, 0.12);
-            box-shadow: 0 0 25px rgba(0, 212, 255, 0.2);
-            transform: scale(1.02);
-        }
+<style>
+/* ============================================================ */
+/* VİZYON 2027 — API SAYFASI (v7.10.0)                          */
+/* Back4App Uyumlu · Aurora Tema                                */
+/* ============================================================ */
+:root{
+    --bg:#03050a; --bg2:#060a14; --bg3:#0a1020;
+    --surface:#0a1020; --surface2:#0e1630;
+    --border:#1a2a4a; --border2:#24365e;
+    --accent:#00e5ff; --accent2:#00ff9d; --accent3:#ff5e1a;
+    --accent4:#ff2d92; --gold:#ffd11a; --purple:#b845ff; --pink:#ff2d92;
+    --danger:#ff4757; --warning:#ffb700; --success:#00ff9d;
+    --text:#ffffff; --text2:#d4e5ff; --text3:#8aa8d4; --text4:#5a7aa8;
+    --font-display:'Syne',sans-serif;
+    --font-code:'Fira Code',monospace;
+    --font-body:'Inter',sans-serif;
+}
+[data-theme="light"]{
+    --bg:#f0f4fb; --bg2:#e6ecf7; --bg3:#dde5f4;
+    --surface:#ffffff; --surface2:#f7fafc;
+    --border:#cbd8ec; --border2:#b0c2dc;
+    --text:#0a1020; --text2:#1e2a44; --text3:#4a5d80; --text4:#6b7ea3;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{
+    background:var(--bg);color:var(--text);font-family:var(--font-body);
+    overflow-x:hidden;min-height:100vh;position:relative;
+    -webkit-font-smoothing:antialiased;line-height:1.7;
+}
+body::before{
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+        radial-gradient(ellipse 80% 50% at 20% 0%, rgba(0,229,255,0.12) 0%, transparent 55%),
+        radial-gradient(ellipse 70% 50% at 80% 10%, rgba(184,69,255,0.10) 0%, transparent 55%),
+        radial-gradient(ellipse 90% 60% at 50% 100%, rgba(255,45,146,0.08) 0%, transparent 60%);
+    animation:auroraShift 24s ease-in-out infinite alternate;
+}
+body::after{
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:
+        linear-gradient(rgba(0,229,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.025) 1px, transparent 1px);
+    background-size:60px 60px;
+    mask-image:radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 85%);
+    -webkit-mask-image:radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 85%);
+    opacity:0.6;
+}
+@keyframes auroraShift{
+    0%{opacity:0.75;transform:scale(1) rotate(0deg)}
+    50%{opacity:1;transform:scale(1.06) rotate(2deg)}
+    100%{opacity:0.85;transform:scale(1) rotate(0deg)}
+}
 
-        /* ===== BADGE ===== */
-        .badge {
-            display: inline-block;
-            background: rgba(0, 212, 255, 0.12);
-            color: #00d4ff;
-            padding: 4px 16px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            border: 1px solid rgba(0, 212, 255, 0.25);
-            margin: 4px 4px 4px 0;
-        }
-        .badge-success {
-            background: rgba(0, 255, 136, 0.12);
-            border-color: rgba(0, 255, 136, 0.25);
-            color: #00ff88;
-        }
-        .badge-warning {
-            background: rgba(255, 183, 0, 0.12);
-            border-color: rgba(255, 183, 0, 0.25);
-            color: #ffb700;
-        }
-        .badge-danger {
-            background: rgba(255, 71, 87, 0.12);
-            border-color: rgba(255, 71, 87, 0.25);
-            color: #ff4757;
-        }
+/* ============ NAVBAR ============ */
+nav{
+    position:fixed;top:0;left:0;right:0;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 48px;height:84px;
+    background:rgba(3,5,10,0.75);
+    backdrop-filter:blur(28px) saturate(160%);
+    -webkit-backdrop-filter:blur(28px) saturate(160%);
+    border-bottom:1px solid rgba(0,229,255,0.15);
+    z-index:100;box-shadow:0 4px 30px rgba(0,0,0,0.4);
+}
+nav::after{
+    content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,var(--accent) 20%,var(--purple) 50%,var(--pink) 80%,transparent);
+    opacity:0.6;animation:navGlow 4s ease-in-out infinite alternate;
+}
+@keyframes navGlow{0%{opacity:0.4}100%{opacity:0.9}}
+[data-theme="light"] nav{background:rgba(255,255,255,0.85);border-bottom-color:rgba(0,0,0,0.08)}
 
-        /* ===== TYPOGRAPHY ===== */
-        h1 {
-            font-family: 'Syne', sans-serif;
-            font-size: 36px;
-            font-weight: 800;
-            color: #ffffff;
-            margin-bottom: 8px;
-        }
-        h1 i { color: #00d4ff; margin-right: 10px; }
-        .subtitle {
-            font-size: 16px;
-            color: #8ab4cc;
-            margin-bottom: 30px;
-        }
-        h2 {
-            font-family: 'Syne', sans-serif;
-            font-size: 26px;
-            font-weight: 700;
-            color: #ffffff;
-            margin: 40px 0 20px 0;
-            border-left: 4px solid #00d4ff;
-            padding-left: 18px;
-        }
-        h3 {
-            font-size: 20px;
-            font-weight: 700;
-            color: #a0d0f0;
-            margin: 28px 0 14px 0;
-        }
-        p, li {
-            color: #c8d8e8;
-            font-size: 15px;
-            line-height: 1.8;
-        }
-        ul { padding-left: 24px; }
-        li { margin-bottom: 6px; }
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
+.nav-logo svg{filter:drop-shadow(0 0 12px rgba(0,229,255,0.6))}
+.nav-logo-text{
+    font-family:var(--font-display);font-size:24px;font-weight:800;
+    background:linear-gradient(45deg,#00e5ff,#00ff9d,#b845ff,#ff2d92,#ffd11a,#00e5ff);
+    background-size:400% 400%;-webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:gradientMove 6s ease infinite;letter-spacing:1px;
+}
+@keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.nav-menu{display:flex;gap:32px;list-style:none}
+.nav-menu a{
+    color:var(--text2);text-decoration:none;font-size:13px;font-weight:500;
+    text-transform:uppercase;letter-spacing:1.2px;position:relative;padding:6px 0;
+    transition:color 0.15s ease;
+}
+.nav-menu a::after{
+    content:'';position:absolute;bottom:0;left:50%;right:50%;height:2px;
+    background:linear-gradient(90deg,var(--accent),var(--purple));
+    transition:left 0.3s,right 0.3s;border-radius:2px;
+}
+.nav-menu a:hover{color:var(--accent)}
+.nav-menu a:hover::after{left:0;right:0}
+.nav-actions{display:flex;gap:12px;align-items:center}
+.btn-nav{
+    padding:9px 22px;border-radius:40px;font-size:13px;font-weight:600;
+    cursor:pointer;transition:all 0.15s;border:none;text-decoration:none;
+    display:inline-flex;align-items:center;gap:6px;
+}
+.btn-nav-outline{background:transparent;border:1.5px solid var(--accent);color:var(--accent)}
+.btn-nav-outline:hover{background:rgba(0,229,255,0.12);box-shadow:0 0 20px rgba(0,229,255,0.4);transform:translateY(-1px)}
+.btn-nav-primary{
+    background:linear-gradient(135deg,#00e5ff,#b845ff,#ff2d92);
+    background-size:200% 200%;color:#fff;
+    box-shadow:0 0 25px rgba(0,229,255,0.4);
+    animation:btnGradientShift 4s ease infinite;
+}
+@keyframes btnGradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.btn-nav-primary:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 0 40px rgba(0,229,255,0.7)}
+.nav-theme-btn{
+    width:40px;height:40px;border-radius:50%;background:none;
+    border:1px solid var(--border);color:var(--text);font-size:16px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:all 0.15s;
+}
+.nav-theme-btn:hover{border-color:var(--accent);box-shadow:0 0 20px rgba(0,229,255,0.4);transform:rotate(20deg)}
+.nav-toggle{display:none;background:none;border:none;color:var(--text);font-size:24px;cursor:pointer;padding:8px}
 
-        /* ===== CODE BLOCK ===== */
-        .code-block {
-            background: #0a0f18;
-            border: 1px solid #1a3350;
-            border-radius: 12px;
-            padding: 20px 24px;
-            overflow-x: auto;
-            font-family: 'Fira Code', monospace;
-            font-size: 14px;
-            color: #00ff88;
-            margin: 16px 0;
-            position: relative;
-        }
-        .code-block .comment { color: #6a8a9a; }
-        .code-block .keyword { color: #ff6b35; }
-        .code-block .string { color: #ffb700; }
-        .code-block .function { color: #00d4ff; }
-        .code-block .variable { color: #a855f7; }
+/* ============ HERO ============ */
+.api-hero{padding:160px 24px 40px;position:relative;z-index:10;text-align:center}
+.api-hero-badge{
+    display:inline-flex;align-items:center;gap:8px;padding:8px 18px;
+    border:1px solid rgba(0,229,255,0.35);border-radius:40px;
+    font-size:12px;color:var(--accent);font-weight:600;letter-spacing:0.5px;
+    background:rgba(0,229,255,0.05);margin-bottom:24px;backdrop-filter:blur(12px);
+}
+.api-hero h1{
+    font-family:var(--font-display);font-size:clamp(36px,5vw,58px);
+    font-weight:800;line-height:1.05;margin-bottom:16px;letter-spacing:-0.5px;
+    background:linear-gradient(135deg,#fff 0%,var(--accent) 40%,var(--purple) 70%,var(--pink) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.api-hero p{max-width:720px;margin:0 auto;color:var(--text2);font-size:15.5px;line-height:1.75}
+.api-hero-stats{
+    display:flex;justify-content:center;gap:20px;flex-wrap:wrap;
+    margin-top:28px;
+}
+.api-stat{
+    padding:14px 22px;border-radius:14px;
+    background:linear-gradient(135deg,rgba(0,229,255,0.06),rgba(184,69,255,0.04));
+    border:1px solid rgba(0,229,255,0.2);
+    min-width:140px;
+}
+.api-stat-num{
+    font-family:var(--font-display);font-size:24px;font-weight:800;
+    background:linear-gradient(135deg,var(--accent),var(--purple),var(--pink));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.api-stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px}
 
-        /* ===== ENDPOINT GRID ===== */
-        .endpoint-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 16px;
-            margin: 16px 0 8px 0;
-        }
-        .endpoint-card {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid #1a2a3a;
-            border-radius: 12px;
-            padding: 16px 18px;
-            transition: all 0.25s;
-            cursor: default;
-        }
-        .endpoint-card:hover {
-            border-color: #00d4ff;
-            background: rgba(0, 212, 255, 0.04);
-            transform: translateY(-2px);
-        }
-        .endpoint-card .name {
-            font-weight: 700;
-            color: #00d4ff;
-            font-size: 15px;
-            font-family: 'Fira Code', monospace;
-        }
-        .endpoint-card .desc {
-            font-size: 13px;
-            color: #8ab4cc;
-            margin-top: 4px;
-        }
-        .endpoint-card .tag {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 2px 10px;
-            border-radius: 20px;
-            background: rgba(0, 212, 255, 0.08);
-            border: 1px solid rgba(0, 212, 255, 0.15);
-            color: #00d4ff;
-            display: inline-block;
-            margin-top: 6px;
-        }
-        .endpoint-card .tag.admin {
-            border-color: #ff6b35;
-            color: #ff6b35;
-        }
-        .endpoint-card .tag.founder {
-            border-color: #ffd700;
-            color: #ffd700;
-        }
+/* ============ LAYOUT ============ */
+.api-layout{
+    max-width:1400px;margin:40px auto 80px;padding:0 24px;
+    display:grid;grid-template-columns:260px 1fr;gap:32px;
+    position:relative;z-index:10;
+}
+.api-sidebar{
+    position:sticky;top:110px;align-self:start;
+    max-height:calc(100vh - 140px);overflow-y:auto;
+    background:linear-gradient(135deg,rgba(10,16,32,0.92),rgba(6,10,20,0.95));
+    border:1px solid var(--border2);border-radius:18px;padding:20px 18px;
+    backdrop-filter:blur(8px);
+}
+[data-theme="light"] .api-sidebar{background:rgba(255,255,255,0.92)}
+.api-sidebar::-webkit-scrollbar{width:6px}
+.api-sidebar::-webkit-scrollbar-thumb{background:rgba(0,229,255,0.3);border-radius:3px}
+.api-sidebar h3{
+    font-family:var(--font-display);font-size:12.5px;color:var(--accent);
+    text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;
+    padding-bottom:10px;border-bottom:1px solid var(--border);
+}
+.api-nav-list{list-style:none;display:flex;flex-direction:column;gap:2px}
+.api-nav-list a{
+    display:block;padding:8px 12px;border-radius:8px;
+    color:var(--text3);text-decoration:none;font-size:13px;line-height:1.4;
+    transition:all 0.15s ease;border-left:2px solid transparent;
+}
+.api-nav-list a:hover{color:var(--accent);background:rgba(0,229,255,0.06);border-left-color:var(--accent)}
+.api-nav-list a.active{color:var(--accent);background:rgba(0,229,255,0.1);border-left-color:var(--accent);font-weight:600}
 
-        /* ===== HR ===== */
-        hr {
-            border: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
-            margin: 36px 0;
-        }
+.api-content{min-width:0}
+.api-content > section{
+    background:linear-gradient(135deg,rgba(10,16,32,0.92),rgba(6,10,20,0.95));
+    border:1px solid var(--border2);border-radius:22px;
+    padding:38px 36px;margin-bottom:28px;
+    backdrop-filter:blur(8px);position:relative;overflow:hidden;
+    scroll-margin-top:110px;
+}
+[data-theme="light"] .api-content > section{background:rgba(255,255,255,0.92)}
+.api-content > section::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--accent),var(--purple),var(--pink),transparent);
+    opacity:0.6;
+}
+.section-head{
+    display:flex;align-items:center;gap:14px;margin-bottom:22px;
+    padding-bottom:18px;border-bottom:1px solid var(--border);
+    flex-wrap:wrap;
+}
+.section-icon{
+    width:52px;height:52px;border-radius:14px;
+    background:linear-gradient(135deg,rgba(0,229,255,0.15),rgba(184,69,255,0.1));
+    border:1px solid rgba(0,229,255,0.3);
+    display:flex;align-items:center;justify-content:center;
+    font-size:24px;flex-shrink:0;
+}
+.section-title{flex:1;min-width:180px}
+.section-title h2{
+    font-family:var(--font-display);font-size:24px;font-weight:800;
+    color:var(--text);letter-spacing:-0.3px;line-height:1.2;
+}
+.section-title p{font-size:13px;color:var(--text3);margin-top:4px}
 
-        /* ===== FOOTER ===== */
-        .footer {
-            margin-top: 40px;
-            padding-top: 24px;
-            border-top: 1px solid rgba(0, 212, 255, 0.08);
-            text-align: center;
-            color: #5a7a8a;
-            font-size: 13px;
-        }
-        .footer a { color: #00d4ff; }
-        .footer a:hover { color: #a855f7; }
+/* ============ ENDPOINT KARTLAR ============ */
+.endpoint-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:12px;margin:14px 0;
+}
+.endpoint-card{
+    background:linear-gradient(135deg,rgba(0,229,255,0.03),rgba(184,69,255,0.02));
+    border:1px solid var(--border2);border-radius:12px;
+    padding:14px 16px;transition:all 0.2s ease;
+    cursor:pointer;position:relative;overflow:hidden;
+}
+.endpoint-card:hover{
+    border-color:var(--accent);
+    background:linear-gradient(135deg,rgba(0,229,255,0.08),rgba(184,69,255,0.04));
+    transform:translateY(-2px);
+    box-shadow:0 8px 30px rgba(0,229,255,0.15);
+}
+.endpoint-card .name{
+    font-family:var(--font-code);font-weight:600;color:var(--accent);
+    font-size:13.5px;display:flex;align-items:center;gap:6px;
+    word-break:break-all;
+}
+.endpoint-card .desc{
+    font-size:12.5px;color:var(--text2);margin-top:6px;line-height:1.5;
+}
+.endpoint-card .tag{
+    display:inline-block;font-size:9.5px;font-weight:700;
+    letter-spacing:0.8px;text-transform:uppercase;
+    padding:3px 9px;border-radius:20px;margin-top:8px;
+    background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3);
+    color:var(--accent);
+}
+.endpoint-card .tag.founder{border-color:rgba(255,209,26,0.5);color:var(--gold);background:rgba(255,209,26,0.08)}
+.endpoint-card .tag.moderator{border-color:rgba(0,229,255,0.5);color:#00e5ff;background:rgba(0,229,255,0.08)}
+.endpoint-card .tag.admin{border-color:rgba(255,94,26,0.5);color:var(--accent3);background:rgba(255,94,26,0.08)}
+.endpoint-card .tag.ai{border-color:rgba(184,69,255,0.5);color:var(--purple);background:rgba(184,69,255,0.08)}
+.endpoint-card .tag.premium{
+    border-color:rgba(255,209,26,0.6);color:var(--gold);background:rgba(255,209,26,0.1);
+    animation:premiumPulse 2s ease-in-out infinite;
+}
+@keyframes premiumPulse{
+    0%,100%{box-shadow:0 0 0 rgba(255,209,26,0)}
+    50%{box-shadow:0 0 15px rgba(255,209,26,0.4)}
+}
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            body { padding: 20px 12px; }
-            .container { padding: 28px 20px; border-radius: 20px; }
-            .header { flex-direction: column; align-items: flex-start; gap: 12px; }
-            .logo-text { font-size: 20px; }
-            h1 { font-size: 28px; }
-            h2 { font-size: 22px; }
-            .endpoint-grid { grid-template-columns: 1fr; }
-            .code-block { font-size: 12px; padding: 14px 16px; }
-        }
-        @media (max-width: 480px) {
-            .container { padding: 16px 12px; border-radius: 16px; }
-            .logo-icon { width: 40px; height: 40px; font-size: 18px; }
-            .logo-text { font-size: 18px; }
-            h1 { font-size: 22px; }
-            h2 { font-size: 18px; padding-left: 12px; }
-            h3 { font-size: 17px; }
-            .back-link { font-size: 12px; padding: 6px 14px; }
-            .endpoint-card { padding: 12px 14px; }
-        }
-    </style>
+/* ============ CODE BLOCK ============ */
+.code-block{
+    background:linear-gradient(135deg,#050810,#02040a);
+    border:1px solid rgba(0,229,255,0.2);
+    border-radius:14px;padding:18px 20px;
+    overflow-x:auto;font-family:var(--font-code);
+    font-size:13px;line-height:1.7;color:#e0f0ff;
+    margin:14px 0;position:relative;
+    box-shadow:inset 0 0 30px rgba(0,229,255,0.03);
+}
+.code-block .code-lang{
+    position:absolute;top:10px;right:14px;
+    font-size:10px;color:var(--text4);text-transform:uppercase;
+    letter-spacing:1.5px;font-weight:600;
+}
+.code-block .comment{color:#5a7aa8;font-style:italic}
+.code-block .keyword{color:var(--accent3);font-weight:600}
+.code-block .string{color:var(--gold)}
+.code-block .function{color:var(--accent)}
+.code-block .variable{color:var(--purple)}
+.code-block .number{color:var(--accent2)}
+.code-block .operator{color:#ff6b9d}
+
+/* ============ BİLGİ KUTULARI ============ */
+.info-box{
+    padding:16px 20px;border-radius:14px;margin:16px 0;
+    border-left:4px solid var(--accent);
+    background:linear-gradient(135deg,rgba(0,229,255,0.06),rgba(184,69,255,0.03));
+    font-size:13.5px;color:var(--text2);line-height:1.75;
+}
+.info-box.warning{
+    border-left-color:var(--warning);
+    background:linear-gradient(135deg,rgba(255,183,0,0.08),rgba(255,94,26,0.04));
+    color:#ffd58a;
+}
+.info-box.danger{
+    border-left-color:var(--danger);
+    background:linear-gradient(135deg,rgba(255,71,87,0.08),rgba(255,45,146,0.04));
+    color:#ffb0b0;
+}
+.info-box.success{
+    border-left-color:var(--success);
+    background:linear-gradient(135deg,rgba(0,255,157,0.08),rgba(0,229,255,0.04));
+    color:#a8ffd4;
+}
+.info-box.premium{
+    border-left-color:var(--gold);
+    background:linear-gradient(135deg,rgba(255,209,26,0.08),rgba(255,140,0,0.04));
+    color:#ffd58a;
+}
+.info-box-title{
+    display:block;font-weight:700;margin-bottom:6px;
+    font-family:var(--font-display);letter-spacing:0.2px;font-size:14px;
+}
+
+/* ============ TABLO ============ */
+.api-table{
+    width:100%;border-collapse:collapse;margin:16px 0;
+    background:rgba(0,0,0,0.2);border-radius:12px;overflow:hidden;
+    font-size:13px;
+}
+.api-table th{
+    text-align:left;padding:12px 16px;
+    background:linear-gradient(135deg,rgba(0,229,255,0.08),rgba(184,69,255,0.05));
+    color:var(--accent);font-family:var(--font-display);
+    font-size:12px;letter-spacing:1px;text-transform:uppercase;
+    border-bottom:1px solid var(--border2);
+}
+.api-table td{
+    padding:11px 16px;color:var(--text2);
+    border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.api-table tr:last-child td{border-bottom:none}
+.api-table tr:hover td{background:rgba(0,229,255,0.03)}
+.api-table code{
+    background:rgba(0,229,255,0.1);color:var(--accent2);
+    padding:2px 7px;border-radius:6px;
+    font-family:var(--font-code);font-size:11.5px;
+    border:1px solid rgba(0,229,255,0.2);
+}
+
+/* ============ METİN ============ */
+.api-content h3{
+    font-family:var(--font-display);font-size:17px;font-weight:700;
+    color:var(--text);margin:22px 0 12px;letter-spacing:-0.1px;
+    display:flex;align-items:center;gap:8px;
+}
+.api-content h4{
+    font-size:14.5px;font-weight:700;color:var(--accent);margin:16px 0 8px;
+}
+.api-content p{font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:12px}
+.api-content ul,.api-content ol{margin:12px 0 14px 22px}
+.api-content li{font-size:13.5px;color:var(--text2);line-height:1.8;margin-bottom:6px}
+.api-content li::marker{color:var(--accent)}
+.api-content strong{color:var(--text);font-weight:600}
+.api-content a{color:var(--accent);text-decoration:none;border-bottom:1px dashed rgba(0,229,255,0.4);transition:border-color 0.15s}
+.api-content a:hover{border-bottom-color:var(--accent)}
+.api-content code{
+    background:rgba(0,229,255,0.1);color:var(--accent2);
+    padding:2px 7px;border-radius:6px;
+    font-family:var(--font-code);font-size:12px;
+    border:1px solid rgba(0,229,255,0.2);
+}
+
+/* ============ YENİ ROZET ============ */
+.badge-new{
+    display:inline-block;font-size:9px;font-weight:800;
+    letter-spacing:1px;text-transform:uppercase;
+    padding:3px 9px;border-radius:20px;margin-left:8px;
+    background:linear-gradient(135deg,var(--accent),var(--purple),var(--pink));
+    background-size:200% 200%;color:#fff;
+    animation:btnGradientShift 3s ease infinite;
+    box-shadow:0 0 15px rgba(0,229,255,0.5);
+    vertical-align:middle;
+}
+
+/* ============ MODEL KARTLARI ============ */
+.model-group{margin:20px 0}
+.model-group-title{
+    font-family:var(--font-display);font-size:13.5px;
+    color:var(--accent2);font-weight:700;margin-bottom:10px;
+    display:flex;align-items:center;gap:8px;letter-spacing:0.3px;
+}
+.model-group-title::before{
+    content:'';width:4px;height:16px;border-radius:2px;
+    background:linear-gradient(180deg,var(--accent),var(--purple));
+}
+.model-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.model-pill{
+    padding:5px 12px;border-radius:20px;font-size:11.5px;
+    font-family:var(--font-code);font-weight:500;
+    background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.2);
+    color:var(--text2);transition:all 0.2s;
+}
+.model-pill:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,229,255,0.12);transform:translateY(-1px)}
+
+/* ============ FOOTER ============ */
+footer{
+    border-top:1px solid rgba(0,229,255,0.15);
+    padding:50px 24px 30px;
+    background:linear-gradient(180deg,var(--bg2),var(--bg));
+    position:relative;z-index:10;
+}
+footer::before{
+    content:'';position:absolute;top:-1px;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent 0%,var(--accent) 20%,var(--purple) 50%,var(--pink) 80%,transparent 100%);
+    opacity:0.7;
+}
+.footer-inner{
+    max-width:1200px;margin:0 auto;
+    display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:20px;
+}
+.footer-copy{font-size:12.5px;color:var(--text3)}
+.footer-copy span{
+    background:linear-gradient(135deg,var(--accent),var(--purple));
+    -webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700;
+}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{color:var(--text3);font-size:12.5px;text-decoration:none;transition:color 0.15s}
+.footer-links a:hover{color:var(--accent)}
+
+/* ============ BACK TO TOP ============ */
+.back-top{
+    position:fixed;bottom:24px;right:24px;
+    width:48px;height:48px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),var(--purple));
+    color:#fff;border:none;cursor:pointer;
+    display:none;align-items:center;justify-content:center;
+    font-size:18px;z-index:50;
+    box-shadow:0 4px 20px rgba(0,229,255,0.5);
+    transition:transform 0.2s,box-shadow 0.2s;
+}
+.back-top.show{display:flex}
+.back-top:hover{transform:translateY(-3px) scale(1.08);box-shadow:0 8px 35px rgba(0,229,255,0.8)}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:1100px){
+    .api-layout{grid-template-columns:1fr;gap:20px}
+    .api-sidebar{
+        position:relative;top:0;max-height:none;
+        display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+        gap:8px;
+    }
+    .api-sidebar h3{grid-column:1/-1}
+    .api-nav-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px}
+}
+@media (max-width:900px){
+    nav{padding:0 20px;height:72px}
+    .nav-menu{gap:20px}
+    .nav-menu a{font-size:11px}
+    .nav-logo-text{font-size:18px}
+    .api-hero{padding:130px 18px 30px}
+    .api-content > section{padding:26px 22px}
+}
+@media (max-width:768px){
+    .nav-menu{
+        display:none;position:fixed;top:72px;left:0;right:0;
+        background:rgba(3,5,10,0.98);backdrop-filter:blur(20px);
+        flex-direction:column;padding:24px;gap:20px;
+        border-bottom:1px solid var(--border);
+    }
+    .nav-menu.open{display:flex}
+    .nav-menu a{font-size:14px;letter-spacing:0.5px}
+    .nav-toggle{display:block}
+    .btn-nav{padding:7px 14px;font-size:11.5px}
+    .btn-nav-outline{display:none}
+    .api-hero h1{font-size:32px}
+    .api-hero p{font-size:13.5px}
+    .endpoint-grid{grid-template-columns:1fr}
+    .api-table{font-size:11.5px}
+    .api-table th,.api-table td{padding:8px 10px}
+    .code-block{font-size:11.5px;padding:14px 12px}
+}
+@media (max-width:480px){
+    nav{padding:0 12px;height:66px}
+    .nav-logo-text{font-size:15px}
+    .nav-logo svg{width:38px;height:38px}
+    .btn-nav{padding:6px 11px;font-size:10.5px}
+    .api-hero{padding:110px 14px 24px}
+    .api-hero h1{font-size:26px}
+    .api-content > section{padding:20px 16px;border-radius:18px}
+    .section-icon{width:42px;height:42px;font-size:20px}
+    .section-title h2{font-size:19px}
+    .endpoint-card{padding:11px 13px}
+    .endpoint-card .name{font-size:12.5px}
+    .endpoint-card .desc{font-size:11.5px}
+}
+</style>
 </head>
 <body>
 
-<div class="container">
-
-    <!-- ===== HEADER ===== -->
-    <header class="header">
-        <div class="logo-area">
-            <div class="logo-icon">⚡</div>
-            <div class="logo-text">VİZYON 2027</div>
-        </div>
-        <a href="index.html" class="back-link">
-            <i class="fas fa-arrow-left"></i> Ana Sayfa
-        </a>
-    </header>
-
-    <!-- ===== BAŞLIK ===== -->
-    <h1><i class="fas fa-plug"></i> API Dokümantasyonu</h1>
-    <div class="subtitle">
-        <span class="badge"><i class="fas fa-cloud"></i> Back4App Cloud Code</span>
-        <span class="badge badge-success"><i class="fas fa-check-circle"></i> Tüm Fonksiyonlar Aktif</span>
-        <span class="badge badge-warning"><i class="fas fa-code"></i> Parse SDK ile Erişim</span>
+<!-- ============ NAVBAR ============ -->
+<nav>
+    <a href="/index.html" class="nav-logo">
+        <svg width="52" height="52" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#00e5ff"/>
+                    <stop offset="50%" stop-color="#b845ff"/>
+                    <stop offset="100%" stop-color="#ff2d92"/>
+                </linearGradient>
+                <linearGradient id="lg2" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#00ff9d"/>
+                    <stop offset="100%" stop-color="#00e5ff"/>
+                </linearGradient>
+                <radialGradient id="lgg">
+                    <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.7"/>
+                    <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+                </radialGradient>
+            </defs>
+            <circle cx="30" cy="30" r="28" fill="url(#lgg)"/>
+            <circle cx="30" cy="30" r="25" fill="none" stroke="url(#lg1)" stroke-width="2.5"/>
+            <circle cx="30" cy="30" r="21" fill="none" stroke="url(#lg1)" stroke-width="0.8" stroke-dasharray="3 3"/>
+            <circle cx="30" cy="30" r="20" fill="rgba(10,16,32,0.78)"/>
+            <path d="M 33 15 A 15 15 0 1 0 33 45 A 12 12 0 1 1 33 15 Z" fill="url(#lg2)"/>
+            <polygon points="42,18 43.5,23 48.5,23 44.5,26 46,31 42,28 38,31 39.5,26 35.5,23 40.5,23" fill="#ffd11a"/>
+            <circle cx="12" cy="30" r="1.8" fill="#00e5ff"/>
+            <circle cx="48" cy="30" r="1.8" fill="#00e5ff"/>
+            <circle cx="30" cy="12" r="1.8" fill="#00ff9d"/>
+            <circle cx="30" cy="48" r="1.8" fill="#ff2d92"/>
+        </svg>
+        <span class="nav-logo-text">VİZYON 2027</span>
+    </a>
+    <ul class="nav-menu" id="navMenu">
+        <li><a href="/index.html#features">Özellikler</a></li>
+        <li><a href="/index.html#ai">Yapay Zeka</a></li>
+        <li><a href="/api.html">V27 API</a></li>
+        <li><a href="/index.html#pricing">Fiyatlar</a></li>
+        <li><a href="/bana-ogret.html">📖 Bana Öğret</a></li>
+    </ul>
+    <div class="nav-actions">
+        <a href="/index.html#login" class="btn-nav btn-nav-outline">Giriş Yap</a>
+        <a href="/index.html#register" class="btn-nav btn-nav-primary">Ücretsiz Başla</a>
+        <button class="nav-theme-btn" onclick="toggleTheme()" title="Tema Değiştir">🌙</button>
+        <button class="nav-toggle" onclick="document.getElementById('navMenu').classList.toggle('open')">☰</button>
     </div>
+</nav>
 
+<!-- ============ HERO ============ -->
+<section class="api-hero">
+    <div class="api-hero-badge">
+        <span>🔌</span> API DOKÜMANTASYONU
+    </div>
+    <h1>VİZYON 2027 API</h1>
     <p>
-        <strong>Vizyon2027 API</strong>, güçlü bir arka uç hizmetidir. 
-        Tüm fonksiyonlara <strong>Parse SDK</strong> (JavaScript) üzerinden erişebilirsiniz. 
-        Aşağıda tüm mevcut fonksiyonlar, açıklamaları ve örnek kullanımları yer almaktadır.
+        28 yapay zeka modeli, Vizyon Al, V27 API, V27 Koç, takım yönetimi, 3D stüdyo ve
+        daha fazlası. Tüm özellikler <strong>Back4App Cloud Code</strong> üzerinden
+        <strong>Parse SDK</strong> ile erişilebilir. Aşağıda güncel tüm fonksiyonlar,
+        parametreler ve örnek kodlar yer alır.
     </p>
-
-    <!-- ===== ÖRNEK KOD ===== -->
-    <div class="code-block">
-        <span class="comment">// 📦 Örnek API çağrısı</span><br>
-        <span class="keyword">const</span> result = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'superAI'</span>, {<br>
-        &nbsp;&nbsp;prompt: <span class="string">'Python'da REST API nasıl yazılır?'</span><br>
-        });<br>
-        <span class="function">console.log</span>(result);
+    <div class="api-hero-stats">
+        <div class="api-stat">
+            <div class="api-stat-num">200+</div>
+            <div class="api-stat-label">Cloud Function</div>
+        </div>
+        <div class="api-stat">
+            <div class="api-stat-num">28</div>
+            <div class="api-stat-label">AI Modeli</div>
+        </div>
+        <div class="api-stat">
+            <div class="api-stat-num">15</div>
+            <div class="api-stat-label">Zamanlanmış Job</div>
+        </div>
+        <div class="api-stat">
+            <div class="api-stat-num">v7.10.0</div>
+            <div class="api-stat-label">Sürüm</div>
+        </div>
     </div>
+</section>
 
-    <hr>
+<!-- ============ İÇERİK ============ -->
+<div class="api-layout">
 
-    <!-- ============================================================ -->
-    <!-- ===================== FONKSİYON LİSTESİ ===================== -->
-    <!-- ============================================================ -->
+    <!-- SIDEBAR -->
+    <aside class="api-sidebar">
+        <h3>📋 İçindekiler</h3>
+        <ul class="api-nav-list">
+            <li><a href="#baslangic">🚀 Başlangıç</a></li>
+            <li><a href="#v27api">🔑 V27 API (Kullanıcı)</a></li>
+            <li><a href="#ai">🤖 AI Modelleri</a></li>
+            <li><a href="#vizyon-al">✨ Vizyon Al</a></li>
+            <li><a href="#koc">🧭 V27 Koç</a></li>
+            <li><a href="#ses-dosya">🔊 Ses & Dosya</a></li>
+            <li><a href="#video">🎬 Video Stüdyo</a></li>
+            <li><a href="#logs">📋 Logs & Kullanım</a></li>
+            <li><a href="#kullanici">👤 Kullanıcı & Auth</a></li>
+            <li><a href="#plan">📊 Plan Limitleri</a></li>
+            <li><a href="#takim">👥 Takım Yönetimi</a></li>
+            <li><a href="#proje">📦 Proje & Talep</a></li>
+            <li><a href="#magaza">🛒 Mağaza & Pazar</a></li>
+            <li><a href="#puan">⭐ Puan & Görev</a></li>
+            <li><a href="#sosyal">📬 Sosyal & DM</a></li>
+            <li><a href="#icerik">📚 İçerik & Akademi</a></li>
+            <li><a href="#yarisma">🏆 Yarışma</a></li>
+            <li><a href="#moderator">🎨 Moderatör</a></li>
+            <li><a href="#ebeveyn">🛡️ Ebeveyn</a></li>
+            <li><a href="#admin">👑 Admin / Kurucu</a></li>
+            <li><a href="#devriye">🛡️ Devriye & Destek</a></li>
+            <li><a href="#limits">⚡ Rate Limit</a></li>
+            <li><a href="#ornek">📖 Tam Örnekler</a></li>
+            <li><a href="#destek">📞 Destek</a></li>
+        </ul>
+    </aside>
 
-    <h2>🤖 AI Modelleri</h2>
-    <div class="endpoint-grid">
-        <div class="endpoint-card"><div class="name">callGroq</div><div class="desc">Groq Llama 3.3 70B</div><span class="tag">AI</span></div>
-        <div class="endpoint-card"><div class="name">callDeepSeek</div><div class="desc">DeepSeek Chat</div><span class="tag">AI</span></div>
-        <div class="endpoint-card"><div class="name">callOpenAI</div><div class="desc">OpenAI GPT-4o</div><span class="tag">AI</span></div>
-        <div class="endpoint-card"><div class="name">callOpenRouter</div><div class="desc">100+ model (ücretsiz)</div><span class="tag">AI</span></div>
-        <div class="endpoint-card"><div class="name">callCohere</div><div class="desc">Cohere Command R+</div><span class="tag">AI</span></div>
-        <div class="endpoint-card"><div class="name">callCerebras</div><div class="desc">Cerebras Llama 3.1</div><span class="tag">AI</span></div>
-        <div class="endpoint-card"><div class="name">callGitHubModels</div><div class="desc">GitHub Meta-Llama 3</div><span class="tag">AI</span></div>
-        <div class="endpoint-card"><div class="name">callGemini</div><div class="desc">Google Gemini 2.0 Flash</div><span class="tag">AI</span></div>
-        <div class="endpoint-card" style="border-color:#ffd700;"><div class="name">⭐ superAI</div><div class="desc">Tüm modelleri dener, en iyisini getirir</div><span class="tag" style="border-color:#ffd700;color:#ffd700;">ÖNERİLEN</span></div>
-    </div>
+    <!-- CONTENT -->
+    <main class="api-content">
 
-    <h2>🌐 Web Arama</h2>
-    <div class="endpoint-grid">
-        <div class="endpoint-card"><div class="name">webSearch</div><div class="desc">SerpApi ile canlı arama (dolar, haber, hava)</div><span class="tag">Arama</span></div>
-    </div>
+        <!-- BAŞLANGIÇ -->
+        <section id="baslangic">
+            <div class="section-head">
+                <div class="section-icon">🚀</div>
+                <div class="section-title">
+                    <h2>Başlangıç</h2>
+                    <p>Back4App Cloud Code + Parse SDK ile hızlı kurulum</p>
+                </div>
+            </div>
 
-    <h2>👤 Kullanıcı Yönetimi</h2>
-    <div class="endpoint-grid">
-        <div class="endpoint-card"><div class="name">register</div><div class="desc">Yeni kullanıcı kaydı</div><span class="tag">Auth</span></div>
-        <div class="endpoint-card"><div class="name">login</div><div class="desc">Kullanıcı girişi</div><span class="tag">Auth</span></div>
-        <div class="endpoint-card"><div class="name">verifyUser</div><div class="desc">E-posta doğrulama</div><span class="tag">Auth</span></div>
-        <div class="endpoint-card"><div class="name">sendVerificationCode</div><div class="desc">Doğrulama kodu gönder</div><span class="tag">Auth</span></div>
-        <div class="endpoint-card"><div class="name">resetPasswordWithCode</div><div class="desc">Şifre sıfırlama</div><span class="tag">Auth</span></div>
-        <div class="endpoint-card"><div class="name">getProfile</div><div class="desc">Profil bilgilerini getir</div><span class="tag">Kullanıcı</span></div>
-        <div class="endpoint-card"><div class="name">searchUsers</div><div class="desc">Kullanıcı ara (isim/e-posta)</div><span class="tag">Kullanıcı</span></div>
-        <div class="endpoint-card"><div class="name">toggleFollow</div><div class="desc">Takip et / bırak</div><span class="tag">Kullanıcı</span></div>
-    </div>
+            <p><strong>VİZYON 2027 API</strong>, <strong>Back4App Cloud Code</strong> üzerinde çalışır. Tüm fonksiyonlar <strong>Parse SDK (JavaScript)</strong> ile çağrılır. Aşağıdaki adımları takip ederek 2 dakikada entegre olabilirsiniz.</p>
 
-    <h2>👥 Takım Yönetimi</h2>
-    <div class="endpoint-grid">
-        <div class="endpoint-card"><div class="name">createTeam</div><div class="desc">Takım oluştur</div><span class="tag">Takım</span></div>
-        <div class="endpoint-card"><div class="name">joinTeamWithCode</div><div class="desc">Kod ile takıma katıl</div><span class="tag">Takım</span></div>
-        <div class="endpoint-card"><div class="name">sendTeamMessage</div><div class="desc">Takım mesajı gönder</div><span class="tag">Takım</span></div>
-        <div class="endpoint-card"><div class="name">inviteToTeam</div><div class="desc">Takıma davet et</div><span class="tag">Takım</span></div>
-        <div class="endpoint-card"><div class="name">acceptTeamInvite</div><div class="desc">Daveti kabul et</div><span class="tag">Takım</span></div>
-        <div class="endpoint-card"><div class="name">rejectTeamInvite</div><div class="desc">Daveti reddet</div><span class="tag">Takım</span></div>
-        <div class="endpoint-card"><div class="name">getTeamMembers</div><div class="desc">Takım üyelerini listele</div><span class="tag">Takım</span></div>
-        <div class="endpoint-card"><div class="name">makeTeamManager</div><div class="desc">Yönetici ata</div><span class="tag">Takım</span></div>
-        <div class="endpoint-card"><div class="name">demoteManager</div><div class="desc">Yöneticiliği kaldır</div><span class="tag">Takım</span></div>
-        <div class="endpoint-card"><div class="name">removeFromTeam</div><div class="desc">Üyeyi takımdan at</div><span class="tag">Takım</span></div>
-        <div class="endpoint-card"><div class="name">transferOwnership</div><div class="desc">Sahipliği devret</div><span class="tag">Takım</span></div>
-        <div class="endpoint-card"><div class="name">leaveTeam</div><div class="desc">Takımdan ayrıl</div><span class="tag">Takım</span></div>
-        <div class="endpoint-card"><div class="name">closeTeam</div><div class="desc">Takımı kapat</div><span class="tag">Takım</span></div>
-    </div>
+            <h3>📦 1. SDK'yı Yükle</h3>
+            <div class="code-block">
+                <span class="code-lang">HTML</span>
+<span class="comment">&lt;!-- index.html içine ekle --&gt;</span>
+&lt;<span class="keyword">script</span> src=<span class="string">"https://cdnjs.cloudflare.com/ajax/libs/parse/5.0.0/parse.min.js"</span>&gt;&lt;/<span class="keyword">script</span>&gt;
+            </div>
 
-    <h2>📦 Proje ve Ürün Yönetimi</h2>
-    <div class="endpoint-grid">
-        <div class="endpoint-card"><div class="name">addProduct</div><div class="desc">Ürün ekle</div><span class="tag">Pazar</span></div>
-        <div class="endpoint-card"><div class="name">getProducts</div><div class="desc">Ürünleri listele</div><span class="tag">Pazar</span></div>
-        <div class="endpoint-card"><div class="name">buyProduct</div><div class="desc">Ürün satın al</div><span class="tag">Pazar</span></div>
-        <div class="endpoint-card"><div class="name">getStoreItems</div><div class="desc">Mağaza ürünlerini getir</div><span class="tag">Pazar</span></div>
-        <div class="endpoint-card"><div class="name">purchaseStoreItem</div><div class="desc">Mağazadan satın al</div><span class="tag">Pazar</span></div>
-        <div class="endpoint-card"><div class="name">saveProject</div><div class="desc">Proje kaydet</div><span class="tag">Proje</span></div>
-        <div class="endpoint-card"><div class="name">favoriteProject</div><div class="desc">Projeyi favorile</div><span class="tag">Proje</span></div>
-        <div class="endpoint-card"><div class="name">archiveProject</div><div class="desc">Projeyi arşivle</div><span class="tag">Proje</span></div>
-        <div class="endpoint-card"><div class="name">trashProject</div><div class="desc">Projeyi çöpe at</div><span class="tag">Proje</span></div>
-        <div class="endpoint-card"><div class="name">restoreProject</div><div class="desc">Projeyi geri yükle</div><span class="tag">Proje</span></div>
-        <div class="endpoint-card"><div class="name">publishProjectToStore</div><div class="desc">Projeyi puan mağazasında satışa sun</div><span class="tag">Proje</span></div>
-    </div>
+            <h3>⚙️ 2. Başlat</h3>
+            <div class="code-block">
+                <span class="code-lang">JavaScript</span>
+<span class="comment">// Back4App uyumlu başlatma</span>
+<span class="function">Parse.initialize</span>(
+  <span class="string">"Dr9SODgMburZ54QvC8RnIHc9dbjreozBbKLOpMjX"</span>,  <span class="comment">// App ID</span>
+  <span class="string">"dCXRvnEcCcOFvpzVDAV9AAJnYvdrqaP1JFRkJzvv"</span>   <span class="comment">// JS Key</span>
+);
+<span class="variable">Parse.serverURL</span> = <span class="string">"https://parseapi.back4app.com/"</span>;
+            </div>
 
-    <h2>⭐ Puan ve Görev</h2>
-    <div class="endpoint-grid">
-        <div class="endpoint-card"><div class="name">getUserPoints</div><div class="desc">Kullanıcı puanlarını getir</div><span class="tag">Puan</span></div>
-        <div class="endpoint-card"><div class="name">getDailyTasks</div><div class="desc">Günlük görevleri listele</div><span class="tag">Görev</span></div>
-        <div class="endpoint-card"><div class="name">completeDailyTask</div><div class="desc">Görevi tamamla</div><span class="tag">Görev</span></div>
-        <div class="endpoint-card"><div class="name">getSocialTasks</div><div class="desc">Topluluk görevlerini getir</div><span class="tag">Görev</span></div>
-        <div class="endpoint-card"><div class="name">getTeamTasks</div><div class="desc">Takım görevlerini getir</div><span class="tag">Görev</span></div>
-        <div class="endpoint-card"><div class="name">generateReferralCode</div><div class="desc">Davet kodu oluştur</div><span class="tag">Davet</span></div>
-        <div class="endpoint-card"><div class="name">applyReferral</div><div class="desc">Davet kodunu uygula</div><span class="tag">Davet</span></div>
-        <div class="endpoint-card"><div class="name">getReferralLeaderboard</div><div class="desc">En çok davet edenler</div><span class="tag">Davet</span></div>
-        <div class="endpoint-card"><div class="name">getStreakStatus</div><div class="desc">Günlük seri durumu</div><span class="tag">Seri</span></div>
-        <div class="endpoint-card"><div class="name">claimDailyStreak</div><div class="desc">Günlük seri ödülünü al</div><span class="tag">Seri</span></div>
-    </div>
+            <h3>⚡ 3. İlk Çağrı</h3>
+            <div class="code-block">
+                <span class="code-lang">JavaScript</span>
+<span class="comment">// VİZYON AI'ya soru sor</span>
+<span class="keyword">const</span> reply = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'superAI'</span>, {
+  prompt: <span class="string">'Python'da hesap makinesi yaz'</span>
+});
+<span class="function">console.log</span>(reply);
+            </div>
 
-    <h2>📬 Sosyal ve İletişim</h2>
-    <div class="endpoint-grid">
-        <div class="endpoint-card"><div class="name">sendMessage</div><div class="desc">Özel mesaj gönder</div><span class="tag">DM</span></div>
-        <div class="endpoint-card"><div class="name">getConversations</div><div class="desc">Konuşmaları listele</div><span class="tag">DM</span></div>
-        <div class="endpoint-card"><div class="name">getConversationMessages</div><div class="desc">Konuşma mesajlarını getir</div><span class="tag">DM</span></div>
-        <div class="endpoint-card"><div class="name">startConversation</div><div class="desc">Yeni konuşma başlat</div><span class="tag">DM</span></div>
-        <div class="endpoint-card"><div class="name">deleteConversation</div><div class="desc">Konuşmayı sil</div><span class="tag">DM</span></div>
-        <div class="endpoint-card"><div class="name">shareConversation</div><div class="desc">Konuşmayı paylaş (link oluştur)</div><span class="tag">DM</span></div>
-        <div class="endpoint-card"><div class="name">getSharedConversation</div><div class="desc">Paylaşılan konuşmayı getir</div><span class="tag">DM</span></div>
-        <div class="endpoint-card"><div class="name">getNotifications</div><div class="desc">Bildirimleri getir</div><span class="tag">Bildirim</span></div>
-        <div class="endpoint-card"><div class="name">sendFounderMessage</div><div class="desc">Kurucuya mesaj gönder</div><span class="tag">İletişim</span></div>
-    </div>
+            <div class="info-box success">
+                <span class="info-box-title">✅ Hazırsın!</span>
+                Artık tüm Cloud Function'ları çağırabilirsin. Aşağıdaki bölümlerde her özellik kategorize edilmiş halde.
+            </div>
+        </section>
 
-    <h2>📢 İçerik ve Yönetim</h2>
-    <div class="endpoint-grid">
-        <div class="endpoint-card"><div class="name">getComments</div><div class="desc">Yorumları getir</div><span class="tag">Yorum</span></div>
-        <div class="endpoint-card"><div class="name">addComment</div><div class="desc">Yorum ekle</div><span class="tag">Yorum</span></div>
-        <div class="endpoint-card"><div class="name">deleteComment</div><div class="desc">Yorum sil</div><span class="tag">Yorum</span></div>
-        <div class="endpoint-card"><div class="name">editComment</div><div class="desc">Yorum düzenle</div><span class="tag">Yorum</span></div>
-        <div class="endpoint-card"><div class="name">createPoll</div><div class="desc">Anket oluştur</div><span class="tag admin">Admin</span></div>
-        <div class="endpoint-card"><div class="name">votePoll</div><div class="desc">Ankete oy ver</div><span class="tag">Anket</span></div>
-        <div class="endpoint-card"><div class="name">getActivePoll</div><div class="desc">Aktif anketi getir</div><span class="tag">Anket</span></div>
-        <div class="endpoint-card"><div class="name">deletePoll</div><div class="desc">Anketi sil</div><span class="tag admin">Admin</span></div>
-        <div class="endpoint-card"><div class="name">getAnnouncements</div><div class="desc">Duyuruları getir</div><span class="tag">Duyuru</span></div>
-        <div class="endpoint-card"><div class="name">addAnnouncement</div><div class="desc">Duyuru ekle</div><span class="tag admin">Admin</span></div>
-        <div class="endpoint-card"><div class="name">deleteAnnouncement</div><div class="desc">Duyuru sil</div><span class="tag admin">Admin</span></div>
-        <div class="endpoint-card"><div class="name">getCourses</div><div class="desc">Dersleri listele</div><span class="tag">Akademi</span></div>
-        <div class="endpoint-card"><div class="name">getCourseDetails</div><div class="desc">Ders detaylarını getir</div><span class="tag">Akademi</span></div>
-        <div class="endpoint-card"><div class="name">completeLesson</div><div class="desc">Dersi tamamla</div><span class="tag">Akademi</span></div>
-        <div class="endpoint-card"><div class="name">getJobs</div><div class="desc">İş ilanlarını getir</div><span class="tag">Kariyer</span></div>
-        <div class="endpoint-card"><div class="name">applyJob</div><div class="desc">İş başvurusu yap</div><span class="tag">Kariyer</span></div>
-        <div class="endpoint-card"><div class="name">submitBugReport</div><div class="desc">Hata bildir</div><span class="tag">Destek</span></div>
-        <div class="endpoint-card"><div class="name">getQuizQuestions</div><div class="desc">Zeka testi sorularını getir</div><span class="tag">Oyun</span></div>
-        <div class="endpoint-card"><div class="name">submitQuizAnswer</div><div class="desc">Test cevabını gönder</div><span class="tag">Oyun</span></div>
-    </div>
+        <!-- V27 API -->
+        <section id="v27api">
+            <div class="section-head">
+                <div class="section-icon">🔑</div>
+                <div class="section-title">
+                    <h2>V27 API Sistemi <span class="badge-new">YENİ</span></h2>
+                    <p>Kendi uygulamalarınızda VİZYON AI gücünü kullanın</p>
+                </div>
+            </div>
 
-    <h2>🛠️ Admin / Kurucu Özel</h2>
-    <div class="endpoint-grid">
-        <div class="endpoint-card"><div class="name">initAdminUsers</div><div class="desc">Admin/Beta hesaplarını oluştur</div><span class="tag founder">Kurucu</span></div>
-        <div class="endpoint-card"><div class="name">adminLogin</div><div class="desc">Admin girişi</div><span class="tag admin">Admin</span></div>
-        <div class="endpoint-card"><div class="name">founderLogin</div><div class="desc">Kurucu girişi</div><span class="tag founder">Kurucu</span></div>
-        <div class="endpoint-card"><div class="name">betaLogin</div><div class="desc">Beta girişi</div><span class="tag">Beta</span></div>
-        <div class="endpoint-card"><div class="name">banUser</div><div class="desc">Kullanıcıyı yasakla</div><span class="tag admin">Admin</span></div>
-        <div class="endpoint-card"><div class="name">unbanUser</div><div class="desc">Yasaklamayı kaldır</div><span class="tag admin">Admin</span></div>
-        <div class="endpoint-card"><div class="name">getAdmins</div><div class="desc">Admin listesi</div><span class="tag founder">Kurucu</span></div>
-        <div class="endpoint-card"><div class="name">getBetas</div><div class="desc">Beta listesi</div><span class="tag admin">Admin</span></div>
-        <div class="endpoint-card"><div class="name">getBannedUsers</div><div class="desc">Engelli kullanıcılar</div><span class="tag admin">Admin</span></div>
-        <div class="endpoint-card"><div class="name">sendGiftRequest</div><div class="desc">Hediye paketi gönder</div><span class="tag admin">Admin</span></div>
-        <div class="endpoint-card"><div class="name">sendRoleRequest</div><div class="desc">Rol teklifi gönder</div><span class="tag admin">Admin</span></div>
-        <div class="endpoint-card"><div class="name">handleRequest</div><div class="desc">Teklifi yanıtla (kabul/red)</div><span class="tag">Kullanıcı</span></div>
-        <div class="endpoint-card"><div class="name">getAllTeams</div><div class="desc">Tüm takımları listele</div><span class="tag founder">Kurucu</span></div>
-        <div class="endpoint-card"><div class="name">searchTeams</div><div class="desc">Takım ara (isim/kod)</div><span class="tag founder">Kurucu</span></div>
-        <div class="endpoint-card"><div class="name">joinTeamAsFounder</div><div class="desc">Herhangi bir takıma kurucu olarak katıl</div><span class="tag founder">Kurucu</span></div>
-        <div class="endpoint-card"><div class="name">forceCloseTeam</div><div class="desc">Takımı zorla kapat</div><span class="tag founder">Kurucu</span></div>
-        <div class="endpoint-card"><div class="name">getVizyonLog</div><div class="desc">Sistem loglarını getir</div><span class="tag founder">Kurucu</span></div>
-        <div class="endpoint-card"><div class="name">addVizyonLog</div><div class="desc">Sistem logu ekle</div><span class="tag founder">Kurucu</span></div>
-        <div class="endpoint-card"><div class="name">searchAllUsers</div><div class="desc">Tüm kullanıcıları ara (isim/e-posta)</div><span class="tag founder">Kurucu</span></div>
-    </div>
+            <div class="info-box premium">
+                <span class="info-box-title">🌟 V27 API Nedir?</span>
+                V27 API, VİZYON AI'nın 28 model birleşik gücünü dış uygulamalara açan bir REST API servisidir. Kendi web sitenizde, mobil uygulamanızda, bot'unuzda veya Discord/Telegram entegrasyonunuzda kullanabilirsiniz.
+            </div>
 
-    <h2>🛡️ Ebeveyn Kontrolleri</h2>
-    <div class="endpoint-grid">
-        <div class="endpoint-card"><div class="name">requestParentVerification</div><div class="desc">Ebeveyn doğrulaması başlat</div><span class="tag">Ebeveyn</span></div>
-        <div class="endpoint-card"><div class="name">verifyParentCode</div><div class="desc">Ebeveyn kodunu doğrula</div><span class="tag">Ebeveyn</span></div>
-        <div class="endpoint-card"><div class="name">getParentSettings</div><div class="desc">Ebeveyn ayarlarını getir</div><span class="tag">Ebeveyn</span></div>
-        <div class="endpoint-card"><div class="name">updateParentSettings</div><div class="desc">Ebeveyn ayarlarını güncelle</div><span class="tag">Ebeveyn</span></div>
-        <div class="endpoint-card"><div class="name">toggleParentFeature</div><div class="desc">Özelliği aç/kapat</div><span class="tag">Ebeveyn</span></div>
-        <div class="endpoint-card"><div class="name">suspendChildAccount</div><div class="desc">Çocuk hesabını askıya al</div><span class="tag">Ebeveyn</span></div>
-        <div class="endpoint-card"><div class="name">unsuspendChildAccount</div><div class="desc">Askıyı kaldır</div><span class="tag">Ebeveyn</span></div>
-        <div class="endpoint-card"><div class="name">getChildSessions</div><div class="desc">Çocuğun oturum geçmişi</div><span class="tag">Ebeveyn</span></div>
-        <div class="endpoint-card"><div class="name">sendParentReport</div><div class="desc">Haftalık rapor gönder</div><span class="tag">Ebeveyn</span></div>
-    </div>
+            <h3>📊 Anahtar Limitleri</h3>
+            <table class="api-table">
+                <thead>
+                    <tr><th>Rol / Plan</th><th>API Anahtarı Hakkı</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>👑 Kurucu / ⚙️ Admin / 🔬 Beta / 🎨 Moderatör</td><td><code>♾️ Sınırsız</code></td></tr>
+                    <tr><td>👥 Takım Paketi</td><td><code>100 anahtar</code></td></tr>
+                    <tr><td>🌟 Pro Paket</td><td><code>20 anahtar</code></td></tr>
+                    <tr><td>🆓 Ücretsiz Üye</td><td><code>2 anahtar</code></td></tr>
+                </tbody>
+            </table>
 
-    <h2>📊 Diğer Özellikler</h2>
-    <div class="endpoint-grid">
-        <div class="endpoint-card"><div class="name">battleMode</div><div class="desc">AI vs AI savaşı</div><span class="tag">Eğlence</span></div>
-        <div class="endpoint-card"><div class="name">multiAI</div><div class="desc">4 modele aynı soruyu sor</div><span class="tag">Eğlence</span></div>
-        <div class="endpoint-card"><div class="name">analyzeVideo</div><div class="desc">Video analizi</div><span class="tag">Eğlence</span></div>
-        <div class="endpoint-card"><div class="name">generateReelsIdeas</div><div class="desc">Reels fikirleri üret</div><span class="tag">Eğlence</span></div>
-        <div class="endpoint-card"><div class="name">generateApp</div><div class="desc">Uygulama kodu oluştur</div><span class="tag">Eğlence</span></div>
-        <div class="endpoint-card"><div class="name">proTools</div><div class="desc">Pro araçları (/kod, /yazi, /ceviri)</div><span class="tag">Araç</span></div>
-        <div class="endpoint-card"><div class="name">generateImageWithHF</div><div class="desc">Görsel üret (Hugging Face)</div><span class="tag">Görsel</span></div>
-        <div class="endpoint-card"><div class="name">generate3DWithHF</div><div class="desc">3D model üret (Hugging Face)</div><span class="tag">3D</span></div>
-        <div class="endpoint-card"><div class="name">searchGif</div><div class="desc">GIF ara (Giphy)</div><span class="tag">GIF</span></div>
-        <div class="endpoint-card"><div class="name">smartTranslate</div><div class="desc">Akıllı çeviri (DeepL + Libre)</div><span class="tag">Çeviri</span></div>
-        <div class="endpoint-card"><div class="name">getWalletBalance</div><div class="desc">Cüzdan bakiyesini getir</div><span class="tag">Cüzdan</span></div>
-        <div class="endpoint-card"><div class="name">withdrawFunds</div><div class="desc">Para çek</div><span class="tag">Cüzdan</span></div>
-        <div class="endpoint-card"><div class="name">subscribeToBlog</div><div class="desc">Blog aboneliği</div><span class="tag">Abonelik</span></div>
-        <div class="endpoint-card"><div class="name">subscribeToSystemUpdates</div><div class="desc">Sistem güncelleme aboneliği</div><span class="tag">Abonelik</span></div>
-        <div class="endpoint-card"><div class="name">sendBlogUpdateToSubscribers</div><div class="desc">Blog bildirimi gönder</div><span class="tag admin">Admin</span></div>
-        <div class="endpoint-card"><div class="name">sendSystemUpdateToSubscribers</div><div class="desc">Sistem bildirimi gönder</div><span class="tag admin">Admin</span></div>
-        <div class="endpoint-card"><div class="name">getContestRanking</div><div class="desc">Aylık yarışma sıralaması</div><span class="tag">Yarışma</span></div>
-    </div>
+            <h3>⏱️ Geçerlilik Süreleri</h3>
+            <div class="model-pills">
+                <span class="model-pill">♾️ Süresiz</span>
+                <span class="model-pill">1 Yıl</span>
+                <span class="model-pill">5 Ay</span>
+                <span class="model-pill">1 Ay</span>
+                <span class="model-pill">1 Hafta</span>
+            </div>
 
-    <hr>
+            <h3>🔐 Güvenlik</h3>
+            <ul>
+                <li>Anahtar değeri <code>SHA-256</code> ile hash'lenir, sunucuda düz metin olarak saklanmaz.</li>
+                <li>Kullanıcıya <strong>sadece 1 kez</strong> tam anahtar gösterilir.</li>
+                <li>Sonrasında sadece maskelenmiş hali görünür: <code>V27-XXXX••••••••-XXXX</code></li>
+                <li>Her istekte <code>usage_count</code> otomatik artar.</li>
+                <li>Süre dolduğunda anahtar otomatik geçersiz olur.</li>
+            </ul>
 
-    <!-- ============================================================ -->
-    <!-- ===================== ÖRNEK KULLANIMLAR ===================== -->
-    <!-- ============================================================ -->
+            <h3>📌 V27 API Fonksiyonları</h3>
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">createV27ApiKey</div>
+                    <div class="desc">Yeni V27 API anahtarı oluştur</div>
+                    <span class="tag ai">V27 API</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getMyV27ApiKeys</div>
+                    <div class="desc">Kendi anahtarlarını listele (maskelenmiş)</div>
+                    <span class="tag ai">V27 API</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">revokeV27ApiKey</div>
+                    <div class="desc">Anahtarı iptal et</div>
+                    <span class="tag ai">V27 API</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">validateV27ApiKey</div>
+                    <div class="desc">Anahtarın geçerliliğini kontrol et</div>
+                    <span class="tag ai">V27 API</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">v27ApiChat</div>
+                    <div class="desc">apiKey + prompt ile AI yanıtı al</div>
+                    <span class="tag ai">V27 API</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">v27ApiRest</div>
+                    <div class="desc">REST endpoint (Postman/cURL uyumlu)</div>
+                    <span class="tag premium">Premium</span>
+                </div>
+            </div>
 
-    <h2>📖 Örnek Kullanımlar</h2>
+            <h3>🎯 Anahtar Oluşturma Örneği</h3>
+            <div class="code-block">
+                <span class="code-lang">JavaScript</span>
+<span class="comment">// 1 yıllık anahtar oluştur</span>
+<span class="keyword">const</span> result = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'createV27ApiKey'</span>, {
+  keyName: <span class="string">'Web Sitem İçin'</span>,
+  keyDescription: <span class="string">'React projesi için API anahtarı'</span>,
+  duration: <span class="string">'1y'</span>  <span class="comment">// '1w' | '1m' | '5m' | '1y' | 'unlimited'</span>
+});
+console.log(result.plainKey);   <span class="comment">// Sadece 1 kez gösterilir!</span>
+console.log(result.maskedKey);  <span class="comment">// V27-XXXX••••••••-XXXX</span>
+            </div>
 
-    <h3>1. AI Sorgusu Gönderme</h3>
-    <div class="code-block">
-        <span class="comment">// 🤖 VİZYON AI'ya soru sor</span><br>
-        <span class="keyword">const</span> response = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'superAI'</span>, {<br>
-        &nbsp;&nbsp;prompt: <span class="string">'React'te bir todo uygulaması nasıl yapılır?'</span><br>
-        });<br>
-        <span class="function">console.log</span>(response);
-    </div>
+            <h3>🌐 REST ile Kullanım (cURL)</h3>
+            <div class="code-block">
+                <span class="code-lang">Bash</span>
+curl -X POST <span class="string">"https://vizyon2026.vercel.app/api/v27ApiRest"</span> \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -H <span class="string">"X-V27-Api-Key: V27-XXXX-XXXX-XXXX-XXXX"</span> \
+  -d <span class="string">'{"prompt": "Merhaba, nasılsın?", "lang": "tr"}'</span>
+            </div>
 
-    <h3>2. Web Arama Yapma</h3>
-    <div class="code-block">
-        <span class="comment">// 🌐 Dolar kuru veya haber ara</span><br>
-        <span class="keyword">const</span> result = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'webSearch'</span>, {<br>
-        &nbsp;&nbsp;query: <span class="string">'bugün dolar ne kadar'</span><br>
-        });<br>
-        <span class="function">console.log</span>(result);
-    </div>
+            <h3>🐍 Python ile Kullanım</h3>
+            <div class="code-block">
+                <span class="code-lang">Python</span>
+<span class="keyword">import</span> requests
 
-    <h3>3. Takım Mesajı Gönderme</h3>
-    <div class="code-block">
-        <span class="comment">// 👥 Takım sohbetine mesaj at</span><br>
-        <span class="keyword">const</span> result = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'sendTeamMessage'</span>, {<br>
-        &nbsp;&nbsp;teamId: <span class="string">'TEAM_ID'</span>,<br>
-        &nbsp;&nbsp;message: <span class="string">'Merhaba takım!'</span><br>
-        });<br>
-        <span class="function">console.log</span>(result);
-    </div>
+<span class="keyword">class</span> <span class="function">V27Bot</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, api_key):
+        self.api_key = api_key
+        self.url = <span class="string">'https://vizyon2026.vercel.app/api/v27ApiRest'</span>
+    
+    <span class="keyword">def</span> <span class="function">sor</span>(self, prompt, lang=<span class="string">'tr'</span>):
+        response = requests.post(
+            self.url,
+            headers={
+                <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>,
+                <span class="string">'X-V27-Api-Key'</span>: self.api_key
+            },
+            json={<span class="string">'prompt'</span>: prompt, <span class="string">'lang'</span>: lang}
+        )
+        <span class="keyword">return</span> response.json().get(<span class="string">'reply'</span>, <span class="string">''</span>)
 
-    <h3>4. Yorum Ekleme</h3>
-    <div class="code-block">
-        <span class="comment">// 💬 Yorum gönder</span><br>
-        <span class="keyword">const</span> result = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'addComment'</span>, {<br>
-        &nbsp;&nbsp;comment: <span class="string">'Harika bir uygulama!'</span>,<br>
-        &nbsp;&nbsp;rating: <span class="string">5</span><br>
-        });<br>
-        <span class="function">console.log</span>(result);
-    </div>
+<span class="comment"># Kullanım</span>
+bot = <span class="function">V27Bot</span>(<span class="string">'V27-XXXX-XXXX-XXXX-XXXX'</span>)
+cevap = bot.<span class="function">sor</span>(<span class="string">'Python ile REST API nasıl yazılır?'</span>)
+<span class="function">print</span>(cevap)
+            </div>
 
-    <h3>5. Davet Kodu Kullanma</h3>
-    <div class="code-block">
-        <span class="comment">// 🎁 Davet kodunu uygula</span><br>
-        <span class="keyword">const</span> result = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'applyReferral'</span>, {<br>
-        &nbsp;&nbsp;code: <span class="string">'V27-EYMN-1234'</span><br>
-        });<br>
-        <span class="function">console.log</span>(result);
-    </div>
+            <div class="info-box danger">
+                <span class="info-box-title">⚠️ Güvenlik Uyarısı</span>
+                API anahtarınızı <strong>kimseyle paylaşmayın</strong>. Kodunuzda <code>.env</code> dosyası kullanın, hardcode yapmayın. GitHub'a commit'lemeyin. Sızıntı durumunda derhal iptal edin.
+            </div>
+        </section>
 
-    <h3>6. Günlük Görevi Tamamlama</h3>
-    <div class="code-block">
-        <span class="comment">// ✅ Günlük görevi tamamla</span><br>
-        <span class="keyword">const</span> result = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'completeDailyTask'</span>, {<br>
-        &nbsp;&nbsp;taskId: <span class="string">'TASK_ID'</span><br>
-        });<br>
-        <span class="function">console.log</span>(result);
-    </div>
+        <!-- AI MODELLERİ -->
+        <section id="ai">
+            <div class="section-head">
+                <div class="section-icon">🤖</div>
+                <div class="section-title">
+                    <h2>AI Modelleri</h2>
+                    <p>28 model — 3 katmanlı yapı</p>
+                </div>
+            </div>
 
-    <hr>
+            <h3>⭐ superAI (Önerilen)</h3>
+            <p>Tüm modelleri sırayla dener, ilk başarılı cevabı getirir. <strong>Günlük 100 sorgu (Free) / 2000 sorgu (Pro) / Sınırsız (Team).</strong></p>
+            <div class="code-block">
+                <span class="code-lang">JavaScript</span>
+<span class="keyword">const</span> reply = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'superAI'</span>, {
+  prompt: <span class="string">'Python'da REST API nasıl yazılır?'</span>
+});
+            </div>
 
-    <!-- ============================================================ -->
-    <!-- ===================== GÜVENLİK VE LİMİTLER ================== -->
-    <!-- ============================================================ -->
+            <div class="info-box">
+                <span class="info-box-title">🎯 3 Katmanlı Sistem</span>
+                <strong>1. Katman:</strong> 13 yerli Ollama modeli (Kaggle üzerinden)<br>
+                <strong>2. Katman:</strong> 7 Nvidia NIM modeli<br>
+                <strong>3. Katman:</strong> 8 bulut API modeli (Groq, Gemini vb.)
+            </div>
 
-    <h2>🔐 Güvenlik ve Limitler</h2>
-    <ul>
-        <li><strong>Kimlik Doğrulama:</strong> Çoğu fonksiyon için <strong>oturum açmış kullanıcı</strong> gerekir.</li>
-        <li><strong>Sorgu Limiti:</strong> Ücretsiz kullanıcılar <strong>25 sorgu/gün</strong>, Pro kullanıcılar <strong>2000 sorgu/gün</strong>, Takım kullanıcıları <strong>sınırsız</strong>.</li>
-        <li><strong>Admin/Kurucu Yetkisi:</strong> Yönetim fonksiyonları yalnızca yetkili kullanıcılar tarafından çağrılabilir.</li>
-        <li><strong>Rate Limit:</strong> Aşırı kullanım durumunda geçici olarak erişim kısıtlanabilir.</li>
-        <li><strong>Veri Güvenliği:</strong> Tüm veriler şifrelenmiş olarak Back4App'te saklanır.</li>
-    </ul>
+            <div class="model-group">
+                <div class="model-group-title">🏠 Yerli Ollama Modelleri (13 adet)</div>
+                <div class="model-pills">
+                    <span class="model-pill">granite3.3:2b</span>
+                    <span class="model-pill">qwen2.5vl:3b</span>
+                    <span class="model-pill">phi4-mini-reasoning</span>
+                    <span class="model-pill">gemma3:4b</span>
+                    <span class="model-pill">qwen3:8b</span>
+                    <span class="model-pill">qwen3:4b</span>
+                    <span class="model-pill">qwen2.5-coder</span>
+                    <span class="model-pill">mistral</span>
+                    <span class="model-pill">phi3.5</span>
+                    <span class="model-pill">gemma2</span>
+                    <span class="model-pill">llama3.2</span>
+                    <span class="model-pill">qwen2.5</span>
+                    <span class="model-pill">deepseek-r1</span>
+                </div>
+            </div>
 
-    <hr>
+            <div class="model-group">
+                <div class="model-group-title">🟢 Nvidia NIM Modelleri (7 adet)</div>
+                <div class="model-pills">
+                    <span class="model-pill">llama-3.3-70b-instruct</span>
+                    <span class="model-pill">llama-3.1-8b-instruct</span>
+                    <span class="model-pill">qwen2.5-7b-instruct</span>
+                    <span class="model-pill">qwen2.5-coder-32b</span>
+                    <span class="model-pill">deepseek-r1-distill</span>
+                    <span class="model-pill">gemma-2-2b</span>
+                    <span class="model-pill">phi-3.5-moe</span>
+                </div>
+            </div>
 
-    <!-- ============================================================ -->
-    <!-- ===================== DESTEK ================================= -->
-    <!-- ============================================================ -->
+            <div class="model-group">
+                <div class="model-group-title">☁️ Bulut API Modelleri (8 adet)</div>
+                <div class="model-pills">
+                    <span class="model-pill">Groq (Llama 3.3 70B)</span>
+                    <span class="model-pill">Gemini 2.0 Flash</span>
+                    <span class="model-pill">DeepSeek Chat</span>
+                    <span class="model-pill">DeepInfra (Llama 70B)</span>
+                    <span class="model-pill">OpenAI GPT-4o-mini</span>
+                    <span class="model-pill">Cerebras (Llama 3.3 70B)</span>
+                    <span class="model-pill">OpenRouter</span>
+                    <span class="model-pill">Cohere Command R Plus</span>
+                </div>
+            </div>
 
-    <h2>📞 Destek</h2>
-    <p>API kullanımıyla ilgili sorularınız için:</p>
-    <ul>
-        <li><strong>📧 E-posta:</strong> <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a></li>
-        <li><strong>🌐 Web:</strong> <a href="https://vizyon2026.vercel.app">https://vizyon2026.vercel.app</a></li>
-        <li><strong>📖 Dokümantasyon:</strong> Yakında tam kapsamlı doküman yayınlanacaktır.</li>
-    </ul>
+            <h3>🎯 Bireysel Model Çağrıları</h3>
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">callGroq</div>
+                    <div class="desc">Groq Llama 3.3 70B (en hızlı)</div>
+                    <span class="tag ai">AI</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">callGemini</div>
+                    <div class="desc">Google Gemini 2.0 Flash</div>
+                    <span class="tag ai">AI</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">callDeepSeek</div>
+                    <div class="desc">DeepSeek Chat (reasoning)</div>
+                    <span class="tag ai">AI</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">callDeepInfra</div>
+                    <div class="desc">Meta Llama 3.1 70B</div>
+                    <span class="tag ai">AI</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">callOpenAI</div>
+                    <div class="desc">OpenAI GPT-4o-mini</div>
+                    <span class="tag ai">AI</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">callCerebras</div>
+                    <div class="desc">Cerebras Llama 3.3 70B</div>
+                    <span class="tag ai">AI</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">callOpenRouter</div>
+                    <div class="desc">100+ modele erişim</div>
+                    <span class="tag ai">AI</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">callCohere</div>
+                    <div class="desc">Cohere Command R Plus</div>
+                    <span class="tag ai">AI</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">callLocalLlama</div>
+                    <div class="desc">Yerli Ollama (13 modelden biri)</div>
+                    <span class="tag ai">AI</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">callNvidiaNIM</div>
+                    <div class="desc">Nvidia NIM (7 modelden biri)</div>
+                    <span class="tag ai">AI</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">callCustomAI</div>
+                    <div class="desc">Kullanıcının kendi API anahtarı (tek)</div>
+                    <span class="tag premium">Kullanıcı</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">callCustomAIWithKeys</div>
+                    <div class="desc">Kullanıcının kendi API anahtarları (çoklu)</div>
+                    <span class="tag premium">Kullanıcı</span>
+                </div>
+            </div>
 
-    <!-- ===== FOOTER ===== -->
-    <div class="footer">
-        <p>
-            © 2027 <strong>Vizyon2027</strong> ·
-            <a href="gizlilik.html">Gizlilik Politikası</a> ·
-            <a href="kullanici-sozlesmesi.html">Kullanıcı Sözleşmesi</a>
-        </p>
-        <p style="margin-top:4px; font-size:12px; color:#3a5a6a;">
-            API sürümü 6.01.1 · Tüm hakları saklıdır.
-        </p>
-    </div>
+            <h3>⚔️ Savaş Modu & Çoklu AI</h3>
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">battleMode</div>
+                    <div class="desc">İki modeli kapıştır, kazananı seç</div>
+                    <span class="tag ai">Eğlence</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">multiAI</div>
+                    <div class="desc">4 modele aynı soruyu sor</div>
+                    <span class="tag ai">Eğlence</span>
+                </div>
+            </div>
 
+            <h3>🌐 Web Arama</h3>
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">webSearch</div>
+                    <div class="desc">SerpApi + Google CSE fallback</div>
+                    <span class="tag">Arama</span>
+                </div>
+            </div>
+
+            <h3>🎨 Görsel & 3D Üretim</h3>
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">generateImageWithHF</div>
+                    <div class="desc">Hugging Face FLUX.1-dev görsel üretimi</div>
+                    <span class="tag ai">Görsel</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">generate3DWithHF</div>
+                    <div class="desc">Hugging Face 3D model üretimi</div>
+                    <span class="tag ai">3D</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">generateApp</div>
+                    <div class="desc">AI uygulama kodu üretir</div>
+                    <span class="tag ai">Kod</span>
+                </div>
+            </div>
+
+            <h3>🌍 Çeviri</h3>
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">smartTranslate</div>
+                    <div class="desc">DeepL + Libre fallback</div>
+                    <span class="tag">Çeviri</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">translateWithDeepL</div>
+                    <div class="desc">DeepL ile çeviri</div>
+                    <span class="tag">Çeviri</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">translateWithLibre</div>
+                    <div class="desc">LibreTranslate ile çeviri</div>
+                    <span class="tag">Çeviri</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- VİZYON AL -->
+        <section id="vizyon-al">
+            <div class="section-head">
+                <div class="section-icon">✨</div>
+                <div class="section-title">
+                    <h2>Vizyon Al Paneli <span class="badge-new">YENİ</span></h2>
+                    <p>4 mod + ekran okuma + sesli sohbet + dosya analiz + sunum</p>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <span class="info-box-title">✨ Vizyon Al Nedir?</span>
+                28 yapay zekayı tek panelde birleştiren gelişmiş araç. <strong>4 farklı mod</strong> + ekran okuma + sesli sohbet + dosya analiz + indirilebilir sunum özellikleri sunar.
+            </div>
+
+            <h3>🎛️ 4 Mod</h3>
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">🌐 Normal Mod</div>
+                    <div class="desc">Standart sohbet, tüm modeller eşit</div>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">🧠 Derin Düşünme</div>
+                    <div class="desc">Uzun düşünür, internette gezer, detaylı yanıt</div>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">🕵️ Ajan Modu</div>
+                    <div class="desc">Her siteye girer, işlem yapar, form doldurur</div>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">💻 Yazılımcı Modu</div>
+                    <div class="desc">En iyi kod üretimi ve hata ayıklama</div>
+                </div>
+            </div>
+
+            <h3>📌 Vizyon Al Fonksiyonları</h3>
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">vizyonAlChat</div>
+                    <div class="desc">Ana chat (mode: normal/deep/agent/developer)</div>
+                    <span class="tag ai">Vizyon Al</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">vizyonAlDeepThink</div>
+                    <div class="desc">Kısayol: Derin düşünme modu</div>
+                    <span class="tag ai">Vizyon Al</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">vizyonAlAgent</div>
+                    <div class="desc">Kısayol: Ajan modu</div>
+                    <span class="tag ai">Vizyon Al</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">vizyonAlDeveloper</div>
+                    <div class="desc">Kısayol: Yazılımcı modu</div>
+                    <span class="tag ai">Vizyon Al</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">vizyonAlScreenRead</div>
+                    <div class="desc">Tek kare ekran okuma (Gemini Vision)</div>
+                    <span class="tag premium">Premium</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">vizyonAlLiveScreenStream</div>
+                    <div class="desc">Canlı ekran izleme (3sn aralık)</div>
+                    <span class="tag premium">Premium</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">vizyonAlFileAnalyze</div>
+                    <div class="desc">Dosya analizi (PDF/Word/Excel/Görsel)</div>
+                    <span class="tag ai">Vizyon Al</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">vizyonAlFileCreate</div>
+                    <div class="desc">İndirilebilir dosya/sunum oluştur</div>
+                    <span class="tag ai">Vizyon Al</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">vizyonAlVoiceChat</div>
+                    <div class="desc">Sesli sohbet (sürekli mod)</div>
+                    <span class="tag premium">Premium</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getSiteInfoForVizyonAl</div>
+                    <div class="desc">Site içeriğini AI'ya bağlam olarak ver</div>
+                    <span class="tag ai">Vizyon Al</span>
+                </div>
+            </div>
+
+            <h3>🎯 Chat Çağrı Örneği</h3>
+            <div class="code-block">
+                <span class="code-lang">JavaScript</span>
+<span class="comment">// Derin Düşünme modunda chat</span>
+<span class="keyword">const</span> result = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'vizyonAlChat'</span>, {
+  message: <span class="string">'Yapay zeka geleceği nasıl olacak?'</span>,
+  mode: <span class="string">'deep'</span>  <span class="comment">// 'normal' | 'deep' | 'agent' | 'developer'</span>
+});
+console.log(result.reply);
+            </div>
+
+            <div class="info-box warning">
+                <span class="info-box-title">⚠️ Sorumluluk Onayı</span>
+                Vizyon Al'ı ilk kez kullanırken kullanıcı <strong>sorumluluk onay kutusunu</strong> işaretlemek zorundadır. Ajan modu ve ekran okuma özellikleri kullanıcı sorumluluğundadır.
+            </div>
+        </section>
+
+        <!-- V27 KOÇ -->
+        <section id="koc">
+            <div class="section-head">
+                <div class="section-icon">🧭</div>
+                <div class="section-title">
+                    <h2>V27 Koç Asistanı</h2>
+                    <p>Samimi, yol gösteren yapay zeka koç</p>
+                </div>
+            </div>
+
+            <h3>📊 Haftalık Limitler</h3>
+            <table class="api-table">
+                <thead>
+                    <tr><th>Plan / Rol</th><th>Haftalık İşlem</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>👑 Kurucu / ⚙️ Admin / 🔬 Beta / 🎨 Moderatör</td><td><code>♾️ Sınırsız</code></td></tr>
+                    <tr><td>👥 Takım Paketi</td><td><code>1000 işlem</code></td></tr>
+                    <tr><td>🌟 Pro Paket</td><td><code>50 işlem</code></td></tr>
+                    <tr><td>🆓 Ücretsiz</td><td><code>10 işlem</code></td></tr>
+                </tbody>
+            </table>
+            <p><em>Limitler her Pazartesi 00:00'da otomatik sıfırlanır.</em></p>
+
+            <h3>📌 Koç Fonksiyonları</h3>
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">kocChat</div>
+                    <div class="desc">Koç ile sohbet et</div>
+                    <span class="tag ai">Koç</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getKocHistory</div>
+                    <div class="desc">Geçmiş sohbetleri listele</div>
+                    <span class="tag ai">Koç</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getKocConversationMessages</div>
+                    <div class="desc">Bir sohbetin mesajlarını getir</div>
+                    <span class="tag ai">Koç</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getKocUsage</div>
+                    <div class="desc">Haftalık kullanımını gör</div>
+                    <span class="tag ai">Koç</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">resetKocUsage</div>
+                    <div class="desc">Kullanımı sıfırla (sadece kurucu)</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">shareKocConversation</div>
+                    <div class="desc">Şifreli paylaşım linki oluştur</div>
+                    <span class="tag ai">Koç</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getSharedKocConversation</div>
+                    <div class="desc">Paylaşılan sohbeti şifreyle aç</div>
+                    <span class="tag ai">Koç</span>
+                </div>
+            </div>
+
+            <h3>🎯 Chat Örneği</h3>
+            <div class="code-block">
+                <span class="code-lang">JavaScript</span>
+<span class="keyword">const</span> reply = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'kocChat'</span>, {
+  message: <span class="string">'Motivasyonum düşük, ne yapmalıyım?'</span>,
+  conversationId: <span class="string">null</span>  <span class="comment">// İlk mesajsa null</span>
+});
+console.log(reply.reply);
+console.log(reply.remaining);   <span class="comment">// Kalan hakkın</span>
+            </div>
+        </section>
+
+        <!-- SES & DOSYA -->
+        <section id="ses-dosya">
+            <div class="section-head">
+                <div class="section-icon">🔊</div>
+                <div class="section-title">
+                    <h2>Sesli Sohbet & Dosya Analiz <span class="badge-new">YENİ</span></h2>
+                    <p>ChatGPT tarzı sesli konuşma + dosya analizi</p>
+                </div>
+            </div>
+
+            <h3>🔊 Sesli Sohbet</h3>
+            <p>Web Speech API + Gemini ile tam ekran sesli konuşma. <strong>Sürekli ses tanıma modu</strong> aktiftir, geri tuşuna basıldığında kesin kapanır.</p>
+
+            <table class="api-table">
+                <thead>
+                    <tr><th>Plan</th><th>Günlük Sesli Sohbet</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>🆓 Ücretsiz</td><td><code>5 dakika</code></td></tr>
+                    <tr><td>🌟 Pro</td><td><code>60 dakika</code></td></tr>
+                    <tr><td>👥 Takım+</td><td><code>♾️ Sınırsız</code></td></tr>
+                </tbody>
+            </table>
+
+            <h3>📎 Dosya Analiz</h3>
+            <p>PDF, Word, Excel, görsel, video, kod dosyaları yüklenebilir. AI okur, analiz eder, sunum oluşturur ve <strong>indirilebilir link</strong> verir.</p>
+
+            <table class="api-table">
+                <thead>
+                    <tr><th>Plan</th><th>Günlük Dosya Analiz</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>🆓 Ücretsiz</td><td><code>3 dosya</code></td></tr>
+                    <tr><td>🌟 Pro</td><td><code>50 dosya</code></td></tr>
+                    <tr><td>👥 Takım+</td><td><code>♾️ Sınırsız</code></td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- VİDEO -->
+        <section id="video">
+            <div class="section-head">
+                <div class="section-icon">🎬</div>
+                <div class="section-title">
+                    <h2>Video Stüdyosu <span class="badge-new">YENİ</span></h2>
+                    <p>Senaryo, Reels fikirleri, video analiz ve kesit aracı</p>
+                </div>
+            </div>
+
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">videoStudioProcess</div>
+                    <div class="desc">Tüm video işlemleri (tip: story/reels/analyze/clip)</div>
+                    <span class="tag ai">Video</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">analyzeVideo</div>
+                    <div class="desc">YouTube URL analizi</div>
+                    <span class="tag ai">Video</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">generateReelsIdeas</div>
+                    <div class="desc">Instagram Reels fikri üretir</div>
+                    <span class="tag ai">Video</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">createVideoClip</div>
+                    <div class="desc">Moderatör video kesit aracı</div>
+                    <span class="tag moderator">Moderatör</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getVideoClips</div>
+                    <div class="desc">Kesitleri listele</div>
+                    <span class="tag ai">Video</span>
+                </div>
+            </div>
+
+            <h3>📊 Video Limitleri</h3>
+            <table class="api-table">
+                <thead>
+                    <tr><th>Plan</th><th>Aylık Video</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>🆓 Ücretsiz</td><td><code>Yok</code></td></tr>
+                    <tr><td>🌟 Pro</td><td><code>10 video</code></td></tr>
+                    <tr><td>👥 Takım+</td><td><code>♾️ Sınırsız</code></td></tr>
+                </tbody>
+            </table>
+
+            <h3>🎯 Çağrı Örneği</h3>
+            <div class="code-block">
+                <span class="code-lang">JavaScript</span>
+<span class="keyword">const</span> result = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'videoStudioProcess'</span>, {
+  type: <span class="string">'story'</span>,  <span class="comment">// 'story' | 'reels' | 'analyze' | 'clip'</span>
+  input: <span class="string">'Yapay zeka ve eğitim konulu video'</span>
+});
+console.log(result.result);
+console.log(result.downloadUrl);  <span class="comment">// İndirilebilir dosya</span>
+            </div>
+        </section>
+
+        <!-- LOGS -->
+        <section id="logs">
+            <div class="section-head">
+                <div class="section-icon">📋</div>
+                <div class="section-title">
+                    <h2>Logs & Kullanım Takibi <span class="badge-new">YENİ</span></h2>
+                    <p>Backend log sync + plan limit takibi</p>
+                </div>
+            </div>
+
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">logError</div>
+                    <div class="desc">Frontend hatasını backend'e kaydet</div>
+                    <span class="tag">Logs</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">syncClientLogs</div>
+                    <div class="desc">Toplu log gönder (max 50)</div>
+                    <span class="tag">Logs</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">trackFeatureUsage</div>
+                    <div class="desc">Özellik kullanımını takip et</div>
+                    <span class="tag premium">Plan</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">useQuery</div>
+                    <div class="desc">Günlük AI sorgu hakkını kullan</div>
+                    <span class="tag premium">Plan</span>
+                </div>
+            </div>
+
+            <div class="info-box warning">
+                <span class="info-box-title">📋 Logs Erişim Planı</span>
+                Logs sistemi sadece <strong>Pro</strong>, <strong>Takım</strong>, Admin, Beta, Moderatör ve Kurucu için açıktır. Ücretsiz üyeler erişemez.
+            </div>
+        </section>
+
+        <!-- KULLANICI & AUTH -->
+        <section id="kullanici">
+            <div class="section-head">
+                <div class="section-icon">👤</div>
+                <div class="section-title">
+                    <h2>Kullanıcı & Kimlik Doğrulama</h2>
+                    <p>Kayıt, giriş, Facebook, kurtarma maili</p>
+                </div>
+            </div>
+
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">verifyUser</div>
+                    <div class="desc">E-posta doğrulama kodu</div>
+                    <span class="tag">Auth</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">sendVerificationCode</div>
+                    <div class="desc">Doğrulama kodu gönder</div>
+                    <span class="tag">Auth</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">resetPasswordWithCode</div>
+                    <div class="desc">Şifre sıfırla</div>
+                    <span class="tag">Auth</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">verifyFacebookToken</div>
+                    <div class="desc">Facebook token doğrula</div>
+                    <span class="tag">Facebook</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">facebookLogin</div>
+                    <div class="desc">Facebook ile giriş/kayıt</div>
+                    <span class="tag">Facebook</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">completeFacebookProfile</div>
+                    <div class="desc">Ad + şifre + kurtarma maili tamamla</div>
+                    <span class="tag">Facebook</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">loginWithRecoveryEmail</div>
+                    <div class="desc">Kurtarma maili ile giriş</div>
+                    <span class="tag">Auth</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getProfile</div>
+                    <div class="desc">Kullanıcı profilini getir</div>
+                    <span class="tag">Kullanıcı</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">searchUsers</div>
+                    <div class="desc">Kullanıcı ara (isim/e-posta)</div>
+                    <span class="tag">Kullanıcı</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">toggleFollow</div>
+                    <div class="desc">Takip et / bırak</div>
+                    <span class="tag">Kullanıcı</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <span class="info-box-title">📧 Facebook Sonrası Zorunlu Profil</span>
+                Facebook ile kayıt olan kullanıcılar <strong>ad soyad + şifre + kurtarma maili</strong> belirlemek zorundadır. Bu bilgiler sayesinde Facebook olmadan da giriş yapabilirler.
+            </div>
+        </section>
+
+        <!-- PLAN LİMİTLERİ -->
+        <section id="plan">
+            <div class="section-head">
+                <div class="section-icon">📊</div>
+                <div class="section-title">
+                    <h2>Plan Limitleri <span class="badge-new">YENİ</span></h2>
+                    <p>Free / Pro / Team karşılaştırması</p>
+                </div>
+            </div>
+
+            <table class="api-table">
+                <thead>
+                    <tr>
+                        <th>Özellik</th>
+                        <th>🆓 Free</th>
+                        <th>🌟 Pro</th>
+                        <th>👥 Team</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Günlük AI Sorgusu</td><td><code>100</code></td><td><code>2000</code></td><td><code>♾️</code></td></tr>
+                    <tr><td>Aylık Proje</td><td><code>3</code></td><td><code>15</code></td><td><code>♾️</code></td></tr>
+                    <tr><td>V27 API Anahtarı</td><td><code>2</code></td><td><code>20</code></td><td><code>100</code></td></tr>
+                    <tr><td>V27 Koç / hafta</td><td><code>10</code></td><td><code>50</code></td><td><code>1000</code></td></tr>
+                    <tr><td>Vizyon Al / gün</td><td><code>10</code></td><td><code>500</code></td><td><code>♾️</code></td></tr>
+                    <tr><td>Sesli Sohbet / gün</td><td><code>5 dk</code></td><td><code>60 dk</code></td><td><code>♾️</code></td></tr>
+                    <tr><td>Dosya Analiz / gün</td><td><code>3</code></td><td><code>50</code></td><td><code>♾️</code></td></tr>
+                    <tr><td>Video / ay</td><td><code>❌</code></td><td><code>10</code></td><td><code>♾️</code></td></tr>
+                    <tr><td>Logs Erişim</td><td><code>❌</code></td><td><code>✅</code></td><td><code>✅</code></td></tr>
+                    <tr><td>Takım Kurma</td><td><code>❌</code></td><td><code>❌</code></td><td><code>✅</code></td></tr>
+                    <tr><td>Ajan Modu</td><td><code>❌</code></td><td><code>✅</code></td><td><code>✅</code></td></tr>
+                    <tr><td>Derin Düşünme</td><td><code>❌</code></td><td><code>✅</code></td><td><code>✅</code></td></tr>
+                    <tr><td>Yazılımcı Modu</td><td><code>❌</code></td><td><code>✅</code></td><td><code>✅</code></td></tr>
+                    <tr><td>Ekran Okuma</td><td><code>❌</code></td><td><code>✅</code></td><td><code>✅</code></td></tr>
+                </tbody>
+            </table>
+
+            <div class="info-box success">
+                <span class="info-box-title">♾️ Sınırsız Erişim</span>
+                <strong>Kurucu, Admin, Beta, Moderatör</strong> rütbelerindeki kullanıcılar <strong>tüm özelliklere sınırsız</strong> erişir.
+            </div>
+        </section>
+
+        <!-- TAKIM -->
+        <section id="takim">
+            <div class="section-head">
+                <div class="section-icon">👥</div>
+                <div class="section-title">
+                    <h2>Takım Yönetimi</h2>
+                    <p>Takım kur, üye ekle, ortak proje</p>
+                </div>
+            </div>
+
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">createTeam</div>
+                    <div class="desc">Takım oluştur (kod üretir)</div>
+                    <span class="tag">Takım</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">joinTeamWithCode</div>
+                    <div class="desc">6 haneli kodla takıma katıl</div>
+                    <span class="tag">Takım</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">sendTeamMessage</div>
+                    <div class="desc">Takım mesajı (@vizyonal / @vizyondestek)</div>
+                    <span class="tag">Takım</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">deleteTeamMessage</div>
+                    <div class="desc">Mesaj sil (soft delete)</div>
+                    <span class="tag">Takım</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">editTeamMessage</div>
+                    <div class="desc">Kendi mesajını düzenle</div>
+                    <span class="tag">Takım</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getTeamMessage</div>
+                    <div class="desc">Tek mesaj getir</div>
+                    <span class="tag">Takım</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">inviteToTeam</div>
+                    <div class="desc">E-posta ile davet gönder</div>
+                    <span class="tag">Takım</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">acceptTeamInvite</div>
+                    <div class="desc">Daveti kabul et</div>
+                    <span class="tag">Takım</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">rejectTeamInvite</div>
+                    <div class="desc">Daveti reddet</div>
+                    <span class="tag">Takım</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getTeamMembers</div>
+                    <div class="desc">Üyeleri listele (owner/manager bilgisi)</div>
+                    <span class="tag">Takım</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">makeTeamManager</div>
+                    <div class="desc">Yönetici ata</div>
+                    <span class="tag">Takım</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">demoteManager</div>
+                    <div class="desc">Yöneticilikten çıkar</div>
+                    <span class="tag">Takım</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">removeFromTeam</div>
+                    <div class="desc">Üyeyi takımdan at</div>
+                    <span class="tag">Takım</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">transferOwnership</div>
+                    <div class="desc">Sahipliği devret</div>
+                    <span class="tag">Takım</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">leaveTeam</div>
+                    <div class="desc">Takımdan ayrıl</div>
+                    <span class="tag">Takım</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">closeTeam</div>
+                    <div class="desc">Takımı kapat (owner)</div>
+                    <span class="tag">Takım</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getAllTeams</div>
+                    <div class="desc">Tüm takımlar (founder/mod/admin)</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">searchTeams</div>
+                    <div class="desc">Takım ara (isim/kod)</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">joinTeamAsFounder</div>
+                    <div class="desc">Kurucu olarak takıma katıl</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">forceCloseTeam</div>
+                    <div class="desc">Takımı zorla kapat</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getTeamChatHistory</div>
+                    <div class="desc">Takım sohbet geçmişi (kurucu/mod/admin)</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <span class="info-box-title">💬 Takım Sohbetinde AI Komutları</span>
+                <strong>@vizyonal</strong> — VİZYON AI'ya sor<br>
+                <strong>@vizyondestek</strong> — Vizyon Destek'e sor (site bilgisi)<br>
+                <strong>@v27</strong> — V27 API hakkında bilgi<br>
+                <strong>@vizyonaltheoffline</strong> — AI sohbetten çıkar
+            </div>
+        </section>
+
+        <!-- PROJE -->
+        <section id="proje">
+            <div class="section-head">
+                <div class="section-icon">📦</div>
+                <div class="section-title">
+                    <h2>Proje & Proje Talepleri</h2>
+                    <p>Proje CRUD + moderatör onaylı talep sistemi</p>
+                </div>
+            </div>
+
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">saveProject</div>
+                    <div class="desc">Yeni proje kaydet</div>
+                    <span class="tag">Proje</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">saveProjectWithSceneData</div>
+                    <div class="desc">3D sahne + GLB dosyası ile kaydet</div>
+                    <span class="tag">Proje</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">editProject</div>
+                    <div class="desc">Proje adı/içeriğini güncelle</div>
+                    <span class="tag">Proje</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">favoriteProject</div>
+                    <div class="desc">Favoriye ekle/çıkar</div>
+                    <span class="tag">Proje</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">archiveProject</div>
+                    <div class="desc">Arşivle</div>
+                    <span class="tag">Proje</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">unarchiveProject</div>
+                    <div class="desc">Arşivden çıkar</div>
+                    <span class="tag">Proje</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">trashProject</div>
+                    <div class="desc">Çöp kutusuna taşı</div>
+                    <span class="tag">Proje</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">restoreProject</div>
+                    <div class="desc">Çöpten geri yükle</div>
+                    <span class="tag">Proje</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">deletePermanently</div>
+                    <div class="desc">Kalıcı sil</div>
+                    <span class="tag">Proje</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getUserProjectCount</div>
+                    <div class="desc">Kullanıcının proje sayısı</div>
+                    <span class="tag premium">Plan</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">createProjectRequest</div>
+                    <div class="desc">Moderatörden proje talebi oluştur</div>
+                    <span class="tag premium">Talep</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">cancelProjectRequest</div>
+                    <div class="desc">Talebi iptal et</div>
+                    <span class="tag">Talep</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">handleProjectRequest</div>
+                    <div class="desc">Kabul/Red/Devret</div>
+                    <span class="tag moderator">Moderatör</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">acceptProjectCompletion</div>
+                    <div class="desc">Tamamlanan projeyi kabul et</div>
+                    <span class="tag">Talep</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">rejectProjectCompletion</div>
+                    <div class="desc">Tamamlanan projeyi reddet</div>
+                    <span class="tag">Talep</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAĞAZA -->
+        <section id="magaza">
+            <div class="section-head">
+                <div class="section-icon">🛒</div>
+                <div class="section-title">
+                    <h2>Mağaza & Pazar</h2>
+                    <p>Projelerini sat veya satın al (%20 komisyon)</p>
+                </div>
+            </div>
+
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">publishProjectToStore</div>
+                    <div class="desc">Projeyi mağazada satışa sun</div>
+                    <span class="tag">Pazar</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">removeFromMarket</div>
+                    <div class="desc">Ürünü mağazadan kaldır</div>
+                    <span class="tag">Pazar</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getMarketProjects</div>
+                    <div class="desc">Satılık projeleri listele</div>
+                    <span class="tag">Pazar</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">buyMarketProject</div>
+                    <div class="desc">Proje satın al (%20 komisyon)</div>
+                    <span class="tag">Pazar</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getStoreItems</div>
+                    <div class="desc">Mağaza ürünlerini listele</div>
+                    <span class="tag">Mağaza</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">purchaseStoreItem</div>
+                    <div class="desc">Mağazadan satın al</div>
+                    <span class="tag">Mağaza</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">addProduct</div>
+                    <div class="desc">Ürün ekle</div>
+                    <span class="tag">Ürün</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">buyProduct</div>
+                    <div class="desc">Ürün satın al (%10 komisyon)</div>
+                    <span class="tag">Ürün</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- PUAN & GÖREV -->
+        <section id="puan">
+            <div class="section-head">
+                <div class="section-icon">⭐</div>
+                <div class="section-title">
+                    <h2>Puan, Görev & Seri</h2>
+                    <p>Görev yap, puan kazan, seviye atla</p>
+                </div>
+            </div>
+
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">getUserPoints</div>
+                    <div class="desc">Puan ve seviyeni gör</div>
+                    <span class="tag">Puan</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getDailyTasks</div>
+                    <div class="desc">Günlük görevleri listele</div>
+                    <span class="tag">Görev</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">completeDailyTask</div>
+                    <div class="desc">Görevi tamamla (puan kazan)</div>
+                    <span class="tag">Görev</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getSocialTasks</div>
+                    <div class="desc">Topluluk görevleri</div>
+                    <span class="tag">Görev</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">verifySocialFollow</div>
+                    <div class="desc">Sosyal medya takibini doğrula</div>
+                    <span class="tag">Görev</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getTeamTasks</div>
+                    <div class="desc">Takım görevleri</div>
+                    <span class="tag">Görev</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">completeTeamTask</div>
+                    <div class="desc">Takım görevini tamamla</div>
+                    <span class="tag">Görev</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getStreakStatus</div>
+                    <div class="desc">Günlük seri durumu</div>
+                    <span class="tag">Seri</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">claimDailyStreak</div>
+                    <div class="desc">Günlük seri ödülünü al</div>
+                    <span class="tag">Seri</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getWalletBalance</div>
+                    <div class="desc">Cüzdan bakiyesini gör</div>
+                    <span class="tag">Cüzdan</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">withdrawFunds</div>
+                    <div class="desc">Para çek</div>
+                    <span class="tag">Cüzdan</span>
+                </div>
+            </div>
+
+            <h3>🎁 Davet Sistemi</h3>
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">generateReferralCode</div>
+                    <div class="desc">Davet kodu oluştur</div>
+                    <span class="tag">Davet</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">applyReferral</div>
+                    <div class="desc">Davet kodunu uygula (1000 puan)</div>
+                    <span class="tag">Davet</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getReferralLeaderboard</div>
+                    <div class="desc">En çok davet edenler</div>
+                    <span class="tag">Davet</span>
+                </div>
+            </div>
+
+            <div class="info-box success">
+                <span class="info-box-title">🌟 Uzay Modu (x2 Puan)</span>
+                Saat <strong>02:00 - 05:00</strong> arasında kazanılan tüm puanlar <strong>2 katı</strong> hesaplanır.
+            </div>
+        </section>
+
+        <!-- SOSYAL -->
+        <section id="sosyal">
+            <div class="section-head">
+                <div class="section-icon">📬</div>
+                <div class="section-title">
+                    <h2>Sosyal, DM & Yorum</h2>
+                    <p>Mesajlaşma, bildirim, yorum sistemi</p>
+                </div>
+            </div>
+
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">sendMessage</div>
+                    <div class="desc">Özel mesaj gönder</div>
+                    <span class="tag">DM</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getConversations</div>
+                    <div class="desc">Konuşmaları listele</div>
+                    <span class="tag">DM</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getConversationMessages</div>
+                    <div class="desc">Konuşma mesajlarını getir</div>
+                    <span class="tag">DM</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">startConversation</div>
+                    <div class="desc">Yeni konuşma başlat</div>
+                    <span class="tag">DM</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">deleteConversation</div>
+                    <div class="desc">Konuşmayı sil</div>
+                    <span class="tag">DM</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">shareConversation</div>
+                    <div class="desc">Paylaşılabilir link oluştur</div>
+                    <span class="tag">DM</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getSharedConversation</div>
+                    <div class="desc">Paylaşılan konuşmayı getir</div>
+                    <span class="tag">DM</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">renameConversation</div>
+                    <div class="desc">Sohbete isim ver</div>
+                    <span class="tag">DM</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">sendAIMessage</div>
+                    <div class="desc">AI mesajı kaydet</div>
+                    <span class="tag">DM</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getNotifications</div>
+                    <div class="desc">Bildirimleri getir</div>
+                    <span class="tag">Bildirim</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">markNotificationRead</div>
+                    <div class="desc">Bildirimi okundu işaretle</div>
+                    <span class="tag">Bildirim</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">sendNotification</div>
+                    <div class="desc">Kullanıcıya bildirim gönder</div>
+                    <span class="tag">Bildirim</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getComments</div>
+                    <div class="desc">Yorumları getir</div>
+                    <span class="tag">Yorum</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">addComment</div>
+                    <div class="desc">Yorum ekle (yıldızlı)</div>
+                    <span class="tag">Yorum</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">deleteComment</div>
+                    <div class="desc">Yorum sil</div>
+                    <span class="tag">Yorum</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">editComment</div>
+                    <div class="desc">Yorum düzenle</div>
+                    <span class="tag">Yorum</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">searchGif</div>
+                    <div class="desc">Giphy ile GIF ara</div>
+                    <span class="tag">GIF</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- İÇERİK -->
+        <section id="icerik">
+            <div class="section-head">
+                <div class="section-icon">📚</div>
+                <div class="section-title">
+                    <h2>İçerik, Akademi & Blog</h2>
+                    <p>Dersler, quiz, blog aboneliği, iş ilanları</p>
+                </div>
+            </div>
+
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">getCourses</div>
+                    <div class="desc">Akademi derslerini listele</div>
+                    <span class="tag">Akademi</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getCourseDetails</div>
+                    <div class="desc">Ders detaylarını gör</div>
+                    <span class="tag">Akademi</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">completeLesson</div>
+                    <div class="desc">Dersi tamamla (puan kazan)</div>
+                    <span class="tag">Akademi</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getQuizQuestions</div>
+                    <div class="desc">Günlük zeka testi soruları</div>
+                    <span class="tag">Quiz</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">submitQuizAnswer</div>
+                    <div class="desc">Quiz cevabını gönder</div>
+                    <span class="tag">Quiz</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getJobs</div>
+                    <div class="desc">İş ilanlarını getir</div>
+                    <span class="tag">Kariyer</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">applyJob</div>
+                    <div class="desc">İş başvurusu yap</div>
+                    <span class="tag">Kariyer</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">subscribeToBlog</div>
+                    <div class="desc">Blog aboneliği</div>
+                    <span class="tag">Blog</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">subscribeToSystemUpdates</div>
+                    <div class="desc">Sistem güncelleme aboneliği</div>
+                    <span class="tag">Blog</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getMySubscriptions</div>
+                    <div class="desc">Aboneliklerini gör</div>
+                    <span class="tag">Blog</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">unsubscribeFrom</div>
+                    <div class="desc">Abonelikten çık</div>
+                    <span class="tag">Blog</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">submitBugReport</div>
+                    <div class="desc">Hata bildir (+100 puan)</div>
+                    <span class="tag">Destek</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getAnnouncements</div>
+                    <div class="desc">Duyuruları getir</div>
+                    <span class="tag">Duyuru</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getActivePoll</div>
+                    <div class="desc">Aktif anketi getir</div>
+                    <span class="tag">Anket</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">votePoll</div>
+                    <div class="desc">Ankete oy ver</div>
+                    <span class="tag">Anket</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- YARIŞMA -->
+        <section id="yarisma">
+            <div class="section-head">
+                <div class="section-icon">🏆</div>
+                <div class="section-title">
+                    <h2>Aylık Yarışma</h2>
+                    <p>Projeni gönder, kurucu puanlasın</p>
+                </div>
+            </div>
+
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">getActiveContest</div>
+                    <div class="desc">Bu ayın yarışmasını getir</div>
+                    <span class="tag">Yarışma</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">checkContestParticipation</div>
+                    <div class="desc">Katılımını kontrol et</div>
+                    <span class="tag">Yarışma</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">joinContest</div>
+                    <div class="desc">Yarışmaya katıl</div>
+                    <span class="tag">Yarışma</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">createContestProject</div>
+                    <div class="desc">Projeni gönder</div>
+                    <span class="tag">Yarışma</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getContestRankingV2</div>
+                    <div class="desc">Güncel sıralama</div>
+                    <span class="tag">Yarışma</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getContestProjectsForFounder</div>
+                    <div class="desc">Projeleri görüntüle</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">scoreContestProject</div>
+                    <div class="desc">Projeyi puanla (1-10000)</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">finalizeContest</div>
+                    <div class="desc">Yarışmayı bitir, kazananları ilan et</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+            </div>
+
+            <div class="info-box premium">
+                <span class="info-box-title">🏆 Ödüller</span>
+                🥇 1. Takım Paketi · 🥈 2. Pro Paketi · 🥉 3. 5000 V27 Puan
+            </div>
+        </section>
+
+        <!-- MODERATÖR -->
+        <section id="moderator">
+            <div class="section-head">
+                <div class="section-icon">🎨</div>
+                <div class="section-title">
+                    <h2>Moderatör / Tasarımcı <span class="badge-new">YENİ</span></h2>
+                    <p>Sadece kurucu tarafından atanan gizli rütbe</p>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <span class="info-box-title">🎨 Moderatör Rütbesi Nedir?</span>
+                Bu rütbe <strong>satın alınamaz</strong>. Sadece <strong>kurucu tarafından mail ile atanır</strong>. Ekranı normal üye gibi görünür, ancak yetkileri sınırsızdır (Beta ve Admin ile aynı seviye).
+            </div>
+
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">assignModeratorByEmail</div>
+                    <div class="desc">Mail ile moderatör ata</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getModerators</div>
+                    <div class="desc">Moderatör listesini getir</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">removeModerator</div>
+                    <div class="desc">Moderatörlükten çıkar</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">createVideoClip</div>
+                    <div class="desc">Video kesit oluştur ve paylaş</div>
+                    <span class="tag moderator">Moderatör</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getVideoClips</div>
+                    <div class="desc">Kesitleri listele</div>
+                    <span class="tag moderator">Moderatör</span>
+                </div>
+            </div>
+
+            <h3>🎨 Moderatör Yetkileri</h3>
+            <ul>
+                <li>♾️ Sınırsız V27 API anahtarı</li>
+                <li>♾️ Sınırsız AI sorgusu</li>
+                <li>🎬 Video kesit alma ve paylaşma</li>
+                <li>📨 Proje taleplerini yönlendirme</li>
+                <li>💡 Tavsiye ve analiz sunma</li>
+                <li>👥 Tüm takım özellikleri</li>
+            </ul>
+        </section>
+
+        <!-- EBEVEYN -->
+        <section id="ebeveyn">
+            <div class="section-head">
+                <div class="section-icon">🛡️</div>
+                <div class="section-title">
+                    <h2>Ebeveyn Kontrolleri</h2>
+                    <p>Çocuk hesabı yönetimi, canlı takip</p>
+                </div>
+            </div>
+
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">requestParentVerification</div>
+                    <div class="desc">Ebeveyn doğrulama başlat</div>
+                    <span class="tag">Ebeveyn</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">verifyParentCode</div>
+                    <div class="desc">Doğrulama kodunu onayla</div>
+                    <span class="tag">Ebeveyn</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">setParentPin</div>
+                    <div class="desc">4 haneli PIN belirle</div>
+                    <span class="tag">Ebeveyn</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getParentSettings</div>
+                    <div class="desc">Ayarları getir</div>
+                    <span class="tag">Ebeveyn</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getFullParentSettings</div>
+                    <div class="desc">Tüm ayarları detaylı getir</div>
+                    <span class="tag">Ebeveyn</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">updateParentSettings</div>
+                    <div class="desc">Ayarları güncelle</div>
+                    <span class="tag">Ebeveyn</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">toggleParentFeature</div>
+                    <div class="desc">Özellik aç/kapat (chat/store/game vb.)</div>
+                    <span class="tag">Ebeveyn</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">suspendChildAccount</div>
+                    <div class="desc">Hesabı askıya al (X saat)</div>
+                    <span class="tag">Ebeveyn</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">unsuspendChildAccount</div>
+                    <div class="desc">Askıyı kaldır</div>
+                    <span class="tag">Ebeveyn</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">toggleLiveTracking</div>
+                    <div class="desc">Canlı takip aç/kapat</div>
+                    <span class="tag">Ebeveyn</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">setDailyLimit</div>
+                    <div class="desc">Günlük limit belirle</div>
+                    <span class="tag">Ebeveyn</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getChildSessions</div>
+                    <div class="desc">Oturum geçmişini gör</div>
+                    <span class="tag">Ebeveyn</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">sendParentReport</div>
+                    <div class="desc">Haftalık rapor gönder</div>
+                    <span class="tag">Ebeveyn</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">removeParentControl</div>
+                    <div class="desc">Ebeveyn denetimini kaldır</div>
+                    <span class="tag">Ebeveyn</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">requestParentReset</div>
+                    <div class="desc">Şifre sıfırlama talebi</div>
+                    <span class="tag">Ebeveyn</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">confirmParentReset</div>
+                    <div class="desc">Şifre sıfırlamayı onayla</div>
+                    <span class="tag">Ebeveyn</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADMIN -->
+        <section id="admin">
+            <div class="section-head">
+                <div class="section-icon">👑</div>
+                <div class="section-title">
+                    <h2>Admin / Kurucu Özel</h2>
+                    <p>Yönetim fonksiyonları</p>
+                </div>
+            </div>
+
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">initAdminUsers</div>
+                    <div class="desc">Founder + Admin + Beta otomatik oluştur</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">adminLogin</div>
+                    <div class="desc">Admin girişi (İbrahim/Bozkurt)</div>
+                    <span class="tag admin">Admin</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">betaLogin</div>
+                    <div class="desc">Beta girişi</div>
+                    <span class="tag">Beta</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">founderLogin</div>
+                    <div class="desc">Kurucu girişi</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">initSchemas</div>
+                    <div class="desc">Tüm sınıfları/kolonları oluştur</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">assignAdmin</div>
+                    <div class="desc">Admin ata</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">setUserRole</div>
+                    <div class="desc">Kullanıcı rolünü değiştir</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">setUserPlan</div>
+                    <div class="desc">Plan değiştir (free/pro/team)</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getAdmins</div>
+                    <div class="desc">Admin listesi</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getBetas</div>
+                    <div class="desc">Beta listesi</div>
+                    <span class="tag admin">Admin</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getBannedUsers</div>
+                    <div class="desc">Yasaklı kullanıcılar</div>
+                    <span class="tag admin">Admin</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getAllUsers</div>
+                    <div class="desc">Tüm kullanıcılar</div>
+                    <span class="tag moderator">Moderatör</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">banUser</div>
+                    <div class="desc">Kullanıcıyı yasakla</div>
+                    <span class="tag admin">Admin</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">unbanUser</div>
+                    <div class="desc">Yasağı kaldır</div>
+                    <span class="tag admin">Admin</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">toggleUserFeature</div>
+                    <div class="desc">Özellik engelle/aç</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">leaveAdminRole</div>
+                    <div class="desc">Admin rolünden ayrıl</div>
+                    <span class="tag admin">Admin</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">leaveBetaRole</div>
+                    <div class="desc">Beta rolünden ayrıl</div>
+                    <span class="tag">Beta</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">sendGiftRequest</div>
+                    <div class="desc">Hediye paketi teklif et</div>
+                    <span class="tag admin">Admin</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">sendRoleRequest</div>
+                    <div class="desc">Rol teklifi gönder</div>
+                    <span class="tag admin">Admin</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">handleRequest</div>
+                    <div class="desc">Teklifi kabul/red et</div>
+                    <span class="tag">Kullanıcı</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getInboxItems</div>
+                    <div class="desc">Gelen kutusu öğeleri</div>
+                    <span class="tag">Kullanıcı</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">sendBlogUpdateToSubscribers</div>
+                    <div class="desc">Blog bildirimi gönder</div>
+                    <span class="tag admin">Admin</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">sendSystemUpdateToSubscribers</div>
+                    <div class="desc">Sistem güncelleme bildirimi</div>
+                    <span class="tag admin">Admin</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- DEVRİYE -->
+        <section id="devriye">
+            <div class="section-head">
+                <div class="section-icon">🛡️</div>
+                <div class="section-title">
+                    <h2>Vizyon Devriye & Destek <span class="badge-new">YENİ</span></h2>
+                    <p>7/24 otomatik moderasyon + destek AI</p>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <span class="info-box-title">🛡️ Vizyon Devriye Nedir?</span>
+                28 AI modelini kullanan, <strong>7/24 aktif</strong> otomatik moderasyon sistemi. Tüm siteyi tarar, küfür/argo/siyasi içeriği tespit eder, otomatik müdahale eder. Kurucu kontrolünde açılıp kapatılabilir.
+            </div>
+
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="name">vizyonSupportAI</div>
+                    <div class="desc">Vizyon Destek AI (kurucu özel komutlar dahil)</div>
+                    <span class="tag ai">Destek</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getSupportReply</div>
+                    <div class="desc">Kısa destek yanıtı</div>
+                    <span class="tag ai">Destek</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getCoachAdvice</div>
+                    <div class="desc">Motivasyonel koç tavsiyesi</div>
+                    <span class="tag ai">Koç</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">toggleVizyonPatrol</div>
+                    <div class="desc">Devriye aç/kapat (kurucu)</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">toggleVizyonSupport</div>
+                    <div class="desc">Destek AI aç/kapat (kurucu)</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">getVizyonLog</div>
+                    <div class="desc">Sistem logları</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">addVizyonLog</div>
+                    <div class="desc">Sistem logu ekle</div>
+                    <span class="tag founder">Kurucu</span>
+                </div>
+                <div class="endpoint-card">
+                    <div class="name">sendFounderMessage</div>
+                    <div class="desc">Kurucuya mesaj gönder</div>
+                    <span class="tag">İletişim</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- RATE LIMIT -->
+        <section id="limits">
+            <div class="section-head">
+                <div class="section-icon">⚡</div>
+                <div class="section-title">
+                    <h2>Rate Limiting & Güvenlik</h2>
+                    <p>Koruma önlemleri ve sınırlar</p>
+                </div>
+            </div>
+
+            <h3>📊 Rate Limit Tablosu</h3>
+            <table class="api-table">
+                <thead>
+                    <tr><th>İşlem</th><th>Limit</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>V27 API REST</td><td><code>60 istek / dakika</code></td></tr>
+                    <tr><td>Vizyon Al Chat</td><td><code>30 istek / dakika</code></td></tr>
+                    <tr><td>Ekran Okuma</td><td><code>20 istek / dakika</code></td></tr>
+                    <tr><td>Dosya Analiz</td><td><code>30 istek / dakika</code></td></tr>
+                    <tr><td>Video Studio</td><td><code>10 istek / dakika</code></td></tr>
+                    <tr><td>Koç Chat</td><td><code>30 istek / dakika</code></td></tr>
+                    <tr><td>Şifre Sıfırlama</td><td><code>5 istek / 5 dakika</code></td></tr>
+                    <tr><td>Facebook Login</td><td><code>10 istek / 5 dakika</code></td></tr>
+                    <tr><td>Moderatör Paylaşım</td><td><code>10 istek / saat</code></td></tr>
+                    <tr><td>Proje Kaydet</td><td><code>10 istek / 5 dakika</code></td></tr>
+                </tbody>
+            </table>
+
+            <h3>🔐 Güvenlik Özellikleri</h3>
+            <ul>
+                <li><strong>AES-256-GCM:</strong> Kullanıcı API anahtarları şifreli saklanır</li>
+                <li><strong>PBKDF2-SHA512:</strong> API şifreleri 100.000 iterasyonla hash'lenir</li>
+                <li><strong>SHA-256:</strong> V27 API anahtarları hash'lenir</li>
+                <li><strong>Rate Limiting:</strong> In-memory + persistent (Back4App)</li>
+                <li><strong>Content Filtering:</strong> Argo/küfür/siyasi içerik filtrelenir</li>
+                <li><strong>Vizyon Devriye:</strong> 7/24 otomatik moderasyon</li>
+                <li><strong>XSS Koruması:</strong> Tüm kullanıcı girdileri escape edilir</li>
+            </ul>
+
+            <div class="info-box danger">
+                <span class="info-box-title">⚠️ Rate Limit Aşımı</span>
+                Limit aşıldığında <code>429 (Too Many Requests)</code> hatası döner. Uygulamanızda <strong>retry mekanizması</strong> kullanmanız önerilir (exponential backoff).
+            </div>
+        </section>
+
+        <!-- ÖRNEK -->
+        <section id="ornek">
+            <div class="section-head">
+                <div class="section-icon">📖</div>
+                <div class="section-title">
+                    <h2>Tam Örnekler</h2>
+                    <p>Gerçek kullanım senaryoları</p>
+                </div>
+            </div>
+
+            <h3>1. AI Sorgusu + Kaydetme</h3>
+            <div class="code-block">
+                <span class="code-lang">JavaScript</span>
+<span class="comment">// Sorgu hakkını kullan</span>
+<span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'useQuery'</span>);
+
+<span class="comment">// AI'ya sor</span>
+<span class="keyword">const</span> reply = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'superAI'</span>, {
+  prompt: <span class="string">'React hook nedir?'</span>
+});
+
+<span class="comment">// Cevabı kaydet</span>
+<span class="keyword">const</span> project = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'saveProject'</span>, {
+  name: <span class="string">'React Hooks Notları'</span>,
+  type: <span class="string">'Kod'</span>,
+  content: reply
+});
+            </div>
+
+            <h3>2. Takım Oluştur + Mesaj Gönder</h3>
+            <div class="code-block">
+                <span class="code-lang">JavaScript</span>
+<span class="comment">// Takım kur (Team planı gerekli)</span>
+<span class="keyword">const</span> team = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'createTeam'</span>, {
+  name: <span class="string">'Frontend Ekibi'</span>
+});
+
+console.log(<span class="string">'Takım kodu:'</span>, team.teamCode);
+
+<span class="comment">// AI komutu ile mesaj at</span>
+<span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'sendTeamMessage'</span>, {
+  teamId: team.teamId,
+  message: <span class="string">'@vizyonal Python\'da asal sayı bulma kodu yaz'</span>
+});
+            </div>
+
+            <h3>3. V27 API ile Kendi Chatbot'unu Yap</h3>
+            <div class="code-block">
+                <span class="code-lang">JavaScript</span>
+<span class="comment">// 1. V27 API anahtarı oluştur</span>
+<span class="keyword">const</span> apiKey = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'createV27ApiKey'</span>, {
+  keyName: <span class="string">'Web Chatbot'</span>,
+  duration: <span class="string">'1y'</span>
+});
+
+<span class="comment">// 2. Anahtarı kaydet (bir kez gösterilir!)</span>
+localStorage.setItem(<span class="string">'v27_key'</span>, apiKey.plainKey);
+
+<span class="comment">// 3. Kendi backend'inden çağır</span>
+<span class="keyword">async function</span> <span class="function">chat</span>(message) {
+  <span class="keyword">const</span> res = <span class="keyword">await</span> <span class="function">fetch</span>(<span class="string">'https://vizyon2026.vercel.app/api/v27ApiRest'</span>, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+      <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>,
+      <span class="string">'X-V27-Api-Key'</span>: localStorage.getItem(<span class="string">'v27_key'</span>)
+    },
+    body: JSON.stringify({ prompt: message, lang: <span class="string">'tr'</span> })
+  });
+  <span class="keyword">return</span> (<span class="keyword">await</span> res.json()).reply;
+}
+            </div>
+
+            <h3>4. Dosya Analizi + Sunum İndir</h3>
+            <div class="code-block">
+                <span class="code-lang">JavaScript</span>
+<span class="comment">// Dosyayı Base64'e çevir</span>
+<span class="keyword">const</span> fileBase64 = <span class="keyword">await</span> <span class="function">fileToBase64</span>(file);
+
+<span class="comment">// Analiz et</span>
+<span class="keyword">const</span> analysis = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'vizyonAlFileAnalyze'</span>, {
+  fileBase64: fileBase64,
+  fileName: file.name,
+  fileType: file.type,
+  question: <span class="string">'Bu dosyayı özetle ve sunum haline getir'</span>
+});
+
+<span class="comment">// Sunum oluştur</span>
+<span class="keyword">const</span> presentation = <span class="keyword">await</span> <span class="function">Parse.Cloud.run</span>(<span class="string">'vizyonAlFileCreate'</span>, {
+  content: analysis.reply,
+  format: <span class="string">'html'</span>,  <span class="comment">// 'txt' | 'html' | 'md' | 'json'</span>
+  title: <span class="string">'Dosya Sunumu'</span>
+});
+
+console.log(<span class="string">'İndir:'</span>, presentation.fileDownloadUrl);
+            </div>
+        </section>
+
+        <!-- DESTEK -->
+        <section id="destek">
+            <div class="section-head">
+                <div class="section-icon">📞</div>
+                <div class="section-title">
+                    <h2>Destek</h2>
+                    <p>Yardıma mı ihtiyacın var?</p>
+                </div>
+            </div>
+
+            <div class="endpoint-grid">
+                <div class="endpoint-card" style="cursor:default;">
+                    <div class="name">📧 E-posta</div>
+                    <div class="desc"><a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a></div>
+                </div>
+                <div class="endpoint-card" style="cursor:default;">
+                    <div class="name">🌐 Web</div>
+                    <div class="desc"><a href="https://vizyon2026.vercel.app">vizyon2026.vercel.app</a></div>
+                </div>
+                <div class="endpoint-card" style="cursor:default;">
+                    <div class="name">📖 Bana Öğret</div>
+                    <div class="desc"><a href="/bana-ogret.html">Rehber sayfası</a></div>
+                </div>
+                <div class="endpoint-card" style="cursor:default;">
+                    <div class="name">💬 Vizyon Destek</div>
+                    <div class="desc">Dashboard → 📢 Vizyon Destek butonu</div>
+                </div>
+            </div>
+
+            <div class="info-box success">
+                <span class="info-box-title">🎉 Hazırsın!</span>
+                Artık VİZYON 2027 API'sinin tüm gücünü kendi projelerine taşıyabilirsin. Sorularını <a href="mailto:vizyon2027.info@gmail.com">bize ulaştır</a>.
+            </div>
+        </section>
+
+    </main>
 </div>
 
+<!-- ============ FOOTER ============ -->
+<footer>
+    <div class="footer-inner">
+        <div class="footer-copy">
+            © 2027 Vizyon2027 · <span>Vizyon Ekibi</span> güvencesiyle.
+        </div>
+        <div class="footer-links">
+            <a href="/gizlilik.html">Gizlilik Politikası</a>
+            <a href="/kullanici-sozlesmesi.html">Kullanıcı Sözleşmesi</a>
+            <a href="/iletisim.html">İletişim</a>
+            <a href="/bana-ogret.html">📖 Bana Öğret</a>
+        </div>
+    </div>
+</footer>
+
+<!-- Back to top -->
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+/* ============================================================ */
+/* TEMA + UX                                                     */
+/* ============================================================ */
+function toggleTheme() {
+    var body = document.body;
+    var btn = document.querySelector('.nav-theme-btn');
+    if (body.getAttribute('data-theme') === 'light') {
+        body.removeAttribute('data-theme');
+        if (btn) btn.innerHTML = '🌙';
+        try { localStorage.setItem('vizyon_theme', 'dark'); } catch (e) {}
+    } else {
+        body.setAttribute('data-theme', 'light');
+        if (btn) btn.innerHTML = '☀️';
+        try { localStorage.setItem('vizyon_theme', 'light'); } catch (e) {}
+    }
+}
+(function applyTheme() {
+    try {
+        var saved = localStorage.getItem('vizyon_theme');
+        var btn = document.querySelector('.nav-theme-btn');
+        if (saved === 'light') {
+            document.body.setAttribute('data-theme', 'light');
+            if (btn) btn.innerHTML = '☀️';
+        }
+    } catch (e) {}
+})();
+
+/* Back to top göster/gizle */
+window.addEventListener('scroll', function () {
+    var btn = document.getElementById('backTop');
+    if (btn) btn.classList.toggle('show', window.scrollY > 400);
+}, { passive: true });
+
+/* Sidebar aktif link takibi */
+(function initActiveLink() {
+    var sections = document.querySelectorAll('.api-content > section');
+    var links = document.querySelectorAll('.api-nav-list a');
+
+    if (!('IntersectionObserver' in window)) return;
+
+    var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+                var id = entry.target.id;
+                links.forEach(function (link) {
+                    link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+                });
+            }
+        });
+    }, { rootMargin: '-110px 0px -70% 0px', threshold: 0 });
+
+    sections.forEach(function (s) { observer.observe(s); });
+})();
+
+/* Endpoint karta tıkla → kopyala */
+document.querySelectorAll('.endpoint-card .name').forEach(function (el) {
+    el.style.cursor = 'pointer';
+    el.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var text = el.textContent.replace(/[^\w]/g, '').trim();
+        if (!text) return;
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(function () {
+                var old = el.textContent;
+                el.textContent = '✅ Kopyalandı!';
+                setTimeout(function () { el.textContent = old; }, 1200);
+            });
+        }
+    });
+});
+
+console.log('🔌 VİZYON 2027 API Dokümantasyonu v7.10.0 yüklendi');
+</script>
 </body>
 </html>
