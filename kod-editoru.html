@@ -1,107 +1,581 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kod Editörü – Vizyon2027</title>
-    <style>
-        /* ===== GENEL ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0a0a0a; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; line-height: 1.7; }
-        .container { max-width: 1200px; margin: 0 auto; background: #141414; padding: 40px; border-radius: 20px; border: 1px solid #2a2a2a; box-shadow: 0 0 60px rgba(0,212,255,0.05); }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="VİZYON AI Kod Editörü - 28 yapay zeka modeli ile her dilde çalışan kod üret. Python, React, JavaScript, SQL, Docker ve daha fazlası.">
+<meta name="theme-color" content="#03050a">
+<title>Kod Editörü | VİZYON 2027</title>
 
-        /* ===== DİL SEÇİCİ ===== */
-        .lang-selector { display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
-        .lang-btn { padding: 8px 20px; border-radius: 40px; border: 2px solid #2a2a2a; background: transparent; color: #aaa; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 14px; }
-        .lang-btn:hover { border-color: #00d4ff; color: #00d4ff; }
-        .lang-btn.active { border-color: #00d4ff; background: #00d4ff22; color: #00d4ff; }
-        .lang-content { display: none; }
-        .lang-content.active { display: block; }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-        /* ===== BAŞLIKLAR ===== */
-        h1 { color: #00d4ff; font-size: 36px; border-bottom: 3px solid #00d4ff; padding-bottom: 18px; font-family: 'Syne', sans-serif; }
-        h2 { color: #00d4ff; font-size: 28px; margin-top: 45px; border-left: 6px solid #00d4ff; padding-left: 20px; font-family: 'Syne', sans-serif; }
-        h3 { color: #a0c4e0; font-size: 20px; margin-top: 20px; }
-        p, li { color: #c8d0d8; font-size: 16px; margin-bottom: 10px; }
-        ul, ol { padding-left: 28px; margin: 12px 0; }
-        li { margin-bottom: 8px; }
+<style>
+:root{
+    --bg:#03050a; --bg2:#060a14; --bg3:#0a1020;
+    --surface:#0a1020; --surface2:#0e1630;
+    --border:#1a2a4a; --border2:#24365e;
+    --accent:#00e5ff; --accent2:#00ff9d; --accent3:#ff5e1a;
+    --accent4:#ff2d92; --gold:#ffd11a; --purple:#b845ff; --pink:#ff2d92;
+    --danger:#ff4757; --warning:#ffb700; --success:#00ff9d;
+    --text:#ffffff; --text2:#d4e5ff; --text3:#8aa8d4; --text4:#5a7aa8;
+    --font-display:'Syne',sans-serif;
+    --font-code:'Fira Code',monospace;
+    --font-body:'Inter',sans-serif;
+}
+[data-theme="light"]{
+    --bg:#f0f4fb; --bg2:#e6ecf7; --bg3:#dde5f4;
+    --surface:#ffffff; --surface2:#f7fafc;
+    --border:#cbd8ec; --border2:#b0c2dc;
+    --text:#0a1020; --text2:#1e2a44; --text3:#4a5d80; --text4:#6b7ea3;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{
+    background:var(--bg);color:var(--text);font-family:var(--font-body);
+    overflow-x:hidden;min-height:100vh;position:relative;
+    -webkit-font-smoothing:antialiased;line-height:1.7;
+}
+body::before{
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+        radial-gradient(ellipse 80% 50% at 20% 0%, rgba(0,229,255,0.12) 0%, transparent 55%),
+        radial-gradient(ellipse 70% 50% at 80% 10%, rgba(184,69,255,0.10) 0%, transparent 55%),
+        radial-gradient(ellipse 90% 60% at 50% 100%, rgba(255,45,146,0.08) 0%, transparent 60%);
+    animation:auroraShift 24s ease-in-out infinite alternate;
+}
+body::after{
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:
+        linear-gradient(rgba(0,229,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.025) 1px, transparent 1px);
+    background-size:60px 60px;
+    mask-image:radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 85%);
+    -webkit-mask-image:radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 85%);
+    opacity:0.6;
+}
+@keyframes auroraShift{
+    0%{opacity:0.75;transform:scale(1) rotate(0deg)}
+    50%{opacity:1;transform:scale(1.06) rotate(2deg)}
+    100%{opacity:0.85;transform:scale(1) rotate(0deg)}
+}
+nav{
+    position:fixed;top:0;left:0;right:0;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 48px;height:84px;
+    background:rgba(3,5,10,0.75);
+    backdrop-filter:blur(28px) saturate(160%);
+    -webkit-backdrop-filter:blur(28px) saturate(160%);
+    border-bottom:1px solid rgba(0,229,255,0.15);
+    z-index:100;box-shadow:0 4px 30px rgba(0,0,0,0.4);
+}
+nav::after{
+    content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,var(--accent) 20%,var(--purple) 50%,var(--pink) 80%,transparent);
+    opacity:0.6;animation:navGlow 4s ease-in-out infinite alternate;
+}
+@keyframes navGlow{0%{opacity:0.4}100%{opacity:0.9}}
+[data-theme="light"] nav{background:rgba(255,255,255,0.85);border-bottom-color:rgba(0,0,0,0.08)}
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
+.nav-logo svg{filter:drop-shadow(0 0 12px rgba(0,229,255,0.6))}
+.nav-logo-text{
+    font-family:var(--font-display);font-size:24px;font-weight:800;
+    background:linear-gradient(45deg,#00e5ff,#00ff9d,#b845ff,#ff2d92,#ffd11a,#00e5ff);
+    background-size:400% 400%;-webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:gradientMove 6s ease infinite;letter-spacing:1px;
+}
+@keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.nav-menu{display:flex;gap:32px;list-style:none}
+.nav-menu a{
+    color:var(--text2);text-decoration:none;font-size:13px;font-weight:500;
+    text-transform:uppercase;letter-spacing:1.2px;position:relative;padding:6px 0;
+    transition:color 0.15s ease;
+}
+.nav-menu a::after{
+    content:'';position:absolute;bottom:0;left:50%;right:50%;height:2px;
+    background:linear-gradient(90deg,var(--accent),var(--purple));
+    transition:left 0.3s,right 0.3s;border-radius:2px;
+}
+.nav-menu a:hover{color:var(--accent)}
+.nav-menu a:hover::after{left:0;right:0}
+.nav-actions{display:flex;gap:12px;align-items:center}
+.btn-nav{
+    padding:9px 22px;border-radius:40px;font-size:13px;font-weight:600;
+    cursor:pointer;transition:all 0.15s;border:none;text-decoration:none;
+    display:inline-flex;align-items:center;gap:6px;
+}
+.btn-nav-outline{background:transparent;border:1.5px solid var(--accent);color:var(--accent)}
+.btn-nav-outline:hover{background:rgba(0,229,255,0.12);box-shadow:0 0 20px rgba(0,229,255,0.4);transform:translateY(-1px)}
+.btn-nav-primary{
+    background:linear-gradient(135deg,#00e5ff,#b845ff,#ff2d92);
+    background-size:200% 200%;color:#fff;
+    box-shadow:0 0 25px rgba(0,229,255,0.4);
+    animation:btnGradientShift 4s ease infinite;
+}
+@keyframes btnGradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.btn-nav-primary:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 0 40px rgba(0,229,255,0.7)}
+.nav-theme-btn{
+    width:40px;height:40px;border-radius:50%;background:none;
+    border:1px solid var(--border);color:var(--text);font-size:16px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:all 0.15s;
+}
+.nav-theme-btn:hover{border-color:var(--accent);box-shadow:0 0 20px rgba(0,229,255,0.4);transform:rotate(20deg)}
+.nav-toggle{display:none;background:none;border:none;color:var(--text);font-size:24px;cursor:pointer;padding:8px}
 
-        /* ===== KUTULAR ===== */
-        .highlight-box { background: #1a1a2a; border-left: 6px solid #00ff88; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
-        .important-box { background: #1a0a0a; border-left: 6px solid #ff6b6b; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
-        .info-box { background: #0a1a1a; border-left: 6px solid #ffb700; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
+.editor-hero{padding:160px 24px 30px;position:relative;z-index:10;text-align:center}
+.editor-hero-badge{
+    display:inline-flex;align-items:center;gap:8px;padding:8px 18px;
+    border:1px solid rgba(0,229,255,0.35);border-radius:40px;
+    font-size:12px;color:var(--accent);font-weight:600;letter-spacing:0.5px;
+    background:rgba(0,229,255,0.05);margin-bottom:24px;backdrop-filter:blur(12px);
+}
+.editor-hero h1{
+    font-family:var(--font-display);font-size:clamp(36px,5vw,54px);
+    font-weight:800;line-height:1.05;margin-bottom:16px;letter-spacing:-0.5px;
+    background:linear-gradient(135deg,#fff 0%,var(--accent) 40%,var(--purple) 70%,var(--pink) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.editor-hero p{max-width:720px;margin:0 auto;color:var(--text2);font-size:15.5px;line-height:1.75}
+.editor-hero-meta{
+    display:flex;justify-content:center;gap:20px;flex-wrap:wrap;
+    margin-top:24px;font-size:12.5px;color:var(--text3);
+}
+.lang-bar{
+    display:flex;justify-content:center;gap:10px;flex-wrap:wrap;
+    padding:20px 24px;position:relative;z-index:10;
+}
+.lang-btn{
+    padding:9px 22px;border-radius:40px;
+    border:1.5px solid var(--border2);
+    background:transparent;color:var(--text3);
+    font-weight:600;cursor:pointer;transition:all 0.2s;
+    font-size:13px;font-family:var(--font-body);
+    display:inline-flex;align-items:center;gap:8px;
+}
+.lang-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,229,255,0.06)}
+.lang-btn.active{
+    border-color:var(--accent);
+    background:linear-gradient(135deg,rgba(0,229,255,0.15),rgba(184,69,255,0.1));
+    color:var(--accent);
+    box-shadow:0 0 20px rgba(0,229,255,0.3);
+}
+.editor-container{
+    max-width:1200px;margin:20px auto 80px;padding:0 24px;
+    position:relative;z-index:10;
+}
+.editor-content{display:none}
+.editor-content.active{display:block;animation:fadeIn 0.4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-        /* ===== KOD EDITÖRÜ ===== */
-        .editor-wrapper { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 16px; overflow: hidden; margin: 24px 0; }
-        .editor-header { display: flex; align-items: center; padding: 12px 20px; background: #1a1a2a; border-bottom: 1px solid #2a2a2a; gap: 12px; flex-wrap: wrap; }
-        .editor-dots { display: flex; gap: 8px; }
-        .editor-dot { width: 14px; height: 14px; border-radius: 50%; }
-        .editor-dot.red { background: #ff5f56; }
-        .editor-dot.yellow { background: #ffbd2e; }
-        .editor-dot.green { background: #27c93f; }
-        .editor-filename { margin-left: auto; font-size: 13px; color: #888; font-family: monospace; }
-        .editor-body { padding: 20px; background: #0d0d0d; }
-        .editor-body textarea { width: 100%; min-height: 300px; background: #0a0a0a; color: #e0e0e0; border: 1px solid #2a2a2a; border-radius: 8px; padding: 16px; font-family: 'Fira Code', 'Courier New', monospace; font-size: 14px; line-height: 1.8; resize: vertical; outline: none; transition: 0.3s; }
-        .editor-body textarea:focus { border-color: #00d4ff; box-shadow: 0 0 20px rgba(0,212,255,0.05); }
-        .editor-actions { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
-        .btn { padding: 10px 24px; border-radius: 40px; font-size: 14px; font-weight: 700; border: none; cursor: pointer; transition: 0.3s; text-decoration: none; display: inline-block; }
-        .btn-primary { background: linear-gradient(135deg, #00d4ff, #a855f7); color: #0a0a0a; }
-        .btn-primary:hover { transform: scale(1.03); box-shadow: 0 0 30px rgba(0,212,255,0.3); }
-        .btn-secondary { background: transparent; border: 2px solid #00d4ff; color: #00d4ff; }
-        .btn-secondary:hover { background: rgba(0,212,255,0.1); }
-        .btn-success { background: #00ff88; color: #0a0a0a; }
-        .btn-success:hover { transform: scale(1.03); box-shadow: 0 0 30px rgba(0,255,136,0.3); }
-        .btn-danger { background: #ff4757; color: #fff; }
-        .btn-danger:hover { transform: scale(1.03); box-shadow: 0 0 30px rgba(255,71,87,0.3); }
+.info-highlight{
+    padding:18px 22px;border-radius:14px;margin:20px 0;
+    border-left:4px solid var(--success);
+    background:linear-gradient(135deg,rgba(0,255,157,0.08),rgba(0,229,255,0.04));
+    color:#a8ffd4;font-size:13.5px;line-height:1.75;
+}
+.info-highlight strong{color:#fff}
 
-        .output-box { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 16px; margin-top: 16px; min-height: 60px; max-height: 300px; overflow-y: auto; font-family: 'Fira Code', monospace; font-size: 14px; white-space: pre-wrap; word-break: break-word; color: #b0b8c0; }
-        .output-box .ai-response { color: #00ff88; }
-        .output-box .error { color: #ff6b6b; }
+/* ============ EDİTÖR ============ */
+.editor-wrapper{
+    background:linear-gradient(135deg,rgba(10,16,32,0.95),rgba(6,10,20,0.98));
+    border:1.5px solid var(--border2);border-radius:20px;
+    overflow:hidden;margin:24px 0;
+    box-shadow:0 12px 50px rgba(0,0,0,0.5), 0 0 40px rgba(0,229,255,0.08);
+    transition:all 0.3s ease;
+}
+.editor-wrapper:focus-within{
+    border-color:var(--accent);
+    box-shadow:0 12px 60px rgba(0,0,0,0.6), 0 0 60px rgba(0,229,255,0.25);
+}
+.editor-header{
+    display:flex;align-items:center;padding:14px 22px;
+    background:linear-gradient(90deg,rgba(0,229,255,0.05),rgba(184,69,255,0.03));
+    border-bottom:1px solid var(--border);
+    gap:12px;flex-wrap:wrap;
+}
+.editor-dots{display:flex;gap:8px}
+.editor-dot{width:13px;height:13px;border-radius:50%;box-shadow:0 0 8px currentColor}
+.editor-dot.red{background:#ff5f56;color:rgba(255,95,86,0.5)}
+.editor-dot.yellow{background:#ffbd2e;color:rgba(255,189,46,0.5)}
+.editor-dot.green{background:#27c93f;color:rgba(39,201,63,0.5)}
+.editor-filename{
+    margin-left:auto;font-size:12.5px;color:var(--text3);
+    font-family:var(--font-code);letter-spacing:0.5px;
+}
+.editor-body{padding:22px}
+.editor-body textarea{
+    width:100%;min-height:200px;
+    background:linear-gradient(135deg,#050810,#02040a);
+    color:#e0f0ff;border:1.5px solid var(--border2);
+    border-radius:12px;padding:18px;
+    font-family:var(--font-code);font-size:13.5px;line-height:1.75;
+    resize:vertical;outline:none;transition:all 0.3s;
+}
+.editor-body textarea:focus{
+    border-color:var(--accent);
+    box-shadow:0 0 25px rgba(0,229,255,0.25), inset 0 0 20px rgba(0,229,255,0.03);
+}
+.editor-body textarea::placeholder{color:var(--text4)}
+.editor-actions{
+    display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;
+}
+.btn{
+    padding:11px 22px;border-radius:40px;font-size:13px;font-weight:700;
+    border:none;cursor:pointer;transition:all 0.25s;
+    text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+    font-family:var(--font-body);letter-spacing:0.3px;
+}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none !important}
+.btn-primary{
+    background:linear-gradient(135deg,#00e5ff,#b845ff,#ff2d92);
+    background-size:200% 200%;color:#fff;
+    box-shadow:0 0 25px rgba(0,229,255,0.4);
+    animation:btnGradientShift 4s ease infinite;
+}
+.btn-primary:hover:not(:disabled){
+    transform:translateY(-2px) scale(1.03);
+    box-shadow:0 8px 40px rgba(0,229,255,0.8);
+}
+.btn-secondary{
+    background:transparent;border:1.5px solid var(--border2);color:var(--text3);
+}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,229,255,0.08)}
+.btn-success{
+    background:linear-gradient(135deg,#00ff9d,#00cc78);color:#03050a;
+    box-shadow:0 0 20px rgba(0,255,157,0.4);
+}
+.btn-success:hover:not(:disabled){transform:translateY(-2px) scale(1.03);box-shadow:0 8px 35px rgba(0,255,157,0.7)}
+.btn-danger{
+    background:linear-gradient(135deg,#ff4757,#ff2d92);color:#fff;
+    box-shadow:0 0 20px rgba(255,71,87,0.4);
+}
+.btn-danger:hover:not(:disabled){transform:translateY(-2px) scale(1.03);box-shadow:0 8px 35px rgba(255,71,87,0.7)}
+.btn-sm{padding:8px 16px;font-size:12px}
 
-        /* ===== ÖZELLİKLER ===== */
-        .feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 20px 0; }
-        .feature-item { background: #1a1a2a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 18px; text-align: center; transition: 0.2s; }
-        .feature-item:hover { border-color: #00d4ff; }
-        .feature-item .icon { font-size: 32px; display: block; margin-bottom: 6px; }
-        .feature-item .label { font-weight: 600; color: #e0e0e0; font-size: 14px; }
-        .feature-item .desc { font-size: 12px; color: #888; margin-top: 4px; }
+/* Output */
+.output-box{
+    background:linear-gradient(135deg,#050810,#02040a);
+    border:1.5px solid var(--border2);border-radius:12px;
+    padding:18px;margin-top:16px;
+    min-height:60px;max-height:500px;overflow-y:auto;
+    font-family:var(--font-code);font-size:13px;
+    white-space:pre-wrap;word-break:break-word;
+    color:#e0f0ff;line-height:1.7;
+    box-shadow:inset 0 0 30px rgba(0,229,255,0.03);
+    transition:border-color 0.3s;
+}
+.output-box::-webkit-scrollbar{width:8px}
+.output-box::-webkit-scrollbar-track{background:rgba(0,0,0,0.3);border-radius:4px}
+.output-box::-webkit-scrollbar-thumb{
+    background:linear-gradient(180deg,rgba(0,229,255,0.5),rgba(184,69,255,0.5));
+    border-radius:4px;
+}
+.output-box .ai-response{color:var(--accent2)}
+.output-box .error{color:var(--danger)}
+.output-box .loading{color:var(--text3);font-style:italic}
+.output-actions{
+    display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;
+}
+.output-actions .btn{padding:7px 14px;font-size:11.5px}
 
-        /* ===== DİĞER ===== */
-        .back-link { display: inline-block; margin-top: 30px; color: #00d4ff; text-decoration: none; border: 2px solid #00d4ff; padding: 12px 32px; border-radius: 40px; transition: 0.3s; font-weight: 600; font-size: 16px; }
-        .back-link:hover { background: #00d4ff; color: #0a0a0a; box-shadow: 0 0 40px rgba(0,212,255,0.3); }
-        .badge { display: inline-block; background: #00d4ff22; color: #00d4ff; padding: 4px 16px; border-radius: 30px; font-size: 14px; border: 1px solid #00d4ff55; margin-right: 8px; margin-bottom: 6px; }
-        hr { border: 0; height: 1px; background: #2a2a2a; margin: 45px 0; }
+/* Section */
+.section-title{
+    font-family:var(--font-display);font-size:22px;font-weight:800;
+    color:var(--text);margin:36px 0 18px;padding-bottom:14px;
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:12px;
+    letter-spacing:-0.3px;
+}
+.section-title .icon{
+    width:44px;height:44px;border-radius:12px;
+    background:linear-gradient(135deg,rgba(0,229,255,0.15),rgba(184,69,255,0.1));
+    border:1px solid rgba(0,229,255,0.3);
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;flex-shrink:0;
+}
 
-        .legal-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a2a; font-size: 13px; color: #666; text-align: center; }
-        .legal-footer a { color: #00d4ff; text-decoration: none; }
-        .legal-footer a:hover { text-decoration: underline; }
+/* Feature grid */
+.feature-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:12px;margin:20px 0;
+}
+.feature-item{
+    background:linear-gradient(135deg,rgba(0,229,255,0.04),rgba(184,69,255,0.02));
+    border:1px solid var(--border2);border-radius:12px;
+    padding:16px 14px;text-align:center;
+    transition:all 0.25s ease;
+}
+.feature-item:hover{
+    border-color:var(--accent);
+    transform:translateY(-3px);
+    box-shadow:0 8px 25px rgba(0,229,255,0.15);
+}
+.feature-item .icon{font-size:30px;display:block;margin-bottom:6px;filter:drop-shadow(0 0 10px rgba(0,229,255,0.4))}
+.feature-item .label{
+    font-family:var(--font-display);font-weight:700;
+    color:var(--text);font-size:13.5px;
+}
+.feature-item .desc{font-size:11.5px;color:var(--text3);margin-top:4px;line-height:1.5}
 
-        @media (max-width: 768px) { .container { padding: 20px; } h1 { font-size: 28px; } h2 { font-size: 22px; } .feature-grid { grid-template-columns: 1fr 1fr; } .lang-selector { justify-content: center; } }
-        @media (max-width: 480px) { body { padding: 10px; } .container { padding: 14px; } h1 { font-size: 22px; } .feature-grid { grid-template-columns: 1fr; } .editor-body textarea { min-height: 180px; } }
-    </style>
+/* Steps */
+.step-item{
+    display:flex;gap:16px;align-items:flex-start;
+    padding:16px 20px;margin:10px 0;
+    background:linear-gradient(135deg,rgba(0,229,255,0.04),rgba(184,69,255,0.02));
+    border:1px solid var(--border2);border-radius:14px;
+    transition:all 0.2s ease;
+}
+.step-item:hover{
+    border-color:var(--accent);
+    transform:translateX(4px);
+    box-shadow:0 0 25px rgba(0,229,255,0.15);
+}
+.step-num{
+    width:36px;height:36px;border-radius:10px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--accent),var(--purple));
+    color:#fff;font-weight:800;font-size:15px;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 20px rgba(0,229,255,0.5);
+    font-family:var(--font-code);
+}
+.step-content{flex:1;min-width:0}
+.step-content strong{
+    color:var(--accent);font-weight:700;font-size:14px;
+    display:block;margin-bottom:4px;
+}
+.step-content span{font-size:13.5px;color:var(--text2);line-height:1.65}
+
+/* Sample code */
+.sample-code{
+    background:linear-gradient(135deg,#050810,#02040a);
+    border:1px solid rgba(0,229,255,0.2);
+    border-radius:12px;padding:18px;
+    font-family:var(--font-code);font-size:12.5px;
+    color:#e0f0ff;overflow-x:auto;margin:14px 0;
+    line-height:1.7;
+    box-shadow:inset 0 0 30px rgba(0,229,255,0.03);
+}
+.sample-code .kw{color:var(--accent3);font-weight:600}
+.sample-code .fn{color:var(--accent);font-weight:600}
+.sample-code .str{color:var(--gold)}
+.sample-code .cm{color:var(--text4);font-style:italic}
+.sample-code .num{color:var(--accent2)}
+.sample-code .cls{color:var(--purple)}
+
+/* Info boxes */
+.info-box{
+    padding:16px 20px;border-radius:14px;margin:16px 0;
+    border-left:4px solid var(--accent);
+    background:linear-gradient(135deg,rgba(0,229,255,0.06),rgba(184,69,255,0.03));
+    font-size:13.5px;color:var(--text2);line-height:1.75;
+}
+.info-box.warning{
+    border-left-color:var(--warning);
+    background:linear-gradient(135deg,rgba(255,183,0,0.08),rgba(255,94,26,0.04));
+    color:#ffd58a;
+}
+.info-box.premium{
+    border-left-color:var(--gold);
+    background:linear-gradient(135deg,rgba(255,209,26,0.08),rgba(255,140,0,0.04));
+    color:#ffd58a;
+}
+.info-box.success{
+    border-left-color:var(--success);
+    background:linear-gradient(135deg,rgba(0,255,157,0.08),rgba(0,229,255,0.04));
+    color:#a8ffd4;
+}
+.info-box-title{
+    display:block;font-weight:700;margin-bottom:6px;
+    font-family:var(--font-display);letter-spacing:0.2px;font-size:14px;
+}
+.info-box code{
+    background:rgba(0,229,255,0.12);color:var(--accent2);
+    padding:2px 7px;border-radius:6px;
+    font-family:var(--font-code);font-size:12px;
+    border:1px solid rgba(0,229,255,0.2);
+}
+
+/* Quick prompts */
+.quick-prompts{
+    display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px;
+}
+.quick-prompt{
+    padding:8px 16px;border-radius:30px;
+    background:linear-gradient(135deg,rgba(0,229,255,0.06),rgba(184,69,255,0.04));
+    border:1px solid var(--border2);
+    color:var(--text2);font-size:12px;font-weight:600;
+    cursor:pointer;transition:all 0.2s ease;
+    font-family:var(--font-body);
+}
+.quick-prompt:hover{
+    border-color:var(--accent);color:var(--accent);
+    background:rgba(0,229,255,0.12);
+    transform:translateY(-2px);
+    box-shadow:0 4px 15px rgba(0,229,255,0.25);
+}
+
+footer{
+    border-top:1px solid rgba(0,229,255,0.15);
+    padding:50px 24px 30px;
+    background:linear-gradient(180deg,var(--bg2),var(--bg));
+    position:relative;z-index:10;
+}
+footer::before{
+    content:'';position:absolute;top:-1px;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent 0%,var(--accent) 20%,var(--purple) 50%,var(--pink) 80%,transparent 100%);
+    opacity:0.7;
+}
+.footer-inner{
+    max-width:1200px;margin:0 auto;
+    display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:20px;
+}
+.footer-copy{font-size:12.5px;color:var(--text3)}
+.footer-copy span{
+    background:linear-gradient(135deg,var(--accent),var(--purple));
+    -webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700;
+}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{color:var(--text3);font-size:12.5px;text-decoration:none;transition:color 0.15s}
+.footer-links a:hover{color:var(--accent)}
+
+.back-top{
+    position:fixed;bottom:24px;right:24px;
+    width:48px;height:48px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),var(--purple));
+    color:#fff;border:none;cursor:pointer;
+    display:none;align-items:center;justify-content:center;
+    font-size:18px;z-index:50;
+    box-shadow:0 4px 20px rgba(0,229,255,0.5);
+    transition:transform 0.2s,box-shadow 0.2s;
+}
+.back-top.show{display:flex}
+.back-top:hover{transform:translateY(-3px) scale(1.08);box-shadow:0 8px 35px rgba(0,229,255,0.8)}
+
+@media (max-width:900px){
+    nav{padding:0 20px;height:72px}
+    .nav-menu{gap:20px}
+    .nav-menu a{font-size:11px}
+    .nav-logo-text{font-size:18px}
+    .editor-hero{padding:130px 18px 30px}
+}
+@media (max-width:768px){
+    .nav-menu{
+        display:none;position:fixed;top:72px;left:0;right:0;
+        background:rgba(3,5,10,0.98);backdrop-filter:blur(20px);
+        flex-direction:column;padding:24px;gap:20px;
+        border-bottom:1px solid var(--border);
+    }
+    .nav-menu.open{display:flex}
+    .nav-menu a{font-size:14px;letter-spacing:0.5px}
+    .nav-toggle{display:block}
+    .btn-nav{padding:7px 14px;font-size:11.5px}
+    .btn-nav-outline{display:none}
+    .editor-hero h1{font-size:30px}
+    .editor-hero p{font-size:13.5px}
+    .feature-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:480px){
+    nav{padding:0 12px;height:66px}
+    .nav-logo-text{font-size:15px}
+    .nav-logo svg{width:38px;height:38px}
+    .btn-nav{padding:6px 11px;font-size:10.5px}
+    .editor-hero{padding:110px 14px 24px}
+    .editor-hero h1{font-size:25px}
+    .editor-body{padding:14px}
+    .editor-body textarea{min-height:160px;font-size:12px;padding:12px}
+    .btn{font-size:11.5px;padding:9px 16px}
+    .editor-actions{flex-direction:column}
+    .editor-actions .btn{width:100%;justify-content:center}
+    .feature-grid{grid-template-columns:1fr}
+    .footer-inner{flex-direction:column;text-align:center}
+    .lang-btn{padding:7px 14px;font-size:11.5px}
+}
+</style>
 </head>
 <body>
-<div class="container" id="mainContainer">
 
-    <!-- ===== DİL SEÇİCİ ===== -->
-    <div class="lang-selector">
-        <button class="lang-btn active" data-lang="tr" onclick="switchLanguage('tr')">🇹🇷 Türkçe</button>
-        <button class="lang-btn" data-lang="en" onclick="switchLanguage('en')">🇬🇧 English</button>
-        <button class="lang-btn" data-lang="ar" onclick="switchLanguage('ar')">🇸🇦 العربية</button>
+<nav>
+    <a href="/index.html" class="nav-logo">
+        <svg width="52" height="52" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#00e5ff"/>
+                    <stop offset="50%" stop-color="#b845ff"/>
+                    <stop offset="100%" stop-color="#ff2d92"/>
+                </linearGradient>
+                <linearGradient id="lg2" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#00ff9d"/>
+                    <stop offset="100%" stop-color="#00e5ff"/>
+                </linearGradient>
+                <radialGradient id="lgg">
+                    <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.7"/>
+                    <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+                </radialGradient>
+            </defs>
+            <circle cx="30" cy="30" r="28" fill="url(#lgg)"/>
+            <circle cx="30" cy="30" r="25" fill="none" stroke="url(#lg1)" stroke-width="2.5"/>
+            <circle cx="30" cy="30" r="21" fill="none" stroke="url(#lg1)" stroke-width="0.8" stroke-dasharray="3 3"/>
+            <circle cx="30" cy="30" r="20" fill="rgba(10,16,32,0.78)"/>
+            <path d="M 33 15 A 15 15 0 1 0 33 45 A 12 12 0 1 1 33 15 Z" fill="url(#lg2)"/>
+            <polygon points="42,18 43.5,23 48.5,23 44.5,26 46,31 42,28 38,31 39.5,26 35.5,23 40.5,23" fill="#ffd11a"/>
+            <circle cx="12" cy="30" r="1.8" fill="#00e5ff"/>
+            <circle cx="48" cy="30" r="1.8" fill="#00e5ff"/>
+            <circle cx="30" cy="12" r="1.8" fill="#00ff9d"/>
+            <circle cx="30" cy="48" r="1.8" fill="#ff2d92"/>
+        </svg>
+        <span class="nav-logo-text">VİZYON 2027</span>
+    </a>
+    <ul class="nav-menu" id="navMenu">
+        <li><a href="/index.html#features">Özellikler</a></li>
+        <li><a href="/index.html#ai">Yapay Zeka</a></li>
+        <li><a href="/api.html">V27 API</a></li>
+        <li><a href="/index.html#pricing">Fiyatlar</a></li>
+        <li><a href="/bana-ogret.html">📖 Bana Öğret</a></li>
+    </ul>
+    <div class="nav-actions">
+        <a href="/index.html#login" class="btn-nav btn-nav-outline">Giriş Yap</a>
+        <a href="/index.html#register" class="btn-nav btn-nav-primary">Ücretsiz Başla</a>
+        <button class="nav-theme-btn" onclick="toggleTheme()" title="Tema Değiştir">🌙</button>
+        <button class="nav-toggle" onclick="document.getElementById('navMenu').classList.toggle('open')">☰</button>
     </div>
+</nav>
 
-    <!-- ===== TÜRKÇE ===== -->
-    <div id="lang-tr" class="lang-content active">
-        <h1>⌨️ VİZYON AI Kod Editörü</h1>
-        <p><span class="badge">🤖 AI Destekli Kod Üretimi</span> <span class="badge" style="margin-left:10px;">🌍 20+ Dil</span> <span class="badge">⚡ Anında Çalışır</span></p>
+<section class="editor-hero">
+    <div class="editor-hero-badge">
+        <span>⌨️</span> KOD EDİTÖRÜ
+    </div>
+    <h1 id="heroTitle">VİZYON AI Kod Editörü</h1>
+    <p id="heroSub">
+        <strong>28 yapay zeka modeli</strong> ile her dilde çalışan kod üret. Python, React, JavaScript,
+        SQL, Docker, Java, C#, C++, Flutter ve daha fazlası. Ne istediğini yaz, AI saniyeler içinde
+        çalışan kodu versin.
+    </p>
+    <div class="editor-hero-meta">
+        <span>🤖 28 AI Modeli</span>
+        <span>🌍 20+ Dil</span>
+        <span>⚡ Anında Çalışır</span>
+    </div>
+</section>
 
-        <p><strong>VİZYON AI Kod Editörü</strong>, yapay zeka ile kod yazmanın en hızlı ve etkili yoludur. Hangi dili kullanırsan kullan, AI sana çalışan kodları anında üretir. Aşağıdaki editöre ne istediğini yaz, AI hemen kodunu oluştursun!</p>
+<div class="lang-bar">
+    <button class="lang-btn active" data-lang="tr" onclick="switchLanguage('tr')">🇹🇷 Türkçe</button>
+    <button class="lang-btn" data-lang="en" onclick="switchLanguage('en')">🇬🇧 English</button>
+    <button class="lang-btn" data-lang="ar" onclick="switchLanguage('ar')">🇸🇦 العربية</button>
+</div>
 
-        <div class="highlight-box">
-            <strong>🚀 Hızlı Başlangıç:</strong> "Python'da hesap makinesi yaz", "React'te todo app yap", "SQL'de join sorgusu oluştur" gibi komutlarla hemen kod üretmeye başlayabilirsin.
+<main class="editor-container">
+
+    <!-- TÜRKÇE -->
+    <div id="lang-tr" class="editor-content active">
+
+        <div class="info-highlight">
+            <strong>🚀 Hızlı Başlangıç:</strong> Aşağıdaki editöre ne istediğini yaz ve <strong>⚡ Kod Üret</strong> butonuna bas. AI saniyeler içinde çalışan kodu getirir. Komutları yazarken detay vermekten çekinme — AI sana en uygun çözümü sunar.
         </div>
 
-        <!-- ===== KOD EDITÖRÜ ===== -->
+        <!-- EDITOR -->
         <div class="editor-wrapper">
             <div class="editor-header">
                 <div class="editor-dots">
@@ -109,339 +583,770 @@
                     <span class="editor-dot yellow"></span>
                     <span class="editor-dot green"></span>
                 </div>
-                <span class="editor-filename">📄 komut.txt</span>
+                <span class="editor-filename">📄 komut.txt — VİZYON AI (28 Model)</span>
             </div>
             <div class="editor-body">
-                <textarea id="codeInput" placeholder="Örn: Python'da hesap makinesi yaz veya React'te bir form oluştur...">Python'da bir dosya okuma ve yazma fonksiyonu yaz</textarea>
+                <textarea id="codeInput" placeholder="Örn: Python'da REST API yaz / React'te form validasyonu yap / SQL'de JOIN sorgusu...">Python'da bir dosya okuma ve yazma fonksiyonu yaz</textarea>
+
+                <div class="quick-prompts">
+                    <button class="quick-prompt" onclick="setPrompt('Python\'da REST API yaz (FastAPI)')">🐍 Python REST API</button>
+                    <button class="quick-prompt" onclick="setPrompt('React\'te todo app yap')">⚛️ React Todo</button>
+                    <button class="quick-prompt" onclick="setPrompt('JavaScript\'te debounce fonksiyonu yaz')">🌐 JS Debounce</button>
+                    <button class="quick-prompt" onclick="setPrompt('SQL\'de iki tabloyu JOIN ile birleştir')">🗄️ SQL JOIN</button>
+                    <button class="quick-prompt" onclick="setPrompt('Docker ile Python uygulaması containerize et')">🐳 Docker</button>
+                    <button class="quick-prompt" onclick="setPrompt('Flutter\'da login ekranı tasarla')">📱 Flutter</button>
+                </div>
+
                 <div class="editor-actions">
-                    <button class="btn btn-primary" onclick="generateCode()">⚡ Kod Üret</button>
+                    <button class="btn btn-primary" id="generateBtn" onclick="generateCode()">⚡ Kod Üret</button>
                     <button class="btn btn-secondary" onclick="clearEditor()">🗑️ Temizle</button>
                     <button class="btn btn-success" onclick="copyCode()">📋 Kopyala</button>
-                    <button class="btn btn-danger" onclick="clearOutput()">🧹 Çıktıyı Temizle</button>
                 </div>
+
                 <div id="outputBox" class="output-box">
-                    <span style="color: #888;">💡 Kodunuz burada görünecek. "Kod Üret" butonuna tıklayın.</span>
+                    <span style="color:var(--text3);">💡 Kodun burada görünecek. <strong style="color:var(--accent);">⚡ Kod Üret</strong> butonuna bas.</span>
+                </div>
+
+                <div id="outputActions" class="output-actions" style="display:none;">
+                    <button class="btn btn-success btn-sm" onclick="copyCode()">📋 Kodu Kopyala</button>
+                    <button class="btn btn-secondary btn-sm" onclick="downloadCode()">⬇️ İndir</button>
+                    <button class="btn btn-secondary btn-sm" onclick="clearOutput()">🧹 Çıktıyı Temizle</button>
                 </div>
             </div>
         </div>
 
-        <h2>🛠️ Desteklenen Diller ve Teknolojiler</h2>
+        <!-- DESTEKLENEN DİLLER -->
+        <h2 class="section-title">
+            <span class="icon">🛠️</span>
+            Desteklenen Diller & Teknolojiler
+        </h2>
+
         <div class="feature-grid">
-            <div class="feature-item"><span class="icon">🐍</span><div class="label">Python</div><div class="desc">Backend, veri bilimi, otomasyon</div></div>
-            <div class="feature-item"><span class="icon">⚛️</span><div class="label">React / Next.js</div><div class="desc">Modern frontend, SSR, component</div></div>
-            <div class="feature-item"><span class="icon">🌐</span><div class="label">HTML / CSS / JS</div><div class="desc">Web temelleri, interaktif siteler</div></div>
-            <div class="feature-item"><span class="icon">🗄️</span><div class="label">SQL</div><div class="desc">Sorgular, tablolar, veri analizi</div></div>
-            <div class="feature-item"><span class="icon">🐳</span><div class="label">Docker</div><div class="desc">Container, DevOps, deployment</div></div>
-            <div class="feature-item"><span class="icon">☕</span><div class="label">Java / C# / C++</div><div class="desc">Kurumsal, oyun, sistem</div></div>
-            <div class="feature-item"><span class="icon">📱</span><div class="label">Flutter / React Native</div><div class="desc">Cross-platform mobil</div></div>
+            <div class="feature-item"><span class="icon">🐍</span><div class="label">Python</div><div class="desc">FastAPI, Flask, Django, pandas, numpy</div></div>
+            <div class="feature-item"><span class="icon">⚛️</span><div class="label">React / Next.js</div><div class="desc">Hooks, Context, SSR, components</div></div>
+            <div class="feature-item"><span class="icon">🌐</span><div class="label">HTML / CSS / JS</div><div class="desc">Tailwind, animasyon, responsive</div></div>
+            <div class="feature-item"><span class="icon">🗄️</span><div class="label">SQL</div><div class="desc">PostgreSQL, MySQL, JOIN, prosedür</div></div>
+            <div class="feature-item"><span class="icon">🐳</span><div class="label">Docker / K8s</div><div class="desc">Dockerfile, compose, deployment</div></div>
+            <div class="feature-item"><span class="icon">☕</span><div class="label">Java / C# / C++</div><div class="desc">Spring, .NET, oyun, sistem</div></div>
+            <div class="feature-item"><span class="icon">📱</span><div class="label">Flutter / RN</div><div class="desc">Cross-platform, iOS, Android</div></div>
             <div class="feature-item"><span class="icon">🔧</span><div class="label">DevOps / Cloud</div><div class="desc">CI/CD, AWS, Azure, K8s</div></div>
+            <div class="feature-item"><span class="icon">🤖</span><div class="label">AI / ML</div><div class="desc">TensorFlow, PyTorch, LangChain</div></div>
+            <div class="feature-item"><span class="icon">🌐</span><div class="label">REST / GraphQL</div><div class="desc">API tasarımı, auth, rate limit</div></div>
+            <div class="feature-item"><span class="icon">🔒</span><div class="label">Güvenlik</div><div class="desc">JWT, OAuth, AES, hashing</div></div>
+            <div class="feature-item"><span class="icon">📊</span><div class="label">Veri Bilimi</div><div class="desc">Matplotlib, seaborn, analiz</div></div>
         </div>
 
-        <h2>⚡ Nasıl Çalışır?</h2>
-        <ol>
-            <li><strong>Ne istediğini söyle:</strong> "Python'da REST API yaz" veya "React'te form validasyonu yap" gibi.</li>
-            <li><strong>AI anında kod üretir:</strong> VİZYON AI 7 farklı modelle en iyi çözümü sunar.</li>
-            <li><strong>Kopyala ve yapıştır:</strong> Kodları tek tıkla kopyala, projene entegre et.</li>
-            <li><strong>Hata düzeltme:</strong> Çalışmayan kodu yapıştır, AI hatayı bulup düzeltir.</li>
-        </ol>
+        <!-- NASIL ÇALIŞIR -->
+        <h2 class="section-title">
+            <span class="icon">⚡</span>
+            Nasıl Çalışır?
+        </h2>
 
-        <h2>💻 Örnek Kod Üretimi</h2>
-        <p><strong>Komut:</strong> "Python'da bir dosya okuma ve yazma fonksiyonu yaz"</p>
-        <div style="background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 8px; padding: 16px; font-family: 'Courier New', monospace; color: #00ff88; overflow-x: auto; margin: 15px 0;">
-            <pre style="margin:0;">def read_file(filename):
-    try:
-        with open(filename, 'r', encoding='utf-8') as f:
-            return f.read()
-    except FileNotFoundError:
-        return "Dosya bulunamadı!"
-
-def write_file(filename, content):
-    try:
-        with open(filename, 'w', encoding='utf-8') as f:
-            f.write(content)
-        return "Dosya yazıldı!"
-    except Exception as e:
-        return f"Hata: {e}"
-
-# Kullanım
-veri = read_file("ornek.txt")
-print(veri)
-write_file("yeni.txt", "Merhaba VİZYON AI!")</pre>
+        <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+                <strong>Ne İstediğini Yaz</strong>
+                <span>Doğal dilde yaz: "Python'da REST API yaz" veya "React'te form validasyonu yap" gibi. Detay ne kadar fazlaysa, kod o kadar isabetli olur.</span>
+            </div>
         </div>
 
-        <h2>🎯 Kimler İçin?</h2>
-        <ul>
-            <li><strong>Yazılımcılar:</strong> Hızlı prototipleme ve kodlama asistanı</li>
-            <li><strong>Öğrenciler:</strong> Algoritma öğrenme, ödev çözümleri</li>
-            <li><strong>Startup'lar:</strong> Minimum viable product (MVP) geliştirme</li>
-            <li><strong>Freelancer'lar:</strong> Müşteriler için hızlı teslimat</li>
-            <li><strong>Meraklılar:</strong> Yeni teknolojileri keşfetme</li>
-        </ul>
-
-        <div class="info-box">
-            <strong>📌 İpucu:</strong> Kod üretimi için <strong>@vizyonal</strong> komutunu takım sohbetinde de kullanabilirsin. Ayrıca, <strong>Pro Araçları</strong> (/kod, /yazi, /ceviri) ile daha hızlı sonuç alabilirsin.
+        <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+                <strong>AI Kod Üretir</strong>
+                <span>VİZYON AI, 28 modeli (13 Ollama + 7 Nvidia NIM + 8 bulut API) sırayla dener, ilk başarılı çalışan kodu getirir. Ortalama 2-5 saniye sürer.</span>
+            </div>
         </div>
 
-        <div class="important-box">
-            <strong>⚠️ Uyarı:</strong> AI tarafından üretilen kodlar bilgilendirme amaçlıdır. Her zaman test edin ve güvenlik açıklarını kontrol edin. Vizyon2027, üretilen kodların doğruluğundan sorumlu değildir.
+        <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+                <strong>Kopyala & Yapıştır</strong>
+                <span>Üretilen kodu tek tıkla kopyala veya <code>.txt</code> olarak indir. Kendi projene anında entegre et.</span>
+            </div>
         </div>
 
-        <hr>
-
-        <div class="legal-footer">
-            <p>
-                <strong>© 2026 Vizyon2027</strong> – Tüm Hakları Saklıdır.<br>
-                Bu platform ve içeriği, uluslararası telif hakkı, marka ve fikri mülkiyet yasaları tarafından korunmaktadır.<br>
-                İzinsiz kullanım, kopyalama, dağıtım veya türev çalışma oluşturma <strong>kesinlikle yasaktır</strong>.<br>
-                <span style="color:#ff6b6b;">⚠️ YASAL UYARI:</span> AI çıktıları bilgilendirme amaçlıdır. Vizyon2027 olası zararlardan sorumlu değildir.
-            </p>
-            <p style="margin-top:8px;">
-                <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a> &nbsp;|&nbsp;
-                <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">Kullanıcı Sözleşmesi</a> &nbsp;|&nbsp;
-                <a href="https://vizyon2026.vercel.app/bana-ogret.html" target="_blank">Bana Öğret</a> &nbsp;|&nbsp;
-                <a href="https://vizyon2026.vercel.app/dokumantasyon.html" target="_blank">Dokümantasyon</a> &nbsp;|&nbsp;
-                <a href="https://vizyon2026.vercel.app/api.html" target="_blank">API</a> &nbsp;|&nbsp;
-                <a href="https://vizyon2026.vercel.app/blog.html" target="_blank">Blog</a> &nbsp;|&nbsp;
-                <a href="https://vizyon2026.vercel.app/hakkimizda.html" target="_blank">Hakkımızda</a> &nbsp;|&nbsp;
-                <a href="https://vizyon2026.vercel.app/iletisim.html" target="_blank">İletişim</a> &nbsp;|&nbsp;
-                <a href="https://vizyon2026.vercel.app/kariyer.html" target="_blank">Kariyer</a>
-            </p>
-            <p style="font-size:12px; color:#555;">
-                Bu sayfa, 6698 sayılı KVKK ve GDPR'ye uygun olarak hazırlanmıştır.
-            </p>
+        <div class="step-item">
+            <div class="step-num">4</div>
+            <div class="step-content">
+                <strong>Hata Düzeltme Modu</strong>
+                <span>Çalışmayan kodu editöre yapıştır, AI hatayı bulup düzeltilmiş halini verir. "Bu kod neden çalışmıyor?" diye sor, sebebini açıklar.</span>
+            </div>
         </div>
 
-        <hr>
-        <a href="index.html" class="back-link">⬅️ Ana Sayfaya Dön</a>
+        <!-- ÖRNEK -->
+        <h2 class="section-title">
+            <span class="icon">💻</span>
+            Örnek Kod Üretimi
+        </h2>
+
+        <p><strong>Komut:</strong> <code style="background:rgba(0,229,255,0.1);padding:3px 8px;border-radius:6px;color:var(--accent2);font-family:var(--font-code);font-size:12.5px;">Python'da bir dosya okuma ve yazma fonksiyonu yaz</code></p>
+
+        <div class="sample-code">
+<span class="kw">def</span> <span class="fn">read_file</span>(filename):<br>
+    <span class="kw">try</span>:<br>
+        <span class="kw">with</span> <span class="fn">open</span>(filename, <span class="str">'r'</span>, encoding=<span class="str">'utf-8'</span>) <span class="kw">as</span> f:<br>
+            <span class="kw">return</span> f.<span class="fn">read</span>()<br>
+    <span class="kw">except</span> <span class="cls">FileNotFoundError</span>:<br>
+        <span class="kw">return</span> <span class="str">"Dosya bulunamadı!"</span><br>
+<br>
+<span class="kw">def</span> <span class="fn">write_file</span>(filename, content):<br>
+    <span class="kw">try</span>:<br>
+        <span class="kw">with</span> <span class="fn">open</span>(filename, <span class="str">'w'</span>, encoding=<span class="str">'utf-8'</span>) <span class="kw">as</span> f:<br>
+            f.<span class="fn">write</span>(content)<br>
+        <span class="kw">return</span> <span class="str">"Dosya yazıldı!"</span><br>
+    <span class="kw">except</span> <span class="cls">Exception</span> <span class="kw">as</span> e:<br>
+        <span class="kw">return</span> <span class="str">f"Hata: {e}"</span><br>
+<br>
+<span class="cm"># Kullanım</span><br>
+veri = <span class="fn">read_file</span>(<span class="str">"ornek.txt"</span>)<br>
+<span class="fn">print</span>(veri)<br>
+<span class="fn">write_file</span>(<span class="str">"yeni.txt"</span>, <span class="str">"Merhaba VİZYON AI!"</span>)
+        </div>
+
+        <!-- VİZYON AL YAZILIMCI MODU -->
+        <h2 class="section-title">
+            <span class="icon">✨</span>
+            Vizyon Al — Yazılımcı Modu
+        </h2>
+
+        <p>Bu editörün arkasındaki güç, <strong>Vizyon Al Paneli'nin 💻 Yazılımcı Modu</strong> ile aynı motoru kullanıyor. Ekstra özellikler için panel üzerinden de kullanabilirsin:</p>
+
+        <div class="feature-grid">
+            <div class="feature-item"><span class="icon">💻</span><div class="label">Yazılımcı Modu</div><div class="desc">En iyi kod üretimi + hata ayıklama</div></div>
+            <div class="feature-item"><span class="icon">📎</span><div class="label">Dosya Analizi</div><div class="desc">Kod dosyası yükle, AI okusun</div></div>
+            <div class="feature-item"><span class="icon">🧠</span><div class="label">Derin Düşünme</div><div class="desc">Karmaşık projeler için</div></div>
+            <div class="feature-item"><span class="icon">🕵️</span><div class="label">Ajan Modu</div><div class="desc">Dökümantasyon gez, kod uyarla</div></div>
+        </div>
+
+        <div class="info-box premium">
+            <span class="info-box-title">✨ Vizyon Al Nasıl Açılır?</span>
+            Sağ üstteki <strong>3 çizgi menüye</strong> tıkla (inline panel) veya <a href="/vizyon-al.html" style="color:var(--accent);text-decoration:underline;">/vizyon-al.html</a> sayfasına git (tam sayfa). İlk açılışta <strong>sorumluluk onay kutusu</strong> karşına çıkar.
+        </div>
+
+        <!-- V27 API -->
+        <h2 class="section-title">
+            <span class="icon">🔑</span>
+            V27 API ile Kendi Kod Asistanını Yap
+        </h2>
+
+        <p>V27 API anahtarı ile bu kod üretme motorunu <strong>kendi uygulamanda</strong> kullanabilirsin. Web sitesi, mobil uygulama, bot veya IDE eklentisi — hepsinde çalışır.</p>
+
+        <div class="sample-code">
+<span class="cm">// JavaScript ile V27 API kullanımı</span><br>
+<span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://vizyon2026.vercel.app/api/v27ApiRest'</span>, {<br>
+&nbsp;&nbsp;method: <span class="str">'POST'</span>,<br>
+&nbsp;&nbsp;headers: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">'X-V27-Api-Key'</span>: <span class="str">'V27-XXXX-XXXX-XXXX-XXXX'</span><br>
+&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;body: <span class="fn">JSON.stringify</span>({ prompt: <span class="str">'Python REST API kodu'</span> })<br>
+});<br>
+<span class="kw">const</span> data = <span class="kw">await</span> res.<span class="fn">json</span>();<br>
+<span class="fn">console.log</span>(data.reply);
+        </div>
+
+        <div class="info-box success">
+            <span class="info-box-title">🔑 V27 API Anahtarı Limitleri</span>
+            <strong>Kurucu/Admin/Beta/Moderatör:</strong> ♾️ Sınırsız · <strong>Takım:</strong> 100 · <strong>Pro:</strong> 20 · <strong>Ücretsiz:</strong> 2 anahtar<br>
+            Detaylar için <a href="/api.html" style="color:var(--accent);text-decoration:underline;">/api.html</a> sayfasına bak.
+        </div>
+
+        <!-- KİMLER İÇİN -->
+        <h2 class="section-title">
+            <span class="icon">🎯</span>
+            Kimler İçin?
+        </h2>
+
+        <div class="feature-grid">
+            <div class="feature-item"><span class="icon">💼</span><div class="label">Yazılımcılar</div><div class="desc">Hızlı prototipleme ve kod asistanı</div></div>
+            <div class="feature-item"><span class="icon">🎓</span><div class="label">Öğrenciler</div><div class="desc">Algoritma öğrenme, ödev çözümleri</div></div>
+            <div class="feature-item"><span class="icon">🚀</span><div class="label">Startup'lar</div><div class="desc">MVP geliştirme ve hızlı iterasyon</div></div>
+            <div class="feature-item"><span class="icon">💻</span><div class="label">Freelancer'lar</div><div class="desc">Müşteriler için hızlı teslimat</div></div>
+            <div class="feature-item"><span class="icon">🔍</span><div class="label">Meraklılar</div><div class="desc">Yeni teknolojileri keşfetme</div></div>
+            <div class="feature-item"><span class="icon">👨‍🏫</span><div class="label">Eğitimciler</div><div class="desc">Ders materyali ve örnek kod</div></div>
+        </div>
+
+        <!-- İPUCU -->
+        <div class="info-box premium">
+            <span class="info-box-title">💡 İpuçları</span>
+            <strong>@vizyonal</strong> komutunu takım sohbetinde de kullanabilirsin. <strong>Pro Araçları</strong> (<code>/kod</code>, <code>/yazi</code>, <code>/ceviri</code>) ile daha hızlı sonuç al. Karmaşık projeler için <strong>Vizyon Al → Yazılımcı Modu</strong>'nu dene.
+        </div>
+
+        <div class="info-box warning">
+            <span class="info-box-title">⚠️ Önemli Uyarı</span>
+            AI tarafından üretilen kodlar <strong>bilgilendirme amaçlıdır</strong>. Her zaman test edin, güvenlik açıklarını kontrol edin ve üretim ortamına almadan önce gözden geçirin. VİZYON 2027, üretilen kodların doğruluğundan veya kullanımından doğacak zararlardan sorumlu değildir.
+        </div>
+
     </div>
 
-    <!-- ===== ENGLISH (KISA) ===== -->
-    <div id="lang-en" class="lang-content">
-        <h1>⌨️ VİZYON AI Code Editor</h1>
-        <p><span class="badge">🤖 AI-Powered Code Generation</span> <span class="badge" style="margin-left:10px;">🌍 20+ Languages</span></p>
-        <p><strong>VİZYON AI Code Editor</strong> is the fastest way to write code with AI. Just tell what you need, and AI generates working code instantly.</p>
+    <!-- ENGLISH -->
+    <div id="lang-en" class="editor-content" dir="ltr">
+
+        <div class="info-highlight">
+            <strong>🚀 Quick Start:</strong> Type what you need into the editor below and click <strong>⚡ Generate Code</strong>. AI returns working code within seconds.
+        </div>
 
         <div class="editor-wrapper">
             <div class="editor-header">
-                <div class="editor-dots"><span class="editor-dot red"></span><span class="editor-dot yellow"></span><span class="editor-dot green"></span></div>
-                <span class="editor-filename">📄 command.txt</span>
+                <div class="editor-dots">
+                    <span class="editor-dot red"></span>
+                    <span class="editor-dot yellow"></span>
+                    <span class="editor-dot green"></span>
+                </div>
+                <span class="editor-filename">📄 command.txt — VISION AI (28 Models)</span>
             </div>
             <div class="editor-body">
-                <textarea id="codeInputEn" placeholder="E.g.: Write a REST API in Python">Write a function to read and write files in Python</textarea>
+                <textarea id="codeInputEn" placeholder="E.g.: Write a REST API in Python / React form validation / SQL JOIN query...">Write a function to read and write files in Python</textarea>
+
+                <div class="quick-prompts">
+                    <button class="quick-prompt" onclick="setPromptEn('Write a REST API in Python (FastAPI)')">🐍 Python REST API</button>
+                    <button class="quick-prompt" onclick="setPromptEn('Build a todo app in React')">⚛️ React Todo</button>
+                    <button class="quick-prompt" onclick="setPromptEn('Write a debounce function in JavaScript')">🌐 JS Debounce</button>
+                    <button class="quick-prompt" onclick="setPromptEn('JOIN two SQL tables')">🗄️ SQL JOIN</button>
+                    <button class="quick-prompt" onclick="setPromptEn('Containerize a Python app with Docker')">🐳 Docker</button>
+                    <button class="quick-prompt" onclick="setPromptEn('Design a login screen in Flutter')">📱 Flutter</button>
+                </div>
+
                 <div class="editor-actions">
-                    <button class="btn btn-primary" onclick="generateCodeEn()">⚡ Generate Code</button>
+                    <button class="btn btn-primary" id="generateBtnEn" onclick="generateCodeEn()">⚡ Generate Code</button>
                     <button class="btn btn-secondary" onclick="clearEditorEn()">🗑️ Clear</button>
                     <button class="btn btn-success" onclick="copyCodeEn()">📋 Copy</button>
                 </div>
-                <div id="outputBoxEn" class="output-box"><span style="color: #888;">💡 Your code will appear here. Click "Generate Code".</span></div>
+
+                <div id="outputBoxEn" class="output-box">
+                    <span style="color:var(--text3);">💡 Your code will appear here. Click <strong style="color:var(--accent);">⚡ Generate Code</strong>.</span>
+                </div>
+
+                <div id="outputActionsEn" class="output-actions" style="display:none;">
+                    <button class="btn btn-success btn-sm" onclick="copyCodeEn()">📋 Copy Code</button>
+                    <button class="btn btn-secondary btn-sm" onclick="downloadCodeEn()">⬇️ Download</button>
+                    <button class="btn btn-secondary btn-sm" onclick="clearOutputEn()">🧹 Clear Output</button>
+                </div>
             </div>
         </div>
 
+        <h2 class="section-title">
+            <span class="icon">🛠️</span>
+            Supported Languages & Technologies
+        </h2>
+
         <div class="feature-grid">
-            <div class="feature-item"><span class="icon">🐍</span><div class="label">Python</div></div>
-            <div class="feature-item"><span class="icon">⚛️</span><div class="label">React</div></div>
-            <div class="feature-item"><span class="icon">🌐</span><div class="label">HTML/CSS/JS</div></div>
-            <div class="feature-item"><span class="icon">🗄️</span><div class="label">SQL</div></div>
+            <div class="feature-item"><span class="icon">🐍</span><div class="label">Python</div><div class="desc">FastAPI, Flask, Django, pandas</div></div>
+            <div class="feature-item"><span class="icon">⚛️</span><div class="label">React / Next.js</div><div class="desc">Hooks, Context, SSR</div></div>
+            <div class="feature-item"><span class="icon">🌐</span><div class="label">HTML / CSS / JS</div><div class="desc">Tailwind, animations, responsive</div></div>
+            <div class="feature-item"><span class="icon">🗄️</span><div class="label">SQL</div><div class="desc">PostgreSQL, MySQL, JOIN</div></div>
+            <div class="feature-item"><span class="icon">🐳</span><div class="label">Docker / K8s</div><div class="desc">Dockerfile, compose, deployment</div></div>
+            <div class="feature-item"><span class="icon">☕</span><div class="label">Java / C# / C++</div><div class="desc">Spring, .NET, systems</div></div>
+            <div class="feature-item"><span class="icon">📱</span><div class="label">Flutter / RN</div><div class="desc">Cross-platform mobile</div></div>
+            <div class="feature-item"><span class="icon">🤖</span><div class="label">AI / ML</div><div class="desc">TensorFlow, PyTorch</div></div>
         </div>
 
-        <div class="important-box">
-            <strong>⚠️ Disclaimer:</strong> AI-generated code is for informational purposes. Always test and verify. Vizyon2027 is not responsible for any damages.
+        <h2 class="section-title">
+            <span class="icon">⚡</span>
+            How It Works
+        </h2>
+
+        <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+                <strong>Describe What You Want</strong>
+                <span>Write in natural language: "Write a REST API in Python" or "React form validation". More details = better code.</span>
+            </div>
         </div>
 
-        <hr>
-        <div class="legal-footer">
-            <p><strong>© 2026 Vizyon2027</strong> – All Rights Reserved.</p>
-            <p><a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Privacy Policy</a> | <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">Terms</a></p>
+        <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+                <strong>AI Generates Code</strong>
+                <span>VISION AI tries 28 models (13 Ollama + 7 Nvidia NIM + 8 cloud APIs) sequentially and returns the first working result. Average: 2-5 seconds.</span>
+            </div>
         </div>
-        <hr>
-        <a href="index.html" class="back-link">⬅️ Back to Home</a>
+
+        <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+                <strong>Copy & Paste</strong>
+                <span>Copy with one click or download as <code>.txt</code>. Integrate into your project instantly.</span>
+            </div>
+        </div>
+
+        <div class="step-item">
+            <div class="step-num">4</div>
+            <div class="step-content">
+                <strong>Debug Mode</strong>
+                <span>Paste broken code, AI finds and fixes the error. Ask "Why doesn't this work?" and get an explanation.</span>
+            </div>
+        </div>
+
+        <div class="info-box premium">
+            <span class="info-box-title">💡 Tips</span>
+            Use <strong>@vizyonal</strong> in team chat. Try <strong>Pro Tools</strong> (<code>/kod</code>, <code>/yazi</code>, <code>/ceviri</code>). For complex projects, use <strong>Vizyon Al → Developer Mode</strong>.
+        </div>
+
+        <div class="info-box warning">
+            <span class="info-box-title">⚠️ Important</span>
+            AI-generated code is for informational purposes only. Always test, check for security vulnerabilities, and review before production. VISION 2027 is not responsible for any damages.
+        </div>
     </div>
 
-    <!-- ===== ARAPÇA (KISA) ===== -->
-    <div id="lang-ar" class="lang-content" dir="rtl">
-        <h1>⌨️ محرر أكواد VİZYON AI</h1>
-        <p><span class="badge">🤖 إنشاء أكواد مدعوم بالذكاء الاصطناعي</span></p>
-        <p><strong>محرر أكواد VİZYON AI</strong> هو أسرع طريقة لكتابة الأكواد باستخدام الذكاء الاصطناعي. فقط أخبرنا بما تحتاجه، وسيقوم الذكاء الاصطناعي بإنشاء الكود فورًا.</p>
+    <!-- ARAPÇA -->
+    <div id="lang-ar" class="editor-content" dir="rtl">
+
+        <div class="info-highlight">
+            <strong>🚀 بداية سريعة:</strong> اكتب ما تحتاجه في المحرر أدناه وانقر على <strong>⚡ إنشاء الكود</strong>. سيُرجع الذكاء الاصطناعي كودًا جاهزًا خلال ثوانٍ.
+        </div>
 
         <div class="editor-wrapper">
             <div class="editor-header">
-                <div class="editor-dots"><span class="editor-dot red"></span><span class="editor-dot yellow"></span><span class="editor-dot green"></span></div>
-                <span class="editor-filename">📄 أمر.txt</span>
+                <div class="editor-dots">
+                    <span class="editor-dot red"></span>
+                    <span class="editor-dot yellow"></span>
+                    <span class="editor-dot green"></span>
+                </div>
+                <span class="editor-filename">📄 أمر.txt — VISION AI (28 نموذج)</span>
             </div>
             <div class="editor-body">
-                <textarea id="codeInputAr" placeholder="مثال: اكتب دالة لقراءة وكتابة الملفات في بايثون">اكتب دالة لقراءة وكتابة الملفات في بايثون</textarea>
+                <textarea id="codeInputAr" placeholder="مثال: اكتب REST API في Python / التحقق من نموذج React / استعلام SQL JOIN...">اكتب دالة لقراءة وكتابة الملفات في بايثون</textarea>
+
+                <div class="quick-prompts">
+                    <button class="quick-prompt" onclick="setPromptAr('اكتب REST API في Python (FastAPI)')">🐍 Python REST API</button>
+                    <button class="quick-prompt" onclick="setPromptAr('ابنِ تطبيق todo في React')">⚛️ React Todo</button>
+                    <button class="quick-prompt" onclick="setPromptAr('اكتب دالة debounce في JavaScript')">🌐 JS Debounce</button>
+                    <button class="quick-prompt" onclick="setPromptAr('JOIN بين جدولين في SQL')">🗄️ SQL JOIN</button>
+                    <button class="quick-prompt" onclick="setPromptAr('ضع تطبيق Python في Docker')">🐳 Docker</button>
+                    <button class="quick-prompt" onclick="setPromptAr('صمم شاشة تسجيل دخول في Flutter')">📱 Flutter</button>
+                </div>
+
                 <div class="editor-actions">
-                    <button class="btn btn-primary" onclick="generateCodeAr()">⚡ إنشاء الكود</button>
+                    <button class="btn btn-primary" id="generateBtnAr" onclick="generateCodeAr()">⚡ إنشاء الكود</button>
                     <button class="btn btn-secondary" onclick="clearEditorAr()">🗑️ مسح</button>
                     <button class="btn btn-success" onclick="copyCodeAr()">📋 نسخ</button>
                 </div>
-                <div id="outputBoxAr" class="output-box"><span style="color: #888;">💡 سيظهر الكود هنا. انقر على "إنشاء الكود".</span></div>
+
+                <div id="outputBoxAr" class="output-box">
+                    <span style="color:var(--text3);">💡 سيظهر الكود هنا. انقر على <strong style="color:var(--accent);">⚡ إنشاء الكود</strong>.</span>
+                </div>
+
+                <div id="outputActionsAr" class="output-actions" style="display:none;">
+                    <button class="btn btn-success btn-sm" onclick="copyCodeAr()">📋 نسخ الكود</button>
+                    <button class="btn btn-secondary btn-sm" onclick="downloadCodeAr()">⬇️ تحميل</button>
+                    <button class="btn btn-secondary btn-sm" onclick="clearOutputAr()">🧹 مسح</button>
+                </div>
             </div>
         </div>
 
-        <div class="important-box">
-            <strong>⚠️ إخلاء المسؤولية:</strong> الأكواد المولدة بواسطة الذكاء الاصطناعي لأغراض إعلامية. اختبرها دائمًا وتحقق منها. فيجن 2027 ليست مسؤولة عن أي أضرار.
+        <h2 class="section-title">
+            <span class="icon">🛠️</span>
+            اللغات والتقنيات المدعومة
+        </h2>
+
+        <div class="feature-grid">
+            <div class="feature-item"><span class="icon">🐍</span><div class="label">Python</div><div class="desc">FastAPI، Flask، Django</div></div>
+            <div class="feature-item"><span class="icon">⚛️</span><div class="label">React / Next.js</div><div class="desc">Hooks، Context، SSR</div></div>
+            <div class="feature-item"><span class="icon">🌐</span><div class="label">HTML / CSS / JS</div><div class="desc">Tailwind، animations</div></div>
+            <div class="feature-item"><span class="icon">🗄️</span><div class="label">SQL</div><div class="desc">PostgreSQL، MySQL، JOIN</div></div>
+            <div class="feature-item"><span class="icon">🐳</span><div class="label">Docker / K8s</div><div class="desc">Dockerfile، compose</div></div>
+            <div class="feature-item"><span class="icon">☕</span><div class="label">Java / C# / C++</div><div class="desc">Spring، .NET</div></div>
+            <div class="feature-item"><span class="icon">📱</span><div class="label">Flutter / RN</div><div class="desc">جوال متعدد المنصات</div></div>
+            <div class="feature-item"><span class="icon">🤖</span><div class="label">AI / ML</div><div class="desc">TensorFlow، PyTorch</div></div>
         </div>
 
-        <hr>
-        <div class="legal-footer">
-            <p><strong>© 2026 فيجن 2027</strong> – جميع الحقوق محفوظة.</p>
+        <h2 class="section-title">
+            <span class="icon">⚡</span>
+            كيف يعمل؟
+        </h2>
+
+        <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+                <strong>اكتب ما تريد</strong>
+                <span>اكتب بلغة طبيعية: "اكتب REST API في Python" أو "التحقق من نموذج React".</span>
+            </div>
         </div>
-        <hr>
-        <a href="index.html" class="back-link">⬅️ العودة إلى الصفحة الرئيسية</a>
+
+        <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+                <strong>الذكاء الاصطناعي يُنشئ الكود</strong>
+                <span>يجرب VISION AI 28 نموذجًا (13 Ollama + 7 Nvidia NIM + 8 Cloud API) ويعيد أول كود يعمل. المدة: 2-5 ثوانٍ.</span>
+            </div>
+        </div>
+
+        <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+                <strong>انسخ والصق</strong>
+                <span>انسخ بنقرة واحدة أو حمّل كملف <code>.txt</code>.</span>
+            </div>
+        </div>
+
+        <div class="step-item">
+            <div class="step-num">4</div>
+            <div class="step-content">
+                <strong>وضع تصحيح الأخطاء</strong>
+                <span>الصق الكود المعطوب، سيصلحه الذكاء الاصطناعي ويشرح السبب.</span>
+            </div>
+        </div>
+
+        <div class="info-box warning">
+            <span class="info-box-title">⚠️ تنبيه مهم</span>
+            الأكواد المُنشأة بواسطة الذكاء الاصطناعي لأغراض إعلامية فقط. اختبرها دائمًا وتحقق من الثغرات الأمنية قبل الإنتاج. VISION 2027 ليست مسؤولة عن أي أضرار.
+        </div>
     </div>
 
-</div>
+</main>
 
-<!-- ===== Parse SDK ===== -->
+<footer>
+    <div class="footer-inner">
+        <div class="footer-copy">
+            © 2027 Vizyon2027 · <span>Vizyon Ekibi</span> güvencesiyle.
+        </div>
+        <div class="footer-links">
+            <a href="/gizlilik.html">Gizlilik Politikası</a>
+            <a href="/kullanici-sozlesmesi.html">Kullanıcı Sözleşmesi</a>
+            <a href="/hakkimizda.html">Hakkımızda</a>
+            <a href="/bana-ogret.html">Bana Öğret</a>
+            <a href="/dokumantasyon.html">Dokümantasyon</a>
+            <a href="/api.html">API</a>
+            <a href="/blog.html">Blog</a>
+            <a href="/iletisim.html">İletişim</a>
+            <a href="/kariyer.html">Kariyer</a>
+        </div>
+    </div>
+</footer>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- ============ PARSE SDK (Back4App) ============ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/parse/5.0.0/parse.min.js"></script>
-
 <script>
-    // ===== PARSE BAŞLAT =====
-    Parse.initialize(
-        "ThIYRKlEASe177ioNjJX37easF7lVvlzWiZrGuK8",
-        "mur4DtLsGOsQhykTnFVNGxYOeNbvjPbAkl6xPQGp"
-    );
-    Parse.serverURL = "https://parseapi.back4app.com";
+/* ============================================================ */
+/* BACK4APP BAŞLAT (DOĞRU App ID + JS Key)                       */
+/* ============================================================ */
+try {
+    if (typeof Parse !== 'undefined') {
+        Parse.initialize(
+            "Dr9SODgMburZ54QvC8RnIHc9dbjreozBbKLOpMjX",
+            "dCXRvnEcCcOFvpzVDAV9AAJnYvdrqaP1JFRkJzvv"
+        );
+        Parse.serverURL = "https://parseapi.back4app.com/";
+        console.log('✅ Back4App bağlantısı kuruldu (kod-editoru.html)');
+    }
+} catch (e) {
+    console.warn('Parse başlatma hatası:', e.message);
+}
 
-    // ===== DİL DEĞİŞTİRME =====
-    function switchLanguage(lang) {
-        document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active'));
-        const target = document.getElementById('lang-' + lang);
-        if (target) target.classList.add('active');
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.lang === lang) btn.classList.add('active');
+/* ============================================================ */
+/* TEMA                                                          */
+/* ============================================================ */
+function toggleTheme(){
+    var body=document.body;
+    var btn=document.querySelector('.nav-theme-btn');
+    if(body.getAttribute('data-theme')==='light'){
+        body.removeAttribute('data-theme');
+        if(btn) btn.innerHTML='🌙';
+        try{localStorage.setItem('vizyon_theme','dark');}catch(e){}
+    }else{
+        body.setAttribute('data-theme','light');
+        if(btn) btn.innerHTML='☀️';
+        try{localStorage.setItem('vizyon_theme','light');}catch(e){}
+    }
+}
+(function applyTheme(){
+    try{
+        var saved=localStorage.getItem('vizyon_theme');
+        var btn=document.querySelector('.nav-theme-btn');
+        if(saved==='light'){
+            document.body.setAttribute('data-theme','light');
+            if(btn) btn.innerHTML='☀️';
+        }
+    }catch(e){}
+})();
+
+/* ============================================================ */
+/* DİL DEĞİŞTİRME                                                */
+/* ============================================================ */
+function switchLanguage(lang){
+    document.querySelectorAll('.editor-content').forEach(function(el){
+        el.classList.remove('active');
+    });
+    var target = document.getElementById('lang-' + lang);
+    if(target) target.classList.add('active');
+
+    document.querySelectorAll('.lang-btn').forEach(function(btn){
+        btn.classList.remove('active');
+        if(btn.dataset.lang === lang) btn.classList.add('active');
+    });
+
+    var heroTitle = document.getElementById('heroTitle');
+    var heroSub = document.getElementById('heroSub');
+    if(lang === 'tr'){
+        if(heroTitle) heroTitle.textContent = 'VİZYON AI Kod Editörü';
+        if(heroSub) heroSub.innerHTML = '<strong>28 yapay zeka modeli</strong> ile her dilde çalışan kod üret. Python, React, JavaScript, SQL, Docker, Java, C#, C++, Flutter ve daha fazlası. Ne istediğini yaz, AI saniyeler içinde çalışan kodu versin.';
+    } else if(lang === 'en'){
+        if(heroTitle) heroTitle.textContent = 'VISION AI Code Editor';
+        if(heroSub) heroSub.innerHTML = 'Generate working code in any language with <strong>28 AI models</strong>. Python, React, JavaScript, SQL, Docker, Java, C#, C++, Flutter and more.';
+    } else if(lang === 'ar'){
+        if(heroTitle) heroTitle.textContent = 'محرر أكواد VISION AI';
+        if(heroSub) heroSub.innerHTML = 'أنشئ كودًا يعمل بأي لغة مع <strong>28 نموذج ذكاء اصطناعي</strong>. Python، React، JavaScript، SQL والمزيد.';
+    }
+
+    if(lang === 'ar'){
+        document.documentElement.setAttribute('dir', 'rtl');
+    } else {
+        document.documentElement.setAttribute('dir', 'ltr');
+    }
+    document.documentElement.lang = lang;
+
+    try{ localStorage.setItem('preferred_lang', lang); }catch(e){}
+}
+
+(function initLang(){
+    var saved = null;
+    try{ saved = localStorage.getItem('preferred_lang'); }catch(e){}
+    try{
+        var urlParams = new URLSearchParams(window.location.search);
+        var urlLang = urlParams.get('lang');
+        if(urlLang && ['tr','en','ar'].indexOf(urlLang) !== -1){
+            saved = urlLang;
+        }
+    }catch(e){}
+    if(saved && ['tr','en','ar'].indexOf(saved) !== -1){
+        switchLanguage(saved);
+    } else {
+        switchLanguage('tr');
+    }
+})();
+
+/* ============================================================ */
+/* KOD ÜRETME FONKSİYONLARI                                      */
+/* ============================================================ */
+async function callSuperAI(prompt, outputEl, generateBtn){
+    if(!prompt){
+        outputEl.innerHTML = '<span class="error">⚠️ Lütfen bir komut yazın!</span>';
+        return;
+    }
+
+    // Butonu devre dışı bırak
+    if(generateBtn){ generateBtn.disabled = true; }
+    outputEl.innerHTML = '<span class="loading">⏳ AI düşünüyor, kod üretiliyor... (28 model sırayla deneniyor)</span>';
+
+    try {
+        if (typeof Parse === 'undefined') {
+            throw new Error('Parse SDK yüklenmedi. Sayfayı yenileyin.');
+        }
+
+        var result = await Parse.Cloud.run('superAI', {
+            prompt: 'Sadece kod ver, hiçbir açıklama yapma. Doğrudan kod bloğu ver: ' + prompt
         });
-        const container = document.getElementById('mainContainer');
-        container.style.direction = (lang === 'ar') ? 'rtl' : 'ltr';
-        localStorage.setItem('preferred_lang', lang);
-    }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const savedLang = localStorage.getItem('preferred_lang');
-        if (savedLang && (savedLang === 'tr' || savedLang === 'en' || savedLang === 'ar')) {
-            switchLanguage(savedLang);
-        } else {
-            switchLanguage('tr');
-        }
-    });
-
-    // ===== KOD ÜRETME (TÜRKÇE) =====
-    async function generateCode() {
-        const input = document.getElementById('codeInput');
-        const output = document.getElementById('outputBox');
-        const prompt = input.value.trim();
-        if (!prompt) {
-            output.innerHTML = '<span class="error">⚠️ Lütfen bir komut yazın!</span>';
+        if(!result || result.length < 3){
+            outputEl.innerHTML = '<span class="error">❌ AI boş yanıt döndü. Farklı bir komutla tekrar dene.</span>';
             return;
         }
-        output.innerHTML = '<span style="color: #888;">⏳ Kod üretiliyor...</span>';
-        try {
-            const result = await Parse.Cloud.run('superAI', { prompt: 'Sadece kod ver, açıklama yapma: ' + prompt });
-            const clean = result.replace(/```(\w+)?\n?/g, '').replace(/```/g, '').trim();
-            output.innerHTML = '<span class="ai-response">' + clean.replace(/\n/g, '<br>') + '</span>';
-        } catch (e) {
-            output.innerHTML = '<span class="error">❌ Hata: ' + e.message + '</span>';
+
+        // Kod bloklarını temizle
+        var clean = result.replace(/```(\w+)?\n?/g, '').replace(/```/g, '').trim();
+        // HTML escape (XSS koruması)
+        var escaped = clean.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        outputEl.innerHTML = '<span class="ai-response">' + escaped + '</span>';
+
+        // Output actions göster
+        var currentLang = document.documentElement.lang;
+        var actionsEl = document.getElementById('outputActions');
+        if(currentLang === 'en') actionsEl = document.getElementById('outputActionsEn');
+        if(currentLang === 'ar') actionsEl = document.getElementById('outputActionsAr');
+        if(actionsEl) actionsEl.style.display = 'flex';
+
+    } catch (e) {
+        console.error('Kod üretme hatası:', e);
+        var errMsg = e && e.message ? e.message : 'Bilinmeyen hata';
+        outputEl.innerHTML = '<span class="error">❌ Hata: ' + errMsg.replace(/</g,'&lt;') + '</span>';
+    } finally {
+        if(generateBtn){ generateBtn.disabled = false; }
+    }
+}
+
+/* TR */
+async function generateCode(){
+    var input = document.getElementById('codeInput');
+    var output = document.getElementById('outputBox');
+    var btn = document.getElementById('generateBtn');
+    await callSuperAI(input.value.trim(), output, btn);
+}
+function setPrompt(text){
+    document.getElementById('codeInput').value = text;
+    document.getElementById('codeInput').focus();
+}
+function clearEditor(){
+    document.getElementById('codeInput').value = '';
+    document.getElementById('outputBox').innerHTML = '<span style="color:var(--text3);">💡 Kodun burada görünecek. <strong style="color:var(--accent);">⚡ Kod Üret</strong> butonuna bas.</span>';
+    document.getElementById('outputActions').style.display = 'none';
+}
+function clearOutput(){
+    document.getElementById('outputBox').innerHTML = '<span style="color:var(--text3);">💡 Kodun burada görünecek. <strong style="color:var(--accent);">⚡ Kod Üret</strong> butonuna bas.</span>';
+    document.getElementById('outputActions').style.display = 'none';
+}
+function copyCode(){
+    var text = document.getElementById('outputBox').textContent;
+    if(!text || text.includes('💡') || text.includes('⏳')){
+        if(typeof showToast === 'function') showToast('Kopyalanacak kod yok!', 'warning');
+        else alert('Kopyalanacak kod yok!');
+        return;
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){
+            if(typeof showToast === 'function') showToast('📋 Kod kopyalandı!', 'success');
+            else alert('✅ Kod kopyalandı!');
+        }).catch(function(){ fallbackCopy(text); });
+    } else {
+        fallbackCopy(text);
+    }
+}
+function fallbackCopy(text){
+    var area = document.createElement('textarea');
+    area.value = text;
+    area.style.position = 'fixed';
+    area.style.opacity = '0';
+    document.body.appendChild(area);
+    area.select();
+    try {
+        document.execCommand('copy');
+        if(typeof showToast === 'function') showToast('📋 Kod kopyalandı!', 'success');
+        else alert('✅ Kod kopyalandı!');
+    } catch(e){ alert('Kopyalanamadı'); }
+    document.body.removeChild(area);
+}
+function downloadCode(){
+    var text = document.getElementById('outputBox').textContent;
+    if(!text || text.includes('💡')) return;
+    var blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'vizyon-ai-kod-' + Date.now() + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+/* EN */
+async function generateCodeEn(){
+    var input = document.getElementById('codeInputEn');
+    var output = document.getElementById('outputBoxEn');
+    var btn = document.getElementById('generateBtnEn');
+    await callSuperAI(input.value.trim(), output, btn);
+}
+function setPromptEn(text){ document.getElementById('codeInputEn').value = text; document.getElementById('codeInputEn').focus(); }
+function clearEditorEn(){
+    document.getElementById('codeInputEn').value = '';
+    document.getElementById('outputBoxEn').innerHTML = '<span style="color:var(--text3);">💡 Your code will appear here. Click <strong style="color:var(--accent);">⚡ Generate Code</strong>.</span>';
+    document.getElementById('outputActionsEn').style.display = 'none';
+}
+function clearOutputEn(){
+    document.getElementById('outputBoxEn').innerHTML = '<span style="color:var(--text3);">💡 Your code will appear here. Click <strong style="color:var(--accent);">⚡ Generate Code</strong>.</span>';
+    document.getElementById('outputActionsEn').style.display = 'none';
+}
+function copyCodeEn(){
+    var text = document.getElementById('outputBoxEn').textContent;
+    if(!text || text.includes('💡')){ alert('No code to copy!'); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){ alert('✅ Copied!'); }).catch(function(){ fallbackCopy(text); });
+    } else fallbackCopy(text);
+}
+function downloadCodeEn(){
+    var text = document.getElementById('outputBoxEn').textContent;
+    if(!text || text.includes('💡')) return;
+    var blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'vision-ai-code-' + Date.now() + '.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+/* AR */
+async function generateCodeAr(){
+    var input = document.getElementById('codeInputAr');
+    var output = document.getElementById('outputBoxAr');
+    var btn = document.getElementById('generateBtnAr');
+    await callSuperAI(input.value.trim(), output, btn);
+}
+function setPromptAr(text){ document.getElementById('codeInputAr').value = text; document.getElementById('codeInputAr').focus(); }
+function clearEditorAr(){
+    document.getElementById('codeInputAr').value = '';
+    document.getElementById('outputBoxAr').innerHTML = '<span style="color:var(--text3);">💡 سيظهر الكود هنا. انقر على <strong style="color:var(--accent);">⚡ إنشاء الكود</strong>.</span>';
+    document.getElementById('outputActionsAr').style.display = 'none';
+}
+function clearOutputAr(){
+    document.getElementById('outputBoxAr').innerHTML = '<span style="color:var(--text3);">💡 سيظهر الكود هنا. انقر على <strong style="color:var(--accent);">⚡ إنشاء الكود</strong>.</span>';
+    document.getElementById('outputActionsAr').style.display = 'none';
+}
+function copyCodeAr(){
+    var text = document.getElementById('outputBoxAr').textContent;
+    if(!text || text.includes('💡')){ alert('لا يوجد كود للنسخ!'); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){ alert('✅ تم النسخ!'); }).catch(function(){ fallbackCopy(text); });
+    } else fallbackCopy(text);
+}
+function downloadCodeAr(){
+    var text = document.getElementById('outputBoxAr').textContent;
+    if(!text || text.includes('💡')) return;
+    var blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'vision-ai-code-' + Date.now() + '.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+/* ============================================================ */
+/* ENTER TUŞU İLE ÜRET                                           */
+/* ============================================================ */
+document.addEventListener('DOMContentLoaded', function(){
+    var inp = document.getElementById('codeInput');
+    if(inp) inp.addEventListener('keydown', function(e){
+        if(e.key === 'Enter' && !e.shiftKey && !e.ctrlKey){
+            e.preventDefault();
+            generateCode();
         }
-    }
-
-    function clearEditor() {
-        document.getElementById('codeInput').value = '';
-        document.getElementById('outputBox').innerHTML = '<span style="color: #888;">💡 Kodunuz burada görünecek. "Kod Üret" butonuna tıklayın.</span>';
-    }
-
-    function copyCode() {
-        const text = document.getElementById('outputBox').textContent;
-        if (!text || text.includes('💡')) { alert('Kopyalanacak kod yok!'); return; }
-        navigator.clipboard.writeText(text).then(() => {
-            alert('✅ Kod kopyalandı!');
-        }).catch(() => {
-            const area = document.createElement('textarea');
-            area.value = text;
-            document.body.appendChild(area);
-            area.select();
-            document.execCommand('copy');
-            document.body.removeChild(area);
-            alert('✅ Kod kopyalandı!');
-        });
-    }
-
-    function clearOutput() {
-        document.getElementById('outputBox').innerHTML = '<span style="color: #888;">💡 Kodunuz burada görünecek. "Kod Üret" butonuna tıklayın.</span>';
-    }
-
-    // ===== İNGİLİZCE =====
-    async function generateCodeEn() {
-        const input = document.getElementById('codeInputEn');
-        const output = document.getElementById('outputBoxEn');
-        const prompt = input.value.trim();
-        if (!prompt) {
-            output.innerHTML = '<span class="error">⚠️ Please enter a command!</span>';
-            return;
-        }
-        output.innerHTML = '<span style="color: #888;">⏳ Generating code...</span>';
-        try {
-            const result = await Parse.Cloud.run('superAI', { prompt: 'Sadece kod ver, açıklama yapma: ' + prompt });
-            const clean = result.replace(/```(\w+)?\n?/g, '').replace(/```/g, '').trim();
-            output.innerHTML = '<span class="ai-response">' + clean.replace(/\n/g, '<br>') + '</span>';
-        } catch (e) {
-            output.innerHTML = '<span class="error">❌ Error: ' + e.message + '</span>';
-        }
-    }
-
-    function clearEditorEn() {
-        document.getElementById('codeInputEn').value = '';
-        document.getElementById('outputBoxEn').innerHTML = '<span style="color: #888;">💡 Your code will appear here. Click "Generate Code".</span>';
-    }
-
-    function copyCodeEn() {
-        const text = document.getElementById('outputBoxEn').textContent;
-        if (!text || text.includes('💡')) { alert('No code to copy!'); return; }
-        navigator.clipboard.writeText(text).then(() => alert('✅ Code copied!')).catch(() => { /* fallback */ });
-    }
-
-    // ===== ARAPÇA =====
-    async function generateCodeAr() {
-        const input = document.getElementById('codeInputAr');
-        const output = document.getElementById('outputBoxAr');
-        const prompt = input.value.trim();
-        if (!prompt) {
-            output.innerHTML = '<span class="error">⚠️ يرجى كتابة أمر!</span>';
-            return;
-        }
-        output.innerHTML = '<span style="color: #888;">⏳ جاري إنشاء الكود...</span>';
-        try {
-            const result = await Parse.Cloud.run('superAI', { prompt: 'Sadece kod ver, açıklama yapma: ' + prompt });
-            const clean = result.replace(/```(\w+)?\n?/g, '').replace(/```/g, '').trim();
-            output.innerHTML = '<span class="ai-response">' + clean.replace(/\n/g, '<br>') + '</span>';
-        } catch (e) {
-            output.innerHTML = '<span class="error">❌ خطأ: ' + e.message + '</span>';
-        }
-    }
-
-    function clearEditorAr() {
-        document.getElementById('codeInputAr').value = '';
-        document.getElementById('outputBoxAr').innerHTML = '<span style="color: #888;">💡 سيظهر الكود هنا. انقر على "إنشاء الكود".</span>';
-    }
-
-    function copyCodeAr() {
-        const text = document.getElementById('outputBoxAr').textContent;
-        if (!text || text.includes('💡')) { alert('لا يوجد كود للنسخ!'); return; }
-        navigator.clipboard.writeText(text).then(() => alert('✅ تم نسخ الكود!')).catch(() => { /* fallback */ });
-    }
-
-    // Enter tuşu ile kod üret (Türkçe)
-    document.getElementById('codeInput').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); generateCode(); }
     });
-    document.getElementById('codeInputEn').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); generateCodeEn(); }
+    var inpEn = document.getElementById('codeInputEn');
+    if(inpEn) inpEn.addEventListener('keydown', function(e){
+        if(e.key === 'Enter' && !e.shiftKey && !e.ctrlKey){ e.preventDefault(); generateCodeEn(); }
     });
-    document.getElementById('codeInputAr').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); generateCodeAr(); }
+    var inpAr = document.getElementById('codeInputAr');
+    if(inpAr) inpAr.addEventListener('keydown', function(e){
+        if(e.key === 'Enter' && !e.shiftKey && !e.ctrlKey){ e.preventDefault(); generateCodeAr(); }
     });
+});
+
+/* ============================================================ */
+/* BACK TO TOP                                                   */
+/* ============================================================ */
+window.addEventListener('scroll', function(){
+    var btn = document.getElementById('backTop');
+    if(btn) btn.classList.toggle('show', window.scrollY > 400);
+}, {passive:true});
+
+/* Basit toast */
+function showToast(msg, type){
+    var t = document.createElement('div');
+    var bg = type === 'success' ? 'linear-gradient(135deg,#00ff9d,#00cc78)' :
+             type === 'warning' ? 'linear-gradient(135deg,#ffb700,#ff5e1a)' :
+             'linear-gradient(135deg,#00e5ff,#b845ff)';
+    t.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);padding:14px 26px;background:' + bg + ';color:#03050a;border-radius:30px;font-weight:700;font-size:14px;z-index:99999;box-shadow:0 10px 40px rgba(0,229,255,0.5);opacity:0;transition:all 0.3s;';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function(){ t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)'; }, 50);
+    setTimeout(function(){ t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(20px)'; }, 2500);
+    setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 3000);
+}
+
+console.log('⌨️ VİZYON 2027 Kod Editörü v7.10.0 yüklendi');
+console.log('✅ Back4App + superAI (28 model) hazır');
 </script>
-
 </body>
 </html>
