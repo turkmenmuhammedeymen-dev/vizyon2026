@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#03050a">
     <title>✨ Vizyon Al — 21 Yapay Zeka Tek Panelde | VİZYON 2027</title>
     <meta name="description" content="Vizyon Al, 21 farklı yapay zeka modelini tek panelde birleştiren; 4 modda (Normal, Derin Düşünme, Ajan, Yazılımcı), ekran okuma, sesli sohbet, dosya analiz + sunum ve indirilebilir dosya özellikleriyle donatılmış devrim niteliğinde AI asistanıdır.">
 
@@ -11,12 +12,16 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://vizyon2026.vercel.app/vizyon-al.html">
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://vizyon2026.vercel.app/logo.png" />
+    <link rel="apple-touch-icon" href="https://vizyon2026.vercel.app/logo.png" />
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
         /* ============================================================ */
-        /* ROOT DEĞİŞKENLER — EFSANE PALET (index.html ile aynı)        */
+        /* ROOT DEĞİŞKENLER — EFSANE PALET (index.html v7.10.0 ile aynı) */
         /* ============================================================ */
         :root {
             --bg: #03050a;
@@ -50,18 +55,15 @@
             --font-display: 'Syne', sans-serif;
             --font-code: 'Fira Code', monospace;
             --font-body: 'Inter', sans-serif;
+
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.25s ease;
+            --transition-slow: 0.4s ease;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        html {
-            scroll-behavior: smooth;
-            overflow-x: hidden;
-        }
+        html { scroll-behavior: smooth; overflow-x: hidden; }
 
         body {
             background: var(--bg);
@@ -138,6 +140,7 @@
             animation: float-up linear infinite;
             opacity: 0;
             box-shadow: 0 0 6px var(--accent);
+            will-change: transform, opacity;
         }
 
         .particle:nth-child(2n) { background: var(--accent2); width: 3px; height: 3px; box-shadow: 0 0 8px var(--accent2); }
@@ -251,6 +254,30 @@
             gap: 12px;
         }
 
+        /* Dil seçici (navbar) */
+        .nav-lang-select {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.06), rgba(184, 69, 255, 0.03));
+            color: var(--text2);
+            border: 1.5px solid var(--border2);
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: var(--font-body);
+            transition: all var(--transition-fast);
+        }
+
+        .nav-lang-select:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+
+        .nav-lang-select option {
+            background: var(--bg);
+            color: var(--text);
+        }
+
         .nav-back-btn {
             display: inline-flex;
             align-items: center;
@@ -303,6 +330,17 @@
         .nav-start-btn:hover {
             transform: translateY(-2px) scale(1.03);
             box-shadow: 0 0 45px rgba(0, 229, 255, 0.85), 0 0 80px rgba(184, 69, 255, 0.5);
+        }
+
+        /* ============================================================ */
+        /* DİL İÇERİK GÖSTERME                                          */
+        /* ============================================================ */
+        .lang-content { display: none; }
+        .lang-content.active { display: block; animation: fadeIn 0.4s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         /* ============================================================ */
@@ -486,7 +524,7 @@
         }
 
         /* ============================================================ */
-        /* MOD KARTLARI (4 mod)                                          */
+        /* SECTION                                                       */
         /* ============================================================ */
         .section {
             position: relative;
@@ -538,7 +576,56 @@
             color: var(--text2);
         }
 
-        /* --- 4 Mod Grid --- */
+        /* ============================================================ */
+        /* İSTATİSTİK BAR                                                */
+        /* ============================================================ */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 40px;
+            padding: 40px 32px;
+            max-width: 900px;
+            margin: 0 auto;
+            border-radius: 24px;
+            background: linear-gradient(135deg, rgba(10, 16, 32, 0.85), rgba(6, 10, 20, 0.9));
+            border: 1px solid var(--border2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 229, 255, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .stat-item {
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .stat-num {
+            font-family: var(--font-display);
+            font-size: 42px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--purple), var(--pink));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientMove 4s ease infinite;
+            display: block;
+            letter-spacing: -1.5px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text3);
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        /* ============================================================ */
+        /* MOD KARTLARI (4 mod)                                          */
+        /* ============================================================ */
         .modes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -554,6 +641,8 @@
             overflow: hidden;
             transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .mode-card::before {
@@ -650,6 +739,8 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
 
         .feature-card::before {
@@ -724,7 +815,121 @@
             text-transform: uppercase;
             animation: btnGradientShift 3s ease infinite;
             box-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
+            position: relative;
+            overflow: hidden;
         }
+
+        .badge-new::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: newBadgeShine 2s linear infinite;
+        }
+
+        @keyframes newBadgeShine {
+            0%   { left: -100%; }
+            100% { left: 200%; }
+        }
+
+        /* ============================================================ */
+        /* ÖZEL SİSTEMLER (V27 API / KOÇ / MODERATÖR)                    */
+        /* ============================================================ */
+        .special-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 22px;
+            margin-top: 40px;
+        }
+
+        .special-card {
+            padding: 30px 26px;
+            border-radius: 22px;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-normal);
+            border: 2px solid;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .special-card.v27api {
+            background: linear-gradient(135deg, rgba(255, 209, 26, 0.10), rgba(255, 140, 0, 0.05));
+            border-color: var(--gold);
+            box-shadow: 0 0 30px rgba(255, 209, 26, 0.15);
+        }
+        .special-card.v27api:hover {
+            border-color: #ffcc00;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5), 0 0 50px rgba(255, 209, 26, 0.4);
+        }
+
+        .special-card.koc {
+            background: linear-gradient(135deg, rgba(255, 45, 146, 0.10), rgba(184, 69, 255, 0.05));
+            border-color: var(--pink);
+            box-shadow: 0 0 30px rgba(255, 45, 146, 0.15);
+        }
+        .special-card.koc:hover {
+            border-color: var(--pink);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5), 0 0 50px rgba(255, 45, 146, 0.4);
+        }
+
+        .special-card.moderator {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.10), rgba(0, 212, 255, 0.05));
+            border-color: var(--accent);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.15);
+        }
+        .special-card.moderator:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5), 0 0 50px rgba(0, 229, 255, 0.4);
+        }
+
+        .special-card .sp-icon {
+            font-size: 44px;
+            margin-bottom: 12px;
+            display: block;
+            filter: drop-shadow(0 0 12px currentColor);
+        }
+
+        .special-card .sp-title {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.2px;
+        }
+
+        .special-card.v27api .sp-title { color: var(--gold); }
+        .special-card.koc .sp-title { color: var(--pink); }
+        .special-card.moderator .sp-title { color: var(--accent); }
+
+        .special-card .sp-desc {
+            font-size: 13px;
+            color: var(--text2);
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .special-card .sp-limits {
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 12px;
+            color: var(--text3);
+            line-height: 1.9;
+        }
+
+        .special-card .sp-limits strong {
+            font-weight: 700;
+        }
+
+        .special-card.v27api .sp-limits strong { color: var(--gold); }
+        .special-card.koc .sp-limits strong { color: var(--pink); }
+        .special-card.moderator .sp-limits strong { color: var(--accent); }
 
         /* ============================================================ */
         /* ÖNİZLEME (PREVIEW MOCKUP)                                     */
@@ -897,6 +1102,68 @@
         }
 
         /* ============================================================ */
+        /* SSS                                                           */
+        /* ============================================================ */
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.04), rgba(184, 69, 255, 0.02));
+            border: 1px solid rgba(0, 229, 255, 0.15);
+            border-radius: 16px;
+            padding: 18px 22px;
+            transition: all var(--transition-normal);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .faq-item:hover {
+            border-color: rgba(0, 229, 255, 0.35);
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(184, 69, 255, 0.04));
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .faq-item .faq-q {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 15px;
+            margin-bottom: 8px;
+            letter-spacing: -0.1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .faq-item .faq-q::before {
+            content: '?';
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 0 12px rgba(0, 229, 255, 0.5);
+        }
+
+        .faq-item .faq-a {
+            font-size: 13.5px;
+            color: var(--text2);
+            line-height: 1.75;
+            padding-left: 30px;
+        }
+
+        /* ============================================================ */
         /* CTA                                                           */
         /* ============================================================ */
         .cta-box {
@@ -921,6 +1188,7 @@
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
             animation: ctaShine 6s linear infinite;
+            pointer-events: none;
         }
 
         @keyframes ctaShine {
@@ -966,51 +1234,6 @@
             justify-content: center;
             position: relative;
             z-index: 2;
-        }
-
-        /* ============================================================ */
-        /* İSTATİSTİK BAR                                                */
-        /* ============================================================ */
-        .stats-bar {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 40px;
-            padding: 40px 32px;
-            max-width: 900px;
-            margin: 0 auto;
-            border-radius: 24px;
-            background: linear-gradient(135deg, rgba(10, 16, 32, 0.85), rgba(6, 10, 20, 0.9));
-            border: 1px solid var(--border2);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 229, 255, 0.08);
-        }
-
-        .stat-item {
-            text-align: center;
-            min-width: 120px;
-        }
-
-        .stat-num {
-            font-family: var(--font-display);
-            font-size: 42px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--accent), var(--purple), var(--pink));
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: gradientMove 4s ease infinite;
-            display: block;
-            letter-spacing: -1.5px;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text3);
-            margin-top: 6px;
-            font-weight: 600;
         }
 
         /* ============================================================ */
@@ -1077,6 +1300,7 @@
             .nav-logo-icon { width: 40px; height: 40px; }
             .nav-logo-text { font-size: 17px; }
             .nav-badge { display: none; }
+            .nav-lang-select { font-size: 11px; padding: 6px 10px; }
             .nav-back-btn { font-size: 11.5px; padding: 8px 14px; }
             .nav-start-btn { font-size: 11.5px; padding: 8px 16px; }
             .nav-start-btn .nav-text { display: none; }
@@ -1092,6 +1316,7 @@
             .modes-grid { grid-template-columns: 1fr; }
             .mode-card { padding: 24px 22px; }
             .features-grid { grid-template-columns: 1fr; }
+            .special-cards { grid-template-columns: 1fr; }
             .preview-chat { padding: 18px; min-height: 220px; }
             .preview-msg { font-size: 12.5px; padding: 11px 14px; }
             .preview-input-area { padding: 14px 18px; }
@@ -1105,6 +1330,7 @@
         @media (max-width: 480px) {
             nav.top-nav { padding: 0 12px; height: 60px; gap: 6px; }
             .nav-logo-text { font-size: 14px; letter-spacing: 0.5px; }
+            .nav-lang-select { font-size: 10px; padding: 5px 8px; }
             .nav-back-btn { font-size: 10px; padding: 6px 10px; }
             .nav-start-btn { font-size: 10px; padding: 6px 12px; }
 
@@ -1117,6 +1343,9 @@
             .mode-title { font-size: 18px; }
             .mode-icon { width: 52px; height: 52px; font-size: 22px; }
             .feature-card { padding: 22px 18px; }
+            .special-card { padding: 22px 18px; }
+            .special-card .sp-icon { font-size: 36px; }
+            .special-card .sp-title { font-size: 17px; }
             .preview-chat { padding: 14px; min-height: 200px; }
             .preview-input-area { padding: 12px 14px; }
             .preview-input { padding: 10px 14px; font-size: 12px; }
@@ -1125,6 +1354,28 @@
             .cta-box { padding: 28px 16px; }
             .stats-bar { gap: 16px; padding: 24px 14px; }
             .stat-num { font-size: 26px; }
+            .faq-item { padding: 14px 16px; }
+            .faq-item .faq-q { font-size: 13.5px; }
+            .faq-item .faq-a { font-size: 12.5px; padding-left: 0; }
+        }
+
+        /* RTL DESTEĞİ (Arapça için) */
+        [dir="rtl"] .mode-features span::before {
+            content: '◂';
+        }
+
+        [dir="rtl"] .faq-item .faq-q::before {
+            content: '?';
+        }
+
+        [dir="rtl"] .faq-item .faq-a {
+            padding-left: 0;
+            padding-right: 30px;
+        }
+
+        [dir="rtl"] .preview-msg.bot {
+            border-left: none;
+            border-right: 3px solid var(--accent2);
         }
 
         /* Reduced motion */
@@ -1134,6 +1385,7 @@
                 animation-iteration-count: 1 !important;
                 transition-duration: 0.01ms !important;
             }
+            body::before, body::after, .particle { animation: none !important; }
         }
     </style>
 </head>
@@ -1182,319 +1434,828 @@
             <span class="nav-badge">✨ Vizyon Al</span>
         </div>
         <div class="nav-right">
+            <select class="nav-lang-select" id="langSelect" onchange="window.changeLanguage(this.value)">
+                <option value="tr">🇹🇷 Türkçe</option>
+                <option value="en">🇬🇧 English</option>
+                <option value="ar">🇸🇦 العربية</option>
+            </select>
             <a href="https://vizyon2026.vercel.app/" class="nav-back-btn">
-                <i class="fas fa-arrow-left"></i> <span>Anasayfa</span>
+                <i class="fas fa-arrow-left"></i> <span id="navBackText">Anasayfa</span>
             </a>
             <a href="https://vizyon2026.vercel.app/?openVizyonAl=1" class="nav-start-btn">
-                <i class="fas fa-rocket"></i> <span class="nav-text">Başlat</span>
+                <i class="fas fa-rocket"></i> <span class="nav-text" id="navStartText">Başlat</span>
             </a>
         </div>
     </nav>
 
-    <!-- ============ HERO ============ -->
-    <section class="hero">
-        <div class="hero-orb">
-            <div class="hero-orb-icon">✨</div>
-        </div>
+    <!-- ============ TÜRKÇE ============ -->
+    <div id="lang-tr" class="lang-content active">
 
-        <div class="hero-tag">
-            <span class="dot"></span>
-            VİZYON 2027 · YENİ NESİL AI PANELİ
-        </div>
-
-        <h1 class="hero-title">
-            <span class="line1">VİZYON AL</span>
-            <span class="line2">21 YAPAY ZEKA · TEK PANEL</span>
-        </h1>
-
-        <p class="hero-sub">
-            Vizyon Al, <strong style="color:var(--accent);">21 farklı yapay zeka modelini</strong> (13 yerli Ollama + 8 bulut API) tek bir panelde birleştirir.
-            4 farklı modda çalışır, <strong style="color:var(--purple);">ekranını okuyabilir</strong>, <strong style="color:var(--pink);">seninle sesli sohbet edebilir</strong>,
-            <strong style="color:var(--gold);">dosyalarını analiz edip sunum oluşturabilir</strong> ve oluşturduğu dosyaları sana <strong style="color:var(--accent2);">indirme linki</strong> olarak sunar.
-        </p>
-
-        <div class="hero-actions">
-            <a href="https://vizyon2026.vercel.app/?openVizyonAl=1" class="btn btn-primary">
-                <i class="fas fa-rocket"></i> Vizyon Al'ı Başlat
-            </a>
-            <a href="#modlar" class="btn btn-secondary">
-                <i class="fas fa-list"></i> Modları Keşfet
-            </a>
-        </div>
-
-        <!-- ============ İSTATİSTİK BAR ============ -->
-        <div class="stats-bar">
-            <div class="stat-item">
-                <span class="stat-num">21</span>
-                <div class="stat-label">AI Modeli</div>
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero-orb">
+                <div class="hero-orb-icon">✨</div>
             </div>
-            <div class="stat-item">
-                <span class="stat-num">4</span>
-                <div class="stat-label">Farklı Mod</div>
-            </div>
-            <div class="stat-item">
-                <span class="stat-num">∞</span>
-                <div class="stat-label">Sınırsız Olasılık</div>
-            </div>
-            <div class="stat-item">
-                <span class="stat-num">7/24</span>
-                <div class="stat-label">Kesintisiz Erişim</div>
-            </div>
-        </div>
-    </section>
 
-    <!-- ============ 4 MOD ============ -->
-    <section class="section" id="modlar">
-        <div class="section-header">
-            <div class="section-tag">// 4 FARKLI MOD</div>
-            <h2 class="section-title">Her İş İçin <span class="hl">Ayrı Mod</span></h2>
-            <p class="section-desc">
-                Vizyon Al, yapacağın işe göre 4 farklı modda çalışır. Modu üstteki butonlardan tek tıkla değiştirebilirsin.
+            <div class="hero-tag">
+                <span class="dot"></span>
+                VİZYON 2027 · YENİ NESİL AI PANELİ
+            </div>
+
+            <h1 class="hero-title">
+                <span class="line1">VİZYON AL</span>
+                <span class="line2">21 YAPAY ZEKA · TEK PANEL</span>
+            </h1>
+
+            <p class="hero-sub">
+                Vizyon Al, <strong style="color:var(--accent);">21 farklı yapay zeka modelini</strong> (13 yerli Ollama + 8 bulut API) tek bir panelde birleştirir.
+                4 farklı modda çalışır, <strong style="color:var(--purple);">ekranını okuyabilir</strong>, <strong style="color:var(--pink);">seninle sesli sohbet edebilir</strong>,
+                <strong style="color:var(--gold);">dosyalarını analiz edip sunum oluşturabilir</strong> ve oluşturduğu dosyaları sana <strong style="color:var(--accent2);">indirme linki</strong> olarak sunar.
             </p>
-        </div>
 
-        <div class="modes-grid">
-            <!-- NORMAL -->
-            <div class="mode-card normal">
-                <div class="mode-icon">🌐</div>
-                <h3 class="mode-title">🌐 Normal Mod</h3>
-                <p class="mode-desc">
-                    Tüm modellerin eşit şekilde çalıştığı varsayılan moddur. Günlük sorular, sohbet ve genel görevler için idealdir.
-                </p>
-                <div class="mode-features">
-                    <span>Hızlı cevap üretimi</span>
-                    <span>Tüm modeller sırayla denenir</span>
-                    <span>Sohbet + bilgi + soru-cevap</span>
-                    <span>Herkesin kullanımına uygun</span>
-                </div>
-            </div>
-
-            <!-- DERİN DÜŞÜNME -->
-            <div class="mode-card deep">
-                <div class="mode-icon">🧠</div>
-                <h3 class="mode-title">🧠 Derin Düşünme</h3>
-                <p class="mode-desc">
-                    Uzun uzun düşünür, internette gezer, tüm bilgileri toplayıp birleştirir. Düşünme sürecini ince mavi bir çizgi ve gri yazıyla gösterir.
-                </p>
-                <div class="mode-features">
-                    <span>Adım adım düşünme süreci</span>
-                    <span>İnternette gezinme</span>
-                    <span>Kapsamlı analiz</span>
-                    <span>Karmaşık sorular için ideal</span>
-                </div>
-            </div>
-
-            <!-- AJAN -->
-            <div class="mode-card agent">
-                <div class="mode-icon">🕵️</div>
-                <h3 class="mode-title">🕵️ Ajan Modu</h3>
-                <p class="mode-desc">
-                    Her siteye girer, her işlemi yapar. Form doldurma, tıklama, şifre girme dahil tüm görevleri yerine getirir.
-                </p>
-                <div class="mode-features">
-                    <span>Site otomasyonu</span>
-                    <span>Form doldurma + tıklama</span>
-                    <span>Çoklu adım görevleri</span>
-                    <span>Pro ve üzeri paketlerde</span>
-                </div>
-            </div>
-
-            <!-- YAZILIMCI -->
-            <div class="mode-card developer">
-                <div class="mode-icon">💻</div>
-                <h3 class="mode-title">💻 Yazılımcı</h3>
-                <p class="mode-desc">
-                    Her türlü kodla en iyi baş etme, en iyi kod üretimi. Hata ayıklama ve optimize etme konusunda uzmandır.
-                </p>
-                <div class="mode-features">
-                    <span>Python, JavaScript, React, SQL</span>
-                    <span>Hata ayıklama</span>
-                    <span>Optimizasyon önerileri</span>
-                    <span>Çalışan, eksiksiz kod</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============ ÖZELLİKLER ============ -->
-    <section class="section">
-        <div class="section-header">
-            <div class="section-tag">// ÖZELLİKLER</div>
-            <h2 class="section-title">Vizyon Al'ın <span class="hl">Gücü</span></h2>
-            <p class="section-desc">
-                21 AI modeli, 4 mod, 8 süper özellik. Vizyon Al, sadece bir sohbet aracı değil — tam bir AI asistanıdır.
-            </p>
-        </div>
-
-        <div class="features-grid">
-            <!-- EKRAN OKUMA -->
-            <div class="feature-card">
-                <div class="feature-icon" style="border-color:#00ff9d;color:#00ff9d;box-shadow:0 0 25px rgba(0,255,157,0.3);">👁️</div>
-                <h3 class="feature-title">Ekran Okuma <span class="badge-new">YENİ</span></h3>
-                <p class="feature-desc">
-                    İzin verirsen ekranını görebilir. Tek kare (👁️) veya canlı mod (🟢) olarak analiz eder.
-                    Ekrandaki metinleri okur, butonları tanımlar, işlemleri önerir.
-                </p>
-            </div>
-
-            <!-- SESLİ SOHBET -->
-            <div class="feature-card">
-                <div class="feature-icon" style="border-color:#ff2d92;color:#ff2d92;box-shadow:0 0 25px rgba(255,45,146,0.3);">🔊</div>
-                <h3 class="feature-title">Sesli Sohbet <span class="badge-new">YENİ</span></h3>
-                <p class="feature-desc">
-                    Tam ekran ChatGPT gibi sesli sohbet. Al konuşur, sen konuşursun.
-                    Ortada logo, dalga animasyonu, geri tuşuna basınca ses kaydı kesinlikle kapanır.
-                </p>
-            </div>
-
-            <!-- DOSYA ANALİZ -->
-            <div class="feature-card">
-                <div class="feature-icon" style="border-color:#ffd11a;color:#ffd11a;box-shadow:0 0 25px rgba(255,209,26,0.3);">📎</div>
-                <h3 class="feature-title">Dosya Analiz <span class="badge-new">YENİ</span></h3>
-                <p class="feature-desc">
-                    Fotoğraf, video, PDF, Word, Excel, kod dosyaları yükle.
-                    Mesaj alanının üstünde önizleme kutusu çıkar. AI okur, analiz eder, günceller.
-                </p>
-            </div>
-
-            <!-- SUNUM OLUŞTURMA -->
-            <div class="feature-card">
-                <div class="feature-icon" style="border-color:#b845ff;color:#b845ff;box-shadow:0 0 25px rgba(184,69,255,0.3);">📥</div>
-                <h3 class="feature-title">Sunum + İndirme <span class="badge-new">YENİ</span></h3>
-                <p class="feature-desc">
-                    Dosyanı analiz ettikten sonra AI, sunum/dosya oluşturur ve sana <strong style="color:var(--accent2);">indirme butonu</strong> verir.
-                    PDF, HTML, MD veya TXT olarak indir.
-                </p>
-            </div>
-
-            <!-- SESLİ KOMUT -->
-            <div class="feature-card">
-                <div class="feature-icon" style="border-color:#00e5ff;color:#00e5ff;box-shadow:0 0 25px rgba(0,229,255,0.3);">🎤</div>
-                <h3 class="feature-title">Sesli Komut</h3>
-                <p class="feature-desc">
-                    🎤 butonuyla sesli soru sor. Söylediklerin otomatik olarak yazıya dökülür ve AI'ya gönderilir.
-                </p>
-            </div>
-
-            <!-- DEEP THINK -->
-            <div class="feature-card">
-                <div class="feature-icon" style="border-color:#0096ff;color:#0096ff;box-shadow:0 0 25px rgba(0,150,255,0.3);">🧠</div>
-                <h3 class="feature-title">Deep Think</h3>
-                <p class="feature-desc">
-                    Derin düşünme modunda "DÜŞÜNÜYORUM:" başlığı altında düşünme sürecini gösterir.
-                    Sonra net ve kapsamlı bir cevap verir.
-                </p>
-            </div>
-
-            <!-- SORUMLULUK ONAYI -->
-            <div class="feature-card">
-                <div class="feature-icon" style="border-color:#ff5e1a;color:#ff5e1a;box-shadow:0 0 25px rgba(255,94,26,0.3);">🛡️</div>
-                <h3 class="feature-title">Sorumluluk Onayı</h3>
-                <p class="feature-desc">
-                    İlk açılışta sorumluluk onay kutusu zorunlu.
-                    Tüm ekran okuma ve AI işlemleri için kullanıcı onayı gerekir.
-                </p>
-            </div>
-
-            <!-- SIFIR KURULUM -->
-            <div class="feature-card">
-                <div class="feature-icon" style="border-color:#00ff9d;color:#00ff9d;box-shadow:0 0 25px rgba(0,255,157,0.3);">⚡</div>
-                <h3 class="feature-title">Anında Hazır</h3>
-                <p class="feature-desc">
-                    Kurulum yok. 3-çizgi menüye tıkla veya /vizyon-al.html sayfasına git.
-                    Tüm tarayıcılarda çalışır. Mobil + tablet + masaüstü uyumlu.
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============ ÖNİZLEME ============ -->
-    <section class="section">
-        <div class="section-header">
-            <div class="section-tag">// CANLI ÖNİZLEME</div>
-            <h2 class="section-title">Vizyon Al <span class="hl">Paneli</span></h2>
-            <p class="section-desc">
-                İşte Vizyon Al panelinin tam görünümü. Sadece bir tıkla sen de kullanmaya başlayabilirsin.
-            </p>
-        </div>
-
-        <div class="preview-wrap">
-            <div class="preview-inner">
-                <!-- Header -->
-                <div class="preview-header">
-                    <div class="preview-dots">
-                        <div class="preview-dot red"></div>
-                        <div class="preview-dot yellow"></div>
-                        <div class="preview-dot green"></div>
-                    </div>
-                    <div class="preview-title-bar">
-                        <div class="vz-icon-sm">✨</div>
-                        <span>VİZYON AL · v7.10.0</span>
-                    </div>
-                    <div style="width:50px;"></div>
-                </div>
-
-                <!-- Modes -->
-                <div class="preview-modes">
-                    <div class="preview-mode-pill active">🌐 Normal</div>
-                    <div class="preview-mode-pill">🧠 Derin Düşünme</div>
-                    <div class="preview-mode-pill">🕵️ Ajan</div>
-                    <div class="preview-mode-pill">💻 Yazılımcı</div>
-                </div>
-
-                <!-- Chat -->
-                <div class="preview-chat">
-                    <div class="preview-msg user">
-                        <div class="role">👤 Sen</div>
-                        Merhaba! Bana 21 modelle ilgili bir özet çıkarır mısın?
-                    </div>
-                    <div class="preview-msg bot">
-                        <div class="role">✨ VİZYON AL</div>
-                        Tabii! Ben 21 farklı yapay zeka modeliyle çalışıyorum:
-                        <strong>13 yerli Ollama</strong> + <strong>8 bulut API</strong>.
-                        Her soru için modeller sırayla denenir ve en iyi cevap sana iletilir. 🚀
-                    </div>
-                    <div class="preview-msg user">
-                        <div class="role">👤 Sen</div>
-                        Dosya yükleyip analiz ettirebilir miyim?
-                    </div>
-                    <div class="preview-msg bot">
-                        <div class="role">✨ VİZYON AL</div>
-                        Kesinlikle! 📎 butonuyla fotoğraf, video, PDF, Word, Excel veya kod dosyası yükleyebilirsin.
-                        Analiz ederim, güncellersem sana <strong>indirme butonu</strong> veririm.
-                    </div>
-                </div>
-
-                <!-- Input -->
-                <div class="preview-input-area">
-                    <div class="preview-btn">📎</div>
-                    <input type="text" class="preview-input" placeholder="Vizyon Al'a bir şey sor..." readonly>
-                    <div class="preview-btn">🎤</div>
-                    <div class="preview-btn" style="background:linear-gradient(135deg,#ff2d92,#b845ff);">🔊</div>
-                    <div class="preview-btn" style="width:auto;padding:0 22px;border-radius:25px;font-size:13px;font-weight:700;">⚡ Gönder</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============ CTA ============ -->
-    <section class="section">
-        <div class="cta-box">
-            <h2>Denemeye <span class="hl">Hazır mısın?</span></h2>
-            <p>
-                21 yapay zekanın gücünü tek panelde keşfet. Ücretsiz başla, istediğin zaman yükselt.
-                Ekran okuma, sesli sohbet, dosya analiz ve daha fazlası seni bekliyor.
-            </p>
-            <div class="cta-actions">
+            <div class="hero-actions">
                 <a href="https://vizyon2026.vercel.app/?openVizyonAl=1" class="btn btn-primary">
-                    <i class="fas fa-rocket"></i> Hemen Başlat
+                    <i class="fas fa-rocket"></i> Vizyon Al'ı Başlat
                 </a>
-                <a href="https://vizyon2026.vercel.app/#pricing" class="btn btn-secondary">
-                    <i class="fas fa-crown"></i> Paketleri Gör
+                <a href="#modlar" class="btn btn-secondary">
+                    <i class="fas fa-list"></i> Modları Keşfet
                 </a>
             </div>
-        </div>
-    </section>
+
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-num">21</span>
+                    <div class="stat-label">AI Modeli</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num">4</span>
+                    <div class="stat-label">Farklı Mod</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num">∞</span>
+                    <div class="stat-label">Sınırsız Olasılık</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num">7/24</span>
+                    <div class="stat-label">Kesintisiz Erişim</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4 MOD -->
+        <section class="section" id="modlar">
+            <div class="section-header">
+                <div class="section-tag">// 4 FARKLI MOD</div>
+                <h2 class="section-title">Her İş İçin <span class="hl">Ayrı Mod</span></h2>
+                <p class="section-desc">
+                    Vizyon Al, yapacağın işe göre 4 farklı modda çalışır. Modu üstteki butonlardan tek tıkla değiştirebilirsin.
+                </p>
+            </div>
+
+            <div class="modes-grid">
+                <div class="mode-card normal">
+                    <div class="mode-icon">🌐</div>
+                    <h3 class="mode-title">🌐 Normal Mod</h3>
+                    <p class="mode-desc">
+                        Tüm modellerin eşit şekilde çalıştığı varsayılan moddur. Günlük sorular, sohbet ve genel görevler için idealdir.
+                    </p>
+                    <div class="mode-features">
+                        <span>Hızlı cevap üretimi</span>
+                        <span>Tüm modeller sırayla denenir</span>
+                        <span>Sohbet + bilgi + soru-cevap</span>
+                        <span>Herkesin kullanımına uygun</span>
+                    </div>
+                </div>
+
+                <div class="mode-card deep">
+                    <div class="mode-icon">🧠</div>
+                    <h3 class="mode-title">🧠 Derin Düşünme</h3>
+                    <p class="mode-desc">
+                        Uzun uzun düşünür, internette gezer, tüm bilgileri toplayıp birleştirir. Düşünme sürecini ince mavi bir çizgi ve gri yazıyla gösterir.
+                    </p>
+                    <div class="mode-features">
+                        <span>Adım adım düşünme süreci</span>
+                        <span>İnternette gezinme</span>
+                        <span>Kapsamlı analiz</span>
+                        <span>Karmaşık sorular için ideal</span>
+                    </div>
+                </div>
+
+                <div class="mode-card agent">
+                    <div class="mode-icon">🕵️</div>
+                    <h3 class="mode-title">🕵️ Ajan Modu</h3>
+                    <p class="mode-desc">
+                        Her siteye girer, her işlemi yapar. Form doldurma, tıklama, şifre girme dahil tüm görevleri yerine getirir.
+                    </p>
+                    <div class="mode-features">
+                        <span>Site otomasyonu</span>
+                        <span>Form doldurma + tıklama</span>
+                        <span>Çoklu adım görevleri</span>
+                        <span>Pro ve üzeri paketlerde</span>
+                    </div>
+                </div>
+
+                <div class="mode-card developer">
+                    <div class="mode-icon">💻</div>
+                    <h3 class="mode-title">💻 Yazılımcı</h3>
+                    <p class="mode-desc">
+                        Her türlü kodla en iyi baş etme, en iyi kod üretimi. Hata ayıklama ve optimize etme konusunda uzmandır.
+                    </p>
+                    <div class="mode-features">
+                        <span>Python, JavaScript, React, SQL</span>
+                        <span>Hata ayıklama</span>
+                        <span>Optimizasyon önerileri</span>
+                        <span>Çalışan, eksiksiz kod</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ÖZELLİKLER -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// ÖZELLİKLER</div>
+                <h2 class="section-title">Vizyon Al'ın <span class="hl">Gücü</span></h2>
+                <p class="section-desc">
+                    21 AI modeli, 4 mod, 8 süper özellik. Vizyon Al, sadece bir sohbet aracı değil — tam bir AI asistanıdır.
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#00ff9d;color:#00ff9d;box-shadow:0 0 25px rgba(0,255,157,0.3);">👁️</div>
+                    <h3 class="feature-title">Ekran Okuma <span class="badge-new">YENİ</span></h3>
+                    <p class="feature-desc">
+                        İzin verirsen ekranını görebilir. Tek kare (👁️) veya canlı mod (🟢) olarak analiz eder.
+                        Ekrandaki metinleri okur, butonları tanımlar, işlemleri önerir.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#ff2d92;color:#ff2d92;box-shadow:0 0 25px rgba(255,45,146,0.3);">🔊</div>
+                    <h3 class="feature-title">Sesli Sohbet <span class="badge-new">YENİ</span></h3>
+                    <p class="feature-desc">
+                        Tam ekran ChatGPT gibi sesli sohbet. Al konuşur, sen konuşursun.
+                        Ortada logo, dalga animasyonu, geri tuşuna basınca ses kaydı kesinlikle kapanır.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#ffd11a;color:#ffd11a;box-shadow:0 0 25px rgba(255,209,26,0.3);">📎</div>
+                    <h3 class="feature-title">Dosya Analiz <span class="badge-new">YENİ</span></h3>
+                    <p class="feature-desc">
+                        Fotoğraf, video, PDF, Word, Excel, kod dosyaları yükle.
+                        Mesaj alanının üstünde önizleme kutusu çıkar. AI okur, analiz eder, günceller.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#b845ff;color:#b845ff;box-shadow:0 0 25px rgba(184,69,255,0.3);">📥</div>
+                    <h3 class="feature-title">Sunum + İndirme <span class="badge-new">YENİ</span></h3>
+                    <p class="feature-desc">
+                        Dosyanı analiz ettikten sonra AI, sunum/dosya oluşturur ve sana <strong style="color:var(--accent2);">indirme butonu</strong> verir.
+                        PDF, HTML, MD veya TXT olarak indir.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#00e5ff;color:#00e5ff;box-shadow:0 0 25px rgba(0,229,255,0.3);">🎤</div>
+                    <h3 class="feature-title">Sesli Komut</h3>
+                    <p class="feature-desc">
+                        🎤 butonuyla sesli soru sor. Söylediklerin otomatik olarak yazıya dökülür ve AI'ya gönderilir.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#0096ff;color:#0096ff;box-shadow:0 0 25px rgba(0,150,255,0.3);">🧠</div>
+                    <h3 class="feature-title">Deep Think</h3>
+                    <p class="feature-desc">
+                        Derin düşünme modunda "DÜŞÜNÜYORUM:" başlığı altında düşünme sürecini gösterir.
+                        Sonra net ve kapsamlı bir cevap verir.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#ff5e1a;color:#ff5e1a;box-shadow:0 0 25px rgba(255,94,26,0.3);">🛡️</div>
+                    <h3 class="feature-title">Sorumluluk Onayı</h3>
+                    <p class="feature-desc">
+                        İlk açılışta sorumluluk onay kutusu zorunlu.
+                        Tüm ekran okuma ve AI işlemleri için kullanıcı onayı gerekir.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#00ff9d;color:#00ff9d;box-shadow:0 0 25px rgba(0,255,157,0.3);">⚡</div>
+                    <h3 class="feature-title">Anında Hazır</h3>
+                    <p class="feature-desc">
+                        Kurulum yok. 3-çizgi menüye tıkla veya /vizyon-al.html sayfasına git.
+                        Tüm tarayıcılarda çalışır. Mobil + tablet + masaüstü uyumlu.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ÖZEL SİSTEMLER -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// ÖZEL SİSTEMLER</div>
+                <h2 class="section-title">Vizyon Al <span class="hl">Ekosistemi</span></h2>
+                <p class="section-desc">
+                    Vizyon Al sadece bir panel değil — tüm VİZYON 2027 sistemleriyle entegre çalışır.
+                </p>
+            </div>
+
+            <div class="special-cards">
+                <div class="special-card v27api">
+                    <span class="sp-icon">🔑</span>
+                    <div class="sp-title">V27 API Anahtarı</div>
+                    <div class="sp-desc">
+                        Vizyon Al'ın gücünü kendi projelerine taşı. Web sitende, mobil uygulamanda, botunda kullan.
+                    </div>
+                    <div class="sp-limits">
+                        <div>👑 Kurucu/Admin/Beta/Moderatör → <strong>♾️ Sınırsız</strong></div>
+                        <div>👥 Takım → <strong>100 adet</strong></div>
+                        <div>🌟 Pro → <strong>20 adet</strong></div>
+                        <div>🆓 Ücretsiz → <strong>2 adet</strong></div>
+                    </div>
+                </div>
+
+                <div class="special-card koc">
+                    <span class="sp-icon">🧭</span>
+                    <div class="sp-title">V27 Koç Asistanı</div>
+                    <div class="sp-desc">
+                        Samimi, yol gösteren, psikolojik destek veren AI koç. Sohbetler şifreli link ile paylaşılabilir.
+                    </div>
+                    <div class="sp-limits">
+                        <div>👑 Kurucu/Admin/Beta/Moderatör → <strong>♾️ Sınırsız</strong></div>
+                        <div>👥 Takım → <strong>1000/hafta</strong></div>
+                        <div>🌟 Pro → <strong>50/hafta</strong></div>
+                        <div>🆓 Ücretsiz → <strong>10/hafta</strong></div>
+                    </div>
+                </div>
+
+                <div class="special-card moderator">
+                    <span class="sp-icon">🎨</span>
+                    <div class="sp-title">Moderatör / Tasarımcı</div>
+                    <div class="sp-desc">
+                        Satın alınamaz, sadece kurucu atar. Butonu yok, yetkileri sınırsız.
+                    </div>
+                    <div class="sp-limits">
+                        <div>♾️ Sınırsız V27 API + AI sorgusu</div>
+                        <div>🎬 Video kesit aracı</div>
+                        <div>📨 Proje taleplerini yönlendirme</div>
+                        <div>💡 Tavsiye ve analiz sunma</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ÖNİZLEME -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// CANLI ÖNİZLEME</div>
+                <h2 class="section-title">Vizyon Al <span class="hl">Paneli</span></h2>
+                <p class="section-desc">
+                    İşte Vizyon Al panelinin tam görünümü. Sadece bir tıkla sen de kullanmaya başlayabilirsin.
+                </p>
+            </div>
+
+            <div class="preview-wrap">
+                <div class="preview-inner">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <div class="preview-dot red"></div>
+                            <div class="preview-dot yellow"></div>
+                            <div class="preview-dot green"></div>
+                        </div>
+                        <div class="preview-title-bar">
+                            <div class="vz-icon-sm">✨</div>
+                            <span>VİZYON AL · v7.10.0</span>
+                        </div>
+                        <div style="width:50px;"></div>
+                    </div>
+
+                    <div class="preview-modes">
+                        <div class="preview-mode-pill active">🌐 Normal</div>
+                        <div class="preview-mode-pill">🧠 Derin Düşünme</div>
+                        <div class="preview-mode-pill">🕵️ Ajan</div>
+                        <div class="preview-mode-pill">💻 Yazılımcı</div>
+                    </div>
+
+                    <div class="preview-chat">
+                        <div class="preview-msg user">
+                            <div class="role">👤 Sen</div>
+                            Merhaba! Bana 21 modelle ilgili bir özet çıkarır mısın?
+                        </div>
+                        <div class="preview-msg bot">
+                            <div class="role">✨ VİZYON AL</div>
+                            Tabii! Ben 21 farklı yapay zeka modeliyle çalışıyorum:
+                            <strong>13 yerli Ollama</strong> + <strong>8 bulut API</strong>.
+                            Her soru için modeller sırayla denenir ve en iyi cevap sana iletilir. 🚀
+                        </div>
+                        <div class="preview-msg user">
+                            <div class="role">👤 Sen</div>
+                            Dosya yükleyip analiz ettirebilir miyim?
+                        </div>
+                        <div class="preview-msg bot">
+                            <div class="role">✨ VİZYON AL</div>
+                            Kesinlikle! 📎 butonuyla fotoğraf, video, PDF, Word, Excel veya kod dosyası yükleyebilirsin.
+                            Analiz ederim, güncellersem sana <strong>indirme butonu</strong> veririm.
+                        </div>
+                    </div>
+
+                    <div class="preview-input-area">
+                        <div class="preview-btn">📎</div>
+                        <input type="text" class="preview-input" placeholder="Vizyon Al'a bir şey sor..." readonly>
+                        <div class="preview-btn">🎤</div>
+                        <div class="preview-btn" style="background:linear-gradient(135deg,#ff2d92,#b845ff);">🔊</div>
+                        <div class="preview-btn" style="width:auto;padding:0 22px;border-radius:25px;font-size:13px;font-weight:700;">⚡ Gönder</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SSS -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// SSS</div>
+                <h2 class="section-title">Sık Sorulan <span class="hl">Sorular</span></h2>
+            </div>
+
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-q">Vizyon Al nedir?</div>
+                    <div class="faq-a">21 farklı yapay zekayı tek panelde birleştiren çeyrek ekran AI aracıdır. Sağ üstteki 3 çizgi menüden veya <strong>/vizyon-al.html</strong> sayfasından açılır.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">4 mod nedir ve ne işe yarar?</div>
+                    <div class="faq-a">🌐 Normal (standart), 🧠 Derin Düşünme (uzun düşünür), 🕵️ Ajan (site otomasyonu), 💻 Yazılımcı (kod uzmanı). Modu üstteki butonlardan tek tıkla değiştirebilirsin.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">Ekran okuma nasıl çalışır?</div>
+                    <div class="faq-a">👁️ butonuyla tarayıcı ekran izni ister. İzin verirsen, tek kare (tek seferlik) veya canlı mod (sürekli) olarak ekranını analiz eder.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">Sesli sohbet nasıl başlatılır?</div>
+                    <div class="faq-a">🔊 butonuna tıkla → tam ekran ChatGPT tarzı sesli sohbet açılır. Mikrofona dokun, konuşmaya başla. Geri tuşuna basınca kesinlikle durur.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">Hangi dosya türleri destekleniyor?</div>
+                    <div class="faq-a">Fotoğraf, video, PDF, Word, Excel, kod dosyaları (JS, PY, HTML), ZIP, ses dosyaları ve daha fazlası. AI okur, analiz eder, sunum oluşturur ve indirilebilir link verir.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">Vizyon Al ücretsiz mi?</div>
+                    <div class="faq-a">Ücretsiz planda günde <strong>10 kullanım</strong> hakkın var. Pro'da <strong>500/gün</strong>, Takım'da <strong>sınırsız</strong>. Ekran okuma, sesli sohbet, dosya analiz için plan limitleri geçerlidir.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">Kendi projemde kullanabilir miyim?</div>
+                    <div class="faq-a">Evet! <strong>V27 API anahtarı</strong> ile Vizyon Al'ın gücünü kendi uygulamalarında kullanabilirsin. Dashboard → V27 API bölümünden anahtar oluştur.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="section">
+            <div class="cta-box">
+                <h2>Denemeye <span class="hl">Hazır mısın?</span></h2>
+                <p>
+                    21 yapay zekanın gücünü tek panelde keşfet. Ücretsiz başla, istediğin zaman yükselt.
+                    Ekran okuma, sesli sohbet, dosya analiz ve daha fazlası seni bekliyor.
+                </p>
+                <div class="cta-actions">
+                    <a href="https://vizyon2026.vercel.app/?openVizyonAl=1" class="btn btn-primary">
+                        <i class="fas fa-rocket"></i> Hemen Başlat
+                    </a>
+                    <a href="https://vizyon2026.vercel.app/#pricing" class="btn btn-secondary">
+                        <i class="fas fa-crown"></i> Paketleri Gör
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ============ ENGLISH ============ -->
+    <div id="lang-en" class="lang-content">
+        <section class="hero">
+            <div class="hero-orb"><div class="hero-orb-icon">✨</div></div>
+            <div class="hero-tag">
+                <span class="dot"></span>
+                VİZYON 2027 · NEXT-GEN AI PANEL
+            </div>
+            <h1 class="hero-title">
+                <span class="line1">VIZYON AL</span>
+                <span class="line2">21 AIs · ONE PANEL</span>
+            </h1>
+            <p class="hero-sub">
+                Vizyon Al combines <strong style="color:var(--accent);">21 different AI models</strong> (13 local Ollama + 8 cloud API) in one panel.
+                4 modes, <strong style="color:var(--purple);">screen reading</strong>, <strong style="color:var(--pink);">voice chat</strong>,
+                <strong style="color:var(--gold);">file analysis + presentation</strong> and <strong style="color:var(--accent2);">downloadable files</strong>.
+            </p>
+            <div class="hero-actions">
+                <a href="https://vizyon2026.vercel.app/?openVizyonAl=1" class="btn btn-primary">
+                    <i class="fas fa-rocket"></i> Launch Vizyon Al
+                </a>
+                <a href="#modlar" class="btn btn-secondary">
+                    <i class="fas fa-list"></i> Explore Modes
+                </a>
+            </div>
+            <div class="stats-bar">
+                <div class="stat-item"><span class="stat-num">21</span><div class="stat-label">AI Models</div></div>
+                <div class="stat-item"><span class="stat-num">4</span><div class="stat-label">Modes</div></div>
+                <div class="stat-item"><span class="stat-num">∞</span><div class="stat-label">Possibilities</div></div>
+                <div class="stat-item"><span class="stat-num">24/7</span><div class="stat-label">Access</div></div>
+            </div>
+        </section>
+
+        <section class="section" id="modlar">
+            <div class="section-header">
+                <div class="section-tag">// 4 MODES</div>
+                <h2 class="section-title">A <span class="hl">Mode</span> for Every Task</h2>
+            </div>
+            <div class="modes-grid">
+                <div class="mode-card normal">
+                    <div class="mode-icon">🌐</div>
+                    <h3 class="mode-title">🌐 Normal Mode</h3>
+                    <p class="mode-desc">Default mode where all models work equally. Ideal for daily questions and general tasks.</p>
+                </div>
+                <div class="mode-card deep">
+                    <div class="mode-icon">🧠</div>
+                    <h3 class="mode-title">🧠 Deep Thinking</h3>
+                    <p class="mode-desc">Thinks deeply, browses the web, combines all info. Shows the thought process with a thin blue line.</p>
+                </div>
+                <div class="mode-card agent">
+                    <div class="mode-icon">🕵️</div>
+                    <h3 class="mode-title">🕵️ Agent Mode</h3>
+                    <p class="mode-desc">Enters any site, completes all tasks including form filling, clicking, password entry.</p>
+                </div>
+                <div class="mode-card developer">
+                    <div class="mode-icon">💻</div>
+                    <h3 class="mode-title">💻 Developer</h3>
+                    <p class="mode-desc">Best code generation and bug fixing in any language. Expert at debugging and optimization.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// FEATURES</div>
+                <h2 class="section-title">Vizyon Al's <span class="hl">Power</span></h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#00ff9d;color:#00ff9d;">👁️</div>
+                    <h3 class="feature-title">Screen Reading <span class="badge-new">NEW</span></h3>
+                    <p class="feature-desc">If you permit, it can see your screen. Analyzes in single frame or live mode. Reads text, identifies buttons.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#ff2d92;color:#ff2d92;">🔊</div>
+                    <h3 class="feature-title">Voice Chat <span class="badge-new">NEW</span></h3>
+                    <p class="feature-desc">Full-screen ChatGPT-style voice chat. Al speaks, you speak. Center logo + wave animation.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#ffd11a;color:#ffd11a;">📎</div>
+                    <h3 class="feature-title">File Analysis <span class="badge-new">NEW</span></h3>
+                    <p class="feature-desc">Upload photos, videos, PDF, Word, Excel, code files. Preview box appears above the input.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#b845ff;color:#b845ff;">📥</div>
+                    <h3 class="feature-title">Presentation + Download <span class="badge-new">NEW</span></h3>
+                    <p class="feature-desc">After analysis, AI creates presentation/file and gives you a download button. PDF, HTML, MD or TXT.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#00e5ff;color:#00e5ff;">🎤</div>
+                    <h3 class="feature-title">Voice Command</h3>
+                    <p class="feature-desc">Ask by voice with 🎤 button. Your words are transcribed and sent to AI automatically.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#0096ff;color:#0096ff;">🧠</div>
+                    <h3 class="feature-title">Deep Think</h3>
+                    <p class="feature-desc">In deep thinking mode, shows the process under "THINKING:" heading, then gives a comprehensive answer.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// SPECIAL SYSTEMS</div>
+                <h2 class="section-title">Vizyon Al <span class="hl">Ecosystem</span></h2>
+            </div>
+            <div class="special-cards">
+                <div class="special-card v27api">
+                    <span class="sp-icon">🔑</span>
+                    <div class="sp-title">V27 API Key</div>
+                    <div class="sp-desc">Use Vizyon Al's power in your own projects. Web, mobile, bot.</div>
+                    <div class="sp-limits">
+                        <div>👑 Founder/Admin/Beta/Moderator → <strong>♾️ Unlimited</strong></div>
+                        <div>👥 Team → <strong>100 keys</strong></div>
+                        <div>🌟 Pro → <strong>20 keys</strong></div>
+                        <div>🆓 Free → <strong>2 keys</strong></div>
+                    </div>
+                </div>
+                <div class="special-card koc">
+                    <span class="sp-icon">🧭</span>
+                    <div class="sp-title">V27 Coach</div>
+                    <div class="sp-desc">Warm, guiding AI coach with psychological support. Password-protected sharing.</div>
+                    <div class="sp-limits">
+                        <div>👑 Founder/Admin/Beta/Moderator → <strong>♾️ Unlimited</strong></div>
+                        <div>👥 Team → <strong>1000/week</strong></div>
+                        <div>🌟 Pro → <strong>50/week</strong></div>
+                        <div>🆓 Free → <strong>10/week</strong></div>
+                    </div>
+                </div>
+                <div class="special-card moderator">
+                    <span class="sp-icon">🎨</span>
+                    <div class="sp-title">Moderator / Designer</div>
+                    <div class="sp-desc">Cannot be purchased, assigned only by founder. Hidden rank with unlimited powers.</div>
+                    <div class="sp-limits">
+                        <div>♾️ Unlimited V27 API + AI queries</div>
+                        <div>🎬 Video clip tool</div>
+                        <div>📨 Project request redirect</div>
+                        <div>💡 Advice and analysis</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// PREVIEW</div>
+                <h2 class="section-title">Vizyon Al <span class="hl">Panel</span></h2>
+            </div>
+            <div class="preview-wrap">
+                <div class="preview-inner">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <div class="preview-dot red"></div>
+                            <div class="preview-dot yellow"></div>
+                            <div class="preview-dot green"></div>
+                        </div>
+                        <div class="preview-title-bar">
+                            <div class="vz-icon-sm">✨</div>
+                            <span>VIZYON AL · v7.10.0</span>
+                        </div>
+                        <div style="width:50px;"></div>
+                    </div>
+                    <div class="preview-modes">
+                        <div class="preview-mode-pill active">🌐 Normal</div>
+                        <div class="preview-mode-pill">🧠 Deep</div>
+                        <div class="preview-mode-pill">🕵️ Agent</div>
+                        <div class="preview-mode-pill">💻 Dev</div>
+                    </div>
+                    <div class="preview-chat">
+                        <div class="preview-msg user"><div class="role">👤 You</div>Hi! Give me a summary of the 21 models.</div>
+                        <div class="preview-msg bot"><div class="role">✨ VIZYON AL</div>I work with 21 different AI models: <strong>13 local Ollama</strong> + <strong>8 cloud API</strong>. Models tried sequentially for each question. 🚀</div>
+                    </div>
+                    <div class="preview-input-area">
+                        <div class="preview-btn">📎</div>
+                        <input type="text" class="preview-input" placeholder="Ask Vizyon Al something..." readonly>
+                        <div class="preview-btn">🎤</div>
+                        <div class="preview-btn" style="background:linear-gradient(135deg,#ff2d92,#b845ff);">🔊</div>
+                        <div class="preview-btn" style="width:auto;padding:0 22px;border-radius:25px;font-size:13px;font-weight:700;">⚡ Send</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// FAQ</div>
+                <h2 class="section-title">Frequently Asked <span class="hl">Questions</span></h2>
+            </div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-q">What is Vizyon Al?</div>
+                    <div class="faq-a">A quarter-screen AI tool combining 21 AIs in one panel. Open via 3-line menu or <strong>/vizyon-al.html</strong>.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">What are the 4 modes?</div>
+                    <div class="faq-a">🌐 Normal, 🧠 Deep Thinking, 🕵️ Agent, 💻 Developer. Switch with one click from top buttons.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">How does screen reading work?</div>
+                    <div class="faq-a">The 👁️ button asks for browser screen permission. If granted, analyzes as single frame or live mode.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">How to start voice chat?</div>
+                    <div class="faq-a">Click 🔊 button → full-screen ChatGPT-style voice chat opens. Touch mic and start speaking.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="cta-box">
+                <h2>Ready to <span class="hl">Try?</span></h2>
+                <p>Experience the power of 21 AIs in one panel. Start free, upgrade anytime.</p>
+                <div class="cta-actions">
+                    <a href="https://vizyon2026.vercel.app/?openVizyonAl=1" class="btn btn-primary">
+                        <i class="fas fa-rocket"></i> Launch Now
+                    </a>
+                    <a href="https://vizyon2026.vercel.app/#pricing" class="btn btn-secondary">
+                        <i class="fas fa-crown"></i> See Plans
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ============ ARAPÇA ============ -->
+    <div id="lang-ar" class="lang-content" dir="rtl">
+        <section class="hero">
+            <div class="hero-orb"><div class="hero-orb-icon">✨</div></div>
+            <div class="hero-tag">
+                <span class="dot"></span>
+                فيجن 2027 · لوحة الذكاء الاصطناعي من الجيل الجديد
+            </div>
+            <h1 class="hero-title">
+                <span class="line1">فيجن آل</span>
+                <span class="line2">21 ذكاء اصطناعي · لوحة واحدة</span>
+            </h1>
+            <p class="hero-sub">
+                يجمع فيجن آل <strong style="color:var(--accent);">21 نموذج ذكاء اصطناعي</strong> (13 Ollama محلي + 8 API سحابي) في لوحة واحدة.
+                4 أوضاع، <strong style="color:var(--purple);">قراءة الشاشة</strong>، <strong style="color:var(--pink);">الدردشة الصوتية</strong>،
+                <strong style="color:var(--gold);">تحليل الملفات + العرض</strong> و <strong style="color:var(--accent2);">ملفات قابلة للتنزيل</strong>.
+            </p>
+            <div class="hero-actions">
+                <a href="https://vizyon2026.vercel.app/?openVizyonAl=1" class="btn btn-primary">
+                    <i class="fas fa-rocket"></i> ابدأ فيجن آل
+                </a>
+                <a href="#modlar" class="btn btn-secondary">
+                    <i class="fas fa-list"></i> اكتشف الأوضاع
+                </a>
+            </div>
+            <div class="stats-bar">
+                <div class="stat-item"><span class="stat-num">21</span><div class="stat-label">نموذج</div></div>
+                <div class="stat-item"><span class="stat-num">4</span><div class="stat-label">أوضاع</div></div>
+                <div class="stat-item"><span class="stat-num">∞</span><div class="stat-label">احتمالات</div></div>
+                <div class="stat-item"><span class="stat-num">7/24</span><div class="stat-label">وصول</div></div>
+            </div>
+        </section>
+
+        <section class="section" id="modlar">
+            <div class="section-header">
+                <div class="section-tag">// 4 أوضاع</div>
+                <h2 class="section-title">وضع <span class="hl">لكل مهمة</span></h2>
+            </div>
+            <div class="modes-grid">
+                <div class="mode-card normal">
+                    <div class="mode-icon">🌐</div>
+                    <h3 class="mode-title">🌐 الوضع العادي</h3>
+                    <p class="mode-desc">الوضع الافتراضي حيث تعمل جميع النماذج بالتساوي. مثالي للأسئلة اليومية والمهام العامة.</p>
+                </div>
+                <div class="mode-card deep">
+                    <div class="mode-icon">🧠</div>
+                    <h3 class="mode-title">🧠 التفكير العميق</h3>
+                    <p class="mode-desc">يفكر بعمق، يتصفح الويب، يجمع كل المعلومات. يُظهر عملية التفكير بخط أزرق رفيع.</p>
+                </div>
+                <div class="mode-card agent">
+                    <div class="mode-icon">🕵️</div>
+                    <h3 class="mode-title">🕵️ وضع الوكيل</h3>
+                    <p class="mode-desc">يدخل أي موقع، يكمل جميع المهام بما في ذلك ملء النماذج والنقر وإدخال كلمات المرور.</p>
+                </div>
+                <div class="mode-card developer">
+                    <div class="mode-icon">💻</div>
+                    <h3 class="mode-title">💻 المبرمج</h3>
+                    <p class="mode-desc">أفضل توليد للأكواد وإصلاح الأخطاء بأي لغة. خبير في التصحيح والتحسين.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// الميزات</div>
+                <h2 class="section-title">قوة <span class="hl">فيجن آل</span></h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#00ff9d;color:#00ff9d;">👁️</div>
+                    <h3 class="feature-title">قراءة الشاشة <span class="badge-new">جديد</span></h3>
+                    <p class="feature-desc">إذا سمحت، يمكنه رؤية شاشتك. يُحلل في وضع الإطار الواحد أو الوضع المباشر.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#ff2d92;color:#ff2d92;">🔊</div>
+                    <h3 class="feature-title">الدردشة الصوتية <span class="badge-new">جديد</span></h3>
+                    <p class="feature-desc">دردشة صوتية بملء الشاشة على غرار ChatGPT. آل يتحدث، أنت تتحدث.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#ffd11a;color:#ffd11a;">📎</div>
+                    <h3 class="feature-title">تحليل الملفات <span class="badge-new">جديد</span></h3>
+                    <p class="feature-desc">حمّل الصور ومقاطع الفيديو و PDF و Word و Excel والأكواد. يظهر صندوق المعاينة فوق الإدخال.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#b845ff;color:#b845ff;">📥</div>
+                    <h3 class="feature-title">العرض + التنزيل <span class="badge-new">جديد</span></h3>
+                    <p class="feature-desc">بعد التحليل، ينشئ الذكاء الاصطناعي عرضًا/ملفًا ويمنحك زر التنزيل. PDF أو HTML أو MD أو TXT.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#00e5ff;color:#00e5ff;">🎤</div>
+                    <h3 class="feature-title">الأمر الصوتي</h3>
+                    <p class="feature-desc">اسأل بصوتك عبر زر 🎤. يتم نسخ كلماتك تلقائيًا وإرسالها إلى الذكاء الاصطناعي.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#0096ff;color:#0096ff;">🧠</div>
+                    <h3 class="feature-title">التفكير العميق</h3>
+                    <p class="feature-desc">في وضع التفكير العميق، يُظهر العملية تحت عنوان "أفكر:"، ثم يقدم إجابة شاملة.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// أنظمة خاصة</div>
+                <h2 class="section-title">نظام <span class="hl">فيجن آل البيئي</span></h2>
+            </div>
+            <div class="special-cards">
+                <div class="special-card v27api">
+                    <span class="sp-icon">🔑</span>
+                    <div class="sp-title">مفتاح V27 API</div>
+                    <div class="sp-desc">استخدم قوة فيجن آل في مشاريعك. الويب والجوال والبوت.</div>
+                    <div class="sp-limits">
+                        <div>👑 المؤسس/المشرف/بيتا/المشرف → <strong>♾️ غير محدود</strong></div>
+                        <div>👥 الفريق → <strong>100 مفتاح</strong></div>
+                        <div>🌟 Pro → <strong>20 مفتاحًا</strong></div>
+                        <div>🆓 مجاني → <strong>مفتاحان</strong></div>
+                    </div>
+                </div>
+                <div class="special-card koc">
+                    <span class="sp-icon">🧭</span>
+                    <div class="sp-title">مدرب V27</div>
+                    <div class="sp-desc">مدرب ذكاء اصطناعي دافئ وموجّه مع دعم نفسي. مشاركة محمية بكلمة مرور.</div>
+                    <div class="sp-limits">
+                        <div>👑 المؤسس/المشرف/بيتا/المشرف → <strong>♾️ غير محدود</strong></div>
+                        <div>👥 الفريق → <strong>1000/أسبوع</strong></div>
+                        <div>🌟 Pro → <strong>50/أسبوع</strong></div>
+                        <div>🆓 مجاني → <strong>10/أسبوع</strong></div>
+                    </div>
+                </div>
+                <div class="special-card moderator">
+                    <span class="sp-icon">🎨</span>
+                    <div class="sp-title">مشرف / مصمم</div>
+                    <div class="sp-desc">لا يمكن شراؤه، يعيّنه المؤسس فقط. رتبة مخفية بصلاحيات غير محدودة.</div>
+                    <div class="sp-limits">
+                        <div>♾️ V27 API غير محدود + استعلامات AI</div>
+                        <div>🎬 أداة قطع الفيديو</div>
+                        <div>📨 إعادة توجيه طلبات المشروع</div>
+                        <div>💡 النصيحة والتحليل</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// معاينة مباشرة</div>
+                <h2 class="section-title">لوحة <span class="hl">فيجن آل</span></h2>
+            </div>
+            <div class="preview-wrap">
+                <div class="preview-inner">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <div class="preview-dot red"></div>
+                            <div class="preview-dot yellow"></div>
+                            <div class="preview-dot green"></div>
+                        </div>
+                        <div class="preview-title-bar">
+                            <div class="vz-icon-sm">✨</div>
+                            <span>فيجن آل · v7.10.0</span>
+                        </div>
+                        <div style="width:50px;"></div>
+                    </div>
+                    <div class="preview-modes">
+                        <div class="preview-mode-pill active">🌐 عادي</div>
+                        <div class="preview-mode-pill">🧠 عميق</div>
+                        <div class="preview-mode-pill">🕵️ وكيل</div>
+                        <div class="preview-mode-pill">💻 مبرمج</div>
+                    </div>
+                    <div class="preview-chat">
+                        <div class="preview-msg user"><div class="role">👤 أنت</div>مرحبًا! أعطني ملخصًا عن 21 نموذجًا.</div>
+                        <div class="preview-msg bot"><div class="role">✨ فيجن آل</div>أعمل مع 21 نموذجًا مختلفًا للذكاء الاصطناعي: <strong>13 Ollama محلي</strong> + <strong>8 API سحابي</strong>. 🚀</div>
+                    </div>
+                    <div class="preview-input-area">
+                        <div class="preview-btn">📎</div>
+                        <input type="text" class="preview-input" placeholder="اسأل فيجن آل شيئًا..." readonly>
+                        <div class="preview-btn">🎤</div>
+                        <div class="preview-btn" style="background:linear-gradient(135deg,#ff2d92,#b845ff);">🔊</div>
+                        <div class="preview-btn" style="width:auto;padding:0 22px;border-radius:25px;font-size:13px;font-weight:700;">⚡ إرسال</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="cta-box">
+                <h2>هل أنت <span class="hl">مستعد؟</span></h2>
+                <p>جرب قوة 21 ذكاءً اصطناعيًا في لوحة واحدة. ابدأ مجانًا، وقم بالترقية في أي وقت.</p>
+                <div class="cta-actions">
+                    <a href="https://vizyon2026.vercel.app/?openVizyonAl=1" class="btn btn-primary">
+                        <i class="fas fa-rocket"></i> ابدأ الآن
+                    </a>
+                    <a href="https://vizyon2026.vercel.app/#pricing" class="btn btn-secondary">
+                        <i class="fas fa-crown"></i> عرض الخطط
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
 
     <!-- ============ FOOTER ============ -->
     <footer class="bottom-footer">
@@ -1506,11 +2267,70 @@
             <a href="https://vizyon2026.vercel.app/#pricing">💰 Paketler</a>
             <a href="https://vizyon2026.vercel.app/#v27api">🔑 V27 API</a>
             <a href="https://vizyon2026.vercel.app/bana-ogret.html">📖 Bana Öğret</a>
+            <a href="https://vizyon2026.vercel.app/topluluk.html">💬 Topluluk</a>
         </div>
     </footer>
 
-    <!-- ============ JS: PARÇACIKLAR ============ -->
+    <!-- ============ PARSE SDK ============ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/parse/5.0.0/parse.min.js"></script>
+
     <script>
+        // ================================================================
+        // VİZYON 2027 — VİZYON AL SAYFASI v3.0 (v7.10.0)
+        // ✅ Back4App uyumlu (index.html + Cloud Code v7.10.0 ile senkron)
+        // ✅ Aurora arka plan + parçacıklar
+        // ✅ Efsane SVG logo + glassmorphism kartlar
+        // ✅ 3 dil (TR/EN/AR) + RTL desteği
+        // ✅ Vizyon Al paneli detaylı tanıtım
+        // ================================================================
+
+        // ===== Back4App Config (index.html v7.10.0 ile aynı) =====
+        Parse.initialize(
+            "Dr9SODgMburZ54QvC8RnIHc9dbjreozBbKLOpMjX",
+            "dCXRvnEcCcOFvpzVDAV9AAJnYvdrqaP1JFRkJzvv"
+        );
+        Parse.serverURL = "https://parseapi.back4app.com/";
+
+        // ===== DİL DEĞİŞTİRME =====
+        var LANG_TEXT = {
+            tr: { navBack: 'Anasayfa', navStart: 'Başlat' },
+            en: { navBack: 'Home', navStart: 'Launch' },
+            ar: { navBack: 'الرئيسية', navStart: 'ابدأ' }
+        };
+
+        function changeLanguage(lang) {
+            if (['tr', 'en', 'ar'].indexOf(lang) === -1) lang = 'tr';
+
+            // İçerikleri değiştir
+            document.querySelectorAll('.lang-content').forEach(function (el) {
+                el.classList.remove('active');
+            });
+            var target = document.getElementById('lang-' + lang);
+            if (target) target.classList.add('active');
+
+            // RTL desteği
+            document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+            document.documentElement.lang = (lang === 'ar') ? 'ar' : lang;
+
+            // Navbar metinleri
+            var t = LANG_TEXT[lang] || LANG_TEXT.tr;
+            var navBack = document.getElementById('navBackText');
+            var navStart = document.getElementById('navStartText');
+            if (navBack) navBack.textContent = t.navBack;
+            if (navStart) navStart.textContent = t.navStart;
+
+            // Navbar select güncelle
+            var sel = document.getElementById('langSelect');
+            if (sel && sel.value !== lang) sel.value = lang;
+
+            // Kaydet
+            try { localStorage.setItem('preferred_lang', lang); } catch (e) {}
+
+            console.log('🌐 Dil değiştirildi:', lang);
+        }
+        window.changeLanguage = changeLanguage;
+
+        // ===== PARÇACIK SİSTEMİ =====
         (function initParticles() {
             var container = document.getElementById('particles');
             if (!container) return;
@@ -1531,12 +2351,40 @@
             console.log('✨ vizyon-al.html parçacıklar hazır: ' + count);
         })();
 
-        // URL'den ?openVizyonAl=1 varsa anasayfaya yönlendir
+        // ===== SAYFA BAŞLANGICI =====
         document.addEventListener('DOMContentLoaded', function () {
-            var url = new URL(window.location.href);
-            if (url.pathname.indexOf('vizyon-al.html') !== -1) {
-                // Bu sayfa — sadece log
-                console.log('✨ Vizyon Al tanıtım sayfası yüklendi (v7.10.0)');
+            // Dil tercihini yükle
+            var savedLang = null;
+            try { savedLang = localStorage.getItem('preferred_lang'); } catch (e) {}
+
+            var urlParams = new URLSearchParams(window.location.search);
+            var urlLang = urlParams.get('lang');
+
+            var finalLang = 'tr';
+            if (urlLang && ['tr', 'en', 'ar'].indexOf(urlLang) !== -1) finalLang = urlLang;
+            else if (savedLang && ['tr', 'en', 'ar'].indexOf(savedLang) !== -1) finalLang = savedLang;
+
+            changeLanguage(finalLang);
+
+            // Console bilgilendirme
+            console.log('%c✨ VİZYON 2027 — Vizyon Al Sayfası v3.0 (v7.10.0)',
+                'color:#b845ff;font-weight:bold;font-size:14px;');
+            console.log('%c✅ Back4App uyumlu — index.html + Cloud Code v7.10.0 ile senkron',
+                'color:#00ff9d;font-size:12px;');
+            console.log('%c🎯 Vizyon Al Özellikleri:', 'color:#00e5ff;font-size:12px;font-weight:bold;');
+            console.log('%c   → 21 model (13 Ollama + 8 Cloud API)', 'color:#8aa8d4;font-size:11px;');
+            console.log('%c   → 4 mod: Normal, Derin Düşünme, Ajan, Yazılımcı', 'color:#8aa8d4;font-size:11px;');
+            console.log('%c   → Ekran Okuma + Sesli Sohbet + Dosya Analiz', 'color:#8aa8d4;font-size:11px;');
+            console.log('%c   → Sunum + İndirilebilir Dosya', 'color:#8aa8d4;font-size:11px;');
+            console.log('%c⌨️ Klavye kısayolları: Ctrl+1/2/3 ile dil değiştir', 'color:#ffd11a;font-size:11px;');
+        });
+
+        // ===== Klavye kısayolları: Ctrl+1/2/3 ile dil =====
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === '1') { e.preventDefault(); changeLanguage('tr'); }
+                if (e.key === '2') { e.preventDefault(); changeLanguage('en'); }
+                if (e.key === '3') { e.preventDefault(); changeLanguage('ar'); }
             }
         });
     </script>
