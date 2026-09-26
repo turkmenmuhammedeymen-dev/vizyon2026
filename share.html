@@ -4,51 +4,247 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta name="theme-color" content="#03050a" />
+    <meta name="description" content="VİZYON 2027 — Paylaşılan Sohbet Görüntüleyici" />
     <title>Paylaşılan Sohbet | VİZYON 2027</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://vizyon2026.vercel.app/logo.png" />
+    <link rel="apple-touch-icon" href="https://vizyon2026.vercel.app/logo.png" />
+
+    <!-- Harici Kütüphaneler -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet" />
+
     <style>
+        /* ============================================================ */
+        /* ROOT DEĞİŞKENLERİ — index.html v7.10.0 ile aynı             */
+        /* ============================================================ */
+        :root {
+            --bg: #03050a;
+            --bg2: #060a14;
+            --bg3: #0a1020;
+            --surface: #0a1020;
+            --surface2: #0e1630;
+            --surface3: #141e40;
+            --border: #1a2a4a;
+            --border2: #24365e;
+
+            --accent: #00e5ff;
+            --accent-hover: #4df0ff;
+            --accent2: #00ff9d;
+            --accent3: #ff5e1a;
+            --accent4: #ff2d92;
+            --gold: #ffd11a;
+            --gold-soft: #ffcc4d;
+            --purple: #b845ff;
+            --purple-hover: #d17bff;
+            --pink: #ff2d92;
+            --deep-blue: #0049ff;
+
+            --text: #ffffff;
+            --text2: #d4e5ff;
+            --text3: #8aa8d4;
+            --text4: #5a7aa8;
+
+            --danger: #ff4757;
+            --success: #00ff9d;
+            --warning: #ffb700;
+            --info: #00e5ff;
+
+            --font-display: 'Syne', sans-serif;
+            --font-code: 'Fira Code', monospace;
+            --font-body: 'Inter', sans-serif;
+
+            --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.6);
+            --shadow-glow: 0 0 30px rgba(0, 229, 255, 0.45);
+            --shadow-glow-purple: 0 0 40px rgba(184, 69, 255, 0.55);
+            --shadow-glow-pink: 0 0 40px rgba(255, 45, 146, 0.55);
+
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.25s ease;
+            --transition-slow: 0.4s ease;
+        }
+
+        /* ============================================================ */
+        /* RESET + BODY                                                 */
+        /* ============================================================ */
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+
         html, body { overflow-x: hidden; }
+
         body {
-            background: #050a0f;
-            background-image:
-                radial-gradient(ellipse 100% 50% at 50% 0%, rgba(0, 212, 255, 0.05) 0%, transparent 60%),
-                radial-gradient(ellipse 80% 40% at 20% 100%, rgba(168, 85, 247, 0.04) 0%, transparent 60%);
-            background-attachment: fixed;
-            color: #ccdeee;
-            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
             line-height: 1.7;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 40px 20px;
+            position: relative;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        a { color: #00d4ff; text-decoration: none; transition: color 0.2s ease; }
-        a:hover { color: #a855f7; }
 
         /* ============================================================ */
-        /* CONTAINER                                                    */
+        /* EFSANE AURORA / NEBULA ARKA PLAN                             */
         /* ============================================================ */
-        .container {
-            max-width: 920px;
-            width: 100%;
-            background: rgba(13, 26, 38, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(0, 212, 255, 0.12);
-            border-radius: 28px;
-            padding: 40px 36px;
-            box-shadow: 0 12px 60px rgba(0, 0, 0, 0.5);
-            position: relative;
-            z-index: 2;
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 0%, rgba(0, 229, 255, 0.12) 0%, transparent 55%),
+                radial-gradient(ellipse 70% 50% at 80% 10%, rgba(184, 69, 255, 0.10) 0%, transparent 55%),
+                radial-gradient(ellipse 90% 60% at 50% 100%, rgba(255, 45, 146, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 10% 60%, rgba(0, 255, 157, 0.06) 0%, transparent 60%);
+            animation: auroraShift 24s ease-in-out infinite alternate;
+            will-change: opacity, transform;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        @keyframes auroraShift {
+            0%   { opacity: 0.75; transform: scale(1) rotate(0deg); }
+            50%  { opacity: 1;    transform: scale(1.06) rotate(2deg); }
+            100% { opacity: 0.85; transform: scale(1) rotate(0deg); }
+        }
+
+        /* Grid overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(0, 229, 255, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.025) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 85%);
+            -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 85%);
+            opacity: 0.6;
+            animation: gridPulse 12s ease-in-out infinite;
+        }
+
+        @keyframes gridPulse {
+            0%, 100% { opacity: 0.4; }
+            50%      { opacity: 0.75; }
         }
 
         /* ============================================================ */
-        /* HEADER                                                       */
+        /* PARÇACIK SİSTEMİ                                             */
+        /* ============================================================ */
+        #particles {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+            contain: strict;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: float-up linear infinite;
+            opacity: 0;
+            will-change: transform, opacity;
+            box-shadow: 0 0 6px var(--accent);
+        }
+
+        .particle:nth-child(2n) {
+            background: var(--accent2);
+            width: 3px;
+            height: 3px;
+            box-shadow: 0 0 8px var(--accent2);
+        }
+
+        .particle:nth-child(3n) {
+            background: var(--purple);
+            width: 2.5px;
+            height: 2.5px;
+            box-shadow: 0 0 8px var(--purple);
+        }
+
+        .particle:nth-child(5n) {
+            background: var(--pink);
+            box-shadow: 0 0 10px var(--pink);
+        }
+
+        .particle:nth-child(7n) {
+            background: var(--gold);
+            box-shadow: 0 0 10px var(--gold);
+        }
+
+        @keyframes float-up {
+            0%   { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10%  { opacity: 0.9; }
+            50%  { opacity: 0.7; }
+            90%  { opacity: 0.35; }
+            100% { transform: translateY(-150px) translateX(30px); opacity: 0; }
+        }
+
+        /* ============================================================ */
+        /* CONTAINER — Cam efekt + Aurora kenar                        */
+        /* ============================================================ */
+        .container {
+            max-width: 960px;
+            width: 100%;
+            background: linear-gradient(135deg, rgba(10, 16, 32, 0.88), rgba(6, 10, 20, 0.92));
+            backdrop-filter: blur(28px) saturate(160%);
+            -webkit-backdrop-filter: blur(28px) saturate(160%);
+            border: 1px solid rgba(0, 229, 255, 0.20);
+            border-radius: 28px;
+            padding: 40px 36px;
+            box-shadow:
+                0 20px 80px rgba(0, 0, 0, 0.6),
+                0 0 60px rgba(0, 229, 255, 0.10),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        /* Aurora üst kenar */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--accent) 20%,
+                var(--purple) 50%,
+                var(--pink) 80%,
+                transparent
+            );
+            opacity: 0.85;
+            animation: borderFlow 4s ease-in-out infinite alternate;
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        @keyframes borderFlow {
+            0%   { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* ============================================================ */
+        /* HEADER — Logo + Geri Dön                                     */
         /* ============================================================ */
         .header {
             display: flex;
@@ -57,289 +253,610 @@
             flex-wrap: wrap;
             gap: 16px;
             padding-bottom: 24px;
-            border-bottom: 1px solid rgba(0, 212, 255, 0.12);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.12);
             margin-bottom: 30px;
+            position: relative;
         }
-        .logo-area { display: flex; align-items: center; gap: 12px; }
-        .logo-icon {
-            width: 44px; height: 44px;
-            background: linear-gradient(135deg, #00d4ff, #a855f7, #ff6b35);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 20px; font-weight: 700; color: #fff;
-            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-svg {
+            width: 52px;
+            height: 52px;
             flex-shrink: 0;
+            filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.6));
         }
+
         .logo-text {
-            font-family: 'Syne', sans-serif;
-            font-size: 22px; font-weight: 800;
-            background: linear-gradient(45deg, #00d4ff, #a855f7, #ff6b35, #00d4ff);
-            background-size: 300% 300%;
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(45deg, #00e5ff, #00ff9d, #b845ff, #ff2d92, #ffd11a, #00e5ff);
+            background-size: 400% 400%;
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            animation: gradientMove 4s ease infinite;
+            animation: gradientMove 5s ease infinite;
             white-space: nowrap;
+            letter-spacing: 1px;
         }
+
         @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0%, 100% { background-position: 0% 50%; }
+            50%      { background-position: 100% 50%; }
         }
+
         .back-link {
-            display: inline-flex; align-items: center; gap: 6px;
-            font-size: 13px; font-weight: 600;
-            padding: 8px 18px;
-            border: 1px solid #00d4ff;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 10px 22px;
+            border: 1.5px solid var(--accent);
             border-radius: 40px;
-            color: #00d4ff;
+            color: var(--accent);
             background: transparent;
-            transition: all 0.25s ease;
+            transition: all var(--transition-normal);
             cursor: pointer;
             white-space: nowrap;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
         }
+
+        .back-link::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.15), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+            pointer-events: none;
+        }
+
+        .back-link:hover::before {
+            transform: translateX(100%);
+        }
+
         .back-link:hover {
-            background: rgba(0, 212, 255, 0.12);
-            box-shadow: 0 0 25px rgba(0, 212, 255, 0.2);
-            transform: scale(1.02);
-            color: #00d4ff;
+            background: rgba(0, 229, 255, 0.12);
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+            transform: translateY(-2px);
+            color: var(--accent);
+            text-decoration: none;
         }
 
         /* ============================================================ */
         /* STATES                                                       */
         /* ============================================================ */
-        .state-view { display: none; animation: fadeIn 0.35s ease; }
+        .state-view { display: none; animation: fadeIn 0.4s ease; }
         .state-view.active { display: block; }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- LOADING --- */
-        .loading-state { text-align: center; padding: 60px 20px; }
-        .loading-spinner {
-            display: inline-block; width: 44px; height: 44px;
-            border: 3px solid rgba(0, 212, 255, 0.1);
-            border-top-color: #00d4ff;
+        /* ============================================================ */
+        /* 1) LOADING STATE — Efsane splash                             */
+        /* ============================================================ */
+        .loading-state {
+            text-align: center;
+            padding: 70px 20px;
+        }
+
+        .loading-logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 26px;
+            padding: 10px;
+            border-radius: 28px;
+            background: rgba(8, 14, 28, 0.75);
+            border: 1.5px solid rgba(0, 229, 255, 0.5);
+            box-shadow:
+                0 0 40px rgba(0, 229, 255, 0.35),
+                0 0 100px rgba(184, 69, 255, 0.25);
+            position: relative;
+            overflow: hidden;
+            animation: loadingPulse 2.2s ease-in-out infinite;
+        }
+
+        .loading-logo::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 30px;
+            background: conic-gradient(
+                from 0deg,
+                #00e5ff, #00ff9d, #ffd11a, #ff2d92, #b845ff, #00e5ff
+            );
+            animation: logoBorderSpin 4s linear infinite;
+            z-index: -1;
+        }
+
+        .loading-logo::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border-radius: 25px;
+            background: #050812;
+            z-index: -1;
+        }
+
+        .loading-logo img,
+        .loading-logo svg {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            border-radius: 20px;
+        }
+
+        @keyframes loadingPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(0, 229, 255, 0.35), 0 0 100px rgba(184, 69, 255, 0.25); }
+            50%      { transform: scale(1.04); box-shadow: 0 0 60px rgba(0, 229, 255, 0.55), 0 0 130px rgba(184, 69, 255, 0.4); }
+        }
+
+        @keyframes logoBorderSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text3);
+            font-size: 14.5px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        .loading-dots {
+            display: inline-flex;
+            gap: 6px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 16px;
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+            background: var(--accent);
+            animation: dotBounce 1.4s ease-in-out infinite both;
+            box-shadow: 0 0 10px var(--accent);
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text { color: #8ab4cc; font-size: 15px; }
 
-        /* --- ERROR --- */
-        .error-state { text-align: center; padding: 50px 20px; }
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s; background: var(--purple); box-shadow: 0 0 10px var(--purple); }
+        .loading-dots span:nth-child(3) { animation-delay: 0s; background: var(--pink); box-shadow: 0 0 10px var(--pink); }
+
+        @keyframes dotBounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40%           { transform: scale(1);   opacity: 1; }
+        }
+
+        /* ============================================================ */
+        /* 2) ERROR STATE                                               */
+        /* ============================================================ */
+        .error-state {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
         .error-icon {
-            font-size: 56px; color: #ff6b6b;
-            margin-bottom: 16px; display: block;
-            animation: pulseError 1.5s ease-in-out infinite;
-        }
-        @keyframes pulseError {
-            0%, 100% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.05); opacity: 1; }
-        }
-        .error-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 22px; font-weight: 700;
-            color: #fff; margin-bottom: 8px;
-        }
-        .error-message {
-            color: #8ab4cc; font-size: 14px;
-            max-width: 480px; margin: 0 auto 16px;
-            line-height: 1.7;
-        }
-        .error-hint { font-size: 12px; color: #5a7a8a; margin-top: 16px; }
-
-        /* --- PASSWORD --- */
-        .password-state { text-align: center; padding: 40px 20px; max-width: 480px; margin: 0 auto; }
-        .password-icon {
-            width: 88px; height: 88px;
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(168, 85, 247, 0.15));
-            border: 2px solid rgba(0, 212, 255, 0.4);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
+            width: 100px;
+            height: 100px;
             margin: 0 auto 22px;
-            font-size: 40px; color: #00d4ff;
-            box-shadow: 0 0 40px rgba(0, 212, 255, 0.25);
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.15), rgba(255, 45, 146, 0.10));
+            border: 2px solid rgba(255, 71, 87, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 44px;
+            color: var(--danger);
+            box-shadow: 0 0 40px rgba(255, 71, 87, 0.25);
+            animation: errorPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes errorPulse {
+            0%, 100% { box-shadow: 0 0 40px rgba(255, 71, 87, 0.25); }
+            50%      { box-shadow: 0 0 60px rgba(255, 71, 87, 0.45); }
+        }
+
+        .error-title {
+            font-family: var(--font-display);
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 12px;
+            letter-spacing: -0.3px;
+        }
+
+        .error-message {
+            color: var(--text3);
+            font-size: 14.5px;
+            max-width: 520px;
+            margin: 0 auto 16px;
+            line-height: 1.8;
+        }
+
+        .error-hint {
+            display: inline-block;
+            font-size: 12.5px;
+            color: var(--text4);
+            margin-top: 12px;
+            padding: 10px 18px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            line-height: 1.6;
+            font-family: var(--font-code);
+        }
+
+        /* ============================================================ */
+        /* 3) PASSWORD STATE                                            */
+        /* ============================================================ */
+        .password-state {
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .password-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(184, 69, 255, 0.15));
+            border: 2px solid rgba(0, 229, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            color: var(--accent);
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.35);
             animation: lockPulse 2s ease-in-out infinite;
+            position: relative;
         }
+
+        .password-icon::after {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            border: 1px dashed rgba(0, 229, 255, 0.3);
+            animation: lockRingSpin 12s linear infinite;
+        }
+
+        @keyframes lockRingSpin {
+            to { transform: rotate(360deg); }
+        }
+
         @keyframes lockPulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(0, 212, 255, 0.25); }
-            50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(0, 212, 255, 0.45); }
+            0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(0, 229, 255, 0.35); }
+            50%      { transform: scale(1.05); box-shadow: 0 0 60px rgba(0, 229, 255, 0.6); }
         }
+
         .password-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 26px; font-weight: 800;
-            color: #fff; margin-bottom: 10px;
+            font-family: var(--font-display);
+            font-size: 27px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 12px;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, var(--accent), var(--purple), var(--pink));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientMove 4s ease infinite;
         }
+
         .password-subtitle {
-            font-size: 13.5px; color: #8ab4cc;
-            margin-bottom: 28px; line-height: 1.7;
+            font-size: 13.5px;
+            color: var(--text3);
+            margin-bottom: 28px;
+            line-height: 1.75;
         }
-        .password-subtitle strong { color: #00ff88; font-weight: 700; }
-        .password-input-wrap { position: relative; margin-bottom: 12px; }
+
+        .password-subtitle strong {
+            color: var(--accent2);
+            font-weight: 700;
+            text-shadow: 0 0 15px rgba(0, 255, 157, 0.5);
+        }
+
+        .password-input-wrap {
+            position: relative;
+            margin-bottom: 14px;
+        }
+
         .password-input {
             width: 100%;
-            padding: 16px 52px 16px 20px;
-            background: rgba(5, 10, 15, 0.8);
-            border: 2px solid rgba(0, 212, 255, 0.25);
+            padding: 16px 54px 16px 20px;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.04), rgba(184, 69, 255, 0.02));
+            border: 2px solid rgba(0, 229, 255, 0.25);
             border-radius: 16px;
-            color: #fff;
-            font-size: 18px;
-            font-family: 'Fira Code', monospace;
+            color: var(--text);
+            font-size: 17px;
+            font-family: var(--font-code);
             letter-spacing: 3px;
             text-align: center;
-            transition: all 0.25s ease;
+            transition: all var(--transition-normal);
             outline: none;
         }
+
         .password-input:focus {
-            border-color: #00d4ff;
-            box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.1), 0 0 30px rgba(0, 212, 255, 0.2);
+            border-color: var(--accent);
+            box-shadow:
+                0 0 0 4px rgba(0, 229, 255, 0.10),
+                0 0 30px rgba(0, 229, 255, 0.30);
             background: rgba(5, 10, 15, 0.95);
         }
+
         .password-input::placeholder {
-            color: #4a6a7a;
+            color: var(--text4);
             letter-spacing: 1px;
-            font-size: 14px;
+            font-size: 13px;
+            font-family: var(--font-body);
         }
+
         .password-toggle {
             position: absolute;
-            top: 50%; right: 14px;
+            top: 50%;
+            right: 14px;
             transform: translateY(-50%);
             background: transparent;
             border: none;
-            color: #8ab4cc;
-            font-size: 20px;
+            color: var(--text3);
+            font-size: 19px;
             cursor: pointer;
-            padding: 6px 10px;
+            padding: 8px 10px;
             border-radius: 10px;
-            transition: all 0.2s ease;
+            transition: all var(--transition-fast);
         }
-        .password-toggle:hover { color: #00d4ff; background: rgba(0, 212, 255, 0.08); }
+
+        .password-toggle:hover {
+            color: var(--accent);
+            background: rgba(0, 229, 255, 0.08);
+        }
+
         .password-btn {
-            width: 100%; padding: 16px;
-            background: linear-gradient(135deg, #00d4ff, #a855f7);
-            color: #fff; border: none;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00e5ff, #b845ff, #ff2d92);
+            background-size: 200% 200%;
+            color: #fff;
+            border: none;
             border-radius: 16px;
-            font-size: 16px; font-weight: 700;
-            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: var(--font-body);
             letter-spacing: 0.5px;
             cursor: pointer;
-            transition: all 0.25s ease;
-            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.35);
+            transition: all var(--transition-normal);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 25px rgba(0, 229, 255, 0.4);
+            animation: btnGrad 4s ease infinite;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
         }
+
+        .password-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            animation: btnShine 3s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes btnShine {
+            0%   { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        @keyframes btnGrad {
+            0%, 100% { background-position: 0% 50%; }
+            50%      { background-position: 100% 50%; }
+        }
+
         .password-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 30px rgba(0, 212, 255, 0.55);
+            transform: translateY(-2px) scale(1.01);
+            box-shadow:
+                0 8px 40px rgba(0, 229, 255, 0.7),
+                0 0 60px rgba(184, 69, 255, 0.4);
         }
-        .password-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+        .password-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            animation: none;
+        }
+
         .password-error {
             display: none;
             margin-top: 14px;
             padding: 12px 16px;
-            background: rgba(255, 71, 87, 0.1);
-            border: 1px solid rgba(255, 71, 87, 0.4);
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.12), rgba(255, 45, 146, 0.08));
+            border: 1.5px solid rgba(255, 71, 87, 0.4);
             border-radius: 12px;
             color: #ff6b7c;
             font-size: 13px;
             line-height: 1.6;
-        }
-        .password-error.show { display: block; animation: shake 0.4s ease; }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-6px); }
-            40% { transform: translateX(6px); }
-            60% { transform: translateX(-4px); }
-            80% { transform: translateX(4px); }
-        }
-        .password-info {
-            margin-top: 22px;
-            padding: 12px 16px;
-            background: rgba(0, 212, 255, 0.05);
-            border: 1px solid rgba(0, 212, 255, 0.15);
-            border-radius: 12px;
-            font-size: 12px;
-            color: #6a8a9a;
-            line-height: 1.7;
             text-align: left;
         }
-        .password-info strong { color: #00d4ff; }
-        .attempt-counter {
-            margin-top: 10px;
-            font-size: 11.5px;
-            color: #ffb700;
-            font-weight: 600;
-            text-align: center;
+
+        .password-error.show {
+            display: block;
+            animation: shake 0.4s ease;
         }
 
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%      { transform: translateX(-6px); }
+            40%      { transform: translateX(6px); }
+            60%      { transform: translateX(-4px); }
+            80%      { transform: translateX(4px); }
+        }
+
+        .attempt-counter {
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--warning);
+            font-weight: 600;
+            min-height: 18px;
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+
+        .password-info {
+            margin-top: 24px;
+            padding: 14px 18px;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.05), rgba(184, 69, 255, 0.03));
+            border: 1px solid rgba(0, 229, 255, 0.15);
+            border-radius: 14px;
+            font-size: 12px;
+            color: var(--text3);
+            line-height: 1.75;
+            text-align: left;
+        }
+
+        .password-info strong { color: var(--accent); }
+
         /* ============================================================ */
-        /* CHAT VIEW                                                    */
+        /* 4) CHAT STATE                                                */
         /* ============================================================ */
         .chat-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 26px; font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 6px;
+            font-family: var(--font-display);
+            font-size: 27px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 10px;
             word-break: break-word;
-            display: flex; align-items: center; gap: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             flex-wrap: wrap;
+            letter-spacing: -0.3px;
         }
-        .chat-title .chat-emoji { font-size: 28px; }
+
+        .chat-title .chat-emoji {
+            font-size: 30px;
+            filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.5));
+        }
+
         .chat-subtitle {
-            font-size: 13px; color: #8ab4cc;
-            margin-bottom: 22px;
-            display: flex; align-items: center; gap: 10px;
+            font-size: 13px;
+            color: var(--text3);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             flex-wrap: wrap;
         }
-        .chat-subtitle .sub-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 4px 12px;
-            background: rgba(0, 212, 255, 0.08);
-            border: 1px solid rgba(0, 212, 255, 0.2);
+
+        .sub-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(184, 69, 255, 0.04));
+            border: 1px solid rgba(0, 229, 255, 0.25);
             border-radius: 30px;
             font-size: 11.5px;
-            color: #00d4ff;
+            color: var(--accent);
             font-weight: 600;
+            letter-spacing: 0.3px;
         }
-        .chat-subtitle .sub-badge.readonly {
-            color: #ffb700;
-            border-color: rgba(255, 183, 0, 0.3);
-            background: rgba(255, 183, 0, 0.08);
+
+        .sub-badge.readonly {
+            color: var(--warning);
+            border-color: rgba(255, 183, 0, 0.35);
+            background: linear-gradient(135deg, rgba(255, 183, 0, 0.10), rgba(255, 140, 0, 0.05));
         }
-        .chat-subtitle .sub-badge.koc {
-            color: #ffd700;
-            border-color: rgba(255, 215, 0, 0.3);
-            background: rgba(255, 215, 0, 0.08);
+
+        .sub-badge.koc {
+            color: var(--gold);
+            border-color: rgba(255, 209, 26, 0.35);
+            background: linear-gradient(135deg, rgba(255, 209, 26, 0.10), rgba(255, 140, 0, 0.05));
+            box-shadow: 0 0 15px rgba(255, 209, 26, 0.15);
         }
 
         /* ============================================================ */
-        /* MESSAGES — YENİ LAYOUT (RIGHT = SAHİBİ, LEFT = AI)           */
+        /* CHAT ACTIONS                                                 */
+        /* ============================================================ */
+        .chat-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .chat-action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.06), rgba(184, 69, 255, 0.03));
+            border: 1.5px solid rgba(0, 229, 255, 0.25);
+            border-radius: 30px;
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            font-family: var(--font-body);
+            letter-spacing: 0.3px;
+        }
+
+        .chat-action-btn:hover {
+            background: rgba(0, 229, 255, 0.15);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+        }
+
+        /* ============================================================ */
+        /* MESSAGES — Cam efekt + Neon border                           */
         /* ============================================================ */
         .messages-container {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 16px;
             max-height: 66vh;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 4px 8px 4px 2px;
+            padding: 6px 10px 6px 4px;
             scroll-behavior: smooth;
+            overscroll-behavior: contain;
         }
+
         .messages-container::-webkit-scrollbar { width: 8px; }
         .messages-container::-webkit-scrollbar-track {
             background: rgba(255, 255, 255, 0.03);
             border-radius: 10px;
         }
         .messages-container::-webkit-scrollbar-thumb {
-            background: rgba(0, 212, 255, 0.3);
+            background: linear-gradient(180deg, rgba(0, 229, 255, 0.4), rgba(184, 69, 255, 0.4));
             border-radius: 10px;
             border: 2px solid rgba(13, 26, 38, 0.6);
         }
         .messages-container::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 212, 255, 0.55);
+            background: linear-gradient(180deg, var(--accent), var(--purple));
         }
 
         .message-row {
@@ -347,18 +864,20 @@
             align-items: flex-end;
             gap: 10px;
             max-width: 100%;
-            animation: msgIn 0.35s ease;
+            animation: msgIn 0.4s ease;
         }
+
         @keyframes msgIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
-        .message-row.left { justify-content: flex-start; }
+
+        .message-row.left  { justify-content: flex-start; }
         .message-row.right { justify-content: flex-end; }
 
         .message-avatar {
-            width: 38px;
-            height: 38px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -367,185 +886,272 @@
             flex-shrink: 0;
             border: 2px solid;
             font-weight: 700;
+            position: relative;
         }
+
         .message-row.left .message-avatar {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(0, 255, 136, 0.15));
-            border-color: rgba(255, 215, 0, 0.5);
-            color: #ffd700;
+            background: linear-gradient(135deg, rgba(255, 209, 26, 0.25), rgba(0, 255, 157, 0.15));
+            border-color: rgba(255, 209, 26, 0.55);
+            color: var(--gold);
+            box-shadow: 0 0 20px rgba(255, 209, 26, 0.30);
         }
+
         .message-row.right .message-avatar {
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(168, 85, 247, 0.15));
-            border-color: rgba(0, 212, 255, 0.5);
-            color: #00d4ff;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.25), rgba(184, 69, 255, 0.15));
+            border-color: rgba(0, 229, 255, 0.55);
+            color: var(--accent);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.30);
         }
 
         .message-bubble {
             max-width: 74%;
-            padding: 12px 16px;
+            padding: 13px 18px;
             border-radius: 18px;
             word-break: break-word;
             position: relative;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+
         .message-row.left .message-bubble {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(0, 255, 136, 0.05));
-            border-left: 3px solid #ffd700;
+            background: linear-gradient(135deg, rgba(255, 209, 26, 0.10), rgba(0, 255, 157, 0.06));
+            border-left: 3px solid var(--gold);
             border-radius: 18px 18px 18px 6px;
+            box-shadow:
+                0 4px 20px rgba(0, 0, 0, 0.3),
+                0 0 25px rgba(255, 209, 26, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
+
         .message-row.right .message-bubble {
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.14), rgba(0, 212, 255, 0.06));
-            border-right: 3px solid #00d4ff;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.16), rgba(0, 229, 255, 0.06));
+            border-right: 3px solid var(--accent);
             border-radius: 18px 18px 6px 18px;
+            box-shadow:
+                0 4px 20px rgba(0, 0, 0, 0.3),
+                0 0 25px rgba(0, 229, 255, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .message-bubble:hover {
+            transform: translateY(-1px);
+        }
+
+        .message-row.left .message-bubble:hover {
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4), 0 0 35px rgba(255, 209, 26, 0.20);
+        }
+
+        .message-row.right .message-bubble:hover {
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4), 0 0 35px rgba(0, 229, 255, 0.20);
         }
 
         .message-sender {
             font-weight: 700;
             font-size: 12.5px;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
             display: flex;
             align-items: center;
             gap: 8px;
             flex-wrap: wrap;
+            letter-spacing: 0.3px;
         }
-        .message-row.left .message-sender { color: #ffd700; }
-        .message-row.right .message-sender { color: #00d4ff; }
+
+        .message-row.left .message-sender { color: var(--gold); }
+        .message-row.right .message-sender { color: var(--accent); }
 
         .message-sender .sender-role {
             font-size: 9.5px;
-            font-weight: 600;
-            padding: 2px 8px;
+            font-weight: 700;
+            padding: 2px 9px;
             border-radius: 20px;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.35);
             color: inherit;
             border: 1px solid currentColor;
-            letter-spacing: 0.3px;
-            opacity: 0.85;
+            letter-spacing: 0.4px;
+            opacity: 0.9;
+            text-transform: uppercase;
         }
 
         .message-text {
             font-size: 14.5px;
-            color: #e8f0f8;
+            color: var(--text2);
             word-break: break-word;
             white-space: pre-wrap;
-            line-height: 1.7;
+            line-height: 1.75;
         }
+
         .message-text code {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 2px 8px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.3));
+            padding: 3px 9px;
             border-radius: 6px;
-            font-family: 'Fira Code', monospace;
+            font-family: var(--font-code);
             font-size: 13px;
-            color: #00ff88;
-            border: 1px solid rgba(0, 212, 255, 0.12);
+            color: var(--accent2);
+            border: 1px solid rgba(0, 229, 255, 0.15);
+            display: inline-block;
+            margin: 1px 0;
         }
 
         .message-time {
             font-size: 10.5px;
-            color: #5a7a8a;
-            margin-top: 6px;
-            opacity: 0.8;
+            color: var(--text4);
+            margin-top: 8px;
+            opacity: 0.85;
+            letter-spacing: 0.3px;
         }
+
         .message-row.right .message-time { text-align: right; }
 
         .message-file {
-            margin-top: 8px;
+            margin-top: 10px;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 6px 14px;
-            background: rgba(0, 212, 255, 0.08);
-            border: 1px solid rgba(0, 212, 255, 0.2);
+            padding: 7px 16px;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.10), rgba(184, 69, 255, 0.06));
+            border: 1.5px solid rgba(0, 229, 255, 0.25);
             border-radius: 20px;
             font-size: 12.5px;
-            color: #00d4ff;
-            transition: all 0.2s ease;
+            color: var(--accent);
+            transition: all var(--transition-normal);
             width: fit-content;
             max-width: 100%;
+            font-weight: 600;
         }
+
         .message-file:hover {
-            background: rgba(0, 212, 255, 0.18);
-            border-color: #00d4ff;
+            background: rgba(0, 229, 255, 0.20);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.35);
+            transform: translateY(-1px);
         }
+
         .message-file a {
             color: inherit;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 200px;
+            max-width: 220px;
+            text-decoration: none;
         }
 
         .message-image {
-            margin-top: 8px;
+            margin-top: 10px;
             max-width: 100%;
-            max-height: 320px;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 212, 255, 0.15);
+            max-height: 340px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 229, 255, 0.2);
             display: block;
             cursor: pointer;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
         }
+
         .message-image:hover {
-            transform: scale(1.01);
-            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.25);
+            transform: scale(1.02);
+            box-shadow: 0 10px 40px rgba(0, 229, 255, 0.35);
+            border-color: var(--accent);
         }
 
         .empty-chat {
             text-align: center;
-            padding: 40px 20px;
-            color: #8ab4cc;
-        }
-        .empty-chat i {
-            font-size: 44px;
-            display: block;
-            margin-bottom: 12px;
-            color: #4a6a7a;
+            padding: 50px 20px;
+            color: var(--text3);
+            font-size: 14px;
         }
 
-        /* Chat action bar */
-        .chat-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
+        .empty-chat i {
+            font-size: 52px;
+            display: block;
             margin-bottom: 16px;
-        }
-        .chat-action-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            background: rgba(0, 212, 255, 0.06);
-            border: 1px solid rgba(0, 212, 255, 0.25);
-            border-radius: 30px;
-            color: #00d4ff;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .chat-action-btn:hover {
-            background: rgba(0, 212, 255, 0.15);
-            border-color: #00d4ff;
-            transform: translateY(-1px);
+            color: var(--text4);
+            opacity: 0.5;
         }
 
         /* ============================================================ */
         /* FOOTER                                                       */
         /* ============================================================ */
         .page-footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(0, 212, 255, 0.08);
+            margin-top: 32px;
+            padding-top: 22px;
+            border-top: 1px solid rgba(0, 229, 255, 0.08);
             text-align: center;
-            color: #5a7a8a;
+            color: var(--text4);
             font-size: 12.5px;
-            line-height: 1.8;
+            line-height: 1.85;
+            position: relative;
         }
-        .page-footer a { color: #00d4ff; }
-        .page-footer a:hover { color: #a855f7; }
+
+        .page-footer::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.4;
+        }
+
+        .page-footer a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        .page-footer a:hover {
+            color: var(--purple);
+            text-shadow: 0 0 12px rgba(184, 69, 255, 0.5);
+        }
+
         .page-footer .footer-warn {
             display: block;
-            margin-top: 8px;
+            margin-top: 10px;
             font-size: 11.5px;
-            color: #4a6a7a;
+            color: var(--text4);
+            opacity: 0.85;
+            line-height: 1.7;
+        }
+
+        /* ============================================================ */
+        /* TOAST                                                        */
+        /* ============================================================ */
+        .vz-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(135deg, #00e5ff, #b845ff, #ff2d92);
+            background-size: 200% 200%;
+            color: #fff;
+            padding: 14px 26px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 13.5px;
+            z-index: 99999;
+            box-shadow:
+                0 10px 40px rgba(0, 229, 255, 0.5),
+                0 0 60px rgba(184, 69, 255, 0.3);
+            animation: toastGrad 4s ease infinite;
+            font-family: var(--font-body);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            letter-spacing: 0.3px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            max-width: calc(100vw - 40px);
+            text-align: center;
+        }
+
+        @keyframes toastGrad {
+            0%, 100% { background-position: 0% 50%; }
+            50%      { background-position: 100% 50%; }
+        }
+
+        .vz-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
 
         /* ============================================================ */
@@ -557,58 +1163,66 @@
             .header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 10px;
+                gap: 12px;
                 padding-bottom: 18px;
                 margin-bottom: 22px;
             }
-            .logo-text { font-size: 18px; }
-            .logo-icon { width: 38px; height: 38px; font-size: 17px; }
-            .back-link { font-size: 12px; padding: 7px 15px; }
+            .logo-svg { width: 44px; height: 44px; }
+            .logo-text { font-size: 19px; }
+            .back-link { font-size: 12px; padding: 8px 18px; }
             .chat-title { font-size: 20px; }
-            .chat-title .chat-emoji { font-size: 22px; }
+            .chat-title .chat-emoji { font-size: 24px; }
             .password-title { font-size: 22px; }
             .password-subtitle { font-size: 12.5px; }
-            .password-icon { width: 72px; height: 72px; font-size: 32px; }
+            .password-icon { width: 82px; height: 82px; font-size: 34px; }
             .password-input { font-size: 16px; padding: 14px 46px 14px 16px; letter-spacing: 2px; }
             .password-btn { font-size: 15px; padding: 14px; }
-            .message-bubble { max-width: 82%; padding: 10px 14px; }
+            .message-bubble { max-width: 84%; padding: 11px 15px; }
             .message-text { font-size: 13.5px; }
             .message-sender { font-size: 12px; }
             .message-avatar { width: 34px; height: 34px; font-size: 16px; }
-            .messages-container { max-height: 68vh; gap: 10px; }
+            .messages-container { max-height: 68vh; gap: 12px; }
+            .loading-logo { width: 84px; height: 84px; border-radius: 24px; }
+            .error-icon { width: 82px; height: 82px; font-size: 36px; }
+            .error-title { font-size: 22px; }
+            .error-message { font-size: 13.5px; }
         }
 
         @media (max-width: 480px) {
             body { padding: 12px 8px; }
             .container { padding: 18px 14px; border-radius: 16px; }
-            .logo-icon { width: 34px; height: 34px; font-size: 15px; }
-            .logo-text { font-size: 16px; }
-            .back-link { font-size: 11px; padding: 6px 12px; }
+            .logo-svg { width: 38px; height: 38px; }
+            .logo-text { font-size: 16px; letter-spacing: 0.5px; }
+            .back-link { font-size: 11px; padding: 7px 14px; gap: 5px; }
             .chat-title { font-size: 17px; }
-            .chat-subtitle { font-size: 11.5px; }
-            .sub-badge { font-size: 10.5px; padding: 3px 10px; }
+            .chat-title .chat-emoji { font-size: 20px; }
+            .chat-subtitle { font-size: 11.5px; gap: 6px; }
+            .sub-badge { font-size: 10.5px; padding: 4px 11px; gap: 4px; }
             .password-title { font-size: 19px; }
-            .password-subtitle { font-size: 12px; margin-bottom: 20px; }
-            .password-icon { width: 62px; height: 62px; font-size: 28px; margin-bottom: 16px; }
+            .password-subtitle { font-size: 12px; margin-bottom: 22px; }
+            .password-icon { width: 70px; height: 70px; font-size: 30px; margin-bottom: 18px; }
             .password-input {
                 font-size: 15px;
-                padding: 12px 42px 12px 14px;
+                padding: 13px 44px 13px 14px;
                 letter-spacing: 1.5px;
+                border-radius: 14px;
             }
             .password-btn { font-size: 14px; padding: 13px; border-radius: 14px; }
-            .password-info { font-size: 11px; padding: 10px 12px; }
-            .message-bubble { max-width: 88%; padding: 9px 12px; border-radius: 14px; }
-            .message-text { font-size: 12.5px; line-height: 1.65; }
-            .message-sender { font-size: 11px; margin-bottom: 3px; }
-            .message-sender .sender-role { font-size: 9px; padding: 1.5px 6px; }
-            .message-avatar { width: 30px; height: 30px; font-size: 14px; }
-            .message-file { font-size: 11.5px; padding: 5px 11px; }
-            .message-image { max-height: 240px; }
-            .error-icon { font-size: 44px; }
+            .password-info { font-size: 11px; padding: 11px 14px; }
+            .message-bubble { max-width: 90%; padding: 10px 13px; border-radius: 15px; }
+            .message-text { font-size: 12.5px; line-height: 1.7; }
+            .message-sender { font-size: 11px; margin-bottom: 4px; gap: 6px; }
+            .message-sender .sender-role { font-size: 9px; padding: 1.5px 7px; }
+            .message-avatar { width: 30px; height: 30px; font-size: 14px; border-width: 1.5px; }
+            .message-file { font-size: 11.5px; padding: 6px 13px; }
+            .message-image { max-height: 250px; }
+            .error-icon { width: 70px; height: 70px; font-size: 30px; }
             .error-title { font-size: 18px; }
             .error-message { font-size: 12.5px; }
             .page-footer { font-size: 11px; }
-            .chat-action-btn { font-size: 11px; padding: 6px 12px; }
+            .chat-action-btn { font-size: 11px; padding: 7px 14px; }
+            .loading-logo { width: 70px; height: 70px; border-radius: 20px; }
+            .loading-text { font-size: 12.5px; letter-spacing: 2px; }
         }
 
         @media (max-width: 360px) {
@@ -625,15 +1239,53 @@
                 animation-iteration-count: 1 !important;
                 transition-duration: 0.01ms !important;
             }
+            body::before, body::after, .particle { animation: none !important; }
         }
     </style>
 </head>
 <body>
+
+    <!-- ============================================================ -->
+    <!-- PARÇACIK KATMANI                                             -->
+    <!-- ============================================================ -->
+    <div id="particles"></div>
+
+    <!-- ============================================================ -->
+    <!-- ANA KONTEYNER                                                -->
+    <!-- ============================================================ -->
     <div class="container" id="app">
+
         <!-- ============ HEADER ============ -->
         <header class="header">
             <div class="logo-area">
-                <div class="logo-icon">💬</div>
+                <!-- Efsane SVG Logo (index.html ile aynı) -->
+                <svg class="logo-svg" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="v27G1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00e5ff"/>
+                            <stop offset="50%" stop-color="#b845ff"/>
+                            <stop offset="100%" stop-color="#ff2d92"/>
+                        </linearGradient>
+                        <linearGradient id="v27G2" x1="0%" y1="100%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#00ff9d"/>
+                            <stop offset="100%" stop-color="#00e5ff"/>
+                        </linearGradient>
+                        <radialGradient id="v27Glow">
+                            <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.7"/>
+                            <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+                        </radialGradient>
+                    </defs>
+                    <circle cx="30" cy="30" r="28" fill="url(#v27Glow)"/>
+                    <circle cx="30" cy="30" r="25" fill="none" stroke="url(#v27G1)" stroke-width="2.5" opacity="0.95"/>
+                    <circle cx="30" cy="30" r="21" fill="none" stroke="url(#v27G1)" stroke-width="0.8" opacity="0.45" stroke-dasharray="3 3"/>
+                    <circle cx="30" cy="30" r="20" fill="rgba(10,16,32,0.78)"/>
+                    <path d="M 33 15 A 15 15 0 1 0 33 45 A 12 12 0 1 1 33 15 Z" fill="url(#v27G2)" opacity="0.95"/>
+                    <polygon points="42,18 43.5,23 48.5,23 44.5,26 46,31 42,28 38,31 39.5,26 35.5,23 40.5,23" fill="#ffd11a" style="filter: drop-shadow(0 0 4px #ffd11a);"/>
+                    <circle cx="12" cy="30" r="1.8" fill="#00e5ff"/>
+                    <circle cx="48" cy="30" r="1.8" fill="#00e5ff"/>
+                    <circle cx="30" cy="12" r="1.8" fill="#00ff9d"/>
+                    <circle cx="30" cy="48" r="1.8" fill="#ff2d92"/>
+                </svg>
                 <div class="logo-text">VİZYON 2027</div>
             </div>
             <a href="https://vizyon2026.vercel.app/" class="back-link">
@@ -647,15 +1299,24 @@
             <!-- 1) LOADING STATE -->
             <div class="state-view active" id="loadingState">
                 <div class="loading-state">
-                    <div class="loading-spinner"></div>
-                    <div class="loading-text">Sohbet hazırlanıyor...</div>
+                    <div class="loading-logo">
+                        <img src="https://vizyon2026.vercel.app/logo.png" alt="VİZYON 2027" onerror="this.style.display='none'; this.parentNode.innerHTML='<span style=\'font-size:44px;\'>✨</span>'">
+                    </div>
+                    <div class="loading-text">Sohbet Hazırlanıyor</div>
+                    <div class="loading-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
                 </div>
             </div>
 
             <!-- 2) ERROR STATE -->
             <div class="state-view" id="errorState">
                 <div class="error-state">
-                    <i class="fas fa-exclamation-circle error-icon"></i>
+                    <div class="error-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
                     <div class="error-title" id="errorTitle">Sohbet Bulunamadı</div>
                     <div class="error-message" id="errorMessage">Bu paylaşım linki geçersiz veya süresi dolmuş olabilir.</div>
                     <div class="error-hint" id="errorHint"></div>
@@ -685,6 +1346,7 @@
                             autocorrect="off"
                             autocapitalize="off"
                             spellcheck="false"
+                            aria-label="Sohbet şifresi"
                         />
                         <button
                             type="button"
@@ -692,6 +1354,7 @@
                             id="passwordToggle"
                             onclick="window.togglePasswordVisibility()"
                             title="Şifreyi Göster/Gizle"
+                            aria-label="Şifreyi göster/gizle"
                         >
                             <i class="fas fa-eye"></i>
                         </button>
@@ -707,8 +1370,8 @@
                         <span>Sohbeti Aç</span>
                     </button>
 
-                    <div class="password-error" id="passwordError"></div>
-                    <div class="attempt-counter" id="attemptCounter"></div>
+                    <div class="password-error" id="passwordError" role="alert"></div>
+                    <div class="attempt-counter" id="attemptCounter" role="status"></div>
 
                     <div class="password-info">
                         <strong>🔒 Güvenlik:</strong> Bu sohbeti paylaşan kişi tarafından belirlenen şifreyi girmeniz gerekiyor. Şifre yanlışsa sohbet içeriği <strong>hiçbir şekilde gösterilmez</strong>. 3 yanlış denemeden sonra 5 dakika beklemeniz gerekir.
@@ -747,6 +1410,9 @@
                     <button class="chat-action-btn" onclick="window.scrollToTop()">
                         <i class="fas fa-arrow-up"></i> Başa Dön
                     </button>
+                    <button class="chat-action-btn" onclick="window.scrollToBottom()">
+                        <i class="fas fa-arrow-down"></i> Sona Git
+                    </button>
                 </div>
 
                 <div class="messages-container" id="messagesContainer"></div>
@@ -757,7 +1423,7 @@
         <!-- ============ FOOTER ============ -->
         <footer class="page-footer">
             <p>
-                © 2027 <strong>Vizyon2027</strong> ·
+                © 2027 <strong style="background:linear-gradient(135deg,#00e5ff,#b845ff);-webkit-background-clip:text;background-clip:text;color:transparent;">Vizyon2027</strong> ·
                 <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank" rel="noopener noreferrer">Gizlilik Politikası</a> ·
                 <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank" rel="noopener noreferrer">Kullanıcı Sözleşmesi</a>
             </p>
@@ -772,37 +1438,36 @@
 
     <script>
     // ================================================================
-    // VİZYON 2027 — PAYLAŞILAN SOHBET GÖRÜNTÜLEYİCİ v2.0 (v7.9.2)
+    // VİZYON 2027 — PAYLAŞILAN SOHBET GÖRÜNTÜLEYİCİ v3.0 (v7.10.0)
     // ================================================================
-    // ÖZELLİKLER:
-    //   1. Şifresiz sohbetler (normal Conversation paylaşımı) → DİREKT AÇILIR
-    //   2. Şifreli sohbetler (V27 Koç paylaşımı) → Şifre ekranı çıkar
-    //   3. SAĞDA = Link sahibi (sohbet sahibi) — mavi/cyan
-    //   4. SOLDA = AI (V27 KOÇ / VİZYON AI) — altın/yeşil
-    //   5. İki isim asla aynı görünmez (rol etiketi ile ayrılır)
-    //   6. XSS korumalı (escapeHtml her yerde)
-    //   7. 3 yanlış deneme → 5 dk client-side blok
-    //   8. Hem getSharedConversation hem getSharedKocConversation desteklenir
-    //   9. URL: ?id=... veya ?shareId=...  &password_required=1
-    //  10. Kopyala, Başa Dön, ESC ile geri
+    // ✅ BACK4APP UYUMLU (index.html + Cloud Code v7.10.0 ile aynı)
+    // ✅ Aurora arka plan + 3 katmanlı parçacık
+    // ✅ Efsane SVG logo + glassmorphism kart
+    // ✅ Şifresiz sohbetler → DİREKT AÇILIR
+    // ✅ Şifreli sohbetler (V27 Koç) → şifre ekranı
+    // ✅ SAĞDA = link sahibi (mavi/cyan)
+    // ✅ SOLDA = AI (V27 KOÇ / VİZYON AI) (altın/yeşil)
+    // ✅ XSS korumalı (escapeHtml her yerde)
+    // ✅ 3 yanlış deneme → 5 dk client-side blok
+    // ✅ Rate-limit mesajlarını yakala
     // ================================================================
 
-    // ---------- SashiDo Config ----------
+    // ---------- Back4App Config ----------
     Parse.initialize(
-        "gLhVZnYkpq33B9Js5Npld1V8aTcA7UXRUEPAU3AA",
-        "tDlQ5PPy6nl9o7iDM0fxvQ0cUEEA7AgUXalRATPE"
+        "Dr9SODgMburZ54QvC8RnIHc9dbjreozBbKLOpMjX",
+        "dCXRvnEcCcOFvpzVDAV9AAJnYvdrqaP1JFRkJzvv"
     );
-    Parse.serverURL = "https://pg-app-6df09qci1t4ee3qrqce800a5fc81y4.scalabl.cloud/1/";
+    Parse.serverURL = "https://parseapi.back4app.com/";
 
     // ---------- Global Durum ----------
     window.__shareState = {
         shareId: null,
-        shareType: null,        // 'regular' | 'koc' | null
+        shareType: null,
         chatData: null,
         password: null,
         attempts: 0,
         blockedUntil: 0,
-        isKoç: false            // paylaşım tipi
+        isKoc: false
     };
 
     var MAX_ATTEMPTS = 3;
@@ -813,18 +1478,14 @@
         try {
             var params = new URLSearchParams(window.location.search);
             return params.get('id') || params.get('shareId') || null;
-        } catch (e) {
-            return null;
-        }
+        } catch (e) { return null; }
     }
 
     function getPasswordFromUrl() {
         try {
             var params = new URLSearchParams(window.location.search);
             return params.get('password') || params.get('pw') || null;
-        } catch (e) {
-            return null;
-        }
+        } catch (e) { return null; }
     }
 
     function isPasswordRequiredParam() {
@@ -832,9 +1493,7 @@
             var params = new URLSearchParams(window.location.search);
             var v = params.get('password_required');
             return v === '1' || v === 'true';
-        } catch (e) {
-            return false;
-        }
+        } catch (e) { return false; }
     }
 
     // ---------- XSS Koruması ----------
@@ -861,9 +1520,7 @@
                 hour: '2-digit',
                 minute: '2-digit'
             });
-        } catch (e) {
-            return '';
-        }
+        } catch (e) { return ''; }
     }
 
     function formatTimeShort(dateInput) {
@@ -879,9 +1536,7 @@
             var diffHour = Math.floor(diffMin / 60);
             if (diffHour < 24) return diffHour + ' saat önce';
             return formatTime(dateInput);
-        } catch (e) {
-            return '';
-        }
+        } catch (e) { return ''; }
     }
 
     // ---------- State Yönetimi ----------
@@ -891,9 +1546,7 @@
             var el = document.getElementById(id);
             if (el) {
                 el.classList.remove('active');
-                if (id === stateName) {
-                    el.classList.add('active');
-                }
+                if (id === stateName) el.classList.add('active');
             }
         });
     }
@@ -916,10 +1569,8 @@
 
         var input = document.getElementById('passwordInput');
         if (input) {
-            input.style.borderColor = 'rgba(255, 71, 87, 0.5)';
-            setTimeout(function () {
-                input.style.borderColor = '';
-            }, 2000);
+            input.style.borderColor = 'rgba(255, 71, 87, 0.65)';
+            setTimeout(function () { input.style.borderColor = ''; }, 2000);
         }
     }
 
@@ -974,7 +1625,7 @@
         }
     }
 
-    // ---------- Başlangıç: Probe + Yönlendirme ----------
+    // ---------- Başlangıç ----------
     async function init() {
         var shareId = getShareId();
 
@@ -982,20 +1633,18 @@
             showError(
                 'Geçersiz Link',
                 'Paylaşım ID bulunamadı. Lütfen linkin doğru olduğundan emin olun.',
-                'Paylaşım linki ?id=... veya ?shareId=... parametresi içermelidir.'
+                '?id=... veya ?shareId=... parametresi gerekli'
             );
             return;
         }
 
         window.__shareState.shareId = shareId;
 
-        // URL'de şifre var mı? (kullanıcı paylaşırken linke şifreyi de eklemişse)
+        // URL'de şifre var mı?
         var pwInUrl = getPasswordFromUrl();
         if (pwInUrl) {
-            // Şifreli sohbeti direkt dene
             var ok = await tryLoadShared(pwInUrl, true);
             if (ok) return;
-            // Başarısızsa normal akışa düş
         }
 
         // ADIM 1: Şifresiz normal sohbet paylaşımı mı?
@@ -1006,7 +1655,6 @@
             });
 
             if (probe && probe.success && probe.passwordRequired === false) {
-                // Şifresiz sohbet → direkt yükle
                 window.__shareState.shareType = 'regular';
                 var fullData = await Parse.Cloud.run('getSharedConversation', {
                     shareId: shareId
@@ -1017,8 +1665,7 @@
                 }
             }
         } catch (e) {
-            // probe desteklenmiyor veya şifreli paylaşım → devam
-            console.log('Probe başarısız, şifreli paylaşım kontrol edilecek:', e.message);
+            console.log('Probe başarısız:', e.message);
         }
 
         // ADIM 2: V27 Koç paylaşımı mı? (şifre gerekebilir)
@@ -1028,7 +1675,6 @@
             });
 
             if (kocProbe && kocProbe.passwordRequired === true) {
-                // Şifre gerekli → şifre ekranını göster
                 window.__shareState.shareType = 'koc';
                 showState('passwordState');
                 setTimeout(function () {
@@ -1040,7 +1686,6 @@
             }
 
             if (kocProbe && kocProbe.success && kocProbe.messages) {
-                // Şifresiz koç paylaşımı (nadir ama olabilir)
                 window.__shareState.shareType = 'koc';
                 renderChat(kocProbe, true);
                 return;
@@ -1049,7 +1694,7 @@
             console.log('Koç probe hatası:', e.message);
         }
 
-        // ADIM 3: Hiçbiri olmadı → Şifre ekranı göster (belki normal sohbet şifreli)
+        // ADIM 3: Şifre ekranı göster
         if (isPasswordRequiredParam()) {
             window.__shareState.shareType = 'koc';
             showState('passwordState');
@@ -1068,7 +1713,7 @@
         );
     }
 
-    // ---------- Paylaşılan Sohbeti Yükle (şifre ile) ----------
+    // ---------- Paylaşılan Sohbeti Yükle ----------
     async function tryLoadShared(password, silent) {
         var shareId = window.__shareState.shareId;
 
@@ -1089,7 +1734,6 @@
             }
 
             if (kocResult && kocResult.error && !kocResult.success) {
-                // Şifre yanlış veya başka hata
                 if (!silent) {
                     if (kocResult.passwordRequired) {
                         window.__shareState.attempts++;
@@ -1111,7 +1755,6 @@
         } catch (e1) {
             console.log('Koç yükleme hatası:', e1.message);
 
-            // Rate limit mesajı mı?
             var errMsg = (e1 && e1.message) ? e1.message : '';
             if (errMsg.toLowerCase().indexOf('çok fazla') !== -1 ||
                 errMsg.toLowerCase().indexOf('rate') !== -1 ||
@@ -1161,7 +1804,6 @@
             console.log('Normal paylaşım yükleme hatası:', e2.message);
         }
 
-        // Hiçbiri olmadı
         if (!silent) {
             window.__shareState.attempts++;
             if (window.__shareState.attempts >= MAX_ATTEMPTS) {
@@ -1177,7 +1819,7 @@
         return false;
     }
 
-    // ---------- Şifre Kontrol (kullanıcı butona bastığında) ----------
+    // ---------- Şifre Kontrol ----------
     window.checkPassword = async function () {
         var input = document.getElementById('passwordInput');
         var btn = document.getElementById('passwordBtn');
@@ -1240,12 +1882,6 @@
     // ================================================================
     // RENDER: Sohbeti Ekrana Bas
     // ================================================================
-    // KURALLAR:
-    //   • isAI === true → SOLDA göster (V27 KOÇ veya VİZYON AI)
-    //   • isAI === false → SAĞDA göster (link sahibi / sohbet sahibi)
-    //   • İsim etiketi her zaman gösterilir
-    //   • İki tarafın ismi asla aynı görünmez (rol etiketi farkı)
-    // ================================================================
     function renderChat(data, isKocShare) {
         var titleText = document.getElementById('chatTitleText');
         var emojiEl = document.getElementById('chatEmoji');
@@ -1261,12 +1897,10 @@
             return;
         }
 
-        // Başlık
         var chatName = data.conversationName || data.title || data.chatTitle || 'Paylaşılan Sohbet';
         if (titleText) titleText.textContent = chatName;
         if (emojiEl) emojiEl.textContent = isKocShare ? '🧭' : '💬';
 
-        // Tip etiketi
         if (chatTypeBadge && chatTypeText) {
             if (isKocShare) {
                 chatTypeBadge.classList.add('koc');
@@ -1276,11 +1910,9 @@
             }
         }
 
-        // Mesaj sayısı
         var messages = data.messages || [];
         if (countEl) countEl.textContent = messages.length;
 
-        // Paylaşım zamanı
         if (data.sharedAt || data.shareTime || data.createdAt) {
             var t = formatTimeShort(data.sharedAt || data.shareTime || data.createdAt);
             if (t && shareTimeBadge && shareTimeText) {
@@ -1298,18 +1930,10 @@
             return;
         }
 
-        // ============================================================
-        // SAHİBİN ADINI TESPİT ET
-        // ============================================================
-        // Koç paylaşımı: Koç olmayan ilk mesajın adı sahibin adıdır
-        // Normal paylaşım: AI olmayan mesajların en sık geçen adı sahibin adıdır
         var ownerName = detectOwnerName(messages, isKocShare);
-
-        // AI etiketi
         var aiLabel = isKocShare ? 'V27 KOÇ' : 'VİZYON AI';
         var aiEmoji = isKocShare ? '🧭' : '🧠';
 
-        // Mesajları render et
         var html = '';
         messages.forEach(function (msg) {
             var isAI = !!(msg.isAI || msg.is_ai);
@@ -1320,10 +1944,8 @@
             var fileType = msg.fileType || msg.file_type || '';
             var time = msg.createdAt || msg.time || msg.timestamp || '';
 
-            // SAĞ = sahip (isAI false), SOL = AI (isAI true)
             var side = isAI ? 'left' : 'right';
 
-            // İsim
             var displayName, roleBadge, avatarIcon;
             if (isAI) {
                 displayName = aiLabel;
@@ -1339,7 +1961,6 @@
 
             html += '<div class="message-row ' + side + '">';
 
-            // Sol tarafta avatar başta
             if (side === 'left') {
                 html += '<div class="message-avatar">' + avatarIcon + '</div>';
             }
@@ -1347,19 +1968,15 @@
             html += '<div class="message-bubble">';
             html += '<div class="message-sender">' + safeName + roleBadge + '</div>';
 
-            // Text içeriği
             if (text) {
                 var safeText = escapeHtml(text);
-                // ```code``` blokları
                 safeText = safeText.replace(/```([a-zA-Z0-9+#]*)\n?([\s\S]*?)```/g, function (match, lang, code) {
                     return '<code>' + code + '</code>';
                 });
-                // `inline code`
                 safeText = safeText.replace(/`([^`\n]+)`/g, '<code>$1</code>');
                 html += '<div class="message-text">' + safeText + '</div>';
             }
 
-            // Dosya / görsel
             if (file) {
                 var safeFile = escapeHtml(file);
                 var safeFileName = escapeHtml(fileName);
@@ -1382,30 +1999,25 @@
                 }
             }
 
-            // Zaman
             var formattedTime = formatTime(time);
             if (formattedTime) {
                 html += '<div class="message-time">' + escapeHtml(formattedTime) + '</div>';
             }
 
-            html += '</div>'; // bubble
+            html += '</div>';
 
-            // Sağ tarafta avatar sonda
             if (side === 'right') {
                 html += '<div class="message-avatar">' + avatarIcon + '</div>';
             }
 
-            html += '</div>'; // row
+            html += '</div>';
         });
 
         container.innerHTML = html;
         showState('chatState');
 
-        // En son mesaja kaydır
         setTimeout(function () {
-            if (container) {
-                container.scrollTop = container.scrollHeight;
-            }
+            if (container) container.scrollTop = container.scrollHeight;
         }, 100);
     }
 
@@ -1413,7 +2025,6 @@
     function detectOwnerName(messages, isKocShare) {
         if (!messages || messages.length === 0) return 'Kullanıcı';
 
-        // Koç paylaşımı: koç olmayan ilk mesajın adı sahibin adı
         if (isKocShare) {
             for (var i = 0; i < messages.length; i++) {
                 var m = messages[i];
@@ -1424,38 +2035,31 @@
             return 'Kullanıcı';
         }
 
-        // Normal paylaşım: AI olmayan mesajların en sık geçen adı
         var nameCounts = {};
         messages.forEach(function (m) {
             if (!m.isAI && !m.is_ai) {
                 var n = m.name || m.sender || m.from_email || '';
-                if (n) {
-                    nameCounts[n] = (nameCounts[n] || 0) + 1;
-                }
+                if (n) nameCounts[n] = (nameCounts[n] || 0) + 1;
             }
         });
 
-        var bestName = '';
-        var bestCount = 0;
+        var bestName = '', bestCount = 0;
         for (var name in nameCounts) {
             if (nameCounts[name] > bestCount) {
                 bestCount = nameCounts[name];
                 bestName = name;
             }
         }
-
         return bestName || 'Kullanıcı';
     }
 
-    // ---------- Yardımcı: Linki Kopyala ----------
+    // ---------- Yardımcılar ----------
     window.copyCurrentUrl = function () {
         var url = window.location.href;
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(url).then(function () {
                 showToast('📋 Link kopyalandı!');
-            }).catch(function () {
-                fallbackCopy(url);
-            });
+            }).catch(function () { fallbackCopy(url); });
         } else {
             fallbackCopy(url);
         }
@@ -1479,30 +2083,34 @@
     }
 
     function showToast(msg) {
+        var existing = document.querySelector('.vz-toast');
+        if (existing) existing.remove();
+
         var t = document.createElement('div');
+        t.className = 'vz-toast';
         t.textContent = msg;
-        t.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);' +
-            'background:linear-gradient(135deg,#00d4ff,#a855f7);color:#fff;padding:12px 24px;' +
-            'border-radius:40px;font-weight:600;font-size:13px;z-index:99999;' +
-            'box-shadow:0 8px 32px rgba(0,212,255,0.4);animation:fadeIn 0.3s ease;' +
-            'font-family:Inter,sans-serif;';
         document.body.appendChild(t);
+
+        requestAnimationFrame(function () { t.classList.add('show'); });
+
         setTimeout(function () {
-            t.style.opacity = '0';
-            t.style.transition = 'opacity 0.4s ease';
+            t.classList.remove('show');
             setTimeout(function () { t.remove(); }, 400);
-        }, 2200);
+        }, 2400);
     }
 
-    // ---------- Yardımcı: Başa Dön ----------
     window.scrollToTop = function () {
-        var container = document.getElementById('messagesContainer');
-        if (container) container.scrollTop = 0;
+        var c = document.getElementById('messagesContainer');
+        if (c) c.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.scrollToBottom = function () {
+        var c = document.getElementById('messagesContainer');
+        if (c) c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' });
     };
 
     // ---------- Klavye Kısayolları ----------
     document.addEventListener('keydown', function (e) {
-        // ESC → input'tan çık (chat açıksa)
         if (e.key === 'Escape') {
             if (window.__shareState.chatData) {
                 var input = document.getElementById('passwordInput');
@@ -1510,7 +2118,6 @@
             }
         }
 
-        // Enter → şifre kontrolü
         if (e.key === 'Enter') {
             var pwState = document.getElementById('passwordState');
             if (pwState && pwState.classList.contains('active')) {
@@ -1529,6 +2136,28 @@
         window.__shareState.chatData = null;
     });
 
+    // ---------- Parçacıkları Başlat ----------
+    (function initParticles() {
+        var container = document.getElementById('particles');
+        if (!container) return;
+
+        var count = 25;
+        try {
+            if (window.matchMedia && window.matchMedia('(max-width: 480px)').matches) count = 12;
+            else if (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) count = 18;
+        } catch (e) {}
+
+        for (var i = 0; i < count; i++) {
+            var p = document.createElement('div');
+            p.className = 'particle';
+            p.style.cssText =
+                'left:' + (Math.random() * 100) + '%;' +
+                'animation-duration:' + (8 + Math.random() * 22) + 's;' +
+                'animation-delay:' + (-Math.random() * 30) + 's;';
+            container.appendChild(p);
+        }
+    })();
+
     // ---------- Başlat ----------
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
@@ -1537,13 +2166,17 @@
     }
 
     // ---------- Console Bilgilendirme ----------
-    console.log('🔒 VİZYON 2027 — Paylaşılan Sohbet Görüntüleyici v2.0 (v7.9.2)');
-    console.log('   • Şifresiz sohbetler → DİREKT AÇILIR');
-    console.log('   • Şifreli (V27 Koç) → Şifre ekranı çıkar');
-    console.log('   • SAĞDA = Link sahibi (sohbet sahibi)');
-    console.log('   • SOLDA = AI (V27 KOÇ / VİZYON AI)');
-    console.log('   • 3 yanlış deneme → 5 dakika bekleme');
-    console.log('   • Tüm içerik XSS korumalı');
+    console.log('%c🔒 VİZYON 2027 — Paylaşılan Sohbet Görüntüleyici v3.0 (v7.10.0)',
+        'color:#00e5ff;font-weight:bold;font-size:14px;');
+    console.log('%c✅ Back4App uyumlu — index.html + Cloud Code v7.10.0 ile senkron',
+        'color:#00ff9d;font-size:12px;');
+    console.log('%c📌 Kurallar:', 'color:#ffd11a;font-size:12px;font-weight:bold;');
+    console.log('%c   • Şifresiz sohbetler → DİREKT AÇILIR', 'color:#8aa8d4;font-size:11px;');
+    console.log('%c   • Şifreli (V27 Koç) → şifre ekranı çıkar', 'color:#8aa8d4;font-size:11px;');
+    console.log('%c   • SAĞDA = Link sahibi (sohbet sahibi)', 'color:#8aa8d4;font-size:11px;');
+    console.log('%c   • SOLDA = AI (V27 KOÇ / VİZYON AI)', 'color:#8aa8d4;font-size:11px;');
+    console.log('%c   • 3 yanlış deneme → 5 dakika bekleme', 'color:#8aa8d4;font-size:11px;');
+    console.log('%c   • Tüm içerik XSS korumalı', 'color:#8aa8d4;font-size:11px;');
     </script>
 </body>
 </html>
