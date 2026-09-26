@@ -1,459 +1,1481 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kullanıcı Sözleşmesi – Vizyon2027</title>
-    <style>
-        /* ===== GENEL ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0a0a0a; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; line-height: 1.7; }
-        .container { max-width: 1100px; margin: 0 auto; background: #141414; padding: 40px; border-radius: 20px; border: 1px solid #2a2a2a; box-shadow: 0 0 60px rgba(0,212,255,0.05); }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="VİZYON 2027 Kullanıcı Sözleşmesi - 28 AI modeli, Vizyon Al, V27 API, V27 Koç ve tüm ekosistem için kullanım şartları ve sorumluluklar.">
+<meta name="theme-color" content="#03050a">
+<title>Kullanıcı Sözleşmesi | VİZYON 2027</title>
 
-        /* ===== DİL SEÇİCİ ===== */
-        .lang-selector { display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
-        .lang-btn { padding: 8px 20px; border-radius: 40px; border: 2px solid #2a2a2a; background: transparent; color: #aaa; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 14px; }
-        .lang-btn:hover { border-color: #00d4ff; color: #00d4ff; }
-        .lang-btn.active { border-color: #00d4ff; background: #00d4ff22; color: #00d4ff; }
-        .lang-content { display: none; }
-        .lang-content.active { display: block; }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-        /* ===== BAŞLIKLAR ===== */
-        h1 { color: #00d4ff; font-size: 36px; border-bottom: 3px solid #00d4ff; padding-bottom: 18px; font-family: 'Syne', sans-serif; }
-        h2 { color: #00d4ff; font-size: 28px; margin-top: 45px; border-left: 6px solid #00d4ff; padding-left: 20px; font-family: 'Syne', sans-serif; }
-        h3 { color: #a0c4e0; font-size: 20px; margin-top: 25px; }
-        h4 { color: #8ab4cc; font-size: 18px; margin-top: 20px; }
-        p, li { color: #c8d0d8; font-size: 16px; margin-bottom: 10px; }
-        ul, ol { padding-left: 28px; margin: 12px 0; }
-        li { margin-bottom: 8px; }
+<style>
+:root{
+    --bg:#03050a; --bg2:#060a14; --bg3:#0a1020;
+    --surface:#0a1020; --surface2:#0e1630;
+    --border:#1a2a4a; --border2:#24365e;
+    --accent:#00e5ff; --accent2:#00ff9d; --accent3:#ff5e1a;
+    --accent4:#ff2d92; --gold:#ffd11a; --purple:#b845ff; --pink:#ff2d92;
+    --danger:#ff4757; --warning:#ffb700; --success:#00ff9d;
+    --text:#ffffff; --text2:#d4e5ff; --text3:#8aa8d4; --text4:#5a7aa8;
+    --font-display:'Syne',sans-serif;
+    --font-code:'Fira Code',monospace;
+    --font-body:'Inter',sans-serif;
+}
+[data-theme="light"]{
+    --bg:#f0f4fb; --bg2:#e6ecf7; --bg3:#dde5f4;
+    --surface:#ffffff; --surface2:#f7fafc;
+    --border:#cbd8ec; --border2:#b0c2dc;
+    --text:#0a1020; --text2:#1e2a44; --text3:#4a5d80; --text4:#6b7ea3;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{
+    background:var(--bg);color:var(--text);font-family:var(--font-body);
+    overflow-x:hidden;min-height:100vh;position:relative;
+    -webkit-font-smoothing:antialiased;line-height:1.7;
+}
+body::before{
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+        radial-gradient(ellipse 80% 50% at 20% 0%, rgba(0,229,255,0.12) 0%, transparent 55%),
+        radial-gradient(ellipse 70% 50% at 80% 10%, rgba(184,69,255,0.10) 0%, transparent 55%),
+        radial-gradient(ellipse 90% 60% at 50% 100%, rgba(255,45,146,0.08) 0%, transparent 60%);
+    animation:auroraShift 24s ease-in-out infinite alternate;
+}
+body::after{
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:
+        linear-gradient(rgba(0,229,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.025) 1px, transparent 1px);
+    background-size:60px 60px;
+    mask-image:radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 85%);
+    -webkit-mask-image:radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 85%);
+    opacity:0.6;
+}
+@keyframes auroraShift{
+    0%{opacity:0.75;transform:scale(1) rotate(0deg)}
+    50%{opacity:1;transform:scale(1.06) rotate(2deg)}
+    100%{opacity:0.85;transform:scale(1) rotate(0deg)}
+}
+nav{
+    position:fixed;top:0;left:0;right:0;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 48px;height:84px;
+    background:rgba(3,5,10,0.75);
+    backdrop-filter:blur(28px) saturate(160%);
+    -webkit-backdrop-filter:blur(28px) saturate(160%);
+    border-bottom:1px solid rgba(0,229,255,0.15);
+    z-index:100;box-shadow:0 4px 30px rgba(0,0,0,0.4);
+}
+nav::after{
+    content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,var(--accent) 20%,var(--purple) 50%,var(--pink) 80%,transparent);
+    opacity:0.6;animation:navGlow 4s ease-in-out infinite alternate;
+}
+@keyframes navGlow{0%{opacity:0.4}100%{opacity:0.9}}
+[data-theme="light"] nav{background:rgba(255,255,255,0.85);border-bottom-color:rgba(0,0,0,0.08)}
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
+.nav-logo svg{filter:drop-shadow(0 0 12px rgba(0,229,255,0.6))}
+.nav-logo-text{
+    font-family:var(--font-display);font-size:24px;font-weight:800;
+    background:linear-gradient(45deg,#00e5ff,#00ff9d,#b845ff,#ff2d92,#ffd11a,#00e5ff);
+    background-size:400% 400%;-webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:gradientMove 6s ease infinite;letter-spacing:1px;
+}
+@keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.nav-menu{display:flex;gap:32px;list-style:none}
+.nav-menu a{
+    color:var(--text2);text-decoration:none;font-size:13px;font-weight:500;
+    text-transform:uppercase;letter-spacing:1.2px;position:relative;padding:6px 0;
+    transition:color 0.15s ease;
+}
+.nav-menu a::after{
+    content:'';position:absolute;bottom:0;left:50%;right:50%;height:2px;
+    background:linear-gradient(90deg,var(--accent),var(--purple));
+    transition:left 0.3s,right 0.3s;border-radius:2px;
+}
+.nav-menu a:hover{color:var(--accent)}
+.nav-menu a:hover::after{left:0;right:0}
+.nav-actions{display:flex;gap:12px;align-items:center}
+.btn-nav{
+    padding:9px 22px;border-radius:40px;font-size:13px;font-weight:600;
+    cursor:pointer;transition:all 0.15s;border:none;text-decoration:none;
+    display:inline-flex;align-items:center;gap:6px;
+}
+.btn-nav-outline{background:transparent;border:1.5px solid var(--accent);color:var(--accent)}
+.btn-nav-outline:hover{background:rgba(0,229,255,0.12);box-shadow:0 0 20px rgba(0,229,255,0.4);transform:translateY(-1px)}
+.btn-nav-primary{
+    background:linear-gradient(135deg,#00e5ff,#b845ff,#ff2d92);
+    background-size:200% 200%;color:#fff;
+    box-shadow:0 0 25px rgba(0,229,255,0.4);
+    animation:btnGradientShift 4s ease infinite;
+}
+@keyframes btnGradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.btn-nav-primary:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 0 40px rgba(0,229,255,0.7)}
+.nav-theme-btn{
+    width:40px;height:40px;border-radius:50%;background:none;
+    border:1px solid var(--border);color:var(--text);font-size:16px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:all 0.15s;
+}
+.nav-theme-btn:hover{border-color:var(--accent);box-shadow:0 0 20px rgba(0,229,255,0.4);transform:rotate(20deg)}
+.nav-toggle{display:none;background:none;border:none;color:var(--text);font-size:24px;cursor:pointer;padding:8px}
 
-        /* ===== KUTULAR ===== */
-        .highlight-box { background: #1a1a2a; border-left: 6px solid #00ff88; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
-        .important-box { background: #1a0a0a; border-left: 6px solid #ff6b6b; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
-        .info-box { background: #0a1a1a; border-left: 6px solid #ffb700; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
+.legal-hero{padding:160px 24px 30px;position:relative;z-index:10;text-align:center}
+.legal-hero-badge{
+    display:inline-flex;align-items:center;gap:8px;padding:8px 18px;
+    border:1px solid rgba(0,229,255,0.35);border-radius:40px;
+    font-size:12px;color:var(--accent);font-weight:600;letter-spacing:0.5px;
+    background:rgba(0,229,255,0.05);margin-bottom:24px;backdrop-filter:blur(12px);
+}
+.legal-hero h1{
+    font-family:var(--font-display);font-size:clamp(36px,5vw,54px);
+    font-weight:800;line-height:1.1;margin-bottom:16px;letter-spacing:-0.5px;
+    background:linear-gradient(135deg,var(--text) 0%,var(--accent) 50%,var(--purple) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.legal-hero p{max-width:720px;margin:0 auto;color:var(--text2);font-size:15px;line-height:1.75}
+.legal-hero-meta{
+    display:flex;justify-content:center;gap:20px;flex-wrap:wrap;
+    margin-top:24px;font-size:12.5px;color:var(--text3);
+}
 
-        /* ===== DİĞER ===== */
-        .back-link { display: inline-block; margin-top: 30px; color: #00d4ff; text-decoration: none; border: 2px solid #00d4ff; padding: 12px 32px; border-radius: 40px; transition: 0.3s; font-weight: 600; font-size: 16px; }
-        .back-link:hover { background: #00d4ff; color: #0a0a0a; box-shadow: 0 0 40px rgba(0,212,255,0.3); }
-        .badge { display: inline-block; background: #00d4ff22; color: #00d4ff; padding: 4px 16px; border-radius: 30px; font-size: 14px; border: 1px solid #00d4ff55; margin-right: 8px; margin-bottom: 6px; }
-        hr { border: 0; height: 1px; background: #2a2a2a; margin: 45px 0; }
-        a { color: #00d4ff; text-decoration: none; }
-        a:hover { text-decoration: underline; }
+.lang-bar{
+    display:flex;justify-content:center;gap:10px;flex-wrap:wrap;
+    padding:20px 24px;position:relative;z-index:10;
+}
+.lang-btn{
+    padding:9px 22px;border-radius:40px;
+    border:1.5px solid var(--border2);
+    background:transparent;color:var(--text3);
+    font-weight:600;cursor:pointer;transition:all 0.2s;
+    font-size:13px;font-family:var(--font-body);
+    display:inline-flex;align-items:center;gap:8px;
+}
+.lang-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,229,255,0.06)}
+.lang-btn.active{
+    border-color:var(--accent);
+    background:linear-gradient(135deg,rgba(0,229,255,0.15),rgba(184,69,255,0.1));
+    color:var(--accent);
+    box-shadow:0 0 20px rgba(0,229,255,0.3);
+}
 
-        .legal-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a2a; font-size: 13px; color: #666; text-align: center; }
-        .legal-footer a { color: #00d4ff; text-decoration: none; }
-        .legal-footer a:hover { text-decoration: underline; }
-        .section-num { display: inline-block; color: #00d4ff; font-weight: 700; margin-right: 6px; }
+.legal-layout{
+    max-width:1400px;margin:20px auto 80px;padding:0 24px;
+    display:grid;grid-template-columns:280px 1fr;gap:32px;
+    position:relative;z-index:10;
+}
+.legal-sidebar{
+    position:sticky;top:110px;align-self:start;
+    max-height:calc(100vh - 140px);overflow-y:auto;
+    background:linear-gradient(135deg,rgba(10,16,32,0.92),rgba(6,10,20,0.95));
+    border:1px solid var(--border2);border-radius:18px;padding:20px 18px;
+    backdrop-filter:blur(8px);
+}
+[data-theme="light"] .legal-sidebar{background:rgba(255,255,255,0.92)}
+.legal-sidebar::-webkit-scrollbar{width:6px}
+.legal-sidebar::-webkit-scrollbar-thumb{background:rgba(0,229,255,0.3);border-radius:3px}
+.legal-sidebar h3{
+    font-family:var(--font-display);font-size:12.5px;color:var(--accent);
+    text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;
+    padding-bottom:10px;border-bottom:1px solid var(--border);
+}
+.legal-nav-list{list-style:none;display:flex;flex-direction:column;gap:2px}
+.legal-nav-list a{
+    display:block;padding:7px 12px;border-radius:8px;
+    color:var(--text3);text-decoration:none;font-size:12.5px;line-height:1.4;
+    transition:all 0.15s ease;border-left:2px solid transparent;
+}
+.legal-nav-list a:hover{color:var(--accent);background:rgba(0,229,255,0.06);border-left-color:var(--accent)}
+.legal-nav-list a.active{color:var(--accent);background:rgba(0,229,255,0.1);border-left-color:var(--accent);font-weight:600}
 
-        @media (max-width: 768px) { .container { padding: 20px; } h1 { font-size: 28px; } h2 { font-size: 22px; } .lang-selector { justify-content: center; } }
-        @media (max-width: 480px) { body { padding: 10px; } .container { padding: 14px; } h1 { font-size: 22px; } h2 { font-size: 18px; padding-left: 12px; } }
-    </style>
+.legal-content-outer{min-width:0}
+.legal-content{display:none}
+.legal-content.active{display:block;animation:fadeIn 0.4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.legal-card{
+    background:linear-gradient(135deg,rgba(10,16,32,0.92),rgba(6,10,20,0.95));
+    border:1px solid var(--border2);border-radius:22px;
+    padding:38px 36px;margin-bottom:24px;
+    backdrop-filter:blur(8px);position:relative;overflow:hidden;
+}
+[data-theme="light"] .legal-card{background:rgba(255,255,255,0.92)}
+.legal-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--accent),var(--purple),var(--pink),transparent);
+    opacity:0.6;
+}
+
+.legal-content h2{
+    font-family:var(--font-display);font-size:21px;font-weight:700;
+    color:var(--text);margin:34px 0 16px;padding-bottom:12px;
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:12px;
+    scroll-margin-top:110px;letter-spacing:-0.2px;
+}
+.legal-content h2 .num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:32px;height:32px;border-radius:10px;
+    background:linear-gradient(135deg,rgba(0,229,255,0.18),rgba(184,69,255,0.12));
+    border:1px solid rgba(0,229,255,0.35);
+    color:var(--accent);font-size:13px;font-weight:800;font-family:var(--font-code);
+    flex-shrink:0;
+}
+.legal-content h2:first-of-type{margin-top:0}
+.legal-content h3{
+    font-family:var(--font-display);font-size:15.5px;font-weight:700;
+    color:var(--accent);margin:20px 0 10px;letter-spacing:-0.1px;
+}
+.legal-content p{font-size:14px;color:var(--text2);line-height:1.85;margin-bottom:12px}
+.legal-content ul,.legal-content ol{margin:12px 0 14px 22px}
+.legal-content li{font-size:13.5px;color:var(--text2);line-height:1.8;margin-bottom:7px}
+.legal-content li::marker{color:var(--accent)}
+.legal-content strong{color:var(--text);font-weight:600}
+.legal-content em{color:var(--accent2);font-style:normal;font-weight:500}
+.legal-content a.inline{
+    color:var(--accent);text-decoration:underline;
+    text-decoration-color:rgba(0,229,255,0.4);text-underline-offset:3px;
+}
+.legal-content a.inline:hover{text-decoration-color:var(--accent)}
+.legal-content code{
+    background:rgba(0,229,255,0.1);color:var(--accent2);
+    padding:2px 7px;border-radius:6px;
+    font-family:var(--font-code);font-size:12px;
+    border:1px solid rgba(0,229,255,0.2);
+}
+
+.info-box{
+    padding:16px 20px;border-radius:14px;margin:16px 0;
+    border-left:4px solid var(--accent);
+    background:linear-gradient(135deg,rgba(0,229,255,0.06),rgba(184,69,255,0.03));
+    font-size:13.5px;color:var(--text2);line-height:1.75;
+}
+.info-box.warning{
+    border-left-color:var(--warning);
+    background:linear-gradient(135deg,rgba(255,183,0,0.08),rgba(255,94,26,0.04));
+    color:#ffd58a;
+}
+.info-box.danger{
+    border-left-color:var(--danger);
+    background:linear-gradient(135deg,rgba(255,71,87,0.08),rgba(255,45,146,0.04));
+    color:#ffb0b0;
+}
+.info-box.success{
+    border-left-color:var(--success);
+    background:linear-gradient(135deg,rgba(0,255,157,0.08),rgba(0,229,255,0.04));
+    color:#a8ffd4;
+}
+.info-box.premium{
+    border-left-color:var(--gold);
+    background:linear-gradient(135deg,rgba(255,209,26,0.08),rgba(255,140,0,0.04));
+    color:#ffd58a;
+}
+.info-box-title{
+    display:block;font-weight:700;margin-bottom:6px;
+    font-family:var(--font-display);letter-spacing:0.2px;font-size:14px;
+}
+
+.feature-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:12px;margin:16px 0;
+}
+.feature-mini{
+    padding:14px 16px;border-radius:12px;
+    background:linear-gradient(135deg,rgba(0,229,255,0.05),rgba(184,69,255,0.03));
+    border:1px solid var(--border2);
+    font-size:12.5px;color:var(--text2);line-height:1.55;
+    transition:all 0.2s ease;
+}
+.feature-mini:hover{
+    border-color:var(--accent);
+    box-shadow:0 0 20px rgba(0,229,255,0.15);
+    transform:translateY(-2px);
+}
+.feature-mini strong{
+    display:block;color:var(--accent);font-family:var(--font-display);
+    font-size:13.5px;margin-bottom:4px;
+}
+
+.not-allowed-box{
+    background:linear-gradient(135deg,rgba(255,71,87,0.08),rgba(255,45,146,0.04));
+    border:2px solid rgba(255,71,87,0.4);
+    border-radius:16px;padding:22px 24px;margin:18px 0;
+}
+.not-allowed-box h3{
+    color:var(--danger);margin-top:0 !important;font-size:15.5px;
+    display:flex;align-items:center;gap:8px;
+}
+.not-allowed-box ul{margin:10px 0 4px 20px}
+.not-allowed-box li{color:#ffb0b0;font-size:13px}
+.not-allowed-box li::marker{color:var(--danger)}
+
+.feature-list{
+    display:flex;flex-direction:column;gap:8px;margin:16px 0;
+}
+.feature-row{
+    display:flex;gap:12px;align-items:flex-start;
+    padding:12px 16px;border-radius:12px;
+    background:linear-gradient(135deg,rgba(0,229,255,0.04),rgba(184,69,255,0.02));
+    border:1px solid var(--border2);
+    transition:all 0.2s ease;
+}
+.feature-row:hover{
+    border-color:var(--accent);
+    transform:translateX(3px);
+    box-shadow:0 0 20px rgba(0,229,255,0.12);
+}
+.feature-row .fr-icon{
+    width:36px;height:36px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;flex-shrink:0;
+    background:linear-gradient(135deg,rgba(0,229,255,0.15),rgba(184,69,255,0.1));
+    border:1px solid rgba(0,229,255,0.3);
+}
+.feature-row .fr-body{flex:1;min-width:0}
+.feature-row .fr-title{
+    font-family:var(--font-display);font-weight:700;
+    color:var(--text);font-size:13.5px;margin-bottom:3px;
+}
+.feature-row .fr-desc{
+    font-size:12.5px;color:var(--text2);line-height:1.65;
+}
+
+footer{
+    border-top:1px solid rgba(0,229,255,0.15);
+    padding:50px 24px 30px;
+    background:linear-gradient(180deg,var(--bg2),var(--bg));
+    position:relative;z-index:10;
+}
+footer::before{
+    content:'';position:absolute;top:-1px;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent 0%,var(--accent) 20%,var(--purple) 50%,var(--pink) 80%,transparent 100%);
+    opacity:0.7;
+}
+.footer-inner{
+    max-width:1200px;margin:0 auto;
+    display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:20px;
+}
+.footer-copy{font-size:12.5px;color:var(--text3)}
+.footer-copy span{
+    background:linear-gradient(135deg,var(--accent),var(--purple));
+    -webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700;
+}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{color:var(--text3);font-size:12.5px;text-decoration:none;transition:color 0.15s}
+.footer-links a:hover{color:var(--accent)}
+
+.back-top{
+    position:fixed;bottom:24px;right:24px;
+    width:48px;height:48px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),var(--purple));
+    color:#fff;border:none;cursor:pointer;
+    display:none;align-items:center;justify-content:center;
+    font-size:18px;z-index:50;
+    box-shadow:0 4px 20px rgba(0,229,255,0.5);
+    transition:transform 0.2s,box-shadow 0.2s;
+}
+.back-top.show{display:flex}
+.back-top:hover{transform:translateY(-3px) scale(1.08);box-shadow:0 8px 35px rgba(0,229,255,0.8)}
+
+@media (max-width:1100px){
+    .legal-layout{grid-template-columns:1fr;gap:20px}
+    .legal-sidebar{
+        position:relative;top:0;max-height:none;
+        display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+        gap:8px;
+    }
+    .legal-sidebar h3{grid-column:1/-1}
+    .legal-nav-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px}
+}
+@media (max-width:900px){
+    nav{padding:0 20px;height:72px}
+    .nav-menu{gap:20px}
+    .nav-menu a{font-size:11px}
+    .nav-logo-text{font-size:18px}
+    .legal-hero{padding:130px 18px 24px}
+    .legal-card{padding:26px 22px}
+}
+@media (max-width:768px){
+    .nav-menu{
+        display:none;position:fixed;top:72px;left:0;right:0;
+        background:rgba(3,5,10,0.98);backdrop-filter:blur(20px);
+        flex-direction:column;padding:24px;gap:20px;
+        border-bottom:1px solid var(--border);
+    }
+    .nav-menu.open{display:flex}
+    .nav-menu a{font-size:14px;letter-spacing:0.5px}
+    .nav-toggle{display:block}
+    .btn-nav{padding:7px 14px;font-size:11.5px}
+    .btn-nav-outline{display:none}
+    .legal-hero h1{font-size:30px}
+    .legal-hero p{font-size:13.5px}
+    .legal-content h2{font-size:18px}
+    .feature-grid{grid-template-columns:1fr}
+}
+@media (max-width:480px){
+    nav{padding:0 12px;height:66px}
+    .nav-logo-text{font-size:15px}
+    .nav-logo svg{width:38px;height:38px}
+    .btn-nav{padding:6px 11px;font-size:10.5px}
+    .legal-hero{padding:110px 14px 24px}
+    .legal-hero h1{font-size:25px}
+    .legal-card{padding:20px 16px;border-radius:16px}
+    .legal-content h2{font-size:16px}
+    .legal-content h2 .num{width:26px;height:26px;font-size:11px}
+    .legal-content p,.legal-content li{font-size:12.5px}
+    .footer-inner{flex-direction:column;text-align:center}
+    .lang-btn{padding:7px 14px;font-size:11.5px}
+}
+</style>
 </head>
 <body>
-<div class="container" id="mainContainer">
 
-    <!-- ===== DİL SEÇİCİ ===== -->
-    <div class="lang-selector">
-        <button class="lang-btn active" data-lang="tr" onclick="switchLanguage('tr')">🇹🇷 Türkçe</button>
-        <button class="lang-btn" data-lang="en" onclick="switchLanguage('en')">🇬🇧 English</button>
-        <button class="lang-btn" data-lang="ar" onclick="switchLanguage('ar')">🇸🇦 العربية</button>
+<nav>
+    <a href="/index.html" class="nav-logo">
+        <svg width="52" height="52" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#00e5ff"/>
+                    <stop offset="50%" stop-color="#b845ff"/>
+                    <stop offset="100%" stop-color="#ff2d92"/>
+                </linearGradient>
+                <linearGradient id="lg2" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#00ff9d"/>
+                    <stop offset="100%" stop-color="#00e5ff"/>
+                </linearGradient>
+                <radialGradient id="lgg">
+                    <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.7"/>
+                    <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+                </radialGradient>
+            </defs>
+            <circle cx="30" cy="30" r="28" fill="url(#lgg)"/>
+            <circle cx="30" cy="30" r="25" fill="none" stroke="url(#lg1)" stroke-width="2.5"/>
+            <circle cx="30" cy="30" r="21" fill="none" stroke="url(#lg1)" stroke-width="0.8" stroke-dasharray="3 3"/>
+            <circle cx="30" cy="30" r="20" fill="rgba(10,16,32,0.78)"/>
+            <path d="M 33 15 A 15 15 0 1 0 33 45 A 12 12 0 1 1 33 15 Z" fill="url(#lg2)"/>
+            <polygon points="42,18 43.5,23 48.5,23 44.5,26 46,31 42,28 38,31 39.5,26 35.5,23 40.5,23" fill="#ffd11a"/>
+            <circle cx="12" cy="30" r="1.8" fill="#00e5ff"/>
+            <circle cx="48" cy="30" r="1.8" fill="#00e5ff"/>
+            <circle cx="30" cy="12" r="1.8" fill="#00ff9d"/>
+            <circle cx="30" cy="48" r="1.8" fill="#ff2d92"/>
+        </svg>
+        <span class="nav-logo-text">VİZYON 2027</span>
+    </a>
+    <ul class="nav-menu" id="navMenu">
+        <li><a href="/index.html#features">Özellikler</a></li>
+        <li><a href="/index.html#ai">Yapay Zeka</a></li>
+        <li><a href="/api.html">V27 API</a></li>
+        <li><a href="/index.html#pricing">Fiyatlar</a></li>
+        <li><a href="/bana-ogret.html">📖 Bana Öğret</a></li>
+    </ul>
+    <div class="nav-actions">
+        <a href="/index.html#login" class="btn-nav btn-nav-outline">Giriş Yap</a>
+        <a href="/index.html#register" class="btn-nav btn-nav-primary">Ücretsiz Başla</a>
+        <button class="nav-theme-btn" onclick="toggleTheme()" title="Tema Değiştir">🌙</button>
+        <button class="nav-toggle" onclick="document.getElementById('navMenu').classList.toggle('open')">☰</button>
     </div>
+</nav>
 
-    <!-- ===== TÜRKÇE ===== -->
-    <div id="lang-tr" class="lang-content active">
-        <h1>📜 Kullanıcı Sözleşmesi</h1>
-        <p>
-            <span class="badge">📌 Son Güncelleme: 29 Ağustos 2026</span>
-            <span class="badge" style="margin-left:10px;">⚡ Sürüm 6.02.1</span>
-            <span class="badge">📱 Vizyon2027</span>
-        </p>
-
-        <p><strong>Vizyon2027</strong> platformunu (“Platform”) kullanarak, aşağıdaki şartları (“Sözleşme”) okuduğunuzu, anladığınızı ve kabul ettiğinizi beyan edersiniz. Bu sözleşme, <strong>Vizyon2027 Ekibi</strong> (“Şirket”, “Biz”, “Vizyon2027”) ile siz (“Kullanıcı”, “Üye”) arasında yapılmıştır. Lütfen dikkatlice okuyun.</p>
-
-        <div class="highlight-box">
-            <strong>✅ KISA ÖZET:</strong> Vizyon2027, yapay zeka, takım çalışması, proje yönetimi, puan sistemi ve sosyal özellikler sunan bir platformdur. Bu sözleşme, kullanım kurallarını, hesap güvenliğini, fikri mülkiyet haklarını, sorumluluk sınırlarını, gizlilik taahhütlerini ve diğer önemli hükümleri içerir. <span style="color:#ffb700; font-weight:bold;">Platformu kullanarak bu sözleşmeyi koşulsuz olarak kabul etmiş sayılırsınız.</span>
-        </div>
-
-        <hr>
-
-        <h2>1. TANIMLAR</h2>
-        <p>Bu sözleşmede geçen terimler aşağıdaki anlamları taşır:</p>
-        <ul>
-            <li><strong>Platform:</strong> Vizyon2027 web sitesi, mobil uygulama, API ve ilgili tüm hizmetler.</li>
-            <li><strong>Kullanıcı / Üye:</strong> Platforma kayıtlı gerçek veya tüzel kişi.</li>
-            <li><strong>İçerik:</strong> Platform üzerinde paylaşılan metin, kod, görsel, video, ses, dosya, proje, yorum, mesaj ve diğer tüm veriler.</li>
-            <li><strong>AI Hizmetleri:</strong> Platformda sunulan yapay zeka modelleri (Groq, DeepSeek, OpenAI, OpenRouter, Cohere, Cerebras, Gemini) ve ilgili çıktılar.</li>
-            <li><strong>Puan:</strong> Platform içinde kullanılan, görevlerle kazanılan ve mağazada harcanabilen sanal birim.</li>
-            <li><strong>Takım:</strong> Platform üzerinde oluşturulan, birden fazla üyenin ortak çalışabildiği grup.</li>
-            <li><strong>Kullanıcı İçeriği:</strong> Kullanıcı tarafından oluşturulan ve Platforma yüklenen tüm içerik.</li>
-        </ul>
-
-        <h2>2. HESAP OLUŞTURMA VE GÜVENLİK</h2>
-        <h3>2.1. Hesap Bilgileri</h3>
-        <p>Hesap oluştururken doğru, güncel ve eksiksiz bilgi vermekle yükümlüsünüz. Yanlış veya eksik bilgilerden doğan sorunlardan Vizyon2027 sorumlu değildir.</p>
-
-        <h3>2.2. Şifre Güvenliği</h3>
-        <p>Hesabınıza ait şifre ve diğer giriş bilgilerinin gizliliğinden <strong>tamamen siz sorumlusunuz</strong>. Şifrenizi kimseyle paylaşmayın, güvenli bir yerde saklayın. Şifrenizin ele geçirildiğini düşünüyorsanız derhal değiştirin ve bize bildirin.</p>
-
-        <h3>2.3. Hesap Sorumluluğu</h3>
-        <p>Hesabınız üzerinden yapılan tüm işlemlerden (AI sorguları, mesajlar, takım aktiviteleri, alışverişler, puan harcamaları vb.) <strong>siz sorumlusunuz</strong>. Hesabınızın başkaları tarafından kullanılması durumunda, Vizyon2027 hiçbir sorumluluk kabul etmez.</p>
-
-        <h3>2.4. Yaş Sınırı</h3>
-        <p>Platformumuzu kullanmak için en az <strong>13 yaşında</strong> olmanız gerekmektedir. 13 yaşın altındaki kullanıcılar, ebeveyn veya yasal vasinin açık izni olmadan hesap oluşturamaz. Ebeveynler, çocuklarının platform kullanımından sorumludur.</p>
-
-        <h3>2.5. Birden Fazla Hesap</h3>
-        <p>Her kullanıcı yalnızca bir hesap açabilir. Birden fazla hesap açmak, sahte hesap oluşturmak veya başkaları adına hesap açmak <strong>yasaktır</strong>. Tespit edilmesi halinde tüm hesaplar kalıcı olarak kapatılır.</p>
-
-        <div class="info-box">
-            <strong>🔐 Güvenlik İpucu:</strong> Güçlü bir şifre kullanın (büyük/küçük harf, sayı ve özel karakter içeren). İki faktörlü kimlik doğrulama (2FA) yakında sunulacaktır.
-        </div>
-
-        <h2>3. KULLANIM KURALLARI</h2>
-        <p>Platformu kullanırken aşağıdaki kurallara <strong>kesinlikle uymak zorundasınız</strong>. İhlal durumunda hesabınız askıya alınabilir veya kalıcı olarak silinebilir:</p>
-
-        <ul>
-            <li><span style="color:#ff6b6b;">❌</span> <strong>Yasa Dışı Faaliyetler:</strong> Platformu yasa dışı, tehdit edici, taciz edici, iftira niteliğinde, müstehcen veya herhangi bir yasayı ihlal edecek şekilde kullanamazsınız.</li>
-            <li><span style="color:#ff6b6b;">❌</span> <strong>Zararlı Yazılımlar:</strong> Platforma virüs, solucan, truva atı, kötü amaçlı yazılım veya başka zararlı kodlar yükleyemezsiniz.</li>
-            <li><span style="color:#ff6b6b;">❌</span> <strong>Hack ve Sömürü:</strong> Platformun güvenlik açıklarını sömüremez, başkalarının hesaplarına yetkisiz erişemez, şifre kıramaz veya Platformun işleyişini bozamazsınız.</li>
-            <li><span style="color:#ff6b6b;">❌</span> <strong>Spam ve Taciz:</strong> Diğer kullanıcılara spam mesaj gönderemez, taciz edici, rahatsız edici veya nefret söylemi içeren içerik paylaşamazsınız.</li>
-            <li><span style="color:#ff6b6b;">❌</span> <strong>Telif Hakkı İhlali:</strong> Telif hakkıyla korunan materyalleri izinsiz paylaşamaz, dağıtamaz veya kullanamazsınız.</li>
-            <li><span style="color:#ff6b6b;">❌</span> <strong>Sahte Hesap:</strong> Başka bir kişi, kurum veya kuruluş adına sahte hesap oluşturamaz veya başkasının kimliğine bürünemezsiniz.</li>
-            <li><span style="color:#ff6b6b;">❌</span> <strong>Veri Madenciliği:</strong> Platformu, diğer kullanıcıların verilerini toplamak, kazımak (scraping) veya analiz etmek amacıyla kullanamazsınız.</li>
-            <li><span style="color:#ff6b6b;">❌</span> <strong>Puan Manipülasyonu:</strong> Puan sistemini hileli yollarla (bot, otomasyon, sahte hesap) manipüle edemezsiniz.</li>
-            <li><span style="color:#ff6b6b;">❌</span> <strong>Siyasi veya Dini Propaganda:</strong> Platformu siyasi, dini veya ideolojik propaganda amacıyla kullanamazsınız.</li>
-        </ul>
-
-        <div class="important-box">
-            <strong>⚠️ YAPTIRIMLAR:</strong> Yukarıdaki kuralları ihlal ettiğiniz takdirde, hesabınız <strong>geçici olarak askıya alınabilir, kalıcı olarak silinebilir</strong> ve hukuki yollara başvurulabilir. Puanlarınız ve kazanımlarınız iptal edilebilir.
-        </div>
-
-        <h2>4. FİKRİ MÜLKİYET HAKLARI</h2>
-
-        <h3>4.1. Platform İçeriği</h3>
-        <p>Platformun tüm kodları, tasarımı, metinleri, grafikleri, logoları, simgeleri, ses ve video dosyaları, yazılımı ve diğer materyalleri (“Platform İçeriği”), <strong>Vizyon2027 Ekibi</strong>'nin mülkiyetindedir ve uluslararası telif hakkı, marka, patent, ticari sır ve diğer fikri mülkiyet yasaları tarafından korunmaktadır. Hiçbir Platform İçeriği, Vizyon2027'nin açık yazılı izni olmadan kopyalanamaz, dağıtılamaz, değiştirilemez, yeniden yayınlanamaz veya türev çalışmalar oluşturulamaz.</p>
-
-        <h3>4.2. Kullanıcı Tarafından Oluşturulan İçerik</h3>
-        <p>Platform üzerinden paylaştığınız metinler, dosyalar, projeler, yorumlar, kodlar, görseller ve diğer içerikler (“Kullanıcı İçeriği”) <strong>size aittir</strong>. Ancak, Platformu kullanarak bu içeriği <strong>Vizyon2027</strong>'ye, hizmetleri sağlamak, geliştirmek, iyileştirmek, pazarlamak ve Platformu tanıtmak amacıyla <strong>sınırsız, geri alınamaz, dünya çapında, telifsiz, alt lisans verilebilir bir lisans</strong> vermiş olursunuz.</p>
-
-        <h3>4.3. Markalar</h3>
-        <p>“Vizyon2027”, “VİZYON AI” ve ilgili logolar, Vizyon2027 Ekibi'nin tescilli veya tescilsiz markalarıdır. Bu markalar, Vizyon2027'nin önceden yazılı izni olmadan kullanılamaz, taklit edilemez veya benzer şekilde kullanılamaz.</p>
-
-        <h3>4.4. İhlal Bildirimi</h3>
-        <p>Telif hakkı veya diğer fikri mülkiyet haklarınızın ihlal edildiğini düşünüyorsanız, lütfen <strong>vizyon2027.info@gmail.com</strong> adresine aşağıdaki bilgileri içeren bir bildirim gönderin: (a) ihlal edilen eserin tanımı, (b) ihlal eden içeriğin Platform'daki konumu, (c) iletişim bilgileriniz, (d) iyi niyet beyanı, (e) doğruluk beyanı ve (f) imzanız.</p>
-
-        <h2>5. KULLANICI İÇERİĞİ VE SORUMLULUK</h2>
-        <ul>
-            <li>Platform üzerinden paylaştığınız tüm Kullanıcı İçeriğinden <strong>tamamen siz sorumlusunuz</strong>.</li>
-            <li>Paylaştığınız içeriğin, üçüncü şahısların telif hakkı, gizlilik, kişilik veya diğer haklarını ihlal etmediğini garanti edersiniz.</li>
-            <li><strong>Vizyon2027</strong>, Kullanıcı İçeriğini önceden inceleme yükümlülüğü taşımaz. Ancak, uygun gördüğü takdirde herhangi bir içeriği, herhangi bir zamanda ve herhangi bir nedenle, önceden bildirimde bulunmaksızın kaldırma veya reddetme hakkını saklı tutar.</li>
-            <li>Platform, AI hizmetleri aracılığıyla üretilen içerikler (“AI Çıktıları”) de dahil olmak üzere, tüm içerikler <strong>olduğu gibi</strong> sunulur. AI Çıktılarının doğruluğu, güvenilirliği veya uygunluğu konusunda hiçbir garanti verilmez.</li>
-        </ul>
-
-        <div class="info-box">
-            <strong>💡 Öneri:</strong> Hassas veya özel bilgilerinizi Platformda paylaşırken dikkatli olun. AI sorguları, takım mesajları ve proje dosyaları, ilgili kullanıcılar tarafından görülebilir.
-        </div>
-
-        <h2>6. HİZMETLER VE DEĞİŞİKLİKLER</h2>
-
-        <h3>6.1. Hizmet Kapsamı</h3>
-        <p>Vizyon2027, AI asistan (7 model), takım yönetimi, proje araçları, puan sistemi, mağaza, V27 Pazarı, sosyal özellikler (DM, takip, yorum), anketler, duyurular, akademi, iş ilanları, 3D/ Görsel üretim, video analiz, savaş modu, ebeveyn kontrolleri ve diğer hizmetleri sunar.</p>
-
-        <h3>6.2. Değişiklik Hakkı</h3>
-        <p>Vizyon2027, hizmetleri (özellikler, fiyatlandırma, planlar, kullanıcı arayüzü, API vb.) herhangi bir zamanda, önceden bildirimde bulunarak veya bulunmayarak <strong>değiştirme, askıya alma veya durdurma</strong> hakkını saklı tutar. Bu tür değişiklikler, Platformda yayınlandığı tarihte yürürlüğe girer.</p>
-
-        <h3>6.3. Bakım ve Kesintiler</h3>
-        <p>Zaman zaman sistem bakımı, güncellemeler, güvenlik yamaları veya teknik nedenlerle hizmet kesintileri yaşanabilir. Vizyon2027, bu kesintilerden doğan zararlardan sorumlu değildir. Planlı bakımlar önceden duyurulacaktır.</p>
-
-        <h2>7. ÜCRETLENDİRME VE ÖDEMELER</h2>
-
-        <h3>7.1. Ücretsiz Plan</h3>
-        <p>Vizyon2027, sınırlı özelliklerle (günlük 100 AI sorgusu, 3 proje vb.) <strong>ücretsiz</strong> bir plan sunar.</p>
-
-        <h3>7.2. Ücretli Planlar</h3>
-        <p>"Pro" (2000 sorgu/gün) ve "Takım" (sınırsız sorgu) planları belirli bir ücret karşılığında sunulur. Ücretler ve plan detayları <a href="https://vizyon2026.vercel.app" target="_blank">https://vizyon2026.vercel.app</a> adresinde yayınlanır ve önceden haber verilmeksizin değiştirilebilir.</p>
-
-        <h3>7.3. Ödeme Yükümlülüğü</h3>
-        <p>Ücretli bir plana kaydolduğunuzda, belirtilen ücreti zamanında ödemeyi kabul edersiniz. Ödemelerin yapılmaması durumunda hesabınız askıya alınabilir ve ücretli plan avantajları kaldırılabilir.</p>
-
-        <h3>7.4. İade Politikası</h3>
-        <p>Dijital hizmetler olduğu için, satın alınan planlar için <strong>para iadesi yapılmamaktadır</strong>. Aboneliğinizi istediğiniz zaman iptal edebilirsiniz, ancak iptal tarihine kadar kullanılmamış süre için geri ödeme yapılmaz.</p>
-
-        <h2>8. HESAP İPTALİ VE FESHİH</h2>
-
-        <h3>8.1. Kullanıcı Tarafından Fesih</h3>
-        <p>Hesabınızı istediğiniz zaman Platform içinden (“Hesabımı Sil” butonu) veya <strong>vizyon2027.info@gmail.com</strong> adresine e-posta göndererek silebilirsiniz. Hesabınız silindiğinde, tüm verileriniz (projeler, mesajlar, puanlar, takım üyelikleri vb.) <strong>kalıcı olarak silinir</strong> ve geri getirilemez.</p>
-
-        <h3>8.2. Vizyon2027 Tarafından Fesih</h3>
-        <p>Vizyon2027, bu sözleşmeyi ihlal etmeniz, yasa dışı faaliyetlerde bulunmanız, Platforma zarar vermeniz veya başka bir geçerli nedenle, önceden bildirimde bulunarak veya bulunmayarak hesabınızı <strong>askıya alma veya kalıcı olarak silme</strong> hakkını saklı tutar.</p>
-
-        <h3>8.3. Fesih Sonrası</h3>
-        <p>Hesabınızın feshi durumunda, Platforma erişiminiz sona erer ve tüm Kullanıcı İçeriğiniz silinir. Puanlarınız ve kazanımlarınız iptal edilir. Fesih öncesinde oluşan yükümlülükleriniz (varsa) devam eder.</p>
-
-        <h2>9. SORUMLULUK REDDİ VE SINIRLAMALAR</h2>
-
-        <div class="important-box">
-            <h3 style="color:#ff6b6b; margin-top:0;">⚠️ ÖNEMLİ SORUMLULUK REDDİ</h3>
-            <ul>
-                <li><strong>“Olduğu Gibi” Sağlanır:</strong> Vizyon2027, Platformu “olduğu gibi” ve “mevcut olduğu haliyle” sunar. Platformun kesintisiz, hatasız, güvenli veya belirli bir amaca uygun olacağına dair <strong>hiçbir garanti vermez</strong>.</li>
-                <li><strong>AI Çıktılarının Sorumluluğu:</strong> Platform üzerinden elde ettiğiniz AI yanıtları, öneriler, kodlar, analizler ve diğer çıktılar <strong>bilgilendirme amaçlıdır</strong>. Bu çıktıların doğruluğu, güvenilirliği, güncelliği veya uygunluğu konusunda <strong>hiçbir garanti verilmez</strong>. Kullanıcı, bu çıktıları <strong>tamamen kendi sorumluluğunda kullanır</strong>.</li>
-                <li><strong>Zarar Sınırlaması:</strong> Hiçbir durumda Vizyon2027, Platformun kullanımı veya kullanılamamasından kaynaklanan dolaylı, arızi, özel, cezai veya sonuç olarak ortaya çıkan zararlardan (kâr kaybı, veri kaybı, iş kesintisi, itibar kaybı vb.) <strong>sorumlu değildir</strong>.</li>
-                <li><strong>Maksimum Sorumluluk:</strong> Vizyon2027’nin bu sözleşmeden doğan toplam sorumluluğu, sizin son 12 ayda ödediğiniz toplam ücreti (varsa) <strong>geçmez</strong>. Ücretsiz kullanıcılar için sorumluluk sıfırdır.</li>
-                <li><strong>Üçüncü Taraf Hizmetler:</strong> Platform, üçüncü taraf hizmetlere (Back4App, SerpApi, Giphy, Hugging Face, vb.) bağlanabilir. Bu hizmetlerin gizlilik politikaları, kullanım koşulları ve güvenilirliğinden Vizyon2027 <strong>sorumlu değildir</strong>.</li>
-            </ul>
-        </div>
-
-        <h2>10. GİZLİLİK VE VERİ KORUMA</h2>
-        <p>Kişisel verilerinizin nasıl toplandığı, kullanıldığı, saklandığı ve korunduğu hakkında detaylı bilgi için lütfen <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a> sayfamızı inceleyiniz. Bu sözleşme, Gizlilik Politikası ile birlikte değerlendirilmelidir.</p>
-        <ul>
-            <li>Vizyon2027, <strong>6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK)</strong> ve <strong>Avrupa Birliği Genel Veri Koruma Tüzüğü (GDPR)</strong> hükümlerine tam uyumludur.</li>
-            <li>Verileriniz, yalnızca hizmet kalitesini artırmak ve size özel deneyim sunmak için kullanılır.</li>
-            <li>Verileriniz <strong>hiçbir üçüncü tarafla paylaşılmaz, satılmaz veya kiralanmaz</strong>.</li>
-            <li>Hesap silindiğinde, tüm verileriniz kalıcı olarak yok edilir.</li>
-        </ul>
-
-        <h2>11. ÜÇÜNCÜ TARAF HİZMETLER VE BAĞLANTILAR</h2>
-        <p>Platform, üçüncü taraf hizmetlere (Back4App, SerpApi, Giphy, Hugging Face, Google, Facebook, vb.) ve web sitelerine bağlantılar içerebilir. Bu hizmetlerin gizlilik politikaları, kullanım koşulları ve içeriklerinden Vizyon2027 <strong>sorumlu değildir</strong>. Bu bağlantıları kullanmadan önce ilgili hizmetlerin koşullarını okumanız önerilir.</p>
-
-        <h2>12. SÖZLEŞME DEĞİŞİKLİKLERİ</h2>
-        <p>Vizyon2027, bu sözleşmeyi herhangi bir zamanda güncelleme hakkını saklı tutar. Değişiklikler Platform içinde veya web sitemizde yayınlandığı tarihte yürürlüğe girer. Önemli değişiklikler durumunda, size e-posta veya Platform içi bildirim gönderilebilir. Değişikliklerin yürürlüğe girmesinden sonra Platformu kullanmaya devam etmeniz, <strong>güncellenmiş sözleşmeyi kabul ettiğiniz</strong> anlamına gelir. Bu sayfayı düzenli olarak kontrol etmeniz önerilir.</p>
-
-        <h2>13. GEÇERLİ HUKUK VE UYUŞMAZLIK ÇÖZÜMÜ</h2>
-        <ul>
-            <li>Bu sözleşme, <strong>Türkiye Cumhuriyeti yasalarına</strong> tabidir ve bu yasalara göre yorumlanır.</li>
-            <li>Bu sözleşmeden doğan veya bu sözleşmeyle ilgili herhangi bir uyuşmazlık, öncelikle dostane yollarla çözülmeye çalışılır. Çözülememesi durumunda, uyuşmazlık <strong>İstanbul Mahkemeleri ve İcra Daireleri</strong>'nin münhasır yetkisine tabidir.</li>
-            <li>Kullanıcı, Türkiye dışından erişim sağlıyorsa, kendi ülkesinin yasalarına da uymakla yükümlüdür. Vizyon2027, erişimin yasal olup olmadığını garanti etmez.</li>
-        </ul>
-
-        <h2>14. BÖLÜNEBİLİRLİK</h2>
-        <p>Bu sözleşmenin herhangi bir hükmü, yetkili bir mahkeme tarafından geçersiz veya uygulanamaz bulunursa, bu hüküm, sözleşmeden ayrılabilir ve sözleşmenin geri kalan hükümleri <strong>tam olarak yürürlükte kalmaya devam eder</strong>.</p>
-
-        <h2>15. TAM ANLAŞMA</h2>
-        <p>Bu sözleşme, taraflar arasındaki tam anlaşmayı oluşturur ve önceki tüm yazılı veya sözlü anlaşmaların, görüşmelerin ve tekliflerin yerine geçer. Bu sözleşmenin hiçbir hükmünün uygulanmaması, o hükmün veya başka bir hükmün feragat edildiği anlamına gelmez.</p>
-
-        <h2>16. BİLDİRİMLER</h2>
-        <p>Vizyon2027 tarafından yapılacak tüm bildirimler, kayıtlı e-posta adresinize veya Platform içi bildirim olarak gönderilecektir. Kullanıcı, Vizyon2027'ye bildirimlerini <strong>vizyon2027.info@gmail.com</strong> adresine e-posta göndererek yapabilir.</p>
-
-        <h2>17. İLETİŞİM</h2>
-        <p>Bu sözleşme veya Platform ile ilgili her türlü soru, görüş, şikayet veya talep için bize ulaşabilirsiniz:</p>
-        <ul>
-            <li><strong>📧 E-posta:</strong> <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a></li>
-            <li><strong>🌐 Web:</strong> <a href="https://vizyon2026.vercel.app" target="_blank">https://vizyon2026.vercel.app</a></li>
-            <li><strong>📱 WhatsApp Kanalı:</strong> <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank">Tıklayın</a></li>
-            <li><strong>📸 Instagram:</strong> <a href="https://www.instagram.com/vizyon2027.info" target="_blank">@vizyon2027.info</a></li>
-        </ul>
-
-        <hr>
-
-        <div class="legal-footer">
-            <p>
-                <strong>© 2026 Vizyon2027</strong> – Tüm Hakları Saklıdır.<br>
-                Bu sözleşme, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) ve Avrupa Birliği Genel Veri Koruma Tüzüğü'ne (GDPR) tam uyumlu olarak hazırlanmıştır.<br>
-                <span style="color:#ff6b6b;">⚠️ YASAL UYARI:</span> Bu sözleşme, Vizyon2027 Ekibi tarafından hazırlanmış olup, izinsiz kopyalanması, dağıtılması veya türev çalışma oluşturulması <strong>kesinlikle yasaktır</strong>.
-            </p>
-            <p style="margin-top:8px;">
-                <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a> &nbsp;|&nbsp;
-                <a href="https://vizyon2026.vercel.app/bana-ogret.html" target="_blank">Bana Öğret</a> &nbsp;|&nbsp;
-                <a href="https://vizyon2026.vercel.app/dokumantasyon.html" target="_blank">Dokümantasyon</a> &nbsp;|&nbsp;
-                <a href="https://vizyon2026.vercel.app/api.html" target="_blank">API</a> &nbsp;|&nbsp;
-                <a href="https://vizyon2026.vercel.app/blog.html" target="_blank">Blog</a> &nbsp;|&nbsp;
-                <a href="https://vizyon2026.vercel.app/hakkimizda.html" target="_blank">Hakkımızda</a> &nbsp;|&nbsp;
-                <a href="https://vizyon2026.vercel.app/iletisim.html" target="_blank">İletişim</a> &nbsp;|&nbsp;
-                <a href="https://vizyon2026.vercel.app/kariyer.html" target="_blank">Kariyer</a>
-            </p>
-            <p style="font-size:12px; color:#555;">
-                Son Güncelleme: 29 Ağustos 2026 – Sürüm 6.02.1
-            </p>
-        </div>
-
-        <hr>
-        <a href="index.html" class="back-link">⬅️ Ana Sayfaya Dön</a>
+<section class="legal-hero">
+    <div class="legal-hero-badge">
+        <span>📜</span> YASAL BELGE
     </div>
-
-    <!-- ===== ENGLISH (KISA) ===== -->
-    <div id="lang-en" class="lang-content">
-        <h1>📜 Terms of Service</h1>
-        <p><span class="badge">📌 Last Updated: August 29, 2026</span> <span class="badge" style="margin-left:10px;">⚡ Version 6.02.1</span></p>
-
-        <p><strong>Vizyon2027</strong> (“Platform”) is provided by <strong>Vizyon2027 Team</strong>. By using the Platform, you agree to these Terms of Service. Please read them carefully.</p>
-
-        <div class="highlight-box">
-            <strong>✅ SUMMARY:</strong> Vizyon2027 offers AI, team collaboration, project management, points system, store, and social features. These terms cover usage rules, account security, intellectual property, liability limits, and privacy commitments. <span style="color:#ffb700; font-weight:bold;">By using the Platform, you unconditionally accept these terms.</span>
-        </div>
-
-        <hr>
-
-        <h2>1. Account Creation and Security</h2>
-        <ul>
-            <li><strong>Account Info:</strong> You must provide accurate and complete information during registration.</li>
-            <li><strong>Password Security:</strong> You are <strong>fully responsible</strong> for maintaining the confidentiality of your password.</li>
-            <li><strong>Account Responsibility:</strong> All activities under your account (AI queries, messages, team activities, purchases, points spending) are your responsibility.</li>
-            <li><strong>Age Limit:</strong> You must be at least <strong>13 years old</strong> to use the Platform. Users under 13 require parental consent.</li>
-            <li><strong>Multiple Accounts:</strong> Each user may have only one account. Creating multiple or fake accounts is <strong>prohibited</strong>.</li>
-        </ul>
-
-        <h2>2. Usage Rules – Prohibited Activities</h2>
-        <ul>
-            <li>❌ Illegal, threatening, harassing, defamatory, or obscene content</li>
-            <li>❌ Uploading viruses, worms, or malicious code</li>
-            <li>❌ Hacking, exploiting security vulnerabilities, or unauthorized access</li>
-            <li>❌ Spam, harassment, or hate speech</li>
-            <li>❌ Copyright infringement</li>
-            <li>❌ Impersonation or fake accounts</li>
-            <li>❌ Data scraping or mining</li>
-            <li>❌ Points manipulation (bots, automation, fake accounts)</li>
-            <li>❌ Political or religious propaganda</li>
-        </ul>
-        <div class="important-box">
-            <strong>⚠️ PENALTIES:</strong> Violations may result in <strong>temporary suspension, permanent deletion</strong> of your account, and legal action.
-        </div>
-
-        <h2>3. Intellectual Property</h2>
-        <ul>
-            <li><strong>Platform Content:</strong> All code, design, text, graphics, logos, software, and materials are owned by <strong>Vizyon2027 Team</strong> and protected by copyright, trademark, and other IP laws.</li>
-            <li><strong>User Content:</strong> You retain ownership of content you upload, but grant Vizyon2027 a <strong>worldwide, irrevocable, royalty-free, sublicensable license</strong> to use, modify, and distribute it for Platform purposes.</li>
-            <li><strong>Trademarks:</strong> "Vizyon2027", "VİZYON AI" and related logos are trademarks of Vizyon2027. Unauthorized use is prohibited.</li>
-        </ul>
-
-        <h2>4. Disclaimer and Liability Limits</h2>
-        <div class="important-box">
-            <ul>
-                <li><strong>“As Is”:</strong> The Platform is provided “as is” and “as available.” No warranty of uninterrupted, error-free, or secure service.</li>
-                <li><strong>AI Outputs:</strong> AI-generated responses are for <strong>informational purposes only</strong>. No guarantee of accuracy or reliability. Use at your own risk.</li>
-                <li><strong>Liability Limit:</strong> Vizyon2027 is <strong>not liable</strong> for indirect, incidental, special, punitive, or consequential damages. Maximum liability is limited to the total fees paid by you in the last 12 months (if any).</li>
-                <li><strong>Third-Party Services:</strong> Vizyon2027 is <strong>not responsible</strong> for third-party services (Back4App, SerpApi, Giphy, Hugging Face, etc.) linked through the Platform.</li>
-            </ul>
-        </div>
-
-        <h2>5. Privacy and Data Protection</h2>
-        <p>Your personal data is processed in accordance with <strong>Turkish Law No. 6698 (KVKK)</strong> and <strong>EU GDPR</strong>. For details, see our <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Privacy Policy</a>.</p>
-
-        <h2>6. Termination</h2>
-        <ul>
-            <li><strong>By User:</strong> You may delete your account anytime via the Platform or by emailing <strong>vizyon2027.info@gmail.com</strong>. All data is permanently deleted.</li>
-            <li><strong>By Vizyon2027:</strong> We may suspend or permanently delete your account for violating these terms, illegal activities, or other reasons.</li>
-        </ul>
-
-        <h2>7. Governing Law</h2>
-        <p>These terms are governed by the laws of <strong>the Republic of Türkiye</strong>. Any dispute shall be resolved in <strong>Istanbul Courts</strong>.</p>
-
-        <h2>8. Changes to Terms</h2>
-        <p>Vizyon2027 may update these terms at any time. Changes are effective upon posting. Continued use after changes constitutes acceptance.</p>
-
-        <h2>9. Contact</h2>
-        <ul>
-            <li><strong>📧 Email:</strong> <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a></li>
-            <li><strong>🌐 Web:</strong> <a href="https://vizyon2026.vercel.app" target="_blank">https://vizyon2026.vercel.app</a></li>
-            <li><strong>📱 WhatsApp:</strong> <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank">Channel</a></li>
-            <li><strong>📸 Instagram:</strong> <a href="https://www.instagram.com/vizyon2027.info" target="_blank">@vizyon2027.info</a></li>
-        </ul>
-
-        <hr>
-        <div class="legal-footer">
-            <p><strong>© 2026 Vizyon2027</strong> – All Rights Reserved.</p>
-            <p><a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Privacy Policy</a> | <a href="https://vizyon2026.vercel.app/bana-ogret.html" target="_blank">Teach Me</a> | <a href="https://vizyon2026.vercel.app/dokumantasyon.html" target="_blank">Documentation</a></p>
-        </div>
-        <hr>
-        <a href="index.html" class="back-link">⬅️ Back to Home</a>
+    <h1 id="heroTitle">Kullanıcı Sözleşmesi</h1>
+    <p id="heroSub">
+        VİZYON 2027 ekosistemini kullanmadan önce lütfen bu sözleşmeyi dikkatlice okuyun.
+        Sisteme kayıt olarak ve/veya hizmetlerimizi kullanarak bu sözleşmenin tüm şartlarını
+        kabul etmiş sayılırsınız.
+    </p>
+    <div class="legal-hero-meta">
+        <span>📅 Son Güncelleme: 26 Eylül 2026</span>
+        <span>⚡ Sürüm: v7.10.0</span>
+        <span>🌍 TR/AZ/DE/US</span>
     </div>
+</section>
 
-    <!-- ===== ARAPÇA (KISA) ===== -->
-    <div id="lang-ar" class="lang-content" dir="rtl">
-        <h1>📜 اتفاقية المستخدم</h1>
-        <p><span class="badge">📌 آخر تحديث: 29 أغسطس 2026</span> <span class="badge" style="margin-left:10px;">⚡ الإصدار 6.02.1</span></p>
-
-        <p><strong>فيجن 2027</strong> ("المنصة") مقدمة من <strong>فريق فيجن 2027</strong>. باستخدام المنصة، فإنك توافق على هذه الاتفاقية. يرجى قراءتها بعناية.</p>
-
-        <div class="highlight-box">
-            <strong>✅ ملخص:</strong> تقدم فيجن 2027 الذكاء الاصطناعي، العمل الجماعي، إدارة المشاريع، نظام النقاط، المتجر، والميزات الاجتماعية. تغطي هذه الاتفاقية قواعد الاستخدام، أمان الحساب، حقوق الملكية الفكرية، حدود المسؤولية، والتزامات الخصوصية. <span style="color:#ffb700; font-weight:bold;">باستخدام المنصة، فإنك تقبل هذه الاتفاقية دون قيد أو شرط.</span>
-        </div>
-
-        <hr>
-
-        <h2>1. إنشاء الحساب والأمان</h2>
-        <ul>
-            <li><strong>معلومات الحساب:</strong> يجب تقديم معلومات دقيقة وكاملة أثناء التسجيل.</li>
-            <li><strong>أمان كلمة المرور:</strong> أنت <strong>مسؤول بالكامل</strong> عن الحفاظ على سرية كلمة المرور الخاصة بك.</li>
-            <li><strong>مسؤولية الحساب:</strong> جميع الأنشطة تحت حسابك (استعلامات الذكاء الاصطناعي، الرسائل، أنشطة الفريق، المشتريات، إنفاق النقاط) هي مسؤوليتك.</li>
-            <li><strong>الحد الأدنى للعمر:</strong> يجب أن تكون <strong>13 عامًا</strong> على الأقل لاستخدام المنصة. المستخدمون دون 13 عامًا يحتاجون إلى موافقة الوالدين.</li>
-        </ul>
-
-        <h2>2. قواعد الاستخدام – الأنشطة المحظورة</h2>
-        <ul>
-            <li>❌ محتوى غير قانوني، تهديدي، تحرشي، تشهيري، أو فاحش</li>
-            <li>❌ تحميل فيروسات أو برمجيات ضارة</li>
-            <li>❌ اختراق أو استغلال ثغرات أمنية أو وصول غير مصرح به</li>
-            <li>❌ بريد عشوائي أو تحرش أو خطاب كراهية</li>
-            <li>❌ انتهاك حقوق النشر</li>
-            <li>❌ انتحال الشخصية أو حسابات مزيفة</li>
-            <li>❌ استخراج البيانات أو التعدين</li>
-            <li>❌ التلاعب بنظام النقاط (بوتات، أتمتة، حسابات مزيفة)</li>
-        </ul>
-        <div class="important-box">
-            <strong>⚠️ العقوبات:</strong> قد تؤدي الانتهاكات إلى <strong>تعليق مؤقت، حذف دائم</strong> للحساب، وإجراءات قانونية.
-        </div>
-
-        <h2>3. الملكية الفكرية</h2>
-        <ul>
-            <li><strong>محتوى المنصة:</strong> جميع الأكواد والتصاميم والنصوص والرسومات والشعارات مملوكة لـ <strong>فريق فيجن 2027</strong> ومحمية بقوانين حقوق النشر والعلامات التجارية.</li>
-            <li><strong>محتوى المستخدم:</strong> تحتفظ بملكية المحتوى الذي ترفعه، لكن تمنح فيجن 2027 <strong>ترخيصًا عالميًا غير قابل للإلغاء وخاليًا من حقوق الملكية</strong> لاستخدامه وتعديله وتوزيعه لأغراض المنصة.</li>
-        </ul>
-
-        <h2>4. إخلاء المسؤولية وحدود المسؤولية</h2>
-        <div class="important-box">
-            <ul>
-                <li><strong>"كما هي":</strong> تُقدم المنصة "كما هي" و"كما هي متاحة". لا يوجد ضمان لخدمة متواصلة أو خالية من الأخطاء.</li>
-                <li><strong>مخرجات الذكاء الاصطناعي:</strong> الردود المولدة بواسطة الذكاء الاصطناعي هي <strong>لأغراض إعلامية فقط</strong>. لا يوجد ضمان للدقة أو الموثوقية. الاستخدام على مسؤوليتك الخاصة.</li>
-                <li><strong>حد المسؤولية:</strong> فيجن 2027 <strong>ليست مسؤولة</strong> عن الأضرار غير المباشرة أو العرضية أو الخاصة أو العقابية أو التبعية. الحد الأقصى للمسؤولية يقتصر على إجمالي الرسوم التي دفعتها في آخر 12 شهرًا (إن وجدت).</li>
-            </ul>
-        </div>
-
-        <h2>5. الخصوصية وحماية البيانات</h2>
-        <p>تتم معالجة بياناتك الشخصية وفقًا لـ <strong>قانون حماية البيانات الشخصية التركي رقم 6698 (KVKK)</strong> و <strong>اللائحة العامة لحماية البيانات (GDPR)</strong>. للتفاصيل، راجع <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">سياسة الخصوصية</a>.</p>
-
-        <h2>6. الاتصال</h2>
-        <ul>
-            <li><strong>📧 البريد الإلكتروني:</strong> <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a></li>
-            <li><strong>🌐 الويب:</strong> <a href="https://vizyon2026.vercel.app" target="_blank">https://vizyon2026.vercel.app</a></li>
-        </ul>
-
-        <hr>
-        <div class="legal-footer">
-            <p><strong>© 2026 فيجن 2027</strong> – جميع الحقوق محفوظة.</p>
-        </div>
-        <hr>
-        <a href="index.html" class="back-link">⬅️ العودة إلى الصفحة الرئيسية</a>
-    </div>
-
+<div class="lang-bar">
+    <button class="lang-btn active" data-lang="tr" onclick="switchLanguage('tr')">🇹🇷 Türkçe</button>
+    <button class="lang-btn" data-lang="en" onclick="switchLanguage('en')">🇬🇧 English</button>
+    <button class="lang-btn" data-lang="ar" onclick="switchLanguage('ar')">🇸🇦 العربية</button>
 </div>
 
+<div class="legal-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="legal-sidebar">
+        <h3>📋 İçindekiler</h3>
+        <ul class="legal-nav-list">
+            <li><a href="#tr-m1">📖 Taraflar & Tanımlar</a></li>
+            <li><a href="#tr-m2">🚀 Hizmetin Kapsamı</a></li>
+            <li><a href="#tr-m3">👤 Hesap & Güvenlik</a></li>
+            <li><a href="#tr-m4">⚠️ Kullanım Kuralları</a></li>
+            <li><a href="#tr-m5">🤖 AI Model & Sorumluluk</a></li>
+            <li><a href="#tr-m6">✨ Vizyon Al Şartları</a></li>
+            <li><a href="#tr-m7">🔊 Ses & Ekran Okuma</a></li>
+            <li><a href="#tr-m8">📎 Dosya & Sunum</a></li>
+            <li><a href="#tr-m9">🔑 V27 API Şartları</a></li>
+            <li><a href="#tr-m10">🧭 V27 Koç & Limitler</a></li>
+            <li><a href="#tr-m11">📊 Plan Limitleri</a></li>
+            <li><a href="#tr-m12">🎨 Moderatör Rütbesi</a></li>
+            <li><a href="#tr-m13">📋 Logs Sistemi</a></li>
+            <li><a href="#tr-m14">🏆 Fikri Mülkiyet</a></li>
+            <li><a href="#tr-m15">🛡️ Askı & Yasaklama</a></li>
+            <li><a href="#tr-m16">💰 Ücretler & İade</a></li>
+            <li><a href="#tr-m17">⚠️ Sorumluluk Reddi</a></li>
+            <li><a href="#tr-m18">⚖️ Uyuşmazlık</a></li>
+            <li><a href="#tr-m19">📝 Değişiklikler</a></li>
+            <li><a href="#tr-m20">📞 İletişim</a></li>
+        </ul>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="legal-content-outer">
+
+        <!-- TÜRKÇE -->
+        <div id="lang-tr" class="legal-content active">
+            <article class="legal-card">
+
+                <div class="info-box">
+                    <span class="info-box-title">✅ KISA ÖZET</span>
+                    Bu sözleşme, VİZYON 2027 ekosistemini (28 AI modeli, Vizyon Al, V27 API, V27 Koç, Video Stüdyo, Dosya Analiz, Logs Sistemi, Takım Çalışması, Puan Sistemi, Moderatör Rütbesi) kullanımınızla ilgili kuralları, haklarınızı, yükümlülüklerinizi ve sorumluluk sınırlarını belirler. <strong>Platformu kullanarak bu sözleşmeyi koşulsuz kabul etmiş sayılırsınız.</strong>
+                </div>
+
+                <!-- 1 -->
+                <h2 id="tr-m1"><span class="num">01</span> Taraflar ve Tanımlar</h2>
+                <p><strong>1.1.</strong> Bu sözleşme, <strong>VİZYON 2027 Ekosistemi</strong> ("Platform", "Biz") ile Platform'a kayıt olan gerçek veya tüzel kişi ("Kullanıcı", "Siz") arasında akdedilmiştir.</p>
+                <p><strong>1.2.</strong> Platform, <a href="/index.html" class="inline">vizyon2026.vercel.app</a> ve ilişkili alt alan adları üzerinden hizmet verir.</p>
+                <p><strong>1.3.</strong> Bu sözleşmede kullanılan terimler:</p>
+                <ul>
+                    <li><strong>"Platform":</strong> VİZYON 2027 ekosisteminin tüm uygulamaları, API'leri, mobil/web arayüzleri, AI modelleri ve yardımcı hizmetlerini,</li>
+                    <li><strong>"Hizmet":</strong> Platform üzerinden sunulan tüm ürün ve hizmetleri (VİZYON AI, Vizyon Al, V27 API, V27 Koç, Video Stüdyosu, 3D Stüdyo, Dosya Analiz, Logs Sistemi, Takım Çalışması, V27 Akademi vb.),</li>
+                    <li><strong>"Kullanıcı İçeriği":</strong> Kullanıcı tarafından sisteme yüklenen, oluşturulan, paylaşılan her türlü metin, kod, görsel, video, dosya ve veriyi,</li>
+                    <li><strong>"AI Çıktısı":</strong> Yapay zeka modelleri tarafından üretilen yanıt, kod, görsel, sunum ve analizleri,</li>
+                    <li><strong>"V27 API Anahtarı":</strong> Platformun dış uygulamalarla entegrasyon için kullanıcıya tahsis ettiği erişim anahtarını,</li>
+                    <li><strong>"Moderatör":</strong> Sadece kurucu tarafından mail ile atanan gizli rütbeli kullanıcıyı ifade eder.</li>
+                </ul>
+
+                <!-- 2 -->
+                <h2 id="tr-m2"><span class="num">02</span> Hizmetin Kapsamı</h2>
+                <p><strong>2.1.</strong> Platform, aşağıdaki ana hizmetleri sunar:</p>
+
+                <div class="feature-grid">
+                    <div class="feature-mini">
+                        <strong>🤖 VİZYON AI</strong>
+                        13 yerli Ollama + 7 Nvidia NIM + 8 bulut API = <strong>28 AI modeli</strong> tek çatı altında.
+                    </div>
+                    <div class="feature-mini">
+                        <strong>✨ Vizyon Al Paneli</strong>
+                        4 modlu (Normal / Derin Düşünme / Ajan / Yazılımcı) gelişmiş panel.
+                    </div>
+                    <div class="feature-mini">
+                        <strong>🔊 Sesli Sohbet</strong>
+                        ChatGPT tarzı tam ekran sesli konuşma ve metin okuma.
+                    </div>
+                    <div class="feature-mini">
+                        <strong>📎 Dosya Analizi</strong>
+                        PDF, Word, Excel, görsel, video analizi + sunum + indirme.
+                    </div>
+                    <div class="feature-mini">
+                        <strong>🔑 V27 API</strong>
+                        Kendi uygulamalarınıza AI gücü aktarma (süreli anahtar sistemi).
+                    </div>
+                    <div class="feature-mini">
+                        <strong>🧭 V27 Koç</strong>
+                        Samimi, yol gösteren, psikolojik destek veren AI koç.
+                    </div>
+                    <div class="feature-mini">
+                        <strong>🧊 3D Stüdyo</strong>
+                        90+ hazır 3D şekil, sürükle-bırak, .glb indirme.
+                    </div>
+                    <div class="feature-mini">
+                        <strong>🎬 Video Stüdyosu</strong>
+                        Senaryo, Reels fikirleri, video analiz ve kesit aracı.
+                    </div>
+                    <div class="feature-mini">
+                        <strong>👥 Takım Çalışması</strong>
+                        Ortak projeler, takım sohbeti, @vizyonal / @vizyondestek komutları.
+                    </div>
+                    <div class="feature-mini">
+                        <strong>📋 Logs Sistemi</strong>
+                        Sistem olaylarını 5 seviyede kayıt altına alma.
+                    </div>
+                    <div class="feature-mini">
+                        <strong>🎨 Moderatör Rütbesi</strong>
+                        Sadece kurucu tarafından atanan gizli rütbe.
+                    </div>
+                    <div class="feature-mini">
+                        <strong>📚 V27 Akademi</strong>
+                        Kod, 3D, veri analizi, güvenlik ve API dersleri.
+                    </div>
+                </div>
+
+                <p><strong>2.2.</strong> Platform, hizmetlerini önceden bildirmeksizin güncelleyebilir, değiştirebilir veya kaldırabilir. Kullanıcı, bu tür değişiklikleri peşinen kabul eder.</p>
+                <p><strong>2.3.</strong> Platform hizmetleri "olduğu gibi" sunulmaktadır. Kesintisiz veya hatasız çalışacağı garanti edilmez.</p>
+
+                <!-- 3 -->
+                <h2 id="tr-m3"><span class="num">03</span> Hesap Oluşturma ve Güvenlik</h2>
+                <p><strong>3.1.</strong> Platform'a kayıt olmak için en az <strong>13 yaşında</strong> olmanız gerekir. 18 yaşından küçük kullanıcılar için ebeveyn onayı zorunludur.</p>
+                <p><strong>3.2.</strong> Kayıt sırasında verdiğiniz bilgilerin <strong>doğru, güncel ve eksiksiz</strong> olması zorunludur. Yanlış bilgi verilmesi durumunda hesabınız askıya alınabilir.</p>
+                <p><strong>3.3.</strong> Facebook ile giriş yaptığınızda, hesabınızı kurtarabilmeniz için sizden zorunlu olarak <strong>ad soyad, en az 8 karakterli şifre ve kurtarma maili</strong> istenir. Bu bilgiler <code>AES-256-GCM</code> ile şifrelenerek saklanır.</p>
+                <p><strong>3.4.</strong> Hesap güvenliğinden tamamen siz sorumlusunuz. Şifrenizi <strong>hiç kimseyle paylaşmayın</strong>. Hesabınıza yetkisiz erişim tespit ederseniz derhal <a href="/iletisim.html" class="inline">bize ulaşın</a>.</p>
+                <p><strong>3.5.</strong> Her kullanıcı yalnızca <strong>bir hesap</strong> açabilir. Çoklu hesap, sahte hesap veya başkası adına hesap açmak yasaktır. Tespiti halinde tüm hesaplar kapatılır.</p>
+
+                <div class="info-box warning">
+                    <span class="info-box-title">⚠️ Güvenlik Uyarısı</span>
+                    Kayıt olurken <strong>kullandığınız şifreyi mail şifrenizle aynı yapmayın</strong>. Sitemize üye olduğunuzda sadece e-posta ve profil fotoğrafınıza erişebiliriz; başka hiçbir verinize erişimimiz yoktur.
+                </div>
+
+                <!-- 4 -->
+                <h2 id="tr-m4"><span class="num">04</span> Kullanım Kuralları ve Yasaklar</h2>
+                <p><strong>4.1.</strong> Kullanıcı, Platform'u kullanırken aşağıdaki kurallara uymakla yükümlüdür:</p>
+
+                <div class="not-allowed-box">
+                    <h3>❌ Kesinlikle Yasak Olan Davranışlar</h3>
+                    <ul>
+                        <li><strong>Küfür, argo, hakaret</strong> içeren mesajlar ve yorumlar</li>
+                        <li><strong>Siyasi propaganda</strong>, ayrımcılık veya nefret söylemi</li>
+                        <li><strong>Yasa dışı faaliyetler</strong> (uyuşturucu, silah, terör vb.)</li>
+                        <li><strong>Diğer kullanıcıları taciz</strong>, tehdit, şantaj</li>
+                        <li><strong>Telif hakkı ihlali</strong> yapan içerik paylaşımı</li>
+                        <li><strong>Zararlı yazılım</strong>, virüs, trojan paylaşımı</li>
+                        <li>Platform'un <strong>güvenlik önlemlerini aşma</strong> girişimi</li>
+                        <li><strong>Sahte kimlik</strong> veya başkasının hesabını kullanma</li>
+                        <li><strong>Puan manipülasyonu</strong> (bot, otomasyon, sahte hesap)</li>
+                        <li><strong>Veri kazıma (scraping)</strong> veya otomatik veri toplama</li>
+                        <li><strong>AI çıktılarını</strong> yanıltıcı biçimde kendisine ait gibi sunma</li>
+                        <li>Sunuculara <strong>DDoS saldırısı</strong> veya aşırı yükleme</li>
+                    </ul>
+                </div>
+
+                <p><strong>4.2.</strong> Platform bünyesindeki <strong>Vizyon Devriye</strong> adlı 7/24 aktif otomatik moderasyon sistemi, yukarıdaki kurallara aykırı içerikleri tespit eder ve gerekli yaptırımı uygular:</p>
+                <ul>
+                    <li><strong>1. ihlal:</strong> Uyarı + Log kaydı</li>
+                    <li><strong>2. ihlal:</strong> 7 gün askıya alma</li>
+                    <li><strong>3. ihlal:</strong> Kalıcı yasaklama</li>
+                </ul>
+
+                <div class="info-box danger">
+                    <span class="info-box-title">🚫 Ciddi İhlaller</span>
+                    Yasa dışı içerik, çocuk istismarı, terör propagandası, siber saldırı gibi ciddi ihlaller <strong>doğrudan kalıcı yasaklama</strong> ve gerekli durumlarda <strong>yasal mercilere bildirim</strong> ile sonuçlanır.
+                </div>
+
+                <!-- 5 -->
+                <h2 id="tr-m5"><span class="num">05</span> AI Model Çıktıları ve Sorumluluk</h2>
+                <p><strong>5.1.</strong> Platform, <strong>28 farklı yapay zeka modelini</strong> 3 katmanlı bir yapıda birleştirir:</p>
+                <div class="feature-list">
+                    <div class="feature-row">
+                        <div class="fr-icon">🏠</div>
+                        <div class="fr-body">
+                            <div class="fr-title">13 Yerli Ollama Modeli</div>
+                            <div class="fr-desc">granite3.3:2b, qwen2.5vl:3b, phi4-mini-reasoning, gemma3:4b, qwen3:8b, qwen3:4b, qwen2.5-coder, mistral, phi3.5, gemma2, llama3.2, qwen2.5, deepseek-r1</div>
+                        </div>
+                    </div>
+                    <div class="feature-row">
+                        <div class="fr-icon">🟢</div>
+                        <div class="fr-body">
+                            <div class="fr-title">7 Nvidia NIM Modeli</div>
+                            <div class="fr-desc">Llama 3.3 70B, Llama 3.1 8B, Qwen 2.5 7B, Qwen 2.5 Coder 32B, DeepSeek R1 Distill, Gemma 2 2B, Phi 3.5 MoE</div>
+                        </div>
+                    </div>
+                    <div class="feature-row">
+                        <div class="fr-icon">☁️</div>
+                        <div class="fr-body">
+                            <div class="fr-title">8 Bulut API Modeli</div>
+                            <div class="fr-desc">Groq (Llama 3.3 70B), Gemini 2.0 Flash, DeepSeek Chat, DeepInfra, OpenAI GPT-4o-mini, Cerebras, OpenRouter, Cohere Command R Plus</div>
+                        </div>
+                    </div>
+                </div>
+
+                <p><strong>5.2.</strong> AI çıktıları <strong>bilgilendirme amaçlıdır</strong>. Hiçbir AI yanıtı profesyonel hukuki, tıbbi, finansal veya güvenlik tavsiyesi yerine geçmez.</p>
+                <p><strong>5.3.</strong> AI modellerinin ürettiği içeriklerin <strong>doğruluğu, güncelliği veya uygunluğu garanti edilmez</strong>. Kritik kararlarınızda mutlaka uzman görüşü alın.</p>
+                <p><strong>5.4.</strong> AI çıktılarının kullanımından doğacak her türlü sonuçtan <strong>tamamen kullanıcı sorumludur</strong>. VİZYON 2027 hiçbir sorumluluk kabul etmez.</p>
+
+                <!-- 6 -->
+                <h2 id="tr-m6"><span class="num">06</span> Vizyon Al Paneli Özel Şartları</h2>
+                <p><strong>6.1.</strong> Vizyon Al, 28 yapay zeka modelini tek panelde birleştiren ve <strong>4 farklı mod</strong>da çalışan gelişmiş bir araçtır:</p>
+                <ul>
+                    <li>🌐 <strong>Normal Mod:</strong> Standart sohbet, tüm modeller eşit kullanılır.</li>
+                    <li>🧠 <strong>Derin Düşünme Modu:</strong> Uzun süre düşünür, internette gezinir, kapsamlı cevap verir.</li>
+                    <li>🕵️ <strong>Ajan Modu:</strong> Web sitelerinde gezinebilir, işlem yapabilir, form doldurabilir.</li>
+                    <li>💻 <strong>Yazılımcı Modu:</strong> Her dilde en iyi kod üretimi ve hata ayıklama.</li>
+                </ul>
+
+                <p><strong>6.2.</strong> Vizyon Al'ı ilk kez açtığınızda bir <strong>sorumluluk onay kutusu</strong> karşınıza çıkar. Bu onay kutusunu işaretlediğinizde:</p>
+
+                <div class="info-box premium">
+                    <span class="info-box-title">✍️ Sorumluluk Beyanı</span>
+                    "Vizyon Al tarafından yapılan tüm işlemlerden doğabilecek sorumluluğu kabul ediyorum. Ekranımın okunmasına izin veriyorum. Üretilen içeriklerin doğruluğunu kontrol etmek bana aittir."
+                </div>
+
+                <p>beyanını vermiş sayılırsınız. Bu beyan, hesabınız silinene kadar geçerlidir.</p>
+                <p><strong>6.3.</strong> Vizyon Al'ın <strong>Ajan Modu</strong>'nda site gezintisi, form doldurma, tıklama gibi işlemler yapabilmesi kullanıcının tam sorumluluğundadır. Bu işlemlerden doğacak üçüncü taraf zararlarından Platform sorumlu değildir.</p>
+
+                <!-- 7 -->
+                <h2 id="tr-m7"><span class="num">07</span> Sesli Sohbet ve Ekran Okuma Şartları</h2>
+                <p><strong>7.1. Sesli Sohbet:</strong> Platform, ChatGPT tarzı tam ekran sesli sohbet sunar. Bu özellik kullanılırken:</p>
+                <ul>
+                    <li>🎤 Sesli kaydınız <strong>yalnızca anlık</strong> olarak işlenir, kalıcı saklanmaz</li>
+                    <li>🗣️ Konuşmalarınız üçüncü taraflarla <strong>paylaşılmaz</strong></li>
+                    <li>⏹️ Geri tuşuna basıldığında <strong>ses kaydı kesin olarak kapanır</strong></li>
+                    <li>📊 Günlük plan limitlerine tabidir (Free 5 dk, Pro 60 dk, Team sınırsız)</li>
+                </ul>
+
+                <p><strong>7.2. Ekran Okuma:</strong> Vizyon Al, kullanıcının izniyle ekran görüntüsü alabilir:</p>
+                <ul>
+                    <li><strong>Tek Kare Modu:</strong> Anlık ekran görüntüsü alınır, analiz edilir, <strong>sunucuda saklanmaz</strong></li>
+                    <li><strong>Canlı Mod:</strong> 3 saniye aralıklarla ekran izlenir, sadece değişiklikte AI'ya gönderilir</li>
+                    <li>Ekran görüntüleri <strong>kaydedilmez</strong>, işlem biter bitmez bellekten silinir</li>
+                    <li>İstediğiniz zaman paylaşımı durdurabilirsiniz</li>
+                    <li>Ekran okuma özelliği <strong>Pro ve üzeri planlarda</strong> mevcuttur</li>
+                </ul>
+
+                <div class="info-box warning">
+                    <span class="info-box-title">⚠️ Sorumluluk</span>
+                    Ekran paylaşımı <strong>tamamen sizin kontrolünüzdedir</strong>. Kritik/özel bilgileri ekranda açık bırakmayın. Bu özelliğin kullanımından doğacak tüm sonuçlardan kullanıcı sorumludur.
+                </div>
+
+                <!-- 8 -->
+                <h2 id="tr-m8"><span class="num">08</span> Dosya Analizi ve Sunum</h2>
+                <p><strong>8.1.</strong> Platform, PDF, Word, Excel, görsel, video, ZIP, kod dosyalarının yüklenmesine (max 20MB) izin verir.</p>
+                <p><strong>8.2.</strong> Yüklenen dosyalar analiz için AI'ya gönderilir. Analiz sonucu <strong>indirilebilir sunum</strong> olarak sunulur (txt/html/md/json formatlarında).</p>
+                <p><strong>8.3.</strong> Kullanıcı, yüklediği dosyanın:</p>
+                <ul>
+                    <li>Telif hakkı ihlali içermediğini,</li>
+                    <li>Yasa dışı içerik barındırmadığını,</li>
+                    <li>Üçüncü kişilerin haklarını ihlal etmediğini</li>
+                </ul>
+                <p>garanti eder. Aksi halde tüm sorumluluk kullanıcıya aittir.</p>
+
+                <div class="info-box warning">
+                    <span class="info-box-title">⚠️ Hassas Dosya Uyarısı</span>
+                    Kimlik, pasaport, sağlık raporu, banka ekstresi gibi <strong>hassas dosyaları</strong> yüklememenizi öneririz. Analiz için AI'ya gönderilen içerikler bulut API politikalarına tabidir.
+                </div>
+
+                <!-- 9 -->
+                <h2 id="tr-m9"><span class="num">09</span> V27 API Anahtarı Kullanım Şartları</h2>
+                <p><strong>9.1.</strong> V27 API, VİZYON AI'nın 28 model birleşik gücünü dış uygulamalara açan REST API servisidir.</p>
+
+                <h3>9.2. Anahtar Limitleri</h3>
+                <div class="feature-grid">
+                    <div class="feature-mini"><strong>👑 Kurucu/Admin/Beta/Moderatör</strong>♾️ Sınırsız anahtar</div>
+                    <div class="feature-mini"><strong>👥 Takım Paketi</strong>100 anahtar</div>
+                    <div class="feature-mini"><strong>🌟 Pro Paket</strong>20 anahtar</div>
+                    <div class="feature-mini"><strong>🆓 Ücretsiz</strong>2 anahtar</div>
+                </div>
+
+                <h3>9.3. Güvenlik</h3>
+                <ul>
+                    <li>Anahtar değeri <code>SHA-256</code> ile hash'lenir — düz metin olarak asla saklanmaz</li>
+                    <li>Kullanıcıya anahtar <strong>sadece 1 kez</strong> tam gösterilir</li>
+                    <li>Sonrasında maskelenmiş hali (<code>V27-XXXX••••••••-XXXX</code>) görünür</li>
+                    <li>Dakikada 60 istek limiti (rate limiting) vardır</li>
+                </ul>
+
+                <h3>9.4. Kullanıcı Sorumluluğu</h3>
+                <p>Kullanıcı, V27 API anahtarını:</p>
+                <ul>
+                    <li>Kimseyle <strong>paylaşmamayı</strong>,</li>
+                    <li>Kodda <code>.env</code> dosyasında saklamayı, hardcode yapmamayı,</li>
+                    <li>GitHub gibi kamuya açık platformlara commit'lememeyi,</li>
+                    <li>Sızıntı durumunda derhal iptal etmeyi,</li>
+                    <li>Yasa dışı amaçlarla <strong>kullanmamayı</strong></li>
+                </ul>
+                <p>kabul eder. Kullanıcının API anahtarını kötüye kullanması durumunda anahtar iptal edilir ve gerekli durumlarda yasal işlem başlatılır.</p>
+
+                <!-- 10 -->
+                <h2 id="tr-m10"><span class="num">10</span> V27 Koç Asistanı ve Haftalık Limitler</h2>
+                <p><strong>10.1.</strong> V27 Koç, çok samimi, yol gösteren, psikolojik destek veren yapay zeka koçudur.</p>
+
+                <h3>10.2. Haftalık İşlem Limitleri</h3>
+                <ul>
+                    <li><strong>Free:</strong> 10 işlem/hafta</li>
+                    <li><strong>Pro:</strong> 50 işlem/hafta</li>
+                    <li><strong>Team:</strong> 1000 işlem/hafta</li>
+                    <li><strong>Admin/Founder/Beta/Moderatör:</strong> ♾️ Sınırsız</li>
+                </ul>
+                <p><em>Limitler her Pazartesi 00:00'da otomatik sıfırlanır.</em></p>
+
+                <h3>10.3. Sohbet Koruması ve Paylaşım</h3>
+                <ul>
+                    <li>Koç sohbetlerini kullanıcı <strong>silemez</strong> (kurucu tarafından korunur)</li>
+                    <li>Sohbetler <strong>şifreli link</strong> ile paylaşılabilir</li>
+                    <li>Paylaşım için <strong>sorumluluk onayı + şifre</strong> zorunludur</li>
+                    <li>Şifre girilmeden sohbet görüntülenemez</li>
+                </ul>
+
+                <div class="info-box premium">
+                    <span class="info-box-title">🧭 V27 Koç Sorumluluğu</span>
+                    V27 Koç bir yapay zekadır. Verdiği tavsiyeler <strong>profesyonel psikolojik veya tıbbi tavsiye değildir</strong>. Ciddi durumlarda mutlaka bir uzmana başvurun.
+                </div>
+
+                <!-- 11 -->
+                <h2 id="tr-m11"><span class="num">11</span> Plan Limitleri</h2>
+                <p><strong>11.1.</strong> Platform, Free / Pro / Team olmak üzere 3 farklı plan sunar. Kullanıcının erişebileceği özellikler ve günlük/haftalık/aylık limitler plan bazlıdır:</p>
+
+                <div class="feature-list">
+                    <div class="feature-row">
+                        <div class="fr-icon">🆓</div>
+                        <div class="fr-body">
+                            <div class="fr-title">Free Plan</div>
+                            <div class="fr-desc">100 sorgu/gün · 3 proje/ay · 2 V27 API anahtarı · 10 Koç işlemi/hafta · Vizyon Al 10/gün · Sesli 5 dk/gün · Dosya 3/gün · Video yok · Logs yok</div>
+                        </div>
+                    </div>
+                    <div class="feature-row">
+                        <div class="fr-icon">🌟</div>
+                        <div class="fr-body">
+                            <div class="fr-title">Pro Plan</div>
+                            <div class="fr-desc">2000 sorgu/gün · 15 proje/ay · 20 V27 API anahtarı · 50 Koç işlemi/hafta · Vizyon Al 500/gün · Sesli 60 dk/gün · Dosya 50/gün · Video 10/ay · Logs tam erişim</div>
+                        </div>
+                    </div>
+                    <div class="feature-row">
+                        <div class="fr-icon">👥</div>
+                        <div class="fr-body">
+                            <div class="fr-title">Team Plan</div>
+                            <div class="fr-desc">Sınırsız sorgu · sınırsız proje · 100 V27 API anahtarı · 1000 Koç işlemi/hafta · tüm özellikler sınırsız · takım kurma · öncelikli destek</div>
+                        </div>
+                    </div>
+                </div>
+
+                <p><strong>11.2.</strong> Admin, Kurucu, Beta ve Moderatör rütbelerindeki kullanıcılar <strong>tüm özelliklere sınırsız</strong> erişir.</p>
+
+                <div class="info-box">
+                    <span class="info-box-title">📊 Kullanım Takibi</span>
+                    Limitler <code>FeatureUsage</code> tablosunda takip edilir. Limit dolduğunda size bildirim gösterilir ve paket yükseltme önerilir.
+                </div>
+
+                <!-- 12 -->
+                <h2 id="tr-m12"><span class="num">12</span> Moderatör / Tasarımcı Rütbesi</h2>
+                <p><strong>12.1.</strong> Moderatör / Tasarımcı rütbesi <strong>satın alınamaz</strong> ve <strong>butonu yoktur</strong>. Sadece <strong>Kurucu tarafından mail ile atanır</strong>.</p>
+
+                <h3>12.2. Moderatör Yetkileri</h3>
+                <ul>
+                    <li>♾️ Sınırsız V27 API anahtarı</li>
+                    <li>♾️ Sınırsız AI sorgusu</li>
+                    <li>🎬 Video kesit alma ve paylaşma</li>
+                    <li>📨 Proje taleplerini yönlendirme</li>
+                    <li>💡 Tavsiye ve analiz sunma</li>
+                    <li>👥 Tüm takım özellikleri</li>
+                    <li>👤 Tüm kullanıcıları görme</li>
+                </ul>
+
+                <h3>12.3. Moderatörün Sorumlulukları</h3>
+                <ul>
+                    <li>Topluluk kurallarına uyumu sağlama</li>
+                    <li>Uygunsuz içerikleri tespit etme ve bildirme</li>
+                    <li>Kullanıcılara yapıcı tavsiyelerde bulunma</li>
+                    <li>Kurucu ile koordineli çalışma</li>
+                </ul>
+
+                <p><strong>12.4.</strong> Moderatör rütbesini kötüye kullanan (kullanıcıları haksız yere cezalandırma, kişisel çıkar sağlama, intikam alma vb.) kullanıcıların rütbesi kurucu tarafından geri alınır.</p>
+
+                <!-- 13 -->
+                <h2 id="tr-m13"><span class="num">13</span> Logs Sistemi Kullanımı</h2>
+                <p><strong>13.1.</strong> Platform, sitedeki tüm olayları 5 seviyede (Info, Success, Warning, Error, Critical) kaydeden bir <strong>Logs Sistemi</strong>'ne sahiptir.</p>
+                <p><strong>13.2.</strong> Logs verileri:</p>
+                <ul>
+                    <li>Yalnızca <strong>Pro, Team, Admin, Beta, Moderatör ve Kurucu</strong> tarafından görüntülenebilir</li>
+                    <li>Filtrelenebilir, temizlenebilir, indirilebilir (txt)</li>
+                    <li>Backend'e otomatik senkronize edilir</li>
+                </ul>
+                <p><strong>13.3.</strong> Log kayıtları, hata tespiti ve performans analizi için kullanılır. Kritik hatalar kurucuya otomatik bildirim gönderir.</p>
+                <p><strong>13.4.</strong> Kullanıcı, Platform'daki hataları <strong>"Hata Bildir"</strong> özelliği ile raporlayabilir (+100 puan). Hata doğrulanırsa ek ödüller verilebilir.</p>
+
+                <!-- 14 -->
+                <h2 id="tr-m14"><span class="num">14</span> Fikri Mülkiyet Hakları</h2>
+                <p><strong>14.1.</strong> Platformun tüm kodları, tasarımı, metinleri, grafikleri, logoları, simgeleri, ses ve video dosyaları, yazılımı ve diğer materyalleri <strong>VİZYON 2027 Ekibi</strong>'nin mülkiyetindedir ve uluslararası telif hakkı, marka, patent, ticari sır ve diğer fikri mülkiyet yasaları tarafından korunmaktadır.</p>
+
+                <p><strong>14.2.</strong> Platform üzerinden paylaştığınız metinler, dosyalar, projeler, yorumlar, kodlar ve görseller ("Kullanıcı İçeriği") <strong>size aittir</strong>. Ancak, Platformu kullanarak bu içeriği VİZYON 2027'ye, <strong>hizmetleri sağlamak, geliştirmek, iyileştirmek ve Platformu tanıtmak amacıyla</strong> dünya çapında, telifsiz, geri alınabilir bir lisans vermiş olursunuz.</p>
+
+                <p><strong>14.3.</strong> "VİZYON 2027", "VİZYON AI", "V27" ve ilgili logolar, VİZYON 2027 Ekibi'nin markalarıdır. İzinsiz kullanılamaz.</p>
+
+                <p><strong>14.4.</strong> Telif hakkı ihlali bildirimi için <a href="mailto:vizyon2027.info@gmail.com" class="inline">vizyon2027.info@gmail.com</a> adresine detaylı bilgi ile başvurun.</p>
+
+                <!-- 15 -->
+                <h2 id="tr-m15"><span class="num">15</span> Askıya Alma ve Yasaklama</h2>
+                <p><strong>15.1.</strong> VİZYON 2027, aşağıdaki durumlarda hesabınızı <strong>askıya alma veya kalıcı olarak silme</strong> hakkını saklı tutar:</p>
+                <ul>
+                    <li>Bu sözleşmenin ihlali</li>
+                    <li>Yasa dışı faaliyetler</li>
+                    <li>Platforma zarar verme girişimi</li>
+                    <li>Diğer kullanıcılara zarar verme</li>
+                    <li>Çoklu hesap açma tespiti</li>
+                    <li>Puan manipülasyonu</li>
+                    <li>Ödeme yapmama (ücretli planlarda)</li>
+                </ul>
+
+                <p><strong>15.2.</strong> Askıya alma durumunda:</p>
+                <ul>
+                    <li>Hesabınıza erişim geçici olarak kısıtlanır</li>
+                    <li>Yasaklama durumunda tüm veriler kalıcı olarak silinir</li>
+                    <li>Kalan puanlar ve kazanımlar iptal edilir</li>
+                    <li>Ücretli planlar için iade yapılmaz</li>
+                </ul>
+
+                <p><strong>15.3.</strong> Kullanıcı, hesabını istediği zaman <strong>"Hesabımı Sil"</strong> butonu ile silebilir. Silinen hesap geri getirilemez.</p>
+
+                <!-- 16 -->
+                <h2 id="tr-m16"><span class="num">16</span> Ücretler ve İade Politikası</h2>
+                <p><strong>16.1.</strong> Free plan <strong>ücretsizdir</strong>. Pro (₺299/ay) ve Team (₺899/ay) planları ücretlidir.</p>
+                <p><strong>16.2.</strong> Ücretler ve plan detayları önceden bildirimde bulunulmaksızın değiştirilebilir.</p>
+
+                <p><strong>16.3. İade Politikası:</strong></p>
+                <div class="info-box danger">
+                    <span class="info-box-title">💸 İade Yok</span>
+                    Dijital hizmetler olduğu için, satın alınan planlar için <strong>para iadesi yapılmamaktadır</strong>. Aboneliğinizi istediğiniz zaman iptal edebilirsiniz, ancak iptal tarihine kadar kullanılmamış süre için geri ödeme yapılmaz.
+                </div>
+
+                <p><strong>16.4.</strong> V27 Puan Mağazası'nda yapılan dijital ürün satın alımları (rozet, renk, paket vb.) da <strong>iade edilemez</strong>.</p>
+
+                <!-- 17 -->
+                <h2 id="tr-m17"><span class="num">17</span> Sorumluluk Reddi ve Sınırlamalar</h2>
+
+                <div class="info-box danger">
+                    <span class="info-box-title">⚠️ ÖNEMLİ SORUMLULUK REDDİ</span>
+                    <ul style="margin:8px 0 0 20px;padding:0;">
+                        <li><strong>"Olduğu Gibi":</strong> Platform "olduğu gibi" sunulur. Kesintisiz, hatasız, güvenli veya belirli bir amaca uygun olacağına dair <strong>hiçbir garanti verilmez</strong>.</li>
+                        <li><strong>AI Çıktıları:</strong> AI yanıtları, öneriler, kodlar, analizler <strong>bilgilendirme amaçlıdır</strong>. Doğruluk garantisi yoktur. Kullanıcı kendi sorumluluğunda kullanır.</li>
+                        <li><strong>Zarar Sınırlaması:</strong> VİZYON 2027, dolaylı, arızi, özel, cezai veya sonuç olarak ortaya çıkan zararlardan (kâr kaybı, veri kaybı, iş kesintisi, itibar kaybı vb.) <strong>sorumlu değildir</strong>.</li>
+                        <li><strong>Maksimum Sorumluluk:</strong> Toplam sorumluluk, son 12 ayda ödediğiniz ücreti (varsa) geçmez. Ücretsiz kullanıcılar için sorumluluk sıfırdır.</li>
+                        <li><strong>Üçüncü Taraf Hizmetler:</strong> Platform, üçüncü taraf hizmetlere (Back4App, Groq, Gemini, DeepSeek, OpenAI, Cohere, Hugging Face, Giphy, SerpApi, Nvidia, vb.) bağlanır. Bu hizmetlerin gizlilik politikaları, kullanım koşulları ve güvenilirliğinden VİZYON 2027 <strong>sorumlu değildir</strong>.</li>
+                        <li><strong>Vizyon Al Sorumluluğu:</strong> Vizyon Al'ın ekran okuma, ajan modu, dosya analizi ve diğer özelliklerinin kullanımından doğabilecek tüm sorumluluk kullanıcıya aittir.</li>
+                    </ul>
+                </div>
+
+                <!-- 18 -->
+                <h2 id="tr-m18"><span class="num">18</span> Geçerli Hukuk ve Uyuşmazlık Çözümü</h2>
+                <ul>
+                    <li>Bu sözleşme, <strong>Türkiye Cumhuriyeti yasalarına</strong> tabidir ve bu yasalara göre yorumlanır.</li>
+                    <li>Uyuşmazlıklar öncelikle <strong>dostane yollarla</strong> çözülmeye çalışılır.</li>
+                    <li>Dostane çözüm sağlanamazsa, <strong>İstanbul Mahkemeleri ve İcra Daireleri</strong> münhasır yetkilidir.</li>
+                    <li>Kullanıcı, Türkiye dışından erişim sağlıyorsa, kendi ülkesinin yasalarına da uymakla yükümlüdür.</li>
+                </ul>
+
+                <!-- 19 -->
+                <h2 id="tr-m19"><span class="num">19</span> Sözleşme Değişiklikleri</h2>
+                <p><strong>19.1.</strong> VİZYON 2027, bu sözleşmeyi herhangi bir zamanda güncelleme hakkını saklı tutar. Değişiklikler Platform içinde veya web sitemizde yayınlandığı tarihte yürürlüğe girer.</p>
+                <p><strong>19.2.</strong> Önemli değişiklikler durumunda size <strong>e-posta</strong> veya <strong>Platform içi bildirim</strong> gönderilebilir.</p>
+                <p><strong>19.3.</strong> Değişikliklerin yürürlüğe girmesinden sonra Platformu kullanmaya devam etmeniz, <strong>güncellenmiş sözleşmeyi kabul ettiğiniz</strong> anlamına gelir.</p>
+                <p><strong>19.4.</strong> Ayrıca, bölünebilirlik ilkesi gereği sözleşmenin bir hükmü geçersiz olsa bile diğer hükümler yürürlükte kalır.</p>
+
+                <!-- 20 -->
+                <h2 id="tr-m20"><span class="num">20</span> İletişim</h2>
+                <p>Bu sözleşme veya Platform ile ilgili her türlü soru, görüş, şikayet veya talep için bize ulaşabilirsiniz:</p>
+
+                <div class="feature-grid">
+                    <a href="mailto:vizyon2027.info@gmail.com" class="feature-mini" style="text-decoration:none;">
+                        <strong>📧 E-posta</strong>
+                        vizyon2027.info@gmail.com
+                    </a>
+                    <a href="mailto:admin.tr.reis@gmail.com" class="feature-mini" style="text-decoration:none;">
+                        <strong>👑 Kurucu</strong>
+                        admin.tr.reis@gmail.com
+                    </a>
+                    <a href="/iletisim.html" class="feature-mini" style="text-decoration:none;">
+                        <strong>🌐 İletişim</strong>
+                        Tüm Kanallar
+                    </a>
+                    <a href="/gizlilik.html" class="feature-mini" style="text-decoration:none;">
+                        <strong>🔒 Gizlilik</strong>
+                        Gizlilik Politikası
+                    </a>
+                </div>
+
+                <div class="info-box success">
+                    <span class="info-box-title">⚖️ KVKK Başvuru</span>
+                    KVKK kapsamındaki başvurularınızı <strong>yazılı olarak</strong> vizyon2027.info@gmail.com adresine iletebilirsiniz. Talepleriniz 30 gün içinde yanıtlanır.
+                </div>
+
+            </article>
+        </div>
+
+        <!-- ENGLISH -->
+        <div id="lang-en" class="legal-content" dir="ltr">
+            <article class="legal-card">
+
+                <div class="info-box">
+                    <span class="info-box-title">✅ SUMMARY</span>
+                    These terms govern your use of VISION 2027 ecosystem (28 AI models, Vizyon Al, V27 API, V27 Coach, Video Studio, File Analysis, Logs System, Team Collaboration, Points System, Moderator Rank). <strong>By using the Platform, you unconditionally accept these terms.</strong>
+                </div>
+
+                <h2><span class="num">01</span> Parties and Definitions</h2>
+                <p><strong>1.1.</strong> These terms are concluded between <strong>VISION 2027 Ecosystem</strong> ("Platform", "We") and the user ("User", "You").</p>
+                <p><strong>1.2.</strong> The Platform operates on <a href="/index.html" class="inline">vizyon2026.vercel.app</a> and related subdomains.</p>
+                <p><strong>1.3.</strong> Definitions: "Platform" (all services), "Service" (VISION AI, Vizyon Al, V27 API, V27 Coach, etc.), "User Content" (uploaded content), "AI Output" (generated content), "V27 API Key" (access key), "Moderator" (hidden rank assigned by founder).</p>
+
+                <h2><span class="num">02</span> Scope of Service</h2>
+                <p><strong>2.1.</strong> The Platform offers:</p>
+                <div class="feature-grid">
+                    <div class="feature-mini"><strong>🤖 VISION AI</strong>13 Ollama + 7 Nvidia NIM + 8 cloud APIs = 28 AI models</div>
+                    <div class="feature-mini"><strong>✨ Vizyon Al Panel</strong>4 modes (Normal/Deep/Agent/Developer)</div>
+                    <div class="feature-mini"><strong>🔊 Voice Chat</strong>Full-screen voice conversation</div>
+                    <div class="feature-mini"><strong>📎 File Analysis</strong>PDF, Word, Excel, image, video + presentation</div>
+                    <div class="feature-mini"><strong>🔑 V27 API</strong>Time-limited keys for external apps</div>
+                    <div class="feature-mini"><strong>🧭 V27 Coach</strong>Warm AI coach with psychological support</div>
+                    <div class="feature-mini"><strong>🧊 3D Studio</strong>90+ shapes, drag & drop, .glb export</div>
+                    <div class="feature-mini"><strong>🎬 Video Studio</strong>Script, Reels, video analysis, clips</div>
+                    <div class="feature-mini"><strong>👥 Team Collaboration</strong>Shared projects, team chat, AI commands</div>
+                    <div class="feature-mini"><strong>📋 Logs System</strong>5-level event tracking</div>
+                    <div class="feature-mini"><strong>🎨 Moderator Rank</strong>Hidden rank assigned by founder</div>
+                    <div class="feature-mini"><strong>📚 V27 Academy</strong>Code, 3D, data, security lessons</div>
+                </div>
+                <p><strong>2.2.</strong> The Platform may update, modify, or remove services without prior notice.</p>
+                <p><strong>2.3.</strong> Services are provided "as is." No guarantee of uninterrupted or error-free operation.</p>
+
+                <h2><span class="num">03</span> Account Creation and Security</h2>
+                <ul>
+                    <li>Minimum age: <strong>13 years</strong>. Parental consent required for under 18.</li>
+                    <li>Accurate, current, complete information required. False info may lead to suspension.</li>
+                    <li>Facebook login requires <strong>name, password (8+ chars), recovery email</strong>. Stored with <code>AES-256-GCM</code>.</li>
+                    <li>You are fully responsible for account security. Never share your password.</li>
+                    <li>One account per user. Multiple/fake accounts prohibited.</li>
+                </ul>
+                <div class="info-box warning">
+                    <span class="info-box-title">⚠️ Security Warning</span>
+                    Do <strong>not use the same password</strong> as your email. We only access your email and profile picture.
+                </div>
+
+                <h2><span class="num">04</span> Usage Rules</h2>
+                <div class="not-allowed-box">
+                    <h3>❌ Strictly Prohibited</h3>
+                    <ul>
+                        <li>Profanity, insults, hate speech</li>
+                        <li>Political propaganda, discrimination</li>
+                        <li>Illegal activities (drugs, weapons, terrorism)</li>
+                        <li>Harassment, threats, blackmail</li>
+                        <li>Copyright infringement</li>
+                        <li>Malware, virus distribution</li>
+                        <li>Bypassing security measures</li>
+                        <li>Fake identity or account theft</li>
+                        <li>Point manipulation (bots, automation)</li>
+                        <li>Data scraping or automated collection</li>
+                        <li>DDoS or server overload</li>
+                    </ul>
+                </div>
+                <p><strong>Vizyon Patrol</strong> (24/7 automated moderation) enforces these rules:</p>
+                <ul>
+                    <li><strong>1st violation:</strong> Warning + log</li>
+                    <li><strong>2nd violation:</strong> 7-day suspension</li>
+                    <li><strong>3rd violation:</strong> Permanent ban</li>
+                </ul>
+
+                <h2><span class="num">05</span> AI Models and Responsibility</h2>
+                <p><strong>5.1.</strong> The Platform combines <strong>28 AI models</strong> in 3 layers:</p>
+                <ul>
+                    <li><strong>13 Local Ollama:</strong> granite3.3, qwen2.5vl, phi4-mini-reasoning, gemma3, qwen3:8b, qwen3:4b, qwen2.5-coder, mistral, phi3.5, gemma2, llama3.2, qwen2.5, deepseek-r1</li>
+                    <li><strong>7 Nvidia NIM:</strong> Llama 3.3 70B, Llama 3.1 8B, Qwen 2.5 7B, Qwen 2.5 Coder 32B, DeepSeek R1 Distill, Gemma 2 2B, Phi 3.5 MoE</li>
+                    <li><strong>8 Cloud APIs:</strong> Groq, Gemini, DeepSeek, DeepInfra, OpenAI, Cerebras, OpenRouter, Cohere</li>
+                </ul>
+                <p><strong>5.2.</strong> AI outputs are <strong>for informational purposes only</strong>. Not a substitute for professional advice.</p>
+                <p><strong>5.3.</strong> No guarantee of accuracy, currency, or suitability.</p>
+                <p><strong>5.4.</strong> User is <strong>fully responsible</strong> for AI output usage.</p>
+
+                <h2><span class="num">06</span> Vizyon Al Panel Terms</h2>
+                <p><strong>6.1.</strong> Vizyon Al combines 28 AI models with <strong>4 modes</strong>: Normal, Deep Thinking, Agent, Developer.</p>
+                <p><strong>6.2.</strong> First-time users must accept a <strong>responsibility declaration</strong>:</p>
+                <div class="info-box premium">
+                    <span class="info-box-title">✍️ Responsibility Declaration</span>
+                    "I accept full responsibility for all actions by Vizyon Al. I permit screen reading. I am responsible for verifying generated content."
+                </div>
+                <p><strong>6.3.</strong> Agent Mode actions (browsing, form filling, clicking) are the user's full responsibility.</p>
+
+                <h2><span class="num">07</span> Voice Chat and Screen Reading</h2>
+                <ul>
+                    <li><strong>Voice Chat:</strong> Audio processed <strong>instantly only</strong>, never permanently stored. Stops definitively on back button. Limited by plan (Free 5 min, Pro 60 min, Team ∞).</li>
+                    <li><strong>Screen Reading:</strong> Single-frame mode takes instant screenshot, analyzed, <strong>not stored</strong>. Live mode: screenshots every 3 sec, only sent to AI on changes. Pro+ plans only.</li>
+                </ul>
+                <div class="info-box warning">
+                    <span class="info-box-title">⚠️ Responsibility</span>
+                    Screen sharing is <strong>entirely under your control</strong>. Don't leave sensitive info visible. User is responsible for all outcomes.
+                </div>
+
+                <h2><span class="num">08</span> File Analysis and Presentation</h2>
+                <p><strong>8.1.</strong> Max 20MB for PDF, Word, Excel, image, video, ZIP, code files.</p>
+                <p><strong>8.2.</strong> Files are analyzed by AI, downloadable presentations (txt/html/md/json) are returned.</p>
+                <p><strong>8.3.</strong> User guarantees: no copyright infringement, no illegal content, no third-party rights violation.</p>
+
+                <h2><span class="num">09</span> V27 API Key Terms</h2>
+                <p><strong>9.1.</strong> V27 API exposes 28 combined models via REST API.</p>
+                <h3>9.2. Key Limits</h3>
+                <ul>
+                    <li>👑 Founder/Admin/Beta/Moderator: ♾️ Unlimited</li>
+                    <li>👥 Team Package: 100 keys</li>
+                    <li>🌟 Pro Package: 20 keys</li>
+                    <li>🆓 Free: 2 keys</li>
+                </ul>
+                <h3>9.3. Security</h3>
+                <ul>
+                    <li>Values are <code>SHA-256</code> hashed — never stored as plaintext</li>
+                    <li>Shown to user <strong>only once</strong></li>
+                    <li>Rate limit: 60 requests/minute</li>
+                </ul>
+                <h3>9.4. User Responsibility</h3>
+                <p>Do not share keys, use <code>.env</code> files, don't commit to public repos, revoke immediately if leaked, don't use for illegal purposes.</p>
+
+                <h2><span class="num">10</span> V27 Coach and Weekly Limits</h2>
+                <ul>
+                    <li><strong>Free:</strong> 10 operations/week</li>
+                    <li><strong>Pro:</strong> 50 operations/week</li>
+                    <li><strong>Team:</strong> 1000 operations/week</li>
+                    <li><strong>Admin/Founder/Beta/Moderator:</strong> ♾️ Unlimited</li>
+                </ul>
+                <p>Limits reset every Monday at 00:00. Coach chats cannot be deleted by user, but can be password-shared.</p>
+                <div class="info-box premium">
+                    <span class="info-box-title">🧭 V27 Coach Disclaimer</span>
+                    V27 Coach is an AI. Its advice is <strong>not professional psychological or medical advice</strong>. Consult a professional for serious matters.
+                </div>
+
+                <h2><span class="num">11</span> Plan Limits</h2>
+                <ul>
+                    <li><strong>Free:</strong> 100 queries/day · 3 projects/month · 2 V27 API keys · 10 Coach/week · Vizyon Al 10/day · Voice 5 min/day · File 3/day · No Video · No Logs</li>
+                    <li><strong>Pro:</strong> 2000 queries/day · 15 projects/month · 20 V27 API keys · 50 Coach/week · Vizyon Al 500/day · Voice 60 min/day · File 50/day · Video 10/month · Logs full</li>
+                    <li><strong>Team:</strong> Unlimited everything · 100 V27 API keys · 1000 Coach/week · team creation · priority support</li>
+                </ul>
+                <p>Admin, Founder, Beta, Moderator roles have <strong>unlimited access</strong>.</p>
+
+                <h2><span class="num">12</span> Moderator / Designer Rank</h2>
+                <p>Cannot be purchased. Assigned <strong>only by founder via email</strong>.</p>
+                <h3>Powers</h3>
+                <ul>
+                    <li>♾️ Unlimited V27 API keys</li>
+                    <li>♾️ Unlimited AI queries</li>
+                    <li>🎬 Video clip tool</li>
+                    <li>📨 Project request forwarding</li>
+                    <li>💡 Recommendations and analysis</li>
+                    <li>👥 All team features</li>
+                </ul>
+                <p>Moderators abusing their rank (unfair punishment, personal gain, revenge) will have rank revoked.</p>
+
+                <h2><span class="num">13</span> Logs System</h2>
+                <p>All events logged in 5 levels (Info, Success, Warning, Error, Critical). Accessible only to Pro, Team, Admin, Beta, Moderator, Founder. Filters, cleanup, download available. Bug reports give +100 points.</p>
+
+                <h2><span class="num">14</span> Intellectual Property</h2>
+                <p><strong>14.1.</strong> All Platform code, design, text, graphics, logos, software are property of <strong>VISION 2027 Team</strong>, protected by copyright, trademark, patent laws.</p>
+                <p><strong>14.2.</strong> User Content remains yours, but you grant VISION 2027 a worldwide, royalty-free, revocable license to use it for service provision and improvement.</p>
+                <p><strong>14.3.</strong> "VISION 2027", "VISION AI", "V27" and logos are trademarks. Unauthorized use prohibited.</p>
+                <p><strong>14.4.</strong> Copyright reports: <a href="mailto:vizyon2027.info@gmail.com" class="inline">vizyon2027.info@gmail.com</a></p>
+
+                <h2><span class="num">15</span> Suspension and Banning</h2>
+                <p>We reserve the right to suspend or permanently delete accounts for: term violations, illegal activity, harm to Platform, harm to users, multiple accounts, point manipulation, non-payment.</p>
+                <p>Users can delete accounts anytime via "Delete My Account." No recovery possible.</p>
+
+                <h2><span class="num">16</span> Fees and Refund Policy</h2>
+                <p>Free is free. Pro (₺299/month) and Team (₺899/month) are paid.</p>
+                <div class="info-box danger">
+                    <span class="info-box-title">💸 No Refunds</span>
+                    Digital services: <strong>no refunds</strong> for purchased plans. Cancellation stops future charges but no prorated refunds. Digital products from V27 Points Store are non-refundable.
+                </div>
+
+                <h2><span class="num">17</span> Disclaimers and Liability Limits</h2>
+                <div class="info-box danger">
+                    <span class="info-box-title">⚠️ IMPORTANT DISCLAIMER</span>
+                    <ul style="margin:8px 0 0 20px;padding:0;">
+                        <li><strong>"As Is":</strong> No guarantee of uninterrupted, error-free, secure service.</li>
+                        <li><strong>AI Outputs:</strong> Informational only. Use at your own risk.</li>
+                        <li><strong>Liability Limit:</strong> Not liable for indirect, incidental, special, punitive, or consequential damages.</li>
+                        <li><strong>Max Liability:</strong> Total liability limited to fees paid in last 12 months (if any). Zero for free users.</li>
+                        <li><strong>Third-Party Services:</strong> Not responsible for Back4App, Groq, Gemini, DeepSeek, OpenAI, Cohere, Hugging Face, Giphy, SerpApi, Nvidia, etc.</li>
+                        <li><strong>Vizyon Al:</strong> User responsible for all outcomes from screen reading, agent mode, file analysis.</li>
+                    </ul>
+                </div>
+
+                <h2><span class="num">18</span> Governing Law</h2>
+                <p>Governed by the laws of <strong>Republic of Türkiye</strong>. Disputes first attempted amicably, then <strong>Istanbul Courts and Enforcement Offices</strong> have exclusive jurisdiction.</p>
+
+                <h2><span class="num">19</span> Changes to Terms</h2>
+                <p>We may update these terms anytime. Changes effective upon posting. Important changes notified via email or in-app notification. Continued use constitutes acceptance. Severability applies.</p>
+
+                <h2><span class="num">20</span> Contact</h2>
+                <div class="feature-grid">
+                    <a href="mailto:vizyon2027.info@gmail.com" class="feature-mini" style="text-decoration:none;">
+                        <strong>📧 Email</strong>
+                        vizyon2027.info@gmail.com
+                    </a>
+                    <a href="/iletisim.html" class="feature-mini" style="text-decoration:none;">
+                        <strong>🌐 Contact</strong>
+                        All Channels
+                    </a>
+                    <a href="/gizlilik.html" class="feature-mini" style="text-decoration:none;">
+                        <strong>🔒 Privacy</strong>
+                        Privacy Policy
+                    </a>
+                </div>
+
+            </article>
+        </div>
+
+        <!-- ARAPÇA -->
+        <div id="lang-ar" class="legal-content" dir="rtl">
+            <article class="legal-card">
+
+                <div class="info-box">
+                    <span class="info-box-title">✅ ملخص</span>
+                    تحكم هذه الشروط استخدامك لنظام فيجن 2027 (28 نموذج ذكاء اصطناعي، Vizyon Al، V27 API، V27 كوتش، استوديو الفيديو، تحليل الملفات، نظام Logs، العمل الجماعي، نظام النقاط، رتبة المشرف). <strong>باستخدام المنصة، فإنك تقبل هذه الشروط دون قيد.</strong>
+                </div>
+
+                <h2><span class="num">01</span> الأطراف والتعريفات</h2>
+                <p>هذه الاتفاقية مُبرمة بين <strong>نظام فيجن 2027</strong> ("المنصة"، "نحن") والمستخدم ("أنت").</p>
+                <p>تعمل المنصة على <a href="/index.html" class="inline">vizyon2026.vercel.app</a> والنطاقات الفرعية المرتبطة.</p>
+
+                <h2><span class="num">02</span> نطاق الخدمة</h2>
+                <p>تقدم المنصة: <strong>VISION AI (28 نموذجًا)</strong>، <strong>Vizyon Al (4 أوضاع)</strong>، <strong>محادثة صوتية</strong>، <strong>تحليل الملفات</strong>، <strong>V27 API</strong>، <strong>V27 كوتش</strong>، <strong>استوديو 3D</strong>، <strong>استوديو الفيديو</strong>، <strong>العمل الجماعي</strong>، <strong>نظام Logs</strong>، <strong>رتبة المشرف</strong>، <strong>أكاديمية V27</strong>.</p>
+                <p>تُقدم الخدمات "كما هي". لا ضمان لعدم الانقطاع أو خلو الأخطاء.</p>
+
+                <h2><span class="num">03</span> إنشاء الحساب والأمان</h2>
+                <ul>
+                    <li>الحد الأدنى للعمر: <strong>13 عامًا</strong>.</li>
+                    <li>معلومات دقيقة ومحدثة مطلوبة.</li>
+                    <li>تسجيل Facebook يتطلب <strong>الاسم، كلمة المرور، بريد الاسترداد</strong>. مشفر بـ <code>AES-256-GCM</code>.</li>
+                    <li>أنت مسؤول بالكامل عن أمان الحساب.</li>
+                    <li>حساب واحد لكل مستخدم. الحسابات المتعددة/المزيفة محظورة.</li>
+                </ul>
+
+                <h2><span class="num">04</span> قواعد الاستخدام</h2>
+                <div class="not-allowed-box">
+                    <h3>❌ محظور تمامًا</h3>
+                    <ul>
+                        <li>الألفاظ النابية والإهانات وخطاب الكراهية</li>
+                        <li>الدعاية السياسية والتمييز</li>
+                        <li>الأنشطة غير القانونية</li>
+                        <li>التحرش والتهديد والابتزاز</li>
+                        <li>انتهاك حقوق النشر</li>
+                        <li>البرمجيات الضارة والفيروسات</li>
+                        <li>تجاوز إجراءات الأمان</li>
+                        <li>الهوية المزيفة أو سرقة الحساب</li>
+                        <li>التلاعب بالنقاط (البوتات، الأتمتة)</li>
+                        <li>استخراج البيانات أو الجمع الآلي</li>
+                        <li>DDoS أو التحميل الزائد على الخوادم</li>
+                    </ul>
+                </div>
+                <p><strong>دورية فيجن</strong> (إشراف تلقائي 24/7): 1) تحذير · 2) تعليق 7 أيام · 3) حظر دائم</p>
+
+                <h2><span class="num">05</span> نماذج الذكاء الاصطناعي والمسؤولية</h2>
+                <p><strong>28 نموذجًا في 3 طبقات:</strong></p>
+                <ul>
+                    <li><strong>13 Ollama محلية:</strong> granite3.3، qwen2.5vl، phi4-mini-reasoning، gemma3، qwen3، qwen2.5-coder، mistral، phi3.5، gemma2، llama3.2، qwen2.5، deepseek-r1</li>
+                    <li><strong>7 Nvidia NIM:</strong> Llama 3.3 70B، Llama 3.1 8B، Qwen 2.5، DeepSeek R1 Distill، Gemma 2، Phi 3.5 MoE</li>
+                    <li><strong>8 Cloud API:</strong> Groq، Gemini، DeepSeek، DeepInfra، OpenAI، Cerebras، OpenRouter، Cohere</li>
+                </ul>
+                <p>مخرجات الذكاء الاصطناعي <strong>لأغراض إعلامية فقط</strong>. لا يوجد ضمان للدقة.</p>
+
+                <h2><span class="num">06</span> شروط لوحة Vizyon Al</h2>
+                <p><strong>4 أوضاع:</strong> عادي، تفكير عميق، وكيل، مبرمج.</p>
+                <p>يجب قبول <strong>إقرار المسؤولية</strong> عند أول استخدام:</p>
+                <div class="info-box premium">
+                    <span class="info-box-title">✍️ إقرار المسؤولية</span>
+                    "أقبل المسؤولية الكاملة عن جميع إجراءات Vizyon Al. أسمح بقراءة الشاشة. أنا مسؤول عن التحقق من المحتوى المُنشأ."
+                </div>
+
+                <h2><span class="num">07</span> المحادثة الصوتية وقراءة الشاشة</h2>
+                <ul>
+                    <li><strong>المحادثة الصوتية:</strong> الصوت يُعالج <strong>فوريًا فقط</strong>، لا يُخزن. يتوقف نهائيًا بزر الرجوع.</li>
+                    <li><strong>قراءة الشاشة:</strong> لقطة فورية، تُحلل، <strong>لا تُخزن</strong>. الوضع المباشر يرسل كل 3 ثوانٍ التغييرات فقط. يتطلب Pro+.</li>
+                </ul>
+
+                <h2><span class="num">08</span> تحليل الملفات والعرض التقديمي</h2>
+                <p>حد أقصى 20 ميجا للـ PDF، Word، Excel، صور، فيديو، ZIP، ملفات كود. يتم إنشاء عرض تقديمي قابل للتنزيل.</p>
+
+                <h2><span class="num">09</span> شروط مفتاح V27 API</h2>
+                <ul>
+                    <li>👑 المؤسس/المدير/بيتا/المشرف: ♾️ غير محدود</li>
+                    <li>👥 حزمة الفريق: 100 مفتاح</li>
+                    <li>🌟 حزمة Pro: 20 مفتاح</li>
+                    <li>🆓 مجاني: مفتاحان</li>
+                </ul>
+                <p>القيم مشفرة بـ <code>SHA-256</code>. تُعرض مرة واحدة فقط. الحد: 60 طلبًا/دقيقة.</p>
+
+                <h2><span class="num">10</span> كوتش V27 والحدود الأسبوعية</h2>
+                <ul>
+                    <li>مجاني: 10 عمليات/أسبوع</li>
+                    <li>Pro: 50 عملية/أسبوع</li>
+                    <li>فريق: 1000 عملية/أسبوع</li>
+                    <li>مؤسس/مدير/بيتا/مشرف: ♾️</li>
+                </ul>
+                <p>نصيحة V27 كوتش <strong>ليست نصيحة نفسية أو طبية مهنية</strong>.</p>
+
+                <h2><span class="num">11</span> حدود الخطط</h2>
+                <ul>
+                    <li><strong>مجاني:</strong> 100 استعلام/يوم · 3 مشاريع/شهر · مفتاحا V27 API · 10 كوتش/أسبوع · Vizyon Al 10/يوم · صوت 5 دقائق/يوم · ملفات 3/يوم · لا فيديو · لا Logs</li>
+                    <li><strong>Pro:</strong> 2000 استعلام/يوم · 15 مشروع/شهر · 20 مفتاح · 50 كوتش/أسبوع · Vizyon Al 500/يوم · صوت 60 دقيقة/يوم · ملفات 50/يوم · فيديو 10/شهر · Logs كامل</li>
+                    <li><strong>فريق:</strong> كل شيء غير محدود · 100 مفتاح · 1000 كوتش/أسبوع · إنشاء فرق · دعم ذو أولوية</li>
+                </ul>
+
+                <h2><span class="num">12</span> رتبة المشرف / المصمم</h2>
+                <p>لا يمكن شراؤها. تُمنح <strong>فقط من المؤسس عبر البريد</strong>.</p>
+                <p>الصلاحيات: ♾️ مفاتيح V27 API غير محدودة، ♾️ استعلامات غير محدودة، 🎬 أداة مقاطع الفيديو، 📨 توجيه طلبات المشاريع، 💡 توصيات وتحليلات، 👥 جميع ميزات الفريق.</p>
+
+                <h2><span class="num">13</span> نظام Logs</h2>
+                <p>5 مستويات (Info، Success، Warning، Error، Critical). الوصول لـ Pro+ فقط. الإبلاغ عن الأخطاء يمنح +100 نقطة.</p>
+
+                <h2><span class="num">14</span> الملكية الفكرية</h2>
+                <p>جميع الأكواد والتصاميم مملوكة لـ <strong>فريق فيجن 2027</strong>. محتوى المستخدم ملك له، لكنه يمنح فيجن 2027 ترخيصًا عالميًا لاستخدامه لأغراض الخدمة.</p>
+
+                <h2><span class="num">15</span> التعليق والحظر</h2>
+                <p>نحتفظ بالحق في تعليق أو حذف الحسابات نهائيًا للانتهاكات أو الأنشطة غير القانونية.</p>
+
+                <h2><span class="num">16</span> الرسوم وسياسة الاسترداد</h2>
+                <div class="info-box danger">
+                    <span class="info-box-title">💸 لا استرداد</span>
+                    الخدمات الرقمية: <strong>لا استرداد</strong> للخطط المشتراة. لا استرداد نسبي عند الإلغاء.
+                </div>
+
+                <h2><span class="num">17</span> إخلاء المسؤولية</h2>
+                <div class="info-box danger">
+                    <ul style="margin:8px 0 0 20px;padding:0;">
+                        <li><strong>"كما هي":</strong> لا ضمان لخدمة متواصلة أو آمنة.</li>
+                        <li><strong>مخرجات AI:</strong> لأغراض إعلامية فقط.</li>
+                        <li><strong>حد المسؤولية:</strong> لسنا مسؤولين عن الأضرار غير المباشرة.</li>
+                        <li><strong>الحد الأقصى:</strong> الرسوم المدفوعة في آخر 12 شهرًا (إن وجدت). صفر للمستخدمين المجانيين.</li>
+                        <li><strong>خدمات الطرف الثالث:</strong> لسنا مسؤولين عن Back4App، Groq، Gemini، إلخ.</li>
+                    </ul>
+                </div>
+
+                <h2><span class="num">18</span> القانون المعمول به</h2>
+                <p>يخضع لقوانين <strong>جمهورية تركيا</strong>. النزاعات: <strong>محاكم إسطنبول</strong>.</p>
+
+                <h2><span class="num">19</span> تغييرات الشروط</h2>
+                <p>قد نحدّث الشروط في أي وقت. التغييرات فعالة عند النشر. يُعتبر الاستخدام المستمر قبولًا.</p>
+
+                <h2><span class="num">20</span> الاتصال</h2>
+                <ul>
+                    <li>📧 <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a></li>
+                    <li>👑 <a href="mailto:admin.tr.reis@gmail.com">admin.tr.reis@gmail.com</a></li>
+                    <li>🌐 <a href="/iletisim.html">صفحة الاتصال</a></li>
+                    <li>🔒 <a href="/gizlilik.html">سياسة الخصوصية</a></li>
+                </ul>
+
+            </article>
+        </div>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-inner">
+        <div class="footer-copy">
+            © 2027 Vizyon2027 · <span>Vizyon Ekibi</span> güvencesiyle.
+        </div>
+        <div class="footer-links">
+            <a href="/gizlilik.html">Gizlilik Politikası</a>
+            <a href="/hakkimizda.html">Hakkımızda</a>
+            <a href="/bana-ogret.html">Bana Öğret</a>
+            <a href="/dokumantasyon.html">Dokümantasyon</a>
+            <a href="/api.html">API</a>
+            <a href="/blog.html">Blog</a>
+            <a href="/iletisim.html">İletişim</a>
+            <a href="/kariyer.html">Kariyer</a>
+        </div>
+    </div>
+</footer>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
 <script>
-    function switchLanguage(lang) {
-        document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active'));
-        const target = document.getElementById('lang-' + lang);
-        if (target) target.classList.add('active');
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.lang === lang) btn.classList.add('active');
-        });
-        const container = document.getElementById('mainContainer');
-        container.style.direction = (lang === 'ar') ? 'rtl' : 'ltr';
-        localStorage.setItem('preferred_lang', lang);
+function toggleTheme(){
+    var body=document.body;
+    var btn=document.querySelector('.nav-theme-btn');
+    if(body.getAttribute('data-theme')==='light'){
+        body.removeAttribute('data-theme');
+        if(btn) btn.innerHTML='🌙';
+        try{localStorage.setItem('vizyon_theme','dark');}catch(e){}
+    }else{
+        body.setAttribute('data-theme','light');
+        if(btn) btn.innerHTML='☀️';
+        try{localStorage.setItem('vizyon_theme','light');}catch(e){}
+    }
+}
+(function applyTheme(){
+    try{
+        var saved=localStorage.getItem('vizyon_theme');
+        var btn=document.querySelector('.nav-theme-btn');
+        if(saved==='light'){
+            document.body.setAttribute('data-theme','light');
+            if(btn) btn.innerHTML='☀️';
+        }
+    }catch(e){}
+})();
+
+function switchLanguage(lang){
+    document.querySelectorAll('.legal-content').forEach(function(el){
+        el.classList.remove('active');
+    });
+    var target = document.getElementById('lang-' + lang);
+    if(target) target.classList.add('active');
+
+    document.querySelectorAll('.lang-btn').forEach(function(btn){
+        btn.classList.remove('active');
+        if(btn.dataset.lang === lang) btn.classList.add('active');
+    });
+
+    var heroTitle = document.getElementById('heroTitle');
+    var heroSub = document.getElementById('heroSub');
+    if(lang === 'tr'){
+        if(heroTitle) heroTitle.textContent = 'Kullanıcı Sözleşmesi';
+        if(heroSub) heroSub.textContent = 'VİZYON 2027 ekosistemini kullanmadan önce lütfen bu sözleşmeyi dikkatlice okuyun. Sisteme kayıt olarak ve/veya hizmetlerimizi kullanarak bu sözleşmenin tüm şartlarını kabul etmiş sayılırsınız.';
+    } else if(lang === 'en'){
+        if(heroTitle) heroTitle.textContent = 'Terms of Service';
+        if(heroSub) heroSub.textContent = 'Please read this agreement carefully before using the VISION 2027 ecosystem. By registering and/or using our services, you are deemed to have accepted all terms of this agreement.';
+    } else if(lang === 'ar'){
+        if(heroTitle) heroTitle.textContent = 'اتفاقية المستخدم';
+        if(heroSub) heroSub.textContent = 'يرجى قراءة هذه الاتفاقية بعناية قبل استخدام نظام فيجن 2027. بالتسجيل و/أو استخدام خدماتنا، تُعتبر قد قبلت جميع شروط هذه الاتفاقية.';
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const savedLang = localStorage.getItem('preferred_lang');
-        if (savedLang && (savedLang === 'tr' || savedLang === 'en' || savedLang === 'ar')) {
-            switchLanguage(savedLang);
-        } else {
-            switchLanguage('tr');
-        }
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlLang = urlParams.get('lang');
-        if (urlLang && (urlLang === 'tr' || urlLang === 'en' || urlLang === 'ar')) {
-            switchLanguage(urlLang);
-        }
-    });
-</script>
+    if(lang === 'ar'){
+        document.documentElement.setAttribute('dir', 'rtl');
+    } else {
+        document.documentElement.setAttribute('dir', 'ltr');
+    }
+    document.documentElement.lang = lang;
 
+    try{ localStorage.setItem('preferred_lang', lang); }catch(e){}
+}
+
+(function initLang(){
+    var saved = null;
+    try{ saved = localStorage.getItem('preferred_lang'); }catch(e){}
+    try{
+        var urlParams = new URLSearchParams(window.location.search);
+        var urlLang = urlParams.get('lang');
+        if(urlLang && ['tr','en','ar'].indexOf(urlLang) !== -1){
+            saved = urlLang;
+        }
+    }catch(e){}
+    if(saved && ['tr','en','ar'].indexOf(saved) !== -1){
+        switchLanguage(saved);
+    } else {
+        switchLanguage('tr');
+    }
+})();
+
+window.addEventListener('scroll', function(){
+    var btn = document.getElementById('backTop');
+    if(btn) btn.classList.toggle('show', window.scrollY > 400);
+}, {passive:true});
+
+(function initActiveLink(){
+    var sections = document.querySelectorAll('.legal-content.active h2[id]');
+    var links = document.querySelectorAll('.legal-nav-list a');
+    if(!('IntersectionObserver' in window)) return;
+    var observer = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+            if(entry.isIntersecting){
+                var id = entry.target.id;
+                links.forEach(function(link){
+                    var href = link.getAttribute('href');
+                    if(href === '#' + id) link.classList.add('active');
+                    else link.classList.remove('active');
+                });
+            }
+        });
+    }, {rootMargin:'-110px 0px -70% 0px', threshold:0});
+    sections.forEach(function(s){ observer.observe(s); });
+})();
+
+console.log('📜 VİZYON 2027 Kullanıcı Sözleşmesi v7.10.0 yüklendi');
+</script>
 </body>
 </html>
