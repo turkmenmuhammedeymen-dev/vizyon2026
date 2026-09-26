@@ -32690,20 +32690,16 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
 <!-- ===== JS-5 SONU ===== -->
 
 <!-- ============================================================ -->
-<!-- JS-6 FULL v7.10.0 — TÜM FONKSİYONLAR (TEK BLOK)             -->
+<!-- JS-6 FULL v7.10.1 — TÜM FONKSİYONLAR (TEK BLOK, BAŞTAN SONA) -->
 <!-- Eski JS-6 + JS-6 EK + Ebeveyn Paneli + 3D Builder FULL      -->
-<!-- Hiçbir çakışma yok, tüm fonksiyonlar window üzerinden tanımlı -->
+<!-- + Mavi İmleç Takip Fix                                      -->
+<!-- ÇAKIŞMA YOK — Tüm fonksiyonlar window üzerinden tanımlı     -->
 <!-- ============================================================ -->
 <script>
- // ================================================================
-// JS-6 FULL v7.10.0 — TÜM FONKSİYONLAR (TEK BLOK)
-// Eski JS-6 + JS-6 EK + Ebeveyn Paneli + 3D Builder FULL  
-// Hiçbir çakışma yok, tüm fonksiyonlar window üzerinden tanımlı
-// ================================================================   
 (function () {
     'use strict';
 
-    console.log('🔧 JS-6 FULL yükleniyor (v7.10.0)...');
+    console.log('🔧 JS-6 FULL v7.10.1 yükleniyor (baştan sona)...');
 
     // ============================================================
     // YARDIMCI: Escape HTML / Onclick
@@ -32766,7 +32762,7 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
     }
 
     // ============================================================
-    // 1) KULLANICI LİSTESİ (Founder/Admin)
+    // 1) KULLANICI LİSTESİ (Founder/Admin/Moderatör)
     // ============================================================
     window.loadUserList = async function () {
         if (!currentUser) return;
@@ -32829,7 +32825,7 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
     };
 
     // ============================================================
-    // 2) KULLANICI ARA (FOUNDER PANEL)
+    // 2) KULLANICI ARA
     // ============================================================
     window.searchAllUsers = async function () {
         if (!currentUser) return;
@@ -32865,11 +32861,8 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
             var html = '';
             filtered.forEach(function (u) {
                 var roleColors = {
-                    founder: 'var(--gold)',
-                    admin: 'var(--accent)',
-                    beta: 'var(--purple)',
-                    moderator: 'var(--moderator)',
-                    user: 'var(--border2)'
+                    founder: 'var(--gold)', admin: 'var(--accent)', beta: 'var(--purple)',
+                    moderator: 'var(--moderator)', user: 'var(--border2)'
                 };
                 var borderColor = roleColors[u.role] || 'var(--border2)';
                 var safeName = window.escapeHtml(u.name || 'İsimsiz');
@@ -32931,14 +32924,12 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
                         message: obj.get('message') || '',
                         status: obj.get('status') || '',
                         request_id: obj.get('request_id') || '',
-                        project_title: obj.get('project_title') || '',
-                        project_type: obj.get('project_type') || '',
-                        project_description: obj.get('project_description') || '',
-                        role: obj.get('role') || '',
-                        package_type: obj.get('package_type') || '',
                         team_id: obj.get('team_id') || '',
                         team_name: obj.get('team_name') || '',
                         project_id: obj.get('project_id') || '',
+                        project_title: obj.get('project_title') || '',
+                        role: obj.get('role') || '',
+                        package_type: obj.get('package_type') || '',
                         created_at: obj.get('createdAt') ? obj.get('createdAt').toISOString() : new Date().toISOString()
                     };
                 });
@@ -33677,7 +33668,7 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
     }
 
     // ============================================================
-    // 19) BLOG ABONE (Ana sayfa)
+    // 19) BLOG ABONE
     // ============================================================
     window.mainSubscribe = async function () {
         var input = document.getElementById('mainSubscribeEmail');
@@ -34252,7 +34243,7 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
     };
 
     // ============================================================
-    // 25) SOHBET GEÇMİŞİ + YENİ SOHBET + PAYLAŞ + SİL + AD VER
+    // 25) SOHBET GEÇMİŞİ
     // ============================================================
     window.loadConversationHistory = async function () {
         if (!currentUser) return;
@@ -34640,7 +34631,6 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
         } catch (e) { console.warn('Founder init hatası:', e); }
     };
 
-    // Otomatik inbox yenileme
     (function autoLoadInbox() {
         function tryLoad() {
             if (typeof window.loadInbox === 'function' && currentUser) window.loadInbox();
@@ -34882,7 +34872,6 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
     // ============================================================
     var _f3dAnimateId = null;
 
-    // 3D Şekil Kütüphanesi (90+)
     window.f3dShapeLibrary = [
         { type: 'box', icon: '🧊', label: 'Küp' },
         { type: 'sphere', icon: '⚪', label: 'Küre' },
@@ -34988,7 +34977,6 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
         { type: 'cubeRounded', icon: '🟨', label: 'Yuvarlak Küp' }
     ];
 
-    // Global değişkenler (yoksa oluştur)
     window.f3dBuilt = false;
     window.f3dScene = null;
     window.f3dCamera = null;
@@ -35006,14 +34994,14 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
     window.f3dPointerDownPos = { x: 0, y: 0 };
     window.f3dOrbitEnabledBeforeMove = true;
 
-    // --- 3D Şekil Listesini Render Et ---
+    // --- Şekil Listesi Render ---
     function _renderF3DShapeList() {
         var list = document.getElementById('full3DShapeList');
         if (!list) return;
         if (list.dataset.filled === '1') return;
         var html = '';
         window.f3dShapeLibrary.forEach(function (shape, idx) {
-            html += '<div class="f3d-shape-item" draggable="true" data-type="' + shape.type + '" data-idx="' + idx + '" title="' + window.escapeHtml(shape.label) + ' — Sürükle & bırak">';
+            html += '<div class="f3d-shape-item" draggable="true" data-type="' + shape.type + '" data-idx="' + idx + '" title="' + window.escapeHtml(shape.label) + ' — Tıkla veya sürükle">';
             html += '<div class="f3d-shape-icon">' + shape.icon + '</div>';
             html += '<div class="f3d-shape-label">' + window.escapeHtml(shape.label) + '</div>';
             html += '</div>';
@@ -35039,13 +35027,9 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
             item.addEventListener('dragend', function () {
                 item.classList.remove('dragging');
             });
-            // Dokunmatik için: tıklayınca ekle
             item.addEventListener('click', function () {
                 var type = item.getAttribute('data-type');
-                var stage = document.getElementById('full3DStage');
-                if (stage) {
-                    _addF3DShapeFromType(type, null);
-                }
+                _addF3DShapeFromType(type, null);
             });
         });
     }
@@ -35145,7 +35129,6 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
         }
     }
 
-    // --- 3D Döngü ---
     function _animateF3D() {
         _f3dAnimateId = requestAnimationFrame(_animateF3D);
         if (window.f3dControls) window.f3dControls.update();
@@ -35166,7 +35149,7 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
         }
     }
 
-    // --- 3D Şekil Mesh Oluştur ---
+    // --- 3D Mesh Oluştur ---
     function _createF3DMesh(shapeType, color) {
         var geometry;
         var defaultColor = color || 0x00e5ff;
@@ -35192,7 +35175,7 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
             case 'icosaLarge': geometry = new THREE.IcosahedronGeometry(1.1); break;
             case 'octahedron': geometry = new THREE.OctahedronGeometry(0.7); break;
             case 'tetrahedron': geometry = new THREE.TetrahedronGeometry(0.8); break;
-            case 'capsule': geometry = new THREE.CapsuleGeometry ? new THREE.CapsuleGeometry(0.4, 0.8, 8, 16) : new THREE.CylinderGeometry(0.4, 0.4, 1.2, 16); break;
+            case 'capsule': geometry = new THREE.CylinderGeometry(0.4, 0.4, 1.2, 16); break;
             case 'tube': geometry = new THREE.CylinderGeometry(0.4, 0.4, 1.5, 32, 1, true); break;
             case 'bullet': geometry = new THREE.CylinderGeometry(0.3, 0.5, 1.2, 24); break;
             case 'hemisphere': geometry = new THREE.SphereGeometry(0.8, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2); break;
@@ -35203,133 +35186,61 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
             case 'ring': geometry = new THREE.TorusGeometry(0.7, 0.12, 16, 32); break;
             case 'disk': geometry = new THREE.CylinderGeometry(0.7, 0.7, 0.1, 32); break;
             case 'donutSmall': geometry = new THREE.TorusGeometry(0.4, 0.15, 16, 32); break;
-            case 'star':
-            case 'starSmall':
-            case 'star3D':
-                geometry = new THREE.OctahedronGeometry(0.7); break;
-            case 'heart':
-            case 'heart3D':
-                geometry = new THREE.SphereGeometry(0.6, 16, 16); break;
-            case 'crescent':
-            case 'moon':
-                geometry = new THREE.SphereGeometry(0.7, 32, 32, 0, Math.PI); break;
-            case 'diamond':
-            case 'crystal':
-            case 'gemStone':
-                geometry = new THREE.OctahedronGeometry(0.8); break;
-            case 'shield':
-                geometry = new THREE.CylinderGeometry(0.7, 0.5, 0.15, 6); break;
-            case 'sword':
-                geometry = new THREE.BoxGeometry(0.15, 1.6, 0.15); break;
-            case 'bone':
-                geometry = new THREE.CylinderGeometry(0.15, 0.15, 1.4, 12); break;
-            case 'key':
-                geometry = new THREE.TorusGeometry(0.35, 0.08, 12, 24); break;
-            case 'badge':
-                geometry = new THREE.CylinderGeometry(0.6, 0.6, 0.12, 8); break;
-            case 'arrow':
-            case 'arrowUp':
-            case 'arrowDown':
-                geometry = new THREE.ConeGeometry(0.4, 1.2, 4); break;
-            case 'plus':
-            case 'cross':
-                geometry = new THREE.BoxGeometry(1.4, 0.3, 0.3); break;
-            case 'lightning':
-            case 'spike':
-                geometry = new THREE.TetrahedronGeometry(0.7); break;
-            case 'leaf':
-                geometry = new THREE.SphereGeometry(0.6, 16, 16); break;
-            case 'polygon3':
-                geometry = new THREE.CylinderGeometry(0.7, 0.7, 0.3, 3); break;
-            case 'pentagon':
-            case 'pentagonPrism':
-                geometry = new THREE.CylinderGeometry(0.7, 0.7, 0.3, 5); break;
-            case 'hexagon':
-            case 'hexagonPrism':
-                geometry = new THREE.CylinderGeometry(0.7, 0.7, 0.3, 6); break;
-            case 'wedge':
-                geometry = new THREE.BoxGeometry(1, 0.6, 0.5); break;
-            case 'brick':
-                geometry = new THREE.BoxGeometry(1.2, 0.5, 0.6); break;
-            case 'cloud':
-                geometry = new THREE.SphereGeometry(0.6, 16, 16); break;
-            case 'sun':
-                geometry = new THREE.SphereGeometry(0.8, 32, 32); break;
-            case 'snowflake':
-                geometry = new THREE.OctahedronGeometry(0.6); break;
-            case 'island':
-                geometry = new THREE.CylinderGeometry(0.8, 0.6, 0.4, 32); break;
-            case 'volcano':
-                geometry = new THREE.ConeGeometry(0.9, 0.7, 32); break;
-            case 'cactus':
-            case 'tree':
-            case 'christmasTree':
-                geometry = new THREE.ConeGeometry(0.5, 1.5, 16); break;
-            case 'mushroom':
-                geometry = new THREE.SphereGeometry(0.4, 16, 16); break;
-            case 'flower':
-                geometry = new THREE.SphereGeometry(0.5, 16, 16); break;
-            case 'butterfly':
-                geometry = new THREE.BoxGeometry(0.15, 0.6, 0.6); break;
-            case 'fish':
-            case 'bird':
-                geometry = new THREE.ConeGeometry(0.4, 1.2, 8); break;
-            case 'snowman':
-                geometry = new THREE.SphereGeometry(0.5, 16, 16); break;
-            case 'robot':
-                geometry = new THREE.BoxGeometry(0.8, 0.8, 0.8); break;
-            case 'rocket':
-                geometry = new THREE.ConeGeometry(0.4, 1.6, 8); break;
-            case 'ufo':
-                geometry = new THREE.CylinderGeometry(0.7, 0.7, 0.2, 32); break;
-            case 'car3D':
-                geometry = new THREE.BoxGeometry(1.4, 0.5, 0.7); break;
-            case 'airplane':
-                geometry = new THREE.BoxGeometry(0.5, 0.15, 1.6); break;
-            case 'helicopter':
-                geometry = new THREE.SphereGeometry(0.5, 16, 16); break;
-            case 'ship':
-                geometry = new THREE.BoxGeometry(1.6, 0.3, 0.7); break;
-            case 'submarine':
-                geometry = new THREE.CylinderGeometry(0.3, 0.3, 1.4, 16); break;
-            case 'tower':
-                geometry = new THREE.CylinderGeometry(0.5, 0.7, 1.6, 8); break;
-            case 'ladder':
-                geometry = new THREE.BoxGeometry(0.5, 1.5, 0.1); break;
-            case 'table':
-                geometry = new THREE.BoxGeometry(0.9, 0.1, 0.9); break;
-            case 'chair':
-                geometry = new THREE.BoxGeometry(0.4, 0.6, 0.4); break;
-            case 'crown':
-                geometry = new THREE.CylinderGeometry(0.6, 0.6, 0.4, 8); break;
-            case 'windmill':
-                geometry = new THREE.ConeGeometry(0.6, 0.8, 8); break;
-            case 'hourglass':
-                geometry = new THREE.TorusGeometry(0.5, 0.15, 12, 24); break;
-            case 'balloon':
-                geometry = new THREE.SphereGeometry(0.5, 16, 16); break;
-            case 'lollipop':
-                geometry = new THREE.SphereGeometry(0.5, 16, 16); break;
-            case 'iceCream':
-                geometry = new THREE.ConeGeometry(0.4, 1, 16); break;
-            case 'giftBox':
-                geometry = new THREE.BoxGeometry(0.8, 0.8, 0.8); break;
-            case 'bell':
-                geometry = new THREE.ConeGeometry(0.5, 0.8, 16); break;
-            case 'gear':
-            case 'cog':
-                geometry = new THREE.CylinderGeometry(0.6, 0.6, 0.15, 12); break;
-            case 'spiral':
-            case 'spring':
-                geometry = new THREE.TorusKnotGeometry(0.4, 0.1, 64, 8); break;
-            case 'dna':
-                geometry = new THREE.TorusKnotGeometry(0.4, 0.08, 100, 16); break;
-            case 'cubeRounded':
-                geometry = new THREE.BoxGeometry(0.9, 0.9, 0.9); break;
-            case 'mobius':
-                geometry = new THREE.TorusKnotGeometry(0.5, 0.15, 64, 8, 2, 3); break;
-            default:
-                geometry = new THREE.BoxGeometry(1, 1, 1);
+            case 'star': case 'starSmall': case 'star3D': geometry = new THREE.OctahedronGeometry(0.7); break;
+            case 'heart': case 'heart3D': geometry = new THREE.SphereGeometry(0.6, 16, 16); break;
+            case 'crescent': case 'moon': geometry = new THREE.SphereGeometry(0.7, 32, 32, 0, Math.PI); break;
+            case 'diamond': case 'crystal': case 'gemStone': geometry = new THREE.OctahedronGeometry(0.8); break;
+            case 'shield': geometry = new THREE.CylinderGeometry(0.7, 0.5, 0.15, 6); break;
+            case 'sword': geometry = new THREE.BoxGeometry(0.15, 1.6, 0.15); break;
+            case 'bone': geometry = new THREE.CylinderGeometry(0.15, 0.15, 1.4, 12); break;
+            case 'key': geometry = new THREE.TorusGeometry(0.35, 0.08, 12, 24); break;
+            case 'badge': geometry = new THREE.CylinderGeometry(0.6, 0.6, 0.12, 8); break;
+            case 'arrow': case 'arrowUp': case 'arrowDown': geometry = new THREE.ConeGeometry(0.4, 1.2, 4); break;
+            case 'plus': case 'cross': geometry = new THREE.BoxGeometry(1.4, 0.3, 0.3); break;
+            case 'lightning': case 'spike': geometry = new THREE.TetrahedronGeometry(0.7); break;
+            case 'leaf': geometry = new THREE.SphereGeometry(0.6, 16, 16); break;
+            case 'polygon3': geometry = new THREE.CylinderGeometry(0.7, 0.7, 0.3, 3); break;
+            case 'pentagon': case 'pentagonPrism': geometry = new THREE.CylinderGeometry(0.7, 0.7, 0.3, 5); break;
+            case 'hexagon': case 'hexagonPrism': geometry = new THREE.CylinderGeometry(0.7, 0.7, 0.3, 6); break;
+            case 'wedge': geometry = new THREE.BoxGeometry(1, 0.6, 0.5); break;
+            case 'brick': geometry = new THREE.BoxGeometry(1.2, 0.5, 0.6); break;
+            case 'cloud': geometry = new THREE.SphereGeometry(0.6, 16, 16); break;
+            case 'sun': geometry = new THREE.SphereGeometry(0.8, 32, 32); break;
+            case 'snowflake': geometry = new THREE.OctahedronGeometry(0.6); break;
+            case 'island': geometry = new THREE.CylinderGeometry(0.8, 0.6, 0.4, 32); break;
+            case 'volcano': geometry = new THREE.ConeGeometry(0.9, 0.7, 32); break;
+            case 'cactus': case 'tree': case 'christmasTree': geometry = new THREE.ConeGeometry(0.5, 1.5, 16); break;
+            case 'mushroom': geometry = new THREE.SphereGeometry(0.4, 16, 16); break;
+            case 'flower': geometry = new THREE.SphereGeometry(0.5, 16, 16); break;
+            case 'butterfly': geometry = new THREE.BoxGeometry(0.15, 0.6, 0.6); break;
+            case 'fish': case 'bird': geometry = new THREE.ConeGeometry(0.4, 1.2, 8); break;
+            case 'snowman': geometry = new THREE.SphereGeometry(0.5, 16, 16); break;
+            case 'robot': geometry = new THREE.BoxGeometry(0.8, 0.8, 0.8); break;
+            case 'rocket': geometry = new THREE.ConeGeometry(0.4, 1.6, 8); break;
+            case 'ufo': geometry = new THREE.CylinderGeometry(0.7, 0.7, 0.2, 32); break;
+            case 'car3D': geometry = new THREE.BoxGeometry(1.4, 0.5, 0.7); break;
+            case 'airplane': geometry = new THREE.BoxGeometry(0.5, 0.15, 1.6); break;
+            case 'helicopter': geometry = new THREE.SphereGeometry(0.5, 16, 16); break;
+            case 'ship': geometry = new THREE.BoxGeometry(1.6, 0.3, 0.7); break;
+            case 'submarine': geometry = new THREE.CylinderGeometry(0.3, 0.3, 1.4, 16); break;
+            case 'tower': geometry = new THREE.CylinderGeometry(0.5, 0.7, 1.6, 8); break;
+            case 'ladder': geometry = new THREE.BoxGeometry(0.5, 1.5, 0.1); break;
+            case 'table': geometry = new THREE.BoxGeometry(0.9, 0.1, 0.9); break;
+            case 'chair': geometry = new THREE.BoxGeometry(0.4, 0.6, 0.4); break;
+            case 'crown': geometry = new THREE.CylinderGeometry(0.6, 0.6, 0.4, 8); break;
+            case 'windmill': geometry = new THREE.ConeGeometry(0.6, 0.8, 8); break;
+            case 'hourglass': geometry = new THREE.TorusGeometry(0.5, 0.15, 12, 24); break;
+            case 'balloon': geometry = new THREE.SphereGeometry(0.5, 16, 16); break;
+            case 'lollipop': geometry = new THREE.SphereGeometry(0.5, 16, 16); break;
+            case 'iceCream': geometry = new THREE.ConeGeometry(0.4, 1, 16); break;
+            case 'giftBox': geometry = new THREE.BoxGeometry(0.8, 0.8, 0.8); break;
+            case 'bell': geometry = new THREE.ConeGeometry(0.5, 0.8, 16); break;
+            case 'gear': case 'cog': geometry = new THREE.CylinderGeometry(0.6, 0.6, 0.15, 12); break;
+            case 'spiral': case 'spring': geometry = new THREE.TorusKnotGeometry(0.4, 0.1, 64, 8); break;
+            case 'dna': geometry = new THREE.TorusKnotGeometry(0.4, 0.08, 100, 16); break;
+            case 'cubeRounded': geometry = new THREE.BoxGeometry(0.9, 0.9, 0.9); break;
+            case 'mobius': geometry = new THREE.TorusKnotGeometry(0.5, 0.15, 64, 8, 2, 3); break;
+            default: geometry = new THREE.BoxGeometry(1, 1, 1);
         }
 
         var material = new THREE.MeshStandardMaterial({
@@ -35383,13 +35294,11 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
         return mesh;
     }
 
-    // --- 3D Bilgi Badge Güncelle ---
     function _updateF3DInfoBadge() {
         var badge = document.getElementById('f3dInfoBadge');
         if (badge) badge.textContent = window.f3dObjects.length + ' obje';
     }
 
-    // --- Obje Seç ---
     function _selectF3DObject(mesh) {
         window.f3dSelectedObject = mesh;
         var panel = document.getElementById('f3dSelectedPanel');
@@ -35414,14 +35323,12 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
         }
     }
 
-    // --- Obje Seçimi Kaldır ---
     window.deselect3DObject = function () {
         window.f3dSelectedObject = null;
         var panel = document.getElementById('f3dSelectedPanel');
         if (panel) panel.classList.remove('open');
     };
 
-    // --- Renk Değiştir ---
     window.changeSelected3DColor = function (hexColor) {
         if (!window.f3dSelectedObject) return;
         var c = new THREE.Color(hexColor);
@@ -35430,7 +35337,6 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
         window.f3dSelectedObject.material.needsUpdate = true;
     };
 
-    // --- Boyut Değiştir ---
     window.changeSelected3DSize = function (scale) {
         if (!window.f3dSelectedObject) return;
         var s = parseFloat(scale);
@@ -35440,7 +35346,6 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
         if (valEl) valEl.textContent = s.toFixed(1) + 'x';
     };
 
-    // --- Döndür ---
     window.changeSelected3DRotation = function (deg) {
         if (!window.f3dSelectedObject) return;
         var d = parseFloat(deg);
@@ -35450,7 +35355,6 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
         if (valEl) valEl.textContent = Math.round(d) + '°';
     };
 
-    // --- Kopyala ---
     window.duplicate3DObject = function () {
         if (!window.f3dSelectedObject || !window.f3dScene) return;
         var orig = window.f3dSelectedObject;
@@ -35468,7 +35372,6 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
         showNotification('📋 Kopyalandı', 'success');
     };
 
-    // --- Sil ---
     window.delete3DObject = function () {
         if (!window.f3dSelectedObject || !window.f3dScene) return;
         var obj = window.f3dSelectedObject;
@@ -35482,7 +35385,6 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
         showNotification('🗑️ Silindi', 'warning');
     };
 
-    // --- Sahneyi Temizle ---
     window.clear3DScene = function () {
         if (!window.f3dScene) return;
         if (!confirm('Tüm objeler silinecek. Emin misiniz?')) return;
@@ -35497,7 +35399,6 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
         showNotification('🧹 Sahne temizlendi', 'success');
     };
 
-    // --- 3D Aç ---
     window.open3DBuilder = function () {
         if (!currentUser) {
             showNotification('Önce giriş yapın!', 'error');
@@ -35515,14 +35416,12 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
             document.body.style.overflow = 'hidden';
         }
 
-        // İlk seferde sahneyi kur
         setTimeout(function () {
             _initF3DScene();
             _bindF3DPointerEvents();
 
             setTimeout(function () {
                 if (window.f3dBuilt && window.f3dObjects.length === 0) {
-                    // Hoş geldin küpü
                     _addF3DShapeFromType('cubeRounded', new THREE.Vector3(0, 0.5, 0));
                     _addF3DShapeFromType('torus', new THREE.Vector3(2, 0.5, 0));
                     _addF3DShapeFromType('icosahedron', new THREE.Vector3(-2, 0.5, 0));
@@ -35535,7 +35434,6 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
         if (typeof window.addLogInfo === 'function') window.addLogInfo('3D Stüdyo açıldı');
     };
 
-    // --- 3D Kapat ---
     window.close3DBuilder = function () {
         var builder = document.getElementById('full3DBuilder');
         if (builder) {
@@ -35547,14 +35445,11 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
         showNotification('3D Stüdyo kapatıldı', 'warning');
     };
 
-    // --- Sihirbazdan 3D Builder Aç ---
     window.wizardOpen3DBuilder = function () {
-        // Sihirbaz modalı varsa kapat
         if (typeof closeModal === 'function') closeModal('projectWizardModal');
         window.open3DBuilder();
     };
 
-    // --- 3D Pointer Olayları ---
     function _bindF3DPointerEvents() {
         if (window.f3dRaycastBound) return;
         var stage = document.getElementById('full3DStage');
@@ -35562,7 +35457,6 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
 
         window.f3dRaycastBound = true;
 
-        // Drop zone
         stage.addEventListener('dragover', function (e) {
             e.preventDefault();
             stage.classList.add('dragover');
@@ -35580,7 +35474,6 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
             _addF3DShapeFromType(type, null);
         });
 
-        // Tıklama ve sürükleme
         stage.addEventListener('pointerdown', function (e) {
             window.f3dPointerDownPos.x = e.clientX;
             window.f3dPointerDownPos.y = e.clientY;
@@ -35588,7 +35481,6 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
 
         stage.addEventListener('click', function (e) {
             if (!window.f3dBuilt) return;
-            // Sürükleme sonrası ise iptal
             var dx = Math.abs(e.clientX - window.f3dPointerDownPos.x);
             var dy = Math.abs(e.clientY - window.f3dPointerDownPos.y);
             if (dx > 5 || dy > 5) return;
@@ -35609,7 +35501,6 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
         });
     }
 
-    // --- 3D Projeye Kaydet ---
     window.save3DToProject = async function () {
         if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
         if (!window.f3dObjects || window.f3dObjects.length === 0) {
@@ -35642,22 +35533,152 @@ console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-5 AKTİF');
     };
 
     // ============================================================
+    // 35) MAVİ İMLEÇ TAKİP FIX (JS-6 içinde, guarantee çalışır)
+    // ============================================================
+    (function initCursorFix() {
+        console.log('🖱️ [Cursor] Başlatılıyor (JS-6 içi)...');
+
+        function waitForElements(callback, retries) {
+            retries = retries || 0;
+            var cursor = document.getElementById('customCursor');
+            var ring = document.getElementById('customCursorRing');
+
+            if (cursor && ring) {
+                callback(cursor, ring);
+                return;
+            }
+
+            if (retries > 50) {
+                console.error('❌ [Cursor] Element bulunamadı (5 saniye bekledi)');
+                return;
+            }
+
+            setTimeout(function () { waitForElements(callback, retries + 1); }, 100);
+        }
+
+        waitForElements(function (cursor, ring) {
+            console.log('✅ [Cursor] Elementler bulundu, başlatılıyor...');
+
+            var hasMouse = true;
+            try {
+                var fineMatch = window.matchMedia('(pointer: fine)').matches;
+                var anyHover = window.matchMedia('(any-hover: hover)').matches;
+                var hoverMatch = window.matchMedia('(hover: hover)').matches;
+                hasMouse = fineMatch || anyHover || hoverMatch;
+                console.log('🖱️ pointer:fine=' + fineMatch + ' | any-hover=' + anyHover + ' | hover=' + hoverMatch);
+            } catch (e) { hasMouse = true; }
+
+            if (!hasMouse) {
+                cursor.style.display = 'none';
+                ring.style.display = 'none';
+                console.log('📱 [Cursor] Touch cihaz, imleç kapatıldı');
+                return;
+            }
+
+            cursor.style.display = 'block';
+            ring.style.display = 'block';
+            cursor.style.position = 'fixed';
+            ring.style.position = 'fixed';
+            cursor.style.top = '0';
+            cursor.style.left = '0';
+            ring.style.top = '0';
+            ring.style.left = '0';
+            cursor.style.pointerEvents = 'none';
+            ring.style.pointerEvents = 'none';
+            cursor.style.zIndex = '999999';
+            ring.style.zIndex = '999998';
+            cursor.style.willChange = 'transform';
+            ring.style.willChange = 'transform';
+            cursor.style.transform = 'translate3d(-100px, -100px, 0)';
+            ring.style.transform = 'translate3d(-100px, -100px, 0)';
+
+            var mx = -100, my = -100;
+            var rx = -100, ry = -100;
+            var isMoving = false;
+            var moveTimer = null;
+            var rafId = null;
+
+            function onMouseMove(e) {
+                mx = e.clientX;
+                my = e.clientY;
+                cursor.style.transform = 'translate3d(' + (mx - 7) + 'px, ' + (my - 7) + 'px, 0)';
+
+                if (!isMoving) {
+                    isMoving = true;
+                    animateRing();
+                }
+
+                if (moveTimer) clearTimeout(moveTimer);
+                moveTimer = setTimeout(function () {
+                    isMoving = false;
+                    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+                }, 1500);
+            }
+
+            function animateRing() {
+                if (!isMoving) return;
+                rx += (mx - rx) * 0.15;
+                ry += (my - ry) * 0.15;
+                ring.style.transform = 'translate3d(' + (rx - 20) + 'px, ' + (ry - 20) + 'px, 0)';
+                rafId = requestAnimationFrame(animateRing);
+            }
+
+            document.addEventListener('mousemove', onMouseMove, { passive: true });
+
+            var hoverSelector = 'a, button, .btn, .feature-card, .price-card, ' +
+                               '.store-item, .nav-links a, .secret-btn, .nav-cta, ' +
+                               '[onclick], input, textarea, select, .f3d-shape-item, ' +
+                               '.comment-item, .koc-assistant-btn, .vizyon-al-trigger, ' +
+                               '.btn-primary, .btn-secondary, .btn-danger, .btn-success';
+
+            function bindHover() {
+                var els = document.querySelectorAll(hoverSelector);
+                for (var i = 0; i < els.length; i++) {
+                    var el = els[i];
+                    if (el._cursorBound) continue;
+                    el._cursorBound = true;
+                    el.addEventListener('mouseenter', function () {
+                        cursor.classList.add('hover');
+                    });
+                    el.addEventListener('mouseleave', function () {
+                        cursor.classList.remove('hover');
+                    });
+                }
+            }
+
+            setTimeout(bindHover, 500);
+
+            if (typeof MutationObserver !== 'undefined') {
+                try {
+                    var obs = new MutationObserver(function () {
+                        clearTimeout(window._cursorBindTimer);
+                        window._cursorBindTimer = setTimeout(bindHover, 300);
+                    });
+                    obs.observe(document.body, { childList: true, subtree: true });
+                } catch (e) {}
+            }
+
+            document.addEventListener('mouseleave', function () {
+                cursor.style.opacity = '0';
+                ring.style.opacity = '0';
+            });
+            document.addEventListener('mouseenter', function () {
+                cursor.style.opacity = '1';
+                ring.style.opacity = '0.65';
+            });
+
+            console.log('✅ [Cursor] Mavi imleç takip BAŞLATILDI!');
+        });
+
+    })();
+
+    // ============================================================
     // SON LOG
     // ============================================================
-    console.log('✅ JS-6 FULL yüklendi (v7.10.0)');
-    console.log('   Toplam fonksiyon: 130+');
-    console.log('   → Kullanıcı listesi/arama/inbox');
-    console.log('   → Yorumlar (CRUD + filtre + render)');
-    console.log('   → Admin fonksiyonları (ban/unban/gift/rol)');
-    console.log('   → Hesap bilgileri + abonelikler');
-    console.log('   → Ebeveyn paneli (FULL)');
-    console.log('   → Streak + Battle + MultiAI');
-    console.log('   → Sohbet geçmişi (CRUD + paylaş + ad ver)');
-    console.log('   → Pro araçları + Referral');
-    console.log('   → Projeler (7 fonksiyon)');
-    console.log('   → 3D Stüdyo (FULL — ' + window.f3dShapeLibrary.length + ' şekil)');
-    console.log('   → Inbox badge + Founder dashboard');
-    console.log('🇹🇷 VİZYON 2027 v7.10.0 — JS-6 FULL AKTİF');
+    console.log('✅ JS-6 FULL v7.10.1 yüklendi — tüm fonksiyonlar hazır');
+    console.log('📊 Toplam: 130+ fonksiyon + 3D Stüdyo (90+ şekil) + Mavi İmleç');
+    console.log('🇹🇷 VİZYON 2027 v7.10.1 — JS-6 AKTİF');
+
 })();
 </script>
 <!-- ===== JS-6 FULL SONU ===== -->
