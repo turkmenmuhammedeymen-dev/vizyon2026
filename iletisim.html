@@ -1,389 +1,1352 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İletişim – Vizyon2027</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0a0a0a; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; line-height: 1.7; }
-        .container { max-width: 1100px; margin: 0 auto; background: #141414; padding: 40px; border-radius: 20px; border: 1px solid #2a2a2a; box-shadow: 0 0 60px rgba(0,212,255,0.05); }
-        
-        .lang-selector { display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
-        .lang-btn { padding: 8px 20px; border-radius: 40px; border: 2px solid #2a2a2a; background: transparent; color: #aaa; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 14px; }
-        .lang-btn:hover { border-color: #00d4ff; color: #00d4ff; }
-        .lang-btn.active { border-color: #00d4ff; background: #00d4ff22; color: #00d4ff; }
-        .lang-content { display: none; }
-        .lang-content.active { display: block; }
-        
-        h1 { color: #00d4ff; font-size: 36px; border-bottom: 3px solid #00d4ff; padding-bottom: 18px; font-family: 'Syne', sans-serif; }
-        h2 { color: #00d4ff; font-size: 28px; margin-top: 45px; border-left: 6px solid #00d4ff; padding-left: 20px; font-family: 'Syne', sans-serif; }
-        h3 { color: #a0c4e0; font-size: 20px; margin-top: 20px; }
-        p, li { color: #c8d0d8; font-size: 16px; margin-bottom: 10px; }
-        ul { padding-left: 28px; }
-        li { margin-bottom: 8px; }
-        .back-link { display: inline-block; margin-top: 30px; color: #00d4ff; text-decoration: none; border: 2px solid #00d4ff; padding: 12px 32px; border-radius: 40px; transition: 0.3s; font-weight: 600; font-size: 16px; }
-        .back-link:hover { background: #00d4ff; color: #0a0a0a; box-shadow: 0 0 40px rgba(0,212,255,0.3); }
-        .badge { display: inline-block; background: #00d4ff22; color: #00d4ff; padding: 4px 16px; border-radius: 30px; font-size: 14px; border: 1px solid #00d4ff55; margin-right: 8px; margin-bottom: 6px; }
-        hr { border: 0; height: 1px; background: #2a2a2a; margin: 45px 0; }
-        
-        .highlight-box { background: #1a1a2a; border-left: 6px solid #00ff88; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
-        .important-box { background: #1a0a0a; border-left: 6px solid #ff6b6b; padding: 20px 26px; border-radius: 12px; margin: 20px 0; }
-        
-        .contact-card { background: #1a1a2a; border: 1px solid #2a2a2a; border-radius: 16px; padding: 24px; margin-bottom: 24px; transition: 0.3s; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
-        .contact-card:hover { border-color: #00d4ff; transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,212,255,0.08); }
-        .contact-card .icon { font-size: 48px; width: 70px; text-align: center; }
-        .contact-card .info { flex: 1; }
-        .contact-card .info h3 { margin: 0 0 4px 0; color: #00d4ff; }
-        .contact-card .info p { margin: 0; color: #b0b8c0; }
-        .contact-card .info a { color: #00d4ff; text-decoration: none; font-weight: 600; }
-        .contact-card .info a:hover { text-decoration: underline; }
-        
-        .social-btn { display: inline-block; padding: 10px 24px; border-radius: 30px; font-weight: 700; text-decoration: none; transition: 0.3s; margin-right: 10px; margin-top: 6px; }
-        .social-btn.instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: #fff; border: 1px solid #dc2743; }
-        .social-btn.whatsapp { background: #25D366; color: #fff; border: 1px solid #25D366; }
-        .social-btn.email { background: #00d4ff; color: #0a0a0a; border: 1px solid #00d4ff; }
-        .social-btn.support { background: #a855f7; color: #fff; border: 1px solid #a855f7; }
-        .social-btn.founder { background: #ffd700; color: #0a0a0a; border: 1px solid #ffd700; }
-        .social-btn:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-        
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 20px 0; }
-        .info-card { background: #1a1a2a; border-radius: 12px; padding: 20px; border: 1px solid #2a2a2a; }
-        .info-card h4 { color: #00d4ff; margin-top: 0; }
-        
-        .legal-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a2a; font-size: 13px; color: #666; text-align: center; }
-        .legal-footer a { color: #00d4ff; text-decoration: none; }
-        .legal-footer a:hover { text-decoration: underline; }
-        
-        @media (max-width: 768px) { .container { padding: 20px; } h1 { font-size: 28px; } h2 { font-size: 22px; } .grid-2 { grid-template-columns: 1fr; } .contact-card { flex-direction: column; text-align: center; } .contact-card .icon { width: auto; } .lang-selector { justify-content: center; } }
-        @media (max-width: 480px) { body { padding: 10px; } .container { padding: 14px; } h1 { font-size: 22px; } .social-btn { display: block; margin-right: 0; text-align: center; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="VİZYON 2027 İletişim - Soru, öneri, şikayet ve iş birliği için bize ulaşın. E-posta, WhatsApp, Instagram, Vizyon Destek ve Kurucu iletişimi.">
+<meta name="theme-color" content="#03050a">
+<title>İletişim | VİZYON 2027</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+:root{
+    --bg:#03050a; --bg2:#060a14; --bg3:#0a1020;
+    --surface:#0a1020; --surface2:#0e1630;
+    --border:#1a2a4a; --border2:#24365e;
+    --accent:#00e5ff; --accent2:#00ff9d; --accent3:#ff5e1a;
+    --accent4:#ff2d92; --gold:#ffd11a; --purple:#b845ff; --pink:#ff2d92;
+    --danger:#ff4757; --warning:#ffb700; --success:#00ff9d;
+    --text:#ffffff; --text2:#d4e5ff; --text3:#8aa8d4; --text4:#5a7aa8;
+    --whatsapp:#25D366;
+    --instagram1:#f09433; --instagram2:#dc2743; --instagram3:#bc1888;
+    --font-display:'Syne',sans-serif;
+    --font-code:'Fira Code',monospace;
+    --font-body:'Inter',sans-serif;
+}
+[data-theme="light"]{
+    --bg:#f0f4fb; --bg2:#e6ecf7; --bg3:#dde5f4;
+    --surface:#ffffff; --surface2:#f7fafc;
+    --border:#cbd8ec; --border2:#b0c2dc;
+    --text:#0a1020; --text2:#1e2a44; --text3:#4a5d80; --text4:#6b7ea3;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{
+    background:var(--bg);color:var(--text);font-family:var(--font-body);
+    overflow-x:hidden;min-height:100vh;position:relative;
+    -webkit-font-smoothing:antialiased;line-height:1.7;
+}
+body::before{
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+        radial-gradient(ellipse 80% 50% at 20% 0%, rgba(0,229,255,0.12) 0%, transparent 55%),
+        radial-gradient(ellipse 70% 50% at 80% 10%, rgba(184,69,255,0.10) 0%, transparent 55%),
+        radial-gradient(ellipse 90% 60% at 50% 100%, rgba(255,45,146,0.08) 0%, transparent 60%);
+    animation:auroraShift 24s ease-in-out infinite alternate;
+}
+body::after{
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:
+        linear-gradient(rgba(0,229,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.025) 1px, transparent 1px);
+    background-size:60px 60px;
+    mask-image:radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 85%);
+    -webkit-mask-image:radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 85%);
+    opacity:0.6;
+}
+@keyframes auroraShift{
+    0%{opacity:0.75;transform:scale(1) rotate(0deg)}
+    50%{opacity:1;transform:scale(1.06) rotate(2deg)}
+    100%{opacity:0.85;transform:scale(1) rotate(0deg)}
+}
+nav{
+    position:fixed;top:0;left:0;right:0;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 48px;height:84px;
+    background:rgba(3,5,10,0.75);
+    backdrop-filter:blur(28px) saturate(160%);
+    -webkit-backdrop-filter:blur(28px) saturate(160%);
+    border-bottom:1px solid rgba(0,229,255,0.15);
+    z-index:100;box-shadow:0 4px 30px rgba(0,0,0,0.4);
+}
+nav::after{
+    content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,var(--accent) 20%,var(--purple) 50%,var(--pink) 80%,transparent);
+    opacity:0.6;animation:navGlow 4s ease-in-out infinite alternate;
+}
+@keyframes navGlow{0%{opacity:0.4}100%{opacity:0.9}}
+[data-theme="light"] nav{background:rgba(255,255,255,0.85);border-bottom-color:rgba(0,0,0,0.08)}
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
+.nav-logo svg{filter:drop-shadow(0 0 12px rgba(0,229,255,0.6))}
+.nav-logo-text{
+    font-family:var(--font-display);font-size:24px;font-weight:800;
+    background:linear-gradient(45deg,#00e5ff,#00ff9d,#b845ff,#ff2d92,#ffd11a,#00e5ff);
+    background-size:400% 400%;-webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:gradientMove 6s ease infinite;letter-spacing:1px;
+}
+@keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.nav-menu{display:flex;gap:32px;list-style:none}
+.nav-menu a{
+    color:var(--text2);text-decoration:none;font-size:13px;font-weight:500;
+    text-transform:uppercase;letter-spacing:1.2px;position:relative;padding:6px 0;
+    transition:color 0.15s ease;
+}
+.nav-menu a::after{
+    content:'';position:absolute;bottom:0;left:50%;right:50%;height:2px;
+    background:linear-gradient(90deg,var(--accent),var(--purple));
+    transition:left 0.3s,right 0.3s;border-radius:2px;
+}
+.nav-menu a:hover{color:var(--accent)}
+.nav-menu a:hover::after{left:0;right:0}
+.nav-actions{display:flex;gap:12px;align-items:center}
+.btn-nav{
+    padding:9px 22px;border-radius:40px;font-size:13px;font-weight:600;
+    cursor:pointer;transition:all 0.15s;border:none;text-decoration:none;
+    display:inline-flex;align-items:center;gap:6px;
+}
+.btn-nav-outline{background:transparent;border:1.5px solid var(--accent);color:var(--accent)}
+.btn-nav-outline:hover{background:rgba(0,229,255,0.12);box-shadow:0 0 20px rgba(0,229,255,0.4);transform:translateY(-1px)}
+.btn-nav-primary{
+    background:linear-gradient(135deg,#00e5ff,#b845ff,#ff2d92);
+    background-size:200% 200%;color:#fff;
+    box-shadow:0 0 25px rgba(0,229,255,0.4);
+    animation:btnGradientShift 4s ease infinite;
+}
+@keyframes btnGradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.btn-nav-primary:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 0 40px rgba(0,229,255,0.7)}
+.nav-theme-btn{
+    width:40px;height:40px;border-radius:50%;background:none;
+    border:1px solid var(--border);color:var(--text);font-size:16px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:all 0.15s;
+}
+.nav-theme-btn:hover{border-color:var(--accent);box-shadow:0 0 20px rgba(0,229,255,0.4);transform:rotate(20deg)}
+.nav-toggle{display:none;background:none;border:none;color:var(--text);font-size:24px;cursor:pointer;padding:8px}
+
+.contact-hero{padding:160px 24px 30px;position:relative;z-index:10;text-align:center}
+.contact-hero-badge{
+    display:inline-flex;align-items:center;gap:8px;padding:8px 18px;
+    border:1px solid rgba(0,229,255,0.35);border-radius:40px;
+    font-size:12px;color:var(--accent);font-weight:600;letter-spacing:0.5px;
+    background:rgba(0,229,255,0.05);margin-bottom:24px;backdrop-filter:blur(12px);
+}
+.contact-hero h1{
+    font-family:var(--font-display);font-size:clamp(36px,5vw,54px);
+    font-weight:800;line-height:1.05;margin-bottom:16px;letter-spacing:-0.5px;
+    background:linear-gradient(135deg,#fff 0%,var(--accent) 40%,var(--purple) 70%,var(--pink) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.contact-hero p{max-width:720px;margin:0 auto;color:var(--text2);font-size:15.5px;line-height:1.75}
+
+.lang-bar{
+    display:flex;justify-content:center;gap:10px;flex-wrap:wrap;
+    padding:20px 24px;position:relative;z-index:10;
+}
+.lang-btn{
+    padding:9px 22px;border-radius:40px;
+    border:1.5px solid var(--border2);
+    background:transparent;color:var(--text3);
+    font-weight:600;cursor:pointer;transition:all 0.2s;
+    font-size:13px;font-family:var(--font-body);
+    display:inline-flex;align-items:center;gap:8px;
+}
+.lang-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,229,255,0.06)}
+.lang-btn.active{
+    border-color:var(--accent);
+    background:linear-gradient(135deg,rgba(0,229,255,0.15),rgba(184,69,255,0.1));
+    color:var(--accent);
+    box-shadow:0 0 20px rgba(0,229,255,0.3);
+}
+
+.contact-container{
+    max-width:1100px;margin:20px auto 80px;padding:0 24px;
+    position:relative;z-index:10;
+}
+.contact-content{display:none}
+.contact-content.active{display:block;animation:fadeIn 0.4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.contact-card-box{
+    background:linear-gradient(135deg,rgba(10,16,32,0.92),rgba(6,10,20,0.95));
+    border:1px solid var(--border2);border-radius:22px;
+    padding:36px 34px;margin-bottom:24px;
+    backdrop-filter:blur(8px);position:relative;overflow:hidden;
+}
+[data-theme="light"] .contact-card-box{background:rgba(255,255,255,0.92)}
+.contact-card-box::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--accent),var(--purple),var(--pink),transparent);
+    opacity:0.6;
+}
+
+.info-highlight{
+    padding:18px 22px;border-radius:14px;margin:20px 0;
+    border-left:4px solid var(--success);
+    background:linear-gradient(135deg,rgba(0,255,157,0.08),rgba(0,229,255,0.04));
+    color:#a8ffd4;font-size:13.5px;line-height:1.75;
+}
+.info-highlight strong{color:#fff}
+
+.contact-section-title{
+    font-family:var(--font-display);font-size:22px;font-weight:800;
+    color:var(--text);margin:38px 0 18px;padding-bottom:14px;
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:12px;
+    letter-spacing:-0.3px;
+}
+.contact-section-title .icon{
+    width:44px;height:44px;border-radius:12px;
+    background:linear-gradient(135deg,rgba(0,229,255,0.15),rgba(184,69,255,0.1));
+    border:1px solid rgba(0,229,255,0.3);
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;flex-shrink:0;
+}
+
+/* Kanallar */
+.channels-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:16px;margin:20px 0;
+}
+.channel-card{
+    background:linear-gradient(135deg,rgba(10,16,32,0.9),rgba(6,10,20,0.95));
+    border:1px solid var(--border2);border-radius:18px;
+    padding:22px 24px;
+    transition:all 0.3s ease;
+    position:relative;overflow:hidden;
+    display:flex;flex-direction:column;gap:14px;
+}
+[data-theme="light"] .channel-card{background:rgba(255,255,255,0.92)}
+.channel-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    transform:scaleX(0);transform-origin:left;
+    transition:transform 0.4s ease;
+}
+.channel-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 15px 50px rgba(0,0,0,0.4);
+}
+.channel-card:hover::before{transform:scaleX(1)}
+
+.channel-card.email::before{background:linear-gradient(90deg,var(--accent),var(--purple))}
+.channel-card.email:hover{border-color:var(--accent);box-shadow:0 15px 50px rgba(0,229,255,0.2)}
+.channel-card.whatsapp::before{background:linear-gradient(90deg,#25D366,#00ff9d)}
+.channel-card.whatsapp:hover{border-color:var(--whatsapp);box-shadow:0 15px 50px rgba(37,211,102,0.2)}
+.channel-card.instagram::before{background:linear-gradient(90deg,#f09433,#dc2743,#bc1888)}
+.channel-card.instagram:hover{border-color:#dc2743;box-shadow:0 15px 50px rgba(220,39,67,0.2)}
+.channel-card.support::before{background:linear-gradient(90deg,var(--purple),var(--pink))}
+.channel-card.support:hover{border-color:var(--purple);box-shadow:0 15px 50px rgba(184,69,255,0.2)}
+.channel-card.founder::before{background:linear-gradient(90deg,var(--gold),var(--accent3))}
+.channel-card.founder:hover{border-color:var(--gold);box-shadow:0 15px 50px rgba(255,209,26,0.2)}
+
+.channel-head{
+    display:flex;align-items:center;gap:14px;
+}
+.channel-icon{
+    width:56px;height:56px;border-radius:14px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:26px;transition:all 0.3s ease;
+}
+.channel-card.email .channel-icon{
+    background:linear-gradient(135deg,rgba(0,229,255,0.15),rgba(184,69,255,0.1));
+    border:1px solid rgba(0,229,255,0.35);
+}
+.channel-card.whatsapp .channel-icon{
+    background:linear-gradient(135deg,rgba(37,211,102,0.15),rgba(0,255,157,0.1));
+    border:1px solid rgba(37,211,102,0.35);
+}
+.channel-card.instagram .channel-icon{
+    background:linear-gradient(45deg,rgba(240,148,51,0.15),rgba(220,39,67,0.15),rgba(188,24,136,0.15));
+    border:1px solid rgba(220,39,67,0.4);
+}
+.channel-card.support .channel-icon{
+    background:linear-gradient(135deg,rgba(184,69,255,0.15),rgba(255,45,146,0.1));
+    border:1px solid rgba(184,69,255,0.35);
+}
+.channel-card.founder .channel-icon{
+    background:linear-gradient(135deg,rgba(255,209,26,0.15),rgba(255,94,26,0.1));
+    border:1px solid rgba(255,209,26,0.4);
+}
+.channel-card:hover .channel-icon{
+    transform:scale(1.08) rotate(-5deg);
+}
+.channel-title{
+    font-family:var(--font-display);font-weight:800;
+    color:var(--text);font-size:17px;line-height:1.2;
+}
+.channel-subtitle{
+    font-size:12px;color:var(--text3);margin-top:2px;
+}
+.channel-desc{
+    font-size:13px;color:var(--text2);line-height:1.65;flex:1;
+}
+.channel-value{
+    font-size:13px;color:var(--text2);line-height:1.65;
+    padding:10px 14px;border-radius:10px;
+    background:rgba(0,0,0,0.25);
+    border:1px solid var(--border);
+    word-break:break-word;
+    font-family:var(--font-code);
+}
+.channel-btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 22px;border-radius:40px;
+    font-size:13px;font-weight:700;text-decoration:none;
+    cursor:pointer;border:none;font-family:var(--font-body);
+    transition:all 0.25s ease;
+    letter-spacing:0.3px;
+    width:100%;
+}
+.channel-card.email .channel-btn{
+    background:linear-gradient(135deg,var(--accent),var(--purple));
+    color:#fff;
+    box-shadow:0 0 20px rgba(0,229,255,0.4);
+}
+.channel-card.email .channel-btn:hover{
+    transform:scale(1.03) translateY(-2px);
+    box-shadow:0 0 35px rgba(0,229,255,0.7);
+}
+.channel-card.whatsapp .channel-btn{
+    background:linear-gradient(135deg,#25D366,#00b85c);
+    color:#fff;
+    box-shadow:0 0 20px rgba(37,211,102,0.4);
+}
+.channel-card.whatsapp .channel-btn:hover{
+    transform:scale(1.03) translateY(-2px);
+    box-shadow:0 0 35px rgba(37,211,102,0.7);
+}
+.channel-card.instagram .channel-btn{
+    background:linear-gradient(45deg,#f09433,#dc2743,#bc1888);
+    color:#fff;
+    box-shadow:0 0 20px rgba(220,39,67,0.4);
+}
+.channel-card.instagram .channel-btn:hover{
+    transform:scale(1.03) translateY(-2px);
+    box-shadow:0 0 35px rgba(220,39,67,0.7);
+}
+.channel-card.support .channel-btn{
+    background:linear-gradient(135deg,var(--purple),var(--pink));
+    color:#fff;
+    box-shadow:0 0 20px rgba(184,69,255,0.4);
+}
+.channel-card.support .channel-btn:hover{
+    transform:scale(1.03) translateY(-2px);
+    box-shadow:0 0 35px rgba(184,69,255,0.7);
+}
+.channel-card.founder .channel-btn{
+    background:linear-gradient(135deg,var(--gold),var(--accent3));
+    color:#03050a;
+    box-shadow:0 0 20px rgba(255,209,26,0.4);
+}
+.channel-card.founder .channel-btn:hover{
+    transform:scale(1.03) translateY(-2px);
+    box-shadow:0 0 35px rgba(255,209,26,0.7);
+}
+
+/* Ne zaman hangi kanal */
+.when-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;
+}
+.when-card{
+    background:linear-gradient(135deg,rgba(0,229,255,0.04),rgba(184,69,255,0.02));
+    border:1px solid var(--border2);border-radius:14px;
+    padding:20px 22px;transition:all 0.25s ease;
+}
+.when-card:hover{
+    border-color:var(--accent);
+    transform:translateY(-2px);
+    box-shadow:0 8px 30px rgba(0,229,255,0.15);
+}
+.when-card h4{
+    font-family:var(--font-display);font-size:15px;font-weight:700;
+    color:var(--accent);margin-bottom:12px;
+    display:flex;align-items:center;gap:8px;
+}
+.when-card ul{margin:0 0 0 20px;padding:0}
+.when-card li{
+    font-size:13px;color:var(--text2);line-height:1.75;
+    margin-bottom:6px;
+}
+.when-card li::marker{color:var(--accent)}
+
+/* Yanıt süreleri */
+.response-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;margin:20px 0;
+}
+.response-card{
+    background:linear-gradient(135deg,rgba(0,229,255,0.04),rgba(184,69,255,0.02));
+    border:1px solid var(--border2);border-radius:14px;
+    padding:18px 20px;text-align:center;
+    transition:all 0.25s ease;
+}
+.response-card:hover{
+    border-color:var(--accent);
+    transform:translateY(-3px);
+    box-shadow:0 8px 25px rgba(0,229,255,0.15);
+}
+.response-icon{
+    font-size:32px;display:block;margin-bottom:8px;
+    filter:drop-shadow(0 0 10px rgba(0,229,255,0.4));
+}
+.response-title{
+    font-family:var(--font-display);font-weight:700;
+    color:var(--text);font-size:13.5px;margin-bottom:6px;
+}
+.response-value{
+    font-family:var(--font-code);font-size:13px;
+    color:var(--accent2);font-weight:700;
+    padding:4px 12px;border-radius:20px;
+    background:rgba(0,255,157,0.1);
+    border:1px solid rgba(0,255,157,0.3);
+    display:inline-block;
+}
+
+.warning-box{
+    padding:18px 22px;border-radius:14px;margin:20px 0;
+    border-left:4px solid var(--warning);
+    background:linear-gradient(135deg,rgba(255,183,0,0.08),rgba(255,94,26,0.04));
+    color:#ffd58a;font-size:13.5px;line-height:1.75;
+}
+.warning-box strong{color:#fff}
+
+/* SSS mini */
+.mini-faq{
+    display:flex;flex-direction:column;gap:8px;margin:16px 0;
+}
+.mini-faq-item{
+    background:linear-gradient(135deg,rgba(0,229,255,0.04),rgba(184,69,255,0.02));
+    border:1px solid var(--border2);border-radius:12px;
+    padding:14px 18px;transition:all 0.2s ease;
+}
+.mini-faq-item:hover{border-color:var(--accent)}
+.mini-faq-item .q{
+    font-weight:600;color:var(--text);font-size:13.5px;
+    display:flex;align-items:flex-start;gap:10px;
+}
+.mini-faq-item .q .q-icon{
+    color:var(--accent);font-weight:800;
+    flex-shrink:0;font-family:var(--font-code);
+}
+.mini-faq-item .a{
+    margin-top:8px;margin-left:22px;
+    font-size:12.5px;color:var(--text2);line-height:1.7;
+}
+.mini-faq-item .a a{
+    color:var(--accent);text-decoration:none;
+    border-bottom:1px dashed rgba(0,229,255,0.4);
+}
+.mini-faq-item .a a:hover{border-bottom-color:var(--accent)}
+
+footer{
+    border-top:1px solid rgba(0,229,255,0.15);
+    padding:50px 24px 30px;
+    background:linear-gradient(180deg,var(--bg2),var(--bg));
+    position:relative;z-index:10;
+}
+footer::before{
+    content:'';position:absolute;top:-1px;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent 0%,var(--accent) 20%,var(--purple) 50%,var(--pink) 80%,transparent 100%);
+    opacity:0.7;
+}
+.footer-inner{
+    max-width:1200px;margin:0 auto;
+    display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:20px;
+}
+.footer-copy{font-size:12.5px;color:var(--text3)}
+.footer-copy span{
+    background:linear-gradient(135deg,var(--accent),var(--purple));
+    -webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700;
+}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{color:var(--text3);font-size:12.5px;text-decoration:none;transition:color 0.15s}
+.footer-links a:hover{color:var(--accent)}
+
+.back-top{
+    position:fixed;bottom:24px;right:24px;
+    width:48px;height:48px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),var(--purple));
+    color:#fff;border:none;cursor:pointer;
+    display:none;align-items:center;justify-content:center;
+    font-size:18px;z-index:50;
+    box-shadow:0 4px 20px rgba(0,229,255,0.5);
+    transition:transform 0.2s,box-shadow 0.2s;
+}
+.back-top.show{display:flex}
+.back-top:hover{transform:translateY(-3px) scale(1.08);box-shadow:0 8px 35px rgba(0,229,255,0.8)}
+
+@media (max-width:900px){
+    nav{padding:0 20px;height:72px}
+    .nav-menu{gap:20px}
+    .nav-menu a{font-size:11px}
+    .nav-logo-text{font-size:18px}
+    .contact-hero{padding:130px 18px 30px}
+    .contact-card-box{padding:26px 22px}
+    .when-grid{grid-template-columns:1fr}
+}
+@media (max-width:768px){
+    .nav-menu{
+        display:none;position:fixed;top:72px;left:0;right:0;
+        background:rgba(3,5,10,0.98);backdrop-filter:blur(20px);
+        flex-direction:column;padding:24px;gap:20px;
+        border-bottom:1px solid var(--border);
+    }
+    .nav-menu.open{display:flex}
+    .nav-menu a{font-size:14px;letter-spacing:0.5px}
+    .nav-toggle{display:block}
+    .btn-nav{padding:7px 14px;font-size:11.5px}
+    .btn-nav-outline{display:none}
+    .contact-hero h1{font-size:30px}
+    .contact-hero p{font-size:13.5px}
+    .channels-grid{grid-template-columns:1fr}
+    .contact-section-title{font-size:18px}
+}
+@media (max-width:480px){
+    nav{padding:0 12px;height:66px}
+    .nav-logo-text{font-size:15px}
+    .nav-logo svg{width:38px;height:38px}
+    .btn-nav{padding:6px 11px;font-size:10.5px}
+    .contact-hero{padding:110px 14px 24px}
+    .contact-hero h1{font-size:25px}
+    .contact-card-box{padding:18px 14px;border-radius:16px}
+    .contact-section-title{font-size:16px}
+    .contact-section-title .icon{width:36px;height:36px;font-size:18px}
+    .channel-card{padding:18px 16px;border-radius:14px}
+    .channel-icon{width:48px;height:48px;font-size:22px}
+    .channel-title{font-size:15px}
+    .channel-btn{font-size:12.5px;padding:10px 18px}
+    .response-grid{grid-template-columns:1fr 1fr}
+    .response-card{padding:14px 12px}
+    .response-icon{font-size:26px}
+    .response-title{font-size:12px}
+    .response-value{font-size:11.5px;padding:3px 9px}
+    .footer-inner{flex-direction:column;text-align:center}
+    .lang-btn{padding:7px 14px;font-size:11.5px}
+}
+</style>
 </head>
 <body>
-<div class="container" id="mainContainer">
 
-    <!-- Dil Seçici -->
-    <div class="lang-selector">
-        <button class="lang-btn active" data-lang="tr" onclick="switchLanguage('tr')">🇹🇷 Türkçe</button>
-        <button class="lang-btn" data-lang="en" onclick="switchLanguage('en')">🇬🇧 English</button>
-        <button class="lang-btn" data-lang="ar" onclick="switchLanguage('ar')">🇸🇦 العربية</button>
+<!-- NAVBAR -->
+<nav>
+    <a href="/index.html" class="nav-logo">
+        <svg width="52" height="52" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#00e5ff"/>
+                    <stop offset="50%" stop-color="#b845ff"/>
+                    <stop offset="100%" stop-color="#ff2d92"/>
+                </linearGradient>
+                <linearGradient id="lg2" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#00ff9d"/>
+                    <stop offset="100%" stop-color="#00e5ff"/>
+                </linearGradient>
+                <radialGradient id="lgg">
+                    <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.7"/>
+                    <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+                </radialGradient>
+            </defs>
+            <circle cx="30" cy="30" r="28" fill="url(#lgg)"/>
+            <circle cx="30" cy="30" r="25" fill="none" stroke="url(#lg1)" stroke-width="2.5"/>
+            <circle cx="30" cy="30" r="21" fill="none" stroke="url(#lg1)" stroke-width="0.8" stroke-dasharray="3 3"/>
+            <circle cx="30" cy="30" r="20" fill="rgba(10,16,32,0.78)"/>
+            <path d="M 33 15 A 15 15 0 1 0 33 45 A 12 12 0 1 1 33 15 Z" fill="url(#lg2)"/>
+            <polygon points="42,18 43.5,23 48.5,23 44.5,26 46,31 42,28 38,31 39.5,26 35.5,23 40.5,23" fill="#ffd11a"/>
+            <circle cx="12" cy="30" r="1.8" fill="#00e5ff"/>
+            <circle cx="48" cy="30" r="1.8" fill="#00e5ff"/>
+            <circle cx="30" cy="12" r="1.8" fill="#00ff9d"/>
+            <circle cx="30" cy="48" r="1.8" fill="#ff2d92"/>
+        </svg>
+        <span class="nav-logo-text">VİZYON 2027</span>
+    </a>
+    <ul class="nav-menu" id="navMenu">
+        <li><a href="/index.html#features">Özellikler</a></li>
+        <li><a href="/index.html#ai">Yapay Zeka</a></li>
+        <li><a href="/api.html">V27 API</a></li>
+        <li><a href="/index.html#pricing">Fiyatlar</a></li>
+        <li><a href="/bana-ogret.html">📖 Bana Öğret</a></li>
+    </ul>
+    <div class="nav-actions">
+        <a href="/index.html#login" class="btn-nav btn-nav-outline">Giriş Yap</a>
+        <a href="/index.html#register" class="btn-nav btn-nav-primary">Ücretsiz Başla</a>
+        <button class="nav-theme-btn" onclick="toggleTheme()" title="Tema Değiştir">🌙</button>
+        <button class="nav-toggle" onclick="document.getElementById('navMenu').classList.toggle('open')">☰</button>
     </div>
+</nav>
+
+<!-- HERO -->
+<section class="contact-hero">
+    <div class="contact-hero-badge">
+        <span>📬</span> İLETİŞİM
+    </div>
+    <h1 id="heroTitle">Bize Ulaşın</h1>
+    <p id="heroSub">
+        Sorularınız, önerileriniz, şikayetleriniz veya iş birliği teklifleriniz için buradayız.
+        <strong>28 AI modeli</strong>, <strong>Vizyon Al</strong>, <strong>V27 API</strong> ve tüm
+        ekosistemle ilgili her konuda yardımcı olmaktan mutluluk duyarız.
+    </p>
+</section>
+
+<!-- DİL SEÇİCİ -->
+<div class="lang-bar">
+    <button class="lang-btn active" data-lang="tr" onclick="switchLanguage('tr')">🇹🇷 Türkçe</button>
+    <button class="lang-btn" data-lang="en" onclick="switchLanguage('en')">🇬🇧 English</button>
+    <button class="lang-btn" data-lang="ar" onclick="switchLanguage('ar')">🇸🇦 العربية</button>
+</div>
+
+<!-- CONTENT -->
+<main class="contact-container">
 
     <!-- TÜRKÇE -->
-    <div id="lang-tr" class="lang-content active">
-        <h1>📬 İletişim</h1>
-        <p><span class="badge">📧 Her Zaman Ulaşabilirsiniz</span> <span class="badge" style="margin-left:10px;">⚡ Hızlı Yanıt</span></p>
-        <p>Vizyon2027 olarak, kullanıcılarımızla iletişimi çok önemsiyoruz. Sorularınız, önerileriniz, şikayetleriniz veya iş birliği teklifleriniz için aşağıdaki kanallardan bize ulaşabilirsiniz. En kısa sürede size dönüş yapacağız.</p>
+    <div id="lang-tr" class="contact-content active">
+        <div class="contact-card-box">
 
-        <div class="highlight-box">
-            <strong>📢 Hızlı İletişim:</strong> Acil durumlar veya anlık sorularınız için WhatsApp kanalımızı veya Instagram hesabımızı kullanabilirsiniz. E-posta yanıt süresi genellikle 24-48 saat içindedir.
-        </div>
-
-        <hr>
-
-        <h2>📨 İletişim Kanalları</h2>
-
-        <div class="contact-card">
-            <div class="icon">📧</div>
-            <div class="info">
-                <h3>E-posta</h3>
-                <p>Genel iletişim, destek, iş birliği ve geri bildirimler için:</p>
-                <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a><br><br>
-                <a href="mailto:vizyon2027.info@gmail.com" class="social-btn email">📩 E-posta Gönder</a>
+            <div class="info-highlight">
+                <strong>📢 Hızlı İletişim:</strong> Acil durumlar veya anlık sorularınız için WhatsApp kanalımızı veya Instagram hesabımızı kullanabilirsiniz. E-posta yanıt süresi genellikle <strong>24-48 saat</strong> içindedir.
             </div>
-        </div>
 
-        <div class="contact-card">
-            <div class="icon">💬</div>
-            <div class="info">
-                <h3>WhatsApp Kanalı</h3>
-                <p>Anlık duyurular, güncellemeler ve topluluk iletişimi için:</p>
-                <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank">WhatsApp Kanalımıza Katıl</a><br><br>
-                <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" class="social-btn whatsapp">💬 WhatsApp Kanalı</a>
+            <!-- KANALLAR -->
+            <h2 class="contact-section-title">
+                <span class="icon">📨</span>
+                İletişim Kanalları
+            </h2>
+
+            <div class="channels-grid">
+
+                <!-- E-posta -->
+                <div class="channel-card email">
+                    <div class="channel-head">
+                        <div class="channel-icon">📧</div>
+                        <div>
+                            <div class="channel-title">E-posta</div>
+                            <div class="channel-subtitle">24-48 saat yanıt süresi</div>
+                        </div>
+                    </div>
+                    <div class="channel-desc">
+                        Genel iletişim, uzun sorular, iş birliği teklifleri, resmi başvurular ve KVKK/GDPR veri talepleri için ideal.
+                    </div>
+                    <div class="channel-value">vizyon2027.info@gmail.com</div>
+                    <a href="mailto:vizyon2027.info@gmail.com" class="channel-btn">📩 E-posta Gönder</a>
+                </div>
+
+                <!-- WhatsApp -->
+                <div class="channel-card whatsapp">
+                    <div class="channel-head">
+                        <div class="channel-icon">💬</div>
+                        <div>
+                            <div class="channel-title">WhatsApp Kanalı</div>
+                            <div class="channel-subtitle">1-4 saat yanıt süresi</div>
+                        </div>
+                    </div>
+                    <div class="channel-desc">
+                        Anlık duyurular, sistem güncellemeleri, yeni özellik bildirimleri ve topluluk iletişimi.
+                    </div>
+                    <div class="channel-value">Kanala katılın → Güncel kalın</div>
+                    <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" class="channel-btn">💬 Kanala Katıl</a>
+                </div>
+
+                <!-- Instagram -->
+                <div class="channel-card instagram">
+                    <div class="channel-head">
+                        <div class="channel-icon">📸</div>
+                        <div>
+                            <div class="channel-title">Instagram</div>
+                            <div class="channel-subtitle">1-4 saat yanıt süresi</div>
+                        </div>
+                    </div>
+                    <div class="channel-desc">
+                        Görsel içerikler, güncel paylaşımlar, etkinlik duyuruları ve topluluk etkileşimi.
+                    </div>
+                    <div class="channel-value">@vizyon2027.info</div>
+                    <a href="https://www.instagram.com/vizyon2027.info" target="_blank" class="channel-btn">📸 Instagram'a Git</a>
+                </div>
+
+                <!-- Vizyon Destek -->
+                <div class="channel-card support">
+                    <div class="channel-head">
+                        <div class="channel-icon">🤖</div>
+                        <div>
+                            <div class="channel-title">Vizyon Destek (AI)</div>
+                            <div class="channel-subtitle">Anında · 7/24</div>
+                        </div>
+                    </div>
+                    <div class="channel-desc">
+                        Site hakkında sorularınız için yapay zeka destek asistanımız. Üye olmadan da dashboard'daki butonu kullanabilirsiniz.
+                    </div>
+                    <div class="channel-value">Dashboard → 📢 Vizyon Destek</div>
+                    <button onclick="window.openVizyonSupport && window.openVizyonSupport(); window.location.href='/index.html';" class="channel-btn">🤖 Vizyon Destek Aç</button>
+                </div>
+
+                <!-- Kurucu İletişim -->
+                <div class="channel-card founder">
+                    <div class="channel-head">
+                        <div class="channel-icon">👑</div>
+                        <div>
+                            <div class="channel-title">Kurucu ile İletişim</div>
+                            <div class="channel-subtitle">Özel mesajlar</div>
+                        </div>
+                    </div>
+                    <div class="channel-desc">
+                        Doğrudan kurucuya iletmek istediğiniz özel mesajlar, öneriler ve geri bildirimler.
+                    </div>
+                    <div class="channel-value">admin.tr.reis@gmail.com</div>
+                    <button onclick="window.contactFounder && window.contactFounder(); window.location.href='/index.html';" class="channel-btn">👑 Kurucuya Mesaj</button>
+                </div>
+
             </div>
-        </div>
 
-        <div class="contact-card">
-            <div class="icon">📸</div>
-            <div class="info">
-                <h3>Instagram</h3>
-                <p>Güncel paylaşımlar, görsel içerikler ve etkileşim için:</p>
-                <a href="https://www.instagram.com/vizyon2027.info" target="_blank">@vizyon2027.info</a><br><br>
-                <a href="https://www.instagram.com/vizyon2027.info" target="_blank" class="social-btn instagram">📸 Instagram</a>
+            <!-- NE ZAMAN HANGİ KANAL -->
+            <h2 class="contact-section-title">
+                <span class="icon">📋</span>
+                Ne Zaman Hangi Kanalı Kullanmalı?
+            </h2>
+
+            <div class="when-grid">
+                <div class="when-card">
+                    <h4>📧 E-posta Kullan</h4>
+                    <ul>
+                        <li>🔹 Uzun ve detaylı sorular</li>
+                        <li>🔹 İş birliği ve ortaklık teklifleri</li>
+                        <li>🔹 Resmi başvurular ve şikayetler</li>
+                        <li>🔹 KVKK / GDPR veri talepleri</li>
+                        <li>🔹 Hesap silme talepleri</li>
+                        <li>🔹 API anahtarı sorunları</li>
+                    </ul>
+                </div>
+                <div class="when-card">
+                    <h4>💬 WhatsApp / Instagram Kullan</h4>
+                    <ul>
+                        <li>🔹 Hızlı sorular ve anlık geri bildirim</li>
+                        <li>🔹 Topluluk etkileşimi</li>
+                        <li>🔹 Duyurular ve güncellemeler</li>
+                        <li>🔹 Sosyal etkinlikler ve kampanyalar</li>
+                        <li>🔹 Yarışma duyuruları</li>
+                        <li>🔹 Yeni özellik tanıtımları</li>
+                    </ul>
+                </div>
             </div>
-        </div>
 
-        <div class="contact-card">
-            <div class="icon">🤖</div>
-            <div class="info">
-                <h3>📢 Vizyon Destek (AI Asistan)</h3>
-                <p>Platform içinden canlı AI desteği almak için Dashboard'daki "Vizyon Destek" butonunu kullanın veya doğrudan tıklayın.</p>
-                <button onclick="window.openVizyonSupport && window.openVizyonSupport(); window.location.href='index.html';" class="social-btn support">🤖 Vizyon Destek</button>
+            <!-- YANIT SÜRELERİ -->
+            <h2 class="contact-section-title">
+                <span class="icon">🕒</span>
+                Yanıt Süreleri
+            </h2>
+
+            <div class="response-grid">
+                <div class="response-card">
+                    <span class="response-icon">📧</span>
+                    <div class="response-title">E-posta</div>
+                    <div class="response-value">24-48 saat</div>
+                </div>
+                <div class="response-card">
+                    <span class="response-icon">💬</span>
+                    <div class="response-title">WhatsApp / Instagram</div>
+                    <div class="response-value">1-4 saat</div>
+                </div>
+                <div class="response-card">
+                    <span class="response-icon">🤖</span>
+                    <div class="response-title">Vizyon Destek (AI)</div>
+                    <div class="response-value">Anında · 7/24</div>
+                </div>
+                <div class="response-card">
+                    <span class="response-icon">👑</span>
+                    <div class="response-title">Kurucu</div>
+                    <div class="response-value">24-72 saat</div>
+                </div>
             </div>
-        </div>
 
-        <div class="contact-card">
-            <div class="icon">👑</div>
-            <div class="info">
-                <h3>Kurucu ile İletişim</h3>
-                <p>Doğrudan kurucuya iletmek istediğiniz özel mesajlar için:</p>
-                <button onclick="window.contactFounder && window.contactFounder();" class="social-btn founder">👑 Kurucuya Mesaj Gönder</button>
+            <p style="font-size:12.5px;color:var(--text3);text-align:center;margin-top:14px;">
+                <em>📅 Resmi tatillerde yanıt süreleri uzayabilir, anlayışınız için teşekkür ederiz.</em>
+            </p>
+
+            <!-- MİNİ SSS -->
+            <h2 class="contact-section-title">
+                <span class="icon">❓</span>
+                Sık Sorulan Sorular
+            </h2>
+
+            <div class="mini-faq">
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">S:</span> Hesabımı nasıl silerim?</div>
+                    <div class="a">
+                        Dashboard → <strong>"Hesabımı Sil"</strong> butonu ile veya <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a> adresine yazılı talep göndererek. Hesap silme işlemi <strong>geri alınamaz</strong>.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">S:</span> V27 API anahtarı ile ilgili sorunum var, ne yapmalıyım?</div>
+                    <div class="a">
+                        Önce Dashboard → <strong>"📖 V27 API Key Rehberi"</strong> butonuna bakın. Sorun devam ederse <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a> adresine yazın.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">S:</span> Moderatör olmak istiyorum, nasıl başvururum?</div>
+                    <div class="a">
+                        Moderatör rütbesi <strong>sadece kurucu tarafından</strong> mail ile atanır. Kendin başvuramazsın. Kurucu ile <a href="mailto:admin.tr.reis@gmail.com">admin.tr.reis@gmail.com</a> üzerinden iletişime geçebilirsin.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">S:</span> Doğrulama kodu gelmedi, ne yapmalıyım?</div>
+                    <div class="a">
+                        Spam klasörünü kontrol edin. 5 dakika bekleyip tekrar deneyin. Sorun devam ederse <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a>'a mail atın.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">S:</span> Facebook ile kayıt oldum, hesabımı nasıl kurtarırım?</div>
+                    <div class="a">
+                        Kayıt sırasında belirlediğiniz <strong>kurtarma maili + şifre</strong> ile giriş yapabilirsiniz. Giriş ekranındaki <strong>"Kurtarma maili ile giriş yap"</strong> linkini kullanın.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">S:</span> İş birliği / sponsorluk teklifim var.</div>
+                    <div class="a">
+                        <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a> adresine detaylı teklifinizi gönderin. "İş Birliği" konu başlığı kullanın, 48 saat içinde dönüş yapılır.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">S:</span> Hata buldum, nasıl bildirebilirim?</div>
+                    <div class="a">
+                        Dashboard'da <strong>"🐛 Hata Bildir"</strong> kartından bildirebilirsiniz. <strong>+100 puan</strong> kazanırsınız. Hata doğrulanırsa ek ödüller verilebilir.
+                    </div>
+                </div>
             </div>
+
+            <!-- UYARI -->
+            <div class="warning-box">
+                <strong>⚠️ Önemli Not:</strong> Spam, taciz veya uygunsuz içerik içeren mesajlar dikkate alınmayacaktır. Gerekli durumlarda yasal işlem başlatılabilir. Lütfen iletişim kurarken saygılı ve yapıcı olun.
+            </div>
+
         </div>
-
-        <hr>
-
-        <h2>📋 Ne Zaman Hangi Kanadı Kullanmalı?</h2>
-        <div class="grid-2">
-            <div class="info-card"><h4>📧 E-posta</h4><ul><li>🔹 Uzun ve detaylı sorular</li><li>🔹 İş birliği ve ortaklık teklifleri</li><li>🔹 Resmi başvurular ve şikayetler</li><li>🔹 Gizlilik ve veri talepleri (KVKK/GDPR)</li></ul></div>
-            <div class="info-card"><h4>💬 WhatsApp / Instagram</h4><ul><li>🔹 Hızlı sorular ve anlık geri bildirim</li><li>🔹 Topluluk etkileşimi</li><li>🔹 Duyurular ve güncellemeler</li><li>🔹 Sosyal etkinlikler ve kampanyalar</li></ul></div>
-        </div>
-
-        <hr>
-
-        <h2>🕒 Yanıt Süreleri</h2>
-        <ul>
-            <li><strong>E-posta Yanıt Süresi:</strong> 24-48 saat (hafta içi)</li>
-            <li><strong>WhatsApp / Instagram Yanıt Süresi:</strong> 1-4 saat (aktif saatlerde)</li>
-            <li><strong>Vizyon Destek (AI):</strong> Anında (7/24)</li>
-            <li><strong>Resmi Tatiller:</strong> Yanıt süreleri uzayabilir, anlayışınız için teşekkür ederiz.</li>
-        </ul>
-
-        <div class="important-box">
-            <strong>⚠️ Önemli Not:</strong> Spam, taciz veya uygunsuz içerik içeren mesajlar dikkate alınmayacak ve gerekli durumlarda yasal işlem başlatılacaktır. Lütfen iletişim kurarken saygılı ve yapıcı olun.
-        </div>
-
-        <hr>
-        <a href="index.html" class="back-link">⬅️ Ana Sayfaya Dön</a>
     </div>
 
     <!-- ENGLISH -->
-    <div id="lang-en" class="lang-content">
-        <h1>📬 Contact Us</h1>
-        <p><span class="badge">📧 Always Reachable</span> <span class="badge" style="margin-left:10px;">⚡ Fast Response</span></p>
-        <p>At Vizyon2027, we value communication with our users. You can reach us via the channels below for your questions, suggestions, complaints, or collaboration proposals. We will get back to you as soon as possible.</p>
+    <div id="lang-en" class="contact-content" dir="ltr">
+        <div class="contact-card-box">
 
-        <div class="highlight-box">
-            <strong>📢 Quick Contact:</strong> For urgent matters or instant questions, you can use our WhatsApp channel or Instagram account. Email response time is typically 24-48 hours.
-        </div>
-
-        <hr>
-
-        <h2>📨 Contact Channels</h2>
-
-        <div class="contact-card">
-            <div class="icon">📧</div>
-            <div class="info">
-                <h3>Email</h3>
-                <p>For general communication, support, collaboration, and feedback:</p>
-                <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a><br><br>
-                <a href="mailto:vizyon2027.info@gmail.com" class="social-btn email">📩 Send Email</a>
+            <div class="info-highlight">
+                <strong>📢 Quick Contact:</strong> For urgent matters or instant questions, use our WhatsApp channel or Instagram account. Email response time is typically <strong>24-48 hours</strong>.
             </div>
-        </div>
 
-        <div class="contact-card">
-            <div class="icon">💬</div>
-            <div class="info">
-                <h3>WhatsApp Channel</h3>
-                <p>For instant announcements, updates, and community communication:</p>
-                <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank">Join our WhatsApp Channel</a><br><br>
-                <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" class="social-btn whatsapp">💬 WhatsApp Channel</a>
+            <h2 class="contact-section-title">
+                <span class="icon">📨</span>
+                Contact Channels
+            </h2>
+
+            <div class="channels-grid">
+                <div class="channel-card email">
+                    <div class="channel-head">
+                        <div class="channel-icon">📧</div>
+                        <div>
+                            <div class="channel-title">Email</div>
+                            <div class="channel-subtitle">24-48h response time</div>
+                        </div>
+                    </div>
+                    <div class="channel-desc">
+                        General communication, detailed questions, collaboration proposals, formal applications, KVKK/GDPR data requests.
+                    </div>
+                    <div class="channel-value">vizyon2027.info@gmail.com</div>
+                    <a href="mailto:vizyon2027.info@gmail.com" class="channel-btn">📩 Send Email</a>
+                </div>
+
+                <div class="channel-card whatsapp">
+                    <div class="channel-head">
+                        <div class="channel-icon">💬</div>
+                        <div>
+                            <div class="channel-title">WhatsApp Channel</div>
+                            <div class="channel-subtitle">1-4h response time</div>
+                        </div>
+                    </div>
+                    <div class="channel-desc">
+                        Instant announcements, system updates, new feature notifications, and community communication.
+                    </div>
+                    <div class="channel-value">Join the channel → Stay updated</div>
+                    <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" class="channel-btn">💬 Join Channel</a>
+                </div>
+
+                <div class="channel-card instagram">
+                    <div class="channel-head">
+                        <div class="channel-icon">📸</div>
+                        <div>
+                            <div class="channel-title">Instagram</div>
+                            <div class="channel-subtitle">1-4h response time</div>
+                        </div>
+                    </div>
+                    <div class="channel-desc">
+                        Visual content, latest posts, event announcements, and community interaction.
+                    </div>
+                    <div class="channel-value">@vizyon2027.info</div>
+                    <a href="https://www.instagram.com/vizyon2027.info" target="_blank" class="channel-btn">📸 Go to Instagram</a>
+                </div>
+
+                <div class="channel-card support">
+                    <div class="channel-head">
+                        <div class="channel-icon">🤖</div>
+                        <div>
+                            <div class="channel-title">Vision Support (AI)</div>
+                            <div class="channel-subtitle">Instant · 24/7</div>
+                        </div>
+                    </div>
+                    <div class="channel-desc">
+                        AI support assistant for site-related questions. Access via the Dashboard button.
+                    </div>
+                    <div class="channel-value">Dashboard → 📢 Vision Support</div>
+                    <button onclick="window.openVizyonSupport && window.openVizyonSupport(); window.location.href='/index.html';" class="channel-btn">🤖 Open Support</button>
+                </div>
+
+                <div class="channel-card founder">
+                    <div class="channel-head">
+                        <div class="channel-icon">👑</div>
+                        <div>
+                            <div class="channel-title">Contact Founder</div>
+                            <div class="channel-subtitle">Special messages</div>
+                        </div>
+                    </div>
+                    <div class="channel-desc">
+                        Special messages, suggestions, and feedback you want to send directly to the founder.
+                    </div>
+                    <div class="channel-value">admin.tr.reis@gmail.com</div>
+                    <button onclick="window.contactFounder && window.contactFounder(); window.location.href='/index.html';" class="channel-btn">👑 Message Founder</button>
+                </div>
             </div>
-        </div>
 
-        <div class="contact-card">
-            <div class="icon">📸</div>
-            <div class="info">
-                <h3>Instagram</h3>
-                <p>For latest posts, visual content, and interaction:</p>
-                <a href="https://www.instagram.com/vizyon2027.info" target="_blank">@vizyon2027.info</a><br><br>
-                <a href="https://www.instagram.com/vizyon2027.info" target="_blank" class="social-btn instagram">📸 Instagram</a>
+            <h2 class="contact-section-title">
+                <span class="icon">📋</span>
+                When to Use Which Channel?
+            </h2>
+
+            <div class="when-grid">
+                <div class="when-card">
+                    <h4>📧 Use Email</h4>
+                    <ul>
+                        <li>🔹 Long and detailed questions</li>
+                        <li>🔹 Collaboration and partnership proposals</li>
+                        <li>🔹 Formal applications and complaints</li>
+                        <li>🔹 KVKK / GDPR data requests</li>
+                        <li>🔹 Account deletion requests</li>
+                        <li>🔹 API key issues</li>
+                    </ul>
+                </div>
+                <div class="when-card">
+                    <h4>💬 Use WhatsApp / Instagram</h4>
+                    <ul>
+                        <li>🔹 Quick questions and instant feedback</li>
+                        <li>🔹 Community interaction</li>
+                        <li>🔹 Announcements and updates</li>
+                        <li>🔹 Social events and campaigns</li>
+                        <li>🔹 Contest announcements</li>
+                        <li>🔹 New feature launches</li>
+                    </ul>
+                </div>
             </div>
-        </div>
 
-        <div class="contact-card">
-            <div class="icon">🤖</div>
-            <div class="info">
-                <h3>📢 Vision Support (AI Assistant)</h3>
-                <p>Use the "Vision Support" button in the Dashboard for live AI support within the platform.</p>
-                <button onclick="window.openVizyonSupport && window.openVizyonSupport(); window.location.href='index.html';" class="social-btn support">🤖 Vision Support</button>
+            <h2 class="contact-section-title">
+                <span class="icon">🕒</span>
+                Response Times
+            </h2>
+
+            <div class="response-grid">
+                <div class="response-card">
+                    <span class="response-icon">📧</span>
+                    <div class="response-title">Email</div>
+                    <div class="response-value">24-48h</div>
+                </div>
+                <div class="response-card">
+                    <span class="response-icon">💬</span>
+                    <div class="response-title">WhatsApp / Instagram</div>
+                    <div class="response-value">1-4h</div>
+                </div>
+                <div class="response-card">
+                    <span class="response-icon">🤖</span>
+                    <div class="response-title">Vision Support (AI)</div>
+                    <div class="response-value">Instant · 24/7</div>
+                </div>
+                <div class="response-card">
+                    <span class="response-icon">👑</span>
+                    <div class="response-title">Founder</div>
+                    <div class="response-value">24-72h</div>
+                </div>
             </div>
-        </div>
 
-        <div class="contact-card">
-            <div class="icon">👑</div>
-            <div class="info">
-                <h3>Contact Founder</h3>
-                <p>For special messages you want to send directly to the founder:</p>
-                <button onclick="window.contactFounder && window.contactFounder();" class="social-btn founder">👑 Send Message to Founder</button>
+            <h2 class="contact-section-title">
+                <span class="icon">❓</span>
+                FAQ
+            </h2>
+
+            <div class="mini-faq">
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">Q:</span> How do I delete my account?</div>
+                    <div class="a">
+                        Dashboard → <strong>"Delete My Account"</strong> button or send a written request to <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a>. Deletion is <strong>irreversible</strong>.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">Q:</span> I have an issue with V27 API key.</div>
+                    <div class="a">
+                        First check Dashboard → <strong>"📖 V27 API Key Guide"</strong>. If the issue persists, email <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a>.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">Q:</span> How to become a Moderator?</div>
+                    <div class="a">
+                        Moderator rank is <strong>assigned only by the founder</strong> via email. You cannot apply. Contact founder via <a href="mailto:admin.tr.reis@gmail.com">admin.tr.reis@gmail.com</a>.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">Q:</span> Verification code didn't arrive.</div>
+                    <div class="a">
+                        Check spam folder. Wait 5 min and retry. If issue persists, email <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a>.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">Q:</span> I registered with Facebook, how to recover my account?</div>
+                    <div class="a">
+                        Use the <strong>recovery email + password</strong> you set during registration. Click <strong>"Login with recovery email"</strong> on the login screen.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">Q:</span> I have a collaboration / sponsorship proposal.</div>
+                    <div class="a">
+                        Send your detailed proposal to <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a> with subject "Collaboration". Response within 48h.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">Q:</span> I found a bug, how do I report?</div>
+                    <div class="a">
+                        Use the <strong>"🐛 Report Bug"</strong> card on Dashboard. Earn <strong>+100 points</strong>. Extra rewards if verified.
+                    </div>
+                </div>
             </div>
+
+            <div class="warning-box">
+                <strong>⚠️ Important Note:</strong> Messages containing spam, harassment, or inappropriate content will not be considered. Legal action may be taken if necessary. Please be respectful and constructive.
+            </div>
+
         </div>
-
-        <hr>
-
-        <h2>📋 When to Use Which Channel?</h2>
-        <div class="grid-2">
-            <div class="info-card"><h4>📧 Email</h4><ul><li>🔹 Long and detailed questions</li><li>🔹 Collaboration and partnership proposals</li><li>🔹 Formal applications and complaints</li><li>🔹 Privacy and data requests (KVKK/GDPR)</li></ul></div>
-            <div class="info-card"><h4>💬 WhatsApp / Instagram</h4><ul><li>🔹 Quick questions and instant feedback</li><li>🔹 Community interaction</li><li>🔹 Announcements and updates</li><li>🔹 Social events and campaigns</li></ul></div>
-        </div>
-
-        <hr>
-
-        <h2>🕒 Response Times</h2>
-        <ul>
-            <li><strong>Email Response Time:</strong> 24-48 hours (weekdays)</li>
-            <li><strong>WhatsApp / Instagram Response Time:</strong> 1-4 hours (active hours)</li>
-            <li><strong>Vision Support (AI):</strong> Instant (24/7)</li>
-            <li><strong>Public Holidays:</strong> Response times may be longer, thank you for your understanding.</li>
-        </ul>
-
-        <div class="important-box">
-            <strong>⚠️ Important Note:</strong> Messages containing spam, harassment, or inappropriate content will not be considered and legal action may be taken if necessary. Please be respectful and constructive when contacting us.
-        </div>
-
-        <hr>
-        <a href="index.html" class="back-link">⬅️ Back to Home</a>
     </div>
 
     <!-- ARAPÇA -->
-    <div id="lang-ar" class="lang-content" dir="rtl">
-        <h1>📬 اتصل بنا</h1>
-        <p><span class="badge">📧 يمكنك الوصول إلينا دائمًا</span> <span class="badge" style="margin-left:10px;">⚡ رد سريع</span></p>
-        <p>في فيجن 2027، نولي أهمية كبيرة للتواصل مع مستخدمينا. يمكنك التواصل معنا عبر القنوات أدناه لأسئلتك أو اقتراحاتك أو شكواك أو عروض التعاون. سوف نرد عليك في أقرب وقت ممكن.</p>
+    <div id="lang-ar" class="contact-content" dir="rtl">
+        <div class="contact-card-box">
 
-        <div class="highlight-box">
-            <strong>📢 تواصل سريع:</strong> للطلبات العاجلة أو الأسئلة الفورية، يمكنك استخدام قناة واتساب أو حساب إنستغرام. وقت الرد على البريد الإلكتروني عادة ما يكون من 24 إلى 48 ساعة.
-        </div>
-
-        <hr>
-
-        <h2>📨 قنوات التواصل</h2>
-
-        <div class="contact-card">
-            <div class="icon">📧</div>
-            <div class="info">
-                <h3>البريد الإلكتروني</h3>
-                <p>للتواصل العام والدعم والتعاون والملاحظات:</p>
-                <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a><br><br>
-                <a href="mailto:vizyon2027.info@gmail.com" class="social-btn email">📩 إرسال بريد إلكتروني</a>
+            <div class="info-highlight">
+                <strong>📢 تواصل سريع:</strong> للطلبات العاجلة أو الأسئلة الفورية، استخدم قناة واتساب أو حساب إنستغرام. وقت الرد على البريد الإلكتروني عادة ما بين <strong>24 إلى 48 ساعة</strong>.
             </div>
-        </div>
 
-        <div class="contact-card">
-            <div class="icon">💬</div>
-            <div class="info">
-                <h3>قناة واتساب</h3>
-                <p>للإعلانات الفورية والتحديثات والتواصل المجتمعي:</p>
-                <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank">انضم إلى قناة واتساب</a><br><br>
-                <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" class="social-btn whatsapp">💬 قناة واتساب</a>
+            <h2 class="contact-section-title">
+                <span class="icon">📨</span>
+                قنوات التواصل
+            </h2>
+
+            <div class="channels-grid">
+                <div class="channel-card email">
+                    <div class="channel-head">
+                        <div class="channel-icon">📧</div>
+                        <div>
+                            <div class="channel-title">البريد الإلكتروني</div>
+                            <div class="channel-subtitle">وقت الرد 24-48 ساعة</div>
+                        </div>
+                    </div>
+                    <div class="channel-desc">
+                        للتواصل العام والأسئلة المفصلة وعروض التعاون والطلبات الرسمية وطلبات البيانات KVKK/GDPR.
+                    </div>
+                    <div class="channel-value">vizyon2027.info@gmail.com</div>
+                    <a href="mailto:vizyon2027.info@gmail.com" class="channel-btn">📩 إرسال بريد</a>
+                </div>
+
+                <div class="channel-card whatsapp">
+                    <div class="channel-head">
+                        <div class="channel-icon">💬</div>
+                        <div>
+                            <div class="channel-title">قناة واتساب</div>
+                            <div class="channel-subtitle">وقت الرد 1-4 ساعات</div>
+                        </div>
+                    </div>
+                    <div class="channel-desc">
+                        للإعلانات الفورية وتحديثات النظام وإشعارات الميزات الجديدة والتواصل المجتمعي.
+                    </div>
+                    <div class="channel-value">انضم إلى القناة → ابق على اطلاع</div>
+                    <a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" class="channel-btn">💬 انضم للقناة</a>
+                </div>
+
+                <div class="channel-card instagram">
+                    <div class="channel-head">
+                        <div class="channel-icon">📸</div>
+                        <div>
+                            <div class="channel-title">إنستغرام</div>
+                            <div class="channel-subtitle">وقت الرد 1-4 ساعات</div>
+                        </div>
+                    </div>
+                    <div class="channel-desc">
+                        المحتوى المرئي وأحدث المنشورات وإعلانات الفعاليات والتفاعل المجتمعي.
+                    </div>
+                    <div class="channel-value">@vizyon2027.info</div>
+                    <a href="https://www.instagram.com/vizyon2027.info" target="_blank" class="channel-btn">📸 الذهاب إلى إنستغرام</a>
+                </div>
+
+                <div class="channel-card support">
+                    <div class="channel-head">
+                        <div class="channel-icon">🤖</div>
+                        <div>
+                            <div class="channel-title">دعم فيجن (AI)</div>
+                            <div class="channel-subtitle">فوري · 24/7</div>
+                        </div>
+                    </div>
+                    <div class="channel-desc">
+                        مساعد دعم الذكاء الاصطناعي لأسئلة الموقع. يمكن الوصول إليه عبر زر لوحة التحكم.
+                    </div>
+                    <div class="channel-value">لوحة التحكم → 📢 دعم فيجن</div>
+                    <button onclick="window.openVizyonSupport && window.openVizyonSupport(); window.location.href='/index.html';" class="channel-btn">🤖 فتح الدعم</button>
+                </div>
+
+                <div class="channel-card founder">
+                    <div class="channel-head">
+                        <div class="channel-icon">👑</div>
+                        <div>
+                            <div class="channel-title">اتصل بالمؤسس</div>
+                            <div class="channel-subtitle">رسائل خاصة</div>
+                        </div>
+                    </div>
+                    <div class="channel-desc">
+                        رسائل خاصة واقتراحات وملاحظات تريد إرسالها مباشرة إلى المؤسس.
+                    </div>
+                    <div class="channel-value">admin.tr.reis@gmail.com</div>
+                    <button onclick="window.contactFounder && window.contactFounder(); window.location.href='/index.html';" class="channel-btn">👑 راسل المؤسس</button>
+                </div>
             </div>
-        </div>
 
-        <div class="contact-card">
-            <div class="icon">📸</div>
-            <div class="info">
-                <h3>إنستغرام</h3>
-                <p>لأحدث المنشورات والمحتوى المرئي والتفاعل:</p>
-                <a href="https://www.instagram.com/vizyon2027.info" target="_blank">@vizyon2027.info</a><br><br>
-                <a href="https://www.instagram.com/vizyon2027.info" target="_blank" class="social-btn instagram">📸 إنستغرام</a>
+            <h2 class="contact-section-title">
+                <span class="icon">📋</span>
+                متى تستخدم أي قناة؟
+            </h2>
+
+            <div class="when-grid">
+                <div class="when-card">
+                    <h4>📧 استخدم البريد الإلكتروني</h4>
+                    <ul>
+                        <li>🔹 أسئلة طويلة ومفصلة</li>
+                        <li>🔹 عروض التعاون والشراكة</li>
+                        <li>🔹 الطلبات الرسمية والشكاوى</li>
+                        <li>🔹 طلبات KVKK / GDPR</li>
+                        <li>🔹 طلبات حذف الحساب</li>
+                        <li>🔹 مشاكل مفاتيح API</li>
+                    </ul>
+                </div>
+                <div class="when-card">
+                    <h4>💬 استخدم واتساب / إنستغرام</h4>
+                    <ul>
+                        <li>🔹 أسئلة سريعة وملاحظات فورية</li>
+                        <li>🔹 التفاعل المجتمعي</li>
+                        <li>🔹 الإعلانات والتحديثات</li>
+                        <li>🔹 الفعاليات والحملات الاجتماعية</li>
+                        <li>🔹 إعلانات المسابقات</li>
+                        <li>🔹 إطلاق الميزات الجديدة</li>
+                    </ul>
+                </div>
             </div>
-        </div>
 
-        <div class="contact-card">
-            <div class="icon">🤖</div>
-            <div class="info">
-                <h3>📢 دعم فيجن (مساعد الذكاء الاصطناعي)</h3>
-                <p>استخدم زر "دعم فيجن" في لوحة التحكم للحصول على دعم الذكاء الاصطناعي المباشر داخل المنصة.</p>
-                <button onclick="window.openVizyonSupport && window.openVizyonSupport(); window.location.href='index.html';" class="social-btn support">🤖 دعم فيجن</button>
+            <h2 class="contact-section-title">
+                <span class="icon">🕒</span>
+                أوقات الرد
+            </h2>
+
+            <div class="response-grid">
+                <div class="response-card">
+                    <span class="response-icon">📧</span>
+                    <div class="response-title">البريد الإلكتروني</div>
+                    <div class="response-value">24-48 ساعة</div>
+                </div>
+                <div class="response-card">
+                    <span class="response-icon">💬</span>
+                    <div class="response-title">واتساب / إنستغرام</div>
+                    <div class="response-value">1-4 ساعات</div>
+                </div>
+                <div class="response-card">
+                    <span class="response-icon">🤖</span>
+                    <div class="response-title">دعم فيجن (AI)</div>
+                    <div class="response-value">فوري · 24/7</div>
+                </div>
+                <div class="response-card">
+                    <span class="response-icon">👑</span>
+                    <div class="response-title">المؤسس</div>
+                    <div class="response-value">24-72 ساعة</div>
+                </div>
             </div>
-        </div>
 
-        <div class="contact-card">
-            <div class="icon">👑</div>
-            <div class="info">
-                <h3>اتصل بالمؤسس</h3>
-                <p>للرسائل الخاصة التي تريد إرسالها مباشرة إلى المؤسس:</p>
-                <button onclick="window.contactFounder && window.contactFounder();" class="social-btn founder">👑 أرسل رسالة إلى المؤسس</button>
+            <h2 class="contact-section-title">
+                <span class="icon">❓</span>
+                الأسئلة الشائعة
+            </h2>
+
+            <div class="mini-faq">
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">س:</span> كيف أحذف حسابي؟</div>
+                    <div class="a">
+                        لوحة التحكم → زر <strong>"حذف حسابي"</strong> أو أرسل طلبًا كتابيًا إلى <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a>. الحذف <strong>لا رجعة فيه</strong>.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">س:</span> لدي مشكلة في مفتاح V27 API.</div>
+                    <div class="a">
+                        تحقق أولاً من لوحة التحكم → <strong>"📖 دليل V27 API"</strong>. إذا استمرت المشكلة راسلنا على <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a>.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">س:</span> كيف أصبح مشرفًا؟</div>
+                    <div class="a">
+                        رتبة المشرف <strong>تُمنح فقط من المؤسس</strong> عبر البريد. لا يمكنك التقديم. تواصل مع المؤسس عبر <a href="mailto:admin.tr.reis@gmail.com">admin.tr.reis@gmail.com</a>.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">س:</span> لم يصل رمز التحقق.</div>
+                    <div class="a">
+                        تحقق من مجلد البريد العشوائي. انتظر 5 دقائق وأعد المحاولة. إذا استمرت المشكلة راسلنا على <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a>.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">س:</span> سجلت عبر Facebook، كيف أستعيد حسابي؟</div>
+                    <div class="a">
+                        استخدم <strong>بريد الاسترداد + كلمة المرور</strong> التي حددتها أثناء التسجيل. انقر <strong>"الدخول عبر بريد الاسترداد"</strong> في شاشة الدخول.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">س:</span> لدي عرض تعاون / رعاية.</div>
+                    <div class="a">
+                        أرسل عرضك المفصل إلى <a href="mailto:vizyon2027.info@gmail.com">vizyon2027.info@gmail.com</a> بموضوع "تعاون". الرد خلال 48 ساعة.
+                    </div>
+                </div>
+                <div class="mini-faq-item">
+                    <div class="q"><span class="q-icon">س:</span> وجدت خطأ، كيف أبلغ عنه؟</div>
+                    <div class="a">
+                        استخدم بطاقة <strong>"🐛 الإبلاغ عن خطأ"</strong> في لوحة التحكم. اكسب <strong>+100 نقطة</strong>. مكافآت إضافية إذا تم التحقق.
+                    </div>
+                </div>
             </div>
+
+            <div class="warning-box">
+                <strong>⚠️ ملاحظة مهمة:</strong> لن يتم النظر في الرسائل التي تحتوي على بريد عشوائي أو مضايقة أو محتوى غير لائق. قد يتم اتخاذ إجراءات قانونية إذا لزم الأمر. يرجى أن تكون محترمًا وبناءً.
+            </div>
+
         </div>
-
-        <hr>
-
-        <h2>📋 متى تستخدم أي قناة؟</h2>
-        <div class="grid-2">
-            <div class="info-card"><h4>📧 البريد الإلكتروني</h4><ul><li>🔹 أسئلة طويلة ومفصلة</li><li>🔹 عروض التعاون والشراكة</li><li>🔹 الطلبات الرسمية والشكاوى</li><li>🔹 طلبات الخصوصية والبيانات (KVKK/GDPR)</li></ul></div>
-            <div class="info-card"><h4>💬 واتساب / إنستغرام</h4><ul><li>🔹 أسئلة سريعة وملاحظات فورية</li><li>🔹 التفاعل المجتمعي</li><li>🔹 الإعلانات والتحديثات</li><li>🔹 الفعاليات والحملات الاجتماعية</li></ul></div>
-        </div>
-
-        <hr>
-
-        <h2>🕒 أوقات الرد</h2>
-        <ul>
-            <li><strong>وقت الرد على البريد الإلكتروني:</strong> 24-48 ساعة (أيام الأسبوع)</li>
-            <li><strong>وقت الرد على واتساب / إنستغرام:</strong> 1-4 ساعات (ساعات النشاط)</li>
-            <li><strong>دعم فيجن (AI):</strong> فوري (24/7)</li>
-            <li><strong>العطلات الرسمية:</strong> قد تطول أوقات الرد، نشكركم على تفهمكم.</li>
-        </ul>
-
-        <div class="important-box">
-            <strong>⚠️ ملاحظة مهمة:</strong> لن يتم النظر في الرسائل التي تحتوي على بريد عشوائي أو مضايقة أو محتوى غير لائق، وقد يتم اتخاذ إجراءات قانونية إذا لزم الأمر. يرجى أن تكون محترمًا وبناءً عند التواصل معنا.
-        </div>
-
-        <hr>
-        <a href="index.html" class="back-link">⬅️ العودة إلى الصفحة الرئيسية</a>
     </div>
 
-    <!-- FOOTER -->
-    <div class="legal-footer">
-        <p>
-            <strong>© 2026 Vizyon2027</strong> – Tüm Hakları Saklıdır.<br>
-            Bu platform ve içeriği, uluslararası telif hakkı, marka ve fikri mülkiyet yasaları tarafından korunmaktadır.<br>
-            İzinsiz kullanım, kopyalama, dağıtım veya türev çalışma oluşturma <strong>kesinlikle yasaktır</strong>.<br>
-            <span style="color:#ff6b6b;">⚠️ YASAL UYARI:</span> AI çıktıları bilgilendirme amaçlıdır. Vizyon2027 olası zararlardan sorumlu değildir.
-        </p>
-        <p style="margin-top:8px;">
-            <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a> &nbsp;|&nbsp;
-            <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">Kullanıcı Sözleşmesi</a> &nbsp;|&nbsp;
-            <a href="https://vizyon2026.vercel.app/bana-ogret.html" target="_blank">Bana Öğret</a> &nbsp;|&nbsp;
-            <a href="https://vizyon2026.vercel.app/dokumantasyon.html" target="_blank">Dokümantasyon</a> &nbsp;|&nbsp;
-            <a href="https://vizyon2026.vercel.app/api.html" target="_blank">API</a> &nbsp;|&nbsp;
-            <a href="https://vizyon2026.vercel.app/blog.html" target="_blank">Blog</a> &nbsp;|&nbsp;
-            <a href="https://vizyon2026.vercel.app/hakkimizda.html" target="_blank">Hakkımızda</a>
-        </p>
-        <p style="font-size:12px; color:#555;">
-            Bu sayfa, 6698 sayılı KVKK ve GDPR'ye uygun olarak hazırlanmıştır.
-        </p>
-    </div>
+</main>
 
-</div>
+<!-- FOOTER -->
+<footer>
+    <div class="footer-inner">
+        <div class="footer-copy">
+            © 2027 Vizyon2027 · <span>Vizyon Ekibi</span> güvencesiyle.
+        </div>
+        <div class="footer-links">
+            <a href="/gizlilik.html">Gizlilik Politikası</a>
+            <a href="/kullanici-sozlesmesi.html">Kullanıcı Sözleşmesi</a>
+            <a href="/hakkimizda.html">Hakkımızda</a>
+            <a href="/bana-ogret.html">Bana Öğret</a>
+            <a href="/dokumantasyon.html">Dokümantasyon</a>
+            <a href="/api.html">API</a>
+            <a href="/blog.html">Blog</a>
+        </div>
+    </div>
+</footer>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <script>
-    function switchLanguage(lang) {
-        document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active'));
-        const target = document.getElementById('lang-' + lang);
-        if (target) target.classList.add('active');
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.lang === lang) btn.classList.add('active');
-        });
-        const container = document.getElementById('mainContainer');
-        container.style.direction = (lang === 'ar') ? 'rtl' : 'ltr';
-        localStorage.setItem('preferred_lang', lang);
+/* ============================================================ */
+/* TEMA                                                          */
+/* ============================================================ */
+function toggleTheme(){
+    var body=document.body;
+    var btn=document.querySelector('.nav-theme-btn');
+    if(body.getAttribute('data-theme')==='light'){
+        body.removeAttribute('data-theme');
+        if(btn) btn.innerHTML='🌙';
+        try{localStorage.setItem('vizyon_theme','dark');}catch(e){}
+    }else{
+        body.setAttribute('data-theme','light');
+        if(btn) btn.innerHTML='☀️';
+        try{localStorage.setItem('vizyon_theme','light');}catch(e){}
+    }
+}
+(function applyTheme(){
+    try{
+        var saved=localStorage.getItem('vizyon_theme');
+        var btn=document.querySelector('.nav-theme-btn');
+        if(saved==='light'){
+            document.body.setAttribute('data-theme','light');
+            if(btn) btn.innerHTML='☀️';
+        }
+    }catch(e){}
+})();
+
+/* ============================================================ */
+/* DİL DEĞİŞTİRME                                                */
+/* ============================================================ */
+function switchLanguage(lang){
+    document.querySelectorAll('.contact-content').forEach(function(el){
+        el.classList.remove('active');
+    });
+    var target = document.getElementById('lang-' + lang);
+    if(target) target.classList.add('active');
+
+    document.querySelectorAll('.lang-btn').forEach(function(btn){
+        btn.classList.remove('active');
+        if(btn.dataset.lang === lang) btn.classList.add('active');
+    });
+
+    // Hero başlık & alt yazı
+    var heroTitle = document.getElementById('heroTitle');
+    var heroSub = document.getElementById('heroSub');
+    if(lang === 'tr'){
+        if(heroTitle) heroTitle.textContent = 'Bize Ulaşın';
+        if(heroSub) heroSub.innerHTML = 'Sorularınız, önerileriniz, şikayetleriniz veya iş birliği teklifleriniz için buradayız. <strong>28 AI modeli</strong>, <strong>Vizyon Al</strong>, <strong>V27 API</strong> ve tüm ekosistemle ilgili her konuda yardımcı olmaktan mutluluk duyarız.';
+    } else if(lang === 'en'){
+        if(heroTitle) heroTitle.textContent = 'Contact Us';
+        if(heroSub) heroSub.innerHTML = 'We are here for your questions, suggestions, complaints, or collaboration proposals. We are happy to help with <strong>28 AI models</strong>, <strong>Vizyon Al</strong>, <strong>V27 API</strong> and everything else.';
+    } else if(lang === 'ar'){
+        if(heroTitle) heroTitle.textContent = 'اتصل بنا';
+        if(heroSub) heroSub.innerHTML = 'نحن هنا لأسئلتكم واقتراحاتكم وشكاويكم أو عروض التعاون. يسعدنا مساعدتكم في كل ما يتعلق بـ<strong>28 نموذج ذكاء اصطناعي</strong>، <strong>Vizyon Al</strong>، <strong>V27 API</strong> وكل شيء آخر.';
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const savedLang = localStorage.getItem('preferred_lang');
-        if (savedLang && (savedLang === 'tr' || savedLang === 'en' || savedLang === 'ar')) {
-            switchLanguage(savedLang);
-        } else {
-            switchLanguage('tr');
+    // Sayfa yönü
+    if(lang === 'ar'){
+        document.documentElement.setAttribute('dir', 'rtl');
+    } else {
+        document.documentElement.setAttribute('dir', 'ltr');
+    }
+    document.documentElement.lang = lang;
+
+    try{ localStorage.setItem('preferred_lang', lang); }catch(e){}
+}
+
+(function initLang(){
+    var saved = null;
+    try{ saved = localStorage.getItem('preferred_lang'); }catch(e){}
+    try{
+        var urlParams = new URLSearchParams(window.location.search);
+        var urlLang = urlParams.get('lang');
+        if(urlLang && ['tr','en','ar'].indexOf(urlLang) !== -1){
+            saved = urlLang;
         }
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlLang = urlParams.get('lang');
-        if (urlLang && (urlLang === 'tr' || urlLang === 'en' || urlLang === 'ar')) {
-            switchLanguage(urlLang);
-        }
-    });
+    }catch(e){}
+    if(saved && ['tr','en','ar'].indexOf(saved) !== -1){
+        switchLanguage(saved);
+    } else {
+        switchLanguage('tr');
+    }
+})();
+
+/* ============================================================ */
+/* BACK TO TOP                                                   */
+/* ============================================================ */
+window.addEventListener('scroll', function(){
+    var btn = document.getElementById('backTop');
+    if(btn) btn.classList.toggle('show', window.scrollY > 400);
+}, {passive:true});
+
+console.log('📬 VİZYON 2027 İletişim v7.10.0 yüklendi');
 </script>
 </body>
 </html>
