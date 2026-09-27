@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Ana Aurora Gradient (6 renk) -->
+    <linearGradient id="auroraMain" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="20%" stop-color="#00ff9d"/>
+      <stop offset="40%" stop-color="#6a5cff"/>
+      <stop offset="60%" stop-color="#b845ff"/>
+      <stop offset="80%" stop-color="#ff2d92"/>
+      <stop offset="100%" stop-color="#ffd11a"/>
+    </linearGradient>
+
+    <!-- İkincil Gradient (V harfi için) -->
+    <linearGradient id="vGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00ff9d"/>
+      <stop offset="50%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#6a5cff"/>
+    </linearGradient>
+
+    <!-- Quantum Ring Gradient -->
+    <linearGradient id="quantumRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="50%" stop-color="#b845ff"/>
+      <stop offset="100%" stop-color="#ff2d92"/>
+    </linearGradient>
+
+    <!-- Altın Yıldız Gradient -->
+    <radialGradient id="starGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="30%" stop-color="#ffd11a"/>
+      <stop offset="100%" stop-color="#ff9900" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Dış Glow (Cyan) -->
+    <radialGradient id="outerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="40%" stop-color="#00e5ff" stop-opacity="0.55"/>
+      <stop offset="70%" stop-color="#6a5cff" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#b845ff" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- İç Arka Plan (Derin Uzay) -->
+    <radialGradient id="innerBg" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#0a0f1e"/>
+      <stop offset="60%" stop-color="#050812"/>
+      <stop offset="100%" stop-color="#02030a"/>
+    </radialGradient>
+
+    <!-- Conic Ring (Dönen) -->
+    <linearGradient id="conicFake" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="14%" stop-color="#00ff9d"/>
+      <stop offset="28%" stop-color="#6a5cff"/>
+      <stop offset="42%" stop-color="#b845ff"/>
+      <stop offset="56%" stop-color="#ff2d92"/>
+      <stop offset="70%" stop-color="#ffd11a"/>
+      <stop offset="84%" stop-color="#76b900"/>
+      <stop offset="100%" stop-color="#00e5ff"/>
+    </linearGradient>
+
+    <!-- V Harfi İç Gölge -->
+    <filter id="vGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Genel Glow Filter -->
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- ============================================================ -->
+  <!-- KATMAN 1: DIŞ GLOW (Aurora halesi)                          -->
+  <!-- ============================================================ -->
+  <circle cx="256" cy="256" r="250" fill="url(#outerGlow)"/>
+
+  <!-- ============================================================ -->
+  <!-- KATMAN 2: ANA CONIC RING (8 renk dönen halka)               -->
+  <!-- ============================================================ -->
+  <circle cx="256" cy="256" r="220"
+          fill="none"
+          stroke="url(#conicFake)"
+          stroke-width="6"
+          opacity="0.95"
+          filter="url(#softGlow)"/>
+
+  <!-- İç ince halka (dashed) -->
+  <circle cx="256" cy="256" r="200"
+          fill="none"
+          stroke="url(#quantumRing)"
+          stroke-width="2"
+          stroke-dasharray="4 8"
+          opacity="0.7"/>
+
+  <!-- En dış ince halka (cyan) -->
+  <circle cx="256" cy="256" r="235"
+          fill="none"
+          stroke="#00e5ff"
+          stroke-width="1.5"
+          opacity="0.4"/>
+
+  <!-- ============================================================ -->
+  <!-- KATMAN 3: İÇ ARKA PLAN (Derin Uzay Diski)                   -->
+  <!-- ============================================================ -->
+  <circle cx="256" cy="256" r="190" fill="url(#innerBg)"/>
+
+  <!-- İç halka parlaklık (aurora iç glow) -->
+  <circle cx="256" cy="256" r="190"
+          fill="none"
+          stroke="url(#auroraMain)"
+          stroke-width="2"
+          opacity="0.6"
+          filter="url(#softGlow)"/>
+
+  <!-- ============================================================ -->
+  <!-- KATMAN 4: KUANTUM YÖRÜNGELERİ (3 adet elips)                -->
+  <!-- ============================================================ -->
+  <g filter="url(#softGlow)">
+    <!-- Yatay yörünge -->
+    <ellipse cx="256" cy="256" rx="140" ry="40"
+             fill="none"
+             stroke="#00e5ff"
+             stroke-width="1.5"
+             opacity="0.45"
+             transform="rotate(-20 256 256)"/>
+
+    <!-- Dikey yörünge -->
+    <ellipse cx="256" cy="256" rx="40" ry="140"
+             fill="none"
+             stroke="#b845ff"
+             stroke-width="1.5"
+             opacity="0.45"
+             transform="rotate(-20 256 256)"/>
+
+    <!-- Diyagonal yörünge -->
+    <ellipse cx="256" cy="256" rx="150" ry="30"
+             fill="none"
+             stroke="#ff2d92"
+             stroke-width="1.5"
+             opacity="0.35"
+             transform="rotate(60 256 256)"/>
+  </g>
+
+  <!-- Yörünge üzerindeki parlak noktalar (uydu) -->
+  <circle cx="396" cy="256" r="5" fill="#00e5ff" filter="url(#softGlow)"/>
+  <circle cx="256" cy="116" r="5" fill="#b845ff" filter="url(#softGlow)"/>
+  <circle cx="256" cy="396" r="5" fill="#ff2d92" filter="url(#softGlow)"/>
+  <circle cx="116" cy="256" r="4" fill="#00ff9d" filter="url(#softGlow)"/>
+
+  <!-- ============================================================ -->
+  <!-- KATMAN 5: V HARFİ (Vizyon sembolü)                          -->
+  <!-- ============================================================ -->
+  <g filter="url(#vGlow)">
+    <!-- V harfinin sol kolu -->
+    <path d="M 176 160
+             L 226 320
+             L 246 320
+             L 200 160 Z"
+          fill="url(#vGradient)"
+          opacity="0.98"/>
+
+    <!-- V harfinin sağ kolu -->
+    <path d="M 336 160
+             L 286 320
+             L 266 320
+             L 312 160 Z"
+          fill="url(#vGradient)"
+          opacity="0.98"/>
+
+    <!-- V harfinin iç gölge çizgisi (keskinlik) -->
+    <line x1="256" y1="200" x2="256" y2="300"
+          stroke="#ffffff"
+          stroke-width="1.5"
+          opacity="0.5"/>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- KATMAN 6: ELMAS / YILDIZ (V'nin üstünde)                    -->
+  <!-- ============================================================ -->
+  <g filter="url(#softGlow)">
+    <!-- Elmas şekli (rotated square) -->
+    <polygon points="256,90 280,130 256,170 232,130"
+             fill="url(#starGlow)"
+             stroke="#ffd11a"
+             stroke-width="1.5"
+             opacity="0.98"/>
+
+    <!-- Merkez parlak nokta -->
+    <circle cx="256" cy="130" r="6" fill="#ffffff" filter="url(#softGlow)"/>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- KATMAN 7: VERİ/ENERJİ NOKTALARI (V'nin altında)             -->
+  <!-- ============================================================ -->
+  <g opacity="0.85">
+    <circle cx="220" cy="360" r="3" fill="#00e5ff" filter="url(#softGlow)"/>
+    <circle cx="240" cy="375" r="3.5" fill="#00ff9d" filter="url(#softGlow)"/>
+    <circle cx="256" cy="382" r="4" fill="#ffd11a" filter="url(#softGlow)"/>
+    <circle cx="272" cy="375" r="3.5" fill="#b845ff" filter="url(#softGlow)"/>
+    <circle cx="292" cy="360" r="3" fill="#ff2d92" filter="url(#softGlow)"/>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- KATMAN 8: KÖŞE YILDIZLARI (Küçük parıltılar)                -->
+  <!-- ============================================================ -->
+  <g opacity="0.9">
+    <!-- Sol üst -->
+    <path d="M 110 110 L 114 122 L 126 126 L 114 130 L 110 142 L 106 130 L 94 126 L 106 122 Z"
+          fill="#00e5ff"
+          filter="url(#softGlow)"/>
+
+    <!-- Sağ üst -->
+    <path d="M 402 110 L 405 119 L 414 122 L 405 125 L 402 134 L 399 125 L 390 122 L 399 119 Z"
+          fill="#b845ff"
+          filter="url(#softGlow)"/>
+
+    <!-- Sol alt -->
+    <path d="M 110 402 L 114 414 L 126 418 L 114 422 L 110 434 L 106 422 L 94 418 L 106 414 Z"
+          fill="#ff2d92"
+          filter="url(#softGlow)"/>
+
+    <!-- Sağ alt -->
+    <path d="M 402 402 L 405 411 L 414 414 L 405 417 L 402 426 L 399 417 L 390 414 L 399 411 Z"
+          fill="#ffd11a"
+          filter="url(#softGlow)"/>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- KATMAN 9: DAHA KÜÇÜK PARILTILAR                             -->
+  <!-- ============================================================ -->
+  <g opacity="0.6">
+    <circle cx="160" cy="80" r="2" fill="#ffffff" filter="url(#softGlow)"/>
+    <circle cx="350" cy="90" r="1.8" fill="#00ff9d" filter="url(#softGlow)"/>
+    <circle cx="90" cy="300" r="2" fill="#00e5ff" filter="url(#softGlow)"/>
+    <circle cx="425" cy="320" r="2.2" fill="#b845ff" filter="url(#softGlow)"/>
+    <circle cx="180" cy="440" r="1.8" fill="#ffd11a" filter="url(#softGlow)"/>
+    <circle cx="340" cy="450" r="2" fill="#ff2d92" filter="url(#softGlow)"/>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- KATMAN 10: 28 MODEL NOKTASI (Kenar boyunca 28 küçük nokta)  -->
+  <!-- ============================================================ -->
+  <g opacity="0.55" fill="#00ff9d">
+    <circle cx="256" cy="36"  r="1.5"/>
+    <circle cx="290" cy="39"  r="1.5"/>
+    <circle cx="321" cy="50"  r="1.5"/>
+    <circle cx="348" cy="68"  r="1.5"/>
+    <circle cx="370" cy="92"  r="1.5"/>
+    <circle cx="386" cy="121" r="1.5"/>
+    <circle cx="394" cy="152" r="1.5"/>
+    <circle cx="394" cy="185" r="1.5"/>
+    <circle cx="386" cy="217" r="1.5"/>
+    <circle cx="386" cy="295" r="1.5"/>
+    <circle cx="394" cy="327" r="1.5"/>
+    <circle cx="394" cy="360" r="1.5"/>
+    <circle cx="386" cy="391" r="1.5"/>
+    <circle cx="370" cy="420" r="1.5"/>
+    <circle cx="348" cy="444" r="1.5"/>
+    <circle cx="321" cy="462" r="1.5"/>
+    <circle cx="290" cy="473" r="1.5"/>
+    <circle cx="256" cy="476" r="1.5"/>
+    <circle cx="222" cy="473" r="1.5"/>
+    <circle cx="191" cy="462" r="1.5"/>
+    <circle cx="164" cy="444" r="1.5"/>
+    <circle cx="142" cy="420" r="1.5"/>
+    <circle cx="126" cy="391" r="1.5"/>
+    <circle cx="118" cy="360" r="1.5"/>
+    <circle cx="118" cy="327" r="1.5"/>
+    <circle cx="126" cy="295" r="1.5"/>
+    <circle cx="126" cy="217" r="1.5"/>
+    <circle cx="118" cy="185" r="1.5"/>
+    <circle cx="118" cy="152" r="1.5"/>
+    <circle cx="126" cy="121" r="1.5"/>
+  </g>
+</svg>
