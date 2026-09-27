@@ -1234,13 +1234,56 @@
 </script>
 <!-- ==================== JSON-LD SONU ==================== -->
 
-    <!-- ========== HARİCİ KÜTÜPHANELER ========== -->
-    <!-- Three.js ve eklentileri (importmap KALDIRILDI, klasik script kullanıldı) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
+<!-- ========== HARİCİ KÜTÜPHANELER ========== -->
+<!-- Three.js ve eklentileri (importmap KALDIRILDI, klasik script kullanıldı) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/parse/5.0.0/parse.min.js"></script>
+
+<!-- ========== GOOGLE IDENTITY SERVICES SDK (v7.10.1 YENİ) ========== -->
+<!-- Google ile giriş için gerekli — Client ID: 648997195148-... -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<script>
+  // ✅ [v7.10.1] Google Identity Services için hazırlık
+  window._googleGISReady = false;
+  window.GOOGLE_CLIENT_ID = '648997195148-eoo5683g1ar0gmlckgq4b79tv91dkuut.apps.googleusercontent.com';
+
+  // SDK yüklendiğinde callback
+  window.handleGoogleLibraryLoad = function () {
+    if (typeof google !== 'undefined' && google.accounts) {
+      window._googleGISReady = true;
+      console.log('✅ Google Identity Services hazır');
+      try {
+        google.accounts.id.initialize({
+          client_id: window.GOOGLE_CLIENT_ID,
+          callback: window.handleGoogleLoginResponse,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+          ux_mode: 'popup'
+        });
+        console.log('✅ Google GIS initialize edildi');
+      } catch (e) {
+        console.warn('⚠️ Google GIS initialize hatası:', e.message);
+      }
+    } else {
+      console.warn('⚠️ Google GIS henüz yüklenmedi, 1 saniye sonra tekrar denenecek...');
+      setTimeout(window.handleGoogleLibraryLoad, 1000);
+    }
+  };
+
+  // SDK yüklendiğinde otomatik çağır
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+      setTimeout(window.handleGoogleLibraryLoad, 800);
+    });
+  } else {
+    setTimeout(window.handleGoogleLibraryLoad, 800);
+  }
+</script>
+<!-- ========== GOOGLE SDK SONU ========== -->
 
 <!-- ========== FACEBOOK SDK ========== -->
 <script>
@@ -1258,10 +1301,10 @@
         src="https://connect.facebook.net/tr_TR/sdk.js"></script>
 <!-- ========== FACEBOOK SDK SONU ========== -->
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
 
 
     <!-- ============================================================ -->
@@ -18932,18 +18975,22 @@ print(cevap)</pre>
     <!-- ============================================================ -->
 
     <!-- ============================================================ -->
-<!-- JS-1: SASHIDO CONFIG + SAYAÇLAR + OTURUM + SPLASH + TEMA +   -->
-<!--       PARÇACIK + BİLDİRİM + MODAL + VİZYON AL PANEL TEMEL +  -->
-<!--       LOGS + VIDEO + SESLİ SOHBET + V27 API REHBER +         -->
-<!--       [v7.10.0] PLAN LİMİT SİSTEMİ (FULL AKTİF)              -->
+<!-- JS-1 v7.10.1 FULL — TEMEL + PLAN LİMİT + SESLİ SOHBET FIX   -->
+<!-- [v7.10.1 EFSANE GÜNCELLEME]                                  -->
+<!-- + [v7.10.1 YENİ] Sesli sohbet adil süre hesabı              -->
+<!-- + [v7.10.1 YENİ] checkFeatureLimit backend sync             -->
+<!-- + [v7.10.1 YENİ] showLimitModal zengin gösterim             -->
+<!-- + [v7.10.1 YENİ] incrementUsage queue mekanizması           -->
+<!-- + [v7.10.1 YENİ] Splash timeout iyileştirildi               -->
+<!-- + [v7.10.1 YENİ] refreshUserLimits otomatik çağrı           -->
 <!-- ============================================================ -->
 <script>
 // ================================================================
-// JS-1: TÜM TEMEL SİSTEMLER + PLAN LİMİT SİSTEMİ (v7.10.0 FULL)
+// JS-1: TÜM TEMEL SİSTEMLER + PLAN LİMİT SİSTEMİ (v7.10.1 FULL)
 // ================================================================
 
 // ============================================================
-// [v7.10.0] GLOBAL DEĞİŞKENLER
+// [v7.10.1] GLOBAL DEĞİŞKENLER
 // ============================================================
 var currentUser = null;
 var currentRole = null;
@@ -18951,7 +18998,7 @@ var parseInitialized = false;
 var statsInterval = null;
 var currentConversationId = null;
 
-// [v7.10.0] Vizyon Al
+// [v7.10.1] Vizyon Al
 window.vizyonAlMode = 'normal';
 window.vizyonAlOpened = false;
 window.vizyonAlScreenSharing = false;
@@ -18959,33 +19006,32 @@ window.vizyonAlScreenStream = null;
 window.vizyonAlResponsibilityAccepted = false;
 window.vizyonAlLastRequestId = null;
 
-// [v7.10.0] Logs
+// [v7.10.1] Logs
 window.logsCache = [];
 window.currentLogFilter = 'all';
 window.MAX_LOGS_CACHE = 500;
 
-// [v7.10.0] Sesli Sohbet
+// [v7.10.1] Sesli Sohbet
 window.voiceChatActive = false;
 window.voiceChatStartTime = null;
 window.voiceChatTimer = null;
 window.voiceChatRecognition = null;
+window.voiceChatCountedMinutes = 0;   // YENİ: gerçekten sayılan dakika
+window.voiceChatLastTick = null;       // YENİ: son tik zamanı
 
-// [v7.10.0] Dosya Analiz
+// [v7.10.1] Dosya Analiz
 window.currentUploadedFile = null;
 window.filePreviewData = null;
 
-// [v7.10.0] Video Studio
+// [v7.10.1] Video Studio
 window.videoStudioActive = false;
 
+// [v7.10.1] Usage Queue (incrementUsage için)
+window._usageQueue = {};
+window._usageQueueTimer = null;
+
 // ============================================================
-// [v7.10.0] PLAN LİMİT SİSTEMİ — TAM LİSTE (index.html paketleriyle uyumlu)
-// ============================================================
-// FREE: 100 sorgu/gün · 3 proje/ay · 2 V27 API · 10 Koç/hafta
-//       Vizyon Al 10/gün · Sesli 5dk/gün · Dosya 3/gün · Video YOK
-// PRO:  2000 sorgu/gün · 15 proje/ay · 20 V27 API · 50 Koç/hafta
-//       Vizyon Al 500/gün · Sesli 60dk/gün · Dosya 50/gün · Video 10/ay · Logs VAR
-// TEAM: SINIRSIZ her şey
-// ADMIN/FOUNDER/BETA/MODERATÖR: SINIRSIZ her şey
+// [v7.10.1] PLAN LİMİT SİSTEMİ — TAM LİSTE
 // ============================================================
 window.PLAN_LIMITS = {
     free: {
@@ -19131,7 +19177,7 @@ window.PLAN_LIMITS = {
 };
 
 // ============================================================
-// [v7.10.0] MODERATÖR ROL TANIMLARI
+// [v7.10.1] MODERATÖR ROL TANIMLARI
 // ============================================================
 window.MODERATOR_ROLE = 'moderator';
 window.MODERATOR_LABEL = '🎨 MODERATÖR / TASARIMCI';
@@ -19148,7 +19194,7 @@ window.hasSuperRole = function () {
 };
 
 // ============================================================
-// [v7.10.0] PLAN LİMİT SİSTEMİ — ANA FONKSİYONLAR
+// [v7.10.1] PLAN LİMİT SİSTEMİ — ANA FONKSİYONLAR
 // ============================================================
 
 // --- Kullanıcının plan limitlerini al ---
@@ -19159,19 +19205,25 @@ window.getPlanLimits = function (user) {
     var role = user.get('role') || 'user';
     var plan = user.get('plan') || 'free';
 
-    // Rol öncelikli
     if (role === 'founder') return window.PLAN_LIMITS.founder;
     if (role === 'admin') return window.PLAN_LIMITS.admin;
     if (role === 'beta') return window.PLAN_LIMITS.beta;
     if (role === 'moderator') return window.PLAN_LIMITS.moderator;
 
-    // Plan bazlı
     if (plan === 'team') return window.PLAN_LIMITS.team;
     if (plan === 'pro') return window.PLAN_LIMITS.pro;
     return window.PLAN_LIMITS.free;
 };
 
-// --- Günlük/Aylık kullanım anahtarı (localStorage) ---
+// --- Kullanıcının rolünün süper rol olup olmadığı ---
+window.isSuperUser = function (user) {
+    if (!user) user = currentUser;
+    if (!user) return false;
+    var role = user.get('role') || 'user';
+    return window.SUPER_ROLES.indexOf(role) !== -1;
+};
+
+// --- Günlük/Aylık/Haftalık kullanım anahtarı (localStorage) ---
 function getTodayKey() {
     var d = new Date();
     return 'usage_' + d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
@@ -19222,27 +19274,61 @@ function setUsageData(feature, period, count) {
     }
 }
 
-// --- Kullanımı artır ---
+// ============================================================
+// [v7.10.1 YENİ] incrementUsage — QUEUE MEKANİZMASI
+// Aynı feature için 1 saniye içinde çok istek gelirse birleştir
+// ============================================================
 window.incrementUsage = function (feature, period, amount) {
     amount = amount || 1;
-    var current = getUsageData(feature, period);
-    var newCount = current + amount;
-    setUsageData(feature, period, newCount);
+    var queueKey = feature + '_' + period;
 
-    // Backend'e de kaydet
-    if (currentUser && parseInitialized) {
-        try {
-            Parse.Cloud.run('trackFeatureUsage', {
-                feature: feature,
-                period: period,
-                count: amount
-            }).catch(function () {});
-        } catch (e) {}
+    // Queue'ya ekle
+    if (!window._usageQueue[queueKey]) {
+        window._usageQueue[queueKey] = { feature: feature, period: period, total: 0 };
     }
-    return newCount;
+    window._usageQueue[queueKey].total += amount;
+
+    // Timer başlat (tek seferlik)
+    if (!window._usageQueueTimer) {
+        window._usageQueueTimer = setTimeout(function () {
+            window._flushUsageQueue();
+        }, 800);
+    }
+
+    // Anlık değeri dön (kullanıcı hemen görebilsin)
+    var current = getUsageData(feature, period);
+    return current + amount;
 };
 
-// --- Kullanım kontrolü yap ---
+// Queue'yu backend'e gönder
+window._flushUsageQueue = function () {
+    var queue = window._usageQueue;
+    window._usageQueue = {};
+    window._usageQueueTimer = null;
+
+    Object.keys(queue).forEach(function (key) {
+        var item = queue[key];
+        // localStorage'a yaz
+        var current = getUsageData(item.feature, item.period);
+        var newCount = current + item.total;
+        setUsageData(item.feature, item.period, newCount);
+
+        // Backend'e de kaydet
+        if (currentUser && parseInitialized) {
+            try {
+                Parse.Cloud.run('trackFeatureUsage', {
+                    feature: item.feature,
+                    period: item.period,
+                    count: item.total
+                }).catch(function () {});
+            } catch (e) {}
+        }
+    });
+};
+
+// ============================================================
+// [v7.10.1 GELİŞTİRİLDİ] Kullanım kontrolü
+// ============================================================
 window.checkFeatureLimit = function (feature, period) {
     if (!currentUser) {
         return { allowed: false, reason: 'Giriş yapmalısınız', limit: 0, used: 0 };
@@ -19301,7 +19387,48 @@ window.checkFeatureLimit = function (feature, period) {
     };
 };
 
-// --- Limit uyarı modalı göster ---
+// ============================================================
+// [v7.10.1 YENİ] checkFeatureLimitWithBackend
+// Backend'den de kullanım çeken güvenli kontrol (opsiyonel)
+// ============================================================
+window.checkFeatureLimitWithBackend = async function (feature, period) {
+    // Önce client kontrolü
+    var clientCheck = window.checkFeatureLimit(feature, period);
+    if (!clientCheck.allowed) return clientCheck;
+
+    // Backend'den de kontrol et (güvenlik katmanı)
+    if (currentUser && parseInitialized) {
+        try {
+            var result = await Parse.Cloud.run('getFeatureUsage', {
+                feature: feature,
+                period: period
+            });
+            if (result && result.success) {
+                var limits = window.getPlanLimits(currentUser);
+                var limit = limits[feature];
+                if (limit !== -1 && limit !== Infinity && result.count >= limit) {
+                    // Backend daha fazla kullanım diyorsa backend'i baz al
+                    setUsageData(feature, period, result.count);
+                    return {
+                        allowed: false,
+                        reason: 'Günlük/aylık limitinize ulaştınız',
+                        limit: limit,
+                        used: result.count,
+                        remaining: 0,
+                        requiresUpgrade: true
+                    };
+                }
+            }
+        } catch (e) {
+            // Backend hatası — client sonucu dön
+        }
+    }
+    return clientCheck;
+};
+
+// ============================================================
+// [v7.10.1 GELİŞTİRİLDİ] Limit uyarı modalı (zengin gösterim)
+// ============================================================
 window.showLimitModal = function (feature, checkResult) {
     var featureNames = {
         'vizyonAlPerDay': '✨ Vizyon Al Kullanımı',
@@ -19321,8 +19448,34 @@ window.showLimitModal = function (feature, checkResult) {
     };
     var name = featureNames[feature] || feature;
 
+    // Mevcut modalı kaldır
     var existing = document.getElementById('limitUpgradeModal');
     if (existing) existing.remove();
+
+    // Kullanıcının planı
+    var userPlan = currentUser ? (currentUser.get('plan') || 'free') : 'free';
+    var userRole = currentUser ? (currentUser.get('role') || 'user') : 'user';
+
+    // İlgili özelliğin karşılaştırması
+    var limits = window.PLAN_LIMITS;
+    var featureCompare = {
+        'vizyonAlPerDay': { free: '10/gün', pro: '500/gün', team: '♾️' },
+        'voiceChatMinutesPerDay': { free: '5 dk/gün', pro: '60 dk/gün', team: '♾️' },
+        'fileAnalyzePerDay': { free: '3/gün', pro: '50/gün', team: '♾️' },
+        'videoCreatePerMonth': { free: '❌ Yok', pro: '10/ay', team: '♾️' },
+        'logsAccess': { free: '❌ Yok', pro: '✅ Var', team: '✅ Var' },
+        'v27ApiKeys': { free: '2 adet', pro: '20 adet', team: '100 adet' },
+        'kocPerWeek': { free: '10/hafta', pro: '50/hafta', team: '1000/hafta' },
+        'dailyQueries': { free: '100/gün', pro: '2000/gün', team: '♾️' },
+        'maxProjects': { free: '3/ay', pro: '15/ay', team: '♾️' },
+        'takimKurma': { free: '❌ Yok', pro: '❌ Yok', team: '✅ Var' },
+        'aganModu': { free: '❌ Yok', pro: '✅ Var', team: '✅ Var' },
+        'derinDusunme': { free: '❌ Yok', pro: '✅ Var', team: '✅ Var' },
+        'yazilimciModu': { free: '❌ Yok', pro: '✅ Var', team: '✅ Var' },
+        'ekranOkuma': { free: '❌ Yok', pro: '✅ Var', team: '✅ Var' }
+    };
+
+    var compare = featureCompare[feature] || { free: '-', pro: '-', team: '-' };
 
     var modal = document.createElement('div');
     modal.id = 'limitUpgradeModal';
@@ -19330,7 +19483,7 @@ window.showLimitModal = function (feature, checkResult) {
     modal.style.display = 'flex';
     modal.style.zIndex = '9999999';
     modal.innerHTML = `
-        <div class="modal" style="max-width:520px; text-align:center;">
+        <div class="modal" style="max-width:560px; text-align:center;">
             <div class="modal-header" style="justify-content:center; border-bottom:none;">
                 <div style="font-size:64px; margin-bottom:8px;">🚀</div>
             </div>
@@ -19341,40 +19494,53 @@ window.showLimitModal = function (feature, checkResult) {
             <div style="background:linear-gradient(135deg, rgba(0,229,255,0.06), rgba(184,69,255,0.04)); border:1px solid rgba(0,229,255,0.25); border-radius:14px; padding:14px 18px; margin-bottom:20px; text-align:left; font-size:13px; line-height:1.7; color:var(--text2);">
                 <div><strong>📊 Mevcut Kullanım:</strong> ${checkResult.used || 0} / ${checkResult.limit === -1 ? '∞' : checkResult.limit}</div>
                 <div style="margin-top:6px;"><strong>💡 Sebep:</strong> ${checkResult.reason || 'Limit doldu'}</div>
+                <div style="margin-top:6px;"><strong>👤 Planınız:</strong> ${userPlan.toUpperCase()}</div>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:20px; text-align:center; font-size:11.5px;">
-                <div style="background:rgba(0,0,0,0.3); padding:12px 8px; border-radius:10px; border-left:3px solid var(--text3);">
-                    <div style="font-size:20px; margin-bottom:4px;">🆓</div>
-                    <div style="font-weight:700; color:var(--text3); margin-bottom:4px;">Ücretsiz</div>
-                    <div style="color:var(--text3);">Sınırlı erişim</div>
-                </div>
-                <div style="background:linear-gradient(135deg, rgba(0,229,255,0.1), rgba(184,69,255,0.06)); padding:12px 8px; border-radius:10px; border-left:3px solid var(--gold);">
-                    <div style="font-size:20px; margin-bottom:4px;">🌟</div>
-                    <div style="font-weight:700; color:var(--gold); margin-bottom:4px;">Pro</div>
-                    <div style="color:var(--text3);">₺299/ay</div>
-                </div>
-                <div style="background:linear-gradient(135deg, rgba(255,45,146,0.1), rgba(0,229,255,0.06)); padding:12px 8px; border-radius:10px; border-left:3px solid var(--pink);">
-                    <div style="font-size:20px; margin-bottom:4px;">👥</div>
-                    <div style="font-weight:700; color:var(--pink); margin-bottom:4px;">Takım</div>
-                    <div style="color:var(--text3);">₺899/ay</div>
+            <div style="margin-bottom:20px;">
+                <div style="font-size:13px; color:var(--text3); margin-bottom:10px; font-weight:600;">Bu özelliğin planlara göre karşılaştırması:</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; text-align:center; font-size:11.5px;">
+                    <div style="background:rgba(0,0,0,0.3); padding:12px 8px; border-radius:10px; border-left:3px solid var(--text3); ${userPlan === 'free' ? 'outline:2px solid var(--accent);' : ''}">
+                        <div style="font-size:20px; margin-bottom:4px;">🆓</div>
+                        <div style="font-weight:700; color:var(--text3); margin-bottom:6px;">Ücretsiz</div>
+                        <div style="color:var(--text2); font-weight:600;">${compare.free}</div>
+                    </div>
+                    <div style="background:linear-gradient(135deg, rgba(0,229,255,0.1), rgba(184,69,255,0.06)); padding:12px 8px; border-radius:10px; border-left:3px solid var(--gold); ${userPlan === 'pro' ? 'outline:2px solid var(--accent);' : ''}">
+                        <div style="font-size:20px; margin-bottom:4px;">🌟</div>
+                        <div style="font-weight:700; color:var(--gold); margin-bottom:6px;">Pro</div>
+                        <div style="color:var(--text2); font-weight:600;">${compare.pro}</div>
+                        <div style="color:var(--text3); font-size:10px; margin-top:4px;">₺299/ay</div>
+                    </div>
+                    <div style="background:linear-gradient(135deg, rgba(255,45,146,0.1), rgba(0,229,255,0.06)); padding:12px 8px; border-radius:10px; border-left:3px solid var(--pink); ${userPlan === 'team' ? 'outline:2px solid var(--accent);' : ''}">
+                        <div style="font-size:20px; margin-bottom:4px;">👥</div>
+                        <div style="font-weight:700; color:var(--pink); margin-bottom:6px;">Takım</div>
+                        <div style="color:var(--text2); font-weight:600;">${compare.team}</div>
+                        <div style="color:var(--text3); font-size:10px; margin-top:4px;">₺899/ay</div>
+                    </div>
                 </div>
             </div>
             <div style="display:flex; gap:10px;">
                 <button class="btn-secondary" onclick="this.closest('.modal-overlay').remove()" style="flex:1;">Kapat</button>
                 <button class="btn-primary" onclick="this.closest('.modal-overlay').remove(); document.getElementById('pricing').scrollIntoView({behavior:'smooth'});" style="flex:2;">🚀 Paketleri Gör</button>
             </div>
+            <div style="margin-top:14px; font-size:11px; color:var(--text3); line-height:1.5;">
+                💡 Kurucu, Admin, Beta ve Moderatör hesapları için tüm limitler <strong style="color:var(--gold);">sınırsızdır</strong>.
+            </div>
         </div>
     `;
     document.body.appendChild(modal);
 
+    // Log kaydet
     window.addLog('warning', name + ' limit doldu veya erişim yok', {
         feature: feature,
         used: checkResult.used,
-        limit: checkResult.limit
+        limit: checkResult.limit,
+        plan: userPlan
     });
 };
 
-// --- Limit kontrol + uyarı birleşik ---
+// ============================================================
+// Limit kontrol + uyarı birleşik
+// ============================================================
 window.requireFeatureAccess = function (feature, period) {
     var result = window.checkFeatureLimit(feature, period);
     if (!result.allowed) {
@@ -19384,7 +19550,9 @@ window.requireFeatureAccess = function (feature, period) {
     return true;
 };
 
-// --- Kalan limit metni ---
+// ============================================================
+// Kalan limit metni
+// ============================================================
 window.getLimitText = function (feature, period) {
     var limits = window.getPlanLimits(currentUser);
     var limit = limits[feature];
@@ -19395,7 +19563,7 @@ window.getLimitText = function (feature, period) {
 };
 
 // ============================================================
-// [v7.10.0] ÖZEL ÖZELLİK KONTROL YARDIMCILARI
+// [v7.10.1] ÖZEL ÖZELLİK KONTROL YARDIMCILARI
 // ============================================================
 
 // --- Proje oluşturma hakkı var mı? ---
@@ -19492,7 +19660,7 @@ window.canUseScreenRead = function () {
 };
 
 // ============================================================
-// [v7.10.0] LOG SİSTEMİ
+// [v7.10.1] LOG SİSTEMİ
 // ============================================================
 
 window.addLog = function (level, message, meta) {
@@ -19528,7 +19696,9 @@ window.addLog = function (level, message, meta) {
             Parse.Cloud.run('logError', {
                 level: level,
                 message: message,
-                meta: meta
+                meta: meta,
+                url: window.location.href,
+                userAgent: navigator.userAgent.substring(0, 200)
             }).catch(function () {});
         } catch (e) {}
     }
@@ -19685,7 +19855,7 @@ window.downloadLogs = function () {
 };
 
 // ============================================================
-// [v7.10.0] SESLİ SOHBET (Limit Kontrollü)
+// [v7.10.1 GELİŞTİRİLDİ] SESLİ SOHBET — ADİL SÜRE HESABI
 // ============================================================
 window.openVoiceChatFullscreen = function () {
     if (!currentUser) {
@@ -19723,29 +19893,60 @@ window.openVoiceChatFullscreen = function () {
     modal.style.display = 'flex';
     window.voiceChatActive = true;
     window.voiceChatStartTime = Date.now();
+    window.voiceChatLastTick = Date.now();
+    window.voiceChatCountedMinutes = 0;
 
     var limitText = limitCheck.limit === -1 ? '♾️ Sınırsız' : limitCheck.remaining + ' dk kaldı';
     showNotification('🎤 Sesli sohbet başladı — ' + limitText, 'success');
     window.addLogInfo('Sesli sohbet başlatıldı', { remaining: limitCheck.remaining });
 
+    // ✅ [v7.10.1 FIX] Her 30 saniyede bir geçen süreyi hesapla
     window.voiceChatTimer = setInterval(function () {
-        if (!window.voiceChatActive) return;
-        window.incrementUsage('voiceChatMinutesPerDay', 'day', 1);
-        var newUsed = getUsageData('voiceChatMinutesPerDay', 'day');
-        var newLimit = window.getPlanLimits(currentUser).voiceChatMinutesPerDay;
-        if (newLimit !== -1 && newUsed >= newLimit) {
-            window.closeVoiceChatFullscreen();
-            window.addLogWarning('Sesli sohbet limiti doldu');
-            window.showLimitModal('voiceChatMinutesPerDay', {
-                allowed: false,
-                limit: newLimit,
-                used: newUsed,
-                remaining: 0,
-                reason: 'Günlük sesli sohbet süresi doldu'
-            });
-        }
-    }, 60000);
+        if (!window.voiceChatActive || !window.voiceChatStartTime) return;
 
+        // Gerçek geçen süre (dakika)
+        var elapsedMs = Date.now() - window.voiceChatStartTime;
+        var elapsedMinutes = Math.floor(elapsedMs / 60000);
+
+        // Şimdiye kadar sayılan dakika
+        var counted = window.voiceChatCountedMinutes || 0;
+        var toAdd = elapsedMinutes - counted;
+
+        if (toAdd > 0) {
+            // Yeni dakikaları ekle
+            var current = getUsageData('voiceChatMinutesPerDay', 'day');
+            setUsageData('voiceChatMinutesPerDay', 'day', current + toAdd);
+            window.voiceChatCountedMinutes = elapsedMinutes;
+
+            // Backend'e kaydet
+            if (currentUser && parseInitialized) {
+                try {
+                    Parse.Cloud.run('trackFeatureUsage', {
+                        feature: 'voiceChatMinutesPerDay',
+                        period: 'day',
+                        count: toAdd
+                    }).catch(function () {});
+                } catch (e) {}
+            }
+
+            // Limit kontrolü
+            var newUsed = getUsageData('voiceChatMinutesPerDay', 'day');
+            var newLimit = window.getPlanLimits(currentUser).voiceChatMinutesPerDay;
+            if (newLimit !== -1 && newUsed >= newLimit) {
+                window.closeVoiceChatFullscreen();
+                window.addLogWarning('Sesli sohbet limiti doldu');
+                window.showLimitModal('voiceChatMinutesPerDay', {
+                    allowed: false,
+                    limit: newLimit,
+                    used: newUsed,
+                    remaining: 0,
+                    reason: 'Günlük sesli sohbet süresi doldu'
+                });
+            }
+        }
+    }, 30000); // 30 saniyede bir kontrol
+
+    // Ses tanıma başlat
     setTimeout(function () {
         if (typeof window.startVoiceChatRecognition === 'function') {
             window.startVoiceChatRecognition();
@@ -19754,12 +19955,38 @@ window.openVoiceChatFullscreen = function () {
 };
 
 window.closeVoiceChatFullscreen = function () {
+    // ✅ [v7.10.1 FIX] Kapanışta kalan süreyi de ekle
+    if (window.voiceChatStartTime && window.voiceChatActive) {
+        var elapsedMs = Date.now() - window.voiceChatStartTime;
+        var totalMinutes = Math.ceil(elapsedMs / 60000);
+        var counted = window.voiceChatCountedMinutes || 0;
+        var toAdd = totalMinutes - counted;
+
+        if (toAdd > 0) {
+            var current = getUsageData('voiceChatMinutesPerDay', 'day');
+            setUsageData('voiceChatMinutesPerDay', 'day', current + toAdd);
+
+            if (currentUser && parseInitialized) {
+                try {
+                    Parse.Cloud.run('trackFeatureUsage', {
+                        feature: 'voiceChatMinutesPerDay',
+                        period: 'day',
+                        count: toAdd
+                    }).catch(function () {});
+                } catch (e) {}
+            }
+        }
+    }
+
     var modal = document.getElementById('voiceChatFullscreen');
     if (modal) {
         modal.classList.remove('open');
         modal.style.display = 'none';
     }
     window.voiceChatActive = false;
+    window.voiceChatStartTime = null;
+    window.voiceChatCountedMinutes = 0;
+
     if (window.voiceChatTimer) {
         clearInterval(window.voiceChatTimer);
         window.voiceChatTimer = null;
@@ -19775,7 +20002,7 @@ window.closeVoiceChatFullscreen = function () {
 };
 
 // ============================================================
-// [v7.10.0] DOSYA ANALİZ (Limit Kontrollü)
+// [v7.10.1] DOSYA ANALİZ (Limit Kontrollü)
 // ============================================================
 window.handleVizyonAlFileUpload = function (input) {
     if (!input || !input.files || !input.files[0]) return;
@@ -19843,7 +20070,7 @@ window.removeVizyonAlFile = function () {
 };
 
 // ============================================================
-// [v7.10.0] VİDEO STÜDYO (Limit Kontrollü)
+// [v7.10.1] VİDEO STÜDYO (Limit Kontrollü)
 // ============================================================
 window.openVideoStudio = function () {
     if (!currentUser) {
@@ -19931,7 +20158,7 @@ window.runVideoStudio = async function () {
 };
 
 // ============================================================
-// [v7.10.0] V27 API REHBER
+// [v7.10.1] V27 API REHBER
 // ============================================================
 window.openV27ApiGuide = function () {
     var modal = document.getElementById('v27ApiGuideModal');
@@ -20015,7 +20242,7 @@ document.addEventListener('click', function (e) {
 });
 
 // ============================================================
-// VİZYON AL PANEL TEMEL FONKSİYONLAR (Limit Kontrollü)
+// [v7.10.1] VİZYON AL PANEL TEMEL FONKSİYONLAR (Limit Kontrollü)
 // ============================================================
 window.openVizyonAlPanel = function () {
     var panel = document.getElementById('vizyonAlPanel');
@@ -20156,12 +20383,11 @@ async function initSashiDo() {
             return;
         }
 
-        // ✅ [v7.10.0 BACK4APP] Back4App uyumlu
         Parse.initialize(
-            "Dr9SODgMburZ54QvC8RnIHc9dbjreozBbKLOpMjX",   // App ID (Back4App'ten al)
-            "dCXRvnEcCcOFvpzVDAV9AAJnYvdrqaP1JFRkJzvv"    // JS Key (Back4App'ten al)
+            "Dr9SODgMburZ54QvC8RnIHc9dbjreozBbKLOpMjX",
+            "dCXRvnEcCcOFvpzVDAV9AAJnYvdrqaP1JFRkJzvv"
         );
-        Parse.serverURL = "https://parseapi.back4app.com/";  // ✅ Back4App serverURL
+        Parse.serverURL = "https://parseapi.back4app.com/";
 
         parseInitialized = true;
         window.parseInitialized = true;
@@ -20479,12 +20705,13 @@ function initSplashScreen() {
         createSplashParticles();
     }
     startSplashProgress();
+    // [v7.10.1] Timeout 8sn → 10sn (yavaş bağlantılar için)
     setTimeout(function () {
         if (!splashHidden) {
             console.warn('⚠️ Splash takıldı, zorla kapatılıyor...');
             window.hideSplash(true);
         }
-    }, 8000);
+    }, 10000);
 }
 
 if (document.readyState === 'loading') {
@@ -20530,7 +20757,7 @@ window.closeDownloadOptions = function () {
 // ============================================================
 window.updateVersion = function (version) {
     var el = document.getElementById('versionDisplay');
-    if (el) el.textContent = version || 'V7.10.0';
+    if (el) el.textContent = version || 'V7.10.1';
 };
 
 // ============================================================
@@ -20609,7 +20836,7 @@ window.getReferralCodeFromUrl = function () {
         container.appendChild(line);
     }
 
-    console.log('✅ Parçacıklar başlatıldı: ' + particleCount + ' adet (v7.10.0)');
+    console.log('✅ Parçacıklar başlatıldı: ' + particleCount + ' adet (v7.10.1)');
 })();
 
 // ============================================================
@@ -20660,9 +20887,9 @@ window.getReferralCodeFromUrl = function () {
 (function syncSplashVersion() {
     function sync() {
         var splashVersion = document.querySelector('.splash-version');
-        if (splashVersion) splashVersion.textContent = 'v7.10.0';
+        if (splashVersion) splashVersion.textContent = 'v7.10.1';
         var versionDisplay = document.getElementById('versionDisplay');
-        if (versionDisplay) versionDisplay.textContent = 'V7.10.0';
+        if (versionDisplay) versionDisplay.textContent = 'V7.10.1';
     }
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', sync);
@@ -20731,7 +20958,7 @@ window.getReferralCodeFromUrl = function () {
 })();
 
 // ============================================================
-// [v7.10.0] KULLANICI PLANI DEĞİŞİNCE LİMİTLERİ YENİLE
+// [v7.10.1] KULLANICI PLANI DEĞİŞİNCE LİMİTLERİ YENİLE
 // ============================================================
 window.refreshUserLimits = function () {
     if (!currentUser) return;
@@ -20745,10 +20972,15 @@ window.refreshUserLimits = function () {
         var period = b.getAttribute('data-limit-period') || 'day';
         b.textContent = window.getLimitText(feature, period);
     });
+
+    // [v7.10.1] Koc limit badge'ini de güncelle
+    if (typeof window.updateKocLimitBadge === 'function') {
+        try { window.updateKocLimitBadge(); } catch (e) {}
+    }
 };
 
 // ============================================================
-// [v7.10.0] PLAN LİMİT ÖZET GÖSTER
+// [v7.10.1] PLAN LİMİT ÖZET GÖSTER
 // ============================================================
 window.showPlanLimitSummary = function () {
     if (!currentUser) {
@@ -20800,7 +21032,7 @@ window.showPlanLimitSummary = function () {
     document.body.insertAdjacentHTML('beforeend', summaryHtml);
 };
 
-console.log('✅ JS-1 yüklendi (v7.10.0 FULL)');
+console.log('✅ JS-1 v7.10.1 FULL yüklendi');
 console.log('🆕 PLAN LİMİT SİSTEMİ AKTİF:');
 console.log('  → FREE: 100 sorgu/gün · 3 proje/ay · 2 V27 API · 10 Koç/hafta');
 console.log('  → FREE: Vizyon Al 10/gün · Sesli 5dk/gün · Dosya 3/gün · Video YOK');
@@ -20808,12 +21040,29 @@ console.log('  → PRO: 2000 sorgu/gün · 15 proje/ay · 20 V27 API · 50 Koç/
 console.log('  → PRO: Vizyon Al 500/gün · Sesli 60dk/gün · Dosya 50/gün · Video 10/ay · Logs VAR');
 console.log('  → TEAM: SINIRSIZ');
 console.log('  → ADMIN/FOUNDER/BETA/MOD: SINIRSIZ');
+console.log('🆕 [v7.10.1 YENİLİKLERİ]:');
+console.log('  → Sesli sohbet adil süre hesabı (başlangıç/bitiş)');
+console.log('  → checkFeatureLimitWithBackend() — güvenli kontrol');
+console.log('  → showLimitModal — plan karşılaştırmalı zengin gösterim');
+console.log('  → incrementUsage — queue mekanizması (800ms debounce)');
+console.log('  → Splash timeout 8sn → 10sn');
+console.log('  → refreshUserLimits — Koç badge otomatik güncelleme');
 console.log('🆕 YARDIMCI FONKSİYONLAR:');
 console.log('  → canCreateProject() · canCreateTeam()');
 console.log('  → canUseAgentMode() · canUseDeepThink() · canUseDeveloperMode()');
-console.log('  → canUseScreenRead()');
-console.log('  → showPlanLimitSummary()');
-console.log('  → refreshUserLimits()');
+console.log('  → canUseScreenRead() · isSuperUser()');
+console.log('  → showPlanLimitSummary() · refreshUserLimits()');
+console.log('');
+console.log('📌 DEVAM ETMEK İÇİN "devam" YAZ → FULL JS-3 yazılacak');
+console.log('📌 JS-3\'te düzeltilecekler:');
+console.log('  → 3D Stüdyo renk ayarlama hatası');
+console.log('  → "yılıx" benzeri hatalı şeyler');
+console.log('  → Vizyon Al dosya yükleme backend entegrasyonu');
+console.log('  → Mod yetkisi kontrolü (setVizyonAlMode)');
+console.log('  → cleanClientResponse markdown parse');
+console.log('  → filePreviewContainer id çakışması');
+console.log('');
+console.log('🇹🇷 VİZYON 2027 v7.10.1 — JS-1 AKTİF');
 </script>
 
 
@@ -21091,23 +21340,45 @@ async function handleLogin() {
 // ============================================================
 // GOOGLE İLE GİRİŞ (Güvenlik nedeniyle devre dışı)
 // ============================================================
-window.loginWithGoogle = async function () {
-    try {
-        showNotification('Google ile giriş başlatılıyor...', 'success');
-        showNotification(
-            '❌ Google ile giriş şu anda kullanılamıyor. ' +
-            'Lütfen e-posta ile kayıt olun veya yöneticiye başvurun.',
-            'error'
-        );
-        console.warn('⚠️ Güvenlik: Sahte Google authData ile giriş denemesi engellendi.');
-        window.addLogWarning('Google giriş denemesi engellendi (güvenlik)');
+window.loginWithGoogle = function () {
+    if (typeof google === 'undefined' || !google.accounts) {
+        showNotification('Google SDK yüklenemedi, sayfayı yenileyin.', 'error');
         return;
-    } catch (e) {
-        console.error('Google giriş hatası:', e);
-        showNotification('Google giriş hatası: ' + e.message, 'error');
-        window.addLogError('Google giriş hatası: ' + e.message);
     }
+    google.accounts.id.initialize({
+        client_id: '648997195148-eoo5683g1ar0gmlckgq4b79tv91dkuut.apps.googleusercontent.com', // Back4App'e girdiğin Client ID
+        callback: handleGoogleLoginResponse
+    });
+    google.accounts.id.prompt(); // Google giriş penceresini açar
 };
+
+async function handleGoogleLoginResponse(response) {
+    if (!response.credential) {
+        showNotification('Google girişi başarısız.', 'error');
+        return;
+    }
+    try {
+        var authData = {
+            id: response.credential, // Google'ın döndürdüğü JWT token
+            access_token: response.credential
+        };
+        var user = await Parse.User.logInWith('google', { authData: authData });
+        currentUser = user;
+        localStorage.setItem('vizyon_user', JSON.stringify({
+            id: user.id,
+            name: user.get('name'),
+            email: user.get('email'),
+            role: user.get('role'),
+            plan: user.get('plan')
+        }));
+        closeModal('authModal');
+        await showDashboard();
+        showNotification('✅ Google ile giriş başarılı!', 'success');
+    } catch (e) {
+        console.error('Google login hatası:', e);
+        showNotification('Google giriş hatası: ' + e.message, 'error');
+    }
+}
 
 // ============================================================
 // FACEBOOK İLE GİRİŞ
@@ -22176,35 +22447,18 @@ console.log('✅ Moderatör rol desteği aktif (profil + logout + rol etiketi)')
 </script>
     
 <!-- ============================================================ -->
-<!-- JS-3: TAKIM VE AI (Cloud Code + Dosya Yükleme + Kopyala +    -->
-<!--       3D/Görsel + SES + GIF + ÇEVİRİ + SANSÜR + AI KOÇ +     -->
-<!--       CANLI DESTEK + V27 KOÇ + VİZYON AL FULL + MODERATÖR)   -->
-<!-- [v7.10.0 EFSANE GÜNCELLEME]                                  -->
-<!-- + [v7.10.0 YENİ] Plan limit entegrasyonu (vizyonAlChat,      -->
-<!--                  voiceChat, fileAnalyze, videoCreate)        -->
-<!-- + [v7.10.0 YENİ] Vizyon Al FULL (4 mod + ekran + sesli +     -->
-<!--                  dosya + indirilebilir sunum)                -->
-<!-- + [v7.10.0 YENİ] Sesli Sohbet tam çalışır (limit + kesin     -->
-<!--                  durdurma)                                   -->
-<!-- + [v7.10.0 YENİ] Dosya Analiz + Sunum + İndirme              -->
-<!-- + [v7.10.0 YENİ] Logs backend entegrasyonu                   -->
-<!-- + [v7.10.0 YENİ] V27 Koç plan limit gösterimi                -->
-<!-- + [v7.10.0 YENİ] Moderatör video kesit aracı                 -->
-<!-- + [v7.10.0 DEĞİŞTİ] Tüm işlemlerde log kaydı                 -->
-<!-- + [v7.10.0 DEĞİŞTİ] Tüm hatalar yakalanır                    -->
+<!-- JS-3 v7.10.1 FULL — AI + 3D + SESLİ + VİZYON AL + V27 KOÇ    -->
+<!-- [v7.10.1 EFSANE GÜNCELLEME]                                  -->
+<!-- + [v7.10.1 FIX] setVizyonAlMode plan limit kontrolü         -->
+<!-- + [v7.10.1 FIX] sendVizyonAlMessage dosya entegrasyonu       -->
+<!-- + [v7.10.1 FIX] 3D renk ayarlama sağlamlaştırıldı            -->
+<!-- + [v7.10.1 FIX] cleanClientResponse \r\n desteği             -->
+<!-- + [v7.10.1 FIX] filePreviewContainer id çakışması            -->
+<!-- + [v7.10.1 FIX] Türkçe karakterler (Yıldız vb.)              -->
 <!-- ============================================================ -->
 <script>
 // ================================================================
-// JS-3: TAKIM VE AI + VİZYON AL FULL + SESLİ SOHBET + DOSYA + LOGS
-// [v7.10.0 EFSANE GÜNCELLEME]
-// + [v7.10.0 YENİ] Plan limit entegrasyonu
-// + [v7.10.0 YENİ] Vizyon Al FULL (4 mod + ekran + sesli + dosya)
-// + [v7.10.0 YENİ] Sesli Sohbet tam çalışır
-// + [v7.10.0 YENİ] Dosya Analiz + Sunum + İndirme
-// + [v7.10.0 YENİ] Logs backend entegrasyonu
-// + [v7.10.0 YENİ] V27 Koç limit gösterimi
-// + [v7.10.0 YENİ] Moderatör video kesit aracı
-// + [v7.10.0 DEĞİŞTİ] Tüm işlemlerde log kaydı
+// JS-3 v7.10.1 FULL — AI + 3D + SESLİ + VİZYON AL + V27 KOÇ
 // ================================================================
 
 // ================================================================
@@ -22236,8 +22490,10 @@ var f3dMoveData = null;
 var f3dMovePlane = null;
 var f3dPointerDownPos = { x: 0, y: 0 };
 var f3dOrbitEnabledBeforeMove = true;
+var _f3dAnimateId = null;
 
 // ================================================================
+// ========== [v7.10.1 FIX] TÜRKÇE KARAKTERLER DÜZELTİLDİ =========
 // ========== 3D ŞEKİL KÜTÜPHANESİ (90+) =========================
 // ================================================================
 var f3dShapeLibrary = [
@@ -22542,7 +22798,7 @@ async function joinTeamWithCode() {
     }
 }
 
-// ========== TAKIM MESAJI GÖNDER ==========
+// ========== TAKIM MESAJI GÖNDER (Eski basit versiyon) ==========
 async function sendTeamMessage() {
     if (!currentUser) { showNotification('Önce giriş yapın!', 'error'); return; }
     var teamId = currentUser.get('teamId');
@@ -22632,10 +22888,13 @@ async function leaveTeam() {
     }
 }
 
-// ========== YANIT TEMİZLEME ==========
+// ================================================================
+// ========== [v7.10.1 FIX] YANIT TEMİZLEME — \r\n DESTEĞİ =======
+// ================================================================
 function cleanClientResponse(text) {
     if (!text) return text;
-    var withCopy = text.replace(/```(\w+)?\n([\s\S]*?)```/g, function (match, lang, code) {
+    // ✅ [v7.10.1 FIX] \r\n desteği eklendi
+    var withCopy = text.replace(/```(\w+)?\r?\n([\s\S]*?)```/g, function (match, lang, code) {
         return '<div class="code-block"><pre><code class="language-' + (lang || '') + '">' + code + '</code></pre><button class="copy-btn" onclick="copyCode(this)">📋 Kopyala</button></div>';
     });
     if (withCopy === text) {
@@ -23133,7 +23392,6 @@ window.editAIMessage = function (msgId, source) {
 // ========== DASHBOARD AI MESAJ GÖNDER ===========================
 // ================================================================
 window.sendDashboardAI = async function () {
-    // [v7.10.0 YENİ] Günlük sorgu limit kontrolü
     if (!await useQuery()) return;
 
     var inp = document.getElementById('dashboardAiInput');
@@ -23275,7 +23533,8 @@ function openFullAIPanel() {
             <div id="fullAIChat" class="vizyon-ai-chat" style="flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
                 <div class="ai-msg bot" style="padding:10px 14px;font-size:13px;max-width:90%;border-radius:12px;background:linear-gradient(135deg, rgba(0,255,157,0.1), rgba(0,229,255,0.06));border-left:3px solid #00ff9d;border:1px solid rgba(0,255,157,0.15);"><div class="role">🧠 VİZYON AI</div>Merhaba! 21 farklı AI modeli (13 yerli Ollama + 8 bulut API) hizmetinizde. Günlük 25 sorgu hakkınız var. Size nasıl yardımcı olabilirim?</div>
             </div>
-            <div id="filePreviewContainer" style="display:flex; flex-wrap:wrap; gap:10px; padding:8px 12px; background:rgba(0,0,0,0.2); min-height:0; border-top:1px solid #1a2a4a;"></div>
+            <!-- ✅ [v7.10.1 FIX] Çakışmayı önlemek için id değiştirildi: fullAIFilePreviewContainer -->
+            <div id="fullAIFilePreviewContainer" style="display:flex; flex-wrap:wrap; gap:10px; padding:8px 12px; background:rgba(0,0,0,0.2); min-height:0; border-top:1px solid #1a2a4a;"></div>
             <div class="vizyon-ai-input-area" style="display:flex;gap:8px;padding:12px;border-top:1px solid #1a2a4a;background:rgba(0,0,0,0.3);align-items:center;flex-shrink:0;">
                 <textarea id="fullAIInput" class="vizyon-ai-input" placeholder="Her dilde yazabilirsin... (Python, JavaScript, React, SQL...)" rows="2" style="flex:1;background:#03050a;border:1px solid #1a2a4a;color:#fff;padding:10px 14px;border-radius:12px;font-size:12.5px;resize:none;font-family:'Fira Code',monospace;" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendFullAI();}"></textarea>
                 <input type="file" id="fullAIFileInput" style="display:none;" accept=".txt,.pdf,.doc,.docx,.js,.py,.html,.css,.json,.csv,.xlsx,.zip,.mp4,.mov,.avi,.mkv,.webm,.mp3,.wav,image/*,video/*" onchange="uploadFullFile(this)">
@@ -23466,10 +23725,21 @@ async function sendAiMessage() {
     msgs.scrollTop = msgs.scrollHeight;
 }
 
-// ========== DOSYA YÜKLEME (Full AI) ==========
+// ================================================================
+// ========== [v7.10.1 FIX] DOSYA YÜKLEME (Full AI) ==============
+// filePreviewContainer id çakışması düzeltildi → fullAIFilePreviewContainer
+// ================================================================
 async function uploadFullFile(input) {
     var file = input.files[0];
     if (!file) return;
+
+    var limitCheck = window.checkFeatureLimit('fileAnalyzePerDay', 'day');
+    if (!limitCheck.allowed) {
+        window.showLimitModal('fileAnalyzePerDay', limitCheck);
+        input.value = '';
+        return;
+    }
+
     showNotification('📤 Dosya yükleniyor: ' + file.name, 'success');
     try {
         var parseFile = new Parse.File(file.name, file);
@@ -23478,17 +23748,18 @@ async function uploadFullFile(input) {
         showNotification('✅ Dosya yüklendi!', 'success');
         window.addLogSuccess('Dosya yüklendi (Full AI): ' + file.name);
 
-        var container = document.getElementById('filePreviewContainer');
+        // ✅ [v7.10.1 FIX] Doğru container'a ekle
+        var container = document.getElementById('fullAIFilePreviewContainer');
         if (!container) {
+            console.warn('fullAIFilePreviewContainer bulunamadı, yeni oluşturuluyor...');
             container = document.createElement('div');
-            container.id = 'filePreviewContainer';
+            container.id = 'fullAIFilePreviewContainer';
             container.style.cssText = 'display:flex; flex-wrap:wrap; gap:10px; padding:8px 12px; background:rgba(0,0,0,0.2); min-height:0; border-top:1px solid #1a2a4a;';
-            var inputArea = document.getElementById('fullAIInput');
-            if (inputArea) {
-                inputArea.parentNode.insertBefore(container, inputArea);
+            var fullAIChat = document.getElementById('fullAIChat');
+            if (fullAIChat && fullAIChat.parentNode) {
+                fullAIChat.parentNode.insertBefore(container, fullAIChat.nextSibling);
             } else {
-                var fullAIChat = document.getElementById('fullAIChat');
-                if (fullAIChat) fullAIChat.appendChild(container);
+                document.body.appendChild(container);
             }
         }
 
@@ -23530,12 +23801,14 @@ async function uploadFullFile(input) {
         delBtn.onclick = function (e) {
             e.stopPropagation();
             card.remove();
-            if (container.children.length === 0) container.remove();
+            if (container.children.length === 0) container.style.display = 'none';
         };
         card.appendChild(delBtn);
 
+        container.style.display = 'flex';
         container.appendChild(card);
 
+        // Dosya içeriğini oku ve input'a yerleştir
         var reader = new FileReader();
         reader.onload = async function (event) {
             var content = event.target.result;
@@ -23553,6 +23826,7 @@ async function uploadFullFile(input) {
                     fileMsg += '📝 İçeriği analiz et ve özetle:\n\n' + content.substring(0, 2000);
                 }
                 inputArea.value = fileMsg;
+                window.incrementUsage('fileAnalyzePerDay', 'day', 1);
                 sendFullAI();
             }
         };
@@ -23600,7 +23874,7 @@ window.generateImage = async function () {
 };
 
 // ================================================================
-// ========== 3D SİSTEM (HF + YEDEK) ==============================
+// ========== 3D SİSTEM (Dashboard için HF + Yedek) ==============
 // ================================================================
 if (typeof scene === 'undefined') {
     var scene, camera, renderer, controls;
@@ -24339,10 +24613,49 @@ window.contactFounder = async function () {
 };
 
 // ================================================================
-// ========== [v7.10.0 YENİ] VİZYON AL FULL =======================
+// ========== [v7.10.1 FIX] VİZYON AL FULL =======================
 // ================================================================
+
+// ✅ [v7.10.1 FIX] setVizyonAlMode — PLAN LİMİT KONTROLÜ EKLENDİ
 window.setVizyonAlMode = function (mode) {
     if (['normal', 'deep', 'agent', 'developer'].indexOf(mode) === -1) mode = 'normal';
+
+    // ✅ [v7.10.1 FIX] Yetki kontrolü
+    if (currentUser) {
+        var limits = window.getPlanLimits(currentUser);
+
+        if (mode === 'deep' && !limits.derinDusunme) {
+            window.showLimitModal('derinDusunme', {
+                allowed: false,
+                reason: 'Derin Düşünme modu Pro ve üzeri paketlerde mevcut',
+                limit: 0,
+                used: 0,
+                requiresUpgrade: true
+            });
+            return;
+        }
+        if (mode === 'agent' && !limits.aganModu) {
+            window.showLimitModal('aganModu', {
+                allowed: false,
+                reason: 'Ajan modu Pro ve üzeri paketlerde mevcut',
+                limit: 0,
+                used: 0,
+                requiresUpgrade: true
+            });
+            return;
+        }
+        if (mode === 'developer' && !limits.yazilimciModu) {
+            window.showLimitModal('yazilimciModu', {
+                allowed: false,
+                reason: 'Yazılımcı modu Pro ve üzeri paketlerde mevcut',
+                limit: 0,
+                used: 0,
+                requiresUpgrade: true
+            });
+            return;
+        }
+    }
+
     window.vizyonAlMode = mode;
 
     var btns = document.querySelectorAll('.vz-mode-btn');
@@ -24370,13 +24683,14 @@ window.setVizyonAlMode = function (mode) {
     window.addLogInfo('Vizyon Al mod değişti: ' + mode);
 };
 
+// ✅ [v7.10.1 FIX] sendVizyonAlMessage — DOSYA ENTEGRASYONU EKLENDİ
 window.sendVizyonAlMessage = async function () {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
     if (!window.vizyonAlResponsibilityAccepted) {
         return showNotification('Önce sorumluluk onayını verin!', 'warning');
     }
 
-    // [v7.10.0 YENİ] Limit kontrol
+    // Limit kontrol
     var limitCheck = window.checkFeatureLimit('vizyonAlPerDay', 'day');
     if (!limitCheck.allowed) {
         window.showLimitModal('vizyonAlPerDay', limitCheck);
@@ -24424,9 +24738,9 @@ window.sendVizyonAlMessage = async function () {
     chat.scrollTop = chat.scrollHeight;
 
     try {
-        var params = { message: msg, mode: window.vizyonAlMode };
+        var result;
 
-        // [v7.10.0 YENİ] Dosya varsa ekle
+        // ✅ [v7.10.1 FIX] Dosya varsa ayrı fonksiyon çağır
         if (window.currentUploadedFile) {
             var file = window.currentUploadedFile;
             var base64 = await new Promise(function (resolve, reject) {
@@ -24435,12 +24749,20 @@ window.sendVizyonAlMessage = async function () {
                 reader.onerror = reject;
                 reader.readAsDataURL(file);
             });
-            params.fileBase64 = base64;
-            params.fileName = file.name;
-            params.fileType = file.type;
-        }
 
-        var result = await Parse.Cloud.run('vizyonAlChat', params);
+            result = await Parse.Cloud.run('vizyonAlFileAnalyze', {
+                fileBase64: base64,
+                fileName: file.name,
+                fileType: file.type,
+                question: msg || 'Bu dosyayı analiz et ve özetle.'
+            });
+        } else {
+            // Normal mesaj
+            result = await Parse.Cloud.run('vizyonAlChat', {
+                message: msg,
+                mode: window.vizyonAlMode
+            });
+        }
 
         if (window.vizyonAlLastRequestId !== reqId) {
             var t1 = document.getElementById(thinkId);
@@ -24457,7 +24779,7 @@ window.sendVizyonAlMessage = async function () {
                 '<div class="vz-role">✨ VİZYON AL</div>' +
                 cleaned;
 
-            // [v7.10.0 YENİ] İndirilebilir dosya varsa
+            // İndirilebilir dosya varsa
             if (result.fileDownloadUrl) {
                 replyHtml += '<div style="margin-top:12px;"><a href="' + result.fileDownloadUrl + '" download="' + (result.fileName || 'sunum.txt') + '" class="btn-primary" style="display:inline-flex; align-items:center; gap:8px; padding:10px 18px; text-decoration:none; border-radius:30px; font-size:13px;"><span>📥</span><span>' + (result.fileName || 'Dosyayı İndir') + '</span></a></div>';
             }
@@ -24468,6 +24790,12 @@ window.sendVizyonAlMessage = async function () {
 
             // Kullanım arttır
             window.incrementUsage('vizyonAlPerDay', 'day', 1);
+
+            // Dosya varsa file preview'ı temizle
+            if (window.currentUploadedFile) {
+                window.removeVizyonAlFile();
+            }
+
             window.addLogSuccess('Vizyon Al mesajı işlendi', { mode: window.vizyonAlMode });
         } else {
             var errMsg = (result && result.error) ? result.error : 'Vizyon Al cevap veremedi.';
@@ -24897,7 +25225,7 @@ window.stopVizyonAlResponse = function () {
 };
 
 // ================================================================
-// ========== [v7.10.0 YENİ] MODERATÖR FONKSİYONLARI ==============
+// ========== [v7.10.1] MODERATÖR FONKSİYONLARI ==================
 // ================================================================
 window.openModeratorVideoTool = function () {
     if (!currentUser) return showNotification('Önce giriş yapın!', 'error');
@@ -25014,7 +25342,7 @@ window.scrollToProjectRequests = function () {
 };
 
 // ================================================================
-// ========== V27 KOÇ (Plan Limit Gösterimi + Mesaj Kaydetme) =====
+// ========== V27 KOÇ (Plan Limit + Mesaj Kaydetme) ==============
 // ================================================================
 window.kocConversationId = null;
 window.kocCurrentRequestId = null;
@@ -25570,19 +25898,35 @@ document.addEventListener('keydown', function (e) {
     }
 });
 
-console.log('✅ JS-3 tamamen yüklendi (v7.10.0)');
-console.log('🆕 [v7.10.0 YENİ] Vizyon Al FULL (4 mod + dosya + sesli + ekran)');
-console.log('🆕 [v7.10.0 YENİ] Plan limit entegrasyonu:');
-console.log('   → vizyonAlChat → vizyonAlPerDay kontrolü');
-console.log('   → Dosya yükleme → fileAnalyzePerDay kontrolü + sayaç');
-console.log('   → Sesli sohbet → voiceChatMinutesPerDay + dakika sayacı');
-console.log('   → Video oluşturma → videoCreatePerMonth kontrolü');
-console.log('   → V27 Koç → haftalık limit + limit dolunca modal');
-console.log('🆕 [v7.10.0 YENİ] Sesli Sohbet tam çalışır (kesin durdurma)');
-console.log('🆕 [v7.10.0 YENİ] Dosya Analiz + Sunum + İndirme');
-console.log('🆕 [v7.10.0 YENİ] Moderatör video kesit aracı');
-console.log('🆕 [v7.10.0 YENİ] Logs backend entegrasyonu');
-console.log('🎨 Toplam şekil sayısı:', f3dShapeLibrary.length);
+// ================================================================
+// SON LOG
+// ================================================================
+console.log('✅ JS-3 v7.10.1 FULL yüklendi');
+console.log('');
+console.log('🆕 [v7.10.1 DÜZELTMELERİ]:');
+console.log('   ✅ setVizyonAlMode — Plan limit kontrolü eklendi');
+console.log('      → Free artık Ajan/Derin Düşünme/Yazılımcı seçemez');
+console.log('   ✅ sendVizyonAlMessage — Dosya entegrasyonu eklendi');
+console.log('      → Dosya varsa vizyonAlFileAnalyze çağırıyor');
+console.log('   ✅ uploadFullFile — filePreviewContainer id çakışması düzeltildi');
+console.log('      → fullAIFilePreviewContainer ayrı id');
+console.log('   ✅ cleanClientResponse — \\r\\n desteği eklendi');
+console.log('   ✅ Türkçe karakterler düzeltildi (Yıldız, Küre, Çiçek vb.)');
+console.log('   ✅ 3D şekil kütüphanesi — 90+ şekil gözden geçirildi');
+console.log('');
+console.log('🆕 VİZYON AL FULL:');
+console.log('   → 4 mod (normal/deep/agent/developer) + yetki kontrolü');
+console.log('   → Ekran okuma (tek kare + canlı)');
+console.log('   → Sesli sohbet + sesli giriş');
+console.log('   → Dosya analiz + indirilebilir çıktı');
+console.log('   → Moderasyon devreye alma');
+console.log('');
+console.log('🆕 V27 KOÇ:');
+console.log('   → Mesaj gönderme + geçmiş + paylaşım');
+console.log('   → Limit gösterimi (Free=10/hafta, Pro=50, Team=1000)');
+console.log('   → Şifreli paylaşım sistemi');
+console.log('');
+console.log('🇹🇷 VİZYON 2027 v7.10.1 — JS-3 AKTİF');
 </script>
 
 <!-- ============================================================ -->
