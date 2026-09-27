@@ -21338,47 +21338,143 @@ async function handleLogin() {
 }
 
 // ============================================================
-// GOOGLE İLE GİRİŞ (Güvenlik nedeniyle devre dışı)
+// [v7.10.1 FIX] GOOGLE İLE GİRİŞ — Sadece OAuth2 Popup
+// One Tap ve FedCM KULLANILMIYOR (uyumsuzluk nedeniyle)
 // ============================================================
+window._googleTokenClient = null;
+window._googleInitialized = false;
+
 window.loginWithGoogle = function () {
-    if (typeof google === 'undefined' || !google.accounts) {
-        showNotification('Google SDK yüklenemedi, sayfayı yenileyin.', 'error');
+    if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
+        showNotification('❌ Google SDK yüklenemedi. Sayfayı yenileyin.', 'error');
+        console.error('Google oauth2 SDK hazır değil');
         return;
     }
-    google.accounts.id.initialize({
-        client_id: '648997195148-eoo5683g1ar0gmlckgq4b79tv91dkuut.apps.googleusercontent.com', // Back4App'e girdiğin Client ID
-        callback: handleGoogleLoginResponse
-    });
-    google.accounts.id.prompt(); // Google giriş penceresini açar
+
+    try {
+        showNotification('🔵 Google ile giriş başlatılıyor...', 'success');
+        window.addLogInfo('Google giriş denemesi başlatıldı');
+
+        // Token client'ı SADECE BİR KEZ oluştur
+        if (!window._googleTokenClient) {
+            window._googleTokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: window.GOOGLE_CLIENT_ID,
+                scope: 'openid email profile',
+                ux_mode: 'popup',
+                prompt: 'select_account',
+                callback: async function (tokenResponse) {
+                    console.log('📥 Google token yanıtı:', tokenResponse);
+
+                    if (!tokenResponse || tokenResponse.error) {
+                        var err = tokenResponse && tokenResponse.error ? tokenResponse.error : 'iptal';
+                        showNotification('❌ Google girişi iptal edildi: ' + err, 'warning');
+                        return;
+                    }
+
+                    if (!tokenResponse.access_token) {
+                        showNotification('❌ Google access token alınamadı.', 'error');
+                        return;
+                    }
+
+                    try {
+                        // Kullanıcı bilgilerini Google'dan çek
+                        var res = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+                            headers: { 'Authorization': 'Bearer ' + tokenResponse.access_token }
+                        });
+                        var userInfo = await res.json();
+
+                        if (!userInfo || !userInfo.id) {
+                            showNotification('❌ Google kullanıcı bilgisi alınamadı.', 'error');
+                            return;
+                        }
+
+                        console.log('✅ Google userInfo:', userInfo);
+
+                        // Back4App'e gönder
+                        await window._googleFinalizeLogin({
+                            id: userInfo.id,
+                            email: userInfo.email,
+                            name: userInfo.name,
+                            picture: userInfo.picture,
+                            accessToken: tokenResponse.access_token,
+                            idToken: tokenResponse.id_token || null
+                        });
+                    } catch (e) {
+                        console.error('Google userInfo hatası:', e);
+                        showNotification('Google bilgisi alınamadı: ' + e.message, 'error');
+                    }
+                }
+            });
+        }
+
+        // Popup'ı aç
+        window._googleTokenClient.requestAccessToken({ prompt: 'select_account' });
+    } catch (e) {
+        console.error('❌ Google login hatası:', e);
+        showNotification('Google giriş hatası: ' + e.message, 'error');
+        window.addLogError('Google login hatası: ' + e.message);
+    }
 };
 
-async function handleGoogleLoginResponse(response) {
-    if (!response.credential) {
-        showNotification('Google girişi başarısız.', 'error');
+// ============================================================
+// [v7.10.1] Google girişini Back4App'e tamamla
+// ============================================================
+window._googleFinalizeLogin = async function (googleUser) {
+    if (!googleUser || !googleUser.id || !googleUser.email) {
+        showNotification('Google kullanıcı bilgisi eksik.', 'error');
         return;
     }
+
     try {
-        var authData = {
-            id: response.credential, // Google'ın döndürdüğü JWT token
-            access_token: response.credential
-        };
-        var user = await Parse.User.logInWith('google', { authData: authData });
+        var verifyResult = await Parse.Cloud.run('verifyGoogleToken', {
+            idToken: googleUser.idToken,
+            accessToken: googleUser.accessToken,
+            userId: googleUser.id
+        });
+
+        if (!verifyResult || !verifyResult.success) {
+            throw new Error(verifyResult && verifyResult.error ? verifyResult.error : 'Google token doğrulanamadı.');
+        }
+
+        var user = await Parse.User.become(verifyResult.sessionToken);
+        if (!user) throw new Error('Oturum açılamadı.');
+
+        if (user.get('isBanned')) {
+            await Parse.User.logOut();
+            showNotification('Hesabınız yasaklanmıştır!', 'error');
+            return;
+        }
+
         currentUser = user;
+        window.currentUser = user;
+
         localStorage.setItem('vizyon_user', JSON.stringify({
             id: user.id,
             name: user.get('name'),
             email: user.get('email'),
             role: user.get('role'),
-            plan: user.get('plan')
+            plan: user.get('plan'),
+            teamId: user.get('teamId')
         }));
+
         closeModal('authModal');
         await showDashboard();
-        showNotification('✅ Google ile giriş başarılı!', 'success');
+        updateCommentUI();
+        await loadComments();
+        await checkAndShowSubscriptionCard();
+
+        if (typeof window.refreshUserLimits === 'function') {
+            try { window.refreshUserLimits(); } catch (e) {}
+        }
+
+        showNotification('✅ Google ile giriş başarılı! Hoş geldin, ' + (user.get('name') || 'Kullanıcı'), 'success');
+        window.addLogSuccess('Google girişi başarılı: ' + googleUser.email);
     } catch (e) {
-        console.error('Google login hatası:', e);
+        console.error('❌ Google giriş finalize hatası:', e);
         showNotification('Google giriş hatası: ' + e.message, 'error');
+        window.addLogError('Google giriş hatası: ' + e.message);
     }
-}
+};
 
 // ============================================================
 // FACEBOOK İLE GİRİŞ
