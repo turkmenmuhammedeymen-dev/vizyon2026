@@ -19124,7 +19124,7 @@ body.light-theme .legal-banner {
 
     <!-- ===== YASAL UYARI BANNER ===== -->
     <div class="legal-banner">
-        <div class="legal-banner-line">⚠️ BU PROJE AETHRION'A AİTTİR. HERHANGİ BİR YAPAY ZEKA VEYA İNSAN TARAFINDAN KOPYALANAMAZ VEYA ÖRNEK ALINAMAZ. YAPILMASI DURUMUNDA GEREKLİ YASAL YAPTIRIM UYGULANACAKTIR. BELGELERİMİZDE 28 MODEL KULLANIYORUZ DİYE BAHSETTİK SEBEBİ YENİ MODELLER GETİRME ÇABAMIZ OLMASIDIR 28 MODEL ÇALIŞIYOR: 13 YERLİ OLLAMA + 7 NVIDIA NIM + 8 BULUT API. TÜM KULLANICILARIMIZIN BİLGİSİNE SUNARIZ...</div>
+        <div class="legal-banner-line">⚠️ BU PROJE AETHRION'A AİTTİR. HERHANGİ BİR YAPAY ZEKA VEYA İNSAN TARAFINDAN KOPYALANAMAZ VEYA ÖRNEK ALINAMAZ. YAPILMASI DURUMUNDA GEREKLİ YASAL YAPTIRIM UYGULANACAKTIR.</div>
         <div class="legal-banner-line community-line">📢 SİSTEMDE KULLANILACAK HERHANGİ BİR ARGO SÖZ, KÜFÜR, SİYASİ KONUŞMA VB. ALGILANINCA GEREKLİ YAPTIRIMLAR UYGULANACAKTIR. LÜTFEN TOPLULUK KURALLARINA UYUN.</div>
     </div>
 
@@ -25262,7 +25262,8 @@ console.log('🆕 [AETHRION] A27 alias\'lar aktif: A27_MODELS_TOTAL = 28');
 console.log('🆕 [AETHRION] Tüm log ve bildirim mesajları AETHRION markalı');
 console.log('📌 DEVAM ETMEK İÇİN "devam" YAZ → JS-1/B (Splash + Parse + Session + Counters + Particles)');
 console.log('🇹🇷 AETHRION v1.0.0 — Intelligence Without Limits. — JS-1/A AKTİF');
-<script>
+</script>   
+
 
 <!-- ============================================================ -->
 <!-- JS-1/B: SPLASH + PARSE INIT + SESSION + COUNTERS + PARTICLES -->
@@ -45967,5 +45968,306 @@ body:not(.dashboard-open) .vz-voice-fullscreen:not(.open) {
     pointer-events: none !important;
 }
 </style>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- 🔧 [FIX v1.0.0] MODAL + FOOTER + NAVBAR DÜZELTMELERİ       -->
+<!-- Kapanmayan modalları temizler, footer'ı düzenler            -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<style>
+/* Modal Temizleme */
+.modal-overlay:not(.open),
+.a27-key-reveal-overlay:not(.open),
+.koc-share-modal-overlay:not(.open),
+.v27-key-reveal-overlay:not(.open) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.modal-overlay.open,
+.a27-key-reveal-overlay.open,
+.koc-share-modal-overlay.open,
+.v27-key-reveal-overlay.open {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* Z-Index düzeltmesi */
+#v27KeyRevealOverlay,
+#a27KeyRevealOverlay {
+    z-index: 2147483647 !important;
+}
+
+#kocShareModalOverlay {
+    z-index: 2147483646 !important;
+}
+
+/* Footer Düzeni */
+.footer-badges {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+}
+
+.footer-badges > * {
+    flex: 0 0 auto !important;
+}
+
+@media (max-width: 768px) {
+    .footer-badges {
+        flex-direction: column !important;
+    }
+    .footer-badges > * {
+        width: 100% !important;
+        max-width: 320px !important;
+        justify-content: center !important;
+    }
+}
+
+/* Navbar Sticky */
+nav, .navbar {
+    position: fixed !important;
+    top: 48px !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+    background: rgba(10, 10, 14, 0.92) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+}
+
+@media (max-width: 768px) {
+    nav, .navbar {
+        top: 52px !important;
+    }
+}
+
+body {
+    padding-top: 48px;
+}
+</style>
+
+<script>
+// Modal Cleanup - periyodik
+(function() {
+    function cleanup() {
+        ['v27KeyRevealOverlay', 'a27KeyRevealOverlay',
+         'v27ApiKeyCreatedModal', 'a27ApiKeyCreatedModal',
+         'kocShareModalOverlay'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el && !el.classList.contains('open')) {
+                el.style.display = 'none';
+                el.style.visibility = 'hidden';
+                el.style.pointerEvents = 'none';
+            }
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() { setTimeout(cleanup, 500); });
+    } else {
+        setTimeout(cleanup, 500);
+    }
+    setInterval(cleanup, 3000);
+    console.log('✅ [AETHRION FIX] Modal cleanup aktif');
+})();
+</script>
+
+<script>
+// ═══ [FIX v2] loadTeamPage null kontrolü ═══
+(function() {
+    var _originalLoadTeamPage = window.loadTeamPage;
+    if (typeof _originalLoadTeamPage === 'function') {
+        window.loadTeamPage = async function() {
+            if (!window.currentUser) return;
+            var teamId = window.currentUser.get('teamId');
+            
+            // ✅ FIX: Team yoksa hata verme, temiz çık
+            if (!teamId) {
+                var panelInfo = document.getElementById('teamPageInfo');
+                if (panelInfo) panelInfo.innerHTML = '<span>Takım kodu</span>: <span class="team-code">-</span> <span>0 üye</span>';
+                var panelMessages = document.getElementById('teamPageMessages');
+                if (panelMessages) panelMessages.innerHTML = '<div style="color:var(--text3);text-align:center;padding:20px;">Bir takıma üye değilsiniz.</div>';
+                var createBtn = document.getElementById('teamPageCreateBtn');
+                if (createBtn) createBtn.style.display = 'inline-block';
+                var joinBtn = document.getElementById('teamPageJoinBtn');
+                if (joinBtn) joinBtn.style.display = 'inline-block';
+                var codeInput = document.getElementById('teamPageCodeInput');
+                if (codeInput) codeInput.style.display = 'inline-block';
+                var leaveBtn = document.getElementById('teamPageLeaveBtn');
+                if (leaveBtn) leaveBtn.style.display = 'none';
+                return;
+            }
+            
+            // Team varsa orijinal fonksiyonu çağır, hata çıkarsa sessizce yakala
+            try {
+                await _originalLoadTeamPage.apply(this, arguments);
+            } catch (e) {
+                console.warn('loadTeamPage hata yakalandı:', e.message);
+                var panelInfo2 = document.getElementById('teamPageInfo');
+                if (panelInfo2) panelInfo2.innerHTML = '<span style="color:var(--warning);">Takım yüklenemedi.</span>';
+            }
+        };
+        console.log('✅ [FIX] loadTeamPage null kontrolü eklendi');
+    }
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- 🔧 [FIX v3] EKSİK MODAL GİZLEME — A27 Rehber + Quick Create -->
+<!-- Bu modallar farklı class kullanıyor, onları da gizler       -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<style>
+/* A27 API Rehber Modalı — VARSAYILAN GİZLİ */
+.v27-api-guide-overlay,
+#v27ApiGuideModal {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+.v27-api-guide-overlay.open,
+#v27ApiGuideModal.open {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* A27 Quick Create Modalı — VARSAYILAN GİZLİ */
+.v27-quick-create-overlay,
+#v27QuickCreateOverlay {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+.v27-quick-create-overlay.open,
+#v27QuickCreateOverlay.open {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* A27 Key Created Modal (V27 + A27 uyumlu) */
+#v27ApiKeyCreatedModal,
+#a27ApiKeyCreatedModal {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+#v27ApiKeyCreatedModal.open,
+#a27ApiKeyCreatedModal.open {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* A27 Key Generator Modal */
+#v27ApiKeyGeneratorModal,
+#a27ApiKeyGeneratorModal {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+#v27ApiKeyGeneratorModal.open,
+#a27ApiKeyGeneratorModal.open {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* Z-Index güvenlik */
+#v27ApiGuideModal.open,
+#v27QuickCreateOverlay.open {
+    z-index: 2147483647 !important;
+}
+</style>
+
+<script>
+// ═══ [FIX v3] Tüm A27 modallerini zorla gizle ═══
+(function a27ModalsCleanup() {
+    function cleanup() {
+        var allModalIds = [
+            'v27ApiGuideModal',
+            'v27QuickCreateOverlay',
+            'v27ApiKeyCreatedModal',
+            'a27ApiKeyCreatedModal',
+            'v27ApiKeyGeneratorModal',
+            'a27ApiKeyGeneratorModal',
+            'v27KeyRevealOverlay',
+            'a27KeyRevealOverlay',
+            'kocShareModalOverlay',
+            'kocPanelOverlay'
+        ];
+        
+        allModalIds.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el && !el.classList.contains('open')) {
+                el.style.display = 'none';
+                el.style.visibility = 'hidden';
+                el.style.opacity = '0';
+                el.style.pointerEvents = 'none';
+            }
+        });
+
+        // Class bazlı kontrol
+        var classSelectors = [
+            '.v27-api-guide-overlay',
+            '.v27-quick-create-overlay',
+            '.a27-key-reveal-overlay',
+            '.v27-key-reveal-overlay',
+            '.koc-share-modal-overlay',
+            '.modal-overlay'
+        ];
+        
+        classSelectors.forEach(function(sel) {
+            document.querySelectorAll(sel).forEach(function(el) {
+                if (!el.classList.contains('open')) {
+                    el.style.display = 'none';
+                    el.style.visibility = 'hidden';
+                    el.style.opacity = '0';
+                    el.style.pointerEvents = 'none';
+                }
+            });
+        });
+    }
+
+    // Sayfa yüklendiğinde çalıştır
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(cleanup, 300);
+            setTimeout(cleanup, 1000);
+            setTimeout(cleanup, 3000);
+        });
+    } else {
+        setTimeout(cleanup, 300);
+        setTimeout(cleanup, 1000);
+        setTimeout(cleanup, 3000);
+    }
+
+    // Periyodik temizlik (her 2 saniyede bir)
+    setInterval(cleanup, 2000);
+
+    // Sayfa tekrar görünür olduğunda
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) cleanup();
+    });
+
+    console.log('✅ [FIX v3] A27 modalleri için güçlendirilmiş cleanup aktif');
+})();
+</script>
 </body>
 </html>
