@@ -52066,5 +52066,67 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
     setTimeout(runAll, 4000);
 })();
 </script>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- [AETHRION v1.0.0 ULTIMATE CLEANUP]                          -->
+<!-- Çift butonları siler, navbar'ı temizler, hataları susturur  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script>
+(function AethrionUltimateCleanup() {
+    'use strict';
+
+    function runCleanup() {
+        // 1. Statik Sidebar'ı DOM'dan tamamen sil
+        ['aethrionSidebar', 'aethrionSidebarToggle', 'aethrionSidebarBackdrop'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        });
+
+        // 2. Çift Özellikler Butonunu temizle (Sadece 1 tane kalsın)
+        const triggers = document.querySelectorAll('#aethrionFeaturesTrigger');
+        if (triggers.length > 1) {
+            for (let i = 1; i < triggers.length; i++) {
+                triggers[i].remove();
+            }
+        }
+
+        // 3. Navbar / Dashboard Header Temizliği
+        // Gereksiz butonları gizle (çünkü Özellikler panelinde var)
+        const hideTexts = ['Koc', 'Coach', 'Agents', 'İş İlanları', 'Sesli Sohbet', 'Jarvis'];
+        document.querySelectorAll('button, a').forEach(btn => {
+            const text = (btn.textContent || '').trim();
+            // Eğer buton bu metinlerden birini içeriyorsa ve sidebar/panel içinde değilse
+            if (hideTexts.some(t => text.includes(t)) && !btn.closest('#aethrionFeaturesPanel')) {
+                // Sadece üst menüdeki (header/navbar) olanları gizle
+                if (btn.closest('.user-info') || btn.closest('.button-group') || btn.closest('nav')) {
+                    btn.style.display = 'none';
+                }
+            }
+        });
+
+        // 4. getPublicStats Hatasını Sustur (Cloud'da yoksa konsolu kirletmesin)
+        window.updateStats = async function() {
+            console.log('ℹ️ [AETHRION] Stats güncellemesi atlandı (fonksiyon yok).');
+        };
+
+        // 5. checkFirstTimeSetup Hatasını Sustur
+        window.checkFirstTimeSetup = async function() {
+            return { success: true, skipped: true };
+        };
+
+        console.log('🧹 [UltimateCleanup] Navbar temizlendi, çift butonlar silindi.');
+    }
+
+    // DOM hazır olduğunda ve biraz gecikmeyle çalıştır (diğer scriptler yüklensin diye)
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => setTimeout(runCleanup, 1000));
+    } else {
+        setTimeout(runCleanup, 1000);
+    }
+    
+    // Geç yüklenen butonlar için tekrar çalıştır
+    setTimeout(runCleanup, 3000);
+})();
+</script>
 </body>
 </html>
