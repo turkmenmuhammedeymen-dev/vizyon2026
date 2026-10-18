@@ -50257,5 +50257,1814 @@ window.addEventListener('load', function() {
 });
 </script>
 
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- [AETHRION v1.0.0 SON] KUSURSUZ DASHBOARD, PANEL VE MOBİL  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<style id="aethrionNihaiStyles">
+    /* ========== 1. MOBİL VE GENEL DÜZELTMELER ========== */
+    @media (max-width: 768px) {
+        /* Dashboard içeriğinin taşmasını ve titreşimi engelle */
+        #dashboardArea, #dashboardArea * {
+            max-width: 100vw !important;
+            box-sizing: border-box !important;
+        }
+        #dashboardArea .dashboard-content-wrapper {
+            padding: 15px !important;
+            overflow-x: hidden !important;
+        }
+        /* Karşılama ekranı mobil */
+        #aethrionWelcomeScreen {
+            padding: 30px 15px !important;
+        }
+        #aethrionWelcomeScreen h1 {
+            font-size: 28px !important;
+        }
+        /* Sağ panel mobilde tam ekran */
+        #aethrionFeaturesPanel {
+            width: 100vw !important;
+            max-width: 100vw !important;
+        }
+    }
+
+    /* ========== 2. ÖZELLİKLER PANELİ TETİKLEYİCİSİ ========== */
+    /* Her zaman görünür ve tıklanabilir olsun */
+    #aethrionFeaturesTrigger {
+        position: fixed !important;
+        top: 100px !important;
+        right: 24px !important;
+        width: 54px !important;
+        height: 54px !important;
+        background: linear-gradient(135deg, #e8c555, #c5cde0, #8b6bff, #6ee0ff) !important;
+        background-size: 300% 300% !important;
+        border: none !important;
+        border-radius: 15px !important;
+        cursor: pointer !important;
+        z-index: 99999999 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 5px !important;
+        box-shadow: 0 4px 35px rgba(232,197,85,0.6) !important;
+        animation: btnGradientShift 6s ease infinite !important;
+    }
+    #aethrionFeaturesTrigger span {
+        display: block !important;
+        width: 26px !important;
+        height: 3px !important;
+        background: #fff !important;
+        border-radius: 2px !important;
+    }
+    @media (max-width: 768px) {
+        #aethrionFeaturesTrigger {
+            top: 80px !important;
+            right: 14px !important;
+            width: 46px !important;
+            height: 46px !important;
+        }
+        #aethrionFeaturesTrigger span { width: 22px !important; }
+    }
+
+    /* ========== 3. PANEL İÇİ DÜZEN ========== */
+    #aethrionFeaturesPanel {
+        position: fixed !important;
+        top: 0 !important;
+        right: -100% !important;
+        width: 420px !important;
+        max-width: 92vw !important;
+        height: 100vh !important;
+        background: #0f0f16 !important;
+        border-left: 2px solid #e8c555 !important;
+        z-index: 99999998 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        transition: right 0.4s ease !important;
+        overflow-y: auto !important;
+    }
+    #aethrionFeaturesPanel.open { right: 0 !important; }
+
+    /* ========== 4. KARŞILAMA EKRANI KİLİDİ ========== */
+    #aethrionWelcomeScreen {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: calc(100vh - 100px) !important;
+        text-align: center !important;
+    }
+</style>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// [AETHRION v1.0.0 SON] TÜM HATALARI ÇÖZEN NİHAİ KOD
+// ═══════════════════════════════════════════════════════════════
+(function AethrionNihaiFix() {
+    'use strict';
+
+    // 1. YARDIMCILAR
+    function getUser() {
+        if (window.currentUser) return window.currentUser;
+        try {
+            if (typeof Parse !== 'undefined' && Parse.User && Parse.User.current()) {
+                window.currentUser = Parse.User.current();
+                return window.currentUser;
+            }
+        } catch(e) {}
+        return null;
+    }
+
+    // 2. KARŞILAMA EKRANI (Tüm kartları gizler, sadece karşılama görünür)
+    function showWelcome() {
+        var user = getUser();
+        if (!user) return;
+
+        var wrapper = document.querySelector('#dashboardArea .dashboard-content-wrapper');
+        if (!wrapper) return;
+
+        // TÜM çocukları gizle (dashboardSimplifiedHome varsa onu da sil)
+        var children = Array.from(wrapper.children);
+        children.forEach(function(child) {
+            if (child.id !== 'aethrionWelcomeScreen') {
+                child.style.display = 'none';
+            }
+        });
+        var oldSimplified = document.getElementById('dashboardSimplifiedHome');
+        if (oldSimplified) oldSimplified.remove();
+
+        // Eski karşılamayı sil
+        var oldWelcome = document.getElementById('aethrionWelcomeScreen');
+        if (oldWelcome) oldWelcome.remove();
+
+        var name = user.get('name') || 'Kullanıcı';
+        var role = user.get('role') || 'user';
+        var roleConfig = {
+            founder: { icon: '👑', label: 'KURUCU', cls: 'founder', desc: 'Sınırsız yetki · 28 model · Tüm özellikler' },
+            admin: { icon: '⚙️', label: 'ADMİN', cls: 'admin', desc: 'Yönetici yetkisi · 28 model · Tüm özellikler' },
+            beta: { icon: '🔬', label: 'BETA TESTER', cls: 'beta', desc: 'Sınırsız kullanım · 28 model · Tüm özellikler' },
+            moderator: { icon: '🎨', label: 'MODERATÖR', cls: 'moderator', desc: 'Sınırsız yetki · 28 model · Tüm özellikler' },
+            user: { icon: '👤', label: 'ÜYE', cls: 'user', desc: 'Ücretsiz plan · 28 model · Temel özellikler' }
+        };
+        var rc = roleConfig[role] || roleConfig.user;
+
+        var screen = document.createElement('div');
+        screen.id = 'aethrionWelcomeScreen';
+        screen.innerHTML =
+            '<div style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#e8c555,#c5cde0,#8b6bff,#6ee0ff);display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:900;color:#06060b;margin-bottom:22px;box-shadow:0 0 60px rgba(232,197,85,0.7);">' + name.charAt(0).toUpperCase() + '</div>' +
+            '<h1 style="font-family:Syne,sans-serif;font-size:clamp(32px,5vw,52px);font-weight:800;margin-bottom:10px;">Merhaba,<br><span style="background:linear-gradient(90deg,#e8c555,#c5cde0,#8b6bff,#6ee0ff);-webkit-background-clip:text;background-clip:text;color:transparent;">' + name + '</span></h1>' +
+            '<div style="display:inline-block;padding:10px 24px;border-radius:999px;font-size:14px;font-weight:700;letter-spacing:1px;margin-bottom:24px;background:rgba(232,197,85,0.2);border:1.5px solid #e8c555;color:#e8c555;">' + rc.icon + ' ' + rc.label + '</div>' +
+            '<p style="color:#dbdbe8;font-size:15px;max-width:560px;line-height:1.8;margin-bottom:32px;">' + rc.desc + '.<br>AETHRION\'a hoş geldin! Aşağıdaki butondan tüm özelliklere erişebilirsin.</p>' +
+            '<button onclick="window.openAethrionFeaturesPanel()" style="padding:18px 48px;font-size:18px;font-weight:800;background:linear-gradient(135deg,#e8c555,#c5cde0,#8b6bff,#6ee0ff);background-size:250% 250%;color:#06060b;border:none;border-radius:60px;cursor:pointer;box-shadow:0 0 50px rgba(232,197,85,0.6);animation:btnGradientShift 5s ease infinite;display:inline-flex;align-items:center;gap:12px;">🚀 Tüm Özellikler</button>';
+
+        wrapper.insertBefore(screen, wrapper.firstChild);
+        console.log('✅ Karşılama ekranı gösterildi.');
+    }
+
+    // 3. DASHBOARD KARTI GÖSTER (Yönetim panelleri için)
+    window.openDashboardCard = function(cardId) {
+        var card = document.getElementById(cardId);
+        if (!card) {
+            if (typeof showNotification === 'function') showNotification('⚠️ Bu panel henüz hazır değil.', 'warning');
+            return;
+        }
+        var welcome = document.getElementById('aethrionWelcomeScreen');
+        if (welcome) welcome.style.display = 'none';
+        var wrapper = document.querySelector('#dashboardArea .dashboard-content-wrapper');
+        if (wrapper) {
+            Array.from(wrapper.children).forEach(function(child) {
+                if (child.id !== cardId) child.style.display = 'none';
+            });
+        }
+        card.style.display = 'block';
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    // 4. ÖZELLİK ÇAĞIRMA (Her özellik kendi sayfasını açar)
+    window.safeFeatureCall = function(action, name) {
+        window.closeAethrionFeaturesPanel();
+
+        if (action === 'goHome') {
+            showWelcome();
+            return;
+        }
+        if (action === 'doLogout') {
+            if (typeof window.logout === 'function') window.logout();
+            else location.reload();
+            return;
+        }
+
+        // Dashboard kartları
+        var cardMap = {
+            'openUserManagement': 'userManagementCard',
+            'openAdminAssign': 'adminPanelCard',
+            'openBetaAssign': 'betaAssignSection',
+            'openPollCreator': 'pollCreator',
+            'openAnnouncementCreator': 'announcementCreator'
+        };
+        if (cardMap[action]) {
+            window.openDashboardCard(cardMap[action]);
+            return;
+        }
+
+        // Modal / Panel fonksiyonları
+        var fn = window[action];
+        if (typeof fn === 'function') {
+            try { fn(); } catch(e) { 
+                if (typeof showNotification === 'function') showNotification('⚠️ ' + name + ' açılamadı: ' + e.message, 'error'); 
+            }
+        } else {
+            if (typeof showNotification === 'function') showNotification('⚠️ "' + name + '" özelliği yüklenemedi.', 'warning');
+        }
+    };
+
+    // 5. PANEL OLUŞTURMA
+    window.buildPanel = function() {
+        if (document.getElementById('aethrionFeaturesPanel')) return;
+
+        // Tetikleyici buton
+        var trigger = document.createElement('button');
+        trigger.id = 'aethrionFeaturesTrigger';
+        trigger.innerHTML = '<span></span><span></span><span></span>';
+        trigger.onclick = window.toggleAethrionFeaturesPanel;
+        document.body.appendChild(trigger);
+
+        // Backdrop
+        var bd = document.createElement('div');
+        bd.id = 'aethrionFeaturesBackdrop';
+        bd.style.cssText = 'position:fixed;inset:0;background:rgba(5,5,7,0.75);backdrop-filter:blur(6px);z-index:99999997;opacity:0;visibility:hidden;pointer-events:none;transition:0.3s;';
+        bd.onclick = window.closeAethrionFeaturesPanel;
+        document.body.appendChild(bd);
+
+        // Panel
+        var panel = document.createElement('aside');
+        panel.id = 'aethrionFeaturesPanel';
+        var user = getUser();
+        var role = user ? user.get('role') : 'user';
+
+        var features = [
+            { group: '🏠 Ana', icon: '🏠', name: 'Ana Sayfa', desc: 'Karşılama ekranına dön', action: 'goHome' },
+            { group: '⚡ Çekirdek', icon: '🧠', name: 'Aethrion AI', desc: '28 model birleşik güç', action: 'openFullAIPanel' },
+            { group: '⚡ Çekirdek', icon: '✨', name: 'Aethrion Al', desc: '4 mod · 28 model', action: 'openAethrionAlPanel' },
+            { group: '⚡ Çekirdek', icon: '🧭', name: 'Aethrion Coach', desc: 'Samimi AI koç', action: 'openKocPanel' },
+            { group: '⚡ Çekirdek', icon: '🤖', name: 'Jarvis', desc: 'Sesli asistan (wake word)', action: 'startJarvisMode' },
+            { group: '⚡ Çekirdek', icon: '🔊', name: 'Sesli Sohbet', desc: 'Tam ekran ChatGPT tarzı', action: 'openVoiceChatFullscreen' },
+            { group: '⚡ Çekirdek', icon: '🟢', name: '28 Model Showcase', desc: '13 Ollama + 7 NIM + 8 API', action: 'openModelsShowcase' },
+            { group: '🎨 Oluşturma', icon: '🎬', name: 'Video Editör', desc: 'Timeline + trim + overlay', action: 'openVideoEditor' },
+            { group: '🎨 Oluşturma', icon: '🎥', name: 'Video Stüdyosu', desc: 'Senaryo + Reels + Analiz', action: 'openVideoStudio' },
+            { group: '🎨 Oluşturma', icon: '🧊', name: '3D Stüdyo', desc: '90+ şekil + .glb', action: 'open3DBuilder' },
+            { group: '🎨 Oluşturma', icon: '🖼️', name: 'GIF Seçici', desc: 'Giphy ile GIF ara', action: 'openGifPicker' },
+            { group: '🌐 Platform', icon: '💼', name: 'İş İlanları', desc: 'A27 İş İlanları Mağazası', action: 'openJobMarket' },
+            { group: '🌐 Platform', icon: '🛒', name: 'Puan Mağazası', desc: 'Kazan, harca, sat', action: 'openMarket' },
+            { group: '🌐 Platform', icon: '👥', name: 'Community', desc: 'Takım + ortak proje', action: 'toggleTeamPage' },
+            { group: '🌐 Platform', icon: '🤖', name: 'AI Kişisel Asistan', desc: 'Günlük özet + hatırlatıcı', action: 'openPersonalAssistant' },
+            { group: '🌐 Platform', icon: '🏆', name: 'Aylık Yarışma', desc: 'Projeni gönder, kazan', action: 'openContestPage' },
+            { group: '🌐 Platform', icon: '📬', name: 'Gelen Kutusu', desc: 'Bildirimler ve davetler', action: 'loadInbox' },
+            { group: '🔑 Gelişmiş', icon: '🔑', name: 'A27 API Anahtarı', desc: '2 / 20 / 100 / sınırsız', action: 'openV27ApiKeyGenerator' },
+            { group: '🔑 Gelişmiş', icon: '📖', name: 'A27 API Rehberi', desc: 'cURL / JS / Python', action: 'openA27ApiGuide' },
+            { group: '🔑 Gelişmiş', icon: '🔐', name: 'Kendi API Ekle', desc: 'OpenAI, Groq, Gemini', action: 'openApiEkle' },
+            { group: '🔑 Gelişmiş', icon: '📋', name: 'API Anahtarlarım', desc: 'Kayıtlı API\'lerim', action: 'openApiAnahtarlarim' },
+            { group: '🔑 Gelişmiş', icon: '📊', name: 'Logs Sistemi', desc: '5 seviye + backend sync', action: 'openLogsPanel' },
+            { group: '🔑 Gelişmiş', icon: '🛡️', name: 'Ebeveyn Ayarları', desc: 'Güvenli mod + limitler', action: 'openParentSettings' },
+            { group: '👤 Hesap', icon: '👤', name: 'Profilim', desc: 'Bilgiler, puan, seviye', action: 'openProfileModal' },
+            { group: '👤 Hesap', icon: '📋', name: 'Hesap Bilgilerim', desc: 'IP, cihaz, üyelik', action: 'openAccountInfo' },
+            { group: '👤 Hesap', icon: '⚙️', name: 'Ayarlar', desc: 'Dil, tema, tercihler', action: 'openSettingsModal' },
+            { group: '👤 Hesap', icon: '🚪', name: 'Çıkış Yap', desc: 'Oturumu kapat', action: 'doLogout' }
+        ];
+
+        if (role === 'founder' || role === 'admin') {
+            features.splice(features.length - 4, 0,
+                { group: '👑 Yönetim', icon: '👥', name: 'Kullanıcı Yönetimi', desc: 'Tüm kullanıcıları listele', action: 'openUserManagement' },
+                { group: '👑 Yönetim', icon: '🔬', name: 'Beta Tester Ata', desc: 'Beta rolü ver', action: 'openBetaAssign' },
+                { group: '👑 Yönetim', icon: '📢', name: 'Duyuru Yayınla', desc: 'Sistem duyurusu', action: 'openAnnouncementCreator' }
+            );
+        }
+        if (role === 'founder') {
+            features.splice(features.length - 4, 0,
+                { group: '👑 Yönetim', icon: '🎨', name: 'Moderatör Ata', desc: 'Gizli rütbe', action: 'openModeratorAssignModal' },
+                { group: '👑 Yönetim', icon: '⚙️', name: 'Admin Ata', desc: 'Yönetici yetkisi', action: 'openAdminAssign' },
+                { group: '👑 Yönetim', icon: '📊', name: 'Anket Oluştur', desc: 'Topluluk oylaması', action: 'openPollCreator' }
+            );
+        }
+
+        var groups = {};
+        var order = [];
+        features.forEach(function(f) {
+            if (!groups[f.group]) { groups[f.group] = []; order.push(f.group); }
+            groups[f.group].push(f);
+        });
+
+        var html = '<div style="padding:18px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e8c555;background:#0f0f16;"><h3 style="margin:0;font-size:16px;color:#e8c555;">✨ AETHRION MENÜ</h3><button onclick="window.closeAethrionFeaturesPanel()" style="background:none;border:1px solid #ef4444;color:#ef4444;border-radius:50%;width:32px;height:32px;cursor:pointer;">✕</button></div><div style="padding:10px 12px;overflow-y:auto;flex:1;">';
+        order.forEach(function(g) {
+            html += '<div style="margin-bottom:16px;"><div style="font-size:10.5px;color:#8a8aa8;font-weight:700;letter-spacing:2px;padding:8px 6px;text-transform:uppercase;">' + g + '</div>';
+            groups[g].forEach(function(f) {
+                html += '<button onclick="window.safeFeatureCall(\'' + f.action + '\', \'' + f.name + '\')" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;margin-bottom:4px;background:rgba(232,197,85,0.04);border:1px solid rgba(232,197,85,0.1);border-radius:10px;cursor:pointer;text-align:left;color:inherit;font-family:inherit;"><span style="font-size:18px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);border-radius:9px;border:1px solid rgba(232,197,85,0.3);">' + f.icon + '</span><span style="flex:1;min-width:0;"><span style="font-size:13px;font-weight:700;color:#fff;display:block;">' + f.name + '</span><span style="font-size:10.5px;color:#8a8aa8;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + f.desc + '</span></span><span style="color:#e8c555;font-size:16px;opacity:0.5;">›</span></button>';
+            });
+            html += '</div>';
+        });
+        html += '</div>';
+        panel.innerHTML = html;
+        document.body.appendChild(panel);
+    };
+
+    // 6. PANEL AÇ / KAPAT
+    window.openAethrionFeaturesPanel = function() {
+        window.buildPanel();
+        var panel = document.getElementById('aethrionFeaturesPanel');
+        var bd = document.getElementById('aethrionFeaturesBackdrop');
+        if (panel) panel.classList.add('open');
+        if (bd) bd.classList.add('show');
+    };
+    window.closeAethrionFeaturesPanel = function() {
+        var panel = document.getElementById('aethrionFeaturesPanel');
+        var bd = document.getElementById('aethrionFeaturesBackdrop');
+        if (panel) panel.classList.remove('open');
+        if (bd) bd.classList.remove('show');
+    };
+    window.toggleAethrionFeaturesPanel = function() {
+        var panel = document.getElementById('aethrionFeaturesPanel');
+        if (panel && panel.classList.contains('open')) window.closeAethrionFeaturesPanel();
+        else window.openAethrionFeaturesPanel();
+    };
+
+    // 7. BAŞLAT
+    function init() {
+        var user = getUser();
+        if (user) {
+            // Kullanıcı varsa dashboard'u göster, ana sayfayı gizle
+            document.body.classList.add('logged-in-user');
+            var dash = document.getElementById('dashboardArea');
+            if (dash) { dash.style.display = 'block'; dash.style.visibility = 'visible'; }
+            var main = document.getElementById('mainSite');
+            if (main) main.style.display = 'none';
+            
+            // Karşılama ekranını göster
+            showWelcome();
+        } else {
+            // Kullanıcı yoksa ana sayfayı göster
+            document.body.classList.remove('logged-in-user');
+            var dash2 = document.getElementById('dashboardArea');
+            if (dash2) dash2.style.display = 'none';
+            var main2 = document.getElementById('mainSite');
+            if (main2) main2.style.display = 'block';
+        }
+        // Panelin varlığından emin ol
+        window.buildPanel();
+        console.log('✅ Nihai kurulum tamamlandı.');
+    }
+
+    // Sayfa yüklendiğinde çalıştır
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() { setTimeout(init, 1000); });
+    } else {
+        setTimeout(init, 1000);
+    }
+    // showDashboard override
+    var origShow = window.showDashboard;
+    if (typeof origShow === 'function') {
+        window.showDashboard = async function() {
+            await origShow.apply(this, arguments);
+            setTimeout(init, 500);
+        };
+    }
+    console.log('✅ [AETHRION NİHAİ FIX] Yüklendi!');
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- [AETHRION v1.0.0 KESİN ÇÖZÜM] MODAL FIX + KARŞILAMA + PANEL -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<style id="aethrionFinalMasterCSS">
+    /* 1. MODERATÖR PANELİNİ KESİN GİZLE (Sadece gerçekten moderatörse gösterilecek) */
+    #moderatorInfoCard {
+        display: none !important;
+    }
+
+    /* 2. KOÇ VE SESLİ ASİSTAN MODALLARINI ZORLA ÖNE ÇIKAR */
+    #kocPanelOverlay, #voiceChatFullscreen, #vzVoiceFullscreen, #aethrionAlPanel {
+        z-index: 2147483647 !important; /* En üst katman */
+    }
+    #kocPanelOverlay.open, #voiceChatFullscreen.open, #vzVoiceFullscreen.open {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* 3. ÖZELLİKLER BUTONU HER ZAMAN GÖRÜNSÜN */
+    #aethrionFeaturesTrigger {
+        z-index: 2147483646 !important;
+    }
+
+    /* 4. MOBİL DÜZELTME */
+    @media (max-width: 768px) {
+        #dashboardArea .dashboard-content-wrapper {
+            padding: 10px !important;
+            overflow-x: hidden !important;
+        }
+        #aethrionWelcomeScreen h1 { font-size: 28px !important; }
+        #aethrionFeaturesPanel { width: 100vw !important; max-width: 100vw !important; }
+    }
+</style>
+
+<script>
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        console.log('🚀 AETHRION KESİN ÇÖZÜM YÜKLENİYOR...');
+
+        // ============================================================
+        // 1. YARDIMCILAR
+        // ============================================================
+        function getUser() {
+            if (window.currentUser) return window.currentUser;
+            try {
+                if (typeof Parse !== 'undefined' && Parse.User && Parse.User.current()) {
+                    window.currentUser = Parse.User.current();
+                    return window.currentUser;
+                }
+            } catch(e) {}
+            return null;
+        }
+
+        // ============================================================
+        // 2. EKRAN GÖSTERİMLERİ (Karşılama vs Dashboard)
+        // ============================================================
+        window.showWelcomeScreen = function() {
+            var wrapper = document.querySelector('#dashboardArea .dashboard-content-wrapper');
+            if (!wrapper) return;
+            
+            // Tüm alt öğeleri gizle
+            Array.from(wrapper.children).forEach(function(c) { c.style.display = 'none'; });
+            
+            var oldWelcome = document.getElementById('aethrionWelcomeScreen');
+            if (oldWelcome) oldWelcome.remove();
+
+            var user = getUser();
+            if (!user) return;
+
+            var name = user.get('name') || 'Kullanıcı';
+            var role = user.get('role') || 'user';
+            var roleLabel = role === 'founder' ? '👑 KURUCU' : (role === 'admin' ? '⚙️ ADMİN' : (role === 'moderator' ? '🎨 MODERATÖR' : '👤 ÜYE'));
+
+            var screen = document.createElement('div');
+            screen.id = 'aethrionWelcomeScreen';
+            screen.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 120px);text-align:center;';
+            screen.innerHTML = 
+                '<div style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#e8c555,#c5cde0,#8b6bff,#6ee0ff);display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:900;color:#06060b;margin-bottom:20px;box-shadow:0 0 60px rgba(232,197,85,0.7);">' + name.charAt(0).toUpperCase() + '</div>' +
+                '<h1 style="font-family:Syne,sans-serif;font-size:clamp(32px,5vw,52px);font-weight:800;margin-bottom:10px;">Merhaba,<br><span style="background:linear-gradient(90deg,#e8c555,#c5cde0,#8b6bff,#6ee0ff);-webkit-background-clip:text;background-clip:text;color:transparent;">' + name + '</span></h1>' +
+                '<div style="padding:10px 24px;border-radius:999px;font-size:14px;font-weight:700;margin-bottom:24px;background:rgba(232,197,85,0.2);border:1.5px solid #e8c555;color:#e8c555;">' + roleLabel + '</div>' +
+                '<p style="color:#dbdbe8;font-size:15px;max-width:560px;line-height:1.8;margin-bottom:32px;">AETHRION\'a hoş geldin! Aşağıdaki butondan tüm özelliklere erişebilirsin.</p>' +
+                '<button onclick="window.openAethrionFeaturesPanel()" style="padding:18px 48px;font-size:18px;font-weight:800;background:linear-gradient(135deg,#e8c555,#c5cde0,#8b6bff,#6ee0ff);background-size:250% 250%;color:#06060b;border:none;border-radius:60px;cursor:pointer;box-shadow:0 0 50px rgba(232,197,85,0.6);">🚀 Tüm Özellikler</button>';
+            wrapper.insertBefore(screen, wrapper.firstChild);
+        };
+
+        window.showDashboardCards = function() {
+            // Karşılamayı gizle
+            var welcome = document.getElementById('aethrionWelcomeScreen');
+            if (welcome) welcome.style.display = 'none';
+            
+            // Tüm dashboard kartlarını göster (alt alta)
+            var wrapper = document.querySelector('#dashboardArea .dashboard-content-wrapper');
+            if (wrapper) {
+                Array.from(wrapper.children).forEach(function(c) {
+                    if (c.id !== 'aethrionWelcomeScreen') c.style.display = 'block';
+                });
+            }
+        };
+
+        // ============================================================
+        // 3. ÖZELLİKLER PANELİ (Yan Menü)
+        // ============================================================
+        window.buildPanel = function() {
+            if (document.getElementById('aethrionFeaturesPanel')) return;
+
+            // Buton
+            var trigger = document.createElement('button');
+            trigger.id = 'aethrionFeaturesTrigger';
+            trigger.innerHTML = '<span></span><span></span><span></span>';
+            trigger.style.cssText = 'position:fixed;top:100px;right:24px;width:54px;height:54px;background:linear-gradient(135deg,#e8c555,#c5cde0,#8b6bff,#6ee0ff);border-radius:15px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;box-shadow:0 4px 35px rgba(232,197,85,0.6);';
+            trigger.onclick = window.toggleAethrionFeaturesPanel;
+            document.body.appendChild(trigger);
+
+            // Arka plan
+            var bd = document.createElement('div');
+            bd.id = 'aethrionFeaturesBackdrop';
+            bd.style.cssText = 'position:fixed;inset:0;background:rgba(5,5,7,0.75);backdrop-filter:blur(6px);z-index:99999997;opacity:0;visibility:hidden;pointer-events:none;transition:0.3s;';
+            bd.onclick = window.closeAethrionFeaturesPanel;
+            document.body.appendChild(bd);
+
+            // Panel içeriği
+            var panel = document.createElement('aside');
+            panel.id = 'aethrionFeaturesPanel';
+            panel.style.cssText = 'position:fixed;top:0;right:-100%;width:420px;max-width:92vw;height:100vh;background:#0f0f16;border-left:2px solid #e8c555;z-index:99999998;display:flex;flex-direction:column;transition:right 0.4s ease;overflow-y:auto;';
+            
+            var user = getUser();
+            var role = user ? user.get('role') : 'user';
+
+            var features = [
+                { group: '🏠 Ana Ekran', icon: '🏠', name: 'Karşılama Ekranı', desc: 'Sadece isminin yazdığı ekran', action: 'goHome' },
+                { group: '🏠 Ana Ekran', icon: '📋', name: 'Tüm Özellikler', desc: 'Eski alt alta dizilmiş kartlar', action: 'showAllCards' },
+                
+                { group: '⚡ Çekirdek', icon: '🧠', name: 'Aethrion AI', desc: '28 model birleşik güç', action: 'openFullAIPanel' },
+                { group: '⚡ Çekirdek', icon: '✨', name: 'Aethrion Al', desc: '4 mod · 28 model', action: 'openAethrionAlPanel' },
+                { group: '⚡ Çekirdek', icon: '🧭', name: 'Aethrion Coach', desc: 'Samimi AI koç', action: 'openKocPanel' },
+                { group: '⚡ Çekirdek', icon: '🤖', name: 'Jarvis', desc: 'Sesli asistan (wake word)', action: 'startJarvisMode' },
+                { group: '⚡ Çekirdek', icon: '🔊', name: 'Sesli Sohbet', desc: 'Tam ekran ChatGPT tarzı', action: 'openVoiceChatFullscreen' },
+                
+                { group: '🎨 Oluşturma', icon: '🎬', name: 'Video Editör', desc: 'Timeline + trim + overlay', action: 'openVideoEditor' },
+                { group: '🎨 Oluşturma', icon: '🎥', name: 'Video Stüdyosu', desc: 'Senaryo + Reels + Analiz', action: 'openVideoStudio' },
+                { group: '🎨 Oluşturma', icon: '🧊', name: '3D Stüdyo', desc: '90+ şekil + .glb', action: 'open3DBuilder' },
+                { group: '🎨 Oluşturma', icon: '🖼️', name: 'GIF Seçici', desc: 'Giphy ile GIF ara', action: 'openGifPicker' },
+                
+                { group: '🌐 Platform', icon: '💼', name: 'İş İlanları', desc: 'A27 İş İlanları Mağazası', action: 'openJobMarket' },
+                { group: '🌐 Platform', icon: '🛒', name: 'Puan Mağazası', desc: 'Kazan, harca, sat', action: 'openMarket' },
+                { group: '🌐 Platform', icon: '👥', name: 'Community', desc: 'Takım + ortak proje', action: 'toggleTeamPage' },
+                { group: '🌐 Platform', icon: '🤖', name: 'AI Kişisel Asistan', desc: 'Günlük özet + hatırlatıcı', action: 'openPersonalAssistant' },
+                { group: '🌐 Platform', icon: '🏆', name: 'Aylık Yarışma', desc: 'Projeni gönder, kazan', action: 'openContestPage' },
+                { group: '🌐 Platform', icon: '📬', name: 'Gelen Kutusu', desc: 'Bildirimler ve davetler', action: 'loadInbox' },
+                
+                { group: '🔑 Gelişmiş', icon: '🔑', name: 'A27 API Anahtarı', desc: '2 / 20 / 100 / sınırsız', action: 'openV27ApiKeyGenerator' },
+                { group: '🔑 Gelişmiş', icon: '📖', name: 'A27 API Rehberi', desc: 'cURL / JS / Python', action: 'openA27ApiGuide' },
+                { group: '🔑 Gelişmiş', icon: '🔐', name: 'Kendi API Ekle', desc: 'OpenAI, Groq, Gemini', action: 'openApiEkle' },
+                { group: '🔑 Gelişmiş', icon: '📋', name: 'API Anahtarlarım', desc: 'Kayıtlı API\'lerim', action: 'openApiAnahtarlarim' },
+                { group: '🔑 Gelişmiş', icon: '📊', name: 'Logs Sistemi', desc: '5 seviye + backend sync', action: 'openLogsPanel' },
+                { group: '🔑 Gelişmiş', icon: '🛡️', name: 'Ebeveyn Ayarları', desc: 'Güvenli mod + limitler', action: 'openParentSettings' },
+                
+                { group: '👤 Hesap', icon: '👤', name: 'Profilim', desc: 'Bilgiler, puan, seviye', action: 'openProfileModal' },
+                { group: '👤 Hesap', icon: '📋', name: 'Hesap Bilgilerim', desc: 'IP, cihaz, üyelik', action: 'openAccountInfo' },
+                { group: '👤 Hesap', icon: '⚙️', name: 'Ayarlar', desc: 'Dil, tema, tercihler', action: 'openSettingsModal' },
+                { group: '👤 Hesap', icon: '🚪', name: 'Çıkış Yap', desc: 'Oturumu kapat', action: 'doLogout' }
+            ];
+
+            if (role === 'founder' || role === 'admin') {
+                features.splice(features.length - 4, 0,
+                    { group: '👑 Yönetim', icon: '👥', name: 'Kullanıcı Yönetimi', desc: 'Tüm kullanıcıları listele', action: 'openUserManagement' },
+                    { group: '👑 Yönetim', icon: '🔬', name: 'Beta Tester Ata', desc: 'Beta rolü ver', action: 'openBetaAssign' },
+                    { group: '👑 Yönetim', icon: '📢', name: 'Duyuru Yayınla', desc: 'Sistem duyurusu', action: 'openAnnouncementCreator' }
+                );
+            }
+            if (role === 'founder') {
+                features.splice(features.length - 4, 0,
+                    { group: '👑 Yönetim', icon: '🎨', name: 'Moderatör Ata', desc: 'Gizli rütbe', action: 'openModeratorAssignModal' },
+                    { group: '👑 Yönetim', icon: '⚙️', name: 'Admin Ata', desc: 'Yönetici yetkisi', action: 'openAdminAssign' },
+                    { group: '👑 Yönetim', icon: '📊', name: 'Anket Oluştur', desc: 'Topluluk oylaması', action: 'openPollCreator' }
+                );
+            }
+
+            var groups = {}, order = [];
+            features.forEach(function(f) {
+                if (!groups[f.group]) { groups[f.group] = []; order.push(f.group); }
+                groups[f.group].push(f);
+            });
+
+            var html = '<div style="padding:18px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e8c555;background:#0f0f16;"><h3 style="margin:0;font-size:16px;color:#e8c555;">✨ AETHRION MENÜ</h3><button onclick="window.closeAethrionFeaturesPanel()" style="background:none;border:1px solid #ef4444;color:#ef4444;border-radius:50%;width:32px;height:32px;cursor:pointer;">✕</button></div><div style="padding:10px 12px;overflow-y:auto;flex:1;">';
+            
+            order.forEach(function(g) {
+                html += '<div style="margin-bottom:16px;"><div style="font-size:10.5px;color:#8a8aa8;font-weight:700;letter-spacing:2px;padding:8px 6px;text-transform:uppercase;">' + g + '</div>';
+                groups[g].forEach(function(f) {
+                    html += '<button onclick="window.safeFeatureCall(\'' + f.action + '\', \'' + f.name + '\')" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;margin-bottom:4px;background:rgba(232,197,85,0.04);border:1px solid rgba(232,197,85,0.1);border-radius:10px;cursor:pointer;text-align:left;color:inherit;font-family:inherit;"><span style="font-size:18px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);border-radius:9px;border:1px solid rgba(232,197,85,0.3);">' + f.icon + '</span><span style="flex:1;min-width:0;"><span style="font-size:13px;font-weight:700;color:#fff;display:block;">' + f.name + '</span><span style="font-size:10.5px;color:#8a8aa8;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + f.desc + '</span></span><span style="color:#e8c555;font-size:16px;opacity:0.5;">›</span></button>';
+                });
+                html += '</div>';
+            });
+            html += '</div>';
+            panel.innerHTML = html;
+            document.body.appendChild(panel);
+        };
+
+        // Panel Aç/Kapat
+        window.openAethrionFeaturesPanel = function() {
+            window.buildPanel();
+            var panel = document.getElementById('aethrionFeaturesPanel');
+            var bd = document.getElementById('aethrionFeaturesBackdrop');
+            if (panel) panel.style.right = '0';
+            if (bd) { bd.style.opacity = '1'; bd.style.visibility = 'visible'; bd.style.pointerEvents = 'auto'; }
+        };
+        window.closeAethrionFeaturesPanel = function() {
+            var panel = document.getElementById('aethrionFeaturesPanel');
+            var bd = document.getElementById('aethrionFeaturesBackdrop');
+            if (panel) panel.style.right = '-100%';
+            if (bd) { bd.style.opacity = '0'; bd.style.visibility = 'hidden'; bd.style.pointerEvents = 'none'; }
+        };
+        window.toggleAethrionFeaturesPanel = function() {
+            var panel = document.getElementById('aethrionFeaturesPanel');
+            if (panel && panel.style.right === '0px') window.closeAethrionFeaturesPanel();
+            else window.openAethrionFeaturesPanel();
+        };
+
+        // ============================================================
+        // 4. ÖZELLİK ÇAĞIRMA (Seçilen özelliği aç)
+        // ============================================================
+        window.safeFeatureCall = function(action, name) {
+            window.closeAethrionFeaturesPanel();
+
+            if (action === 'goHome') { window.showWelcomeScreen(); return; }
+            if (action === 'showAllCards') { window.showDashboardCards(); return; }
+            if (action === 'doLogout') { if (typeof window.logout === 'function') window.logout(); else location.reload(); return; }
+
+            // Yönetim kartları
+            var cardMap = { 'openUserManagement': 'userManagementCard', 'openAdminAssign': 'adminPanelCard', 'openBetaAssign': 'betaAssignSection', 'openPollCreator': 'pollCreator', 'openAnnouncementCreator': 'announcementCreator' };
+            if (cardMap[action]) {
+                window.showDashboardCards();
+                var card = document.getElementById(cardMap[action]);
+                if (card) { card.style.display = 'block'; card.scrollIntoView({behavior:'smooth'}); }
+                return;
+            }
+
+            // Diğer fonksiyonlar (Koç, Sesli vs.)
+            var fn = window[action];
+            if (typeof fn === 'function') {
+                try { fn(); } catch(e) { if (typeof showNotification === 'function') showNotification('⚠️ ' + name + ' açılamadı: ' + e.message, 'error'); }
+            } else {
+                if (typeof showNotification === 'function') showNotification('⚠️ "' + name + '" özelliği yüklenemedi.', 'warning');
+            }
+        };
+
+        // ============================================================
+        // 5. BAŞLATMA
+        // ============================================================
+        function init() {
+            var user = getUser();
+            if (user) {
+                document.body.classList.add('logged-in-user');
+                var dash = document.getElementById('dashboardArea');
+                if (dash) { dash.style.display = 'block'; dash.style.visibility = 'visible'; }
+                var main = document.getElementById('mainSite');
+                if (main) main.style.display = 'none';
+                
+                // Moderatör panelini gizle (JS ile de garantiye alalım)
+                var modCard = document.getElementById('moderatorInfoCard');
+                if (modCard) modCard.style.display = 'none';
+
+                // İlk açılışta karşılama ekranını göster
+                window.showWelcomeScreen();
+            } else {
+                document.body.classList.remove('logged-in-user');
+                var dash2 = document.getElementById('dashboardArea');
+                if (dash2) dash2.style.display = 'none';
+                var main2 = document.getElementById('mainSite');
+                if (main2) main2.style.display = 'block';
+            }
+            window.buildPanel();
+        }
+
+        init();
+        console.log('✅ Nihai kurulum tamamlandı. Moderatör paneli gizlendi.');
+
+    }, 1500); // Diğer scriptlerin yüklenmesini bekle
+});
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// ☢️ [AETHRION GOD MODE] - HER ŞEYİ SIFIRLA VE DÜZELT ☢️
+// ═══════════════════════════════════════════════════════════════
+(function AETHRION_GOD_MODE() {
+    'use strict';
+
+    console.log('☢️ GOD MODE BAŞLATILIYOR...');
+
+    // 1. TIKLAMAYI ENGELLEYEN İMLEÇ VE KATMANLARI SİL
+    var style = document.createElement('style');
+    style.innerHTML = `
+        #customCursor, #customCursorRing { display: none !important; pointer-events: none !important; }
+        * { cursor: auto !important; }
+        
+        /* Eski yan menüleri gizle */
+        #aethrionSidebar, #aethrionSidebarToggle, #aethrionSidebarBackdrop { display: none !important; }
+        
+        /* Görünmez engelleyicileri gizle */
+        .modal-overlay:not(.open), .aethrion-responsibility-modal:not(.open), 
+        #aethrionFeaturesBackdrop:not(.show), #kocPanelOverlay:not(.open), 
+        #voiceChatFullscreen:not(.open), #vzVoiceFullscreen:not(.open) {
+            display: none !important; visibility: hidden !important; 
+            opacity: 0 !important; pointer-events: none !important; z-index: -9999 !important;
+        }
+
+        /* Mobil Düzeltme */
+        @media (max-width: 768px) {
+            #dashboardArea .dashboard-content-wrapper { padding: 10px !important; overflow-x: hidden !important; }
+            #aethrionWelcomeScreen h1 { font-size: 26px !important; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // 2. DASHBOARD'U HAZIRLA
+    var wrapper = document.querySelector('#dashboardArea .dashboard-content-wrapper');
+    if (!wrapper) return;
+
+    // Tüm eski kartları GİZLE
+    Array.from(wrapper.children).forEach(function(c) {
+        c.style.display = 'none';
+    });
+
+    // 3. KARŞILAMA EKRANI OLUŞTUR
+    var welcome = document.getElementById('aethrionWelcomeScreen');
+    if (!welcome) {
+        welcome = document.createElement('div');
+        welcome.id = 'aethrionWelcomeScreen';
+        wrapper.insertBefore(welcome, wrapper.firstChild);
+    }
+    welcome.style.display = 'flex';
+    
+    // Kullanıcı bilgisini al (Parse'dan veya HTML'den)
+    var name = "Eymen";
+    var role = "founder";
+    try {
+        if (window.currentUser) {
+            name = window.currentUser.get('name') || "Eymen";
+            role = window.currentUser.get('role') || "founder";
+        }
+    } catch(e) {}
+
+    welcome.innerHTML = `
+        <div style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#e8c555,#c5cde0,#8b6bff,#6ee0ff);display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:900;color:#06060b;margin-bottom:20px;box-shadow:0 0 60px rgba(232,197,85,0.7);">${name.charAt(0).toUpperCase()}</div>
+        <h1 style="font-family:Syne,sans-serif;font-size:clamp(32px,5vw,52px);font-weight:800;margin-bottom:10px;">Merhaba,<br><span style="background:linear-gradient(90deg,#e8c555,#c5cde0,#8b6bff,#6ee0ff);-webkit-background-clip:text;background-clip:text;color:transparent;">${name}</span></h1>
+        <div style="padding:10px 24px;border-radius:999px;font-size:14px;font-weight:700;margin-bottom:24px;background:rgba(232,197,85,0.2);border:1.5px solid #e8c555;color:#e8c555;">${role === 'founder' ? '👑 KURUCU' : '👤 ÜYE'}</div>
+        <p style="color:#dbdbe8;font-size:15px;max-width:560px;line-height:1.8;margin-bottom:32px;">AETHRION'a hoş geldin! Tüm özellikleri sağ üstteki menüden veya aşağıdaki butondan açabilirsin.</p>
+        <button onclick="window.openAethrionFeaturesPanel()" style="padding:18px 48px;font-size:18px;font-weight:800;background:linear-gradient(135deg,#e8c555,#c5cde0,#8b6bff,#6ee0ff);color:#06060b;border:none;border-radius:60px;cursor:pointer;box-shadow:0 0 50px rgba(232,197,85,0.6);">🚀 Tüm Özellikler</button>
+    `;
+
+    // 4. GÖRÜNÜM YÖNETİMİ (Karşılama vs Kartlar)
+    window.currentView = 'welcome';
+    
+    window.showWelcome = function() {
+        window.currentView = 'welcome';
+        Array.from(wrapper.children).forEach(function(c) {
+            if (c.id === 'aethrionWelcomeScreen') c.style.display = 'flex';
+            else c.style.display = 'none';
+        });
+    };
+
+    window.showAllCards = function() {
+        window.currentView = 'all_cards';
+        Array.from(wrapper.children).forEach(function(c) {
+            if (c.id === 'aethrionWelcomeScreen') c.style.display = 'none';
+            else c.style.display = 'block';
+        });
+    };
+
+    // 5. SİDEBAR (YAN MENÜ) OLUŞTUR
+    window.openAethrionFeaturesPanel = function() {
+        var oldPanel = document.getElementById('aethrionFeaturesPanel');
+        if (oldPanel) oldPanel.remove();
+        
+        var panel = document.createElement('div');
+        panel.id = 'aethrionFeaturesPanel';
+        panel.style.cssText = 'position:fixed;top:0;right:0;width:380px;max-width:90vw;height:100vh;background:#0f0f16;z-index:99999999;border-left:2px solid #e8c555;display:flex;flex-direction:column;overflow-y:auto;';
+        
+        var menuHtml = `
+            <div style="padding:20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e8c555;">
+                <h3 style="color:#e8c555;margin:0;">✨ AETHRION MENÜ</h3>
+                <button onclick="document.getElementById('aethrionFeaturesPanel').remove()" style="background:none;border:1px solid red;color:red;border-radius:50%;width:30px;height:30px;cursor:pointer;">✕</button>
+            </div>
+            <div style="padding:15px;display:flex;flex-direction:column;gap:8px;">
+                <button onclick="window.showWelcome(); document.getElementById('aethrionFeaturesPanel').remove();" style="padding:12px;background:#1e1e2a;color:#fff;border:1px solid #333;border-radius:10px;text-align:left;cursor:pointer;">🏠 Karşılama Ekranı</button>
+                <button onclick="window.showAllCards(); document.getElementById('aethrionFeaturesPanel').remove();" style="padding:12px;background:#1e1e2a;color:#fff;border:1px solid #333;border-radius:10px;text-align:left;cursor:pointer;">📋 Tüm Özellikler (Eski Görünüm)</button>
+                
+                <div style="height:1px;background:#333;margin:10px 0;"></div>
+                
+                <button onclick="document.getElementById('aethrionFeaturesPanel').remove(); if(window.openKocPanel) { window.openKocPanel(); } else { alert('HATA: Koç fonksiyonu kodda bulunamadı!'); }" style="padding:12px;background:#1e1e2a;color:#fff;border:1px solid #333;border-radius:10px;text-align:left;cursor:pointer;">🧭 Aethrion Coach</button>
+                
+                <button onclick="document.getElementById('aethrionFeaturesPanel').remove(); if(window.openAethrionAlPanel) { window.openAethrionAlPanel(); } else { alert('HATA: Al paneli fonksiyonu kodda bulunamadı!'); }" style="padding:12px;background:#1e1e2a;color:#fff;border:1px solid #333;border-radius:10px;text-align:left;cursor:pointer;">✨ Aethrion Al</button>
+                
+                <button onclick="document.getElementById('aethrionFeaturesPanel').remove(); if(window.openVoiceChatFullscreen) { window.openVoiceChatFullscreen(); } else { alert('HATA: Sesli sohbet fonksiyonu kodda bulunamadı!'); }" style="padding:12px;background:#1e1e2a;color:#fff;border:1px solid #333;border-radius:10px;text-align:left;cursor:pointer;">🔊 Sesli Sohbet</button>
+                
+                <button onclick="document.getElementById('aethrionFeaturesPanel').remove(); if(window.startJarvisMode) { window.startJarvisMode(); } else { alert('HATA: Jarvis fonksiyonu kodda bulunamadı!'); }" style="padding:12px;background:#1e1e2a;color:#fff;border:1px solid #333;border-radius:10px;text-align:left;cursor:pointer;">🤖 Jarvis (Sesli Asistan)</button>
+                
+                <button onclick="document.getElementById('aethrionFeaturesPanel').remove(); if(window.openFullAIPanel) { window.openFullAIPanel(); } else { alert('HATA: AI fonksiyonu kodda bulunamadı!'); }" style="padding:12px;background:#1e1e2a;color:#fff;border:1px solid #333;border-radius:10px;text-align:left;cursor:pointer;">🧠 Aethrion AI</button>
+                
+                <button onclick="document.getElementById('aethrionFeaturesPanel').remove(); if(window.openJobMarket) { window.openJobMarket(); } else { alert('HATA: İş ilanları fonksiyonu kodda bulunamadı!'); }" style="padding:12px;background:#1e1e2a;color:#fff;border:1px solid #333;border-radius:10px;text-align:left;cursor:pointer;">💼 İş İlanları</button>
+                
+                <div style="height:1px;background:#333;margin:10px 0;"></div>
+                
+                <button onclick="if(window.logout) { window.logout(); } else { location.reload(); }" style="padding:12px;background:rgba(255,0,0,0.2);color:#ff4d5e;border:1px solid #ff4d5e;border-radius:10px;text-align:left;cursor:pointer;">🚪 Çıkış Yap</button>
+            </div>
+        `;
+        
+        panel.innerHTML = menuHtml;
+        document.body.appendChild(panel);
+    };
+
+    // 6. MENÜ BUTONUNU OLUŞTUR (Sağ Üst)
+    var trigger = document.getElementById('aethrionFeaturesTrigger');
+    if (!trigger) {
+        trigger = document.createElement('button');
+        trigger.id = 'aethrionFeaturesTrigger';
+        trigger.innerHTML = '<span></span><span></span><span></span>';
+        trigger.style.cssText = 'position:fixed;top:100px;right:20px;width:54px;height:54px;background:linear-gradient(135deg,#e8c555,#8b6bff);border-radius:12px;z-index:99999999;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;cursor:pointer;box-shadow:0 0 30px rgba(232,197,85,0.8);';
+        trigger.querySelectorAll('span').forEach(function(s) {
+            s.style.cssText = 'display:block;width:24px;height:3px;background:#fff;border-radius:2px;';
+        });
+        document.body.appendChild(trigger);
+    }
+    trigger.onclick = window.openAethrionFeaturesPanel;
+
+    // 7. SÜREKLİ KONTROL (Eski kodlar araya girip bozmasın diye)
+    setInterval(function() {
+        if (!window.currentView) window.currentView = 'welcome';
+        if (window.currentView === 'welcome') {
+            Array.from(wrapper.children).forEach(function(c) {
+                if (c.id !== 'aethrionWelcomeScreen' && c.style.display !== 'none') {
+                    c.style.display = 'none';
+                }
+            });
+        }
+    }, 500);
+
+    console.log('✅ GOD MODE TAMAM. Tüm eski kodlar ezildi.');
+})();
+</script>
+
+<!-- ============================================================ -->
+<!-- [AETHRION v1.0.0 UNIFIED ROUTER — FINAL FIX]                -->
+<!-- Bu blok, en son çalışır ve önceki tüm panel sistemlerini    -->
+<!-- devre dışı bırakır. SADECE BU ÇALIŞIR.                       -->
+<!-- </body> etiketinden HEMEN ÖNCE ekle.                         -->
+<!-- ============================================================ -->
+<script>
+(function AethrionUnifiedRouter() {
+    'use strict';
+
+    // ═══════════════════════════════════════════════════════════
+    // 1. ESKİ OVERRIDE'LARI DEVRE DIŞI BIRAK
+    // ═══════════════════════════════════════════════════════════
+    window.showDashboardCards = function() { window.aethrionRouter.showAllCards(); };
+    window.showAllCards = function() { window.aethrionRouter.showAllCards(); };
+    window.goHome = function() { window.aethrionRouter.goWelcome(); };
+    window.showWelcome = function() { window.aethrionRouter.goWelcome(); };
+
+    // ═══════════════════════════════════════════════════════════
+    // 2. EKSİK OVERLAYS'LERİ DİNAMİK OLUŞTUR
+    // ═══════════════════════════════════════════════════════════
+    function ensureOverlays() {
+        // ----- KOÇ PANEL -----
+        if (!document.getElementById('kocPanelOverlay')) {
+            const koc = document.createElement('div');
+            koc.id = 'kocPanelOverlay';
+            koc.className = 'coach-panel-overlay';
+            koc.innerHTML = `
+                <div class="coach-panel-header">
+                    <div class="coach-header-left">
+                        <div class="coach-panel-title">
+                            <span class="coach-title-icon">🧭</span>
+                            <span>AETHRION COACH</span>
+                        </div>
+                    </div>
+                    <div class="coach-header-right">
+                        <span class="coach-limit-badge" id="kocPanelLimitBadge">– / –</span>
+                        <button class="coach-share-btn" onclick="window.openKocShareModal && window.openKocShareModal()">🔗 Paylaş</button>
+                        <button class="coach-back-btn" onclick="window.closeKocPanel && window.closeKocPanel()">← Geri</button>
+                    </div>
+                </div>
+                <div class="coach-panel-body">
+                    <div class="coach-chat-wrap">
+                        <div class="coach-chat-header">
+                            <span class="coach-topic" id="kocCurrentTopic">Yeni Sohbet</span>
+                        </div>
+                        <div class="coach-chat-messages" id="kocChatMessages"></div>
+                        <div class="coach-input-area">
+                            <textarea class="coach-input" id="kocInput" rows="1" placeholder="AETHRION Coach'a yaz..." onkeypress="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();window.sendKocMessage && window.sendKocMessage();}"></textarea>
+                            <button class="coach-send-btn" id="kocSendBtn" onclick="window.sendKocMessage && window.sendKocMessage()">Gönder</button>
+                            <button class="coach-send-btn" id="kocStopBtn" onclick="window.stopKocResponse && window.stopKocResponse()" style="display:none;background:linear-gradient(135deg,#ef4444,#f43f5e);">⏹️</button>
+                        </div>
+                    </div>
+                    <div class="coach-history-wrap">
+                        <div class="coach-history-title">📜 Sohbet Geçmişi</div>
+                        <div class="coach-history-list" id="kocHistoryList"></div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(koc);
+        }
+
+        // ----- SESLİ SOHBET -----
+        if (!document.getElementById('voiceChatFullscreen')) {
+            const vc = document.createElement('div');
+            vc.id = 'voiceChatFullscreen';
+            vc.className = 'vz-voice-fullscreen';
+            vc.innerHTML = `
+                <div class="vz-voice-status">🎤 SESLİ SOHBET AKTİF</div>
+                <button class="vz-voice-back-btn" onclick="window.closeVoiceChatFullscreen && window.closeVoiceChatFullscreen()">← Geri</button>
+                <div class="vz-voice-logo">✨</div>
+                <div class="vz-voice-waves"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <div class="vz-voice-transcript" id="vzVoiceTranscript">Konuşmaya başlamak için mikrofon simgesine dokun...</div>
+            `;
+            document.body.appendChild(vc);
+        }
+
+        // ----- LOGS -----
+        if (!document.getElementById('logsModal')) {
+            const logs = document.createElement('div');
+            logs.id = 'logsModal';
+            logs.className = 'logs-panel-overlay';
+            logs.innerHTML = `
+                <div class="logs-panel">
+                    <div class="logs-panel-header">
+                        <h3>📋 Logs Sistemi</h3>
+                        <div class="logs-filter-row">
+                            <button class="logs-filter-btn active" data-filter="all" onclick="window.filterLogs && window.filterLogs('all')">Tümü</button>
+                            <button class="logs-filter-btn" data-filter="info" onclick="window.filterLogs && window.filterLogs('info')">ℹ️</button>
+                            <button class="logs-filter-btn" data-filter="success" onclick="window.filterLogs && window.filterLogs('success')">✅</button>
+                            <button class="logs-filter-btn" data-filter="warning" onclick="window.filterLogs && window.filterLogs('warning')">⚠️</button>
+                            <button class="logs-filter-btn" data-filter="error" onclick="window.filterLogs && window.filterLogs('error')">❌</button>
+                            <button class="logs-filter-btn" data-filter="critical" onclick="window.filterLogs && window.filterLogs('critical')">🚨</button>
+                        </div>
+                        <button class="modal-close" onclick="window.closeLogsPanel && window.closeLogsPanel()">×</button>
+                    </div>
+                    <div class="logs-panel-body" id="logsPanelBody"></div>
+                    <div class="logs-panel-actions">
+                        <button class="btn-secondary btn-sm" onclick="window.refreshLogs && window.refreshLogs()">🔄 Yenile</button>
+                        <button class="btn-secondary btn-sm" onclick="window.downloadLogs && window.downloadLogs()">📥 İndir</button>
+                        <button class="btn-danger btn-sm" onclick="window.clearLogs && window.clearLogs()">🗑️ Temizle</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(logs);
+        }
+
+        // ----- VIDEO STÜDYO -----
+        if (!document.getElementById('videoStudioModal')) {
+            const vs = document.createElement('div');
+            vs.id = 'videoStudioModal';
+            vs.className = 'video-studio-overlay';
+            vs.innerHTML = `
+                <div class="video-studio">
+                    <div class="video-studio-header">
+                        <h3>🎬 Video Stüdyosu</h3>
+                        <button class="modal-close" onclick="window.closeVideoStudio && window.closeVideoStudio()">×</button>
+                    </div>
+                    <div class="video-studio-body">
+                        <div class="video-studio-form">
+                            <div>
+                                <label>İşlem Türü</label>
+                                <select id="videoStudioType" class="form-input" style="width:100%;padding:12px;background:rgba(0,0,0,0.4);border:1.5px solid var(--border2);color:var(--text);border-radius:12px;">
+                                    <option value="story">🎬 Video Senaryo</option>
+                                    <option value="reels">🎞️ Reels Fikirleri</option>
+                                    <option value="analyze">📊 Video URL Analiz</option>
+                                    <option value="clip">✂️ Video Kesit</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Konu / URL / Açıklama</label>
+                                <textarea id="videoStudioInput" class="form-input" style="width:100%;min-height:140px;padding:12px;background:rgba(0,0,0,0.4);border:1.5px solid var(--border2);color:var(--text);border-radius:12px;" placeholder="Ne yapmak istersin?"></textarea>
+                            </div>
+                            <div class="video-studio-actions">
+                                <button class="btn-secondary" onclick="window.closeVideoStudio && window.closeVideoStudio()">İptal</button>
+                                <button class="btn-primary" onclick="window.runVideoStudio && window.runVideoStudio()">🚀 İşle</button>
+                            </div>
+                            <div class="video-studio-preview" id="videoStudioResult">Henüz işlem yapılmadı.</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(vs);
+        }
+
+        // ----- A27 REHBER -----
+        if (!document.getElementById('v27ApiGuideModal')) {
+            const guide = document.createElement('div');
+            guide.id = 'v27ApiGuideModal';
+            guide.className = 'v27-api-guide-overlay';
+            guide.innerHTML = `
+                <div class="a27-api-guide">
+                    <div class="a27-api-guide-header">
+                        <h3>📖 A27 API Rehberi</h3>
+                        <button class="modal-close" onclick="window.closeModal && window.closeModal('v27ApiGuideModal')">×</button>
+                    </div>
+                    <div class="a27-api-guide-body">
+                        <h4>🔑 A27 API Anahtarı Nasıl Alınır?</h4>
+                        <ol class="guide-step-list">
+                            <li>Dashboard'a giriş yap</li>
+                            <li>"A27 API Anahtarı" bölümüne git</li>
+                            <li>"Yeni Anahtar Oluştur" butonuna tıkla</li>
+                            <li>Anahtar adı ve süre seç</li>
+                            <li>Anahtarı kopyala (bir kez gösterilir!)</li>
+                        </ol>
+                        <h4>📡 API Kullanımı</h4>
+                        <pre>POST /functions/v27ApiRest
+Header: X-V27-Api-Key: V27-xxxx-xxxx-xxxx-xxxx
+Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
+                        <div class="guide-note">Kurucu/Admin/Beta/Moderatör: ♾️ · Takım: 100 · Pro: 20 · Ücretsiz: 2</div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(guide);
+        }
+
+        // ----- A27 QUICK CREATE -----
+        if (!document.getElementById('v27QuickCreateOverlay')) {
+            const qc = document.createElement('div');
+            qc.id = 'v27QuickCreateOverlay';
+            qc.className = 'a27-quick-create-overlay';
+            qc.innerHTML = `
+                <div class="a27-quick-create-modal">
+                    <h3>🔑 Hızlı A27 API Anahtarı</h3>
+                    <div class="a27-quick-create-info">Aethrion Al senin için güvenli bir anahtar oluşturuyor. Anahtar <strong>sadece bir kez</strong> gösterilecek.</div>
+                    <input type="text" id="v27QuickKeyName" class="a27-form-input" placeholder="Anahtar adı (örn: Web Sitem)">
+                    <input type="text" id="v27QuickKeyDesc" class="a27-form-input" placeholder="Açıklama (opsiyonel)">
+                    <div id="v27QuickDurationRow" class="a27-duration-row">
+                        <button class="a27-duration-btn active" data-val="unlimited" onclick="window._a27QuickSelectedDuration='unlimited';this.parentNode.querySelectorAll('.a27-duration-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">♾️ Süresiz</button>
+                        <button class="a27-duration-btn" data-val="1y" onclick="window._a27QuickSelectedDuration='1y';this.parentNode.querySelectorAll('.a27-duration-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">1 Yıl</button>
+                        <button class="a27-duration-btn" data-val="5m" onclick="window._a27QuickSelectedDuration='5m';this.parentNode.querySelectorAll('.a27-duration-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">5 Ay</button>
+                        <button class="a27-duration-btn" data-val="1m" onclick="window._a27QuickSelectedDuration='1m';this.parentNode.querySelectorAll('.a27-duration-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">1 Ay</button>
+                        <button class="a27-duration-btn" data-val="1w" onclick="window._a27QuickSelectedDuration='1w';this.parentNode.querySelectorAll('.a27-duration-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">1 Hafta</button>
+                    </div>
+                    <div id="v27QuickCreateError" class="job-create-error"></div>
+                    <div style="display:flex;gap:10px;">
+                        <button class="btn-secondary" onclick="window.closeA27QuickCreate && window.closeA27QuickCreate()" style="flex:1;">İptal</button>
+                        <button class="btn-primary" onclick="window.submitQuickA27Key && window.submitQuickA27Key()" style="flex:2;">🔑 Oluştur</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(qc);
+        }
+
+        // ----- A27 KEY REVEAL -----
+        if (!document.getElementById('v27KeyRevealOverlay')) {
+            const reveal = document.createElement('div');
+            reveal.id = 'v27KeyRevealOverlay';
+            reveal.className = 'a27-key-reveal-overlay';
+            reveal.innerHTML = `
+                <div class="a27-key-reveal-modal">
+                    <div class="a27-key-reveal-header-icon">🔑</div>
+                    <h3>A27 API Anahtarınız Hazır!</h3>
+                    <p class="reveal-sub">Bu anahtar <strong>sadece bir kez</strong> gösterilecek. Güvenli bir yere kaydedin!</p>
+                    <div class="a27-key-value-display" id="v27RevealKeyValue"></div>
+                    <div class="a27-key-warning-big">
+                        <strong>⚠️ ÖNEMLİ</strong>
+                        Kaybettiğinizde tekrar göremeyeceksiniz. Yeni anahtar oluşturmanız gerekir.
+                    </div>
+                    <button class="a27-key-copy-btn-big" onclick="window.copyA27RevealKey && window.copyA27RevealKey()">📋 Kopyala</button>
+                    <button class="a27-key-close-btn-big" onclick="window.closeA27KeyReveal && window.closeA27KeyReveal()">✅ Kaydettim, Kapat</button>
+                </div>
+            `;
+            document.body.appendChild(reveal);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 3. TÜM ÖZELLİK LİSTESİ (30+)
+    // ═══════════════════════════════════════════════════════════
+    const ALL_FEATURES = [
+        { group: '🏠 Ana', icon: '🏠', name: 'Ana Ekran (Karşılama)', desc: 'Karşılama ekranına dön', action: 'goWelcome', color: '#e8c555' },
+        { group: '🏠 Ana', icon: '📋', name: 'Tüm Dashboard Kartları', desc: 'Tüm kartları alt alta göster', action: 'showAllCards', color: '#c5cde0' },
+
+        { group: '⚡ Çekirdek', icon: '🧠', name: 'Aethrion AI', desc: '28 model birleşik güç', action: 'openFullAIPanel', color: '#e8c555' },
+        { group: '⚡ Çekirdek', icon: '✨', name: 'Aethrion Al', desc: '4 mod · 28 model · Ekran okuma', action: 'openAethrionAlPanel', color: '#8b6bff' },
+        { group: '⚡ Çekirdek', icon: '🧭', name: 'Aethrion Coach', desc: 'Samimi AI koç', action: 'openKocPanel', color: '#f5d878' },
+        { group: '⚡ Çekirdek', icon: '🤖', name: 'Jarvis Sesli Asistan', desc: 'Wake word + sürekli dinleme', action: 'startJarvisMode', color: '#6ee0ff' },
+        { group: '⚡ Çekirdek', icon: '🔊', name: 'Sesli Sohbet', desc: 'Tam ekran ChatGPT tarzı', action: 'openVoiceChatFullscreen', color: '#ff4d5e' },
+        { group: '⚡ Çekirdek', icon: '🟢', name: '28 Model Showcase', desc: '13 Ollama + 7 NIM + 8 API', action: 'openModelsShowcase', color: '#76b900' },
+
+        { group: '🎨 Oluşturma', icon: '🎬', name: 'Video Editör', desc: 'Timeline + trim + overlay', action: 'openVideoEditor', color: '#ff8a5c' },
+        { group: '🎨 Oluşturma', icon: '🎥', name: 'Video Stüdyosu', desc: 'Senaryo + Reels + Analiz', action: 'openVideoStudio', color: '#ff8a5c' },
+        { group: '🎨 Oluşturma', icon: '🧊', name: '3D Stüdyo', desc: '90+ şekil + .glb indir', action: 'open3DBuilder', color: '#6ee0ff' },
+        { group: '🎨 Oluşturma', icon: '📁', name: 'Proje Sihirbazı', desc: 'Görsel, kod, 3D proje oluştur', action: 'createProjectWizard', color: '#ff2d92' },
+        { group: '🎨 Oluşturma', icon: '🖼️', name: 'GIF Seçici', desc: 'Giphy ile GIF ara', action: 'openGifPicker', color: '#8b6bff' },
+
+        { group: '🌐 Platform', icon: '💼', name: 'İş İlanları', desc: 'A27 İş İlanları Mağazası', action: 'openJobMarket', color: '#e8c555' },
+        { group: '🌐 Platform', icon: '🛒', name: 'Puan Mağazası', desc: 'Kazan, harca, takas', action: 'openMarket', color: '#e8c555' },
+        { group: '🌐 Platform', icon: '👥', name: 'Community', desc: 'Takım + ortak proje', action: 'toggleTeamPage', color: '#c5cde0' },
+        { group: '🌐 Platform', icon: '🤖', name: 'AI Kişisel Asistan', desc: 'Günlük özet + hatırlatıcı', action: 'openPersonalAssistant', color: '#e8c555' },
+        { group: '🌐 Platform', icon: '🏆', name: 'Aylık Yarışma', desc: 'Projeni gönder, kazan', action: 'openContestPage', color: '#e8c555' },
+
+        { group: '🔑 Gelişmiş', icon: '🔑', name: 'A27 API Anahtarı', desc: 'Yeni anahtar oluştur', action: 'openA27ApiKeyGenerator', color: '#e8c555' },
+        { group: '🔑 Gelişmiş', icon: '📖', name: 'A27 API Rehberi', desc: 'cURL / JS / Python örnekler', action: 'openA27ApiGuide', color: '#e8c555' },
+        { group: '🔑 Gelişmiş', icon: '🔐', name: 'Kendi API Ekle', desc: 'OpenAI, Groq, Gemini', action: 'openApiEkle', color: '#76b900' },
+        { group: '🔑 Gelişmiş', icon: '📋', name: 'API Anahtarlarım', desc: 'Kayıtlı API anahtarlarım', action: 'openApiAnahtarlarim', color: '#76b900' },
+        { group: '🔑 Gelişmiş', icon: '📊', name: 'Logs Sistemi', desc: '5 seviye + backend sync', action: 'openLogsPanel', color: '#c5cde0' },
+        { group: '🔑 Gelişmiş', icon: '🛡️', name: 'Ebeveyn Ayarları', desc: 'Güvenli mod + limitler', action: 'openParentSettings', color: '#ffb347' },
+
+        { group: '👤 Hesap', icon: '👤', name: 'Profilim', desc: 'Bilgiler, puan, seviye', action: 'openProfileModal', color: '#e8c555' },
+        { group: '👤 Hesap', icon: '📋', name: 'Hesap Bilgilerim', desc: 'IP, cihaz, üyelik', action: 'openAccountInfo', color: '#8a8aa8' },
+        { group: '👤 Hesap', icon: '⚙️', name: 'Ayarlar', desc: 'Dil, tema, tercihler', action: 'openSettingsModal', color: '#8a8aa8' },
+        { group: '👤 Hesap', icon: '🚪', name: 'Çıkış Yap', desc: 'Oturumu kapat', action: 'doLogout', color: '#ff4d5e' }
+    ];
+
+    function getFeaturesForRole(role) {
+        const base = ALL_FEATURES.slice();
+        // Founder/Admin için yönetim özellikleri (Çıkış Yap'tan hemen önce)
+        if (role === 'founder' || role === 'admin') {
+            const logoutIdx = base.findIndex(f => f.action === 'doLogout');
+            base.splice(logoutIdx, 0,
+                { group: '👑 Yönetim', icon: '👥', name: 'Kullanıcı Yönetimi', desc: 'Tüm kullanıcıları listele', action: 'openUserManagement', color: '#e8c555' },
+                { group: '👑 Yönetim', icon: '🔬', name: 'Beta Tester Ata', desc: 'Beta rolü ver', action: 'openBetaAssign', color: '#8b6bff' },
+                { group: '👑 Yönetim', icon: '📢', name: 'Duyuru Yayınla', desc: 'Sistem duyurusu', action: 'openAnnouncementCreator', color: '#e8c555' }
+            );
+        }
+        if (role === 'founder') {
+            const logoutIdx = base.findIndex(f => f.action === 'doLogout');
+            base.splice(logoutIdx, 0,
+                { group: '👑 Yönetim', icon: '🎨', name: 'Moderatör Ata', desc: 'Gizli rütbe', action: 'openModeratorAssignModal', color: '#f5d878' },
+                { group: '👑 Yönetim', icon: '⚙️', name: 'Admin Ata', desc: 'Yönetici yetkisi', action: 'openAdminAssign', color: '#e8c555' },
+                { group: '👑 Yönetim', icon: '📊', name: 'Anket Oluştur', desc: 'Topluluk oylaması', action: 'openPollCreator', color: '#e8c555' }
+            );
+        }
+        return base;
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 4. YARDIMCILAR
+    // ═══════════════════════════════════════════════════════════
+    function getUser() {
+        if (window.currentUser) return window.currentUser;
+        try {
+            if (typeof Parse !== 'undefined' && Parse.User && Parse.User.current()) {
+                window.currentUser = Parse.User.current();
+                return window.currentUser;
+            }
+        } catch(e) {}
+        return null;
+    }
+    function getUserRole() {
+        const u = getUser();
+        return u ? (u.get('role') || 'user') : 'guest';
+    }
+    function esc(s) {
+        if (!s) return '';
+        return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+    function notify(msg, type) {
+        if (typeof window.showNotification === 'function') {
+            try { window.showNotification(msg, type); return; } catch(e) {}
+        }
+        console.log('[AETHRION]', msg);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 5. PANEL OLUŞTUR
+    // ═══════════════════════════════════════════════════════════
+    function buildPanel() {
+        let panel = document.getElementById('aethrionFeaturesPanel');
+        if (panel) {
+            const body = panel.querySelector('.afp-body');
+            if (body) renderFeaturesList(body);
+            return panel;
+        }
+
+        panel = document.createElement('aside');
+        panel.id = 'aethrionFeaturesPanel';
+        panel.style.cssText = `
+            position: fixed; top: 0; right: -100%; width: 420px; max-width: 92vw;
+            height: 100vh; background: linear-gradient(180deg,#0f0f16 0%,#050508 100%);
+            border-left: 2px solid rgba(232,197,85,0.5); z-index: 2147483647;
+            display: flex; flex-direction: column;
+            transition: right 0.4s cubic-bezier(0.4,0,0.2,1);
+            overflow: hidden; box-shadow: -30px 0 90px rgba(0,0,0,0.9);
+        `;
+        panel.innerHTML = `
+            <div class="afp-head" style="padding:18px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(232,197,85,0.25);background:linear-gradient(90deg,rgba(232,197,85,0.12),rgba(139,107,255,0.06));flex-shrink:0;">
+                <h3 style="margin:0;font-family:Syne,sans-serif;font-size:16px;letter-spacing:1.5px;background:linear-gradient(90deg,#e8c555,#c5cde0,#8b6bff,#e8c555);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;">✨ AETHRION ÖZELLİKLER</h3>
+                <button class="afp-close" onclick="window.closeAethrionFeaturesPanel()" style="width:34px;height:34px;border-radius:50%;background:rgba(239,68,68,0.15);border:1.5px solid rgba(239,68,68,0.6);color:#ef4444;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+            </div>
+            <div class="afp-body" style="flex:1;overflow-y:auto;padding:12px;"></div>
+            <div style="padding:12px 18px;border-top:1px solid rgba(232,197,85,0.15);font-size:10px;color:#8a8aa8;text-align:center;letter-spacing:0.5px;">
+                © 2027 AETHRION · 28 Model · Intelligence Without Limits.
+            </div>
+        `;
+        document.body.appendChild(panel);
+        renderFeaturesList(panel.querySelector('.afp-body'));
+        return panel;
+    }
+
+    function renderFeaturesList(container) {
+        if (!container) return;
+        const role = getUserRole();
+        const features = getFeaturesForRole(role);
+        const groups = {}, order = [];
+        features.forEach(f => {
+            if (!groups[f.group]) { groups[f.group] = []; order.push(f.group); }
+            groups[f.group].push(f);
+        });
+
+        let html = '';
+        order.forEach(g => {
+            html += `<div style="margin-bottom:16px;">
+                <div style="font-size:10.5px;color:#8a8aa8;font-weight:700;letter-spacing:2px;padding:8px 6px;text-transform:uppercase;display:flex;align-items:center;gap:8px;">
+                    ${g}<span style="flex:1;height:1px;background:linear-gradient(90deg,rgba(232,197,85,0.3),transparent);"></span>
+                </div>`;
+            groups[g].forEach(f => {
+                html += `<button onclick="window.aethrionRouter.routeTo('${f.action}','${esc(f.name)}')" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;margin-bottom:4px;background:linear-gradient(135deg,rgba(232,197,85,0.04),rgba(139,107,255,0.02));border:1px solid rgba(232,197,85,0.1);border-radius:10px;cursor:pointer;text-align:left;color:inherit;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='rgba(232,197,85,0.12)';this.style.borderColor='${f.color||'#e8c555'}'" onmouseout="this.style.background='linear-gradient(135deg,rgba(232,197,85,0.04),rgba(139,107,255,0.02))';this.style.borderColor='rgba(232,197,85,0.1)'">
+                    <span style="font-size:18px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);border-radius:9px;border:1.5px solid ${f.color||'#e8c555'};flex-shrink:0;">${f.icon}</span>
+                    <span style="flex:1;min-width:0;">
+                        <span style="font-size:13px;font-weight:700;color:#fff;display:block;">${esc(f.name)}</span>
+                        <span style="font-size:10.5px;color:#8a8aa8;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(f.desc)}</span>
+                    </span>
+                    <span style="color:#e8c555;font-size:16px;opacity:0.5;">›</span>
+                </button>`;
+            });
+            html += `</div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 6. ROUTER
+    // ═══════════════════════════════════════════════════════════
+    window.aethrionRouter = window.aethrionRouter || {};
+
+    window.aethrionRouter.routeTo = function(action, featureName) {
+        window.closeAethrionFeaturesPanel();
+
+        // Ana ekranlar
+        if (action === 'goWelcome') return window.aethrionRouter.goWelcome();
+        if (action === 'showAllCards') return window.aethrionRouter.showAllCards();
+        if (action === 'doLogout') {
+            if (typeof window.logout === 'function') return window.logout();
+            try { Parse.User.logOut(); } catch(e) {}
+            localStorage.clear();
+            return location.reload();
+        }
+
+        // Yönetim kartları
+        const cardMap = {
+            'openUserManagement': 'userManagementCard',
+            'openAdminAssign': 'adminPanelCard',
+            'openBetaAssign': 'betaAssignSection',
+            'openPollCreator': 'pollCreator',
+            'openAnnouncementCreator': 'announcementCreator'
+        };
+        if (cardMap[action]) {
+            return window.aethrionRouter.showCard(cardMap[action]);
+        }
+
+        // Fonksiyon var mı?
+        const fn = window[action];
+        if (typeof fn !== 'function') {
+            notify('⚠️ "' + featureName + '" özelliği yüklenemedi (fonksiyon: ' + action + ')', 'warning');
+            console.error('[AETHRION Router] Fonksiyon yok:', action);
+            return;
+        }
+
+        // Çalıştır
+        try {
+            const result = fn();
+            if (result && typeof result.catch === 'function') {
+                result.catch(e => {
+                    console.error('[AETHRION Router] Feature async error:', action, e);
+                    notify('⚠️ ' + featureName + ' hatası: ' + e.message, 'error');
+                });
+            }
+        } catch(e) {
+            console.error('[AETHRION Router] Feature error:', action, e);
+            notify('⚠️ ' + featureName + ' açılamadı: ' + e.message, 'error');
+        }
+    };
+
+    window.aethrionRouter.goWelcome = function() {
+        // Tüm overlay'leri kapat
+        document.querySelectorAll('.modal-overlay.open, .coach-panel-overlay.open, .vz-voice-fullscreen.open, .logs-panel-overlay.open, .video-studio-overlay.open, .v27-api-guide-overlay.open, #aethrionJarvisOverlay.open, .job-market-overlay.open, .a27-key-reveal-overlay.open, .a27-quick-create-overlay.open, .aethrion-responsibility-modal.open').forEach(el => {
+            el.classList.remove('open');
+            el.style.display = 'none';
+        });
+        window.aethrionRouter.showWelcomeScreen();
+    };
+
+    window.aethrionRouter.showAllCards = function() {
+        const wrapper = document.querySelector('#dashboardArea .dashboard-content-wrapper');
+        if (!wrapper) return;
+        const welcome = document.getElementById('aethrionWelcomeScreen');
+        if (welcome) welcome.style.display = 'none';
+        Array.from(wrapper.children).forEach(c => {
+            if (c.id !== 'aethrionWelcomeScreen') c.style.display = 'block';
+        });
+    };
+
+    window.aethrionRouter.showCard = function(cardId) {
+        const wrapper = document.querySelector('#dashboardArea .dashboard-content-wrapper');
+        if (!wrapper) return;
+        const welcome = document.getElementById('aethrionWelcomeScreen');
+        if (welcome) welcome.style.display = 'none';
+        Array.from(wrapper.children).forEach(c => c.style.display = 'none');
+        const card = document.getElementById(cardId);
+        if (!card) {
+            notify('⚠️ Bu yönetim paneli henüz hazır değil', 'warning');
+            return;
+        }
+        card.style.display = 'block';
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (cardId === 'userManagementCard' && typeof window.loadUserList === 'function') {
+            try { window.loadUserList(); } catch(e) {}
+        }
+        if (cardId === 'moderatorAssignSection' && typeof window.loadModeratorsList === 'function') {
+            try { window.loadModeratorsList(); } catch(e) {}
+        }
+    };
+
+    // ═══════════════════════════════════════════════════════════
+    // 7. WELCOME SCREEN
+    // ═══════════════════════════════════════════════════════════
+    window.aethrionRouter.showWelcomeScreen = function() {
+        const user = getUser();
+        const dash = document.getElementById('dashboardArea');
+        const main = document.getElementById('mainSite');
+
+        if (!user) {
+            document.body.classList.remove('logged-in-user');
+            if (dash) dash.style.display = 'none';
+            if (main) main.style.display = 'block';
+            return;
+        }
+
+        document.body.classList.add('logged-in-user');
+        if (dash) { dash.style.display = 'block'; dash.style.visibility = 'visible'; }
+        if (main) main.style.display = 'none';
+
+        const wrapper = document.querySelector('#dashboardArea .dashboard-content-wrapper');
+        if (!wrapper) {
+            setTimeout(window.aethrionRouter.showWelcomeScreen, 500);
+            return;
+        }
+
+        // Tüm çocukları gizle
+        Array.from(wrapper.children).forEach(c => c.style.display = 'none');
+
+        // Eski karşılamayı sil
+        const old = document.getElementById('aethrionWelcomeScreen');
+        if (old) old.remove();
+
+        const name = user.get('name') || 'Kullanıcı';
+        const role = user.get('role') || 'user';
+        const roleConfig = {
+            founder: { icon: '👑', label: 'KURUCU', desc: 'Sınırsız yetki · 28 model · Tüm özellikler' },
+            admin: { icon: '⚙️', label: 'ADMİN', desc: 'Yönetici yetkisi · 28 model · Tüm özellikler' },
+            beta: { icon: '🔬', label: 'BETA TESTER', desc: 'Sınırsız kullanım · 28 model' },
+            moderator: { icon: '🎨', label: 'MODERATÖR', desc: 'Sınırsız yetki · 28 model' },
+            user: { icon: '👤', label: 'ÜYE', desc: '28 model · Temel özellikler' }
+        };
+        const rc = roleConfig[role] || roleConfig.user;
+
+        const screen = document.createElement('div');
+        screen.id = 'aethrionWelcomeScreen';
+        screen.style.cssText = 'min-height:calc(100vh - 120px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;';
+        screen.innerHTML = `
+            <div style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#e8c555,#c5cde0,#8b6bff,#6ee0ff);background-size:300% 300%;display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:900;color:#06060b;margin-bottom:22px;box-shadow:0 0 60px rgba(232,197,85,0.7),0 0 120px rgba(139,107,255,0.4);animation:awPulse 3s ease-in-out infinite;">${esc(name.charAt(0).toUpperCase())}</div>
+            <h1 style="font-family:Syne,sans-serif;font-size:clamp(32px,5vw,52px);font-weight:800;margin-bottom:10px;line-height:1.15;">
+                Merhaba,<br><span style="background:linear-gradient(90deg,#e8c555,#c5cde0,#8b6bff,#6ee0ff,#e8c555);background-size:400% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:awGrad 4s ease infinite;">${esc(name)}</span>
+            </h1>
+            <div style="display:inline-block;padding:10px 24px;border-radius:999px;font-size:14px;font-weight:700;letter-spacing:1px;margin-bottom:24px;background:rgba(232,197,85,0.2);border:1.5px solid #e8c555;color:#e8c555;">${rc.icon} ${rc.label}</div>
+            <p style="color:#dbdbe8;font-size:15px;max-width:560px;line-height:1.8;margin-bottom:32px;">${rc.desc}.<br>AETHRION'a hoş geldin! Aşağıdaki butondan tüm özelliklere erişebilirsin.</p>
+            <button onclick="window.openAethrionFeaturesPanel()" style="padding:18px 48px;font-size:18px;font-weight:800;background:linear-gradient(135deg,#e8c555,#c5cde0,#8b6bff,#6ee0ff);background-size:250% 250%;color:#06060b;border:none;border-radius:60px;cursor:pointer;box-shadow:0 0 50px rgba(232,197,85,0.6),0 0 100px rgba(139,107,255,0.4);display:inline-flex;align-items:center;gap:12px;transition:transform 0.25s;animation:btnGradientShift 5s ease infinite;" onmouseover="this.style.transform='translateY(-4px) scale(1.05)'" onmouseout="this.style.transform='none'">
+                <span>🚀</span><span>Tüm Özellikler</span>
+            </button>
+            <style>
+                @keyframes awPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+                @keyframes awGrad { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+            </style>
+        `;
+        wrapper.insertBefore(screen, wrapper.firstChild);
+    };
+
+    // ═══════════════════════════════════════════════════════════
+    // 8. PUBLIC API
+    // ═══════════════════════════════════════════════════════════
+    window.openAethrionFeaturesPanel = function() {
+        buildPanel();
+        const panel = document.getElementById('aethrionFeaturesPanel');
+        if (panel) {
+            renderFeaturesList(panel.querySelector('.afp-body'));
+            panel.style.right = '0';
+        }
+    };
+    window.closeAethrionFeaturesPanel = function() {
+        const panel = document.getElementById('aethrionFeaturesPanel');
+        if (panel) panel.style.right = '-100%';
+    };
+    window.toggleAethrionFeaturesPanel = function() {
+        const panel = document.getElementById('aethrionFeaturesPanel');
+        if (panel && panel.style.right === '0px') window.closeAethrionFeaturesPanel();
+        else window.openAethrionFeaturesPanel();
+    };
+    window.toggleAethrionSidebar = window.toggleAethrionFeaturesPanel;
+    window.closeAethrionSidebar = window.closeAethrionFeaturesPanel;
+
+    // ═══════════════════════════════════════════════════════════
+    // 9. TRIGGER BUTTON (HER EKRANDA GÖRÜNÜR)
+    // ═══════════════════════════════════════════════════════════
+    function ensureTrigger() {
+        let trigger = document.getElementById('aethrionFeaturesTrigger');
+        if (!trigger) {
+            trigger = document.createElement('button');
+            trigger.id = 'aethrionFeaturesTrigger';
+            trigger.title = 'Özellikler Menüsü';
+            trigger.innerHTML = '<span></span><span></span><span></span>';
+            document.body.appendChild(trigger);
+        }
+        // Her zaman en üst z-index
+        trigger.style.cssText = `
+            position: fixed; top: 100px; right: 24px; width: 54px; height: 54px;
+            background: linear-gradient(135deg,#e8c555,#c5cde0,#8b6bff,#6ee0ff);
+            background-size: 300% 300%;
+            border: none; border-radius: 15px; cursor: pointer;
+            z-index: 2147483646 !important;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px;
+            box-shadow: 0 4px 35px rgba(232,197,85,0.7), 0 0 70px rgba(139,107,255,0.4);
+            animation: btnGradientShift 6s ease infinite;
+            transition: transform 0.28s ease;
+        `;
+        trigger.onclick = window.toggleAethrionFeaturesPanel;
+
+        // Span styles (tek sefer)
+        if (!document.getElementById('aethrionTriggerStyles')) {
+            const style = document.createElement('style');
+            style.id = 'aethrionTriggerStyles';
+            style.textContent = `
+                #aethrionFeaturesTrigger span {
+                    display: block; width: 26px; height: 3px;
+                    background: #fff; border-radius: 2px;
+                    box-shadow: 0 0 10px rgba(255,255,255,0.7);
+                }
+                #aethrionFeaturesTrigger:hover { transform: scale(1.1) rotate(-3deg); }
+                @media (max-width: 768px) {
+                    #aethrionFeaturesTrigger { top: 84px !important; right: 14px !important; width: 46px !important; height: 46px !important; }
+                    #aethrionFeaturesTrigger span { width: 22px !important; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 10. CLOUD BUG FIX — revealV27KeyOnce
+    // ═══════════════════════════════════════════════════════════
+    // createV27ApiKey'de viaVizyonAl=true dönerse revealToken gelir.
+    // Client submitQuickA27Key bunu çağırmalı. Override edelim:
+    if (typeof window.submitQuickA27Key === 'function') {
+        const orig = window.submitQuickA27Key;
+        window.submitQuickA27Key = async function() {
+            try {
+                const nameEl = document.getElementById('v27QuickKeyName') || document.getElementById('a27QuickKeyName');
+                const descEl = document.getElementById('v27QuickKeyDesc') || document.getElementById('a27QuickKeyDesc');
+                const errEl = document.getElementById('v27QuickCreateError') || document.getElementById('a27QuickCreateError');
+                const keyName = nameEl ? nameEl.value.trim() : '';
+                const keyDesc = descEl ? descEl.value.trim() : '';
+                if (errEl) errEl.style.display = 'none';
+                if (!keyName) {
+                    if (errEl) { errEl.textContent = '❌ Anahtar adı gerekli!'; errEl.style.display = 'block'; }
+                    return;
+                }
+                const result = await Parse.Cloud.run('createV27ApiKey', {
+                    keyName, keyDescription: keyDesc,
+                    duration: window._a27QuickSelectedDuration || 'unlimited',
+                    viaVizyonAl: true
+                });
+                if (!result.success) {
+                    if (errEl) { errEl.textContent = '❌ ' + (result.error || 'Anahtar oluşturulamadı.'); errEl.style.display = 'block'; }
+                    return;
+                }
+                // ⚡ revealToken geldiyse, tek seferlik gösterim için çağır
+                let plainKey = result.plainKey;
+                if (!plainKey && result.revealToken) {
+                    try {
+                        const reveal = await Parse.Cloud.run('revealV27KeyOnce', { revealToken: result.revealToken });
+                        plainKey = reveal.plainKey;
+                    } catch(e) {
+                        if (errEl) { errEl.textContent = '❌ Anahtar gösterilemedi: ' + e.message; errEl.style.display = 'block'; }
+                        return;
+                    }
+                }
+                window.closeA27QuickCreate();
+                window.showA27KeyReveal(plainKey, result.durationLabel);
+                if (typeof window.addLogSuccess === 'function') window.addLogSuccess('A27 API anahtarı oluşturuldu');
+            } catch(e) {
+                console.error('[AETHRION] submitQuickA27Key hata:', e);
+            }
+        };
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 11. CLOUD BUG FIX — job.title fallback
+    // ═══════════════════════════════════════════════════════════
+    if (typeof window.renderJobMarket === 'function') {
+        const origRender = window.renderJobMarket;
+        window.renderJobMarket = function(jobs) {
+            if (Array.isArray(jobs)) {
+                jobs = jobs.map(j => {
+                    if (!j.title || j.title === 'İlan') {
+                        j.title = (j.job_type ? j.job_type + ' İlanı' : 'İlan') + (j.job_number ? ' · ' + j.job_number : '');
+                    }
+                    return j;
+                });
+            }
+            return origRender.call(this, jobs);
+        };
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 12. INIT
+    // ═══════════════════════════════════════════════════════════
+    function init() {
+        ensureOverlays();
+        ensureTrigger();
+        const user = getUser();
+        if (user) {
+            window.aethrionRouter.showWelcomeScreen();
+        }
+        console.log('✅ [AethrionUnifiedRouter] Aktif — 30+ özellik, tüm overlay\'ler hazır');
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => setTimeout(init, 300));
+    } else {
+        setTimeout(init, 300);
+    }
+    setTimeout(init, 1500);
+    setTimeout(init, 3500);
+
+    // showDashboard override
+    const origShow = window.showDashboard;
+    if (typeof origShow === 'function') {
+        window.showDashboard = async function() {
+            const r = await origShow.apply(this, arguments);
+            setTimeout(init, 300);
+            return r;
+        };
+    }
+})();
+</script>
+
+<!-- ============================================================ -->
+<!-- [AETHRION v1.0.0 FINAL — KALAN HATALAR TAM ÇÖZÜM]           -->
+<!-- M5, L1, C7, M7, M2, L12, M3, M4                              -->
+<!-- ============================================================ -->
+<script>
+(function AethrionFinalCleanup() {
+    'use strict';
+
+    // ═══════════════════════════════════════════════════════════
+    // M5: Duplicate #dashboardArea temizle
+    // ═══════════════════════════════════════════════════════════
+    function fixDuplicateDashboardArea() {
+        const list = document.querySelectorAll('#dashboardArea');
+        if (list.length <= 1) return;
+        console.warn('[AETHRION Fix] ' + list.length + ' adet #dashboardArea bulundu, temizleniyor...');
+        const first = list[0];
+        for (let i = list.length - 1; i >= 1; i--) {
+            const dup = list[i];
+            if (dup.parentNode === first) {
+                // İç içe → çocukları birinciye taşı, kabuğu sil
+                while (dup.firstChild) first.appendChild(dup.firstChild);
+                dup.remove();
+            } else {
+                // Kardeş → doğrudan sil
+                dup.remove();
+            }
+        }
+        console.log('✅ [AETHRION Fix] #dashboardArea tekleştirildi');
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // L1: Duplicate #aethrionResponsibilityModal temizle
+    // ═══════════════════════════════════════════════════════════
+    function fixDuplicateResponsibilityModal() {
+        const list = document.querySelectorAll('#aethrionResponsibilityModal');
+        if (list.length <= 1) return;
+        console.warn('[AETHRION Fix] ' + list.length + ' adet #aethrionResponsibilityModal bulundu, temizleniyor...');
+        for (let i = list.length - 1; i >= 1; i--) list[i].remove();
+        console.log('✅ [AETHRION Fix] #aethrionResponsibilityModal tekleştirildi');
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // C7 + M7: Statik #aethrionSidebar ve toggle'ını gizle
+    // ═══════════════════════════════════════════════════════════
+    function hideStaticSidebar() {
+        const staticIds = [
+            'aethrionSidebar',
+            'aethrionSidebarToggle',
+            'aethrionSidebarBackdrop'
+        ];
+        staticIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.display = 'none';
+                el.style.visibility = 'hidden';
+                el.style.pointerEvents = 'none';
+                el.setAttribute('data-aethrion-hidden', '1');
+            }
+        });
+        // Statik toggle'a tıklama engeli
+        document.querySelectorAll('.aethrion-sidebar-toggle').forEach(el => {
+            el.style.display = 'none';
+        });
+        console.log('✅ [AETHRION Fix] Statik sidebar gizlendi (dinamik panel aktif)');
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // M2: openAssistantSettings — Gerçek Modal + Kaydetme
+    // ═══════════════════════════════════════════════════════════
+    function fixAssistantSettings() {
+        window.openAssistantSettings = async function() {
+            let modal = document.getElementById('assistantSettingsModal');
+            if (modal) modal.remove();
+
+            // Mevcut ayarları cloud'dan çek
+            let settings = { liveTracking: true, weeklyReport: true, notifications: true, voiceResponse: true };
+            try {
+                const r = await Parse.Cloud.run('getAssistantSettings', {});
+                if (r && r.success) {
+                    settings = {
+                        liveTracking: r.liveTracking,
+                        weeklyReport: r.weeklyReport,
+                        notifications: r.notifications,
+                        voiceResponse: r.voiceResponse
+                    };
+                }
+            } catch(e) { console.warn('Ayarlar yüklenemedi:', e.message); }
+
+            modal = document.createElement('div');
+            modal.id = 'assistantSettingsModal';
+            modal.className = 'modal-overlay open';
+            modal.style.cssText = 'display:flex;z-index:2147483645;position:fixed;inset:0;background:rgba(3,3,6,0.97);backdrop-filter:blur(22px);align-items:center;justify-content:center;padding:24px;';
+            modal.onclick = (e) => { if (e.target === modal) { modal.remove(); } };
+            modal.innerHTML = `
+                <div class="modal" style="max-width:560px;width:100%;background:linear-gradient(135deg,rgba(18,18,26,0.99),rgba(8,8,12,0.998));border:2px solid var(--accent);border-radius:24px;padding:32px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                        <h3 style="margin:0;color:var(--accent);font-family:Syne,sans-serif;font-size:22px;">⚙️ Asistan Ayarları</h3>
+                        <button onclick="document.getElementById('assistantSettingsModal').remove()" style="background:none;border:none;color:var(--text3);font-size:28px;cursor:pointer;">×</button>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:4px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(232,197,85,0.12);">
+                            <span style="color:var(--text2);font-size:14px;">🟢 Canlı Takip</span>
+                            <div class="toggle-switch ${settings.liveTracking ? 'active' : ''}" id="asstLiveTracking" onclick="this.classList.toggle('active')"></div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(232,197,85,0.12);">
+                            <span style="color:var(--text2);font-size:14px;">📊 Haftalık Analiz</span>
+                            <div class="toggle-switch ${settings.weeklyReport ? 'active' : ''}" id="asstWeeklyReport" onclick="this.classList.toggle('active')"></div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(232,197,85,0.12);">
+                            <span style="color:var(--text2);font-size:14px;">🔔 Bildirimler</span>
+                            <div class="toggle-switch ${settings.notifications ? 'active' : ''}" id="asstNotifications" onclick="this.classList.toggle('active')"></div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;">
+                            <span style="color:var(--text2);font-size:14px;">🎤 Sesli Yanıt</span>
+                            <div class="toggle-switch ${settings.voiceResponse ? 'active' : ''}" id="asstVoiceResponse" onclick="this.classList.toggle('active')"></div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:10px;margin-top:24px;">
+                        <button onclick="document.getElementById('assistantSettingsModal').remove()" class="btn-secondary" style="flex:1;padding:13px;">İptal</button>
+                        <button onclick="window._saveAssistantSettings()" class="btn-primary" style="flex:2;padding:13px;">💾 Kaydet</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        };
+
+        window._saveAssistantSettings = async function() {
+            try {
+                const r = await Parse.Cloud.run('saveAssistantSettings', {
+                    liveTracking: document.getElementById('asstLiveTracking').classList.contains('active'),
+                    weeklyReport: document.getElementById('asstWeeklyReport').classList.contains('active'),
+                    notifications: document.getElementById('asstNotifications').classList.contains('active'),
+                    voiceResponse: document.getElementById('asstVoiceResponse').classList.contains('active')
+                });
+                if (r && r.success) {
+                    if (typeof showNotification === 'function') showNotification('✅ Asistan ayarları kaydedildi!', 'success');
+                    const m = document.getElementById('assistantSettingsModal');
+                    if (m) m.remove();
+                    if (typeof window.addLogSuccess === 'function') window.addLogSuccess('Asistan ayarları güncellendi');
+                } else {
+                    if (typeof showNotification === 'function') showNotification('❌ ' + ((r && r.error) || 'Kaydedilemedi'), 'error');
+                }
+            } catch(e) {
+                if (typeof showNotification === 'function') showNotification('Hata: ' + e.message, 'error');
+            }
+        };
+
+        console.log('✅ [AETHRION Fix] openAssistantSettings override edildi');
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // L12: submitJobCreate — Edit desteği
+    // ═══════════════════════════════════════════════════════════
+    function fixJobEdit() {
+        if (typeof window.submitJobCreate !== 'function') return;
+        const orig = window.submitJobCreate;
+        window.submitJobCreate = async function() {
+            // Düzenleme modunda mı?
+            if (window._editingJobId) {
+                try {
+                    const typeEl = document.getElementById('jobCreateType');
+                    const titleEl = document.getElementById('jobCreateTitle');
+                    const descEl = document.getElementById('jobCreateDescription');
+                    const salaryEl = document.getElementById('jobCreateSalary');
+                    const payEl = document.getElementById('jobCreatePaymentMethod');
+                    const errEl = document.getElementById('jobCreateError');
+                    const submitBtn = document.getElementById('jobCreateSubmitBtn');
+
+                    const title = titleEl ? titleEl.value.trim() : '';
+                    const description = descEl ? descEl.value.trim() : '';
+                    const jobType = typeEl ? typeEl.value : '';
+                    const salary = salaryEl ? String(salaryEl.value).trim() : '';
+                    const paymentMethod = payEl ? payEl.value.trim() : '';
+
+                    if (errEl) errEl.classList.remove('show');
+                    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '⏳ Güncelleniyor...'; }
+
+                    const r = await Parse.Cloud.run('editJobListing', {
+                        jobId: window._editingJobId,
+                        title: title,
+                        jobType: jobType,
+                        description: description,
+                        salary: salary,
+                        paymentMethod: paymentMethod
+                    });
+
+                    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '💾 Güncelle'; }
+
+                    if (r && r.success) {
+                        if (typeof showNotification === 'function') showNotification('✅ İlan güncellendi!', 'success');
+                        window._editingJobId = null;
+                        const overlay = document.getElementById('jobCreateOverlay');
+                        if (overlay) { overlay.classList.remove('open'); overlay.style.display = 'none'; }
+                        if (typeof window.loadJobMarket === 'function') window.loadJobMarket();
+                    } else {
+                        if (errEl) { errEl.textContent = '❌ ' + ((r && r.error) || 'Güncellenemedi'); errEl.classList.add('show'); }
+                        if (typeof showNotification === 'function') showNotification('❌ ' + ((r && r.error) || 'Güncellenemedi'), 'error');
+                    }
+                } catch(e) {
+                    console.error('Job edit hata:', e);
+                    if (typeof showNotification === 'function') showNotification('Hata: ' + e.message, 'error');
+                }
+                return;
+            }
+            // Yeni oluşturma → orijinal akış
+            return orig.apply(this, arguments);
+        };
+        console.log('✅ [AETHRION Fix] submitJobCreate edit desteği eklendi');
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // M3 + M4: Cursor — tek tanım, GOLD renk
+    // ═══════════════════════════════════════════════════════════
+    function fixCursor() {
+        // Eski imleçleri sil
+        const oldC = document.getElementById('customCursor');
+        const oldR = document.getElementById('customCursorRing');
+        if (oldC) oldC.remove();
+        if (oldR) oldR.remove();
+
+        // Mobil ise hiç oluşturma
+        const hasMouse = window.matchMedia('(pointer: fine)').matches || window.matchMedia('(hover: hover)').matches;
+        if (!hasMouse) return;
+
+        const cursor = document.createElement('div');
+        cursor.id = 'customCursor';
+        cursor.style.cssText = 'position:fixed;top:0;left:0;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle,#e8c555 0%,#fff 85%);box-shadow:0 0 22px #e8c555,0 0 44px rgba(232,197,85,0.55);pointer-events:none;z-index:999999;transform:translate3d(-100px,-100px,0);will-change:transform;mix-blend-mode:screen;';
+
+        const ring = document.createElement('div');
+        ring.id = 'customCursorRing';
+        ring.style.cssText = 'position:fixed;top:0;left:0;width:44px;height:44px;border:1.5px solid rgba(232,197,85,0.65);border-radius:50%;box-shadow:0 0 24px rgba(232,197,85,0.4),inset 0 0 15px rgba(232,197,85,0.15);pointer-events:none;z-index:999998;transform:translate3d(-100px,-100px,0);will-change:transform;';
+
+        document.body.appendChild(cursor);
+        document.body.appendChild(ring);
+
+        let mx = -100, my = -100, rx = -100, ry = -100, moving = false, raf = null;
+
+        document.addEventListener('mousemove', function(e) {
+            mx = e.clientX; my = e.clientY;
+            cursor.style.transform = `translate3d(${mx - 7}px, ${my - 7}px, 0)`;
+            if (!moving) { moving = true; loop(); }
+            clearTimeout(window._cursorStopTimer);
+            window._cursorStopTimer = setTimeout(() => {
+                moving = false;
+                if (raf) cancelAnimationFrame(raf);
+            }, 1200);
+        }, { passive: true });
+
+        function loop() {
+            if (!moving) return;
+            rx += (mx - rx) * 0.16;
+            ry += (my - ry) * 0.16;
+            ring.style.transform = `translate3d(${rx - 22}px, ${ry - 22}px, 0)`;
+            raf = requestAnimationFrame(loop);
+        }
+
+        document.addEventListener('mouseleave', () => { cursor.style.opacity = '0'; ring.style.opacity = '0'; });
+        document.addEventListener('mouseenter', () => { cursor.style.opacity = '1'; ring.style.opacity = '0.65'; });
+
+        console.log('✅ [AETHRION Fix] Cursor GOLD tek tanım');
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // RUN — DOM hazır olunca
+    // ═══════════════════════════════════════════════════════════
+    function runAll() {
+        fixDuplicateDashboardArea();
+        fixDuplicateResponsibilityModal();
+        hideStaticSidebar();
+        fixAssistantSettings();
+        fixJobEdit();
+        fixCursor();
+        console.log('✅ [AETHRION FinalCleanup] Tüm düzeltmeler uygulandı');
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => setTimeout(runAll, 400));
+    } else {
+        setTimeout(runAll, 400);
+    }
+
+    // Geç yüklenen elementler için retry
+    setTimeout(runAll, 2000);
+    setTimeout(runAll, 4000);
+})();
+</script>
 </body>
 </html>
