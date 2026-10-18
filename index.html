@@ -48232,230 +48232,6 @@ body {
 })();
 </script>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- [v1.0.0 CRITICAL FIX] MAIN SITE GİZLE + DASHBOARD GÖSTER   -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<script>
-(function fixDashboardVisibility() {
-    'use strict';
-    
-    // Orijinal showDashboard'u sakla
-    var originalShowDashboard = window.showDashboard;
-    
-    // Yeni showDashboard
-    window.showDashboard = async function () {
-        console.log('🔄 [Dashboard Fix] showDashboard çağrıldı');
-        
-        // Orijinali çalıştır
-        if (typeof originalShowDashboard === 'function') {
-            try {
-                await originalShowDashboard.apply(this, arguments);
-            } catch (e) {
-                console.error('⚠️ Orijinal showDashboard hatası:', e.message);
-            }
-        }
-        
-        // ═══ ZORLA GİZLE/GÖSTER ═══
-        var mainSite = document.getElementById('mainSite');
-        var dash = document.getElementById('dashboardArea');
-        var userPanel = document.getElementById('userPanel');
-        
-        if (mainSite) {
-            mainSite.style.display = 'none';
-            mainSite.style.visibility = 'hidden';
-            console.log('✅ mainSite gizlendi');
-        }
-        
-        if (userPanel) {
-            userPanel.style.display = 'none';
-        }
-        
-        if (dash) {
-            dash.style.display = 'block';
-            dash.style.visibility = 'visible';
-            dash.style.opacity = '1';
-            dash.style.zIndex = '999999';
-            dash.style.position = 'fixed';
-            dash.style.top = '0';
-            dash.style.left = '0';
-            dash.style.right = '0';
-            dash.style.bottom = '0';
-            dash.style.overflowY = 'auto';
-            dash.style.background = '#030306';
-            console.log('✅ dashboardArea gösterildi');
-        }
-        
-        // İçerik wrapper'ı zorla göster
-        var wrapper = dash ? dash.querySelector('.dashboard-content-wrapper') : null;
-        if (wrapper) {
-            wrapper.style.display = 'block';
-            wrapper.style.visibility = 'visible';
-            wrapper.style.opacity = '1';
-        }
-        
-        // Header'ı zorla göster
-        var header = dash ? dash.querySelector('.dashboard-header') : null;
-        if (header) {
-            header.style.display = 'flex';
-            header.style.visibility = 'visible';
-            header.style.opacity = '1';
-        }
-        
-        // Body class
-        document.body.classList.add('dashboard-open');
-        document.documentElement.classList.add('dashboard-open');
-        
-        console.log('✅ [Dashboard Fix] Tüm görünürlük ayarları uygulandı');
-    };
-    
-    // ═══ LOGOUT FIX — mainSite'ı tekrar göster ═══
-    var originalLogout = window.logout;
-    window.logout = function () {
-        if (typeof originalLogout === 'function') {
-            originalLogout.apply(this, arguments);
-        }
-        // Logout sonrası mainSite'ı göster
-        var mainSite = document.getElementById('mainSite');
-        if (mainSite) {
-            mainSite.style.display = 'block';
-            mainSite.style.visibility = 'visible';
-        }
-    };
-    
-    // ═══ SAYFA YÜKLENDİĞİNDE OTURUM VARSA DASHBOARD AÇ ═══
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', checkSessionAndOpenDashboard);
-    } else {
-        checkSessionAndOpenDashboard();
-    }
-    
-    function checkSessionAndOpenDashboard() {
-        if (typeof Parse === 'undefined' || !Parse.User) return;
-        
-        var user = Parse.User.current();
-        if (user) {
-            console.log('✅ Oturum bulundu, dashboard açılıyor...');
-            window.currentUser = user;
-            try { currentUser = user; } catch(e) {}
-            
-            if (typeof window.showDashboard === 'function') {
-                setTimeout(function() {
-                    window.showDashboard();
-                }, 500);
-            }
-        }
-    }
-    
-    console.log('✅ [DASHBOARD VISIBILITY FIX] Yüklendi');
-})();
-</script>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- [v1.0.0 ULTIMATE FIX] Parse Hatalarını Kökten Çöz          -->
-<!-- initAdminUsers ve checkSessionAndOpenDashboard hatalarını   -->
-<!-- kaynağından engeller                                        -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<script>
-(function ultimateParseFix() {
-    'use strict';
-    
-    // ═══ 1) Parse.Cloud.run'ı sarmala — initAdminUsers'ı engelle ═══
-    function wrapParseCloudRun() {
-        if (typeof Parse === 'undefined' || !Parse.Cloud || !Parse.Cloud.run) {
-            setTimeout(wrapParseCloudRun, 200);
-            return;
-        }
-        if (Parse.Cloud._runWrapped) return; // Zaten sarmalanmış
-        
-        var originalRun = Parse.Cloud.run.bind(Parse.Cloud);
-        Parse.Cloud.run = function(functionName, params, options) {
-            // initAdminUsers ve initSchemas'ı sadece Founder için geçir
-            if (functionName === 'initAdminUsers' || functionName === 'initSchemas') {
-                var user = null;
-                try { user = Parse.User.current(); } catch(e) {}
-                
-                if (!user || user.get('role') !== 'founder') {
-                    console.log('ℹ️ [AETHRION] ' + functionName + ' atlandı (sadece Kurucu).');
-                    return Promise.resolve({ success: false, skipped: true });
-                }
-            }
-            
-            // Diğer fonksiyonlar normal çalışsın
-            return originalRun.apply(Parse.Cloud, arguments);
-        };
-        Parse.Cloud._runWrapped = true;
-        console.log('✅ [ULTIMATE FIX] Parse.Cloud.run sarmalandı');
-    }
-    wrapParseCloudRun();
-    
-    // ═══ 2) Parse.User.current'i güvenli hale getir ═══
-    function wrapParseUserCurrent() {
-        if (typeof Parse === 'undefined' || !Parse.User) {
-            setTimeout(wrapParseUserCurrent, 200);
-            return;
-        }
-        if (Parse.User._currentWrapped) return;
-        
-        var originalCurrent = Parse.User.current.bind(Parse.User);
-        Parse.User.current = function() {
-            try {
-                return originalCurrent.apply(Parse.User, arguments);
-            } catch (e) {
-                console.warn('⚠️ Parse.User.current hatası yakalandı:', e.message);
-                return null;
-            }
-        };
-        Parse.User._currentWrapped = true;
-        console.log('✅ [ULTIMATE FIX] Parse.User.current güvenli hale getirildi');
-    }
-    wrapParseUserCurrent();
-    
-    // ═══ 3) checkSessionAndOpenDashboard'u tamamen devre dışı bırak ═══
-    // Bu fonksiyon zaten showDashboard içinde çağrılıyor, ayrıca çağrılmasına gerek yok
-    setTimeout(function() {
-        window.checkSessionAndOpenDashboard = function() {
-            console.log('ℹ️ [AETHRION] checkSessionAndOpenDashboard devre dışı (showDashboard kullanılıyor).');
-            return;
-        };
-        console.log('✅ [ULTIMATE FIX] checkSessionAndOpenDashboard devre dışı bırakıldı');
-    }, 500);
-    
-    // ═══ 4) Splash zorla kapat (6sn sonra) ═══
-    setTimeout(function() {
-        var splash = document.getElementById('splashScreen');
-        if (splash && splash.style.display !== 'none') {
-            splash.classList.add('hidden', 'hide');
-            splash.style.display = 'none';
-            splash.style.opacity = '0';
-            splash.style.visibility = 'hidden';
-            document.body.style.overflow = '';
-            document.documentElement.style.overflow = '';
-            console.log('✅ [ULTIMATE FIX] Splash zorla kapatıldı');
-        }
-    }, 6000);
-    
-    // ═══ 5) Global hata yakalayıcıyı sustur (Parse hataları için) ═══
-    var originalAddLog = window.addLog;
-    if (typeof originalAddLog === 'function') {
-        window.addLog = function(level, message, meta) {
-            // Parse kaynaklı hataları loglama
-            if (message && (
-                message.indexOf('Parse') !== -1 ||
-                message.indexOf('parse') !== -1 ||
-                message.indexOf('async') !== -1 ||
-                message.indexOf('Script error') !== -1
-            )) {
-                return { skipped: true }; // Konsola yazma
-            }
-            return originalAddLog.apply(this, arguments);
-        };
-        console.log('✅ [ULTIMATE FIX] Log filtresi eklendi (Parse hataları susturuldu)');
-    }
-    
-    console.log('✅ [ULTIMATE FIX] Tüm Parse hataları kökten çözüldü');
-})();
-</script>
-
 // ================================================================
 // [AETHRION v1.0.0 FIX] EKSİK ROL PANELLERİNİ DİNAMİK OLUŞTUR
 // Bu script HTML'de olmayan admin/founder/moderator/beta panellerini
@@ -48641,6 +48417,984 @@ body {
         setTimeout(build, 1200);
     }
     setTimeout(build, 3000);
+})();
+</script>
+
+// ═══════════════════════════════════════════════════════════════
+// [AETHRION SAFETY NET] Otomatik Acil Temizlik
+// Sayfa 3 saniye içinde açılmazsa veya bir modal takılırsa
+// otomatik sıfırlar
+// ═══════════════════════════════════════════════════════════════
+(function aethrionSafetyNet() {
+    'use strict';
+
+    // Sayfa yüklendikten 3 saniye sonra kontrol
+    setTimeout(function () {
+        // Eğer body overflow hidden ise ve hiçbir panel açık değilse, sıfırla
+        if (document.body.style.overflow === 'hidden') {
+            var anyPanelOpen = document.querySelector('.modal-overlay.open, #aethrionFeaturesPanel.open, #vizyonAlPanel.open, #kocPanelOverlay.open, [class*="overlay"].open');
+            if (!anyPanelOpen) {
+                console.warn('🛡️ [SafetyNet] Body overflow takılı, sıfırlanıyor...');
+                document.body.style.overflow = '';
+                document.documentElement.style.overflow = '';
+            }
+        }
+
+        // Cursor görünmüyorsa yeniden başlat
+        var cursor = document.getElementById('customCursor');
+        var ring = document.getElementById('customCursorRing');
+        if (cursor && cursor.style.display === 'none' && window.innerWidth > 768) {
+            console.log('🛡️ [SafetyNet] Cursor yeniden başlatılıyor...');
+            cursor.style.display = 'block';
+            cursor.style.pointerEvents = 'none';
+            cursor.style.position = 'fixed';
+            cursor.style.zIndex = '999999';
+            cursor.style.transform = 'translate3d(-100px, -100px, 0)';
+            if (ring) {
+                ring.style.display = 'block';
+                ring.style.pointerEvents = 'none';
+                ring.style.position = 'fixed';
+                ring.style.zIndex = '999998';
+                ring.style.transform = 'translate3d(-100px, -100px, 0)';
+            }
+
+            // Mousemove dinleyicisi yoksa ekle
+            if (!window._cursorMousemoveBound) {
+                window._cursorMousemoveBound = true;
+                var mx = -100, my = -100;
+                var rx = -100, ry = -100;
+                var isMoving = false;
+                var animId = null;
+
+                document.addEventListener('mousemove', function(e) {
+                    mx = e.clientX;
+                    my = e.clientY;
+                    cursor.style.transform = 'translate3d(' + (mx - 7) + 'px, ' + (my - 7) + 'px, 0)';
+
+                    if (!isMoving) {
+                        isMoving = true;
+                        (function loop() {
+                            if (!isMoving) return;
+                            rx += (mx - rx) * 0.15;
+                            ry += (my - ry) * 0.15;
+                            ring.style.transform = 'translate3d(' + (rx - 20) + 'px, ' + (ry - 20) + 'px, 0)';
+                            animId = requestAnimationFrame(loop);
+                        })();
+                    }
+
+                    clearTimeout(window._cursorStopTimer);
+                    window._cursorStopTimer = setTimeout(function() {
+                        isMoving = false;
+                        if (animId) cancelAnimationFrame(animId);
+                    }, 1000);
+                }, { passive: true });
+            }
+        }
+
+        // Çıkış butonunu kontrol et
+        var logoutBtns = document.querySelectorAll('[onclick*="logout"], .logout-btn');
+        logoutBtns.forEach(function(btn) {
+            if (!btn._logoutBound) {
+                btn._logoutBound = true;
+                // Eski onclick'i kaldır
+                btn.removeAttribute('onclick');
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (confirm('AETHRION\'dan çıkış yapmak istediğinize emin misiniz?')) {
+                        if (typeof Parse !== 'undefined') {
+                            Parse.User.logOut().then(function() {
+                                localStorage.removeItem('aethrion_user');
+                                window.currentUser = null;
+                                location.reload();
+                            });
+                        } else {
+                            location.reload();
+                        }
+                    }
+                });
+            }
+        });
+    }, 3000);
+
+    // Her 5 saniyede bir modal takılma kontrolü
+    setInterval(function() {
+        // Eğer body overflow hidden ve hiçbir panel açık değilse, sıfırla
+        if (document.body.style.overflow === 'hidden') {
+            var anyOpen = document.querySelector('.modal-overlay.open, #aethrionFeaturesPanel.open, [class*="overlay"].open');
+            if (!anyOpen) {
+                document.body.style.overflow = '';
+            }
+        }
+    }, 5000);
+
+    console.log('🛡️ [AETHRION SafetyNet] Aktif');
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- [AETHRION v1.0.0 FINAL] KESİN ÇÖZÜM                       -->
+<!-- Tüm eksik fonksiyonlar + Karşılama + Sağ Panel + Health    -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<style id="aethrionFinalStyles">
+/* ═══ KARŞILAMA EKRANI ═══ */
+#aethrionWelcomeScreen {
+    min-height: calc(100vh - 100px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    background: radial-gradient(ellipse at center top, rgba(232,197,85,0.08), transparent 70%);
+}
+
+#aethrionWelcomeScreen .aw-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e8c555, #c5cde0, #8b6bff, #6ee0ff);
+    background-size: 300% 300%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 52px;
+    font-weight: 900;
+    color: #06060b;
+    margin-bottom: 22px;
+    box-shadow: 0 0 60px rgba(232,197,85,0.7), 0 0 120px rgba(139,107,255,0.4);
+    animation: awSpin 8s linear infinite, awPulse 3s ease-in-out infinite;
+}
+
+@keyframes awSpin { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
+@keyframes awPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+#aethrionWelcomeScreen h1 {
+    font-family: 'Syne', 'Inter', sans-serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 800;
+    margin-bottom: 10px;
+    line-height: 1.15;
+}
+
+#aethrionWelcomeScreen .aw-name {
+    background: linear-gradient(90deg, #e8c555, #c5cde0, #8b6bff, #6ee0ff, #e8c555);
+    background-size: 400% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: awGrad 4s ease infinite;
+}
+
+@keyframes awGrad { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+#aethrionWelcomeScreen .aw-role {
+    display: inline-block;
+    padding: 10px 24px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 24px;
+}
+
+#aethrionWelcomeScreen .aw-role.founder { background: rgba(232,197,85,0.2); border: 1.5px solid #e8c555; color: #e8c555; }
+#aethrionWelcomeScreen .aw-role.admin { background: rgba(232,197,85,0.15); border: 1.5px solid #e8c555; color: #e8c555; }
+#aethrionWelcomeScreen .aw-role.beta { background: rgba(139,107,255,0.2); border: 1.5px solid #8b6bff; color: #8b6bff; }
+#aethrionWelcomeScreen .aw-role.moderator { background: rgba(232,197,85,0.15); border: 1.5px solid #e8c555; color: #e8c555; }
+#aethrionWelcomeScreen .aw-role.user { background: rgba(197,205,224,0.15); border: 1.5px solid #c5cde0; color: #c5cde0; }
+
+#aethrionWelcomeScreen .aw-sub {
+    color: #dbdbe8;
+    font-size: 15px;
+    max-width: 560px;
+    line-height: 1.8;
+    margin-bottom: 32px;
+}
+
+#aethrionWelcomeScreen .aw-cta {
+    padding: 18px 48px;
+    font-size: 18px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #e8c555, #c5cde0, #8b6bff, #6ee0ff);
+    background-size: 250% 250%;
+    color: #06060b;
+    border: none;
+    border-radius: 60px;
+    cursor: pointer;
+    box-shadow: 0 0 50px rgba(232,197,85,0.6), 0 0 100px rgba(139,107,255,0.4);
+    animation: btnGradientShift 5s ease infinite;
+    transition: transform 0.25s;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 50px;
+}
+
+#aethrionWelcomeScreen .aw-cta:hover {
+    transform: translateY(-4px) scale(1.05);
+}
+
+/* ═══ SAĞ PANEL ═══ */
+#aethrionFeaturesPanel {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 420px;
+    max-width: 92vw;
+    height: 100vh;
+    background: linear-gradient(180deg, #0f0f16 0%, #050508 100%);
+    border-left: 2px solid rgba(232,197,85,0.4);
+    box-shadow: -30px 0 90px rgba(0,0,0,0.85);
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.4s cubic-bezier(0.4,0,0.2,1);
+    overflow: hidden;
+}
+
+#aethrionFeaturesPanel.open { right: 0; }
+
+#aethrionFeaturesPanel .afp-head {
+    padding: 18px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(232,197,85,0.2);
+    background: linear-gradient(90deg, rgba(232,197,85,0.1), rgba(139,107,255,0.05));
+    flex-shrink: 0;
+}
+
+#aethrionFeaturesPanel .afp-head h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1.5px;
+    background: linear-gradient(90deg, #e8c555, #c5cde0, #8b6bff, #e8c555);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: awGrad 4s ease infinite;
+}
+
+#aethrionFeaturesPanel .afp-close {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(239,68,68,0.15);
+    border: 1.5px solid rgba(239,68,68,0.6);
+    color: #ef4444;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#aethrionFeaturesPanel .afp-close:hover {
+    background: rgba(239,68,68,0.35);
+    color: #fff;
+    transform: rotate(90deg);
+}
+
+#aethrionFeaturesPanel .afp-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 12px;
+}
+
+#aethrionFeaturesPanel .afp-group {
+    margin-bottom: 16px;
+}
+
+#aethrionFeaturesPanel .afp-group-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #8a8aa8;
+    text-transform: uppercase;
+    padding: 8px 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#aethrionFeaturesPanel .afp-group-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(232,197,85,0.3), transparent);
+}
+
+#aethrionFeaturesPanel .afp-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 4px;
+    background: linear-gradient(135deg, rgba(232,197,85,0.04), rgba(139,107,255,0.02));
+    border: 1px solid rgba(232,197,85,0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    color: inherit;
+    transition: all 0.2s;
+}
+
+#aethrionFeaturesPanel .afp-item:hover {
+    background: rgba(232,197,85,0.12);
+    border-color: #e8c555;
+    transform: translateX(-3px);
+}
+
+#aethrionFeaturesPanel .afp-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    border-radius: 9px;
+    background: rgba(0,0,0,0.4);
+    border: 1.5px solid rgba(232,197,85,0.3);
+}
+
+#aethrionFeaturesPanel .afp-text {
+    flex: 1;
+    min-width: 0;
+}
+
+#aethrionFeaturesPanel .afp-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    display: block;
+    margin-bottom: 2px;
+}
+
+#aethrionFeaturesPanel .afp-desc {
+    font-size: 10.5px;
+    color: #8a8aa8;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#aethrionFeaturesPanel .afp-arrow {
+    color: #e8c555;
+    opacity: 0.5;
+    font-size: 16px;
+}
+
+#aethrionFeaturesPanel .afp-item:hover .afp-arrow {
+    opacity: 1;
+}
+
+/* ═══ TRIGGER (Panel Açma Butonu) ═══ */
+#aethrionFeaturesTrigger {
+    position: fixed;
+    top: 100px;
+    right: 24px;
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, #e8c555, #c5cde0, #8b6bff, #6ee0ff);
+    background-size: 300% 300%;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    z-index: 999998;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 4px 30px rgba(232,197,85,0.6);
+    animation: btnGradientShift 6s ease infinite;
+}
+
+#aethrionFeaturesTrigger span {
+    display: block;
+    width: 24px;
+    height: 3px;
+    background: #fff;
+    border-radius: 2px;
+}
+
+#aethrionFeaturesTrigger:hover {
+    transform: scale(1.1);
+}
+
+#aethrionFeaturesTrigger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+#aethrionFeaturesTrigger.active span:nth-child(2) { opacity: 0; }
+#aethrionFeaturesTrigger.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+/* ═══ BACKDROP ═══ */
+#aethrionFeaturesBackdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(5,5,7,0.75);
+    backdrop-filter: blur(6px);
+    z-index: 999997;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+#aethrionFeaturesBackdrop.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+    #aethrionFeaturesPanel { width: 100vw; max-width: 100vw; }
+    #aethrionFeaturesTrigger { top: 80px; right: 14px; width: 46px; height: 46px; }
+    #aethrionWelcomeScreen .aw-avatar { width: 90px; height: 90px; font-size: 40px; }
+    #aethrionWelcomeScreen .aw-cta { padding: 14px 32px; font-size: 15px; }
+}
+</style>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// [AETHRION v1.0.0 FINAL] TÜM SORUNLARI ÇÖZEN KOD
+// ═══════════════════════════════════════════════════════════════
+(function AethrionFinalFix() {
+    'use strict';
+
+    // ═══════════════════════════════════════════════════════
+    // 1) YARDIMCI FONKSİYONLAR
+    // ═══════════════════════════════════════════════════════
+    function esc(s) {
+        if (!s) return '';
+        if (typeof window.escapeHtml === 'function') return window.escapeHtml(s);
+        return String(s).replace(/[&<>"']/g, function(m) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+        });
+    }
+
+    function notify(msg, type) {
+        if (typeof window.showNotification === 'function') {
+            try { window.showNotification(msg, type); return; } catch(e) {}
+        }
+        console.log('[AETHRION]', msg);
+        // Fallback alert (sadece kritik hatalar için)
+        if (type === 'error') alert(msg);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // 2) EKSİK FONKSİYONLARI TANIMLA (Fallback)
+    // ═══════════════════════════════════════════════════════
+    var fallbackFns = {
+        openFullAIPanel: 'Aethrion AI (28 Model)',
+        openAethrionAlPanel: 'Aethrion Al (4 Mod)',
+        openKocPanel: 'Aethrion Coach',
+        startJarvisMode: 'Jarvis Sesli Asistan',
+        openVoiceChatFullscreen: 'Sesli Sohbet',
+        openModelsShowcase: '28 Model Showcase',
+        openVideoEditor: 'Video Editör',
+        openVideoStudio: 'Video Stüdyosu',
+        open3DBuilder: '3D Stüdyo',
+        createProjectWizard: 'Proje Sihirbazı',
+        openJobMarket: 'İş İlanları Mağazası',
+        openMarket: 'Puan Mağazası',
+        toggleTeamPage: 'Community',
+        openPersonalAssistant: 'AI Kişisel Asistan',
+        openContestPage: 'Aylık Yarışma',
+        loadInbox: 'Gelen Kutusu',
+        openV27ApiKeyGenerator: 'A27 API Anahtarı',
+        openA27ApiGuide: 'A27 API Rehberi',
+        openApiEkle: 'Kendi API Ekle',
+        openApiAnahtarlarim: 'API Anahtarlarım',
+        openLogsPanel: 'Logs Sistemi',
+        openParentSettings: 'Ebeveyn Ayarları',
+        openProfileModal: 'Profil',
+        openAccountInfo: 'Hesap Bilgileri',
+        openSettingsModal: 'Ayarlar',
+        openModeratorAssignModal: 'Moderatör Ata',
+        openAdminAssign: 'Admin Yönetimi',
+        openBetaAssign: 'Beta Tester Yönetimi',
+        openPollCreator: 'Anket Oluştur',
+        openAnnouncementCreator: 'Duyuru Yayınla',
+        openUserManagement: 'Kullanıcı Yönetimi',
+        openGifPicker: 'GIF Seçici',
+        newConversation: 'Yeni Sohbet',
+        toggleConversationHistory: 'Sohbet Geçmişi',
+        shareCurrentConversation: 'Sohbet Paylaş',
+        deleteCurrentConversation: 'Sohbeti Sil',
+        renameCurrentConversation: 'Sohbeti Yeniden Adlandır',
+        showDownloadOptions: 'Uygulamayı İndir',
+        closeDownloadOptions: 'İndirme Penceresini Kapat',
+        buyPackage: 'Paket Satın Al',
+        sendBlogNotification: 'Blog Bildirimi',
+        sendSystemNotification: 'Sistem Bildirimi',
+        banUserByEmail: 'Kullanıcı Engelle',
+        unbanUserByEmail: 'Engeli Kaldır',
+        closeAethrionResponsibilityModal: 'Sorumluluk Modalı Kapat',
+        confirmAethrionResponsibilityAction: 'Sorumluluk Onayla',
+        toggleNavbarAvatarMenu: 'Avatar Menü',
+        closeNavbarAvatarMenu: 'Avatar Menü Kapat',
+        openJobEdit: 'İş İlanı Düzenle'
+    };
+
+    Object.keys(fallbackFns).forEach(function(fnName) {
+        if (typeof window[fnName] !== 'function') {
+            window[fnName] = function() {
+                notify('⚠️ "' + fallbackFns[fnName] + '" özelliği yükleniyor... (Fonksiyon eksik)', 'warning');
+                console.warn('[AETHRION] Eksik fonksiyon:', fnName);
+            };
+        }
+    });
+
+    // ═══════════════════════════════════════════════════════
+    // 3) KULLANICI DURUMUNU KONTROL ET
+    // ═══════════════════════════════════════════════════════
+    function getUser() {
+        // Önce window.currentUser
+        if (window.currentUser) return window.currentUser;
+        // Sonra Parse
+        try {
+            if (typeof Parse !== 'undefined' && Parse.User && Parse.User.current()) {
+                window.currentUser = Parse.User.current();
+                return window.currentUser;
+            }
+        } catch(e) {}
+        return null;
+    }
+
+    function getUserRole() {
+        var u = getUser();
+        if (!u) return 'guest';
+        return u.get('role') || 'user';
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // 4) MAIN SITE / DASHBOARD GÖRÜNÜRLÜK DÜZELT
+    // ═══════════════════════════════════════════════════════
+    function fixVisibility() {
+        var user = getUser();
+        var main = document.getElementById('mainSite');
+        var dash = document.getElementById('dashboardArea');
+        var splash = document.getElementById('splashScreen');
+
+        if (splash) {
+            splash.style.display = 'none';
+            splash.style.visibility = 'hidden';
+        }
+
+        if (user && dash) {
+            // Dashboard açık, mainSite gizli
+            dash.style.display = 'block';
+            if (main) main.style.display = 'none';
+        } else if (!user && main) {
+            // MainSite açık, dashboard gizli
+            main.style.display = 'block';
+            if (dash) dash.style.display = 'none';
+        }
+
+        // Body overflow düzelt
+        document.body.style.overflow = 'auto';
+        document.documentElement.style.overflow = 'auto';
+        document.body.style.pointerEvents = 'auto';
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // 5) KARŞILAMA EKRANI
+    // ═══════════════════════════════════════════════════════
+    function renderWelcome() {
+        var user = getUser();
+        if (!user) {
+            console.warn('[AETHRION] Kullanıcı yok, karşılama gösterilmiyor');
+            return;
+        }
+
+        var wrapper = document.querySelector('#dashboardArea .dashboard-content-wrapper');
+        if (!wrapper) {
+            setTimeout(renderWelcome, 800);
+            return;
+        }
+
+        // Eski karşılamayı sil
+        var old = document.getElementById('aethrionWelcomeScreen');
+        if (old) old.remove();
+
+        // Tüm kartları gizle (sadece karşılama görünsün)
+        var children = wrapper.children;
+        for (var i = 0; i < children.length; i++) {
+            var c = children[i];
+            if (c.id === 'aethrionWelcomeScreen') continue;
+            c.style.display = 'none';
+        }
+
+        var name = user.get('name') || 'Kullanıcı';
+        var role = user.get('role') || 'user';
+        var plan = user.get('plan') || 'free';
+
+        var roleConfig = {
+            founder: { icon: '👑', label: 'KURUCU', cls: 'founder', desc: 'Sınırsız yetki · 28 model · Tüm özellikler' },
+            admin: { icon: '⚙️', label: 'ADMİN', cls: 'admin', desc: 'Yönetici yetkisi · 28 model · Tüm özellikler' },
+            beta: { icon: '🔬', label: 'BETA TESTER', cls: 'beta', desc: 'Sınırsız kullanım · 28 model · Tüm özellikler' },
+            moderator: { icon: '🎨', label: 'MODERATÖR', cls: 'moderator', desc: 'Sınırsız yetki · 28 model · Tüm özellikler' },
+            user: { icon: '👤', label: 'ÜYE', cls: 'user', desc: 'Ücretsiz plan · 28 model · Temel özellikler' }
+        };
+        var rc = roleConfig[role] || roleConfig.user;
+
+        var planLabel = '';
+        if (role === 'user') {
+            if (plan === 'pro') planLabel = ' · 🌟 PRO';
+            else if (plan === 'team') planLabel = ' · 👥 TAKIM';
+        }
+
+        var screen = document.createElement('div');
+        screen.id = 'aethrionWelcomeScreen';
+        screen.innerHTML =
+            '<div class="aw-avatar">' + esc(name.charAt(0).toUpperCase()) + '</div>' +
+            '<h1>Merhaba,<br><span class="aw-name">' + esc(name) + '</span></h1>' +
+            '<div class="aw-role ' + rc.cls + '">' + rc.icon + ' ' + rc.label + planLabel + '</div>' +
+            '<p class="aw-sub">' + rc.desc + '.<br>AETHRION\'a hoş geldin! Aşağıdaki butondan tüm özelliklere erişebilirsin.</p>' +
+            '<button class="aw-cta" onclick="window.openAethrionFeaturesPanel()">' +
+                '<span>🚀</span><span>Tüm Özellikler</span>' +
+            '</button>';
+
+        wrapper.insertBefore(screen, wrapper.firstChild);
+        console.log('✅ [AETHRION] Karşılama ekranı gösterildi:', name, '(' + role + ')');
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // 6) ÖZELLİK LİSTESİ (Rol Bazlı)
+    // ═══════════════════════════════════════════════════════
+    function getFeatures(role) {
+        var all = [
+            { group: '🏠 Ana', icon: '🏠', name: 'Ana Sayfa', desc: 'Karşılama ekranına dön', action: 'goHome', color: '#e8c555' },
+
+            { group: '⚡ Çekirdek', icon: '🧠', name: 'Aethrion AI', desc: '28 model birleşik güç', action: 'openFullAIPanel', color: '#e8c555' },
+            { group: '⚡ Çekirdek', icon: '✨', name: 'Aethrion Al', desc: '4 mod · 28 model', action: 'openAethrionAlPanel', color: '#8b6bff' },
+            { group: '⚡ Çekirdek', icon: '🧭', name: 'Aethrion Coach', desc: 'Samimi AI koç', action: 'openKocPanel', color: '#f5d878' },
+            { group: '⚡ Çekirdek', icon: '🤖', name: 'Jarvis', desc: 'Sesli asistan (wake word)', action: 'startJarvisMode', color: '#6ee0ff' },
+            { group: '⚡ Çekirdek', icon: '🔊', name: 'Sesli Sohbet', desc: 'Tam ekran ChatGPT tarzı', action: 'openVoiceChatFullscreen', color: '#ff4d5e' },
+            { group: '⚡ Çekirdek', icon: '🟢', name: '28 Model Showcase', desc: '13 Ollama + 7 NIM + 8 API', action: 'openModelsShowcase', color: '#76b900' },
+
+            { group: '🎨 Oluşturma', icon: '🎬', name: 'Video Editör', desc: 'Timeline + trim + overlay', action: 'openVideoEditor', color: '#ff8a5c' },
+            { group: '🎨 Oluşturma', icon: '🎥', name: 'Video Stüdyosu', desc: 'Senaryo + Reels + Analiz', action: 'openVideoStudio', color: '#ff8a5c' },
+            { group: '🎨 Oluşturma', icon: '🧊', name: '3D Stüdyo', desc: '90+ şekil + .glb', action: 'open3DBuilder', color: '#6ee0ff' },
+            { group: '🎨 Oluşturma', icon: '🎨', name: 'Proje Sihirbazı', desc: 'Görsel, kod, 3D', action: 'createProjectWizard', color: '#ff2d92' },
+            { group: '🎨 Oluşturma', icon: '🖼️', name: 'GIF Seçici', desc: 'Giphy ile GIF ara', action: 'openGifPicker', color: '#8b6bff' },
+
+            { group: '🌐 Platform', icon: '💼', name: 'İş İlanları', desc: 'A27 İş İlanları Mağazası', action: 'openJobMarket', color: '#e8c555' },
+            { group: '🌐 Platform', icon: '🛒', name: 'Puan Mağazası', desc: 'Kazan, harca, sat', action: 'openMarket', color: '#e8c555' },
+            { group: '🌐 Platform', icon: '👥', name: 'Community', desc: 'Takım + ortak proje', action: 'toggleTeamPage', color: '#c5cde0' },
+            { group: '🌐 Platform', icon: '🤖', name: 'AI Kişisel Asistan', desc: 'Günlük özet + hatırlatıcı', action: 'openPersonalAssistant', color: '#e8c555' },
+            { group: '🌐 Platform', icon: '🏆', name: 'Aylık Yarışma', desc: 'Projeni gönder, kazan', action: 'openContestPage', color: '#e8c555' },
+            { group: '🌐 Platform', icon: '📬', name: 'Gelen Kutusu', desc: 'Bildirimler ve davetler', action: 'loadInbox', color: '#c5cde0' },
+
+            { group: '🔑 Gelişmiş', icon: '🔑', name: 'A27 API Anahtarı', desc: '2 / 20 / 100 / sınırsız', action: 'openV27ApiKeyGenerator', color: '#e8c555' },
+            { group: '🔑 Gelişmiş', icon: '📖', name: 'A27 API Rehberi', desc: 'cURL / JS / Python', action: 'openA27ApiGuide', color: '#e8c555' },
+            { group: '🔑 Gelişmiş', icon: '🔐', name: 'Kendi API Ekle', desc: 'OpenAI, Groq, Gemini', action: 'openApiEkle', color: '#76b900' },
+            { group: '🔑 Gelişmiş', icon: '📋', name: 'API Anahtarlarım', desc: 'Kayıtlı API\'lerim', action: 'openApiAnahtarlarim', color: '#76b900' },
+            { group: '🔑 Gelişmiş', icon: '📊', name: 'Logs Sistemi', desc: '5 seviye + backend sync', action: 'openLogsPanel', color: '#c5cde0' },
+            { group: '🔑 Gelişmiş', icon: '🛡️', name: 'Ebeveyn Ayarları', desc: 'Güvenli mod + limitler', action: 'openParentSettings', color: '#ffb347' },
+
+            { group: '👤 Hesap', icon: '👤', name: 'Profilim', desc: 'Bilgiler, puan, seviye', action: 'openProfileModal', color: '#e8c555' },
+            { group: '👤 Hesap', icon: '📋', name: 'Hesap Bilgilerim', desc: 'IP, cihaz, üyelik', action: 'openAccountInfo', color: '#8a8aa8' },
+            { group: '👤 Hesap', icon: '⚙️', name: 'Ayarlar', desc: 'Dil, tema, tercihler', action: 'openSettingsModal', color: '#8a8aa8' },
+            { group: '👤 Hesap', icon: '🚪', name: 'Çıkış Yap', desc: 'Oturumu kapat', action: 'doLogout', color: '#ff4d5e' }
+        ];
+
+        // Admin/Founder için yönetim özellikleri
+        if (role === 'founder' || role === 'admin') {
+            all.splice(all.length - 4, 0,
+                { group: '👑 Yönetim', icon: '👥', name: 'Kullanıcı Yönetimi', desc: 'Tüm kullanıcıları listele', action: 'openUserManagement', color: '#e8c555' },
+                { group: '👑 Yönetim', icon: '🔬', name: 'Beta Tester Ata', desc: 'Beta rolü ver', action: 'openBetaAssign', color: '#8b6bff' },
+                { group: '👑 Yönetim', icon: '📢', name: 'Duyuru Yayınla', desc: 'Sistem duyurusu', action: 'openAnnouncementCreator', color: '#e8c555' }
+            );
+        }
+
+        // Sadece Founder
+        if (role === 'founder') {
+            all.splice(all.length - 4, 0,
+                { group: '👑 Yönetim', icon: '🎨', name: 'Moderatör Ata', desc: 'Gizli rütbe', action: 'openModeratorAssignModal', color: '#f5d878' },
+                { group: '👑 Yönetim', icon: '⚙️', name: 'Admin Ata', desc: 'Yönetici yetkisi', action: 'openAdminAssign', color: '#e8c555' },
+                { group: '👑 Yönetim', icon: '📊', name: 'Anket Oluştur', desc: 'Topluluk oylaması', action: 'openPollCreator', color: '#e8c555' }
+            );
+        }
+
+        return all;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // 7) ÖZELLİKLER PANELİNİ OLUŞTUR
+    // ═══════════════════════════════════════════════════════
+    function buildPanel() {
+        if (document.getElementById('aethrionFeaturesPanel')) return;
+
+        // Trigger
+        var trig = document.createElement('button');
+        trig.id = 'aethrionFeaturesTrigger';
+        trig.title = 'Özellikler Menüsü';
+        trig.innerHTML = '<span></span><span></span><span></span>';
+        trig.onclick = window.toggleAethrionFeaturesPanel;
+        document.body.appendChild(trig);
+
+        // Backdrop
+        var bd = document.createElement('div');
+        bd.id = 'aethrionFeaturesBackdrop';
+        bd.onclick = window.closeAethrionFeaturesPanel;
+        document.body.appendChild(bd);
+
+        // Panel
+        var panel = document.createElement('aside');
+        panel.id = 'aethrionFeaturesPanel';
+
+        var role = getUserRole();
+        var features = getFeatures(role);
+
+        var groups = {};
+        var order = [];
+        features.forEach(function(f) {
+            if (!groups[f.group]) {
+                groups[f.group] = [];
+                order.push(f.group);
+            }
+            groups[f.group].push(f);
+        });
+
+        var itemsHtml = '';
+        order.forEach(function(g) {
+            itemsHtml += '<div class="afp-group">';
+            itemsHtml += '<div class="afp-group-title">' + g + '</div>';
+            groups[g].forEach(function(f) {
+                itemsHtml += '<button class="afp-item" onclick="window.safeFeatureCall(\'' + f.action + '\', \'' + f.name + '\')">' +
+                    '<span class="afp-icon" style="color:' + f.color + '; border-color:' + f.color + ';">' + f.icon + '</span>' +
+                    '<span class="afp-text">' +
+                        '<span class="afp-name">' + f.name + '</span>' +
+                        '<span class="afp-desc">' + f.desc + '</span>' +
+                    '</span>' +
+                    '<span class="afp-arrow">›</span>' +
+                '</button>';
+            });
+            itemsHtml += '</div>';
+        });
+
+        panel.innerHTML =
+            '<div class="afp-head">' +
+                '<h3>✨ AETHRION MENÜ</h3>' +
+                '<button class="afp-close" onclick="window.closeAethrionFeaturesPanel()">✕</button>' +
+            '</div>' +
+            '<div class="afp-body">' + itemsHtml + '</div>';
+
+        document.body.appendChild(panel);
+        console.log('✅ [AETHRION] Özellikler paneli oluşturuldu. Rol:', role, '| Özellik sayısı:', features.length);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // 8) PANEL AÇ / KAPAT
+    // ═══════════════════════════════════════════════════════
+    window.openAethrionFeaturesPanel = function() {
+        buildPanel();
+        var panel = document.getElementById('aethrionFeaturesPanel');
+        var bd = document.getElementById('aethrionFeaturesBackdrop');
+        var trig = document.getElementById('aethrionFeaturesTrigger');
+
+        if (panel) panel.classList.add('open');
+        if (bd) bd.classList.add('show');
+        if (trig) trig.classList.add('active');
+
+        console.log('✅ [AETHRION] Panel açıldı');
+    };
+
+    window.closeAethrionFeaturesPanel = function() {
+        var panel = document.getElementById('aethrionFeaturesPanel');
+        var bd = document.getElementById('aethrionFeaturesBackdrop');
+        var trig = document.getElementById('aethrionFeaturesTrigger');
+
+        if (panel) panel.classList.remove('open');
+        if (bd) bd.classList.remove('show');
+        if (trig) trig.classList.remove('active');
+
+        console.log('✅ [AETHRION] Panel kapatıldı');
+    };
+
+    window.toggleAethrionFeaturesPanel = function() {
+        var panel = document.getElementById('aethrionFeaturesPanel');
+        if (panel && panel.classList.contains('open')) {
+            window.closeAethrionFeaturesPanel();
+        } else {
+            window.openAethrionFeaturesPanel();
+        }
+    };
+
+    // Alias — eski kodlarla uyumluluk
+    window.toggleAethrionSidebar = window.toggleAethrionFeaturesPanel;
+    window.closeAethrionSidebar = window.closeAethrionFeaturesPanel;
+
+    // ═══════════════════════════════════════════════════════
+    // 9) SAFE FEATURE CALL (Panelden çağrılan)
+    // ═══════════════════════════════════════════════════════
+    window.safeFeatureCall = function(action, name) {
+        window.closeAethrionFeaturesPanel();
+
+        // Özel durumlar
+        if (action === 'goHome') {
+            renderWelcome();
+            var dash = document.getElementById('dashboardArea');
+            if (dash) dash.scrollTop = 0;
+            return;
+        }
+
+        if (action === 'doLogout') {
+            if (typeof window.logout === 'function') {
+                window.logout();
+            } else {
+                try {
+                    if (Parse && Parse.User) {
+                        Parse.User.logOut().then(function() {
+                            localStorage.removeItem('aethrion_user');
+                            location.reload();
+                        });
+                    } else {
+                        localStorage.removeItem('aethrion_user');
+                        location.reload();
+                    }
+                } catch(e) {
+                    localStorage.removeItem('aethrion_user');
+                    location.reload();
+                }
+            }
+            return;
+        }
+
+        // Yönetim panelleri (dashboard içinde kart göster)
+        var panelMap = {
+            'openUserManagement': 'userManagementCard',
+            'openAdminAssign': 'adminPanelCard',
+            'openBetaAssign': 'betaAssignSection',
+            'openPollCreator': 'pollCreator',
+            'openAnnouncementCreator': 'announcementCreator',
+            'openModeratorAssignModal': null // modal fonksiyonu var
+        };
+
+        if (panelMap[action] !== undefined) {
+            var cardId = panelMap[action];
+            if (cardId) {
+                openDashboardCard(cardId);
+                return;
+            }
+        }
+
+        // Standart fonksiyon çağrısı
+        var fn = window[action];
+        if (typeof fn === 'function') {
+            try {
+                fn();
+                console.log('✅ [AETHRION] Çağrıldı:', action);
+            } catch(e) {
+                console.error('[AETHRION] Hata:', action, e);
+                notify('⚠️ ' + name + ' açılamadı: ' + e.message, 'error');
+            }
+        } else {
+            notify('⚠️ "' + name + '" özelliği yüklenemedi (fonksiyon eksik)', 'warning');
+        }
+    };
+
+    // Dashboard içinde kart göster
+    function openDashboardCard(cardId) {
+        var card = document.getElementById(cardId);
+        if (!card) {
+            notify('⚠️ Bu yönetim paneli henüz hazır değil', 'warning');
+            return;
+        }
+
+        var welcome = document.getElementById('aethrionWelcomeScreen');
+        if (welcome) welcome.style.display = 'none';
+
+        var wrapper = document.querySelector('#dashboardArea .dashboard-content-wrapper');
+        if (wrapper) {
+            for (var i = 0; i < wrapper.children.length; i++) {
+                wrapper.children[i].style.display = 'none';
+            }
+        }
+        card.style.display = 'block';
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // İçeriği yükle
+        if (cardId === 'userManagementCard' && typeof window.loadUserList === 'function') {
+            try { window.loadUserList(); } catch(e) {}
+        }
+        if (cardId === 'moderatorAssignSection' && typeof window.loadModeratorsList === 'function') {
+            try { window.loadModeratorsList(); } catch(e) {}
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // 10) HEALTH MONITOR (Body donmasını engelle)
+    // ═══════════════════════════════════════════════════════
+    setInterval(function() {
+        // Panel açık değilse body overflow auto olmalı
+        var panel = document.getElementById('aethrionFeaturesPanel');
+        var panelOpen = panel && panel.classList.contains('open');
+
+        if (!panelOpen) {
+            if (document.body.style.overflow === 'hidden') {
+                document.body.style.overflow = 'auto';
+            }
+            if (document.documentElement.style.overflow === 'hidden') {
+                document.documentElement.style.overflow = 'auto';
+            }
+        }
+
+        // Görünmez backdrop kontrolü
+        var bd = document.getElementById('aethrionFeaturesBackdrop');
+        if (bd && bd.classList.contains('show') && !panelOpen) {
+            bd.classList.remove('show');
+        }
+    }, 2000);
+
+    // ESC ile kapat
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            window.closeAethrionFeaturesPanel();
+        }
+    });
+
+    // ═══════════════════════════════════════════════════════
+    // 11) BAŞLAT
+    // ═══════════════════════════════════════════════════════
+    function init() {
+        console.log('🔧 [AETHRION FINAL] Başlatılıyor...');
+        fixVisibility();
+        buildPanel();
+        renderWelcome();
+        console.log('✅ [AETHRION FINAL] Hazır!');
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(init, 1000);
+            setTimeout(init, 2500);
+        });
+    } else {
+        setTimeout(init, 1000);
+        setTimeout(init, 2500);
+    }
+
+    // showDashboard çağrıldığında
+    var origShow = window.showDashboard;
+    if (typeof origShow === 'function') {
+        window.showDashboard = async function() {
+            await origShow.apply(this, arguments);
+            setTimeout(init, 500);
+            setTimeout(init, 2000);
+        };
+    }
+
+    console.log('✅ [AETHRION FINAL] Yüklendi!');
 })();
 </script>
 </body>
