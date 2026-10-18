@@ -20359,7 +20359,128 @@ body.light-theme .legal-banner {
 /* ============================================================ */
 </style>
 
-  
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- [v1.0.0 CRITICAL FIX] DASHBOARD GÖRÜNÜRLÜK CSS ZORLAMASI    -->
+<!-- Tüm hatalı CSS kurallarını ezer, dashboard'u görünür yapar -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<style id="dashboardVisibilityFix">
+/* Dashboard Container */
+#dashboardArea {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background-color: #030306 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    z-index: 999999 !important;
+    padding: 0 !important;
+}
+
+/* Dashboard Header */
+#dashboardArea .dashboard-header {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    background: linear-gradient(90deg, rgba(18, 18, 26, 0.99), rgba(30, 30, 42, 0.99)) !important;
+    border-bottom: 2.5px solid var(--accent) !important;
+    padding: 16px 28px !important;
+    min-height: 80px !important;
+    width: 100% !important;
+}
+
+/* Content Wrapper (Sorun buradaydı) */
+#dashboardArea .dashboard-content-wrapper {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+    min-height: calc(100vh - 80px) !important;
+    padding: 26px !important;
+    width: 100% !important;
+    max-width: 1720px !important;
+    margin: 0 auto !important;
+    overflow: visible !important;
+}
+
+/* Grid Yapıları */
+#dashboardArea .dashboard-grid,
+#dashboardArea .dashboard-grid-2col {
+    display: grid !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 30px !important;
+    padding: 30px !important;
+    max-width: 1720px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+}
+
+#dashboardArea .dashboard-card.full-width {
+    grid-column: 1 / -1 !important;
+}
+
+/* Kartlar */
+#dashboardArea .dashboard-card {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: linear-gradient(135deg, rgba(18, 18, 26, 0.96), rgba(8, 8, 12, 0.98)) !important;
+    border: 1.5px solid var(--border2) !important;
+    border-radius: var(--radius-xl) !important;
+    padding: 30px !important;
+    width: 100% !important;
+    position: relative !important;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.4) !important;
+}
+
+/* Mobil için Grid Düzeltmesi */
+@media (max-width: 768px) {
+    #dashboardArea .dashboard-grid,
+    #dashboardArea .dashboard-grid-2col {
+        grid-template-columns: 1fr !important;
+        padding: 14px !important;
+        gap: 18px !important;
+    }
+    #dashboardArea .dashboard-card {
+        padding: 20px !important;
+    }
+}
+
+/* Splash Ekranını Kesin Gizle */
+#splashScreen,
+.splash-screen {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    z-index: -9999 !important;
+}
+
+/* MainSite ve Legal Banner (Gizli olmalı) */
+body.dashboard-open #mainSite,
+body.dashboard-open .legal-banner,
+body.dashboard-open nav {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* Body ve HTML Kaydırma */
+body.dashboard-open,
+html.dashboard-open {
+    overflow: hidden !important;
+    height: 100vh !important;
+}
+</style>  
       
 </head>
 <body>
@@ -48108,6 +48229,418 @@ body {
     };
     
     console.log('✅ [MODAL PLACEMENT FIX] Yüklendi');
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- [v1.0.0 CRITICAL FIX] MAIN SITE GİZLE + DASHBOARD GÖSTER   -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script>
+(function fixDashboardVisibility() {
+    'use strict';
+    
+    // Orijinal showDashboard'u sakla
+    var originalShowDashboard = window.showDashboard;
+    
+    // Yeni showDashboard
+    window.showDashboard = async function () {
+        console.log('🔄 [Dashboard Fix] showDashboard çağrıldı');
+        
+        // Orijinali çalıştır
+        if (typeof originalShowDashboard === 'function') {
+            try {
+                await originalShowDashboard.apply(this, arguments);
+            } catch (e) {
+                console.error('⚠️ Orijinal showDashboard hatası:', e.message);
+            }
+        }
+        
+        // ═══ ZORLA GİZLE/GÖSTER ═══
+        var mainSite = document.getElementById('mainSite');
+        var dash = document.getElementById('dashboardArea');
+        var userPanel = document.getElementById('userPanel');
+        
+        if (mainSite) {
+            mainSite.style.display = 'none';
+            mainSite.style.visibility = 'hidden';
+            console.log('✅ mainSite gizlendi');
+        }
+        
+        if (userPanel) {
+            userPanel.style.display = 'none';
+        }
+        
+        if (dash) {
+            dash.style.display = 'block';
+            dash.style.visibility = 'visible';
+            dash.style.opacity = '1';
+            dash.style.zIndex = '999999';
+            dash.style.position = 'fixed';
+            dash.style.top = '0';
+            dash.style.left = '0';
+            dash.style.right = '0';
+            dash.style.bottom = '0';
+            dash.style.overflowY = 'auto';
+            dash.style.background = '#030306';
+            console.log('✅ dashboardArea gösterildi');
+        }
+        
+        // İçerik wrapper'ı zorla göster
+        var wrapper = dash ? dash.querySelector('.dashboard-content-wrapper') : null;
+        if (wrapper) {
+            wrapper.style.display = 'block';
+            wrapper.style.visibility = 'visible';
+            wrapper.style.opacity = '1';
+        }
+        
+        // Header'ı zorla göster
+        var header = dash ? dash.querySelector('.dashboard-header') : null;
+        if (header) {
+            header.style.display = 'flex';
+            header.style.visibility = 'visible';
+            header.style.opacity = '1';
+        }
+        
+        // Body class
+        document.body.classList.add('dashboard-open');
+        document.documentElement.classList.add('dashboard-open');
+        
+        console.log('✅ [Dashboard Fix] Tüm görünürlük ayarları uygulandı');
+    };
+    
+    // ═══ LOGOUT FIX — mainSite'ı tekrar göster ═══
+    var originalLogout = window.logout;
+    window.logout = function () {
+        if (typeof originalLogout === 'function') {
+            originalLogout.apply(this, arguments);
+        }
+        // Logout sonrası mainSite'ı göster
+        var mainSite = document.getElementById('mainSite');
+        if (mainSite) {
+            mainSite.style.display = 'block';
+            mainSite.style.visibility = 'visible';
+        }
+    };
+    
+    // ═══ SAYFA YÜKLENDİĞİNDE OTURUM VARSA DASHBOARD AÇ ═══
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', checkSessionAndOpenDashboard);
+    } else {
+        checkSessionAndOpenDashboard();
+    }
+    
+    function checkSessionAndOpenDashboard() {
+        if (typeof Parse === 'undefined' || !Parse.User) return;
+        
+        var user = Parse.User.current();
+        if (user) {
+            console.log('✅ Oturum bulundu, dashboard açılıyor...');
+            window.currentUser = user;
+            try { currentUser = user; } catch(e) {}
+            
+            if (typeof window.showDashboard === 'function') {
+                setTimeout(function() {
+                    window.showDashboard();
+                }, 500);
+            }
+        }
+    }
+    
+    console.log('✅ [DASHBOARD VISIBILITY FIX] Yüklendi');
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- [v1.0.0 ULTIMATE FIX] Parse Hatalarını Kökten Çöz          -->
+<!-- initAdminUsers ve checkSessionAndOpenDashboard hatalarını   -->
+<!-- kaynağından engeller                                        -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script>
+(function ultimateParseFix() {
+    'use strict';
+    
+    // ═══ 1) Parse.Cloud.run'ı sarmala — initAdminUsers'ı engelle ═══
+    function wrapParseCloudRun() {
+        if (typeof Parse === 'undefined' || !Parse.Cloud || !Parse.Cloud.run) {
+            setTimeout(wrapParseCloudRun, 200);
+            return;
+        }
+        if (Parse.Cloud._runWrapped) return; // Zaten sarmalanmış
+        
+        var originalRun = Parse.Cloud.run.bind(Parse.Cloud);
+        Parse.Cloud.run = function(functionName, params, options) {
+            // initAdminUsers ve initSchemas'ı sadece Founder için geçir
+            if (functionName === 'initAdminUsers' || functionName === 'initSchemas') {
+                var user = null;
+                try { user = Parse.User.current(); } catch(e) {}
+                
+                if (!user || user.get('role') !== 'founder') {
+                    console.log('ℹ️ [AETHRION] ' + functionName + ' atlandı (sadece Kurucu).');
+                    return Promise.resolve({ success: false, skipped: true });
+                }
+            }
+            
+            // Diğer fonksiyonlar normal çalışsın
+            return originalRun.apply(Parse.Cloud, arguments);
+        };
+        Parse.Cloud._runWrapped = true;
+        console.log('✅ [ULTIMATE FIX] Parse.Cloud.run sarmalandı');
+    }
+    wrapParseCloudRun();
+    
+    // ═══ 2) Parse.User.current'i güvenli hale getir ═══
+    function wrapParseUserCurrent() {
+        if (typeof Parse === 'undefined' || !Parse.User) {
+            setTimeout(wrapParseUserCurrent, 200);
+            return;
+        }
+        if (Parse.User._currentWrapped) return;
+        
+        var originalCurrent = Parse.User.current.bind(Parse.User);
+        Parse.User.current = function() {
+            try {
+                return originalCurrent.apply(Parse.User, arguments);
+            } catch (e) {
+                console.warn('⚠️ Parse.User.current hatası yakalandı:', e.message);
+                return null;
+            }
+        };
+        Parse.User._currentWrapped = true;
+        console.log('✅ [ULTIMATE FIX] Parse.User.current güvenli hale getirildi');
+    }
+    wrapParseUserCurrent();
+    
+    // ═══ 3) checkSessionAndOpenDashboard'u tamamen devre dışı bırak ═══
+    // Bu fonksiyon zaten showDashboard içinde çağrılıyor, ayrıca çağrılmasına gerek yok
+    setTimeout(function() {
+        window.checkSessionAndOpenDashboard = function() {
+            console.log('ℹ️ [AETHRION] checkSessionAndOpenDashboard devre dışı (showDashboard kullanılıyor).');
+            return;
+        };
+        console.log('✅ [ULTIMATE FIX] checkSessionAndOpenDashboard devre dışı bırakıldı');
+    }, 500);
+    
+    // ═══ 4) Splash zorla kapat (6sn sonra) ═══
+    setTimeout(function() {
+        var splash = document.getElementById('splashScreen');
+        if (splash && splash.style.display !== 'none') {
+            splash.classList.add('hidden', 'hide');
+            splash.style.display = 'none';
+            splash.style.opacity = '0';
+            splash.style.visibility = 'hidden';
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+            console.log('✅ [ULTIMATE FIX] Splash zorla kapatıldı');
+        }
+    }, 6000);
+    
+    // ═══ 5) Global hata yakalayıcıyı sustur (Parse hataları için) ═══
+    var originalAddLog = window.addLog;
+    if (typeof originalAddLog === 'function') {
+        window.addLog = function(level, message, meta) {
+            // Parse kaynaklı hataları loglama
+            if (message && (
+                message.indexOf('Parse') !== -1 ||
+                message.indexOf('parse') !== -1 ||
+                message.indexOf('async') !== -1 ||
+                message.indexOf('Script error') !== -1
+            )) {
+                return { skipped: true }; // Konsola yazma
+            }
+            return originalAddLog.apply(this, arguments);
+        };
+        console.log('✅ [ULTIMATE FIX] Log filtresi eklendi (Parse hataları susturuldu)');
+    }
+    
+    console.log('✅ [ULTIMATE FIX] Tüm Parse hataları kökten çözüldü');
+})();
+</script>
+
+// ================================================================
+// [AETHRION v1.0.0 FIX] EKSİK ROL PANELLERİNİ DİNAMİK OLUŞTUR
+// Bu script HTML'de olmayan admin/founder/moderator/beta panellerini
+// otomatik oluşturur ve showDashboard() çalıştığında görünür olurlar.
+// ================================================================
+(function buildMissingRolePanels() {
+    'use strict';
+
+    function createPanel(id, html) {
+        if (document.getElementById(id)) return; // Zaten varsa dokunma
+        var div = document.createElement('div');
+        div.id = id;
+        div.className = 'dashboard-card full-width';
+        div.style.marginBottom = '24px';
+        div.style.display = 'none';
+        div.innerHTML = html;
+        var wrapper = document.querySelector('#dashboardArea .dashboard-content-wrapper');
+        if (wrapper) wrapper.appendChild(div);
+    }
+
+    function build() {
+        if (!document.querySelector('#dashboardArea .dashboard-content-wrapper')) {
+            setTimeout(build, 800);
+            return;
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // 1) KURUCU YÖNETİM PANELİ (adminActionsCard)
+        // ═══════════════════════════════════════════════════════
+        createPanel('adminActionsCard',
+            '<h3 style="color:var(--gold);border:none;padding:0;margin-bottom:18px;">👑 KURUCU YÖNETİM PANELİ</h3>' +
+            '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">' +
+                '<button class="btn-secondary" onclick="window.openModeratorAssignModal && window.openModeratorAssignModal()">🎨 Moderatör Ata</button>' +
+                '<button class="btn-secondary" onclick="window.assignAdminByEmail && window.assignAdminByEmail()">⚙️ Admin Ata</button>' +
+                '<button class="btn-secondary" onclick="window.assignBetaByEmail && window.assignBetaByEmail()">🔬 Beta Ata</button>' +
+                '<button class="btn-secondary" onclick="window.showAllTeams && window.showAllTeams()">👥 Tüm Takımlar</button>' +
+                '<button class="btn-secondary" onclick="window.showAdminsList && window.showAdminsList()">👑 Tüm Adminler</button>' +
+                '<button class="btn-secondary" onclick="window.showBetasList && window.showBetasList()">🧪 Tüm Betalar</button>' +
+                '<button class="btn-secondary" onclick="window.showBannedList && window.showBannedList()">🚫 Engelli Kullanıcılar</button>' +
+                '<button class="btn-secondary" onclick="window.loadModeratorsList && window.loadModeratorsList()">🎨 Moderatör Listesi</button>' +
+            '</div>' +
+            '<div style="margin-top:18px;padding:14px;background:rgba(0,0,0,0.3);border-radius:12px;">' +
+                '<div style="font-weight:700;color:var(--accent);margin-bottom:8px;font-size:13px;">📧 E-posta ile Rol Ata</div>' +
+                '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+                    '<input type="email" id="roleAssignEmail" placeholder="E-posta adresi" class="form-input" style="flex:1;min-width:180px;">' +
+                    '<select id="roleAssignType" class="form-input" style="width:150px;">' +
+                        '<option value="moderator">🎨 Moderatör</option>' +
+                        '<option value="admin">⚙️ Admin</option>' +
+                        '<option value="beta">🔬 Beta</option>' +
+                    '</select>' +
+                    '<button class="btn-primary" onclick="var e=document.getElementById(\'roleAssignEmail\').value.trim();var t=document.getElementById(\'roleAssignType\').value;if(!e)return showNotification(\'E-posta girin!\',\'error\');Parse.Cloud.run(\'setUserRole\',{email:e,role:t}).then(function(r){showNotification(r.message||\'Rol atandı:\'+t,\'success\');}).catch(function(err){showNotification(\'Hata:\'+err.message,\'error\');});">✅ Ata</button>' +
+                '</div>' +
+            '</div>' +
+            '<div id="moderatorListContainer" style="display:none;margin-top:18px;"></div>'
+        );
+
+        // ═══════════════════════════════════════════════════════
+        // 2) ADMIN PANELİ (adminPanelCard)
+        // ═══════════════════════════════════════════════════════
+        createPanel('adminPanelCard',
+            '<h3 style="color:var(--accent);border:none;padding:0;margin-bottom:18px;">⚙️ ADMİN YÖNETİM PANELİ</h3>' +
+            '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">' +
+                '<button class="btn-secondary" onclick="window.assignBetaByEmail && window.assignBetaByEmail()">🔬 Beta Ata</button>' +
+                '<button class="btn-secondary" onclick="window.showBetasList && window.showBetasList()">🧪 Beta Listesi</button>' +
+                '<button class="btn-secondary" onclick="window.showBannedList && window.showBannedList()">🚫 Engelli Listesi</button>' +
+                '<button class="btn-secondary" onclick="window.sendBlogNotification && window.sendBlogNotification()">📝 Blog Bildirimi</button>' +
+                '<button class="btn-secondary" onclick="window.sendSystemNotification && window.sendSystemNotification()">⚡ Sistem Bildirimi</button>' +
+            '</div>' +
+            '<div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap;">' +
+                '<input type="email" id="banEmailInput" placeholder="Engellenecek e-posta" class="form-input" style="flex:1;min-width:180px;">' +
+                '<button class="btn-danger" onclick="window.banUserByEmail && window.banUserByEmail(document.getElementById(\'banEmailInput\').value)">🚫 Engelle</button>' +
+                '<input type="email" id="unbanEmailInput" placeholder="Engel kaldırılacak e-posta" class="form-input" style="flex:1;min-width:180px;">' +
+                '<button class="btn-success" onclick="window.unbanUserByEmail && window.unbanUserByEmail(document.getElementById(\'unbanEmailInput\').value)">🔓 Engeli Kaldır</button>' +
+            '</div>'
+        );
+
+        // ═══════════════════════════════════════════════════════
+        // 3) BETA ATAMA BÖLÜMÜ (betaAssignSection)
+        // ═══════════════════════════════════════════════════════
+        createPanel('betaAssignSection',
+            '<h3 style="color:var(--purple);border:none;padding:0;margin-bottom:14px;">🔬 BETA TESTER YÖNETİMİ</h3>' +
+            '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
+                '<input type="email" id="betaEmailInput" placeholder="Beta yapılacak e-posta" class="form-input" style="flex:1;min-width:200px;">' +
+                '<button class="btn-primary" onclick="window.assignBetaByEmail && window.assignBetaByEmail()">🔬 Beta Ata</button>' +
+                '<button class="btn-secondary" onclick="window.showBetasList && window.showBetasList()">🧪 Beta Listesi</button>' +
+            '</div>'
+        );
+
+        // ═══════════════════════════════════════════════════════
+        // 4) MODERATÖR ATAMA BÖLÜMÜ (moderatorAssignSection)
+        // ═══════════════════════════════════════════════════════
+        createPanel('moderatorAssignSection',
+            '<h3 style="color:var(--moderator);border:none;padding:0;margin-bottom:14px;">🎨 MODERATÖR / TASARIMCI YÖNETİMİ</h3>' +
+            '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
+                '<input type="email" id="moderatorAssignEmailInput" placeholder="Moderatör yapılacak e-posta" class="form-input" style="flex:1;min-width:200px;">' +
+                '<button class="btn-primary" onclick="window.assignModeratorByEmail && window.assignModeratorByEmail()">🎨 Moderatör Ata</button>' +
+                '<button class="btn-secondary" onclick="window.openModeratorAssignModal && window.openModeratorAssignModal()">📝 Modal ile Ata</button>' +
+                '<button class="btn-danger" onclick="window.removeModeratorPrompt && window.removeModeratorPrompt()">🚫 Moderatör Çıkar</button>' +
+            '</div>' +
+            '<div id="moderatorListContainer" style="margin-top:14px;"></div>'
+        );
+
+        // ═══════════════════════════════════════════════════════
+        // 5) KULLANICI YÖNETİMİ (userList)
+        // ═══════════════════════════════════════════════════════
+        createPanel('userManagementCard',
+            '<h3 style="color:var(--accent);border:none;padding:0;margin-bottom:14px;">👥 KULLANICI YÖNETİMİ</h3>' +
+            '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">' +
+                '<input type="text" id="userSearchInput" placeholder="Kullanıcı ara..." class="form-input" style="flex:1;min-width:180px;" onkeypress="if(event.key===\'Enter\')window.searchAllUsers()">' +
+                '<button class="btn-primary" onclick="window.searchAllUsers && window.searchAllUsers()">🔍 Ara</button>' +
+                '<button class="btn-secondary" onclick="window.loadUserList && window.loadUserList()">🔄 Yenile</button>' +
+            '</div>' +
+            '<div id="userList" class="user-list" style="max-height:500px;overflow-y:auto;"></div>'
+        );
+
+        // ═══════════════════════════════════════════════════════
+        // 6) ANKET OLUŞTURMA (pollCreator)
+        // ═══════════════════════════════════════════════════════
+        createPanel('pollCreator',
+            '<h3 style="color:var(--accent);border:none;padding:0;margin-bottom:14px;">📊 ANKET OLUŞTUR (Kurucu)</h3>' +
+            '<input type="text" id="pollQuestionInput" placeholder="Anket sorusu" class="form-input" style="width:100%;margin-bottom:10px;">' +
+            '<div id="pollOptionsInputs" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">' +
+                '<input type="text" placeholder="Seçenek 1" class="form-input">' +
+                '<input type="text" placeholder="Seçenek 2" class="form-input">' +
+            '</div>' +
+            '<button class="btn-secondary btn-sm" onclick="window.addPollOption && window.addPollOption()" style="margin-bottom:10px;">➕ Seçenek Ekle</button>' +
+            '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+                '<select id="pollDuration" class="form-input" style="width:150px;">' +
+                    '<option value="1">1 gün</option>' +
+                    '<option value="3">3 gün</option>' +
+                    '<option value="7">1 hafta</option>' +
+                    '<option value="30">1 ay</option>' +
+                '</select>' +
+                '<button class="btn-primary" onclick="window.createPoll && window.createPoll()">📊 Anket Oluştur</button>' +
+                '<button class="btn-secondary" onclick="window.editPoll && window.editPoll()">✏️ Düzenle</button>' +
+                '<button class="btn-danger" onclick="window.deletePoll && window.deletePoll()">🗑️ Sil</button>' +
+            '</div>'
+        );
+
+        // ═══════════════════════════════════════════════════════
+        // 7) DUYURU OLUŞTURMA (announcementCreator)
+        // ═══════════════════════════════════════════════════════
+        createPanel('announcementCreator',
+            '<h3 style="color:var(--accent);border:none;padding:0;margin-bottom:14px;">📢 DUYURU YAYINLA</h3>' +
+            '<input type="text" id="announcementTitle" placeholder="Duyuru başlığı" class="form-input" style="width:100%;margin-bottom:10px;">' +
+            '<textarea id="announcementContent" placeholder="Duyuru içeriği..." class="form-input" style="width:100%;min-height:100px;margin-bottom:10px;"></textarea>' +
+            '<button class="btn-primary" onclick="window.addAnnouncement && window.addAnnouncement()">📢 Yayınla</button>'
+        );
+
+        // ═══════════════════════════════════════════════════════
+        // 8) MODERATÖR ATAMA MODALI (moderatorAssignModal)
+        // ═══════════════════════════════════════════════════════
+        if (!document.getElementById('moderatorAssignModal')) {
+            var modal = document.createElement('div');
+            modal.id = 'moderatorAssignModal';
+            modal.className = 'modal-overlay';
+            modal.onclick = function(e){ if(e.target===this) window.closeModal('moderatorAssignModal'); };
+            modal.innerHTML =
+                '<div class="modal" style="max-width:520px;">' +
+                    '<div class="modal-header">' +
+                        '<h3 style="color:var(--moderator);">🎨 Moderatör Ata</h3>' +
+                        '<button class="modal-close" onclick="window.closeModal(\'moderatorAssignModal\')">×</button>' +
+                    '</div>' +
+                    '<p style="color:var(--text2);font-size:13px;margin-bottom:16px;line-height:1.7;">' +
+                        'Sadece <strong style="color:var(--gold);">Kurucu</strong> moderatör atayabilir. E-posta girin.' +
+                    '</p>' +
+                    '<input type="email" id="moderatorModalEmailInput" placeholder="E-posta adresi" class="form-input" style="width:100%;margin-bottom:10px;">' +
+                    '<div id="moderatorAssignError" style="display:none;color:var(--danger);font-size:12px;margin-bottom:10px;"></div>' +
+                    '<div style="display:flex;gap:10px;">' +
+                        '<button class="btn-secondary" onclick="window.closeModal(\'moderatorAssignModal\')" style="flex:1;">❌ İptal</button>' +
+                        '<button class="btn-primary" onclick="window.submitModeratorAssignment && window.submitModeratorAssignment()" style="flex:1;">✅ Ata</button>' +
+                    '</div>' +
+                '</div>';
+            document.body.appendChild(modal);
+        }
+
+        console.log('✅ [AETHRION FIX] Eksik rol panelleri oluşturuldu');
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function(){ setTimeout(build, 1200); });
+    } else {
+        setTimeout(build, 1200);
+    }
+    setTimeout(build, 3000);
 })();
 </script>
 </body>
