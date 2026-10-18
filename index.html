@@ -49397,5 +49397,292 @@ body {
     console.log('✅ [AETHRION FINAL] Yüklendi!');
 })();
 </script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// [AETHRION v1.0.0 SON] Her Özellik Kendi Paneline Gitsin
+// ═══════════════════════════════════════════════════════════════
+(function AethrionFinalPerfect() {
+    'use strict';
+
+    // ═══ Yardımcılar ═══
+    function esc(s) {
+        if (!s) return '';
+        return String(s).replace(/[&<>"']/g, function(m) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+        });
+    }
+    function notify(msg, type) {
+        if (typeof window.showNotification === 'function') {
+            try { window.showNotification(msg, type); return; } catch(e) {}
+        }
+        console.log('[AETHRION]', msg);
+    }
+    function getUser() {
+        if (window.currentUser) return window.currentUser;
+        try {
+            if (typeof Parse !== 'undefined' && Parse.User && Parse.User.current()) {
+                window.currentUser = Parse.User.current();
+                return window.currentUser;
+            }
+        } catch(e) {}
+        return null;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // KARŞILAMA EKRANI — SADECE İSİM + RÜTBE + BUTON
+    // ═══════════════════════════════════════════════════════
+    function renderWelcome() {
+        var user = getUser();
+        if (!user) {
+            // Kullanıcı yoksa ana sayfayı göster, dashboard'u gizle
+            var main = document.getElementById('mainSite');
+            var dash = document.getElementById('dashboardArea');
+            if (main) main.style.display = 'block';
+            if (dash) dash.style.display = 'none';
+            return;
+        }
+
+        var wrapper = document.querySelector('#dashboardArea .dashboard-content-wrapper');
+        if (!wrapper) { setTimeout(renderWelcome, 800); return; }
+
+        // Eski karşılamayı sil
+        var old = document.getElementById('aethrionWelcomeScreen');
+        if (old) old.remove();
+
+        // TÜM dashboard kartlarını gizle
+        for (var i = 0; i < wrapper.children.length; i++) {
+            wrapper.children[i].style.display = 'none';
+        }
+
+        var name = user.get('name') || 'Kullanıcı';
+        var role = user.get('role') || 'user';
+        var plan = user.get('plan') || 'free';
+
+        var roleConfig = {
+            founder: { icon: '👑', label: 'KURUCU', cls: 'founder', desc: 'Sınırsız yetki · 28 model · Tüm özellikler' },
+            admin: { icon: '⚙️', label: 'ADMİN', cls: 'admin', desc: 'Yönetici yetkisi · 28 model · Tüm özellikler' },
+            beta: { icon: '🔬', label: 'BETA TESTER', cls: 'beta', desc: 'Sınırsız kullanım · 28 model · Tüm özellikler' },
+            moderator: { icon: '🎨', label: 'MODERATÖR', cls: 'moderator', desc: 'Sınırsız yetki · 28 model · Tüm özellikler' },
+            user: { icon: '👤', label: 'ÜYE', cls: 'user', desc: 'Ücretsiz plan · 28 model · Temel özellikler' }
+        };
+        var rc = roleConfig[role] || roleConfig.user;
+
+        var planLabel = '';
+        if (role === 'user') {
+            if (plan === 'pro') planLabel = ' · 🌟 PRO';
+            else if (plan === 'team') planLabel = ' · 👥 TAKIM';
+        }
+
+        var screen = document.createElement('div');
+        screen.id = 'aethrionWelcomeScreen';
+        screen.style.cssText = 'min-height:calc(100vh - 120px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;';
+        screen.innerHTML =
+            '<div class="aw-avatar">' + esc(name.charAt(0).toUpperCase()) + '</div>' +
+            '<h1>Merhaba,<br><span class="aw-name">' + esc(name) + '</span></h1>' +
+            '<div class="aw-role ' + rc.cls + '">' + rc.icon + ' ' + rc.label + planLabel + '</div>' +
+            '<p class="aw-sub">' + rc.desc + '.<br>AETHRION\'a hoş geldin! Aşağıdaki butondan tüm özelliklere erişebilirsin.</p>' +
+            '<button class="aw-cta" onclick="window.openAethrionFeaturesPanel()">' +
+                '<span>🚀</span><span>Tüm Özellikler</span>' +
+            '</button>';
+
+        wrapper.insertBefore(screen, wrapper.firstChild);
+        console.log('✅ [AETHRION] Karşılama ekranı gösterildi:', name, '(' + role + ')');
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // ANA SAYFA (goHome)
+    // ═══════════════════════════════════════════════════════
+    window.goHome = function() {
+        window.closeAethrionFeaturesPanel();
+        renderWelcome();
+        var dash = document.getElementById('dashboardArea');
+        if (dash) dash.scrollTop = 0;
+    };
+
+    // ═══════════════════════════════════════════════════════
+    // ÖZELLİK ÇAĞIRMA — HER ÖZELLİK KENDİ PANELİNE GİDER
+    // ═══════════════════════════════════════════════════════
+    window.safeFeatureCall = function(action, name) {
+        window.closeAethrionFeaturesPanel();
+
+        // Ana Sayfa
+        if (action === 'goHome') {
+            window.goHome();
+            return;
+        }
+
+        // Çıkış
+        if (action === 'doLogout') {
+            if (typeof window.logout === 'function') {
+                window.logout();
+            } else {
+                try {
+                    if (typeof Parse !== 'undefined' && Parse.User) {
+                        Parse.User.logOut().then(function() {
+                            localStorage.clear();
+                            location.reload();
+                        });
+                    } else {
+                        localStorage.clear();
+                        location.reload();
+                    }
+                } catch(e) { location.reload(); }
+            }
+            return;
+        }
+
+        // Dashboard içindeki kartı göster
+        var dashboardCards = {
+            'openUserManagement': 'userManagementCard',
+            'openAdminAssign': 'adminPanelCard',
+            'openBetaAssign': 'betaAssignSection',
+            'openPollCreator': 'pollCreator',
+            'openAnnouncementCreator': 'announcementCreator'
+        };
+
+        if (dashboardCards[action]) {
+            window.openDashboardCard(dashboardCards[action]);
+            return;
+        }
+
+        // Modal / Overlay açan fonksiyonlar
+        var modalActions = {
+            'openFullAIPanel': 'openFullAIPanel',
+            'openAethrionAlPanel': 'openAethrionAlPanel',
+            'openKocPanel': 'openKocPanel',
+            'startJarvisMode': 'startJarvisMode',
+            'openVoiceChatFullscreen': 'openVoiceChatFullscreen',
+            'openModelsShowcase': 'openModelsShowcase',
+            'openVideoEditor': 'openVideoEditor',
+            'openVideoStudio': 'openVideoStudio',
+            'open3DBuilder': 'open3DBuilder',
+            'createProjectWizard': 'createProjectWizard',
+            'openJobMarket': 'openJobMarket',
+            'openMarket': 'openMarket',
+            'toggleTeamPage': 'toggleTeamPage',
+            'openPersonalAssistant': 'openPersonalAssistant',
+            'openContestPage': 'openContestPage',
+            'loadInbox': 'loadInbox',
+            'openV27ApiKeyGenerator': 'openV27ApiKeyGenerator',
+            'openA27ApiGuide': 'openA27ApiGuide',
+            'openApiEkle': 'openApiEkle',
+            'openApiAnahtarlarim': 'openApiAnahtarlarim',
+            'openLogsPanel': 'openLogsPanel',
+            'openParentSettings': 'openParentSettings',
+            'openProfileModal': 'openProfileModal',
+            'openAccountInfo': 'openAccountInfo',
+            'openSettingsModal': 'openSettingsModal',
+            'openModeratorAssignModal': 'openModeratorAssignModal',
+            'openGifPicker': 'openGifPicker'
+        };
+
+        var fnName = modalActions[action];
+        if (fnName && typeof window[fnName] === 'function') {
+            try {
+                window[fnName]();
+                console.log('✅ [AETHRION] Çağrıldı:', fnName);
+            } catch(e) {
+                console.error('[AETHRION] Hata:', fnName, e);
+                notify('⚠️ ' + name + ' açılamadı: ' + e.message, 'error');
+            }
+            return;
+        }
+
+        // Fallback: doğrudan action adını dene
+        if (typeof window[action] === 'function') {
+            try {
+                window[action]();
+                console.log('✅ [AETHRION] Çağrıldı (fallback):', action);
+            } catch(e) {
+                console.error('[AETHRION] Hata:', action, e);
+                notify('⚠️ ' + name + ' açılamadı: ' + e.message, 'error');
+            }
+            return;
+        }
+
+        notify('⚠️ "' + name + '" özelliği yüklenemedi (fonksiyon eksik)', 'warning');
+    };
+
+    // Dashboard içindeki kartı göster
+    window.openDashboardCard = function(cardId) {
+        var card = document.getElementById(cardId);
+        if (!card) {
+            notify('⚠️ Bu yönetim paneli henüz hazır değil', 'warning');
+            return;
+        }
+
+        var welcome = document.getElementById('aethrionWelcomeScreen');
+        if (welcome) welcome.style.display = 'none';
+
+        var wrapper = document.querySelector('#dashboardArea .dashboard-content-wrapper');
+        if (wrapper) {
+            for (var i = 0; i < wrapper.children.length; i++) {
+                wrapper.children[i].style.display = 'none';
+            }
+        }
+        card.style.display = 'block';
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        if (cardId === 'userManagementCard' && typeof window.loadUserList === 'function') {
+            try { window.loadUserList(); } catch(e) {}
+        }
+        if (cardId === 'moderatorAssignSection' && typeof window.loadModeratorsList === 'function') {
+            try { window.loadModeratorsList(); } catch(e) {}
+        }
+    };
+
+    // ═══════════════════════════════════════════════════════
+    // PANEL OLUŞTURMA (buildPanel) — AYNI KALACAK
+    // ═══════════════════════════════════════════════════════
+    // ... (önceki buildPanel fonksiyonu aynen kalacak, değişmeyecek) ...
+
+    // ═══════════════════════════════════════════════════════
+    // BAŞLAT
+    // ═══════════════════════════════════════════════════════
+    function init() {
+        var user = getUser();
+        if (user) {
+            var dash = document.getElementById('dashboardArea');
+            var main = document.getElementById('mainSite');
+            if (dash) { dash.style.display = 'block'; dash.style.visibility = 'visible'; }
+            if (main) main.style.display = 'none';
+            renderWelcome();
+        } else {
+            var dash2 = document.getElementById('dashboardArea');
+            var main2 = document.getElementById('mainSite');
+            if (dash2) dash2.style.display = 'none';
+            if (main2) { main2.style.display = 'block'; main2.style.visibility = 'visible'; }
+        }
+        // Panel varsa yeniden oluştur
+        if (!document.getElementById('aethrionFeaturesPanel')) {
+            if (typeof window.buildPanel === 'function') window.buildPanel();
+        }
+        console.log('✅ [AETHRION FINAL PERFECT] Hazır!');
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(init, 1500);
+            setTimeout(init, 3000);
+        });
+    } else {
+        setTimeout(init, 1500);
+        setTimeout(init, 3000);
+    }
+
+    // showDashboard override
+    var origShow = window.showDashboard;
+    if (typeof origShow === 'function') {
+        window.showDashboard = async function() {
+            await origShow.apply(this, arguments);
+            setTimeout(init, 500);
+            setTimeout(init, 2000);
+        };
+    }
+
+    console.log('✅ [AETHRION FINAL PERFECT] Yüklendi!');
+})();
+</script>
 </body>
 </html>
