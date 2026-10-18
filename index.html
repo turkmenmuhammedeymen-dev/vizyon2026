@@ -20485,6 +20485,30 @@ html.dashboard-open {
 </head>
 <body>
 
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- [AETHRION KESİN ÇÖZÜM] Kullanıcı Yoksa Panel Açılamaz -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<style id="aethrionUltimateGuard">
+    /* 1. Varsayılan olarak Dashboard'u KESİN GİZLE */
+    #dashboardArea {
+        display: none !important;
+    }
+    /* 2. Varsayılan olarak Ana Sayfa'yı GÖSTER */
+    #mainSite {
+        display: block !important;
+    }
+
+    /* 3. SADECE giriş yapılmışsa (body'de logged-in-user class'ı varsa) Dashboard'u GÖSTER */
+    body.logged-in-user #dashboardArea {
+        display: block !important;
+    }
+    
+    /* 4. Giriş yapılmışsa Ana Sayfa'yı GİZLE */
+    body.logged-in-user #mainSite {
+        display: none !important;
+    }
+</style>
+
     <!-- ============================================================ -->
     <!-- ===================== EKSİK ELEMENTLER ====================== -->
     <!-- ============================================================ -->
@@ -49684,5 +49708,554 @@ body {
     console.log('✅ [AETHRION FINAL PERFECT] Yüklendi!');
 })();
 </script>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- [AETHRION v1.0.0] KESİN BEKÇİ — Kullanıcı Yoksa Panel Açılmaz -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<style id="aethrionGuardStyles">
+    /* Kullanıcı yoksa dashboard'u kesin gizle (CSS ile) */
+    body:not(.logged-in-user) #dashboardArea {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+    /* Moderatör paneli her zaman gizli olsun, sadece JS ile gösterilecek */
+    #moderatorInfoCard {
+        display: none !important;
+    }
+    /* Dashboard açıkken ana sayfayı gizle */
+    body.logged-in-user #mainSite {
+        display: none !important;
+    }
+</style>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// [AETHRION v1.0.0] KESİN BEKÇİ SCRIPT
+// ═══════════════════════════════════════════════════════════════
+(function AethrionGuard() {
+    'use strict';
+
+    // ═══ 1. KULLANICI DURUMUNU KONTROL ET ═══
+    function checkUserAndSetGuard() {
+        // Parse hazır mı?
+        if (typeof Parse === 'undefined' || !Parse.User) {
+            // Parse hazır değilse, kullanıcı YOK kabul et ve ana sayfayı göster.
+            document.body.classList.remove('logged-in-user');
+            var dash = document.getElementById('dashboardArea');
+            if (dash) dash.style.display = 'none';
+            var main = document.getElementById('mainSite');
+            if (main) {
+                main.style.display = 'block';
+                main.style.visibility = 'visible';
+            }
+            console.log('🛡️ Bekçi: Parse hazır değil, ana sayfa gösterildi.');
+            return false;
+        }
+
+        // Kullanıcıyı kontrol et
+        var user = null;
+        try {
+            user = Parse.User.current();
+        } catch (e) {
+            console.warn('🛡️ Bekçi: Parse.User.current hatası:', e.message);
+        }
+
+        if (user) {
+            // KULLANICI VAR: Dashboard'u göster, ana sayfayı gizle
+            document.body.classList.add('logged-in-user');
+            window.currentUser = user;
+            if (typeof currentUser !== 'undefined') {
+                try { currentUser = user; } catch(e) {}
+            }
+
+            var dash = document.getElementById('dashboardArea');
+            if (dash) {
+                dash.style.display = 'block';
+                dash.style.visibility = 'visible';
+                dash.style.pointerEvents = 'auto';
+            }
+            var main = document.getElementById('mainSite');
+            if (main) {
+                main.style.display = 'none';
+            }
+
+            // Moderatör panelini kontrol et (sadece moderatör için)
+            var modCard = document.getElementById('moderatorInfoCard');
+            if (modCard) {
+                if (user.get('role') === 'moderator') {
+                    modCard.style.display = 'block';
+                } else {
+                    modCard.style.display = 'none';
+                }
+            }
+
+            console.log('🛡️ Bekçi: Kullanıcı bulundu (' + user.get('email') + '), dashboard gösterildi.');
+            return true;
+        } else {
+            // KULLANICI YOK: Dashboard'u gizle, ana sayfayı göster
+            document.body.classList.remove('logged-in-user');
+            window.currentUser = null;
+            if (typeof currentUser !== 'undefined') {
+                try { currentUser = null; } catch(e) {}
+            }
+
+            var dash = document.getElementById('dashboardArea');
+            if (dash) {
+                dash.style.display = 'none';
+                dash.style.visibility = 'hidden';
+            }
+            var main = document.getElementById('mainSite');
+            if (main) {
+                main.style.display = 'block';
+                main.style.visibility = 'visible';
+                main.style.pointerEvents = 'auto';
+            }
+
+            // Moderatör panelini gizle
+            var modCard = document.getElementById('moderatorInfoCard');
+            if (modCard) modCard.style.display = 'none';
+
+            console.log('🛡️ Bekçi: Kullanıcı yok, ana sayfa gösterildi.');
+            return false;
+        }
+    }
+
+    // ═══ 2. showDashboard'u KİLİTLE ═══
+    // Kullanıcı yoksa showDashboard çağrılsa bile çalışmasın.
+    var originalShow = window.showDashboard;
+    window.showDashboard = async function() {
+        var user = null;
+        try { user = Parse.User.current(); } catch(e) {}
+        if (!user) {
+            console.log('🛡️ Bekçi: showDashboard engellendi (kullanıcı yok).');
+            checkUserAndSetGuard(); // Ana sayfayı göster
+            return;
+        }
+        // Kullanıcı varsa orijinal fonksiyonu çalıştır
+        if (typeof originalShow === 'function') {
+            return originalShow.apply(this, arguments);
+        }
+    };
+
+    // ═══ 3. logout'u KİLİTLE ═══
+    window.logout = function() {
+        if (!confirm('Çıkış yapmak istediğinize emin misiniz?')) return;
+        try { Parse.User.logOut(); } catch(e) {}
+        try {
+            localStorage.clear();
+            sessionStorage.clear();
+        } catch(e) {}
+        window.currentUser = null;
+        // Ana sayfaya dön
+        document.body.classList.remove('logged-in-user');
+        var dash = document.getElementById('dashboardArea');
+        if (dash) dash.style.display = 'none';
+        var main = document.getElementById('mainSite');
+        if (main) main.style.display = 'block';
+        setTimeout(function() { location.reload(true); }, 500);
+    };
+
+    // ═══ 4. SAYFA YÜKLENDİĞİNDE VE PERİYODİK OLARAK ÇALIŞTIR ═══
+    // İlk kontrol
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(checkUserAndSetGuard, 500);
+            setTimeout(checkUserAndSetGuard, 2000);
+            setTimeout(checkUserAndSetGuard, 4000);
+        });
+    } else {
+        setTimeout(checkUserAndSetGuard, 500);
+        setTimeout(checkUserAndSetGuard, 2000);
+        setTimeout(checkUserAndSetGuard, 4000);
+    }
+
+    // Her 2 saniyede bir kontrol et (sayfa donmasın diye)
+    setInterval(function() {
+        // Eğer kullanıcı yoksa ama dashboard açıksa, zorla kapat.
+        var user = null;
+        try { user = Parse.User.current(); } catch(e) {}
+        if (!user) {
+            var dash = document.getElementById('dashboardArea');
+            if (dash && dash.style.display === 'block') {
+                console.log('🛡️ Bekçi: Kullanıcı yok ama dashboard açık, kapatılıyor...');
+                checkUserAndSetGuard();
+            }
+        }
+    }, 2000);
+
+    console.log('✅ [AETHRION] Kesin Bekçi yüklendi!');
+})();
+</script>
+
+<script>
+// ═══ KULLANICI VARSA PANELİ AÇAN KESİN KOD ═══
+setTimeout(function() {
+    var user = null;
+    try { 
+        if (typeof Parse !== 'undefined' && Parse.User) {
+            user = Parse.User.current(); 
+        }
+    } catch(e) {}
+    
+    if (user) {
+        // Kullanıcı VAR: Paneli aç
+        document.body.classList.add('logged-in-user');
+        window.currentUser = user;
+        console.log('🛡️ Bekçi: Kullanıcı bulundu, panel açıldı.');
+    } else {
+        // Kullanıcı YOK: Paneli gizle, ana sayfayı göster
+        document.body.classList.remove('logged-in-user');
+        window.currentUser = null;
+        console.log('🛡️ Bekçi: Kullanıcı yok, ana sayfa gösterildi.');
+    }
+}, 1000); // Sayfa yüklendikten 1 saniye sonra çalış
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// [AETHRION KESİN BEKÇİ] Kullanıcı Yoksa Dashboard Açılmaz
+// ═══════════════════════════════════════════════════════════════
+(function AethrionFinalGuard() {
+    'use strict';
+
+    function checkAndHideDashboard() {
+        var user = null;
+        try {
+            if (typeof Parse !== 'undefined' && Parse.User) {
+                user = Parse.User.current();
+            }
+        } catch(e) {}
+
+        var dash = document.getElementById('dashboardArea');
+        var main = document.getElementById('mainSite');
+
+        if (user) {
+            // KULLANICI VAR: Dashboard'u göster
+            document.body.classList.add('logged-in-user');
+            window.currentUser = user;
+            if (dash) {
+                dash.style.display = 'block';
+                dash.style.visibility = 'visible';
+                dash.style.pointerEvents = 'auto';
+            }
+            if (main) main.style.display = 'none';
+            console.log('🛡️ Bekçi: Kullanıcı var, dashboard açık.');
+        } else {
+            // KULLANICI YOK: Dashboard'u gizle
+            document.body.classList.remove('logged-in-user');
+            window.currentUser = null;
+            if (dash) {
+                dash.style.display = 'none';
+                dash.style.visibility = 'hidden';
+                dash.style.pointerEvents = 'none';
+                // Inline style'ı da zorla
+                dash.setAttribute('style', 'display: none !important; visibility: hidden !important; pointer-events: none !important;');
+            }
+            if (main) {
+                main.style.display = 'block';
+                main.style.visibility = 'visible';
+            }
+            console.log('🛡️ Bekçi: Kullanıcı yok, dashboard gizlendi.');
+        }
+    }
+
+    // Sayfa yüklendiğinde çalıştır
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(checkAndHideDashboard, 1000);
+            setTimeout(checkAndHideDashboard, 2500);
+        });
+    } else {
+        setTimeout(checkAndHideDashboard, 1000);
+        setTimeout(checkAndHideDashboard, 2500);
+    }
+
+    // Her 2 saniyede bir kontrol et (sayfa donmasın diye)
+    setInterval(checkAndHideDashboard, 2000);
+
+    console.log('✅ [AETHRION] Kesin Bekçi yüklendi!');
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- [AETHRION v1.0.0] KALICI İMLEÇ VE PARÇACIK DÜZELTMESİ -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script>
+(function AethrionPermanentAnimationFix() {
+    // Eski bozuk imleçleri sil
+    var oldCursor = document.getElementById('customCursor');
+    var oldRing = document.getElementById('customCursorRing');
+    if (oldCursor) oldCursor.remove();
+    if (oldRing) oldRing.remove();
+
+    // Yeni imleçleri oluştur
+    var cursor = document.createElement('div');
+    cursor.id = 'customCursor';
+    cursor.style.cssText = 'position:fixed;top:0;left:0;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle,#e8c555 0%,#fff 80%);box-shadow:0 0 20px #e8c555;pointer-events:none;z-index:999999;transform:translate3d(-100px,-100px,0);will-change:transform;transition:width 0.2s,height 0.2s;';
+
+    var ring = document.createElement('div');
+    ring.id = 'customCursorRing';
+    ring.style.cssText = 'position:fixed;top:0;left:0;width:44px;height:44px;border:2px solid rgba(232,197,85,0.6);border-radius:50%;box-shadow:0 0 20px rgba(232,197,85,0.3);pointer-events:none;z-index:999998;transform:translate3d(-100px,-100px,0);will-change:transform;';
+
+    document.body.appendChild(cursor);
+    document.body.appendChild(ring);
+
+    // İmleç takip mantığı
+    var mx = -100, my = -100, rx = -100, ry = -100, isMoving = false, rafId = null;
+    
+    document.addEventListener('mousemove', function(e) {
+        mx = e.clientX;
+        my = e.clientY;
+        cursor.style.transform = 'translate3d(' + (mx - 8) + 'px,' + (my - 8) + 'px,0)';
+        
+        if (!isMoving) {
+            isMoving = true;
+            (function loop() {
+                if (!isMoving) return;
+                rx += (mx - rx) * 0.15;
+                ry += (my - ry) * 0.15;
+                ring.style.transform = 'translate3d(' + (rx - 22) + 'px,' + (ry - 22) + 'px,0)';
+                rafId = requestAnimationFrame(loop);
+            })();
+        }
+        clearTimeout(window._cursorStopPerm);
+        window._cursorStopPerm = setTimeout(function() {
+            isMoving = false;
+            if (rafId) cancelAnimationFrame(rafId);
+        }, 1000);
+    }, { passive: true });
+
+    // Parçacıkları yeniden oluştur
+    setTimeout(function() {
+        var particlesContainer = document.getElementById('particles');
+        if (particlesContainer) {
+            particlesContainer.innerHTML = '';
+            if (!document.getElementById('aethrionParticleCSS')) {
+                var style = document.createElement('style');
+                style.id = 'aethrionParticleCSS';
+                style.innerHTML = '@keyframes floatUp { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 0.6; } 100% { transform: translateY(-100px) scale(1.5); opacity: 0; } }';
+                document.head.appendChild(style);
+            }
+            var particleCount = window.innerWidth < 768 ? 15 : 40;
+            for (var i = 0; i < particleCount; i++) {
+                var p = document.createElement('div');
+                var size = Math.random() * 3 + 2;
+                p.style.cssText = 'position:absolute;width:' + size + 'px;height:' + size + 'px;background:#e8c555;border-radius:50%;box-shadow:0 0 10px #e8c555;left:' + (Math.random() * 100) + '%;bottom:-20px;animation: floatUp ' + (Math.random() * 15 + 10) + 's linear infinite;animation-delay: -' + (Math.random() * 15) + 's;opacity:0;';
+                particlesContainer.appendChild(p);
+            }
+        }
+    }, 1000);
+
+    console.log('✅ [AETHRION] Kalıcı Animasyon Düzeltmesi Yüklendi!');
+})();
+</script>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- [AETHRION v1.0.0] KALICI İMLEÇ VE PARÇACIK DÜZELTMESİ -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <script>
+    // Sayfa tamamen yüklendikten sonra (diğer tüm scriptlerden sonra) çalışmasını garantilemek için
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            (function AETHRION_ULTIMATE_CURSOR_PARTICLE_FIX() {
+                console.log('🚀 Eski imleç ve parçacık kodları iptal ediliyor...');
+
+                // 1. ESKİ FONKSİYONLARI DEVRE DIŞI BIRAK
+                window.initCursor = function() { console.log('⛔ Eski initCursor engellendi.'); };
+                window.initCursorFix = function() { console.log('⛔ Eski initCursorFix engellendi.'); };
+                window.initParticles = function() { console.log('⛔ Eski initParticles engellendi.'); };
+
+                // 2. ESKİ ELEMENTLERİ KESİN OLARAK SİL
+                var oldCursor = document.getElementById('customCursor');
+                var oldRing = document.getElementById('customCursorRing');
+                var oldParticles = document.getElementById('particles');
+
+                if (oldCursor) oldCursor.remove();
+                if (oldRing) oldRing.remove();
+                if (oldParticles) oldParticles.innerHTML = '';
+
+                // 3. BODY VE HTML'DEKİ KİLİTLERİ AÇ (Donmayı çözer)
+                document.body.style.overflow = 'auto';
+                document.body.style.pointerEvents = 'auto';
+                document.documentElement.style.overflow = 'auto';
+                document.documentElement.style.pointerEvents = 'auto';
+                document.body.classList.remove('no-scroll', 'dashboard-open');
+
+                // 4. YENİ VE KUSURSUZ İMLEÇLERİ OLUŞTUR
+                var cursor = document.createElement('div');
+                cursor.id = 'customCursor';
+                cursor.style.cssText = 'position:fixed;top:0;left:0;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 15px #e8c555;pointer-events:none;z-index:999999;transform:translate3d(-100px,-100px,0);will-change:transform;';
+
+                var ring = document.createElement('div');
+                ring.id = 'customCursorRing';
+                ring.style.cssText = 'position:fixed;top:0;left:0;width:40px;height:40px;border:1.5px solid rgba(232,197,85,0.8);border-radius:50%;box-shadow:0 0 20px rgba(232,197,85,0.4);pointer-events:none;z-index:999998;transform:translate3d(-100px,-100px,0);will-change:transform;';
+
+                document.body.appendChild(cursor);
+                document.body.appendChild(ring);
+
+                // 5. İMLEÇ TAKİP MANTIĞI
+                var mx = -100, my = -100, rx = -100, ry = -100, isMoving = false, rafId = null;
+                
+                document.addEventListener('mousemove', function(e) {
+                    mx = e.clientX;
+                    my = e.clientY;
+                    cursor.style.transform = 'translate3d(' + (mx - 6) + 'px,' + (my - 6) + 'px,0)';
+                    
+                    if (!isMoving) {
+                        isMoving = true;
+                        (function loop() {
+                            if (!isMoving) return;
+                            rx += (mx - rx) * 0.15;
+                            ry += (my - ry) * 0.15;
+                            ring.style.transform = 'translate3d(' + (rx - 20) + 'px,' + (ry - 20) + 'px,0)';
+                            rafId = requestAnimationFrame(loop);
+                        })();
+                    }
+                    clearTimeout(window._cursorStopFinal);
+                    window._cursorStopFinal = setTimeout(function() {
+                        isMoving = false;
+                        if (rafId) cancelAnimationFrame(rafId);
+                    }, 1000);
+                }, { passive: true });
+
+                // 6. PARÇACIKLARI YENİDEN OLUŞTUR
+                var particlesContainer = document.getElementById('particles');
+                if (particlesContainer) {
+                    particlesContainer.innerHTML = '';
+                    if (!document.getElementById('aethrionParticleCSS')) {
+                        var style = document.createElement('style');
+                        style.id = 'aethrionParticleCSS';
+                        style.innerHTML = '@keyframes floatUp { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 0.6; } 100% { transform: translateY(-100px) scale(1.5); opacity: 0; } }';
+                        document.head.appendChild(style);
+                    }
+
+                    var particleCount = window.innerWidth < 768 ? 15 : 40;
+                    for (var i = 0; i < particleCount; i++) {
+                        var p = document.createElement('div');
+                        var size = Math.random() * 3 + 2;
+                        p.style.cssText = 'position:absolute;width:' + size + 'px;height:' + size + 'px;background:#e8c555;border-radius:50%;box-shadow:0 0 10px #e8c555;left:' + (Math.random() * 100) + '%;bottom:-20px;animation: floatUp ' + (Math.random() * 15 + 10) + 's linear infinite;animation-delay: -' + (Math.random() * 15) + 's;opacity:0;';
+                        particlesContainer.appendChild(p);
+                    }
+                }
+
+                console.log('✅ İmleç ve Parçacıklar %100 düzeltildi! Donma bitti.');
+            })();
+        }, 100); // Diğer tüm scriptlerin çalışmasını beklemek için 100ms gecikme
+    });
+    </script>
+    <!-- ═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- [AETHRION v1.0.0] KUSURSUZ GÖRSEL ONARIM (İmleç + Parçacık + Navbar) -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script>
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        console.log('🚀 Kusursuz Görsel Onarım Başlatılıyor...');
+
+        // 1. Eski bozuk imleçleri sil
+        var oldCursor = document.getElementById('customCursor');
+        var oldRing = document.getElementById('customCursorRing');
+        if (oldCursor) oldCursor.remove();
+        if (oldRing) oldRing.remove();
+
+        // 2. Yeni kusursuz imleci oluştur
+        var cursor = document.createElement('div');
+        cursor.id = 'customCursor';
+        cursor.style.cssText = 'position:fixed;top:0;left:0;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 15px #e8c555;pointer-events:none;z-index:999999;transform:translate3d(-100px,-100px,0);will-change:transform;';
+
+        var ring = document.createElement('div');
+        ring.id = 'customCursorRing';
+        ring.style.cssText = 'position:fixed;top:0;left:0;width:40px;height:40px;border:1.5px solid rgba(232,197,85,0.8);border-radius:50%;box-shadow:0 0 20px rgba(232,197,85,0.4);pointer-events:none;z-index:999998;transform:translate3d(-100px,-100px,0);will-change:transform;';
+
+        document.body.appendChild(cursor);
+        document.body.appendChild(ring);
+
+        // İmleç takip mantığı
+        var mx = -100, my = -100, rx = -100, ry = -100, isMoving = false, rafId = null;
+        document.addEventListener('mousemove', function(e) {
+            mx = e.clientX;
+            my = e.clientY;
+            cursor.style.transform = 'translate3d(' + (mx - 6) + 'px,' + (my - 6) + 'px,0)';
+            if (!isMoving) {
+                isMoving = true;
+                (function loop() {
+                    if (!isMoving) return;
+                    rx += (mx - rx) * 0.15;
+                    ry += (my - ry) * 0.15;
+                    ring.style.transform = 'translate3d(' + (rx - 20) + 'px,' + (ry - 20) + 'px,0)';
+                    rafId = requestAnimationFrame(loop);
+                })();
+            }
+            clearTimeout(window._cursorStopFinal);
+            window._cursorStopFinal = setTimeout(function() {
+                isMoving = false;
+                if (rafId) cancelAnimationFrame(rafId);
+            }, 1000);
+        }, { passive: true });
+
+        // 3. Parçacıkları ORİJİNAL SINIFLARIYLA geri getir
+        var container = document.getElementById('particles');
+        if (container) {
+            container.innerHTML = '';
+            var count = window.innerWidth < 768 ? 15 : 45;
+            for (var i = 0; i < count; i++) {
+                var p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDuration = (Math.random() * 16 + 12) + 's';
+                p.style.animationDelay = Math.random() * 15 + 's';
+                container.appendChild(p);
+            }
+            var lineCount = window.innerWidth < 768 ? 3 : 7;
+            for (var j = 0; j < lineCount; j++) {
+                var line = document.createElement('div');
+                line.className = 'light-line';
+                line.style.left = Math.random() * 100 + '%';
+                line.style.animationDuration = (Math.random() * 7 + 6) + 's';
+                line.style.animationDelay = Math.random() * 10 + 's';
+                container.appendChild(line);
+            }
+            var sparkCount = window.innerWidth < 768 ? 5 : 14;
+            for (var k = 0; k < sparkCount; k++) {
+                var spark = document.createElement('div');
+                spark.className = 'quantum-spark';
+                spark.style.left = Math.random() * 100 + '%';
+                spark.style.top = Math.random() * 100 + '%';
+                spark.style.animationDelay = Math.random() * 3 + 's';
+                spark.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                container.appendChild(spark);
+            }
+        }
+
+        // 4. Navbar'ı (üst menüyü) eski haline getir
+        var nav = document.querySelector('nav');
+        if (nav) {
+            nav.style.display = 'flex';
+            nav.style.alignItems = 'center';
+            nav.style.justifyContent = 'space-between';
+            nav.style.visibility = 'visible';
+            nav.style.opacity = '1';
+            nav.style.position = 'fixed';
+            nav.style.top = '48px';
+            nav.style.left = '0';
+            nav.style.right = '0';
+            nav.style.zIndex = '9999';
+        }
+        var btnGroup = document.querySelector('.button-group');
+        if (btnGroup) {
+            btnGroup.style.display = 'flex';
+            btnGroup.style.flexWrap = 'wrap';
+            btnGroup.style.alignItems = 'center';
+            btnGroup.style.gap = '14px';
+        }
+
+        console.log('✅ Görsel Onarım Tamamlandı!');
+    }, 200); // Diğer tüm scriptlerin çalışmasını bekle
+});
+</script>
+
 </body>
 </html>
