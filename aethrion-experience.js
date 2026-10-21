@@ -470,22 +470,27 @@ window.addEventListener('load', function () {
 /* AETHRION Workspace shell loader — ensure the persistent sidebar is mounted. */
 function loadWorkspaceShell() {
  try {
-  if (!document.querySelector('link[href*="aethrion-workspace-v5.css"]')) {
-   var css = document.createElement('link');
-   css.id = 'aethrionWorkspaceV5Css';
-   css.rel = 'stylesheet';
-   css.href = '/aethrion-workspace-v5.css';
-   document.head.appendChild(css);
+  function ensureCss(id, href) {
+   if (document.getElementById(id) || document.querySelector('link[href*="' + href + '"]')) return;
+   var link = document.createElement('link'); link.id = id; link.rel = 'stylesheet'; link.href = '/' + href; document.head.appendChild(link);
   }
-  if (!document.querySelector('script[src*="aethrion-workspace-v5.js"]')) {
-   var script = document.createElement('script');
-   script.id = 'aethrionWorkspaceV5Script';
-   script.src = '/aethrion-workspace-v5.js';
-   script.async = true;
-   document.head.appendChild(script);
+  ensureCss('aethrionWorkspaceV5Css','aethrion-workspace-v5.css');
+  ensureCss('aethrionWorkspaceV6Css','aethrion-workspace-v6.css');
+  function loadV6() {
+   if (document.querySelector('script[src*="aethrion-workspace-v6.js"]')) return;
+   var v6 = document.createElement('script'); v6.id = 'aethrionWorkspaceV6Script'; v6.src = '/aethrion-workspace-v6.js'; v6.async = true; document.head.appendChild(v6);
+  }
+  var core = document.querySelector('script[src*="aethrion-workspace-v5.js"]');
+  if (!core) {
+   core = document.createElement('script'); core.id = 'aethrionWorkspaceV5Script'; core.src = '/aethrion-workspace-v5.js'; core.async = false;
+   core.addEventListener('load', loadV6, {once:true}); document.head.appendChild(core);
+  } else if (window.__aewsClicks) {
+   loadV6();
+  } else {
+   core.addEventListener('load', loadV6, {once:true});
+   window.setTimeout(loadV6, 900);
   }
  } catch (error) { console.error('[AETHRION] Çalışma alanı menüsü yüklenemedi:', error); }
 }
-
 loadWorkspaceShell();
 })();

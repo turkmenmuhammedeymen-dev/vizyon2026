@@ -15,7 +15,7 @@ body.ae-shell-on #aethrionExperienceWelcome:after{content:"";position:absolute;r
 body.ae-shell-on .aew-eyebrow{display:flex!important;align-items:center!important;gap:9px!important;color:#59728e!important;font-size:10px!important;font-weight:800!important;letter-spacing:.14em!important}body.ae-shell-on .aew-dot{width:7px!important;height:7px!important;background:#2c9a77!important;border-radius:50%!important}
 body.ae-shell-on .aew-greeting{margin:32px 0 10px!important;color:#687d93!important;font-size:14px!important}body.ae-shell-on .aew-name{margin:0!important;color:#142c47!important;font:800 clamp(36px,5.4vw,68px)/1.06 Manrope,"Segoe UI",sans-serif!important;letter-spacing:-.055em!important}body.ae-shell-on .aew-name em{font-style:normal!important;color:#2d639a!important;overflow-wrap:anywhere}body.ae-shell-on .aew-role{display:inline-flex!important;align-self:flex-start!important;margin-top:20px!important;padding:8px 12px!important;border:1px solid #dce7f2!important;border-radius:999px!important;background:#f4f8fc!important;color:#496480!important;font-size:11px!important;font-weight:700!important}
 body.ae-shell-on .aew-copy{max-width:600px!important;margin:25px 0 0!important;color:#61758b!important;font-size:15px!important;line-height:1.9!important}body.ae-shell-on .aew-grid,body.ae-shell-on .aew-actions{display:none!important}body.ae-shell-on .aews-home-cta{display:inline-flex;align-items:center;gap:9px;margin-top:34px;padding:13px 17px;border:1px solid #d6e3f1;border-radius:12px;background:#edf4fb;color:#214f83;font-size:12px;font-weight:750}
-body.ae-shell-on #dashboardArea .dashboard-header{display:none!important}body.ae-shell-on #dashboardArea .dashboard-content-wrapper>*:not(#aethrionExperienceWelcome){display:none!important}body.ae-shell-on #dashboardArea .dashboard-content-wrapper>#aethrionExperienceWelcome{display:flex!important}
+body.ae-shell-on #dashboardArea .dashboard-header{display:none!important}body.ae-shell-on.aews-home-view #dashboardArea .dashboard-content-wrapper>*:not(#aethrionExperienceWelcome){display:none!important}body.ae-shell-on #dashboardArea .dashboard-content-wrapper>#aethrionExperienceWelcome{display:flex!important}
 #splashScreen{background:radial-gradient(ellipse at 50% 34%,#17375a 0%,#0b1728 42%,#07101c 100%)!important}.splash-logo{width:clamp(138px,22vw,184px)!important;height:clamp(138px,22vw,184px)!important;margin-bottom:18px!important;filter:drop-shadow(0 14px 32px #2d7dc240)!important}.splash-logo img{width:100%!important;height:100%!important;object-fit:contain!important;transform:scale(1.12)!important;filter:drop-shadow(0 0 12px #d3e7ff4d)!important}.splash-title{font-size:clamp(27px,5vw,42px)!important;letter-spacing:.2em!important;font-weight:850!important;color:#f5f8fd!important}.splash-sub{color:#b4c6da!important;font-size:12px!important;letter-spacing:.06em!important}.splash-status,.splash-progress-head,.splash-progress-info{color:#a9bdd3!important}.splash-progress-wrap{width:min(340px,calc(100vw - 52px))!important}.splash-progress{height:4px!important;background:#ffffff20!important}.splash-progress-bar{background:linear-gradient(90deg,#6bb4ee,#d9e8f8)!important;box-shadow:0 0 14px #6bb4ee70!important}
 @media(max-width:900px){#aewsMobileToggle{display:block}#aeWorkspaceSidebar{transform:translateX(-105%);transition:transform .24s ease;z-index:10050;width:min(290px,84vw);padding-top:68px}body.aews-nav-open #aeWorkspaceSidebar{transform:translateX(0)}body.ae-shell-on #dashboardArea .dashboard-content-wrapper{margin-left:0!important;padding:72px 14px 22px!important}body.ae-shell-on #aethrionExperienceWelcome{min-height:calc(100vh - 98px)!important;padding:28px 22px!important;border-radius:18px!important}body.ae-shell-on .aew-name{font-size:clamp(34px,10vw,50px)!important}.splash-logo{width:146px!important;height:146px!important}}@media(max-width:420px){body.ae-shell-on #aethrionExperienceWelcome{padding:24px 18px!important}.aews-brand{padding-bottom:14px}}@media(prefers-reduced-motion:reduce){#aeWorkspaceSidebar{transition:none!important}}
 /* Public pages never show the authenticated navigation shell. */
@@ -64,3 +64,53 @@ body.ae-shell-on #aewsMobileToggle{border-radius:12px!important}
 @media(prefers-reduced-motion:reduce){
  body.ae-shell-on *,body.ae-shell-on *:before,body.ae-shell-on *:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
+/* AETHRION Workspace v6 — predictable feature navigation, clean home, responsive controls */
+body.ae-shell-on.aews-home-view #dashboardArea .dashboard-content-wrapper>#aethrionExperienceWelcome{display:flex!important}
+body.ae-shell-on.aews-feature-view #aethrionExperienceWelcome{display:none!important}
+body.ae-shell-on.aews-feature-view #dashboardArea .dashboard-header{display:none!important}
+body.ae-shell-on #aeWorkspaceSidebar{width:276px!important;max-width:86vw;gap:12px!important}
+body.ae-shell-on #dashboardArea .dashboard-content-wrapper{margin-left:276px!important;padding:clamp(22px,3vw,48px)!important}
+body.ae-shell-on .aews-nav{padding:0 3px 8px 0;overscroll-behavior:contain}
+body.ae-shell-on .aews-link{min-height:44px!important;font-size:13px!important;line-height:1.35!important;white-space:normal!important}
+body.ae-shell-on .aews-link span:last-child{min-width:0;overflow-wrap:anywhere}
+body.ae-shell-on .aews-close{display:none;width:36px;height:36px;flex:0 0 36px;border:1px solid #dce5ef;border-radius:10px;background:#fff;color:#344d68;font-size:22px}
+body.ae-shell-on .aews-brand{min-width:0}
+body.ae-shell-on #aewsMobileToggle{min-width:44px;min-height:44px;touch-action:manipulation}
+body.ae-shell-on #aewsMobileShade{touch-action:manipulation}
+body.ae-shell-on :is(button,a,[role="button"],input,select,textarea){touch-action:manipulation}
+body.ae-shell-on .aews-link:focus-visible,body.ae-shell-on #aewsMobileToggle:focus-visible,body.ae-shell-on .aews-close:focus-visible{outline:3px solid #75a8dc!important;outline-offset:2px!important}
+@media(max-width:900px){
+ body.ae-shell-on #aeWorkspaceSidebar{width:min(320px,88vw)!important;padding:64px 12px 14px!important}
+ body.ae-shell-on #aeWorkspaceSidebar .aews-close{display:block}
+ body.ae-shell-on #dashboardArea .dashboard-content-wrapper{margin-left:0!important;padding:70px 14px 20px!important}
+ body.ae-shell-on #aethrionExperienceWelcome{min-height:calc(100dvh - 92px)!important}
+}
+@media(max-width:480px){
+ body.ae-shell-on #aeWorkspaceSidebar{width:min(300px,88vw)!important}
+ body.ae-shell-on .aews-link{min-height:46px!important;font-size:14px!important}
+ body.ae-shell-on .aews-section{font-size:10px!important}
+ body.ae-shell-on #aethrionExperienceWelcome{padding:22px 16px!important}
+ body.ae-shell-on .aew-name{font-size:clamp(30px,8.5vw,40px)!important;line-height:1.12!important;overflow-wrap:anywhere}
+ body.ae-shell-on .aew-copy{font-size:14px!important;line-height:1.75!important}
+}
+/* Workspace v6 final cascade: prevent the legacy shell from competing with the active shell. */
+body.ae-shell-on #aeWorkspaceSidebar{position:fixed!important;inset:0 auto 0 0!important;z-index:10050!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;background:#fff!important;border-right:1px solid #dce5ef!important;color:#172b43!important;box-shadow:8px 0 28px rgba(23,43,67,.06)!important}
+body.ae-shell-on #aeWorkspaceSidebar .aews-brand{display:flex!important;align-items:center!important;gap:11px!important}
+body.ae-shell-on #aeWorkspaceSidebar .aews-nav{display:block!important;flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important}
+body.ae-shell-on #aeWorkspaceSidebar .aews-link{display:flex!important;align-items:center!important;width:100%!important;box-sizing:border-box!important}
+body.ae-shell-on.aews-home-view #dashboardArea .dashboard-content-wrapper>*:not(#aethrionExperienceWelcome){display:none!important}
+body.ae-shell-on.aews-home-view #dashboardArea .dashboard-content-wrapper>#aethrionExperienceWelcome{display:flex!important}
+body.ae-shell-on.aews-feature-view #aethrionExperienceWelcome{display:none!important}
+body.ae-shell-on.aews-feature-view #dashboardArea .dashboard-content-wrapper>*:not(#aethrionExperienceWelcome){display:none!important}
+body.ae-shell-on.aews-feature-view #dashboardArea .dashboard-content-wrapper>.aews-active-feature{display:block!important}
+body.ae-shell-on #aewsMobileToggle{z-index:10060!important;display:none;align-items:center;justify-content:center}
+body.ae-shell-on #aewsMobileShade{z-index:10030!important}
+@media(max-width:900px){
+ body.ae-shell-on #aeWorkspaceSidebar{transform:translateX(-105%)!important;transition:transform .22s ease!important;width:min(320px,88vw)!important}
+ body.ae-shell-on.aews-nav-open #aeWorkspaceSidebar{transform:translateX(0)!important}
+ body.ae-shell-on #aewsMobileToggle{display:flex!important}
+ body.ae-shell-on #aewsMobileShade{display:none!important}
+ body.ae-shell-on.aews-nav-open #aewsMobileShade{display:block!important}
+ body.ae-shell-on #dashboardArea .dashboard-content-wrapper{margin-left:0!important;padding:70px 14px 20px!important}
+}
+@media(prefers-reduced-motion:reduce){body.ae-shell-on #aeWorkspaceSidebar{transition:none!important}}
