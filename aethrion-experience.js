@@ -466,4 +466,26 @@ window.addEventListener('load', function () {
   setTimeout(function () { applyOverrides(); ensureTrigger(); if (authUser()) showWelcome(); }, delay);
  });
 });
+
+/* AETHRION Workspace shell loader — ensure the persistent sidebar is actually mounted. */
+function loadWorkspaceShell() {
+ try {
+  if (!document.querySelector('link[href*="aethrion-workspace-v5.css"]')) {
+   var css = document.createElement('link');
+   css.id = 'aethrionWorkspaceV5Css';
+   css.rel = 'stylesheet';
+   css.href = '/aethrion-workspace-v5.css';
+   document.head.appendChild(css);
+  }
+  if (!document.querySelector('script[src*="aethrion-workspace-v5.js"]')) {
+   var script = document.createElement('script');
+   script.id = 'aethrionWorkspaceV5Script';
+   script.src = '/aethrion-workspace-v5.js';
+   script.async = true;
+   document.head.appendChild(script);
+  }
+ } catch (error) { console.error('[AETHRION] Çalışma alanı menüsü yüklenemedi:', error); }
+}
+
+loadWorkspaceShell();
 })();
