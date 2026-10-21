@@ -165,3 +165,59 @@ setTimeout(boot,800);setTimeout(boot,2200);
  function install(){guard('handleRegister','Kayıt');guard('handleLogin','Giriş');guard('verifyAccount','Doğrulama');guard('handleGoogleLoginResponse','Google ile giriş')}
  install();[400,1000,2200,4200].forEach(function(t){setTimeout(install,t)});
 })();
+
+
+/* AETHRION Auth Reliability Patch — normalize login/register/verification button events. */
+(function(){
+ 'use strict';
+ var inFlight=Object.create(null);
+ function tell(message,type){
+  try{if(typeof window.showNotification==='function')window.showNotification(message,type||'error');else console.error('[AETHRION Auth]',message)}catch(e){console.error(message)}
+ }
+ var actions=[
+  {selector:'#formLogin .btn-primary',form:'#formLogin',fn:'handleLogin',label:'Giriş'},
+  {selector:'#formRegister .btn-primary',form:'#formRegister',fn:'handleRegister',label:'Kayıt'},
+  {selector:'#formVerify .btn-primary',form:'#formVerify',fn:'verifyAccount',label:'Doğrulama'}
+ ];
+ function dispatch(action,button,event){
+  if(event){event.preventDefault();event.stopPropagation();if(event.stopImmediatePropagation)event.stopImmediatePropagation()}
+  if(inFlight[action.fn])return;
+  var fn=window[action.fn];
+  if(typeof fn!=='function'){
+   tell(action.label+' işlemi başlatılamadı: gerekli işlev yüklenmemiş. Sayfayı yenileyin; sorun sürerse geliştirici konsolunu kontrol edin.','error');
+   return;
+  }
+  inFlight[action.fn]=true;
+  var oldText=button?button.textContent:'';
+  if(button){button.disabled=true;button.setAttribute('aria-busy','true');button.classList.add('ae-auth-busy');
+   if(action.fn==='handleLogin')button.textContent='Giriş yapılıyor…';
+   else if(action.fn==='handleRegister')button.textContent='Hesap oluşturuluyor…';
+   else button.textContent='Doğrulanıyor…';
+  }
+  Promise.resolve().then(function(){return fn.call(button||window)}).catch(function(error){
+   console.error('[AETHRION] '+action.label+' işlemi başarısız:',error);
+   tell(action.label+' işlemi tamamlanamadı: '+((error&&error.message)||'Beklenmeyen bir hata oluştu.'),'error');
+  }).finally(function(){
+   inFlight[action.fn]=false;
+   if(button){button.disabled=false;button.removeAttribute('aria-busy');button.classList.remove('ae-auth-busy');if(oldText)button.textContent=oldText;}
+  });
+ }
+ function findAction(target){
+  if(!target||!target.closest)return null;
+  for(var i=0;i<actions.length;i++){var button=target.closest(actions[i].selector);if(button)return {action:actions[i],button:button}}
+  return null;
+ }
+ document.addEventListener('click',function(event){
+  var found=findAction(event.target);if(!found)return;
+  dispatch(found.action,found.button,event);
+ },true);
+ document.addEventListener('submit',function(event){
+  var form=event.target;if(!form||!form.matches)return;
+  for(var i=0;i<actions.length;i++){
+   if(form.matches(actions[i].form)){
+    var button=form.querySelector('.btn-primary');
+    dispatch(actions[i],button,event);return;
+   }
+  }
+ },true);
+})();
