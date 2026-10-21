@@ -85,7 +85,7 @@ function patchWelcome(){
   window.showWelcomeScreen=wrapped;window.renderWelcome=wrapped;window.goHome=wrapped;
  }
 }
-function boot(){document.body.classList.add('ae-shell-on');installRouter();patchWelcome();hideTrigger();if(logged())customWelcome();var logo=q('.aews-logo');if(logo&&!q('img',logo))logo.innerHTML='<img src="/aethrion-mark.svg" alt="AETHRION" draggable="false">'}
+function boot(){installRouter();patchWelcome();if(logged()){document.body.classList.add('ae-shell-on');hideTrigger();customWelcome();var logo=q('.aews-logo');if(logo&&!q('img',logo))logo.innerHTML='<img src="/aethrion-mark.svg" alt="AETHRION" draggable="false">'}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 [150,500,1000,1800,3000,5000].forEach(function(t){setTimeout(boot,t)});
 if(window.MutationObserver&&document.body)new MutationObserver(function(){if(logged()){patchWelcome();customWelcome();hideTrigger()}}).observe(document.body,{attributes:true,attributeFilter:['class']});
