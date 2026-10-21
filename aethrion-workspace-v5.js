@@ -47,7 +47,7 @@
  function user(){
   try{if(window.currentUser)return window.currentUser;}catch(e){}
   try{if(window.Parse&&Parse.User&&Parse.User.current()){window.currentUser=Parse.User.current();return window.currentUser;}}catch(e){}
-  try{var u=JSON.parse(localStorage.getItem('aethrion_user')||'null');if(u&&(u.id||u.email))return u;}catch(e){}
+  try{if(document.body&&document.body.classList.contains('logged-in-user')){var u=JSON.parse(localStorage.getItem('aethrion_user')||'null');if(u&&(u.id||u.email))return u;}}catch(e){}
   return null;
  }
  function value(u,key){
@@ -72,7 +72,7 @@
  }
  function hoistOverlays(w){
   if(!w)return;
-  var nodes=qsa('.modal-overlay, [id$="Overlay"]',w);
+  var nodes=qsa('.modal-overlay, [id$="Overlay"], .aethrion-responsibility-modal',w);
   nodes.forEach(function(n){
    if(!n||n===qs('#aethrionExperienceWelcome')||n===qs('#aeWorkspaceSidebar')||n.parentElement===document.body)return;
    if(n.id==='aethrionExperienceWelcome'||n.id==='aeWorkspaceSidebar')return;
