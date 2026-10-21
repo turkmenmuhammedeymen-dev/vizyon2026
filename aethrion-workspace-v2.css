@@ -1,0 +1,82 @@
+/* AETHRION Workspace v2 — professional, responsive application shell */
+:root{--ae-ws-sidebar:264px;--ae-ws-bg:#f4f7fb;--ae-ws-paper:#fff;--ae-ws-ink:#172b43;--ae-ws-muted:#62748a;--ae-ws-line:#dfe7f0;--ae-ws-blue:#2459a8;--ae-ws-cyan:#2694a8}
+body.ae-workspace-v2{background:var(--ae-ws-bg)!important;color:var(--ae-ws-ink)!important}
+body.ae-workspace-v2 #aethrionWorkspaceSidebar{position:fixed;inset:0 auto 0 0;width:var(--ae-ws-sidebar);z-index:100100;display:flex;flex-direction:column;background:rgba(255,255,255,.97);border-right:1px solid var(--ae-ws-line);box-shadow:8px 0 28px rgba(22,46,77,.045);padding:18px 12px 12px;overflow:hidden;transform:translateX(0);transition:transform .24s ease}
+.aewsb-brand{display:flex;align-items:center;gap:11px;padding:5px 9px 19px;border-bottom:1px solid #e8edf4;flex-shrink:0}
+.aewsb-logo{width:42px;height:42px;display:grid;place-items:center;flex-shrink:0;border-radius:13px;background:linear-gradient(145deg,#193b63,#2a6ca6);box-shadow:0 6px 16px rgba(35,79,136,.18);overflow:hidden}
+.aewsb-logo img{width:33px;height:33px;object-fit:contain;filter:brightness(0) invert(1)}
+.aewsb-brand strong{display:block;font:800 14px/1.3 Manrope,"Segoe UI",sans-serif;letter-spacing:.12em;color:#183451}
+.aewsb-brand small{display:block;margin-top:4px;font-size:9px;letter-spacing:.09em;color:#8190a2}
+.aewsb-home{display:flex;align-items:center;gap:11px;margin:16px 2px 10px;padding:12px 13px;border:1px solid #dce7f3;border-radius:11px;background:#edf4fc;color:#214e80;font-size:12px;font-weight:750;text-align:left;cursor:pointer}
+.aewsb-home:hover,.aewsb-item:hover{background:#f0f5fb;border-color:#c9d8e9;color:#194e87}
+.aewsb-search{padding:0 2px 10px;flex-shrink:0}
+.aewsb-search input{width:100%;height:38px;border:1px solid #e0e7f0;border-radius:10px;padding:0 11px;background:#f8fafc;color:#203851;font-size:12px;outline:none}
+.aewsb-search input:focus{border-color:#8eafd3;box-shadow:0 0 0 3px rgba(36,89,168,.09)}
+.aewsb-scroll{flex:1;overflow:auto;min-height:0;padding:0 2px 14px;scrollbar-width:thin;scrollbar-color:#cdd8e5 transparent}
+.aewsb-group{margin:12px 0 5px;padding:0 10px;color:#8a98a9;font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
+.aewsb-item{width:100%;display:flex;align-items:center;gap:10px;min-height:41px;margin:2px 0;padding:8px 10px;border:1px solid transparent;border-radius:10px;background:transparent;color:#4d6178;text-align:left;cursor:pointer;font:600 11.5px/1.35 "DM Sans","Segoe UI",sans-serif;transition:background .16s,border-color .16s,color .16s}
+.aewsb-item .aewsb-icon{width:25px;height:25px;display:grid;place-items:center;flex-shrink:0;border-radius:8px;background:#edf2f8;color:#315f91;font-size:13px}
+.aewsb-item .aewsb-label{min-width:0;overflow-wrap:anywhere}
+.aewsb-item .aewsb-arrow{margin-left:auto;color:#9aa8b7;font-size:15px}
+.aewsb-item[aria-current="page"]{background:#eaf2fb;border-color:#d8e5f4;color:#1c4f86}
+.aewsb-item[aria-current="page"] .aewsb-icon{background:#dceafa;color:#1c5595}
+.aewsb-foot{border-top:1px solid #e8edf4;padding:12px 8px 3px;color:#8795a6;font-size:9px;line-height:1.6;flex-shrink:0}
+#aethrionWorkspaceMobileToggle{display:none;position:fixed;left:12px;top:12px;z-index:100120;width:42px;height:42px;border:1px solid #d9e4ef;border-radius:12px;background:#fff;color:#214f85;box-shadow:0 6px 20px rgba(20,44,75,.12);font-size:20px;cursor:pointer}
+#aethrionWorkspaceScrim{display:none}
+body.ae-workspace-v2.logged-in-user #dashboardArea{margin-left:var(--ae-ws-sidebar)!important;width:calc(100% - var(--ae-ws-sidebar))!important;max-width:none!important;min-height:100vh!important;box-sizing:border-box!important;padding:clamp(22px,3vw,46px)!important;background:var(--ae-ws-bg)!important}
+body.ae-workspace-v2.logged-in-user #dashboardArea .dashboard-content-wrapper{width:100%;max-width:1450px;margin:0 auto}
+body.ae-workspace-v2.logged-in-user #dashboardArea .dashboard-content-wrapper>*{box-sizing:border-box}
+body.ae-workspace-v2.logged-in-user #aethrionExperienceWelcome{width:100%;min-height:min(680px,calc(100vh - 90px));display:flex;align-items:center;justify-content:center;padding:clamp(20px,5vw,64px);border:1px solid #e1e8f0;border-radius:24px;background:radial-gradient(ellipse at 85% 10%,rgba(53,118,179,.09),transparent 42%),linear-gradient(145deg,#fff,#f7faff);box-shadow:0 16px 50px rgba(27,54,85,.055);color:#1b314b;overflow:hidden}
+.aew-v2{width:min(780px,100%);margin:0 auto;text-align:left}
+.aew-v2-kicker{display:inline-flex;align-items:center;gap:9px;padding:8px 11px;border:1px solid #dce6f1;border-radius:999px;background:#f8fbff;color:#57718d;font-size:9px;font-weight:800;letter-spacing:.14em}
+.aew-v2-kicker i{width:7px;height:7px;border-radius:50%;background:#2a9a8c;box-shadow:0 0 0 4px rgba(42,154,140,.12)}
+.aew-v2 h1{margin:26px 0 14px;color:#162e49;font:800 clamp(34px,5.2vw,64px)/1.05 Manrope,"Segoe UI",sans-serif;letter-spacing:-.055em}
+.aew-v2 h1 span{display:block;margin-top:8px;color:#2c629b}
+.aew-v2 p{max-width:620px;margin:0;color:#63768d;font-size:14px;line-height:1.9}
+.aew-v2-rule{width:64px;height:3px;margin:26px 0;border-radius:3px;background:linear-gradient(90deg,#2459a8,#39a0b3)}
+.aew-v2-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 28px}
+.aew-v2-role{padding:7px 10px;border:1px solid #dfe7f0;border-radius:8px;background:#fff;color:#4f6580;font-size:10px;font-weight:750}
+.aew-v2-primary{display:inline-flex;align-items:center;gap:11px;min-height:48px;padding:0 19px;border:1px solid #214f87;border-radius:11px;background:#214f87;color:#fff;font-size:12px;font-weight:750;cursor:pointer;box-shadow:0 8px 20px rgba(33,79,135,.17);transition:transform .18s,background .18s}
+.aew-v2-primary:hover{background:#183d6b;transform:translateY(-1px)}
+.aew-v2-hint{margin-top:16px!important;font-size:11px!important;color:#8593a4!important}
+body.ae-workspace-v2 .aethrion-features-panel,body.ae-workspace-v2 #aethrionFeaturesPanel,body.ae-workspace-v2 #aethrionExperienceDrawer{display:none!important}
+body.ae-workspace-v2 #aethrionFeaturesTrigger{display:none!important}
+body.ae-workspace-v2 #aethrionExperienceBackdrop,body.ae-workspace-v2 #aethrionFeaturesBackdrop{display:none!important}
+body.ae-workspace-v2 #splashScreen{width:100%;height:100%;min-height:100dvh;padding:24px 18px;box-sizing:border-box;background:radial-gradient(ellipse at 50% 38%,#173b5b 0%,#0a192b 42%,#07111e 100%)!important}
+body.ae-workspace-v2 #splashScreen::before{background:radial-gradient(ellipse at 50% 25%,rgba(48,130,179,.18),transparent 60%),radial-gradient(ellipse at 80% 90%,rgba(36,89,168,.13),transparent 65%)!important;animation:none!important}
+body.ae-workspace-v2 #splashScreen::after{opacity:.2!important}
+body.ae-workspace-v2 #splashScreen .splash-logo{width:clamp(112px,19vw,154px)!important;height:clamp(112px,19vw,154px)!important;padding:12px!important;border-radius:30px!important;background:#0d2034!important;border:1px solid rgba(152,198,227,.55)!important;box-shadow:0 14px 44px rgba(0,0,0,.22),0 0 0 8px rgba(75,139,184,.08)!important;animation:splashLogoEnter .7s ease-out both!important;overflow:hidden!important}
+body.ae-workspace-v2 #splashScreen .splash-logo::before{inset:-2px!important;border-radius:32px!important;filter:none!important;opacity:.45!important;animation:none!important}
+body.ae-workspace-v2 #splashScreen .splash-logo::after{inset:3px!important;border-radius:26px!important;background:#0d2034!important}
+body.ae-workspace-v2 #splashScreen .splash-logo img{position:relative;z-index:3;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;display:block!important;padding:3px!important;filter:drop-shadow(0 3px 12px rgba(95,184,229,.28))!important}
+body.ae-workspace-v2 #splashScreen .splash-logo-outer-ring,body.ae-workspace-v2 #splashScreen .splash-logo-inner-ring,body.ae-workspace-v2 #splashScreen .splash-logo-shimmer{opacity:.25!important}
+body.ae-workspace-v2 #splashScreen .splash-title{font-size:clamp(25px,5vw,36px)!important;letter-spacing:.22em!important;margin-top:27px!important;color:#f3f7fc!important;font-weight:800!important}
+body.ae-workspace-v2 #splashScreen .splash-sub{font-size:clamp(10px,2.6vw,12px)!important;letter-spacing:.12em!important;color:#9db5ca!important;margin-top:11px!important}
+body.ae-workspace-v2 #splashScreen .splash-status{font-size:9px!important;letter-spacing:.1em!important;color:#b4c6d7!important;margin-top:30px!important;text-align:center}
+body.ae-workspace-v2 #splashScreen .splash-progress-wrap{width:min(360px,86vw)!important;margin-top:20px!important}
+body.ae-workspace-v2 #splashScreen .splash-progress{height:5px!important;border-radius:99px!important;background:rgba(225,239,249,.12)!important}
+body.ae-workspace-v2 #splashScreen .splash-progress-bar{border-radius:99px!important;background:linear-gradient(90deg,#3d87c3,#65bdc7)!important;box-shadow:none!important}
+body.ae-workspace-v2 #splashScreen .splash-ready,body.ae-workspace-v2 #splashScreen .splash-version{color:#7895ae!important;font-size:9px!important;letter-spacing:.12em!important}
+body.ae-workspace-v2 #authModal .modal{width:min(460px,calc(100vw - 28px))!important;max-width:460px!important;max-height:calc(100dvh - 28px)!important;overflow:auto!important;padding:clamp(20px,4vw,32px)!important;border:1px solid #dfe7f0!important;border-radius:20px!important;background:#fff!important;color:#203851!important;box-shadow:0 28px 90px rgba(12,31,54,.22)!important}
+body.ae-workspace-v2 #authModal .modal-header h3{font-size:24px!important;color:#183653!important}
+body.ae-workspace-v2 #authModal .modal-tabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important;padding:5px!important;background:#f1f5fa!important;border-radius:12px!important}
+body.ae-workspace-v2 #authModal .modal-tab{min-width:0!important;padding:10px 6px!important;border-radius:8px!important;color:#64768b!important;font-size:12px!important}
+body.ae-workspace-v2 #authModal .modal-tab.active{background:#fff!important;color:#214f87!important;box-shadow:0 2px 8px rgba(26,51,82,.08)!important}
+body.ae-workspace-v2 #authModal .form-input{min-height:45px!important;width:100%!important;box-sizing:border-box!important;padding:12px 13px!important;border:1px solid #dce5ef!important;border-radius:10px!important;background:#fbfcfe!important;color:#203851!important;font-size:14px!important;margin:5px 0!important}
+body.ae-workspace-v2 #authModal .form-input::placeholder{color:#8796a8!important}
+body.ae-workspace-v2 #authModal .btn-google,body.ae-workspace-v2 #authModal .btn-facebook{min-height:44px!important;width:100%!important;border-radius:10px!important;box-shadow:none!important;font-size:12px!important;margin:4px 0!important}
+body.ae-workspace-v2 #authModal .btn-primary{min-height:46px!important;border-radius:10px!important;background:#214f87!important;color:#fff!important}
+body.ae-workspace-v2 #authModal label span{line-height:1.6!important}
+@media(max-width:900px){
+ body.ae-workspace-v2 #aethrionWorkspaceSidebar{width:286px;transform:translateX(-105%);box-shadow:18px 0 45px rgba(15,38,64,.16)}
+ body.ae-workspace-v2.ae-sidebar-open #aethrionWorkspaceSidebar{transform:translateX(0)}
+ body.ae-workspace-v2 #aethrionWorkspaceMobileToggle{display:grid;place-items:center}
+ body.ae-workspace-v2 #aethrionWorkspaceScrim{display:block;position:fixed;inset:0;z-index:100090;background:rgba(11,28,47,.36);backdrop-filter:blur(2px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s}
+ body.ae-workspace-v2.ae-sidebar-open #aethrionWorkspaceScrim{opacity:1;visibility:visible;pointer-events:auto}
+ body.ae-workspace-v2.logged-in-user #dashboardArea{margin-left:0!important;width:100%!important;padding:68px 14px 18px!important}
+ body.ae-workspace-v2.logged-in-user #dashboardArea .dashboard-content-wrapper{width:100%}
+ body.ae-workspace-v2.logged-in-user #aethrionExperienceWelcome{min-height:calc(100dvh - 100px);padding:24px 20px;border-radius:18px}
+ .aew-v2 h1{font-size:clamp(32px,9vw,50px)}
+ .aew-v2 p{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){body.ae-workspace-v2 *,body.ae-workspace-v2 *::before,body.ae-workspace-v2 *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
