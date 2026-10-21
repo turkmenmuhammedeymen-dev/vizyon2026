@@ -139,6 +139,186 @@ function enableScrollMotion() {
     observer.observe(el);
   });
 }
+
+function closeGoogleBridge() {
+  var overlay = document.getElementById('aethrionGoogleBridge');
+  if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+  window._googleLoginInProgress = false;
+}
+function googleBridgeNotice(message) {
+  var note = document.getElementById('aethrionGoogleBridgeNotice');
+  if (note) { note.textContent = message; note.style.display = 'block'; }
+}
+function ensureGoogleBridge() {
+  var overlay = document.getElementById('aethrionGoogleBridge');
+  if (overlay) return overlay;
+  overlay = document.createElement('div');
+  overlay.id = 'aethrionGoogleBridge';
+  overlay.className = 'ae-google-bridge';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-labelledby', 'aethrionGoogleBridgeTitle');
+  overlay.innerHTML =
+    '<div class="ae-google-bridge-card">' +
+      '<button type="button" class="ae-google-bridge-close" aria-label="Kapat">×</button>' +
+      '<div class="ae-google-bridge-mark" aria-hidden="true">A</div>' +
+      '<p class="ae-google-bridge-eyebrow">AETHRION ACCOUNT</p>' +
+      '<h2 id="aethrionGoogleBridgeTitle">Google ile devam et</h2>' +
+      '<p class="ae-google-bridge-copy">Sözleşme ve gizlilik onayınız alındı. Google hesabınızı seçmek için aşağıdaki güvenli Google düğmesine dokunun.</p>' +
+      '<div id="aethrionGoogleButtonMount" class="ae-google-button-mount"></div>' +
+      '<p id="aethrionGoogleBridgeNotice" class="ae-google-bridge-notice" role="status" style="display:none"></p>' +
+      '<p class="ae-google-bridge-foot">Google kimlik doğrulaması, AETHRION sunucu doğrulamasıyla tamamlanır.</p>' +
+    '</div>';
+  overlay.addEventListener('click', function (event) {
+    if (event.target === overlay || (event.target && event.target.closest && event.target.closest('.ae-google-bridge-close'))) closeGoogleBridge();
+  });
+  document.body.appendChild(overlay);
+  return overlay;
+}
+function renderGoogleBridge(attempt) {
+  attempt = attempt || 0;
+  var overlay = ensureGoogleBridge();
+  var mount = document.getElementById('aethrionGoogleButtonMount');
+  if (!mount) return;
+  if (window.google && google.accounts && google.accounts.id && window._googleGISReady) {
+    try {
+      mount.innerHTML = '';
+      google.accounts.id.renderButton(mount, {
+        type: 'standard',
+        theme: 'outline',
+        size: 'large',
+        text: 'continue_with',
+        shape: 'pill',
+        logo_alignment: 'left',
+        width: Math.min(340, Math.max(240, Math.floor((window.innerWidth || 360) - 76)))
+      });
+      overlay.setAttribute('data-google-ready', 'true');
+      var button = mount.querySelector('iframe');
+      if (button) button.setAttribute('title', 'Google ile güvenli giriş');
+      return;
+    } catch (error) {
+      console.error('[AETHRION] Google düğmesi oluşturulamadı:', error);
+      googleBridgeNotice('Google giriş düğmesi hazırlanamadı. Google Identity Services ve izinli alan adı ayarlarını kontrol edin.');
+      return;
+    }
+  }
+  if (typeof window.handleGoogleLibraryLoad === 'function') {
+    try { window.handleGoogleLibraryLoad(); } catch (e) {}
+  }
+  if (attempt < 20) {
+    window.setTimeout(function () { renderGoogleBridge(attempt + 1); }, 350);
+  } else {
+    googleBridgeNotice('Google hizmeti yüklenemedi. Bağlantıyı kontrol edip yeniden deneyin. Sorun sürerse Google Cloud Console içindeki izinli alan adlarını ve AETHRION sunucu doğrulama işlevini kontrol etmek gerekir.');
+    var retry = document.createElement('button');
+    retry.type = 'button';
+    retry.className = 'ae-google-bridge-retry';
+    retry.textContent = 'Yeniden dene';
+    retry.addEventListener('click', function () {
+      retry.remove();
+      googleBridgeNotice('Google hizmeti yeniden yükleniyor…');
+      renderGoogleBridge(0);
+    });
+    overlay.querySelector('.ae-google-bridge-card').appendChild(retry);
+  }
+}
+function installAuthFeedbackRepair() {
+  if (typeof window.showNotification === 'function' && !window.showNotification.__aeAuthFeedbackRepair) {
+    var originalNotify = window.showNotification;
+    var emailFallbackShown = false;
+    var repairedNotify = function (message, type) {
+      var msg = String(message == null ? '' : message);
+      if (type === 'warning' && /Kayıt başarılı!\s*Doğrulama kodunuz:/i.test(msg)) emailFallbackShown = true;
+      if (emailFallbackShown && /Kayıt başarılı!\s*Doğrulama kodunuz mail adresinize gönderildi/i.test(msg)) {
+        emailFallbackShown = false;
+        return;
+      }
+      if (type === 'error') {
+        if (/username.*(?:already taken|taken)|(?:already taken|taken).*username/i.test(msg)) {
+          msg = 'Bu kullanıcı adı zaten kullanılıyor. Farklı bir kullanıcı adı deneyin.';
+        } else if (/email.*(?:already taken|already exists|taken)|(?:already taken|already exists|taken).*email/i.test(msg)) {
+          msg = 'Bu e-posta adresiyle zaten hesap var. Giriş yapmayı veya şifre sıfırlamayı deneyin.';
+        } else if (/invalid email|email address is invalid/i.test(msg)) {
+          msg = 'E-posta adresi geçerli görünmüyor. Adresi kontrol edip tekrar deneyin.';
+        } else if (/failed to fetch|network request failed|network error|connection.*(?:failed|error)|timed? out/i.test(msg)) {
+          msg = 'Sunucuya bağlanılamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.';
+        } else if (/verifyGoogleToken|Google.*(?:Cloud Code|server).*function/i.test(msg)) {
+          msg = 'Google hesabı alındı ancak sunucu doğrulaması tamamlanamadı. Back4App Cloud Code içindeki verifyGoogleToken işlevinin dağıtımını ve günlüklerini kontrol etmek gerekiyor.';
+        } else if (/sendEmail|verifyUser|Cloud Code function/i.test(msg)) {
+          msg = 'Hesap hizmetindeki sunucu işlevi yanıt vermedi. Back4App Cloud Code dağıtımını ve işlev günlüklerini kontrol etmek gerekiyor.';
+        }
+      }
+      return originalNotify.call(this, msg, type);
+    };
+    repairedNotify.__aeAuthFeedbackRepair = true;
+    window.showNotification = repairedNotify;
+  }
+}
+function installAuthSubmitGuards() {
+  [
+    { name: 'handleRegister', selector: '#formRegister button[onclick*="handleRegister"]', busy: 'Hesap oluşturuluyor…', idle: 'Kayıt Ol' },
+    { name: 'handleLogin', selector: '#formLogin button[onclick*="handleLogin"]', busy: 'Giriş yapılıyor…', idle: 'Giriş Yap' }
+  ].forEach(function (config) {
+    var original = window[config.name];
+    if (typeof original !== 'function' || original.__aeSubmitGuard) return;
+    var wrapped = function () {
+      var button = document.querySelector(config.selector);
+      if (button && button.disabled) return;
+      var previousText = button ? button.textContent : '';
+      if (button) {
+        button.disabled = true;
+        button.setAttribute('aria-busy', 'true');
+        button.textContent = config.busy;
+      }
+      var result;
+      try { result = original.apply(this, arguments); }
+      catch (error) {
+        if (button) { button.disabled = false; button.removeAttribute('aria-busy'); button.textContent = previousText || config.idle; }
+        throw error;
+      }
+      return Promise.resolve(result).finally(function () {
+        window.setTimeout(function () {
+          if (!button) return;
+          button.disabled = false;
+          button.removeAttribute('aria-busy');
+          button.textContent = previousText || config.idle;
+        }, 250);
+      });
+    };
+    wrapped.__aeSubmitGuard = true;
+    wrapped.__aeOriginal = original;
+    window[config.name] = wrapped;
+  });
+}
+function installGoogleLoginRepair() {
+  if (typeof window.handleGoogleLoginResponse === 'function' && !window.handleGoogleLoginResponse.__aeBridgeWrapped) {
+    var originalResponse = window.handleGoogleLoginResponse;
+    var wrappedResponse = async function () {
+      window._googleLoginInProgress = true;
+      try { return await originalResponse.apply(this, arguments); }
+      finally { window.setTimeout(closeGoogleBridge, 150); }
+    };
+    wrappedResponse.__aeBridgeWrapped = true;
+    wrappedResponse.__aeOriginal = originalResponse;
+    window.handleGoogleLoginResponse = wrappedResponse;
+  }
+  if (typeof window.loginWithGoogle === 'function' && !window.loginWithGoogle.__aeGoogleButtonRepair) {
+    var repairedGoogleLogin = function () {
+      if (!document.body) return;
+      closeGoogleBridge();
+      ensureGoogleBridge();
+      window._googleLoginInProgress = false;
+      renderGoogleBridge(0);
+    };
+    repairedGoogleLogin.__aeGoogleButtonRepair = true;
+    window.loginWithGoogle = repairedGoogleLogin;
+  }
+}
+function installAuthRepairs() {
+  installAuthFeedbackRepair();
+  installAuthSubmitGuards();
+  installGoogleLoginRepair();
+}
+
 function polish() {
   loadLateTheme();
   updateBrandMetadata();
@@ -146,6 +326,7 @@ function polish() {
   ensurePolicyLinks();
   if (document.body) scan(document.body);
   enableScrollMotion();
+  installAuthRepairs();
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', polish, { once: true });
 else polish();
