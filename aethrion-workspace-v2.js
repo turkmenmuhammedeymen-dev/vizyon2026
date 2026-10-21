@@ -1,0 +1,41 @@
+(function(){
+'use strict';
+var groups={CORE:'Yapay zekâ',CREATE:'Üretim araçları',PLATFORM:'Platform',ADVANCED:'Geliştirici araçları',ACCOUNT:'Hesap',OTHER:'Diğer özellikler'};
+var fallback=[
+{group:'CORE',icon:'✦',name:'AETHRION AI',action:'openFullAIPanel'},
+{group:'CORE',icon:'◈',name:'AETHRION Agents',action:'openAethrionAlPanel'},
+{group:'CORE',icon:'◎',name:'AETHRION Coach',action:'openKocPanel'},
+{group:'CORE',icon:'◉',name:'Model kataloğu',action:'openModelsShowcase'},
+{group:'CREATE',icon:'◇',name:'3D Studio',action:'open3DBuilder',href:'/3d-studio.html'},
+{group:'CREATE',icon:'▶',name:'Video editör',action:'openVideoEditor'},
+{group:'CREATE',icon:'▣',name:'Video stüdyosu',action:'openVideoStudio'},
+{group:'PLATFORM',icon:'⌂',name:'Topluluk ve takımlar',action:'toggleTeamPage',href:'/topluluk.html'},
+{group:'PLATFORM',icon:'▤',name:'Projelerim',action:'scrollToProjects'},
+{group:'ADVANCED',icon:'⌘',name:'A27 API anahtarı',action:'openA27ApiKeyGenerator',href:'/api.html#keys'},
+{group:'ADVANCED',icon:'↗',name:'A27 API rehberi',action:'openA27ApiGuide',href:'/api.html'},
+{group:'ADVANCED',icon:'▥',name:'Dokümantasyon',action:'openDocumentation',href:'/dokumantasyon.html'},
+{group:'ACCOUNT',icon:'⚙',name:'Ayarlar',action:'openSettingsModal'},
+{group:'ACCOUNT',icon:'◌',name:'Hesap bilgilerim',action:'openAccountInfo'}];
+function $(s,r){return(r||document).querySelector(s)}
+function all(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]})}
+function user(){try{if(window.currentUser)return window.currentUser;if(window.Parse&&Parse.User&&Parse.User.current())return Parse.User.current()}catch(e){}try{if(document.body.classList.contains('logged-in-user'))return JSON.parse(localStorage.getItem('aethrion_user')||'null')}catch(e){}return null}
+function features(){var source=Array.isArray(window.FEATURE_LIST)&&window.FEATURE_LIST.length?window.FEATURE_LIST:fallback,seen={};return source.filter(function(f){var k=f&&(f.action||f.name||f.title);if(!k||seen[k])return false;seen[k]=1;return true}).map(function(f){return{group:f.group||'OTHER',icon:f.icon||'•',name:f.name||f.title,action:f.action||f.name||f.title,href:f.href||''}})}
+function render(q){var list=$('#aewsbList');if(!list)return;var query=String(q||'').toLocaleLowerCase('tr-TR'),items=features().filter(function(f){return !query||(f.name+' '+(groups[f.group]||f.group)).toLocaleLowerCase('tr-TR').indexOf(query)>=0}),by={},html='';items.forEach(function(f){(by[f.group]||(by[f.group]=[])).push(f)});Object.keys(by).forEach(function(g){html+='<div class="aewsb-group">'+esc(groups[g]||g)+'</div>';by[g].forEach(function(f){html+='<button type="button" class="aewsb-item" data-aew-action="'+esc(f.action)+'" data-aew-name="'+esc(f.name)+'" data-aew-href="'+esc(f.href)+'"><span class="aewsb-icon">'+esc(f.icon)+'</span><span class="aewsb-label">'+esc(f.name)+'</span><span class="aewsb-arrow">›</span></button>'})});list.innerHTML=html||'<p style="padding:12px;color:#718197">Özellik bulunamadı.</p>'}
+function closeMobile(){document.body.classList.remove('ae-sidebar-open')}
+function home(){try{if(typeof window.safeFeatureCall==='function')window.safeFeatureCall('goHome','Ana ekran');else if(typeof window.showWelcomeScreen==='function')window.showWelcomeScreen()}catch(e){}closeMobile();setTimeout(cleanWelcome,120)}
+function cleanWelcome(){var w=$('#aethrionExperienceWelcome');if(!w||w.querySelector('.aew-v2'))return;var u=user(),name='Kullanıcı',role='user';try{name=(u&&(typeof u.get==='function'?(u.get('name')||u.get('username')):(u.name||u.username)))||'Kullanıcı';role=(u&&typeof u.get==='function'&&u.get('role'))||(u&&u.role)||'user'}catch(e){}var roles={founder:'Kurucu',admin:'Yönetici',moderator:'Moderatör',beta:'Beta üyesi',user:'Üye'};w.innerHTML='<div class="aew-v2"><div class="aew-v2-kicker"><i></i> AETHRION · KİŞİSEL ÇALIŞMA ALANI</div><h1>Hoş geldiniz,<span>'+esc(name)+'</span></h1><div class="aew-v2-rule"></div><div class="aew-v2-meta"><span class="aew-v2-role">'+esc(roles[String(role).toLowerCase()]||'Üye')+'</span><span class="aew-v2-role">Güvenli oturum</span></div><p>Yapay zekâ, üretim araçları ve geliştirici hizmetleri tek bir çalışma alanında. Sol menüden bir özellik seçerek doğrudan ilgili araca geçin.</p><p class="aew-v2-hint">Bu ana ekran yalnızca karşılama alanıdır; özellik kartları burada tekrar gösterilmez.</p></div>'}
+function setup(){
+ document.body.classList.add('ae-workspace-v2');
+ if(!$('#aethrionWorkspaceSidebar')){var side=document.createElement('aside');side.id='aethrionWorkspaceSidebar';side.innerHTML='<div class="aewsb-brand"><div class="aewsb-logo"><img src="/aethrion-mark.svg" alt="AETHRION" onerror="this.onerror=null;this.src=\'/logo.svg\'"></div><div><strong>AETHRION</strong><small>INTELLIGENCE WITHOUT LIMITS</small></div></div><button class="aewsb-home" type="button" data-aew-home>⌂ &nbsp; Ana ekran</button><div class="aewsb-search"><input type="search" id="aewsbSearch" placeholder="Özellik ara…" aria-label="Özellik ara"></div><nav class="aewsb-scroll" id="aewsbList" aria-label="Tüm özellikler"></nav><div class="aewsb-foot">AETHRION · Tek çalışma alanı</div>';document.body.appendChild(side);side.addEventListener('click',function(e){var h=e.target.closest('[data-aew-home]');if(h){home();return}var b=e.target.closest('[data-aew-action]');if(!b)return;closeMobile();all('.aewsb-item').forEach(function(n){n.removeAttribute('aria-current')});b.setAttribute('aria-current','page');var a=b.dataset.aewAction,n=b.dataset.aewName,url=b.dataset.aewHref;if(typeof window.safeFeatureCall==='function')window.safeFeatureCall(a,n,url);else if(url)location.href=url;else if(typeof window[a]==='function')window[a]();else if(window.showNotification)window.showNotification('Bu özellik için açılış bağlantısı bulunamadı.','warning')});$('#aewsbSearch',side).addEventListener('input',function(){render(this.value)})}
+ if(!$('#aethrionWorkspaceMobileToggle')){var t=document.createElement('button');t.id='aethrionWorkspaceMobileToggle';t.type='button';t.setAttribute('aria-label','Yan menüyü aç');t.textContent='☰';t.onclick=function(){document.body.classList.toggle('ae-sidebar-open')};document.body.appendChild(t)}
+ if(!$('#aethrionWorkspaceScrim')){var sc=document.createElement('div');sc.id='aethrionWorkspaceScrim';sc.onclick=closeMobile;document.body.appendChild(sc)}
+ render($('#aewsbSearch')?$('#aewsbSearch').value:'');
+ if(user()||document.body.classList.contains('logged-in-user')){document.body.classList.add('logged-in-user');var old=$('#aethrionWelcomeScreen');if(old)old.style.display='none';var w=$('#aethrionExperienceWelcome');if(w){cleanWelcome();var p=w.parentElement;if(p)Array.prototype.forEach.call(p.children,function(c){if(c!==w)c.style.setProperty('display','none','important')})}}
+ ['#aethrionFeaturesTrigger','#aethrionFeaturesPanel','#aethrionFeaturesBackdrop','#aethrionExperienceDrawer','#aethrionExperienceBackdrop','#aethrionSidebar','#aethrionSidebarToggle','#aethrionSidebarBackdrop'].forEach(function(s){all(s).forEach(function(el){el.style.setProperty('display','none','important')})});
+}
+function authPolish(){var modal=$('#authModal');if(!modal)return;[['rName','text','name'],['rEmail','email','email'],['rUsername','text','username'],['rPass','password','new-password'],['rPass2','password','new-password'],['lEmail','email','email'],['lPass','password','current-password'],['verifyEmail','email','email']].forEach(function(a){var e=$('#'+a[0]);if(e){e.type=a[1];e.autocomplete=a[2];if(a[1]==='email')e.inputMode='email'}})}
+function start(){setup();authPolish();var observer=new MutationObserver(function(){if(user()||document.body.classList.contains('logged-in-user'))setup();authPolish()});observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});[400,1200,2600,5000].forEach(function(t){setTimeout(setup,t)})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+window.addEventListener('load',function(){setTimeout(setup,250)});
+})();
