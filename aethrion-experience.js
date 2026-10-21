@@ -227,7 +227,7 @@
       var trigger=e.target&&e.target.closest?e.target.closest('#aethrionFeaturesTrigger,#aethrionFeaturesButton,[data-aethrion-features-trigger],button,a,[role="button"]'):null;
       if(!trigger||trigger.closest('#aethrionExperienceDrawer'))return;
       var text=((trigger.innerText||trigger.textContent||'')+' '+(trigger.getAttribute('aria-label')||'')+' '+(trigger.getAttribute('title')||'')+' '+(trigger.id||'')).toLocaleLowerCase('tr-TR');
-      if(/aethrionfeaturestrigger|aethrionfeaturesbutton|özellikler|tüm özellikler|features menu|feature menu|sidebar|özellik menüsü/.test(text)){
+      var explicitTrigger=(trigger.id==='aethrionFeaturesTrigger'||trigger.id==='aethrionFeaturesButton'||trigger.hasAttribute('data-aethrion-features-trigger'));var menuLabel=/aethrionfeaturestrigger|aethrionfeaturesbutton|tüm özellikler|features menu|feature menu|sidebar|özellik menüsü|özellik paneli/.test(text);var inDashboard=!!trigger.closest('#dashboardArea')||document.body.classList.contains('logged-in-user');if(explicitTrigger||menuLabel||(inDashboard&&/özellikler|features/.test(text))){
         e.preventDefault();e.stopImmediatePropagation();openDrawer();
       }
     },true);
