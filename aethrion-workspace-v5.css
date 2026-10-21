@@ -93,3 +93,24 @@ body.ae-shell-on .aews-link:focus-visible,body.ae-shell-on #aewsMobileToggle:foc
  body.ae-shell-on .aew-name{font-size:clamp(30px,8.5vw,40px)!important;line-height:1.12!important;overflow-wrap:anywhere}
  body.ae-shell-on .aew-copy{font-size:14px!important;line-height:1.75!important}
 }
+/* Workspace v6 final cascade: prevent the legacy shell from competing with the active shell. */
+body.ae-shell-on #aeWorkspaceSidebar{position:fixed!important;inset:0 auto 0 0!important;z-index:10050!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;background:#fff!important;border-right:1px solid #dce5ef!important;color:#172b43!important;box-shadow:8px 0 28px rgba(23,43,67,.06)!important}
+body.ae-shell-on #aeWorkspaceSidebar .aews-brand{display:flex!important;align-items:center!important;gap:11px!important}
+body.ae-shell-on #aeWorkspaceSidebar .aews-nav{display:block!important;flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important}
+body.ae-shell-on #aeWorkspaceSidebar .aews-link{display:flex!important;align-items:center!important;width:100%!important;box-sizing:border-box!important}
+body.ae-shell-on.aews-home-view #dashboardArea .dashboard-content-wrapper>*:not(#aethrionExperienceWelcome){display:none!important}
+body.ae-shell-on.aews-home-view #dashboardArea .dashboard-content-wrapper>#aethrionExperienceWelcome{display:flex!important}
+body.ae-shell-on.aews-feature-view #aethrionExperienceWelcome{display:none!important}
+body.ae-shell-on.aews-feature-view #dashboardArea .dashboard-content-wrapper>*:not(#aethrionExperienceWelcome){display:none!important}
+body.ae-shell-on.aews-feature-view #dashboardArea .dashboard-content-wrapper>.aews-active-feature{display:block!important}
+body.ae-shell-on #aewsMobileToggle{z-index:10060!important;display:none;align-items:center;justify-content:center}
+body.ae-shell-on #aewsMobileShade{z-index:10030!important}
+@media(max-width:900px){
+ body.ae-shell-on #aeWorkspaceSidebar{transform:translateX(-105%)!important;transition:transform .22s ease!important;width:min(320px,88vw)!important}
+ body.ae-shell-on.aews-nav-open #aeWorkspaceSidebar{transform:translateX(0)!important}
+ body.ae-shell-on #aewsMobileToggle{display:flex!important}
+ body.ae-shell-on #aewsMobileShade{display:none!important}
+ body.ae-shell-on.aews-nav-open #aewsMobileShade{display:block!important}
+ body.ae-shell-on #dashboardArea .dashboard-content-wrapper{margin-left:0!important;padding:70px 14px 20px!important}
+}
+@media(prefers-reduced-motion:reduce){body.ae-shell-on #aeWorkspaceSidebar{transition:none!important}}
