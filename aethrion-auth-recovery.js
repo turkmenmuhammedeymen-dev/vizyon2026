@@ -54,3 +54,5 @@ function boot(){installGoogleRecovery();improveAuthForms()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 setTimeout(boot,800);setTimeout(boot,2200);
 })();
+
+(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='/aethrion-workspace-v2.css?v=20261022-v1';document.head.appendChild(l);var s=document.createElement('script');s.src='/aethrion-workspace-v2.js?v=20261022-v1';s.defer=true;document.body.appendChild(s)})();
