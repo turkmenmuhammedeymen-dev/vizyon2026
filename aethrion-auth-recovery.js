@@ -55,7 +55,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 setTimeout(boot,800);setTimeout(boot,2200);
 })();
 
-(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='/aethrion-workspace-v6.css?v=20261022-workspace8';document.head.appendChild(l);var s=document.createElement('script');s.src='/aethrion-workspace-v6.js?v=20261022-workspace8';s.async=true;document.body.appendChild(s)})();
+(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='/aethrion-workspace-v6.css?v=20261022-workspace9';document.head.appendChild(l);var s=document.createElement('script');s.src='/aethrion-workspace-v6.js?v=20261022-workspace9';s.async=true;document.body.appendChild(s)})();
 
 
 /* AETHRION auth guard v4: prevent duplicate submissions and wait for GIS initialization */
