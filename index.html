@@ -30201,7 +30201,7 @@ window.startVoiceChatRecognition = function () {
     recognition.interimResults = true;
     window.voiceChatRecognition = recognition;
 
-    var transcriptEl = document.getElementById('vzVoiceTranscript');
+    var transcriptEl = document.getElementById('aaVoiceTranscript') || document.getElementById('vzVoiceTranscript');
 
     recognition.onstart = function () {
         if (transcriptEl) transcriptEl.innerHTML = '<span class="vz-voice-user-text">🎤 Sen:</span> Konuşmaya başla...';
@@ -30219,7 +30219,7 @@ window.startVoiceChatRecognition = function () {
             }
         }
         if (transcriptEl) {
-            transcriptEl.innerHTML = '<span class="vz-voice-user-text">🎤 Sen:</span> ' + (finalTranscript + interim);
+            transcriptEl.innerHTML = '<span class="vz-voice-user-text">🎤 Sen:</span> ' + window.escapeHtml(finalTranscript + interim);
         }
         if (finalTranscript.trim().length > 2) {
             var userMsg = finalTranscript.trim();
@@ -30249,7 +30249,7 @@ window.processVoiceChatMessage = async function (userMsg) {
         window.addLogInfo('Sesli sohbet mesajı: ' + userMsg.substring(0, 50));
     }
 
-    var transcriptEl = document.getElementById('vzVoiceTranscript');
+    var transcriptEl = document.getElementById('aaVoiceTranscript') || document.getElementById('vzVoiceTranscript');
     if (transcriptEl) {
         transcriptEl.innerHTML = '<span class="vz-voice-user-text">🎤 Sen:</span> ' +
             window.escapeHtml(userMsg) +
@@ -32006,7 +32006,7 @@ window.openVoiceChatFullscreen = async function () {
         }
     }
 
-    var modal = document.getElementById('voiceChatFullscreen') || document.getElementById('vzVoiceFullscreen');
+    var modal = document.getElementById('aaVoiceFullscreen') || document.getElementById('voiceChatFullscreen') || document.getElementById('vzVoiceFullscreen');
     if (!modal) {
         console.warn('Sesli sohbet modali bulunamadı');
         return;
@@ -32054,7 +32054,7 @@ window.openVoiceChatFullscreen = async function () {
 };
 
 window.closeVoiceChatFullscreen = function () {
-    var modal = document.getElementById('voiceChatFullscreen') || document.getElementById('vzVoiceFullscreen');
+    var modal = document.getElementById('aaVoiceFullscreen') || document.getElementById('voiceChatFullscreen') || document.getElementById('vzVoiceFullscreen');
     if (modal) {
         modal.classList.remove('open');
         modal.style.display = 'none';
@@ -37050,6 +37050,7 @@ window.jarvisStream = null;
 window.jarvisTranscript = '';
 window.jarvisFinalTranscript = '';
 window.jarvisProcessing = false;
+window.jarvisCommandPending = false;
 window.jarvisStatusEl = null;
 window.jarvisTranscriptEl = null;
 
@@ -37194,9 +37195,9 @@ function startJarvisWakeWordListening() {
         var combined = (finalTranscript + interim).toLowerCase();
 
         // Wake word algılama
-        if (combined.includes('jarvis') || combined.includes('hey jarvis') || combined.includes('hey jarvis')) {
+        if (combined.includes('jarvis')) {
             if (!window.jarvisListening) {
-                window.jarvisListening = true;
+                window.jarvisCommandPending = true;
                 finalTranscript = '';
                 recognition.stop();
                 updateJarvisStatus('🔴 Sizi dinliyorum...', 'var(--danger)');
@@ -37219,7 +37220,7 @@ function startJarvisWakeWordListening() {
     };
 
     recognition.onend = function () {
-        if (window.jarvisActive && !window.jarvisListening) {
+        if (window.jarvisActive && !window.jarvisListening && !window.jarvisCommandPending) {
             try { recognition.start(); } catch (e) {}
         }
     };
@@ -37247,7 +37248,8 @@ function startJarvisCommandListening() {
     var finalTranscript = '';
 
     recognition.onstart = function () {
-        window.jarvisListening = true;
+            window.jarvisCommandPending = false;
+            window.jarvisListening = true;
         updateJarvisStatus('🔴 Sizi dinliyorum...', 'var(--danger)');
     };
 
@@ -37268,13 +37270,15 @@ function startJarvisCommandListening() {
 
     recognition.onerror = function (event) {
         console.warn('JARVIS komut hatası:', event.error);
+        window.jarvisCommandPending = false;
         window.jarvisListening = false;
         updateJarvisStatus('🎤 Dinleniyor...', 'var(--ice)');
         startJarvisWakeWordListening();
     };
 
     recognition.onend = function () {
-        window.jarvisListening = false;
+        window.jarvisCommandPending = false;
+            window.jarvisListening = false;
         if (finalTranscript.trim()) {
             processJarvisCommand(finalTranscript.trim());
         } else {
@@ -37285,6 +37289,7 @@ function startJarvisCommandListening() {
 
     try { recognition.start(); } catch (e) {
         console.error('JARVIS komut başlatılamadı:', e);
+        window.jarvisCommandPending = false;
         window.jarvisListening = false;
         updateJarvisStatus('🎤 Dinleniyor...', 'var(--ice)');
     }
@@ -39492,9 +39497,9 @@ window.checkFirstTimeSetup = async function () {
             var combined = (finalTranscript + interim).toLowerCase();
 
             // Wake word algılama
-            if (combined.includes('jarvis') || combined.includes('hey jarvis') || combined.includes('hey jarvis')) {
+            if (combined.includes('jarvis')) {
                 if (!window.jarvisListening) {
-                    window.jarvisListening = true;
+                    window.jarvisCommandPending = true;
                     finalTranscript = '';
                     recognition.stop();
                     updateJarvisStatus('🔴 Sizi dinliyorum...', 'var(--danger)');
@@ -39517,7 +39522,7 @@ window.checkFirstTimeSetup = async function () {
         };
 
         recognition.onend = function () {
-            if (window.jarvisActive && !window.jarvisListening) {
+            if (window.jarvisActive && !window.jarvisListening && !window.jarvisCommandPending) {
                 try { recognition.start(); } catch (e) {}
             }
         };
@@ -39547,6 +39552,7 @@ window.checkFirstTimeSetup = async function () {
         var finalTranscript = '';
 
         recognition.onstart = function () {
+            window.jarvisCommandPending = false;
             window.jarvisListening = true;
             updateJarvisStatus('🔴 Sizi dinliyorum...', 'var(--danger)');
         };
@@ -39568,12 +39574,14 @@ window.checkFirstTimeSetup = async function () {
 
         recognition.onerror = function (event) {
             console.warn('JARVIS komut hatası:', event.error);
-            window.jarvisListening = false;
+            window.jarvisCommandPending = false;
+        window.jarvisListening = false;
             updateJarvisStatus('🎤 Dinleniyor...', 'var(--ice)');
             startJarvisWakeWordListening();
         };
 
         recognition.onend = function () {
+            window.jarvisCommandPending = false;
             window.jarvisListening = false;
             if (finalTranscript.trim()) {
                 processJarvisCommand(finalTranscript.trim());
@@ -39585,7 +39593,8 @@ window.checkFirstTimeSetup = async function () {
 
         try { recognition.start(); } catch (e) {
             console.error('JARVIS komut başlatılamadı:', e);
-            window.jarvisListening = false;
+            window.jarvisCommandPending = false;
+        window.jarvisListening = false;
             updateJarvisStatus('🎤 Dinleniyor...', 'var(--ice)');
         }
     }
@@ -42358,7 +42367,7 @@ window.startVoiceChatRecognition = function () {
     recognition.interimResults = true;
     window.voiceChatRecognition = recognition;
 
-    var transcriptEl = document.getElementById('vzVoiceTranscript');
+    var transcriptEl = document.getElementById('aaVoiceTranscript') || document.getElementById('vzVoiceTranscript');
 
     recognition.onstart = function () {
         if (transcriptEl) transcriptEl.innerHTML = '<span class="vz-voice-user-text">🎤 Sen:</span> Konuşmaya başla...';
@@ -42376,7 +42385,7 @@ window.startVoiceChatRecognition = function () {
             }
         }
         if (transcriptEl) {
-            transcriptEl.innerHTML = '<span class="vz-voice-user-text">🎤 Sen:</span> ' + (finalTranscript + interim);
+            transcriptEl.innerHTML = '<span class="vz-voice-user-text">🎤 Sen:</span> ' + window.escapeHtml(finalTranscript + interim);
         }
         if (finalTranscript.trim().length > 2) {
             var userMsg = finalTranscript.trim();
@@ -42406,7 +42415,7 @@ window.processVoiceChatMessage = async function (userMsg) {
         window.addLogInfo('Sesli sohbet mesajı: ' + userMsg.substring(0, 50));
     }
 
-    var transcriptEl = document.getElementById('vzVoiceTranscript');
+    var transcriptEl = document.getElementById('aaVoiceTranscript') || document.getElementById('vzVoiceTranscript');
     if (transcriptEl) {
         transcriptEl.innerHTML = '<span class="vz-voice-user-text">🎤 Sen:</span> ' +
             window.escapeHtml(userMsg) +
@@ -44183,7 +44192,7 @@ window.openVoiceChatFullscreen = async function () {
         }
     }
 
-    var modal = document.getElementById('voiceChatFullscreen') || document.getElementById('vzVoiceFullscreen');
+    var modal = document.getElementById('aaVoiceFullscreen') || document.getElementById('voiceChatFullscreen') || document.getElementById('vzVoiceFullscreen');
     if (!modal) {
         console.warn('Sesli sohbet modali bulunamadı');
         return;
@@ -44228,7 +44237,7 @@ window.openVoiceChatFullscreen = async function () {
 };
 
 window.closeVoiceChatFullscreen = function () {
-    var modal = document.getElementById('voiceChatFullscreen') || document.getElementById('vzVoiceFullscreen');
+    var modal = document.getElementById('aaVoiceFullscreen') || document.getElementById('voiceChatFullscreen') || document.getElementById('vzVoiceFullscreen');
     if (modal) {
         modal.classList.remove('open');
         modal.style.display = 'none';
@@ -44934,9 +44943,9 @@ window.filterComments = function (minRating) {
             }
             var combined = (finalTranscript + interim).toLowerCase();
 
-            if (combined.includes('jarvis') || combined.includes('hey jarvis') || combined.includes('hey jarvis')) {
+            if (combined.includes('jarvis')) {
                 if (!window.jarvisListening) {
-                    window.jarvisListening = true;
+                    window.jarvisCommandPending = true;
                     finalTranscript = '';
                     recognition.stop();
                     updateJarvisStatus('🔴 Sizi dinliyorum...', 'var(--danger)');
@@ -44958,7 +44967,7 @@ window.filterComments = function (minRating) {
         };
 
         recognition.onend = function () {
-            if (window.jarvisActive && !window.jarvisListening) {
+            if (window.jarvisActive && !window.jarvisListening && !window.jarvisCommandPending) {
                 try { recognition.start(); } catch (e) {}
             }
         };
@@ -44985,6 +44994,7 @@ window.filterComments = function (minRating) {
         var finalTranscript = '';
 
         recognition.onstart = function () {
+            window.jarvisCommandPending = false;
             window.jarvisListening = true;
             updateJarvisStatus('🔴 Sizi dinliyorum...', 'var(--danger)');
         };
@@ -45006,12 +45016,14 @@ window.filterComments = function (minRating) {
 
         recognition.onerror = function (event) {
             console.warn('JARVIS komut hatası:', event.error);
-            window.jarvisListening = false;
+            window.jarvisCommandPending = false;
+        window.jarvisListening = false;
             updateJarvisStatus('🎤 Dinleniyor...', 'var(--ice)');
             startJarvisWakeWordListening();
         };
 
         recognition.onend = function () {
+            window.jarvisCommandPending = false;
             window.jarvisListening = false;
             if (finalTranscript.trim()) {
                 processJarvisCommand(finalTranscript.trim());
@@ -45023,7 +45035,8 @@ window.filterComments = function (minRating) {
 
         try { recognition.start(); } catch (e) {
             console.error('JARVIS komut başlatılamadı:', e);
-            window.jarvisListening = false;
+            window.jarvisCommandPending = false;
+        window.jarvisListening = false;
             updateJarvisStatus('🎤 Dinleniyor...', 'var(--ice)');
         }
     }
