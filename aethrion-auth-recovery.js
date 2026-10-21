@@ -56,3 +56,37 @@ setTimeout(boot,800);setTimeout(boot,2200);
 })();
 
 (function(){var l=document.createElement('link');l.rel='stylesheet';l.href='/aethrion-workspace-v2.css?v=20261022-v1';document.head.appendChild(l);var s=document.createElement('script');s.src='/aethrion-workspace-v2.js?v=20261022-v1';s.defer=true;document.body.appendChild(s)})();
+
+
+/* AETHRION auth guard v4: prevent duplicate submissions and wait for GIS initialization */
+(function(){
+ 'use strict';
+ var wrapped=Object.create(null);
+ function notify(message,type){
+  try{if(typeof window.showNotification==='function')window.showNotification(message,type||'warning');else console.warn('[AETHRION Auth]',message)}catch(e){}
+ }
+ function wrapSubmit(name,selector,label){
+  var original=window[name];
+  if(typeof original!=='function'||original.__aeSubmitGuard)return;
+  var busy=false;
+  var guarded=async function(){
+   if(busy){notify('İşlem devam ediyor; lütfen tamamlanmasını bekleyin.','info');return;}
+   busy=true;
+   var button=document.querySelector(selector),oldText='';
+   if(button){oldText=button.textContent;button.disabled=true;button.setAttribute('aria-busy','true');button.textContent=label;button.classList.add('ae-auth-busy');}
+   try{return await original.apply(this,arguments);}
+   catch(error){notify((name==='handleRegister'?'Kayıt':'Giriş')+' işlemi tamamlanamadı: '+(error&&error.message||'Bilinmeyen hata'),'error');throw error;}
+   finally{
+    busy=false;
+    if(button){button.disabled=false;button.removeAttribute('aria-busy');button.classList.remove('ae-auth-busy');button.textContent=oldText;}
+   }
+  };
+  guarded.__aeSubmitGuard=true;guarded.__aeOriginal=original;window[name]=guarded;wrapped[name]=true;
+ }
+ function install(){
+  wrapSubmit('handleRegister','#formRegister .btn-primary','Hesap oluşturuluyor…');
+  wrapSubmit('handleLogin','#formLogin .btn-primary','Giriş yapılıyor…');
+  wrapSubmit('verifyAccount','#formVerify .btn-primary','Doğrulanıyor…');
+ }
+ install();setTimeout(install,400);setTimeout(install,1400);setTimeout(install,2800);
+})();
