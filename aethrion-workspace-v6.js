@@ -41,32 +41,66 @@ function customWelcome(){
  }else if(title){title.innerHTML='Hoş geldiniz,<br><em>'+name+'</em>'}
  qa('.aew-grid,.aew-actions,.aews-home-cta',w).forEach(function(el){el.remove()});
  var wrap=q('.dashboard-content-wrapper',dash)||q('.dashboard-content',dash)||dash;
- Array.prototype.forEach.call(wrap.children,function(el){if(el===w)return;if(!el.hasAttribute('data-ae-display-saved'))el.setAttribute('data-ae-display-saved',JSON.stringify({value:el.style.getPropertyValue('display'),priority:el.style.getPropertyPriority('display')}));el.style.setProperty('display','none','important')});
+ Array.prototype.forEach.call(wrap.children,function(el){if(el===w)return;if(el.id==='aethrionWorkspaceStage'){el.style.setProperty('display','none','important');return}if(!el.hasAttribute('data-ae-display-saved'))el.setAttribute('data-ae-display-saved',JSON.stringify({value:el.style.getPropertyValue('display'),priority:el.style.getPropertyPriority('display')}));el.style.setProperty('display','none','important')});
  w.style.setProperty('display','flex','important');
  var main=q('#mainSite');if(main)main.style.setProperty('display','none','important');
  var n=q('#aewsUserName');if(n)n.textContent=userName();
  var av=q('#aewsAvatar');if(av)av.textContent=userName().slice(0,1).toUpperCase();
  hideTrigger();var logo=q('.aews-logo');if(logo&&!q('img',logo))logo.innerHTML='<img src="/aethrion-mark.svg" alt="AETHRION" draggable="false">';
 }
-function restoreWelcomeOnly(){
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function stageHost(){
  var w=q('#aethrionExperienceWelcome'),wrap=w&&(q('.dashboard-content-wrapper')||q('.dashboard-content')||w.parentElement);
- if(!w||!wrap)return;
- w.style.setProperty('display','none','important');
- Array.prototype.forEach.call(wrap.children,function(el){if(el===w)return;if(!el.hasAttribute('data-ae-display-saved'))el.setAttribute('data-ae-display-saved',JSON.stringify({value:el.style.getPropertyValue('display'),priority:el.style.getPropertyPriority('display')}));el.style.setProperty('display','none','important')});
+ if(!wrap)return null;
+ var stage=q('#aethrionWorkspaceStage');
+ if(!stage){stage=document.createElement('section');stage.id='aethrionWorkspaceStage';stage.className='ae-ws-stage';wrap.appendChild(stage)}
+ return {stage:stage,wrap:wrap,w:w};
 }
-function home(){document.body.classList.remove('aews-nav-open');if(typeof window.showWelcome==='function')window.showWelcome();setTimeout(customWelcome,30);setActive('Ana ekran')}
+function isolateStage(){
+ var h=stageHost();if(!h)return;
+ h.w.style.setProperty('display','none','important');
+ Array.prototype.forEach.call(h.wrap.children,function(el){
+  if(el===h.stage){el.style.setProperty('display','flex','important');return}
+  if(el===h.w){el.style.setProperty('display','none','important');return}
+  if(!el.hasAttribute('data-ae-display-saved'))el.setAttribute('data-ae-display-saved',JSON.stringify({value:el.style.getPropertyValue('display'),priority:el.style.getPropertyPriority('display')}));
+  el.style.setProperty('display','none','important');
+ });
+}
+function showStage(label,desc,href){
+ var h=stageHost();if(!h)return;
+ var safeHref=String(href||'');
+ var isFrame=!!safeHref&&safeHref.charAt(0)==='/'&&safeHref!=='/index.html#features'&&safeHref!=='#features';
+ var detail=desc||'Bu çalışma alanı seçiminiz için hazırlandı.';
+ h.stage.innerHTML='<div class="ae-ws-stage-head"><div><div class="ae-ws-stage-kicker">AETHRION WORKSPACE</div><h2>'+esc(label)+'</h2><p>'+esc(detail)+'</p></div>'+(isFrame?'<a class="ae-ws-open-tab" href="'+esc(safeHref)+'" target="_blank" rel="noopener noreferrer">Yeni sekmede aç ↗</a>':'<span class="ae-ws-stage-state"><i></i> Çalışma alanı</span>')+'</div>'+(isFrame?'<iframe class="ae-ws-stage-frame" title="'+esc(label)+'" src="'+esc(safeHref)+'" loading="eager" allow="microphone; camera; clipboard-read; clipboard-write; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>':'<div class="ae-ws-stage-empty"><div class="ae-ws-stage-emblem">A</div><h3>'+esc(label)+'</h3><p>Bu özellik uygulama paneli üzerinden açılır. Açılan paneli kapattığınızda sol menüden başka bir çalışma alanına geçebilir veya Ana ekran’a dönebilirsiniz.</p></div>');
+ h.stage.style.setProperty('display','flex','important');
+ var frame=q('.ae-ws-stage-frame',h.stage);
+ if(frame)frame.addEventListener('load',function(){try{var d=frame.contentDocument;if(!d)return;var st=d.createElement('style');st.textContent='html,body{min-height:100%!important;background:#f5f8fc!important;color:#172b43!important}body{padding-bottom:20px!important}.navbar,.top-nav,.main-nav,header.site-header,.site-header,footer,.site-footer{box-shadow:none!important}';d.head.appendChild(st)}catch(e){}},{once:true});
+ isolateStage();
+}
+function home(){document.body.classList.remove('aews-nav-open');var stage=q('#aethrionWorkspaceStage');if(stage)stage.style.setProperty('display','none','important');if(typeof window.showWelcome==='function')window.showWelcome();setTimeout(customWelcome,35);setActive('Ana ekran')}
 function openFeature(label){
  var f=feature(label);document.body.classList.remove('aews-nav-open');setActive(label);
  if(label==='Oturumu kapat'){if(typeof window.logout==='function')return window.logout();if(window.Parse&&Parse.User)return Parse.User.logOut().then(function(){location.reload()});location.reload();return}
- if(f.href&&f.href!=='/index.html#features'&&f.href!=='#features'){location.href=f.href;return}
- if(f.action&&/^scrollTo/.test(f.action)){
-  if(typeof window.safeFeatureCall==='function')window.safeFeatureCall(f.action,label,f.href);
-  else if(typeof window[f.action]==='function')window[f.action]();
+ if(f.href&&f.href!=='/index.html#features'&&f.href!=='#features'){showStage(label,'Özelliğin çalışma alanı açılıyor.',f.href);return}
+ var desc=(Array.isArray(window.FEATURE_LIST)?window.FEATURE_LIST:[]).filter(function(x){return x&&String(x.name||x.title||'')===label})[0];
+ desc=desc&&String(desc.desc||desc.description||'')||'Bu özellik AETHRION çalışma alanı üzerinden kullanılabilir.';
+ if(f.action&&typeof window.safeFeatureCall==='function'&&!/^scrollTo/.test(f.action)){
+  window.safeFeatureCall(f.action,label,'');
+  showStage(label,desc,'');
   return;
  }
- if(f.action&&typeof window.safeFeatureCall==='function'){window.safeFeatureCall(f.action,label,'');setTimeout(restoreWelcomeOnly,100);return}
- if(f.action&&typeof window[f.action]==='function'){window[f.action]();setTimeout(restoreWelcomeOnly,100);return}
- if(typeof window.showNotification==='function')window.showNotification('Bu özellik için açılış bağlantısı henüz tanımlanmamış.','warning');
+ if(f.action&&typeof window[f.action]==='function'&&!/^scrollTo/.test(f.action)){
+  window[f.action]();
+  showStage(label,desc,'');
+  return;
+ }
+ if(/^scrollTo/.test(f.action)){
+  showStage(label,desc,'');
+  if(typeof window.showNotification==='function')window.showNotification('Bu bölüm için ayrı çalışma alanı görünümü hazırlandı.','info');
+  return;
+ }
+ showStage(label,desc,'');
+ if(typeof window.showNotification==='function')window.showNotification('Bu özellik için henüz doğrudan açılış bağlantısı tanımlanmamış.','warning');
 }
 function installRouter(){
  if(document.body.dataset.aeV6Router==='1')return;document.body.dataset.aeV6Router='1';
