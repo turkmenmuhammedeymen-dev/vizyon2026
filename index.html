@@ -20497,6 +20497,7 @@ header,nav,.navbar,.top-nav,.site-header{backdrop-filter:blur(18px);-webkit-back
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}@media(max-width:640px){:root{--ae-radius:17px}body:before{background-size:30px 30px}h1{letter-spacing:-.025em}}
 </style>
 <link rel="stylesheet" href="/aethrion-experience.css?v=20261022-authfix3">
+<link rel="stylesheet" href="/aethrion-corporate-v4.css?v=20261022">
 </head>
 <body>
 
@@ -21890,8 +21891,8 @@ body.aethrion-sidebar-open {
             <span class="splash-logo-outer-ring"></span>
             <span class="splash-logo-inner-ring"></span>
             <img
-                src="/logo.svg"
-                alt="AETHRION Logo"
+                src="/aethrion-mark.svg"
+                alt="AETHRION symbol"
                 draggable="false"
                 onerror="this.onerror=null;this.src='/logo.svg'"
             >
@@ -26550,18 +26551,7 @@ window.confirmSocialAuthTerms = function () {
 // [AETHRION] KAYIT — Checkbox zorunluluğu + 28 model
 // ============================================================
 async function handleRegister() {
-    if (window.currentUser) {
-        try {
-            await Parse.User.logOut();
-            window.currentUser = null;
-            if (typeof currentUser !== 'undefined') currentUser = null;
-            localStorage.removeItem('aethrion_user');
-            console.log('✅ Önceki oturum kapatıldı');
-        } catch (e) {
-            console.log('Çıkış hatası:', e);
-        }
-    }
-
+    // Keep any active session intact while a user is creating another account.
     var name = document.getElementById('rName').value.trim();
     var email = document.getElementById('rEmail').value.trim();
     var username = document.getElementById('rUsername').value.trim();
@@ -52164,6 +52154,7 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 
 <script defer src="/aethrion-identity.js?v=20261022-authfix3"></script>
 <script defer src="/aethrion-experience.js?v=20261022-light"></script>
+<script defer src="/aethrion-auth-recovery.js?v=20261022"></script>
 </body>
 </html>
 
