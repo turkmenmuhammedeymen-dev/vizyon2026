@@ -139,3 +139,29 @@ setTimeout(boot,800);setTimeout(boot,2200);
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
  if(window.MutationObserver&&document.body)new MutationObserver(function(){if(!document.getElementById('aethrionGoogleFallback')||!document.getElementById('aethrionGoogleFallback').dataset.rendered)setTimeout(mountGoogleButton,150)}).observe(document.body,{subtree:true,childList:true});
 })();
+
+
+/* Ensure Parse/Back4App is initialized before email auth or Google-token verification. */
+(function(){
+ 'use strict';
+ function notify(msg,type){try{if(typeof window.showNotification==='function')window.showNotification(msg,type||'error');else console.error('[AETHRION Auth]',msg)}catch(e){}}
+ async function ensureParseReady(){
+  if(typeof window.Parse==='undefined'||!window.Parse.User)throw new Error('Kimlik doğrulama bileşeni yüklenemedi. Sayfayı yenileyip tekrar deneyin.');
+  if(window.parseInitialized||window.Parse.applicationId)return true;
+  if(typeof window.initBack4app!=='function')throw new Error('Sunucu bağlantısı henüz hazır değil. Birkaç saniye sonra tekrar deneyin.');
+  var result=await window.initBack4app();
+  if(result===false||(!window.parseInitialized&&!window.Parse.applicationId))throw new Error('Sunucu bağlantısı kurulamadı. İnternet bağlantısını ve sunucu yapılandırmasını kontrol edin.');
+  return true;
+ }
+ function guard(name,label){
+  var original=window[name];
+  if(typeof original!=='function'||original.__aeParseReadyGuard)return;
+  var wrapped=async function(){
+   try{await ensureParseReady();return await original.apply(this,arguments)}
+   catch(e){console.error('[AETHRION] '+label+' auth setup failed:',e);notify(label+' işlemi başlatılamadı: '+(e&&e.message||'Bilinmeyen hata'),'error');return undefined}
+  };
+  wrapped.__aeParseReadyGuard=true;wrapped.__aeOriginal=original;window[name]=wrapped;
+ }
+ function install(){guard('handleRegister','Kayıt');guard('handleLogin','Giriş');guard('verifyAccount','Doğrulama');guard('handleGoogleLoginResponse','Google ile giriş')}
+ install();[400,1000,2200,4200].forEach(function(t){setTimeout(install,t)});
+})();
