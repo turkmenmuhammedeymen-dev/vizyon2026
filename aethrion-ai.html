@@ -1,0 +1,2188 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#03050a">
+    <meta name="description" content="VİZYON AI — 21 yapay zeka modeli tek platformda. AETHRION AI, Sesli Sohbet, Dosya Analiz, Logs, Video Stüdyo, A27 API, V27 Koç ve Moderatör rütbesi.">
+    <title>🤖 VİZYON AI | VİZYON 2027</title>
+
+    <link rel="icon" type="image/png" href="https://vizyon2026.vercel.app/logo.png" />
+    <link rel="apple-touch-icon" href="https://vizyon2026.vercel.app/logo.png" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet" />
+
+    <style>
+        /* ============================================================ */
+        /* ROOT DEĞİŞKENLERİ — index.html v7.10.0 ile aynı             */
+        /* ============================================================ */
+        :root {
+            --bg: #03050a;
+            --bg2: #060a14;
+            --bg3: #0a1020;
+            --surface: #0a1020;
+            --surface2: #0e1630;
+            --surface3: #141e40;
+            --border: #1a2a4a;
+            --border2: #24365e;
+
+            --accent: #00e5ff;
+            --accent-hover: #4df0ff;
+            --accent2: #00ff9d;
+            --accent3: #ff5e1a;
+            --accent4: #ff2d92;
+            --gold: #ffd11a;
+            --gold-soft: #ffcc4d;
+            --purple: #b845ff;
+            --purple-hover: #d17bff;
+            --pink: #ff2d92;
+
+            --text: #ffffff;
+            --text2: #d4e5ff;
+            --text3: #8aa8d4;
+            --text4: #5a7aa8;
+
+            --danger: #ff4757;
+            --success: #00ff9d;
+            --warning: #ffb700;
+            --info: #00e5ff;
+
+            --font-display: 'Syne', sans-serif;
+            --font-code: 'Fira Code', monospace;
+            --font-body: 'Inter', sans-serif;
+
+            --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.6);
+            --shadow-glow: 0 0 30px rgba(0, 229, 255, 0.45);
+
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.25s ease;
+            --transition-slow: 0.4s ease;
+        }
+
+        /* ============================================================ */
+        /* RESET + BODY                                                 */
+        /* ============================================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            line-height: 1.7;
+            min-height: 100vh;
+            padding: 30px 20px 60px;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ============================================================ */
+        /* AURORA / NEBULA ARKA PLAN                                    */
+        /* ============================================================ */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 0%, rgba(0, 229, 255, 0.12) 0%, transparent 55%),
+                radial-gradient(ellipse 70% 50% at 80% 10%, rgba(184, 69, 255, 0.10) 0%, transparent 55%),
+                radial-gradient(ellipse 90% 60% at 50% 100%, rgba(255, 45, 146, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 10% 60%, rgba(0, 255, 157, 0.06) 0%, transparent 60%);
+            animation: auroraShift 24s ease-in-out infinite alternate;
+            will-change: opacity, transform;
+        }
+
+        @keyframes auroraShift {
+            0%   { opacity: 0.75; transform: scale(1) rotate(0deg); }
+            50%  { opacity: 1;    transform: scale(1.06) rotate(2deg); }
+            100% { opacity: 0.85; transform: scale(1) rotate(0deg); }
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(0, 229, 255, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.025) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 85%);
+            -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 85%);
+            opacity: 0.6;
+            animation: gridPulse 12s ease-in-out infinite;
+        }
+
+        @keyframes gridPulse {
+            0%, 100% { opacity: 0.4; }
+            50%      { opacity: 0.75; }
+        }
+
+        /* ============================================================ */
+        /* PARÇACIK SİSTEMİ                                             */
+        /* ============================================================ */
+        #particles {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+            contain: strict;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: float-up linear infinite;
+            opacity: 0;
+            will-change: transform, opacity;
+            box-shadow: 0 0 6px var(--accent);
+        }
+
+        .particle:nth-child(2n) {
+            background: var(--accent2);
+            width: 3px; height: 3px;
+            box-shadow: 0 0 8px var(--accent2);
+        }
+        .particle:nth-child(3n) {
+            background: var(--purple);
+            width: 2.5px; height: 2.5px;
+            box-shadow: 0 0 8px var(--purple);
+        }
+        .particle:nth-child(5n) {
+            background: var(--pink);
+            box-shadow: 0 0 10px var(--pink);
+        }
+        .particle:nth-child(7n) {
+            background: var(--gold);
+            box-shadow: 0 0 10px var(--gold);
+        }
+
+        @keyframes float-up {
+            0%   { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10%  { opacity: 0.9; }
+            50%  { opacity: 0.7; }
+            90%  { opacity: 0.35; }
+            100% { transform: translateY(-150px) translateX(30px); opacity: 0; }
+        }
+
+        /* ============================================================ */
+        /* CONTAINER                                                    */
+        /* ============================================================ */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(10, 16, 32, 0.85), rgba(6, 10, 20, 0.90));
+            backdrop-filter: blur(20px) saturate(160%);
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            border: 1px solid rgba(0, 229, 255, 0.18);
+            border-radius: 28px;
+            box-shadow:
+                0 20px 80px rgba(0, 0, 0, 0.6),
+                0 0 60px rgba(0, 229, 255, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent) 20%, var(--purple) 50%, var(--pink) 80%, transparent);
+            opacity: 0.85;
+            animation: borderFlow 4s ease-in-out infinite alternate;
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        @keyframes borderFlow {
+            0%   { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* ============================================================ */
+        /* HEADER — Logo + Back                                         */
+        /* ============================================================ */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.12);
+            margin-bottom: 30px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-svg {
+            width: 52px;
+            height: 52px;
+            flex-shrink: 0;
+            filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.6));
+        }
+
+        .logo-text {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(45deg, #00e5ff, #00ff9d, #b845ff, #ff2d92, #ffd11a, #00e5ff);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientMove 5s ease infinite;
+            white-space: nowrap;
+            letter-spacing: 1px;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50%      { background-position: 100% 50%; }
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 10px 22px;
+            border: 1.5px solid var(--accent);
+            border-radius: 40px;
+            color: var(--accent);
+            background: transparent;
+            transition: all var(--transition-normal);
+            cursor: pointer;
+            white-space: nowrap;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .back-link::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.15), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+            pointer-events: none;
+        }
+
+        .back-link:hover::before { transform: translateX(100%); }
+
+        .back-link:hover {
+            background: rgba(0, 229, 255, 0.12);
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* ============================================================ */
+        /* DİL SEÇİCİ                                                   */
+        /* ============================================================ */
+        .lang-selector {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .lang-btn {
+            padding: 9px 22px;
+            border-radius: 40px;
+            border: 1.5px solid var(--border2);
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.04), rgba(184, 69, 255, 0.02));
+            color: var(--text3);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            font-size: 13px;
+            font-family: var(--font-body);
+            letter-spacing: 0.3px;
+        }
+
+        .lang-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+        }
+
+        .lang-btn.active {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.18), rgba(184, 69, 255, 0.10));
+            color: var(--accent);
+            box-shadow:
+                0 0 25px rgba(0, 229, 255, 0.4),
+                inset 0 0 15px rgba(0, 229, 255, 0.08);
+        }
+
+        .lang-content { display: none; }
+        .lang-content.active { display: block; animation: fadeIn 0.4s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============================================================ */
+        /* BAŞLIKLAR                                                    */
+        /* ============================================================ */
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(28px, 5vw, 42px);
+            font-weight: 800;
+            margin-bottom: 18px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #00e5ff, #b845ff, #ff2d92, #00e5ff);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientMove 5s ease infinite;
+            padding-bottom: 18px;
+            border-bottom: 2px solid transparent;
+            border-image: linear-gradient(90deg, transparent, var(--accent), var(--purple), var(--pink), transparent) 1;
+        }
+
+        h2 {
+            font-family: var(--font-display);
+            font-size: clamp(22px, 3vw, 28px);
+            font-weight: 800;
+            color: var(--text);
+            margin-top: 44px;
+            margin-bottom: 20px;
+            padding-left: 20px;
+            border-left: 5px solid var(--accent);
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(0, 229, 255, 0.4), transparent);
+            margin-left: 10px;
+        }
+
+        h3 {
+            font-family: var(--font-display);
+            color: var(--text2);
+            font-size: 20px;
+            margin-top: 22px;
+            letter-spacing: -0.2px;
+        }
+
+        p, li {
+            color: var(--text2);
+            font-size: 15.5px;
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+
+        ul, ol { padding-left: 26px; margin: 14px 0; }
+        li { margin-bottom: 8px; }
+        strong { color: var(--text); font-weight: 700; }
+        a { color: var(--accent); text-decoration: none; transition: color var(--transition-fast); }
+        a:hover { color: var(--purple); }
+
+        /* ============================================================ */
+        /* KUTULAR                                                      */
+        /* ============================================================ */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(0, 255, 157, 0.08), rgba(0, 229, 255, 0.04));
+            border-left: 4px solid var(--accent2);
+            padding: 20px 26px;
+            border-radius: 16px;
+            margin: 22px 0;
+            box-shadow: 0 0 25px rgba(0, 255, 157, 0.10);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            font-size: 14.5px;
+            color: var(--text2);
+            line-height: 1.75;
+        }
+        .highlight-box strong { color: var(--accent2); }
+
+        .highlight-box.blue {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(0, 100, 255, 0.04));
+            border-left-color: var(--accent);
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.10);
+        }
+        .highlight-box.blue strong { color: var(--accent); }
+
+        .highlight-box.purple {
+            background: linear-gradient(135deg, rgba(184, 69, 255, 0.10), rgba(255, 45, 146, 0.04));
+            border-left-color: var(--purple);
+            box-shadow: 0 0 25px rgba(184, 69, 255, 0.15);
+        }
+        .highlight-box.purple strong { color: var(--purple); }
+
+        .highlight-box.gold {
+            background: linear-gradient(135deg, rgba(255, 209, 26, 0.08), rgba(255, 140, 0, 0.04));
+            border-left-color: var(--gold);
+            box-shadow: 0 0 25px rgba(255, 209, 26, 0.10);
+        }
+        .highlight-box.gold strong { color: var(--gold); }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(255, 183, 0, 0.08), rgba(255, 140, 0, 0.04));
+            border-left: 4px solid var(--warning);
+            padding: 20px 26px;
+            border-radius: 16px;
+            margin: 22px 0;
+            box-shadow: 0 0 25px rgba(255, 183, 0, 0.10);
+            backdrop-filter: blur(8px);
+            font-size: 14.5px;
+            color: var(--text2);
+            line-height: 1.75;
+        }
+        .info-box strong { color: var(--warning); }
+
+        /* ============================================================ */
+        /* BADGE                                                        */
+        /* ============================================================ */
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.12), rgba(184, 69, 255, 0.06));
+            color: var(--accent);
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 13px;
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            margin-right: 8px;
+            margin-bottom: 6px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+        }
+        .badge.green {
+            background: linear-gradient(135deg, rgba(0, 255, 157, 0.12), rgba(0, 200, 120, 0.06));
+            color: var(--accent2);
+            border-color: rgba(0, 255, 157, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.15);
+        }
+        .badge.purple {
+            background: linear-gradient(135deg, rgba(184, 69, 255, 0.12), rgba(255, 45, 146, 0.06));
+            color: var(--purple);
+            border-color: rgba(184, 69, 255, 0.3);
+            box-shadow: 0 0 15px rgba(184, 69, 255, 0.15);
+        }
+        .badge.gold {
+            background: linear-gradient(135deg, rgba(255, 209, 26, 0.12), rgba(255, 140, 0, 0.06));
+            color: var(--gold);
+            border-color: rgba(255, 209, 26, 0.3);
+            box-shadow: 0 0 15px rgba(255, 209, 26, 0.15);
+        }
+        .badge.pink {
+            background: linear-gradient(135deg, rgba(255, 45, 146, 0.12), rgba(255, 94, 26, 0.06));
+            color: var(--pink);
+            border-color: rgba(255, 45, 146, 0.3);
+            box-shadow: 0 0 15px rgba(255, 45, 146, 0.15);
+        }
+
+        /* ============================================================ */
+        /* 21 MODEL GRID                                                */
+        /* ============================================================ */
+        .model-section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 24px 0 14px 0;
+            font-family: var(--font-code);
+        }
+
+        .model-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(0, 229, 255, 0.3), transparent);
+        }
+
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 14px;
+            margin: 16px 0 8px 0;
+        }
+
+        .model-card {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.05), rgba(184, 69, 255, 0.03));
+            border: 1px solid rgba(0, 229, 255, 0.18);
+            border-radius: 14px;
+            padding: 16px 14px;
+            text-align: center;
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        .model-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.08), transparent);
+            transition: left 0.6s ease;
+            pointer-events: none;
+        }
+
+        .model-card:hover::before { left: 100%; }
+
+        .model-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.4),
+                0 0 30px rgba(0, 229, 255, 0.25);
+        }
+
+        .model-card.local {
+            border-left: 3px solid var(--accent2);
+        }
+        .model-card.local:hover {
+            border-color: var(--accent2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 255, 157, 0.25);
+        }
+
+        .model-card.cloud {
+            border-left: 3px solid var(--purple);
+        }
+        .model-card.cloud:hover {
+            border-color: var(--purple);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 30px rgba(184, 69, 255, 0.25);
+        }
+
+        .model-card.special {
+            border-left: 3px solid var(--gold);
+            background: linear-gradient(135deg, rgba(255, 209, 26, 0.08), rgba(255, 140, 0, 0.04));
+        }
+        .model-card.special:hover {
+            border-color: var(--gold);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 209, 26, 0.35);
+        }
+
+        .model-card .icon {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.4));
+        }
+
+        .model-card .name {
+            font-weight: 700;
+            color: var(--text);
+            font-size: 13.5px;
+            letter-spacing: 0.2px;
+            word-break: break-word;
+        }
+
+        .model-card .desc {
+            font-size: 10.5px;
+            color: var(--text3);
+            margin-top: 5px;
+            line-height: 1.5;
+            font-family: var(--font-code);
+        }
+
+        /* ============================================================ */
+        /* ÖZELLİKLER GRID                                              */
+        /* ============================================================ */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .feature-item {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.04), rgba(184, 69, 255, 0.02));
+            border: 1px solid rgba(0, 229, 255, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 3px; height: 100%;
+            background: linear-gradient(180deg, var(--accent), var(--purple));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-item:hover::before { opacity: 1; }
+
+        .feature-item:hover {
+            border-color: rgba(0, 229, 255, 0.35);
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(184, 69, 255, 0.04));
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 25px rgba(0, 229, 255, 0.15);
+        }
+
+        .feature-item .icon {
+            font-size: 30px;
+            display: block;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.4));
+        }
+
+        .feature-item .label {
+            font-weight: 700;
+            color: var(--text);
+            font-size: 15px;
+            margin-bottom: 6px;
+            letter-spacing: -0.2px;
+        }
+
+        .feature-item .desc {
+            font-size: 13px;
+            color: var(--text3);
+            line-height: 1.7;
+        }
+
+        .feature-item.new-badge::after {
+            content: 'YENİ';
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 3px 9px;
+            background: linear-gradient(135deg, var(--accent), var(--purple), var(--pink));
+            background-size: 200% 200%;
+            color: #fff;
+            border-radius: 10px;
+            letter-spacing: 1px;
+            animation: newBadgeShine 3s linear infinite;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+        }
+
+        @keyframes newBadgeShine {
+            0%, 100% { background-position: 0% 50%; }
+            50%      { background-position: 100% 50%; }
+        }
+
+        /* ============================================================ */
+        /* VİZYON AL ÖZEL KART                                          */
+        /* ============================================================ */
+        .vizyon-al-showcase {
+            background: linear-gradient(135deg, rgba(184, 69, 255, 0.12), rgba(0, 229, 255, 0.08));
+            border: 2px solid var(--purple);
+            border-radius: 22px;
+            padding: 30px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(184, 69, 255, 0.20);
+        }
+
+        .vizyon-al-showcase::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--purple), var(--accent), transparent);
+            animation: borderFlow 3s ease-in-out infinite alternate;
+        }
+
+        .vizyon-al-title {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--purple);
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
+            text-shadow: 0 0 20px rgba(184, 69, 255, 0.5);
+        }
+
+        .vizyon-al-modes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .vz-mode {
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 14px;
+            padding: 14px 16px;
+            border-left: 3px solid;
+            transition: all var(--transition-normal);
+        }
+
+        .vz-mode:hover {
+            background: rgba(0, 0, 0, 0.5);
+            transform: translateX(4px);
+        }
+
+        .vz-mode.normal { border-left-color: var(--accent); }
+        .vz-mode.deep { border-left-color: #0096ff; }
+        .vz-mode.agent { border-left-color: var(--accent3); }
+        .vz-mode.dev { border-left-color: var(--accent2); }
+
+        .vz-mode .vz-name {
+            font-weight: 700;
+            font-size: 13.5px;
+            margin-bottom: 4px;
+        }
+        .vz-mode.normal .vz-name { color: var(--accent); }
+        .vz-mode.deep .vz-name { color: #0096ff; }
+        .vz-mode.agent .vz-name { color: var(--accent3); }
+        .vz-mode.dev .vz-name { color: var(--accent2); }
+
+        .vz-mode .vz-desc {
+            font-size: 11.5px;
+            color: var(--text3);
+            line-height: 1.55;
+        }
+
+        /* ============================================================ */
+        /* A27 API / KOÇ / MODERATÖR KARTLARI                           */
+        /* ============================================================ */
+        .special-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            margin: 22px 0;
+        }
+
+        .special-card {
+            padding: 24px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-normal);
+            border: 2px solid;
+        }
+
+        .special-card.v27api {
+            background: linear-gradient(135deg, rgba(255, 209, 26, 0.10), rgba(255, 140, 0, 0.05));
+            border-color: var(--gold);
+            box-shadow: 0 0 30px rgba(255, 209, 26, 0.15);
+        }
+        .special-card.v27api:hover {
+            border-color: #ffcc00;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5), 0 0 50px rgba(255, 209, 26, 0.4);
+        }
+
+        .special-card.koc {
+            background: linear-gradient(135deg, rgba(255, 45, 146, 0.10), rgba(184, 69, 255, 0.05));
+            border-color: var(--pink);
+            box-shadow: 0 0 30px rgba(255, 45, 146, 0.15);
+        }
+        .special-card.koc:hover {
+            border-color: var(--pink);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5), 0 0 50px rgba(255, 45, 146, 0.4);
+        }
+
+        .special-card.moderator {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.10), rgba(0, 212, 255, 0.05));
+            border-color: var(--accent);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.15);
+        }
+        .special-card.moderator:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5), 0 0 50px rgba(0, 229, 255, 0.4);
+        }
+
+        .special-card .sp-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            display: block;
+            filter: drop-shadow(0 0 12px currentColor);
+        }
+
+        .special-card .sp-title {
+            font-family: var(--font-display);
+            font-size: 19px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.2px;
+        }
+
+        .special-card.v27api .sp-title { color: var(--gold); }
+        .special-card.koc .sp-title { color: var(--pink); }
+        .special-card.moderator .sp-title { color: var(--accent); }
+
+        .special-card .sp-desc {
+            font-size: 13px;
+            color: var(--text2);
+            line-height: 1.7;
+        }
+
+        /* ============================================================ */
+        /* PLANLAR                                                      */
+        /* ============================================================ */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+            margin: 24px 0;
+        }
+
+        .pricing-card {
+            background: linear-gradient(135deg, rgba(10, 16, 32, 0.9), rgba(6, 10, 20, 0.95));
+            border: 1px solid rgba(0, 229, 255, 0.18);
+            border-radius: 20px;
+            padding: 28px 24px;
+            position: relative;
+            transition: all var(--transition-normal);
+            backdrop-filter: blur(8px);
+            overflow: hidden;
+        }
+
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.06), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s;
+            pointer-events: none;
+        }
+
+        .pricing-card:hover::before { opacity: 1; }
+
+        .pricing-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--accent);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 229, 255, 0.2);
+        }
+
+        .pricing-card.featured {
+            border: 2px solid var(--accent);
+            background: linear-gradient(135deg, rgba(14, 22, 46, 0.98), rgba(10, 16, 32, 0.98));
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.25), inset 0 0 60px rgba(0, 229, 255, 0.05);
+            animation: featuredPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes featuredPulse {
+            0%, 100% { box-shadow: 0 0 40px rgba(0, 229, 255, 0.25), inset 0 0 60px rgba(0, 229, 255, 0.05); }
+            50%      { box-shadow: 0 0 70px rgba(0, 229, 255, 0.5), inset 0 0 100px rgba(0, 229, 255, 0.10); }
+        }
+
+        .pricing-card .badge-featured {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            padding: 6px 18px;
+            background: linear-gradient(135deg, var(--accent), var(--purple), var(--pink));
+            background-size: 200% 200%;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            border-radius: 30px;
+            letter-spacing: 1.5px;
+            animation: gradientMove 3s ease infinite;
+            box-shadow: 0 4px 20px rgba(0, 229, 255, 0.6);
+            text-transform: uppercase;
+        }
+
+        .pricing-card .plan-name {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 6px;
+            letter-spacing: -0.2px;
+        }
+
+        .pricing-card .price {
+            font-family: var(--font-display);
+            font-size: 42px;
+            font-weight: 800;
+            display: block;
+            margin: 8px 0 20px 0;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #ffffff, #b8d4ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1;
+        }
+
+        .pricing-card.featured .price {
+            background: linear-gradient(135deg, var(--accent), var(--purple), var(--pink));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientMove 4s ease infinite;
+        }
+
+        .pricing-card .price span {
+            font-size: 15px;
+            color: var(--text3);
+            font-weight: 500;
+            letter-spacing: 0;
+        }
+
+        .pricing-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+        }
+
+        .pricing-card ul li {
+            padding: 9px 0;
+            color: var(--text2);
+            font-size: 13.5px;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.06);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            line-height: 1.55;
+        }
+
+        .pricing-card ul li::before {
+            content: "▸";
+            color: var(--accent2);
+            font-weight: 700;
+            flex-shrink: 0;
+            text-shadow: 0 0 10px rgba(0, 255, 157, 0.6);
+        }
+
+        .pricing-card ul li:last-child { border-bottom: none; }
+
+        .pricing-card .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            border: 1.5px solid var(--accent);
+            color: var(--accent);
+            border-radius: 40px;
+            font-weight: 700;
+            text-decoration: none;
+            text-align: center;
+            transition: all var(--transition-normal);
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .pricing-card .btn:hover {
+            background: rgba(0, 229, 255, 0.15);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .pricing-card.featured .btn {
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            background-size: 200% 200%;
+            color: #fff;
+            border: none;
+            animation: gradientMove 4s ease infinite;
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.5);
+        }
+
+        .pricing-card.featured .btn:hover {
+            box-shadow: 0 0 50px rgba(0, 229, 255, 0.8);
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        /* ============================================================ */
+        /* SSS (FAQ)                                                    */
+        /* ============================================================ */
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .faq-item {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.04), rgba(184, 69, 255, 0.02));
+            border: 1px solid rgba(0, 229, 255, 0.15);
+            border-radius: 14px;
+            padding: 16px 20px;
+            transition: all var(--transition-normal);
+        }
+
+        .faq-item:hover {
+            border-color: rgba(0, 229, 255, 0.35);
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(184, 69, 255, 0.04));
+        }
+
+        .faq-item .faq-q {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 14.5px;
+            margin-bottom: 6px;
+            letter-spacing: -0.1px;
+        }
+
+        .faq-item .faq-a {
+            font-size: 13.5px;
+            color: var(--text2);
+            line-height: 1.7;
+        }
+
+        /* ============================================================ */
+        /* HR                                                           */
+        /* ============================================================ */
+        hr {
+            border: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.3), transparent);
+            margin: 42px 0;
+        }
+
+        /* ============================================================ */
+        /* BACK LINK (Alt)                                              */
+        /* ============================================================ */
+        .bottom-back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 30px;
+            color: var(--accent);
+            text-decoration: none;
+            border: 2px solid var(--accent);
+            padding: 13px 32px;
+            border-radius: 50px;
+            transition: all var(--transition-normal);
+            font-weight: 700;
+            font-size: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bottom-back-link:hover {
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            color: #fff;
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.5);
+            transform: translateY(-3px);
+            border-color: transparent;
+        }
+
+        /* ============================================================ */
+        /* LEGAL FOOTER                                                 */
+        /* ============================================================ */
+        .legal-footer {
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(0, 229, 255, 0.10);
+            font-size: 13px;
+            color: var(--text3);
+            text-align: center;
+            line-height: 1.9;
+            position: relative;
+        }
+
+        .legal-footer::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.4;
+        }
+
+        .legal-footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        .legal-footer a:hover {
+            color: var(--purple);
+            text-shadow: 0 0 12px rgba(184, 69, 255, 0.6);
+        }
+        .legal-footer strong {
+            background: linear-gradient(135deg, #00e5ff, #b845ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .legal-footer .warn {
+            color: var(--danger);
+            font-weight: 700;
+        }
+
+        /* ============================================================ */
+        /* RESPONSIVE                                                   */
+        /* ============================================================ */
+        @media (max-width: 900px) {
+            .pricing-grid { grid-template-columns: 1fr; max-width: 440px; margin-left: auto; margin-right: auto; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 20px 12px 40px; }
+            .container { padding: 24px 18px; border-radius: 20px; }
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .logo-svg { width: 44px; height: 44px; }
+            .logo-text { font-size: 19px; }
+            h2 { font-size: 22px; padding-left: 14px; border-left-width: 4px; }
+            .lang-selector { justify-content: center; }
+            .model-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+            .model-card { padding: 12px 10px; }
+            .model-card .icon { font-size: 22px; }
+            .model-card .name { font-size: 12px; }
+            .model-card .desc { font-size: 10px; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .vizyon-al-modes { grid-template-columns: 1fr; }
+            .vizyon-al-showcase { padding: 22px 20px; }
+            .special-cards { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 12px 8px 30px; }
+            .container { padding: 16px 14px; border-radius: 16px; }
+            .logo-svg { width: 38px; height: 38px; }
+            .logo-text { font-size: 16px; letter-spacing: 0.5px; }
+            .back-link { font-size: 11px; padding: 7px 14px; }
+            h1 { font-size: 22px; }
+            h2 { font-size: 18px; margin-top: 32px; }
+            p, li { font-size: 13.5px; }
+            .lang-btn { font-size: 11.5px; padding: 7px 15px; }
+            .badge { font-size: 11px; padding: 4px 13px; }
+            .model-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .model-card { padding: 10px 8px; }
+            .model-card .icon { font-size: 20px; margin-bottom: 5px; }
+            .model-card .name { font-size: 11px; }
+            .model-card .desc { font-size: 9.5px; }
+            .highlight-box, .info-box { padding: 14px 16px; font-size: 12.5px; }
+            .feature-item { padding: 16px; }
+            .feature-item .icon { font-size: 26px; }
+            .feature-item .label { font-size: 14px; }
+            .feature-item .desc { font-size: 12px; }
+            .special-card { padding: 20px; }
+            .special-card .sp-icon { font-size: 34px; }
+            .special-card .sp-title { font-size: 16px; }
+            .pricing-card { padding: 22px 18px; }
+            .pricing-card .price { font-size: 34px; }
+            .pricing-card .plan-name { font-size: 17px; }
+            .vizyon-al-showcase { padding: 20px 16px; }
+            .vizyon-al-title { font-size: 19px; }
+            .bottom-back-link { font-size: 13px; padding: 11px 22px; }
+            .legal-footer { font-size: 11px; }
+        }
+
+        @media (max-width: 360px) {
+            .logo-text { font-size: 14px; }
+            h1 { font-size: 19px; }
+            h2 { font-size: 16px; }
+            .model-card .name { font-size: 10px; }
+            .pricing-card .price { font-size: 28px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            body::before, body::after, .particle { animation: none !important; }
+        }
+
+        /* ============================================================ */
+        /* RTL DESTEĞİ                                                  */
+        /* ============================================================ */
+        [dir="rtl"] h2 {
+            padding-left: 0;
+            padding-right: 20px;
+            border-left: none;
+            border-right: 5px solid var(--accent);
+        }
+
+        [dir="rtl"] h2::after {
+            background: linear-gradient(270deg, rgba(0, 229, 255, 0.4), transparent);
+            margin-left: 0;
+            margin-right: 10px;
+        }
+
+        [dir="rtl"] .highlight-box,
+        [dir="rtl"] .info-box {
+            border-left: none;
+            border-right: 4px solid;
+        }
+
+        [dir="rtl"] .highlight-box { border-right-color: var(--accent2); }
+        [dir="rtl"] .highlight-box.blue { border-right-color: var(--accent); }
+        [dir="rtl"] .highlight-box.purple { border-right-color: var(--purple); }
+        [dir="rtl"] .highlight-box.gold { border-right-color: var(--gold); }
+        [dir="rtl"] .info-box { border-right-color: var(--warning); }
+
+        [dir="rtl"] .model-card.local,
+        [dir="rtl"] .model-card.cloud,
+        [dir="rtl"] .model-card.special {
+            border-left: 1px solid rgba(0, 229, 255, 0.18);
+            border-right: 3px solid;
+        }
+        [dir="rtl"] .model-card.local { border-right-color: var(--accent2); }
+        [dir="rtl"] .model-card.cloud { border-right-color: var(--purple); }
+        [dir="rtl"] .model-card.special { border-right-color: var(--gold); }
+    </style>
+<style id="aethrion-visual-system-v3">:root{color-scheme:dark;--ae-line:rgba(133,169,224,.2);--ae-text:#f3f6ff;--ae-cyan:#6be7ff;--ae-violet:#b59aff;--ae-radius:22px}html{scroll-behavior:smooth;background:#070b16}body{background:radial-gradient(ellipse at 12% -10%,rgba(69,107,255,.2),transparent 38%),radial-gradient(ellipse at 90% 12%,rgba(33,220,238,.11),transparent 34%),linear-gradient(160deg,#070b16,#0b1020 55%,#090d19)!important;color:var(--ae-text)!important;-webkit-font-smoothing:antialiased}h1,h2,h3{letter-spacing:-.035em;text-wrap:balance}p,li{line-height:1.72}a,button{transition:all .2s ease}a:focus-visible,button:focus-visible{outline:2px solid var(--ae-cyan);outline-offset:3px}:where(.card,.panel,.glass-card,.feature-card,article,section .card){border-color:var(--ae-line)}::selection{background:rgba(107,231,255,.28);color:white}@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- PARÇACIK KATMANI                                             -->
+<!-- ============================================================ -->
+<div id="particles"></div>
+
+<div class="container" id="mainContainer">
+
+    <!-- ============ PAGE HEADER ============ -->
+    <header class="page-header">
+        <a href="https://vizyon2026.vercel.app/" class="logo-area">
+            <svg class="logo-svg" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="v27G1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#00e5ff"/>
+                        <stop offset="50%" stop-color="#b845ff"/>
+                        <stop offset="100%" stop-color="#ff2d92"/>
+                    </linearGradient>
+                    <linearGradient id="v27G2" x1="0%" y1="100%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#00ff9d"/>
+                        <stop offset="100%" stop-color="#00e5ff"/>
+                    </linearGradient>
+                    <radialGradient id="v27Glow">
+                        <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.7"/>
+                        <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+                    </radialGradient>
+                </defs>
+                <circle cx="30" cy="30" r="28" fill="url(#v27Glow)"/>
+                <circle cx="30" cy="30" r="25" fill="none" stroke="url(#v27G1)" stroke-width="2.5" opacity="0.95"/>
+                <circle cx="30" cy="30" r="21" fill="none" stroke="url(#v27G1)" stroke-width="0.8" opacity="0.45" stroke-dasharray="3 3"/>
+                <circle cx="30" cy="30" r="20" fill="rgba(10,16,32,0.78)"/>
+                <path d="M 33 15 A 15 15 0 1 0 33 45 A 12 12 0 1 1 33 15 Z" fill="url(#v27G2)" opacity="0.95"/>
+                <polygon points="42,18 43.5,23 48.5,23 44.5,26 46,31 42,28 38,31 39.5,26 35.5,23 40.5,23" fill="#ffd11a" style="filter: drop-shadow(0 0 4px #ffd11a);"/>
+                <circle cx="12" cy="30" r="1.8" fill="#00e5ff"/>
+                <circle cx="48" cy="30" r="1.8" fill="#00e5ff"/>
+                <circle cx="30" cy="12" r="1.8" fill="#00ff9d"/>
+                <circle cx="30" cy="48" r="1.8" fill="#ff2d92"/>
+            </svg>
+            <div class="logo-text">VİZYON 2027</div>
+        </a>
+        <a href="https://vizyon2026.vercel.app/" class="back-link">
+            <i class="fas fa-arrow-left"></i> Ana Sayfaya Dön
+        </a>
+    </header>
+
+    <!-- ===== DİL SEÇİCİ ===== -->
+    <div class="lang-selector">
+        <button class="lang-btn active" data-lang="tr" onclick="switchLanguage('tr')">🇹🇷 Türkçe</button>
+        <button class="lang-btn" data-lang="en" onclick="switchLanguage('en')">🇬🇧 English</button>
+        <button class="lang-btn" data-lang="ar" onclick="switchLanguage('ar')">🇸🇦 العربية</button>
+    </div>
+
+    <!-- ===== TÜRKÇE ===== -->
+    <div id="lang-tr" class="lang-content active">
+        <h1>🤖 VİZYON AI</h1>
+        <p>
+            <span class="badge">⚡ Dünyanın En Güçlü Yapay Zeka Ekosistemi</span>
+            <span class="badge green">✅ 21 Model Tek Çatı</span>
+            <span class="badge purple">🧠 Süper AI (3 Katman)</span>
+            <span class="badge gold">🔑 A27 API</span>
+            <span class="badge pink">✨ AETHRION AI</span>
+        </p>
+
+        <p><strong>VİZYON AI</strong>, <strong>13 yerli Ollama modeli</strong> ve <strong>8 bulut API modelini</strong> tek bir platformda birleştiren, her dilde kod yazan, web'de arama yapan, dosya analiz eden, sunum oluşturan, takım çalışmasını destekleyen ve 4 farklı modda çalışan devrim niteliğinde bir asistan sistemidir. Tüm modeller sırayla denenir; ilk başarılı cevabı verir.</p>
+
+        <div class="highlight-box">
+            <strong>🚀 Vizyonumuz:</strong> Yapay zekayı herkes için erişilebilir, anlaşılır ve güçlü kılmak. VİZYON AI ile hayal gücünüzün sınırlarını zorlayın.
+        </div>
+
+        <!-- ===== VİZYON AL ÖZEL ===== -->
+        <h2>✨ AETHRION AI Paneli</h2>
+        <div class="vizyon-al-showcase">
+            <div class="vizyon-al-title">✨ VİZYON AL — 4 Modlu Süper Panel</div>
+            <p style="font-size:14px; color:var(--text2); margin-bottom:8px;">
+                Sağ üstteki 3 çizgi menüye tıklayın veya <a href="https://vizyon2026.vercel.app/vizyon-al.html" target="_blank" style="color:var(--accent); font-weight:700;">/vizyon-al.html</a> sayfasına gidin. 21 model tek panelde.
+            </p>
+
+            <div class="vizyon-al-modes">
+                <div class="vz-mode normal">
+                    <div class="vz-name">🌐 Normal</div>
+                    <div class="vz-desc">Tüm modeller eşit çalışır. Standart sohbet ve görev modu.</div>
+                </div>
+                <div class="vz-mode deep">
+                    <div class="vz-name">🧠 Derin Düşünme</div>
+                    <div class="vz-desc">Uzun düşünür, internette gezer, ince mavi çizgiyle düşünme sürecini gösterir.</div>
+                </div>
+                <div class="vz-mode agent">
+                    <div class="vz-name">🕵️ Ajan</div>
+                    <div class="vz-desc">Her siteye girer, form doldurur, şifre girer — tüm görevleri yerine getirir.</div>
+                </div>
+                <div class="vz-mode dev">
+                    <div class="vz-name">💻 Yazılımcı</div>
+                    <div class="vz-desc">En iyi kod üretimi ve hata çözümü. Her dilde çalışır, eksiksiz kod verir.</div>
+                </div>
+            </div>
+
+            <div style="margin-top:18px; padding:14px 18px; background:rgba(0,0,0,0.35); border-radius:12px; font-size:12.5px; color:var(--text3); line-height:1.7; border-left:3px solid var(--accent2);">
+                <strong style="color:var(--accent2);">Ek Özellikler:</strong>
+                🖥️ Ekran Okuma (tek kare + canlı mod) · 🔊 Tam Ekran Sesli Sohbet · 📎 Dosya Analiz + Sunum + İndirme · 🎤 Sesli Komut · ⚠️ Sorumluluk Onayı
+            </div>
+        </div>
+
+        <!-- ===== 21 MODEL ===== -->
+        <h2>🧩 Kullanılan 21 Yapay Zeka Modeli</h2>
+
+        <div class="model-section-title">🇹🇷 Yerli Ollama Modelleri (13)</div>
+        <div class="model-grid">
+            <div class="model-card local"><span class="icon">🏛️</span><div class="name">granite3.3:2b</div><div class="desc">IBM Granite</div></div>
+            <div class="model-card local"><span class="icon">👁️</span><div class="name">qwen2.5vl:3b</div><div class="desc">Vision Language</div></div>
+            <div class="model-card local"><span class="icon">🧠</span><div class="name">phi4-mini-reasoning</div><div class="desc">MS Phi 4 Reasoning</div></div>
+            <div class="model-card local"><span class="icon">💎</span><div class="name">gemma3:4b</div><div class="desc">Google Gemma 3</div></div>
+            <div class="model-card local"><span class="icon">⚡</span><div class="name">qwen3:8b</div><div class="desc">En Güçlü Qwen 3</div></div>
+            <div class="model-card local"><span class="icon">⚡</span><div class="name">qwen3:4b</div><div class="desc">Hızlı Qwen 3</div></div>
+            <div class="model-card local"><span class="icon">⌨️</span><div class="name">qwen2.5-coder</div><div class="desc">Kod Odaklı</div></div>
+            <div class="model-card local"><span class="icon">💨</span><div class="name">mistral:latest</div><div class="desc">Mistral AI</div></div>
+            <div class="model-card local"><span class="icon">🧪</span><div class="name">phi3.5:latest</div><div class="desc">MS Phi 3.5</div></div>
+            <div class="model-card local"><span class="icon">💎</span><div class="name">gemma2:latest</div><div class="desc">Google Gemma 2</div></div>
+            <div class="model-card local"><span class="icon">🦙</span><div class="name">llama3.2:latest</div><div class="desc">Meta Llama 3.2</div></div>
+            <div class="model-card local"><span class="icon">🎯</span><div class="name">qwen2.5:latest</div><div class="desc">Qwen 2.5</div></div>
+            <div class="model-card local"><span class="icon">🔍</span><div class="name">deepseek-r1</div><div class="desc">Reasoning Modeli</div></div>
+        </div>
+
+        <div class="model-section-title">☁️ Bulut API Modelleri (8)</div>
+        <div class="model-grid">
+            <div class="model-card cloud"><span class="icon">⚡</span><div class="name">Groq</div><div class="desc">Llama 3.3 70B</div></div>
+            <div class="model-card cloud"><span class="icon">🪐</span><div class="name">Gemini</div><div class="desc">Gemini 2.0 Flash</div></div>
+            <div class="model-card cloud"><span class="icon">🧊</span><div class="name">DeepSeek</div><div class="desc">DeepSeek Chat</div></div>
+            <div class="model-card cloud"><span class="icon">🌐</span><div class="name">DeepInfra</div><div class="desc">Meta Llama 3.1 70B</div></div>
+            <div class="model-card cloud"><span class="icon">🌟</span><div class="name">OpenAI</div><div class="desc">GPT-4o-mini</div></div>
+            <div class="model-card cloud"><span class="icon">🔬</span><div class="name">Cerebras</div><div class="desc">Llama 3.3 70B</div></div>
+            <div class="model-card cloud"><span class="icon">🌉</span><div class="name">OpenRouter</div><div class="desc">100+ Model</div></div>
+            <div class="model-card cloud"><span class="icon">🏢</span><div class="name">Cohere</div><div class="desc">Command R Plus</div></div>
+        </div>
+
+        <div class="model-section-title">🎯 Süper AI</div>
+        <div class="model-grid">
+            <div class="model-card special"><span class="icon">🧠</span><div class="name">SuperAI</div><div class="desc">3 Katman Sırayla Denenir — En İyisini Getirir</div></div>
+        </div>
+
+        <!-- ===== ÖZELLİKLER ===== -->
+        <h2>💡 VİZYON AI ile Neler Yapabilirsin?</h2>
+        <div class="feature-grid">
+            <div class="feature-item new-badge">
+                <span class="icon">✨</span>
+                <div class="label">AETHRION AI Paneli</div>
+                <div class="desc">21 model tek panelde. 4 farklı mod (Normal, Derin Düşünme, Ajan, Yazılımcı). Ekran okuma, sesli sohbet, dosya analizi.</div>
+            </div>
+            <div class="feature-item new-badge">
+                <span class="icon">🔊</span>
+                <div class="label">Sesli Sohbet</div>
+                <div class="desc">ChatGPT tarzı tam ekran sesli sohbet. Konuş, dinle, yanıt al. Ortada vizyon Al logosu + dalga animasyonu.</div>
+            </div>
+            <div class="feature-item new-badge">
+                <span class="icon">📎</span>
+                <div class="label">Dosya Analiz + Sunum</div>
+                <div class="desc">Fotoğraf, video, PDF, Word, Excel, kod yükle. AI okur, analiz eder, sunum oluşturur ve indirilebilir link verir.</div>
+            </div>
+            <div class="feature-item new-badge">
+                <span class="icon">📋</span>
+                <div class="label">Logs Sistemi</div>
+                <div class="desc">Sitedeki tüm hatalar, uyarılar, bilgiler seviye seviye listelenir. 5 seviye: Info/Success/Warning/Error/Critical.</div>
+            </div>
+            <div class="feature-item new-badge">
+                <span class="icon">🎬</span>
+                <div class="label">Video Stüdyosu</div>
+                <div class="desc">AI ile video senaryosu, sahne planı, Reels fikirleri, YouTube URL analiz ve video kesit oluşturma.</div>
+            </div>
+            <div class="feature-item new-badge">
+                <span class="icon">📖</span>
+                <div class="label">A27 API Rehber</div>
+                <div class="desc">Adım adım API anahtarı alma, örnek kodlar (cURL/JS/Python), limitler, güvenlik ipuçları ve SSS.</div>
+            </div>
+            <div class="feature-item">
+                <span class="icon">⌨️</span>
+                <div class="label">Kod Yazma</div>
+                <div class="desc">Python, React, SQL, Docker, C#, Java, Flutter — sadece iste, AI çalışan kodu üretsin.</div>
+            </div>
+            <div class="feature-item">
+                <span class="icon">🌐</span>
+                <div class="label">Canlı Web Arama</div>
+                <div class="desc">Dolar, hava durumu, haberler, spor — SerpApi + Google Custom Search ile anlık bilgi.</div>
+            </div>
+            <div class="feature-item">
+                <span class="icon">🧊</span>
+                <div class="label">3D Stüdyo (90+ Şekil)</div>
+                <div class="desc">Küp, küre, kalp, elmas, robot, roket, ağaç, çiçek, kelebek, kule, uçak ve 90+ hazır 3D şekil. Sürükle-bırak, .glb indir.</div>
+            </div>
+            <div class="feature-item">
+                <span class="icon">🖼️</span>
+                <div class="label">Görsel Üret</div>
+                <div class="desc">Hugging Face FLUX.1-dev + Stable Diffusion 3.5 ile görsel oluştur.</div>
+            </div>
+            <div class="feature-item">
+                <span class="icon">🛠️</span>
+                <div class="label">Hata Düzeltme</div>
+                <div class="desc">Kodunu yapıştır, hatayı bulsun, düzeltsin ve yeniden çalıştırsın.</div>
+            </div>
+            <div class="feature-item">
+                <span class="icon">👥</span>
+                <div class="label">Takım Çalışması</div>
+                <div class="desc">Takım kur, ortak projeler oluştur, @vizyonal ile AI'ya sor, @vizyondestek ile destek al.</div>
+            </div>
+            <div class="feature-item">
+                <span class="icon">⚔️</span>
+                <div class="label">Savaş Modu</div>
+                <div class="desc">İki AI modelini karşılaştırın, kazananı görün.</div>
+            </div>
+            <div class="feature-item">
+                <span class="icon">🧠</span>
+                <div class="label">Çoklu AI</div>
+                <div class="desc">4 modele aynı soruyu sor, tüm cevapları karşılaştır.</div>
+            </div>
+            <div class="feature-item">
+                <span class="icon">📱</span>
+                <div class="label">Uygulama Yaptırıcı</div>
+                <div class="desc">"Sayaç uygulaması" de, AI çalışan HTML/JS kodu oluştursun.</div>
+            </div>
+            <div class="feature-item">
+                <span class="icon">🛠️</span>
+                <div class="label">Pro Araçları</div>
+                <div class="desc">/kod, /yazi, /ceviri komutlarıyla hızlı sonuç al.</div>
+            </div>
+        </div>
+
+        <div class="highlight-box blue">
+            <strong>📌 Örnek Kullanım:</strong><br>
+            <em>"Python'da REST API yaz."</em> → FastAPI ile çalışan kod gelir.<br>
+            <em>"React'ta todo app yap."</em> → Bileşenler, state yönetimi ile gelir.<br>
+            <em>"Dolar kaç?"</em> → Anlık kur bilgisi.<br>
+            <em>"Bu PDF'i özetle."</em> → Yükle, AI özet çıkarsın.<br>
+            <em>"Kırmızı küp oluştur."</em> → 3D model oluşturulur.<br>
+            <em>"AETHRION AI'ı aç"</em> → 21 model tek panelde.
+        </div>
+
+        <!-- ===== A27 API + KOÇ + MODERATÖR ===== -->
+        <h2>🔑 Özel Sistemler</h2>
+        <div class="special-cards">
+            <div class="special-card v27api">
+                <span class="sp-icon">🔑</span>
+                <div class="sp-title">A27 API Anahtarı</div>
+                <div class="sp-desc">
+                    Kendi projelerinde VİZYON AI'nın 21 model birleşik gücünü kullan. Süresiz / 1 yıl / 5 ay / 1 ay / 1 hafta geçerlilik seçenekleri.
+                </div>
+                <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,209,26,0.15); font-size:12px; color:var(--text3);">
+                    <div style="margin-bottom:4px;">👑 Kurucu/Admin/Beta/Moderatör → <strong style="color:var(--gold);">♾️ Sınırsız</strong></div>
+                    <div style="margin-bottom:4px;">👥 Takım → <strong style="color:var(--gold);">100 adet</strong></div>
+                    <div style="margin-bottom:4px;">🌟 Pro → <strong style="color:var(--gold);">20 adet</strong></div>
+                    <div>🆓 Ücretsiz → <strong style="color:var(--gold);">2 adet</strong></div>
+                </div>
+            </div>
+
+            <div class="special-card koc">
+                <span class="sp-icon">🧭</span>
+                <div class="sp-title">V27 Koç Asistanı</div>
+                <div class="sp-desc">
+                    Sana özel, çok samimi, yol gösteren AI koç. Psikolojik destek, yol haritası, rehberlik. Şifreli paylaşım destekli.
+                </div>
+                <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,45,146,0.15); font-size:12px; color:var(--text3);">
+                    <div style="margin-bottom:4px;">👑 Kurucu/Admin/Beta/Moderatör → <strong style="color:var(--pink);">♾️ Sınırsız</strong></div>
+                    <div style="margin-bottom:4px;">👥 Takım → <strong style="color:var(--pink);">1000/hafta</strong></div>
+                    <div style="margin-bottom:4px;">🌟 Pro → <strong style="color:var(--pink);">50/hafta</strong></div>
+                    <div>🆓 Ücretsiz → <strong style="color:var(--pink);">10/hafta</strong></div>
+                </div>
+            </div>
+
+            <div class="special-card moderator">
+                <span class="sp-icon">🎨</span>
+                <div class="sp-title">Moderatör / Tasarımcı</div>
+                <div class="sp-desc">
+                    Satın alınamaz. Sadece kurucu tarafından mail ile atanır. Butonu yok, yetkileri sınırsız (Beta ve Admin ile aynı).
+                </div>
+                <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(0,229,255,0.15); font-size:12px; color:var(--text3);">
+                    <div style="margin-bottom:4px;">♾️ Sınırsız A27 API + AI sorgusu</div>
+                    <div style="margin-bottom:4px;">🎬 Video kesit aracı</div>
+                    <div style="margin-bottom:4px;">📨 Proje taleplerini yönlendirme</div>
+                    <div>💡 Tavsiye ve analiz sunma</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== GÜVENLİK ===== -->
+        <h2>🔒 Güvenlik ve Gizlilik</h2>
+        <ul>
+            <li>AI sorgularınız <strong>anonim</strong> olarak işlenir ve kalıcı olarak saklanmaz.</li>
+            <li>Dosya yüklemeleriniz yalnızca analiz süresince geçicidir ve sonrasında silinir.</li>
+            <li>Tüm API anahtarları <strong>AES-256-GCM</strong> ile şifrelenerek sunucuda saklanır.</li>
+            <li>Şifre hash'leme <strong>PBKDF2-SHA512 (100.000 iterasyon)</strong> ile yapılır.</li>
+            <li>Hiçbir kişisel veriniz AI modellerine eğitim amaçlı kullanılmaz.</li>
+            <li>Detaylı bilgi için <a href="https://vizyon2026.vercel.app/gizlilik.html">Gizlilik Politikası</a> sayfamızı inceleyin.</li>
+        </ul>
+
+        <!-- ===== TEKNİK ===== -->
+        <h2>⚙️ Teknik Altyapı</h2>
+        <ul>
+            <li><strong>Back4App Cloud Code</strong> ile çalışan sunucusuz mimari.</li>
+            <li>Her model için ayrı API anahtarları ile güvenli erişim (Back4App Config).</li>
+            <li>Otomatik <strong>yük dengeleme</strong> ve <strong>hata toleransı</strong> — bir model çalışmazsa diğeri devreye girer.</li>
+            <li><strong>3 katmanlı SuperAI</strong>: 13 Ollama → 7 NVIDIA NIM → 8 Cloud API.</li>
+            <li>Rate limiting: <strong>A27 API = 60 RPM</strong>, <strong>Koç = 30/dk</strong>, <strong>AETHRION AI = 30/dk</strong>.</li>
+            <li>Her kullanıcı için <strong>sorgu limiti</strong> (Ücretsiz 100, Pro 2000, Takım sınırsız).</li>
+            <li><strong>Vizyon Devriye</strong> — 7/24 aktif otomatik moderasyon sistemi.</li>
+            <li>7/24 canlı destek ve <strong>Vizyon Destek</strong> ile kullanıcı talepleri anında değerlendirilir.</li>
+        </ul>
+
+        <!-- ===== PLANLAR ===== -->
+        <h2>📊 Planlar ve Fiyatlandırma</h2>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <div class="plan-name">🆓 Ücretsiz</div>
+                <span class="price">₺0<span>/ay</span></span>
+                <ul>
+                    <li>Günlük 100 AI sorgusu</li>
+                    <li>21 AI modeline erişim</li>
+                    <li>AETHRION AI (sınırlı)</li>
+                    <li>Sesli Sohbet (sınırlı)</li>
+                    <li>Dosya Analiz (sınırlı)</li>
+                    <li>2 adet A27 API anahtarı</li>
+                    <li>Haftada 10 Koç işlemi</li>
+                    <li>3D Stüdyo + V27 Akademi</li>
+                    <li>Günlük görevler + seri</li>
+                </ul>
+                <a href="https://vizyon2026.vercel.app/index.html#pricing" class="btn">Başla</a>
+            </div>
+
+            <div class="pricing-card featured">
+                <span class="badge-featured">🌟 En Popüler</span>
+                <div class="plan-name">Pro</div>
+                <span class="price">₺299<span>/ay</span></span>
+                <ul>
+                    <li>Günlük 2000 AI sorgusu</li>
+                    <li>21 AI modeline öncelikli erişim</li>
+                    <li>AETHRION AI (tam erişim)</li>
+                    <li>Sesli Sohbet (sınırsız)</li>
+                    <li>Dosya Analiz + Sunum</li>
+                    <li>Logs sistemi erişimi</li>
+                    <li>Video oluşturma</li>
+                    <li>20 adet A27 API anahtarı</li>
+                    <li>Haftada 50 Koç işlemi</li>
+                    <li>3D Stüdyo + .glb indirme</li>
+                </ul>
+                <a href="https://vizyon2026.vercel.app/index.html#pricing" class="btn">Pro'ya Geç</a>
+            </div>
+
+            <div class="pricing-card">
+                <div class="plan-name">👥 Takım</div>
+                <span class="price">₺899<span>/ay</span></span>
+                <ul>
+                    <li>Sınırsız AI sorgusu</li>
+                    <li>21 AI modeline sınırsız erişim</li>
+                    <li>AETHRION AI (sınırsız)</li>
+                    <li>4 Mod + Ekran Okuma + Sesli</li>
+                    <li>Logs tam erişim</li>
+                    <li>Video oluşturma (tam)</li>
+                    <li>100 adet A27 API anahtarı</li>
+                    <li>Haftada 1000 Koç işlemi</li>
+                    <li>Takım kurma/üye ekleme</li>
+                    <li>@vizyonal + @vizyondestek</li>
+                </ul>
+                <a href="https://vizyon2026.vercel.app/index.html#pricing" class="btn">Takım Kur</a>
+            </div>
+        </div>
+        <p style="font-size:13px; color:var(--text4); text-align:center;">
+            Tüm fiyatlar KDV dahil olup, iptal ve iade politikası
+            <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html">Kullanıcı Sözleşmesi</a>'nde belirtilmiştir.
+        </p>
+
+        <!-- ===== SSS ===== -->
+        <h2>📌 Sık Sorulan Sorular</h2>
+        <div class="faq-list">
+            <div class="faq-item">
+                <div class="faq-q">VİZYON AI kaç model kullanıyor?</div>
+                <div class="faq-a">13 yerli Ollama modeli + 8 bulut API = toplam <strong>21 farklı yapay zeka modeli</strong>. Hepsi sırayla denenir, ilk başarılı cevabı verir.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">AETHRION AI nedir?</div>
+                <div class="faq-a">21 yapay zekayı tek panelde birleştiren çeyrek ekran AI aracıdır. 4 mod: 🌐 Normal, 🧠 Derin Düşünme, 🕵️ Ajan, 💻 Yazılımcı. Ekran okuma, sesli sohbet, dosya analiz özellikleri vardır.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">A27 API anahtarı nasıl alınır?</div>
+                <div class="faq-a">Dashboard'da "AETHRION Yapay Zekasının API Anahtarı" bölümüne gidin, "Anahtarını Al" butonuna tıklayın, ad + süre seçin. Anahtar <strong>sadece bir kez gösterilir</strong>, güvenli bir yere kaydedin!</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">V27 Koç Asistanı nedir?</div>
+                <div class="faq-a">Çok samimi, yol gösteren, psikolojik destek veren AI koçtur. Haftalık limitler: Free=10, Pro=50, Team=1000, Admin/Beta/Founder/Moderatör=Sınırsız. Sohbetler şifreli link ile paylaşılabilir.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">Moderatör / Tasarımcı nasıl olunur?</div>
+                <div class="faq-a">Bu rütbe <strong>satın alınamaz</strong> ve butonu yoktur. Sadece <strong>Kurucu</strong> tarafından mail ile atanır. Ekranı normal üye gibi görünür, ama yetkileri sınırsızdır (Beta ve Admin ile aynı seviye).</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">VİZYON AI hangi dillerde kod yazabilir?</div>
+                <div class="faq-a">Python, JavaScript, React, Next.js, HTML, CSS, SQL, Docker, Java, C#, C++, Flutter, React Native ve daha fazlası. Sadece "Python'da hesap makinesi yaz" gibi bir komut vermeniz yeterlidir.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">VİZYON AI'nın sorgu limiti nedir?</div>
+                <div class="faq-a">Ücretsiz: <strong>100/gün</strong> · Pro: <strong>2000/gün</strong> · Takım: <strong>Sınırsız</strong> · Admin/Founder/Beta/Moderatör: <strong>Sınırsız</strong>.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">Dosya yükleyebilir miyim?</div>
+                <div class="faq-a">Evet. PDF, Word, Excel, görsel (fotoğraf), video, ses, ZIP, kod dosyaları — hepsi desteklenir. AI okur, analiz eder, sunum oluşturur ve indirilebilir link verir.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">Verilerim güvende mi?</div>
+                <div class="faq-a">Evet. Tüm API anahtarları <strong>AES-256-GCM</strong> ile şifrelenir, şifreler <strong>PBKDF2-SHA512</strong> ile hash'lenir. Kişisel verileriniz 3. taraflarla paylaşılmaz.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">VİZYON AI'yı takım sohbetinde nasıl kullanırım?</div>
+                <div class="faq-a">Takım sohbetinde <code>@vizyonal</code> yazarak AI'ya, <code>@vizyondestek</code> yazarak Vizyon Destek asistanına, <code>@v27</code> yazarak A27 API bilgilerine ulaşabilirsiniz.</div>
+            </div>
+        </div>
+
+        <div class="highlight-box purple">
+            <strong>📢 VİZYON AI'yı Hemen Dene!</strong><br>
+            Ana sayfada <strong>"⚡ VİZYON AI'ı Başlat"</strong> butonuna tıkla, ücretsiz planınla hemen keşfetmeye başla.
+        </div>
+
+        <hr>
+
+        <!-- ===== LEGAL FOOTER ===== -->
+        <div class="legal-footer">
+            <p>
+                <strong>© 2027 AETHRION</strong> – Tüm Hakları Saklıdır.<br>
+                Bu platform ve içeriği, uluslararası telif hakkı, marka ve fikri mülkiyet yasaları tarafından korunmaktadır.<br>
+                İzinsiz kullanım, kopyalama, dağıtım veya türev çalışma oluşturma <strong>kesinlikle yasaktır</strong>.<br>
+                <span class="warn">⚠️ YASAL UYARI:</span> AI çıktıları bilgilendirme amaçlıdır. AETHRION olası zararlardan sorumlu değildir.
+            </p>
+            <p style="margin-top:10px;">
+                <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">Kullanıcı Sözleşmesi</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/bana-ogret.html" target="_blank">Bana Öğret</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/dokumantasyon.html" target="_blank">Dokümantasyon</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/api.html" target="_blank">API</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/blog.html" target="_blank">Blog</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/hakkimizda.html" target="_blank">Hakkımızda</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/iletisim.html" target="_blank">İletişim</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/kariyer.html" target="_blank">Kariyer</a> &nbsp;|&nbsp;
+                <a href="https://vizyon2026.vercel.app/topluluk.html" target="_blank">Topluluk</a>
+            </p>
+            <p style="font-size:12px; color:var(--text4); margin-top:8px;">
+                Bu sayfa, 6698 sayılı KVKK ve GDPR'ye uygun olarak hazırlanmıştır.
+            </p>
+        </div>
+
+        <hr>
+        <a href="index.html" class="bottom-back-link">⬅️ Ana Sayfaya Dön</a>
+    </div>
+
+    <!-- ===== ENGLISH ===== -->
+    <div id="lang-en" class="lang-content">
+        <h1>🤖 VİZYON AI</h1>
+        <p>
+            <span class="badge">⚡ World's Most Powerful AI Ecosystem</span>
+            <span class="badge green">✅ 21 Models Under One Roof</span>
+            <span class="badge purple">🧠 SuperAI (3 Layers)</span>
+            <span class="badge gold">🔑 A27 API</span>
+            <span class="badge pink">✨ AETHRION AI</span>
+        </p>
+
+        <p><strong>VİZYON AI</strong> combines <strong>13 local Ollama models</strong> and <strong>8 cloud API models</strong> in one platform — writes code in any language, searches the web, analyzes files, creates presentations, supports team collaboration, and works in 4 different modes.</p>
+
+        <div class="highlight-box"><strong>🚀 Our Vision:</strong> Make AI accessible, understandable, and powerful for everyone.</div>
+
+        <h2>✨ AETHRION AI Panel</h2>
+        <div class="vizyon-al-showcase">
+            <div class="vizyon-al-title">✨ VIZYON AL — 4-Mode Super Panel</div>
+            <p style="font-size:14px; color:var(--text2); margin-bottom:8px;">Click the 3-line menu at top right, or visit <a href="https://vizyon2026.vercel.app/vizyon-al.html" target="_blank" style="color:var(--accent); font-weight:700;">/vizyon-al.html</a>.</p>
+            <div class="vizyon-al-modes">
+                <div class="vz-mode normal"><div class="vz-name">🌐 Normal</div><div class="vz-desc">All models equal. Standard chat mode.</div></div>
+                <div class="vz-mode deep"><div class="vz-name">🧠 Deep Thinking</div><div class="vz-desc">Thinks deeply, browses web, shows process with thin blue line.</div></div>
+                <div class="vz-mode agent"><div class="vz-name">🕵️ Agent</div><div class="vz-desc">Enters any site, fills forms, enters passwords — completes all tasks.</div></div>
+                <div class="vz-mode dev"><div class="vz-name">💻 Developer</div><div class="vz-desc">Best code generation and bug fixing in any language.</div></div>
+            </div>
+        </div>
+
+        <h2>🧩 21 AI Models Used</h2>
+
+        <div class="model-section-title">🇹🇷 Local Ollama Models (13)</div>
+        <div class="model-grid">
+            <div class="model-card local"><span class="icon">🏛️</span><div class="name">granite3.3:2b</div><div class="desc">IBM Granite</div></div>
+            <div class="model-card local"><span class="icon">👁️</span><div class="name">qwen2.5vl:3b</div><div class="desc">Vision Language</div></div>
+            <div class="model-card local"><span class="icon">🧠</span><div class="name">phi4-mini-reasoning</div><div class="desc">Phi 4 Reasoning</div></div>
+            <div class="model-card local"><span class="icon">💎</span><div class="name">gemma3:4b</div><div class="desc">Google Gemma 3</div></div>
+            <div class="model-card local"><span class="icon">⚡</span><div class="name">qwen3:8b</div><div class="desc">Strongest Qwen 3</div></div>
+            <div class="model-card local"><span class="icon">⚡</span><div class="name">qwen3:4b</div><div class="desc">Fast Qwen 3</div></div>
+            <div class="model-card local"><span class="icon">⌨️</span><div class="name">qwen2.5-coder</div><div class="desc">Code-focused</div></div>
+            <div class="model-card local"><span class="icon">💨</span><div class="name">mistral:latest</div><div class="desc">Mistral AI</div></div>
+            <div class="model-card local"><span class="icon">🧪</span><div class="name">phi3.5:latest</div><div class="desc">Phi 3.5</div></div>
+            <div class="model-card local"><span class="icon">💎</span><div class="name">gemma2:latest</div><div class="desc">Google Gemma 2</div></div>
+            <div class="model-card local"><span class="icon">🦙</span><div class="name">llama3.2:latest</div><div class="desc">Meta Llama 3.2</div></div>
+            <div class="model-card local"><span class="icon">🎯</span><div class="name">qwen2.5:latest</div><div class="desc">Qwen 2.5</div></div>
+            <div class="model-card local"><span class="icon">🔍</span><div class="name">deepseek-r1</div><div class="desc">Reasoning Model</div></div>
+        </div>
+
+        <div class="model-section-title">☁️ Cloud API Models (8)</div>
+        <div class="model-grid">
+            <div class="model-card cloud"><span class="icon">⚡</span><div class="name">Groq</div><div class="desc">Llama 3.3 70B</div></div>
+            <div class="model-card cloud"><span class="icon">🪐</span><div class="name">Gemini</div><div class="desc">Gemini 2.0 Flash</div></div>
+            <div class="model-card cloud"><span class="icon">🧊</span><div class="name">DeepSeek</div><div class="desc">DeepSeek Chat</div></div>
+            <div class="model-card cloud"><span class="icon">🌐</span><div class="name">DeepInfra</div><div class="desc">Meta Llama 3.1 70B</div></div>
+            <div class="model-card cloud"><span class="icon">🌟</span><div class="name">OpenAI</div><div class="desc">GPT-4o-mini</div></div>
+            <div class="model-card cloud"><span class="icon">🔬</span><div class="name">Cerebras</div><div class="desc">Llama 3.3 70B</div></div>
+            <div class="model-card cloud"><span class="icon">🌉</span><div class="name">OpenRouter</div><div class="desc">100+ Models</div></div>
+            <div class="model-card cloud"><span class="icon">🏢</span><div class="name">Cohere</div><div class="desc">Command R Plus</div></div>
+        </div>
+
+        <h2>💡 What Can You Do with VİZYON AI?</h2>
+        <div class="feature-grid">
+            <div class="feature-item new-badge"><span class="icon">✨</span><div class="label">AETHRION AI Panel</div><div class="desc">21 models in one panel. 4 modes. Screen reading, voice chat, file analysis.</div></div>
+            <div class="feature-item new-badge"><span class="icon">🔊</span><div class="label">Voice Chat</div><div class="desc">ChatGPT-style full-screen voice chat. Speak, listen, get answers.</div></div>
+            <div class="feature-item new-badge"><span class="icon">📎</span><div class="label">File Analysis + Presentation</div><div class="desc">Upload photos, videos, PDFs, Word, Excel, code. AI reads, analyzes, creates presentations.</div></div>
+            <div class="feature-item new-badge"><span class="icon">📋</span><div class="label">Logs System</div><div class="desc">All site events listed by severity. 5 levels: Info/Success/Warning/Error/Critical.</div></div>
+            <div class="feature-item new-badge"><span class="icon">🎬</span><div class="label">Video Studio</div><div class="desc">AI video scripts, scene plans, Reels ideas, YouTube URL analysis.</div></div>
+            <div class="feature-item new-badge"><span class="icon">📖</span><div class="label">A27 API Guide</div><div class="desc">Step-by-step API key creation, example code (cURL/JS/Python), limits, security.</div></div>
+            <div class="feature-item"><span class="icon">⌨️</span><div class="label">Code Writing</div><div class="desc">Python, React, SQL, Docker, C#, Java, Flutter — just ask.</div></div>
+            <div class="feature-item"><span class="icon">🌐</span><div class="label">Live Web Search</div><div class="desc">USD, weather, news, sports — real-time info via SerpApi.</div></div>
+            <div class="feature-item"><span class="icon">🧊</span><div class="label">3D Studio (90+ Shapes)</div><div class="desc">Cube, sphere, heart, diamond, robot, rocket and 90+ ready 3D shapes.</div></div>
+            <div class="feature-item"><span class="icon">🖼️</span><div class="label">Image Generation</div><div class="desc">Generate images with Hugging Face FLUX.1-dev + Stable Diffusion 3.5.</div></div>
+            <div class="feature-item"><span class="icon">👥</span><div class="label">Team Collaboration</div><div class="desc">Create teams, share projects, ask AI via @vizyonal.</div></div>
+            <div class="feature-item"><span class="icon">⚔️</span><div class="label">Battle Mode & Multi AI</div><div class="desc">Compare models, ask 4 models at once.</div></div>
+        </div>
+
+        <h2>🔑 Special Systems</h2>
+        <div class="special-cards">
+            <div class="special-card v27api">
+                <span class="sp-icon">🔑</span>
+                <div class="sp-title">A27 API Key</div>
+                <div class="sp-desc">Use the combined power of 21 models in your own projects. Unlimited / 1yr / 5mo / 1mo / 1wk duration options.</div>
+            </div>
+            <div class="special-card koc">
+                <span class="sp-icon">🧭</span>
+                <div class="sp-title">V27 Coach Assistant</div>
+                <div class="sp-desc">Warm, guiding AI coach with psychological support. Password-protected sharing.</div>
+            </div>
+            <div class="special-card moderator">
+                <span class="sp-icon">🎨</span>
+                <div class="sp-title">Moderator / Designer</div>
+                <div class="sp-desc">Cannot be purchased. Assigned only by founder via email. Hidden rank with unlimited powers.</div>
+            </div>
+        </div>
+
+        <h2>🔒 Security & Privacy</h2>
+        <ul>
+            <li>AI queries are <strong>anonymous</strong> and not stored permanently.</li>
+            <li>All API keys encrypted with <strong>AES-256-GCM</strong>.</li>
+            <li>Password hashing with <strong>PBKDF2-SHA512 (100,000 iterations)</strong>.</li>
+            <li>No personal data used for AI model training.</li>
+            <li>See <a href="https://vizyon2026.vercel.app/gizlilik.html">Privacy Policy</a> for details.</li>
+        </ul>
+
+        <h2>⚙️ Technical Infrastructure</h2>
+        <ul>
+            <li><strong>Serverless</strong> architecture with Back4App Cloud Code.</li>
+            <li><strong>3-layer SuperAI</strong>: 13 Ollama → 7 NVIDIA NIM → 8 Cloud API.</li>
+            <li>Rate limiting: <strong>A27 API = 60 RPM</strong>.</li>
+            <li>Query limits: Free 100, Pro 2000, Team unlimited.</li>
+            <li><strong>Vision Patrol</strong> — 24/7 active auto-moderation.</li>
+        </ul>
+
+        <h2>📊 Plans & Pricing</h2>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <div class="plan-name">🆓 Free</div>
+                <span class="price">₺0<span>/mo</span></span>
+                <ul>
+                    <li>100 AI queries/day</li>
+                    <li>Access to 21 AI models</li>
+                    <li>AETHRION AI (limited)</li>
+                    <li>Voice Chat (limited)</li>
+                    <li>File Analysis (limited)</li>
+                    <li>2 A27 API keys</li>
+                    <li>10 Coach ops/week</li>
+                    <li>3D Studio + V27 Academy</li>
+                </ul>
+                <a href="https://vizyon2026.vercel.app/index.html#pricing" class="btn">Start</a>
+            </div>
+            <div class="pricing-card featured">
+                <span class="badge-featured">🌟 Most Popular</span>
+                <div class="plan-name">Pro</div>
+                <span class="price">₺299<span>/mo</span></span>
+                <ul>
+                    <li>2000 AI queries/day</li>
+                    <li>Priority access to 21 models</li>
+                    <li>AETHRION AI (full access)</li>
+                    <li>Voice Chat (unlimited)</li>
+                    <li>File Analysis + Presentation</li>
+                    <li>Logs system access</li>
+                    <li>Video creation</li>
+                    <li>20 A27 API keys</li>
+                    <li>50 Coach ops/week</li>
+                </ul>
+                <a href="https://vizyon2026.vercel.app/index.html#pricing" class="btn">Go Pro</a>
+            </div>
+            <div class="pricing-card">
+                <div class="plan-name">👥 Team</div>
+                <span class="price">₺899<span>/mo</span></span>
+                <ul>
+                    <li>Unlimited AI queries</li>
+                    <li>Unlimited access to all 21 models</li>
+                    <li>AETHRION AI (unlimited)</li>
+                    <li>4 Modes + Screen Read + Voice</li>
+                    <li>Logs full access</li>
+                    <li>Video creation (full)</li>
+                    <li>100 A27 API keys</li>
+                    <li>1000 Coach ops/week</li>
+                    <li>Team creation/member add</li>
+                </ul>
+                <a href="https://vizyon2026.vercel.app/index.html#pricing" class="btn">Create Team</a>
+            </div>
+        </div>
+
+        <h2>📌 FAQ</h2>
+        <div class="faq-list">
+            <div class="faq-item">
+                <div class="faq-q">How many models does VİZYON AI use?</div>
+                <div class="faq-a">13 local Ollama + 8 cloud API = <strong>21 different AI models</strong>. All tried sequentially, first successful answer wins.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">What is AETHRION AI?</div>
+                <div class="faq-a">Quarter-screen AI tool combining 21 AIs in one panel. 4 modes: Normal, Deep Thinking, Agent, Developer.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">How to get A27 API key?</div>
+                <div class="faq-a">Go to Dashboard → "AETHRION Yapay Zekasının API Anahtarı" section, click "Get Key", choose name + duration. Key is shown <strong>only once</strong>!</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">What is V27 Coach?</div>
+                <div class="faq-a">Warm AI coach with psychological support. Weekly limits: Free=10, Pro=50, Team=1000, Admin/Beta/Founder/Moderator=Unlimited.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">What's my query limit?</div>
+                <div class="faq-a">Free: <strong>100/day</strong> · Pro: <strong>2000/day</strong> · Team: <strong>Unlimited</strong> · Admin/Founder/Beta/Moderator: <strong>Unlimited</strong>.</div>
+            </div>
+        </div>
+
+        <div class="highlight-box purple">
+            <strong>📢 Try VİZYON AI Now!</strong><br>
+            Click <strong>"⚡ Launch VİZYON AI"</strong> on the homepage and start exploring.
+        </div>
+
+        <hr>
+        <div class="legal-footer">
+            <p><strong>© 2027 AETHRION</strong> – All Rights Reserved.</p>
+            <p>
+                <a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Privacy Policy</a> |
+                <a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">Terms</a> |
+                <a href="https://vizyon2026.vercel.app/bana-ogret.html" target="_blank">Teach Me</a> |
+                <a href="https://vizyon2026.vercel.app/dokumantasyon.html" target="_blank">Documentation</a> |
+                <a href="https://vizyon2026.vercel.app/topluluk.html" target="_blank">Community</a>
+            </p>
+        </div>
+        <hr>
+        <a href="index.html" class="bottom-back-link">⬅️ Back to Home</a>
+    </div>
+
+    <!-- ===== ARAPÇA ===== -->
+    <div id="lang-ar" class="lang-content" dir="rtl">
+        <h1>🤖 فيجن AI</h1>
+        <p>
+            <span class="badge">⚡ أقوى نظام بيئي للذكاء الاصطناعي في العالم</span>
+            <span class="badge green">✅ 21 نموذجًا تحت سقف واحد</span>
+            <span class="badge purple">🧠 SuperAI</span>
+            <span class="badge gold">🔑 A27 API</span>
+            <span class="badge pink">✨ AETHRION AI</span>
+        </p>
+
+        <p><strong>فيجن AI</strong> يجمع <strong>13 نموذج Ollama محلي</strong> و <strong>8 نماذج API سحابية</strong> في منصة واحدة — يكتب الأكواد بأي لغة، يبحث في الويب، يحلل الملفات، ينشئ العروض، ويدعم العمل الجماعي.</p>
+
+        <div class="highlight-box"><strong>🚀 رؤيتنا:</strong> جعل الذكاء الاصطناعي متاحًا ومفهومًا وقويًا للجميع.</div>
+
+        <h2>✨ لوحة AETHRION AI</h2>
+        <div class="vizyon-al-showcase">
+            <div class="vizyon-al-title">✨ VIZYON AL — لوحة خارقة بـ 4 أوضاع</div>
+            <p style="font-size:14px; color:var(--text2); margin-bottom:8px;">انقر على قائمة 3 خطوط في الزاوية العلوية، أو قم بزيارة <a href="https://vizyon2026.vercel.app/vizyon-al.html" target="_blank" style="color:var(--accent); font-weight:700;">/vizyon-al.html</a>.</p>
+            <div class="vizyon-al-modes">
+                <div class="vz-mode normal"><div class="vz-name">🌐 عادي</div><div class="vz-desc">جميع النماذج متساوية. وضع الدردشة القياسي.</div></div>
+                <div class="vz-mode deep"><div class="vz-name">🧠 تفكير عميق</div><div class="vz-desc">يفكر بعمق، يتصفح الويب، يُظهر العملية بخط أزرق رفيع.</div></div>
+                <div class="vz-mode agent"><div class="vz-name">🕵️ وكيل</div><div class="vz-desc">يدخل أي موقع، يملأ النماذج، يدخل كلمات المرور — يكمل جميع المهام.</div></div>
+                <div class="vz-mode dev"><div class="vz-name">💻 مبرمج</div><div class="vz-desc">أفضل توليد للأكواد وإصلاح الأخطاء بأي لغة.</div></div>
+            </div>
+        </div>
+
+        <h2>🧩 21 نموذج ذكاء اصطناعي مستخدم</h2>
+
+        <div class="model-section-title">🇹🇷 نماذج Ollama المحلية (13)</div>
+        <div class="model-grid">
+            <div class="model-card local"><span class="icon">🏛️</span><div class="name">granite3.3:2b</div><div class="desc">IBM Granite</div></div>
+            <div class="model-card local"><span class="icon">👁️</span><div class="name">qwen2.5vl:3b</div><div class="desc">رؤية اللغة</div></div>
+            <div class="model-card local"><span class="icon">🧠</span><div class="name">phi4-mini-reasoning</div><div class="desc">Phi 4 Reasoning</div></div>
+            <div class="model-card local"><span class="icon">💎</span><div class="name">gemma3:4b</div><div class="desc">Google Gemma 3</div></div>
+            <div class="model-card local"><span class="icon">⚡</span><div class="name">qwen3:8b</div><div class="desc">أقوى Qwen 3</div></div>
+            <div class="model-card local"><span class="icon">⚡</span><div class="name">qwen3:4b</div><div class="desc">Qwen 3 سريع</div></div>
+            <div class="model-card local"><span class="icon">⌨️</span><div class="name">qwen2.5-coder</div><div class="desc">موجه للأكواد</div></div>
+            <div class="model-card local"><span class="icon">💨</span><div class="name">mistral:latest</div><div class="desc">Mistral AI</div></div>
+            <div class="model-card local"><span class="icon">🧪</span><div class="name">phi3.5:latest</div><div class="desc">Phi 3.5</div></div>
+            <div class="model-card local"><span class="icon">💎</span><div class="name">gemma2:latest</div><div class="desc">Google Gemma 2</div></div>
+            <div class="model-card local"><span class="icon">🦙</span><div class="name">llama3.2:latest</div><div class="desc">Meta Llama 3.2</div></div>
+            <div class="model-card local"><span class="icon">🎯</span><div class="name">qwen2.5:latest</div><div class="desc">Qwen 2.5</div></div>
+            <div class="model-card local"><span class="icon">🔍</span><div class="name">deepseek-r1</div><div class="desc">نموذج التفكير</div></div>
+        </div>
+
+        <div class="model-section-title">☁️ نماذج API السحابية (8)</div>
+        <div class="model-grid">
+            <div class="model-card cloud"><span class="icon">⚡</span><div class="name">Groq</div><div class="desc">Llama 3.3 70B</div></div>
+            <div class="model-card cloud"><span class="icon">🪐</span><div class="name">Gemini</div><div class="desc">Gemini 2.0 Flash</div></div>
+            <div class="model-card cloud"><span class="icon">🧊</span><div class="name">DeepSeek</div><div class="desc">DeepSeek Chat</div></div>
+            <div class="model-card cloud"><span class="icon">🌐</span><div class="name">DeepInfra</div><div class="desc">Meta Llama 3.1 70B</div></div>
+            <div class="model-card cloud"><span class="icon">🌟</span><div class="name">OpenAI</div><div class="desc">GPT-4o-mini</div></div>
+            <div class="model-card cloud"><span class="icon">🔬</span><div class="name">Cerebras</div><div class="desc">Llama 3.3 70B</div></div>
+            <div class="model-card cloud"><span class="icon">🌉</span><div class="name">OpenRouter</div><div class="desc">أكثر من 100 نموذج</div></div>
+            <div class="model-card cloud"><span class="icon">🏢</span><div class="name">Cohere</div><div class="desc">Command R Plus</div></div>
+        </div>
+
+        <h2>💡 ماذا يمكنك أن تفعل مع فيجن AI؟</h2>
+        <div class="feature-grid">
+            <div class="feature-item new-badge"><span class="icon">✨</span><div class="label">لوحة AETHRION AI</div><div class="desc">21 نموذجًا في لوحة واحدة. 4 أوضاع. قراءة الشاشة، الدردشة الصوتية، تحليل الملفات.</div></div>
+            <div class="feature-item new-badge"><span class="icon">🔊</span><div class="label">الدردشة الصوتية</div><div class="desc">دردشة صوتية بملء الشاشة على غرار ChatGPT. تحدث واستمع واحصل على إجابات.</div></div>
+            <div class="feature-item new-badge"><span class="icon">📎</span><div class="label">تحليل الملفات + العرض</div><div class="desc">حمّل الصور ومقاطع الفيديو و PDF و Word و Excel والأكواد.</div></div>
+            <div class="feature-item new-badge"><span class="icon">📋</span><div class="label">نظام السجلات</div><div class="desc">جميع أحداث الموقع مرتبة حسب الخطورة. 5 مستويات.</div></div>
+            <div class="feature-item new-badge"><span class="icon">🎬</span><div class="label">استوديو الفيديو</div><div class="desc">سيناريوهات فيديو بالذكاء الاصطناعي، أفكار Reels، تحليل روابط YouTube.</div></div>
+            <div class="feature-item new-badge"><span class="icon">📖</span><div class="label">دليل A27 API</div><div class="desc">إنشاء مفتاح API خطوة بخطوة، أمثلة على الأكواد، الحدود، الأمان.</div></div>
+            <div class="feature-item"><span class="icon">⌨️</span><div class="label">كتابة الأكواد</div><div class="desc">Python، React، SQL، Docker، C#، Java، Flutter — فقط اطلب.</div></div>
+            <div class="feature-item"><span class="icon">🌐</span><div class="label">البحث المباشر</div><div class="desc">أسعار العملات، الطقس، الأخبار — معلومات فورية.</div></div>
+            <div class="feature-item"><span class="icon">🧊</span><div class="label">استوديو 3D (90+ شكل)</div><div class="desc">مكعب، كرة، قلب، ماس، روبوت، صاروخ و أكثر من 90 شكلًا جاهزًا.</div></div>
+            <div class="feature-item"><span class="icon">🖼️</span><div class="label">توليد الصور</div><div class="desc">توليد الصور باستخدام Hugging Face FLUX.1-dev.</div></div>
+            <div class="feature-item"><span class="icon">👥</span><div class="label">العمل الجماعي</div><div class="desc">أنشئ فرقًا، شارك المشاريع، اسأل الذكاء الاصطناعي عبر @vizyonal.</div></div>
+            <div class="feature-item"><span class="icon">⚔️</span><div class="label">وضع المعركة و AI متعدد</div><div class="desc">قارن النماذج، اسأل 4 نماذج في وقت واحد.</div></div>
+        </div>
+
+        <h2>🔑 الأنظمة الخاصة</h2>
+        <div class="special-cards">
+            <div class="special-card v27api">
+                <span class="sp-icon">🔑</span>
+                <div class="sp-title">مفتاح A27 API</div>
+                <div class="sp-desc">استخدم القوة المجمعة لـ 21 نموذجًا في مشاريعك. خيارات مدة غير محدودة / سنة / 5 أشهر / شهر / أسبوع.</div>
+            </div>
+            <div class="special-card koc">
+                <span class="sp-icon">🧭</span>
+                <div class="sp-title">مساعد المدرب V27</div>
+                <div class="sp-desc">مدرب ذكاء اصطناعي دافئ وموجّه مع دعم نفسي. مشاركة محمية بكلمة مرور.</div>
+            </div>
+            <div class="special-card moderator">
+                <span class="sp-icon">🎨</span>
+                <div class="sp-title">مشرف / مصمم</div>
+                <div class="sp-desc">لا يمكن شراؤه. يُعيّن فقط من قبل المؤسس عبر البريد الإلكتروني. رتبة مخفية بصلاحيات غير محدودة.</div>
+            </div>
+        </div>
+
+        <h2>🔒 الأمان والخصوصية</h2>
+        <ul>
+            <li>استعلامات الذكاء الاصطناعي <strong>مجهولة</strong> ولا تُخزن بشكل دائم.</li>
+            <li>جميع مفاتيح API مشفرة بـ <strong>AES-256-GCM</strong>.</li>
+            <li>تجزئة كلمة المرور بـ <strong>PBKDF2-SHA512 (100,000 تكرار)</strong>.</li>
+            <li>لا تُستخدم أي بيانات شخصية لتدريب نماذج الذكاء الاصطناعي.</li>
+        </ul>
+
+        <h2>📊 الخطط والأسعار</h2>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <div class="plan-name">🆓 مجاني</div>
+                <span class="price">₺0<span>/شهر</span></span>
+                <ul>
+                    <li>100 استعلام/يوم</li>
+                    <li>الوصول إلى 21 نموذجًا</li>
+                    <li>AETHRION AI (محدود)</li>
+                    <li>دردشة صوتية (محدودة)</li>
+                    <li>مفتاحا A27 API</li>
+                    <li>10 عمليات مدرب/أسبوع</li>
+                </ul>
+                <a href="https://vizyon2026.vercel.app/index.html#pricing" class="btn">ابدأ</a>
+            </div>
+            <div class="pricing-card featured">
+                <span class="badge-featured">🌟 الأكثر شيوعًا</span>
+                <div class="plan-name">Pro</div>
+                <span class="price">₺299<span>/شهر</span></span>
+                <ul>
+                    <li>2000 استعلام/يوم</li>
+                    <li>وصول أولوي إلى 21 نموذجًا</li>
+                    <li>AETHRION AI (وصول كامل)</li>
+                    <li>دردشة صوتية غير محدودة</li>
+                    <li>تحليل الملفات + العرض</li>
+                    <li>20 مفتاح A27 API</li>
+                    <li>50 عملية مدرب/أسبوع</li>
+                </ul>
+                <a href="https://vizyon2026.vercel.app/index.html#pricing" class="btn">اشترك</a>
+            </div>
+            <div class="pricing-card">
+                <div class="plan-name">👥 فريق</div>
+                <span class="price">₺899<span>/شهر</span></span>
+                <ul>
+                    <li>استعلامات غير محدودة</li>
+                    <li>وصول غير محدود لجميع النماذج</li>
+                    <li>AETHRION AI (غير محدود)</li>
+                    <li>4 أوضاع + قراءة الشاشة</li>
+                    <li>100 مفتاح A27 API</li>
+                    <li>1000 عملية مدرب/أسبوع</li>
+                    <li>إنشاء فرق/إضافة أعضاء</li>
+                </ul>
+                <a href="https://vizyon2026.vercel.app/index.html#pricing" class="btn">أنشئ فريقًا</a>
+            </div>
+        </div>
+
+        <div class="highlight-box purple">
+            <strong>📢 جرّب فيجن AI الآن!</strong><br>
+            انقر على <strong>"⚡ ابدأ فيجن AI"</strong> في الصفحة الرئيسية وابدأ الاستكشاف.
+        </div>
+
+        <hr>
+        <div class="legal-footer">
+            <p><strong>© 2027 فيجن 2027</strong> – جميع الحقوق محفوظة.</p>
+        </div>
+        <hr>
+        <a href="index.html" class="bottom-back-link">⬅️ العودة إلى الصفحة الرئيسية</a>
+    </div>
+
+</div>
+
+<!-- ===== PARSE SDK VE SCRIPT ===== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/parse/5.0.0/parse.min.js"></script>
+<script>
+    // ================================================================
+    // VİZYON 2027 — VİZYON AI SAYFASI v3.0 (v7.10.0)
+    // ✅ Back4App uyumlu (index.html + Cloud Code v7.10.0 ile senkron)
+    // ✅ Aurora + parçacıklar + efsane SVG logo
+    // ✅ 21 model (13 Ollama + 8 Cloud API) tam liste
+    // ✅ AETHRION AI + Sesli Sohbet + Dosya Analiz + Logs + Video
+    // ✅ A27 API + V27 Koç + Moderatör + Fiyatlandırma (index.html ile aynı)
+    // ✅ 3 dil (TR/EN/AR) + RTL desteği
+    // ================================================================
+
+    // ===== Back4App Config (index.html v7.10.0 ile aynı) =====
+    Parse.initialize(
+        "Dr9SODgMburZ54QvC8RnIHc9dbjreozBbKLOpMjX",
+        "dCXRvnEcCcOFvpzVDAV9AAJnYvdrqaP1JFRkJzvv"
+    );
+    Parse.serverURL = "https://parseapi.back4app.com/";
+
+    // ===== DİL DEĞİŞTİRME =====
+    function switchLanguage(lang) {
+        document.querySelectorAll('.lang-content').forEach(function (el) {
+            el.classList.remove('active');
+        });
+        var target = document.getElementById('lang-' + lang);
+        if (target) target.classList.add('active');
+
+        document.querySelectorAll('.lang-btn').forEach(function (btn) {
+            btn.classList.remove('active');
+            if (btn.dataset.lang === lang) btn.classList.add('active');
+        });
+
+        var container = document.getElementById('mainContainer');
+        if (container) {
+            container.style.direction = (lang === 'ar') ? 'rtl' : 'ltr';
+        }
+
+        document.documentElement.lang = (lang === 'ar') ? 'ar' : lang;
+
+        try {
+            localStorage.setItem('preferred_lang', lang);
+        } catch (e) {}
+    }
+    window.switchLanguage = switchLanguage;
+
+    // ===== PARÇACIK SİSTEMİ =====
+    function initParticles() {
+        var container = document.getElementById('particles');
+        if (!container) return;
+
+        var count = 30;
+        try {
+            if (window.matchMedia && window.matchMedia('(max-width: 480px)').matches) count = 14;
+            else if (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) count = 20;
+        } catch (e) {}
+
+        for (var i = 0; i < count; i++) {
+            var p = document.createElement('div');
+            p.className = 'particle';
+            p.style.cssText =
+                'left:' + (Math.random() * 100) + '%;' +
+                'animation-duration:' + (8 + Math.random() * 22) + 's;' +
+                'animation-delay:' + (-Math.random() * 30) + 's;';
+            container.appendChild(p);
+        }
+    }
+
+    // ===== SAYFA BAŞLANGICI =====
+    document.addEventListener('DOMContentLoaded', function () {
+        // Parçacıkları başlat
+        initParticles();
+
+        // Dil tercihini yükle
+        var savedLang = null;
+        try { savedLang = localStorage.getItem('preferred_lang'); } catch (e) {}
+
+        var urlParams = new URLSearchParams(window.location.search);
+        var urlLang = urlParams.get('lang');
+
+        var finalLang = 'tr';
+        if (urlLang && ['tr', 'en', 'ar'].indexOf(urlLang) !== -1) finalLang = urlLang;
+        else if (savedLang && ['tr', 'en', 'ar'].indexOf(savedLang) !== -1) finalLang = savedLang;
+
+        switchLanguage(finalLang);
+
+        // Console bilgilendirme
+        console.log('%c🤖 VİZYON 2027 — VİZYON AI Sayfası v3.0 (v7.10.0)',
+            'color:#00e5ff;font-weight:bold;font-size:14px;');
+        console.log('%c✅ Back4App uyumlu — index.html + Cloud Code v7.10.0 ile senkron',
+            'color:#00ff9d;font-size:12px;');
+        console.log('%c🎯 21 model aktif:', 'color:#ffd11a;font-size:12px;font-weight:bold;');
+        console.log('%c   → 13 Ollama + 7 NVIDIA NIM + 8 Cloud API', 'color:#8aa8d4;font-size:11px;');
+        console.log('%c🚀 Yeni özellikler:', 'color:#b845ff;font-size:12px;font-weight:bold;');
+        console.log('%c   → AETHRION AI (4 mod) · Sesli Sohbet · Dosya Analiz', 'color:#8aa8d4;font-size:11px;');
+        console.log('%c   → Logs Sistemi · Video Stüdyo · A27 API Rehber', 'color:#8aa8d4;font-size:11px;');
+        console.log('%c   → V27 Koç · Moderatör Rütbesi · 3D Stüdyo (90+ şekil)', 'color:#8aa8d4;font-size:11px;');
+    });
+
+    // ===== Klavye kısayolu: Ctrl+1/2/3 ile dil değiştirme =====
+    document.addEventListener('keydown', function (e) {
+        if (e.ctrlKey || e.metaKey) {
+            if (e.key === '1') { e.preventDefault(); switchLanguage('tr'); }
+            if (e.key === '2') { e.preventDefault(); switchLanguage('en'); }
+            if (e.key === '3') { e.preventDefault(); switchLanguage('ar'); }
+        }
+    });
+</script>
+
+</body>
+</html>

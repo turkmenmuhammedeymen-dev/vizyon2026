@@ -1,0 +1,2394 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#03050a">
+    <title>✨ AETHRION AI — 21 Yapay Zeka Tek Panelde | VİZYON 2027</title>
+    <meta name="description" content="AETHRION AI, 21 farklı yapay zeka modelini tek panelde birleştiren; 4 modda (Normal, Derin Düşünme, Ajan, Yazılımcı), ekran okuma, sesli sohbet, dosya analiz + sunum ve indirilebilir dosya özellikleriyle donatılmış devrim niteliğinde AI asistanıdır.">
+
+    <meta property="og:title" content="✨ AETHRION AI — 21 Yapay Zeka Tek Panelde">
+    <meta property="og:description" content="4 mod: Normal, Derin Düşünme, Ajan, Yazılımcı. Ekran okuma, sesli sohbet, dosya analiz + sunum ve dahası.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://vizyon2026.vercel.app/vizyon-al.html">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://vizyon2026.vercel.app/logo.png" />
+    <link rel="apple-touch-icon" href="https://vizyon2026.vercel.app/logo.png" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================================================ */
+        /* ROOT DEĞİŞKENLER — EFSANE PALET (index.html v7.10.0 ile aynı) */
+        /* ============================================================ */
+        :root {
+            --bg: #03050a;
+            --bg2: #060a14;
+            --bg3: #0a1020;
+            --surface: #0a1020;
+            --surface2: #0e1630;
+            --surface3: #141e40;
+            --border: #1a2a4a;
+            --border2: #24365e;
+
+            --accent: #00e5ff;
+            --accent-hover: #4df0ff;
+            --accent2: #00ff9d;
+            --accent3: #ff5e1a;
+            --accent4: #ff2d92;
+            --gold: #ffd11a;
+            --purple: #b845ff;
+            --pink: #ff2d92;
+            --deep-blue: #0049ff;
+
+            --text: #ffffff;
+            --text2: #d4e5ff;
+            --text3: #8aa8d4;
+            --text4: #5a7aa8;
+
+            --danger: #ff4757;
+            --success: #00ff9d;
+            --warning: #ffb700;
+
+            --font-display: 'Syne', sans-serif;
+            --font-code: 'Fira Code', monospace;
+            --font-body: 'Inter', sans-serif;
+
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.25s ease;
+            --transition-slow: 0.4s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ============================================================ */
+        /* AURORA / NEBULA ARKA PLAN                                     */
+        /* ============================================================ */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 0%, rgba(0, 229, 255, 0.12) 0%, transparent 55%),
+                radial-gradient(ellipse 70% 50% at 80% 10%, rgba(184, 69, 255, 0.10) 0%, transparent 55%),
+                radial-gradient(ellipse 90% 60% at 50% 100%, rgba(255, 45, 146, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 10% 60%, rgba(0, 255, 157, 0.06) 0%, transparent 60%);
+            animation: auroraShift 24s ease-in-out infinite alternate;
+        }
+
+        @keyframes auroraShift {
+            0%   { opacity: 0.75; transform: scale(1) rotate(0deg); }
+            50%  { opacity: 1;    transform: scale(1.06) rotate(2deg); }
+            100% { opacity: 0.85; transform: scale(1) rotate(0deg); }
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(0, 229, 255, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.025) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 85%);
+            -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 85%);
+            opacity: 0.6;
+            animation: gridPulse 12s ease-in-out infinite;
+        }
+
+        @keyframes gridPulse {
+            0%, 100% { opacity: 0.4; }
+            50%      { opacity: 0.75; }
+        }
+
+        /* ============================================================ */
+        /* PARÇACIK SİSTEMİ                                              */
+        /* ============================================================ */
+        .particles {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: float-up linear infinite;
+            opacity: 0;
+            box-shadow: 0 0 6px var(--accent);
+            will-change: transform, opacity;
+        }
+
+        .particle:nth-child(2n) { background: var(--accent2); width: 3px; height: 3px; box-shadow: 0 0 8px var(--accent2); }
+        .particle:nth-child(3n) { background: var(--purple); box-shadow: 0 0 8px var(--purple); }
+        .particle:nth-child(5n) { background: var(--pink); box-shadow: 0 0 10px var(--pink); }
+        .particle:nth-child(7n) { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+
+        @keyframes float-up {
+            0%   { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10%  { opacity: 0.9; }
+            50%  { opacity: 0.7; }
+            90%  { opacity: 0.35; }
+            100% { transform: translateY(-150px) translateX(30px); opacity: 0; }
+        }
+
+        /* ============================================================ */
+        /* NAVBAR                                                        */
+        /* ============================================================ */
+        nav.top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            height: 76px;
+            background: rgba(3, 5, 10, 0.75);
+            backdrop-filter: blur(28px) saturate(160%);
+            -webkit-backdrop-filter: blur(28px) saturate(160%);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.15);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        nav.top-nav::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), var(--purple), var(--pink), transparent);
+            opacity: 0.7;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-logo-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-logo-link:hover { transform: scale(1.03); }
+
+        .nav-logo-icon {
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.5));
+        }
+
+        .nav-logo-text {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(45deg, #00e5ff, #00ff9d, #b845ff, #ff2d92, #ffd11a, #00e5ff);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientMove 6s ease infinite;
+            letter-spacing: 1px;
+        }
+
+        @keyframes gradientMove {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .nav-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            background: linear-gradient(135deg, rgba(184, 69, 255, 0.2), rgba(0, 229, 255, 0.15));
+            border: 1px solid rgba(184, 69, 255, 0.5);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--purple);
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 15px rgba(184, 69, 255, 0.3);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Dil seçici (navbar) */
+        .nav-lang-select {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.06), rgba(184, 69, 255, 0.03));
+            color: var(--text2);
+            border: 1.5px solid var(--border2);
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: var(--font-body);
+            transition: all var(--transition-fast);
+        }
+
+        .nav-lang-select:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+
+        .nav-lang-select option {
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .nav-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: transparent;
+            border: 1.5px solid rgba(0, 229, 255, 0.4);
+            color: var(--accent);
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            font-family: var(--font-body);
+            transition: all 0.25s ease;
+            letter-spacing: 0.3px;
+        }
+
+        .nav-back-btn:hover {
+            background: rgba(0, 229, 255, 0.12);
+            border-color: var(--accent);
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .nav-start-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            background: linear-gradient(135deg, #00e5ff, #b845ff, #ff2d92);
+            background-size: 200% 200%;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: var(--font-body);
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            animation: btnGradientShift 4s ease infinite;
+            text-decoration: none;
+        }
+
+        @keyframes btnGradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50%      { background-position: 100% 50%; }
+        }
+
+        .nav-start-btn:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 0 45px rgba(0, 229, 255, 0.85), 0 0 80px rgba(184, 69, 255, 0.5);
+        }
+
+        /* ============================================================ */
+        /* DİL İÇERİK GÖSTERME                                          */
+        /* ============================================================ */
+        .lang-content { display: none; }
+        .lang-content.active { display: block; animation: fadeIn 0.4s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============================================================ */
+        /* HERO                                                          */
+        /* ============================================================ */
+        .hero {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 130px 32px 80px;
+        }
+
+        .hero-orb {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-orb::before {
+            content: '';
+            position: absolute;
+            inset: -10px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #00e5ff, #00ff9d, #ffd11a, #ff2d92, #b845ff, #00e5ff);
+            animation: orbSpin 6s linear infinite;
+            filter: blur(8px);
+            opacity: 0.8;
+        }
+
+        .hero-orb::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border-radius: 50%;
+            background: #050812;
+            z-index: 1;
+        }
+
+        @keyframes orbSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hero-orb-icon {
+            position: relative;
+            z-index: 2;
+            font-size: 76px;
+            filter: drop-shadow(0 0 30px rgba(0, 229, 255, 0.8));
+            animation: orbFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(-8px); }
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 22px;
+            border: 1px solid rgba(184, 69, 255, 0.5);
+            border-radius: 40px;
+            font-size: 12px;
+            color: var(--purple);
+            margin-bottom: 24px;
+            background: rgba(184, 69, 255, 0.08);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 25px rgba(184, 69, 255, 0.2);
+        }
+
+        .hero-tag .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent2);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--accent2);
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50%      { opacity: 0.2; }
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(48px, 9vw, 96px);
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 20px;
+            letter-spacing: -1.5px;
+        }
+
+        .hero-title .line1 {
+            display: block;
+            color: var(--text);
+            text-shadow: 0 0 40px rgba(0, 229, 255, 0.5), 0 0 80px rgba(0, 229, 255, 0.25);
+        }
+
+        .hero-title .line2 {
+            display: block;
+            background: linear-gradient(90deg, #00e5ff, #00ff9d, #b845ff, #ff2d92, #00e5ff);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientMove 4s ease infinite;
+            text-shadow: 0 0 60px rgba(184, 69, 255, 0.5);
+        }
+
+        .hero-sub {
+            max-width: 720px;
+            font-size: 16.5px;
+            line-height: 1.85;
+            color: var(--text2);
+            margin-bottom: 40px;
+            letter-spacing: 0.2px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 60px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 34px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            font-family: var(--font-body);
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00e5ff, #b845ff, #ff2d92);
+            background-size: 200% 200%;
+            color: #fff;
+            animation: btnGradientShift 4s ease infinite;
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.1);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 0 50px rgba(0, 229, 255, 0.9), 0 0 100px rgba(184, 69, 255, 0.5);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1.5px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 229, 255, 0.12);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.5);
+            transform: translateY(-3px);
+        }
+
+        /* ============================================================ */
+        /* SECTION                                                       */
+        /* ============================================================ */
+        .section {
+            position: relative;
+            z-index: 2;
+            padding: 90px 32px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-tag {
+            display: inline-block;
+            font-size: 12px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 16px;
+            font-weight: 700;
+            font-family: var(--font-code);
+            text-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(34px, 5vw, 52px);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        .section-title .hl {
+            background: linear-gradient(135deg, var(--accent), var(--purple), var(--pink));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientMove 4s ease infinite;
+        }
+
+        .section-desc {
+            max-width: 700px;
+            margin: 18px auto 0;
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text2);
+        }
+
+        /* ============================================================ */
+        /* İSTATİSTİK BAR                                                */
+        /* ============================================================ */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 40px;
+            padding: 40px 32px;
+            max-width: 900px;
+            margin: 0 auto;
+            border-radius: 24px;
+            background: linear-gradient(135deg, rgba(10, 16, 32, 0.85), rgba(6, 10, 20, 0.9));
+            border: 1px solid var(--border2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 229, 255, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .stat-item {
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .stat-num {
+            font-family: var(--font-display);
+            font-size: 42px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--purple), var(--pink));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientMove 4s ease infinite;
+            display: block;
+            letter-spacing: -1.5px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text3);
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        /* ============================================================ */
+        /* MOD KARTLARI (4 mod)                                          */
+        /* ============================================================ */
+        .modes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 22px;
+        }
+
+        .mode-card {
+            position: relative;
+            padding: 32px 28px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, rgba(10, 16, 32, 0.92), rgba(6, 10, 20, 0.95));
+            border: 1.5px solid var(--border2);
+            overflow: hidden;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--mc-accent, var(--accent));
+            box-shadow: 0 0 20px var(--mc-accent, var(--accent));
+        }
+
+        .mode-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--mc-accent, var(--accent));
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.5),
+                0 0 40px var(--mc-glow, rgba(0, 229, 255, 0.3));
+        }
+
+        .mode-card.normal    { --mc-accent: #00e5ff; --mc-glow: rgba(0, 229, 255, 0.4); }
+        .mode-card.deep      { --mc-accent: #0096ff; --mc-glow: rgba(0, 150, 255, 0.4); }
+        .mode-card.agent     { --mc-accent: #ff6b35; --mc-glow: rgba(255, 107, 53, 0.4); }
+        .mode-card.developer { --mc-accent: #00ff9d; --mc-glow: rgba(0, 255, 157, 0.4); }
+
+        .mode-icon {
+            width: 62px;
+            height: 62px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3));
+            border: 1.5px solid var(--mc-accent);
+            box-shadow: 0 0 25px var(--mc-glow), inset 0 0 15px var(--mc-glow);
+        }
+
+        .mode-title {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: var(--mc-accent);
+            letter-spacing: -0.2px;
+        }
+
+        .mode-desc {
+            font-size: 13.5px;
+            line-height: 1.75;
+            color: var(--text2);
+        }
+
+        .mode-features {
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .mode-features span {
+            font-size: 12.5px;
+            color: var(--text3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mode-features span::before {
+            content: '▸';
+            color: var(--mc-accent);
+            font-weight: 700;
+        }
+
+        /* ============================================================ */
+        /* ÖZELLİK KARTLARI                                              */
+        /* ============================================================ */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 22px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            padding: 28px 26px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(10, 16, 32, 0.85), rgba(6, 10, 20, 0.9));
+            border: 1.5px solid var(--border2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 229, 255, 0.08) 0%, transparent 40%);
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+
+        .feature-card:hover::before { opacity: 1; }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 229, 255, 0.15);
+        }
+
+        .feature-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+            border: 1.5px solid var(--border2);
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(184, 69, 255, 0.05));
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.15), inset 0 0 15px rgba(0, 229, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.08) rotate(-3deg);
+            border-color: var(--accent);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.5), inset 0 0 20px rgba(0, 229, 255, 0.15);
+        }
+
+        .feature-title {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .feature-desc {
+            font-size: 13px;
+            line-height: 1.7;
+            color: var(--text2);
+        }
+
+        .badge-new {
+            font-size: 9.5px;
+            padding: 3px 9px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #00e5ff, #b845ff, #ff2d92);
+            background-size: 200% 200%;
+            color: #fff;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            animation: btnGradientShift 3s ease infinite;
+            box-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .badge-new::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: newBadgeShine 2s linear infinite;
+        }
+
+        @keyframes newBadgeShine {
+            0%   { left: -100%; }
+            100% { left: 200%; }
+        }
+
+        /* ============================================================ */
+        /* ÖZEL SİSTEMLER (A27 API / KOÇ / MODERATÖR)                    */
+        /* ============================================================ */
+        .special-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 22px;
+            margin-top: 40px;
+        }
+
+        .special-card {
+            padding: 30px 26px;
+            border-radius: 22px;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-normal);
+            border: 2px solid;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .special-card.v27api {
+            background: linear-gradient(135deg, rgba(255, 209, 26, 0.10), rgba(255, 140, 0, 0.05));
+            border-color: var(--gold);
+            box-shadow: 0 0 30px rgba(255, 209, 26, 0.15);
+        }
+        .special-card.v27api:hover {
+            border-color: #ffcc00;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5), 0 0 50px rgba(255, 209, 26, 0.4);
+        }
+
+        .special-card.koc {
+            background: linear-gradient(135deg, rgba(255, 45, 146, 0.10), rgba(184, 69, 255, 0.05));
+            border-color: var(--pink);
+            box-shadow: 0 0 30px rgba(255, 45, 146, 0.15);
+        }
+        .special-card.koc:hover {
+            border-color: var(--pink);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5), 0 0 50px rgba(255, 45, 146, 0.4);
+        }
+
+        .special-card.moderator {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.10), rgba(0, 212, 255, 0.05));
+            border-color: var(--accent);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.15);
+        }
+        .special-card.moderator:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5), 0 0 50px rgba(0, 229, 255, 0.4);
+        }
+
+        .special-card .sp-icon {
+            font-size: 44px;
+            margin-bottom: 12px;
+            display: block;
+            filter: drop-shadow(0 0 12px currentColor);
+        }
+
+        .special-card .sp-title {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.2px;
+        }
+
+        .special-card.v27api .sp-title { color: var(--gold); }
+        .special-card.koc .sp-title { color: var(--pink); }
+        .special-card.moderator .sp-title { color: var(--accent); }
+
+        .special-card .sp-desc {
+            font-size: 13px;
+            color: var(--text2);
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .special-card .sp-limits {
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 12px;
+            color: var(--text3);
+            line-height: 1.9;
+        }
+
+        .special-card .sp-limits strong {
+            font-weight: 700;
+        }
+
+        .special-card.v27api .sp-limits strong { color: var(--gold); }
+        .special-card.koc .sp-limits strong { color: var(--pink); }
+        .special-card.moderator .sp-limits strong { color: var(--accent); }
+
+        /* ============================================================ */
+        /* ÖNİZLEME (PREVIEW MOCKUP)                                     */
+        /* ============================================================ */
+        .preview-wrap {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            border-radius: 26px;
+            padding: 2px;
+            background: linear-gradient(135deg, #00e5ff, #b845ff, #ff2d92, #00e5ff);
+            background-size: 300% 300%;
+            animation: gradientMove 6s ease infinite;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 80px rgba(0, 229, 255, 0.25);
+        }
+
+        .preview-inner {
+            background: linear-gradient(135deg, #0a1020, #050812);
+            border-radius: 24px;
+            overflow: hidden;
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.15);
+            background: linear-gradient(90deg, rgba(0, 229, 255, 0.06), rgba(184, 69, 255, 0.04));
+        }
+
+        .preview-dots {
+            display: flex;
+            gap: 7px;
+        }
+
+        .preview-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .preview-dot.red    { background: #ff5f56; box-shadow: 0 0 8px rgba(255, 95, 86, 0.6); }
+        .preview-dot.yellow { background: #ffbd2e; box-shadow: 0 0 8px rgba(255, 189, 46, 0.6); }
+        .preview-dot.green  { background: #27c93f; box-shadow: 0 0 8px rgba(39, 201, 63, 0.6); }
+
+        .preview-title-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-code);
+            font-size: 12px;
+            color: var(--text3);
+            letter-spacing: 0.5px;
+        }
+
+        .preview-title-bar .vz-icon-sm {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00e5ff, #b845ff, #ff2d92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
+        }
+
+        .preview-modes {
+            display: flex;
+            gap: 8px;
+            padding: 14px 24px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .preview-mode-pill {
+            padding: 7px 16px;
+            font-size: 11.5px;
+            font-weight: 600;
+            border-radius: 20px;
+            border: 1px solid var(--border2);
+            color: var(--text3);
+            background: transparent;
+        }
+
+        .preview-mode-pill.active {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.25), rgba(184, 69, 255, 0.25));
+            border-color: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+        }
+
+        .preview-chat {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 280px;
+        }
+
+        .preview-msg {
+            padding: 14px 18px;
+            border-radius: 16px;
+            font-size: 13.5px;
+            line-height: 1.65;
+            max-width: 85%;
+        }
+
+        .preview-msg.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.2), rgba(184, 69, 255, 0.15));
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            color: #fff;
+        }
+
+        .preview-msg.bot {
+            align-self: flex-start;
+            background: linear-gradient(135deg, rgba(0, 255, 157, 0.1), rgba(0, 229, 255, 0.08));
+            border: 1px solid rgba(0, 255, 157, 0.2);
+            border-left: 3px solid var(--accent2);
+            color: #e8f0f8;
+        }
+
+        .preview-msg .role {
+            font-size: 10.5px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .preview-msg.user .role { color: var(--accent); text-align: right; }
+        .preview-msg.bot .role  { color: var(--accent2); }
+
+        .preview-input-area {
+            display: flex;
+            gap: 10px;
+            padding: 18px 24px;
+            border-top: 1px solid rgba(0, 229, 255, 0.15);
+            background: rgba(0, 0, 0, 0.35);
+            align-items: center;
+        }
+
+        .preview-input {
+            flex: 1;
+            padding: 12px 18px;
+            background: rgba(0, 229, 255, 0.04);
+            border: 1.5px solid var(--border2);
+            border-radius: 25px;
+            color: var(--text3);
+            font-size: 13px;
+            font-family: var(--font-body);
+        }
+
+        .preview-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #00e5ff, #b845ff, #ff2d92);
+            color: #fff;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+            flex-shrink: 0;
+        }
+
+        /* ============================================================ */
+        /* SSS                                                           */
+        /* ============================================================ */
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.04), rgba(184, 69, 255, 0.02));
+            border: 1px solid rgba(0, 229, 255, 0.15);
+            border-radius: 16px;
+            padding: 18px 22px;
+            transition: all var(--transition-normal);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .faq-item:hover {
+            border-color: rgba(0, 229, 255, 0.35);
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(184, 69, 255, 0.04));
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .faq-item .faq-q {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 15px;
+            margin-bottom: 8px;
+            letter-spacing: -0.1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .faq-item .faq-q::before {
+            content: '?';
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 0 12px rgba(0, 229, 255, 0.5);
+        }
+
+        .faq-item .faq-a {
+            font-size: 13.5px;
+            color: var(--text2);
+            line-height: 1.75;
+            padding-left: 30px;
+        }
+
+        /* ============================================================ */
+        /* CTA                                                           */
+        /* ============================================================ */
+        .cta-box {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 54px 42px;
+            border-radius: 32px;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(184, 69, 255, 0.08), rgba(255, 45, 146, 0.06));
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 60px rgba(0, 229, 255, 0.2), inset 0 0 60px rgba(0, 229, 255, 0.04);
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .cta-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+            animation: ctaShine 6s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes ctaShine {
+            0%   { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .cta-box h2 {
+            font-family: var(--font-display);
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-box h2 .hl {
+            background: linear-gradient(135deg, var(--accent), var(--purple), var(--pink));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientMove 4s ease infinite;
+        }
+
+        .cta-box p {
+            font-size: 15px;
+            line-height: 1.75;
+            color: var(--text2);
+            margin-bottom: 30px;
+            max-width: 620px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-actions {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ============================================================ */
+        /* FOOTER                                                        */
+        /* ============================================================ */
+        footer.bottom-footer {
+            position: relative;
+            z-index: 2;
+            margin-top: 80px;
+            padding: 44px 32px 32px;
+            border-top: 1px solid rgba(0, 229, 255, 0.15);
+            background: linear-gradient(180deg, rgba(6, 10, 20, 0.95), var(--bg));
+            text-align: center;
+        }
+
+        footer.bottom-footer::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), var(--purple), var(--pink), transparent);
+            opacity: 0.7;
+            box-shadow: 0 0 25px var(--accent);
+        }
+
+        .footer-copy {
+            font-size: 13px;
+            color: var(--text3);
+            letter-spacing: 0.3px;
+        }
+
+        .footer-copy span {
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+        }
+
+        .footer-links {
+            margin-top: 14px;
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            font-size: 13px;
+        }
+
+        .footer-links a {
+            color: var(--text2);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover { color: var(--accent); }
+
+        /* ============================================================ */
+        /* RESPONSIVE                                                    */
+        /* ============================================================ */
+        @media (max-width: 768px) {
+            nav.top-nav { padding: 0 16px; height: 66px; }
+            .nav-logo-icon { width: 40px; height: 40px; }
+            .nav-logo-text { font-size: 17px; }
+            .nav-badge { display: none; }
+            .nav-lang-select { font-size: 11px; padding: 6px 10px; }
+            .nav-back-btn { font-size: 11.5px; padding: 8px 14px; }
+            .nav-start-btn { font-size: 11.5px; padding: 8px 16px; }
+            .nav-start-btn .nav-text { display: none; }
+
+            .hero { padding: 100px 20px 60px; }
+            .hero-orb { width: 130px; height: 130px; margin-bottom: 30px; }
+            .hero-orb-icon { font-size: 56px; }
+            .hero-sub { font-size: 14px; }
+            .btn { padding: 13px 26px; font-size: 13.5px; }
+
+            .section { padding: 60px 20px; }
+            .section-header { margin-bottom: 40px; }
+            .modes-grid { grid-template-columns: 1fr; }
+            .mode-card { padding: 24px 22px; }
+            .features-grid { grid-template-columns: 1fr; }
+            .special-cards { grid-template-columns: 1fr; }
+            .preview-chat { padding: 18px; min-height: 220px; }
+            .preview-msg { font-size: 12.5px; padding: 11px 14px; }
+            .preview-input-area { padding: 14px 18px; }
+
+            .cta-box { padding: 34px 22px; }
+            .stats-bar { gap: 22px; padding: 28px 20px; }
+            .stat-num { font-size: 32px; }
+            .stat-label { font-size: 10px; }
+        }
+
+        @media (max-width: 480px) {
+            nav.top-nav { padding: 0 12px; height: 60px; gap: 6px; }
+            .nav-logo-text { font-size: 14px; letter-spacing: 0.5px; }
+            .nav-lang-select { font-size: 10px; padding: 5px 8px; }
+            .nav-back-btn { font-size: 10px; padding: 6px 10px; }
+            .nav-start-btn { font-size: 10px; padding: 6px 12px; }
+
+            .hero { padding: 90px 14px 50px; }
+            .hero-title { letter-spacing: -1px; }
+            .hero-actions .btn { padding: 11px 20px; font-size: 12.5px; }
+
+            .section { padding: 40px 14px; }
+            .mode-card { padding: 20px 18px; }
+            .mode-title { font-size: 18px; }
+            .mode-icon { width: 52px; height: 52px; font-size: 22px; }
+            .feature-card { padding: 22px 18px; }
+            .special-card { padding: 22px 18px; }
+            .special-card .sp-icon { font-size: 36px; }
+            .special-card .sp-title { font-size: 17px; }
+            .preview-chat { padding: 14px; min-height: 200px; }
+            .preview-input-area { padding: 12px 14px; }
+            .preview-input { padding: 10px 14px; font-size: 12px; }
+            .preview-btn { width: 36px; height: 36px; }
+
+            .cta-box { padding: 28px 16px; }
+            .stats-bar { gap: 16px; padding: 24px 14px; }
+            .stat-num { font-size: 26px; }
+            .faq-item { padding: 14px 16px; }
+            .faq-item .faq-q { font-size: 13.5px; }
+            .faq-item .faq-a { font-size: 12.5px; padding-left: 0; }
+        }
+
+        /* RTL DESTEĞİ (Arapça için) */
+        [dir="rtl"] .mode-features span::before {
+            content: '◂';
+        }
+
+        [dir="rtl"] .faq-item .faq-q::before {
+            content: '?';
+        }
+
+        [dir="rtl"] .faq-item .faq-a {
+            padding-left: 0;
+            padding-right: 30px;
+        }
+
+        [dir="rtl"] .preview-msg.bot {
+            border-left: none;
+            border-right: 3px solid var(--accent2);
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            body::before, body::after, .particle { animation: none !important; }
+        }
+    </style>
+<style id="aethrion-visual-system-v3">:root{color-scheme:dark;--ae-line:rgba(133,169,224,.2);--ae-text:#f3f6ff;--ae-cyan:#6be7ff;--ae-violet:#b59aff;--ae-radius:22px}html{scroll-behavior:smooth;background:#070b16}body{background:radial-gradient(ellipse at 12% -10%,rgba(69,107,255,.2),transparent 38%),radial-gradient(ellipse at 90% 12%,rgba(33,220,238,.11),transparent 34%),linear-gradient(160deg,#070b16,#0b1020 55%,#090d19)!important;color:var(--ae-text)!important;-webkit-font-smoothing:antialiased}h1,h2,h3{letter-spacing:-.035em;text-wrap:balance}p,li{line-height:1.72}a,button{transition:all .2s ease}a:focus-visible,button:focus-visible{outline:2px solid var(--ae-cyan);outline-offset:3px}:where(.card,.panel,.glass-card,.feature-card,article,section .card){border-color:var(--ae-line)}::selection{background:rgba(107,231,255,.28);color:white}@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}</style>
+</head>
+<body>
+
+    <!-- ============ PARÇACIKLAR ============ -->
+    <div class="particles" id="particles"></div>
+
+    <!-- ============ NAVBAR ============ -->
+    <nav class="top-nav">
+        <div class="nav-left">
+            <a href="https://vizyon2026.vercel.app/" class="nav-logo-link">
+                <div class="nav-logo-icon">
+                    <svg width="46" height="46" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="vzLogoGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#00e5ff"/>
+                                <stop offset="50%" stop-color="#b845ff"/>
+                                <stop offset="100%" stop-color="#ff2d92"/>
+                            </linearGradient>
+                            <linearGradient id="vzLogoGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#00ff9d"/>
+                                <stop offset="100%" stop-color="#00e5ff"/>
+                            </linearGradient>
+                            <radialGradient id="vzLogoGlow">
+                                <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.7"/>
+                                <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+                            </radialGradient>
+                        </defs>
+                        <circle cx="30" cy="30" r="28" fill="url(#vzLogoGlow)"/>
+                        <circle cx="30" cy="30" r="25" fill="none" stroke="url(#vzLogoGrad1)" stroke-width="2.5" opacity="0.95"/>
+                        <circle cx="30" cy="30" r="21" fill="none" stroke="url(#vzLogoGrad1)" stroke-width="0.8" opacity="0.45" stroke-dasharray="3 3"/>
+                        <circle cx="30" cy="30" r="20" fill="rgba(10,16,32,0.78)"/>
+                        <path d="M 33 15 A 15 15 0 1 0 33 45 A 12 12 0 1 1 33 15 Z" fill="url(#vzLogoGrad2)" opacity="0.95"/>
+                        <polygon points="42,18 43.5,23 48.5,23 44.5,26 46,31 42,28 38,31 39.5,26 35.5,23 40.5,23" fill="#ffd11a"/>
+                        <path d="M 15 30 L 12 30 M 48 30 L 45 30 M 30 15 L 30 12 M 30 48 L 30 45" stroke="#00e5ff" stroke-width="1.2" opacity="0.75"/>
+                        <circle cx="12" cy="30" r="1.8" fill="#00e5ff"/>
+                        <circle cx="48" cy="30" r="1.8" fill="#00e5ff"/>
+                        <circle cx="30" cy="12" r="1.8" fill="#00ff9d"/>
+                        <circle cx="30" cy="48" r="1.8" fill="#ff2d92"/>
+                        <circle cx="30" cy="30" r="1.8" fill="#00e5ff"/>
+                    </svg>
+                </div>
+                <div class="nav-logo-text">VİZYON 2027</div>
+            </a>
+            <span class="nav-badge">✨ AETHRION AI</span>
+        </div>
+        <div class="nav-right">
+            <select class="nav-lang-select" id="langSelect" onchange="window.changeLanguage(this.value)">
+                <option value="tr">🇹🇷 Türkçe</option>
+                <option value="en">🇬🇧 English</option>
+                <option value="ar">🇸🇦 العربية</option>
+            </select>
+            <a href="https://vizyon2026.vercel.app/" class="nav-back-btn">
+                <i class="fas fa-arrow-left"></i> <span id="navBackText">Anasayfa</span>
+            </a>
+            <a href="https://vizyon2026.vercel.app/?openVizyonAl=1" class="nav-start-btn">
+                <i class="fas fa-rocket"></i> <span class="nav-text" id="navStartText">Başlat</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- ============ TÜRKÇE ============ -->
+    <div id="lang-tr" class="lang-content active">
+
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero-orb">
+                <div class="hero-orb-icon">✨</div>
+            </div>
+
+            <div class="hero-tag">
+                <span class="dot"></span>
+                VİZYON 2027 · YENİ NESİL AI PANELİ
+            </div>
+
+            <h1 class="hero-title">
+                <span class="line1">VİZYON AL</span>
+                <span class="line2">21 YAPAY ZEKA · TEK PANEL</span>
+            </h1>
+
+            <p class="hero-sub">
+                AETHRION AI, <strong style="color:var(--accent);">21 farklı yapay zeka modelini</strong> (13 yerli Ollama + 8 bulut API) tek bir panelde birleştirir.
+                4 farklı modda çalışır, <strong style="color:var(--purple);">ekranını okuyabilir</strong>, <strong style="color:var(--pink);">seninle sesli sohbet edebilir</strong>,
+                <strong style="color:var(--gold);">dosyalarını analiz edip sunum oluşturabilir</strong> ve oluşturduğu dosyaları sana <strong style="color:var(--accent2);">indirme linki</strong> olarak sunar.
+            </p>
+
+            <div class="hero-actions">
+                <a href="https://vizyon2026.vercel.app/?openVizyonAl=1" class="btn btn-primary">
+                    <i class="fas fa-rocket"></i> AETHRION AI'ı Başlat
+                </a>
+                <a href="#modlar" class="btn btn-secondary">
+                    <i class="fas fa-list"></i> Modları Keşfet
+                </a>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-num">21</span>
+                    <div class="stat-label">AI Modeli</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num">4</span>
+                    <div class="stat-label">Farklı Mod</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num">∞</span>
+                    <div class="stat-label">Sınırsız Olasılık</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num">7/24</span>
+                    <div class="stat-label">Kesintisiz Erişim</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4 MOD -->
+        <section class="section" id="modlar">
+            <div class="section-header">
+                <div class="section-tag">// 4 FARKLI MOD</div>
+                <h2 class="section-title">Her İş İçin <span class="hl">Ayrı Mod</span></h2>
+                <p class="section-desc">
+                    AETHRION AI, yapacağın işe göre 4 farklı modda çalışır. Modu üstteki butonlardan tek tıkla değiştirebilirsin.
+                </p>
+            </div>
+
+            <div class="modes-grid">
+                <div class="mode-card normal">
+                    <div class="mode-icon">🌐</div>
+                    <h3 class="mode-title">🌐 Normal Mod</h3>
+                    <p class="mode-desc">
+                        Tüm modellerin eşit şekilde çalıştığı varsayılan moddur. Günlük sorular, sohbet ve genel görevler için idealdir.
+                    </p>
+                    <div class="mode-features">
+                        <span>Hızlı cevap üretimi</span>
+                        <span>Tüm modeller sırayla denenir</span>
+                        <span>Sohbet + bilgi + soru-cevap</span>
+                        <span>Herkesin kullanımına uygun</span>
+                    </div>
+                </div>
+
+                <div class="mode-card deep">
+                    <div class="mode-icon">🧠</div>
+                    <h3 class="mode-title">🧠 Derin Düşünme</h3>
+                    <p class="mode-desc">
+                        Uzun uzun düşünür, internette gezer, tüm bilgileri toplayıp birleştirir. Düşünme sürecini ince mavi bir çizgi ve gri yazıyla gösterir.
+                    </p>
+                    <div class="mode-features">
+                        <span>Adım adım düşünme süreci</span>
+                        <span>İnternette gezinme</span>
+                        <span>Kapsamlı analiz</span>
+                        <span>Karmaşık sorular için ideal</span>
+                    </div>
+                </div>
+
+                <div class="mode-card agent">
+                    <div class="mode-icon">🕵️</div>
+                    <h3 class="mode-title">🕵️ Ajan Modu</h3>
+                    <p class="mode-desc">
+                        Her siteye girer, her işlemi yapar. Form doldurma, tıklama, şifre girme dahil tüm görevleri yerine getirir.
+                    </p>
+                    <div class="mode-features">
+                        <span>Site otomasyonu</span>
+                        <span>Form doldurma + tıklama</span>
+                        <span>Çoklu adım görevleri</span>
+                        <span>Pro ve üzeri paketlerde</span>
+                    </div>
+                </div>
+
+                <div class="mode-card developer">
+                    <div class="mode-icon">💻</div>
+                    <h3 class="mode-title">💻 Yazılımcı</h3>
+                    <p class="mode-desc">
+                        Her türlü kodla en iyi baş etme, en iyi kod üretimi. Hata ayıklama ve optimize etme konusunda uzmandır.
+                    </p>
+                    <div class="mode-features">
+                        <span>Python, JavaScript, React, SQL</span>
+                        <span>Hata ayıklama</span>
+                        <span>Optimizasyon önerileri</span>
+                        <span>Çalışan, eksiksiz kod</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ÖZELLİKLER -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// ÖZELLİKLER</div>
+                <h2 class="section-title">AETHRION AI'ın <span class="hl">Gücü</span></h2>
+                <p class="section-desc">
+                    21 AI modeli, 4 mod, 8 süper özellik. AETHRION AI, sadece bir sohbet aracı değil — tam bir AI asistanıdır.
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#00ff9d;color:#00ff9d;box-shadow:0 0 25px rgba(0,255,157,0.3);">👁️</div>
+                    <h3 class="feature-title">Ekran Okuma <span class="badge-new">YENİ</span></h3>
+                    <p class="feature-desc">
+                        İzin verirsen ekranını görebilir. Tek kare (👁️) veya canlı mod (🟢) olarak analiz eder.
+                        Ekrandaki metinleri okur, butonları tanımlar, işlemleri önerir.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#ff2d92;color:#ff2d92;box-shadow:0 0 25px rgba(255,45,146,0.3);">🔊</div>
+                    <h3 class="feature-title">Sesli Sohbet <span class="badge-new">YENİ</span></h3>
+                    <p class="feature-desc">
+                        Tam ekran ChatGPT gibi sesli sohbet. Al konuşur, sen konuşursun.
+                        Ortada logo, dalga animasyonu, geri tuşuna basınca ses kaydı kesinlikle kapanır.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#ffd11a;color:#ffd11a;box-shadow:0 0 25px rgba(255,209,26,0.3);">📎</div>
+                    <h3 class="feature-title">Dosya Analiz <span class="badge-new">YENİ</span></h3>
+                    <p class="feature-desc">
+                        Fotoğraf, video, PDF, Word, Excel, kod dosyaları yükle.
+                        Mesaj alanının üstünde önizleme kutusu çıkar. AI okur, analiz eder, günceller.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#b845ff;color:#b845ff;box-shadow:0 0 25px rgba(184,69,255,0.3);">📥</div>
+                    <h3 class="feature-title">Sunum + İndirme <span class="badge-new">YENİ</span></h3>
+                    <p class="feature-desc">
+                        Dosyanı analiz ettikten sonra AI, sunum/dosya oluşturur ve sana <strong style="color:var(--accent2);">indirme butonu</strong> verir.
+                        PDF, HTML, MD veya TXT olarak indir.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#00e5ff;color:#00e5ff;box-shadow:0 0 25px rgba(0,229,255,0.3);">🎤</div>
+                    <h3 class="feature-title">Sesli Komut</h3>
+                    <p class="feature-desc">
+                        🎤 butonuyla sesli soru sor. Söylediklerin otomatik olarak yazıya dökülür ve AI'ya gönderilir.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#0096ff;color:#0096ff;box-shadow:0 0 25px rgba(0,150,255,0.3);">🧠</div>
+                    <h3 class="feature-title">Deep Think</h3>
+                    <p class="feature-desc">
+                        Derin düşünme modunda "DÜŞÜNÜYORUM:" başlığı altında düşünme sürecini gösterir.
+                        Sonra net ve kapsamlı bir cevap verir.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#ff5e1a;color:#ff5e1a;box-shadow:0 0 25px rgba(255,94,26,0.3);">🛡️</div>
+                    <h3 class="feature-title">Sorumluluk Onayı</h3>
+                    <p class="feature-desc">
+                        İlk açılışta sorumluluk onay kutusu zorunlu.
+                        Tüm ekran okuma ve AI işlemleri için kullanıcı onayı gerekir.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#00ff9d;color:#00ff9d;box-shadow:0 0 25px rgba(0,255,157,0.3);">⚡</div>
+                    <h3 class="feature-title">Anında Hazır</h3>
+                    <p class="feature-desc">
+                        Kurulum yok. 3-çizgi menüye tıkla veya /vizyon-al.html sayfasına git.
+                        Tüm tarayıcılarda çalışır. Mobil + tablet + masaüstü uyumlu.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ÖZEL SİSTEMLER -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// ÖZEL SİSTEMLER</div>
+                <h2 class="section-title">AETHRION AI <span class="hl">Ekosistemi</span></h2>
+                <p class="section-desc">
+                    AETHRION AI sadece bir panel değil — tüm VİZYON 2027 sistemleriyle entegre çalışır.
+                </p>
+            </div>
+
+            <div class="special-cards">
+                <div class="special-card v27api">
+                    <span class="sp-icon">🔑</span>
+                    <div class="sp-title">A27 API Anahtarı</div>
+                    <div class="sp-desc">
+                        AETHRION AI'ın gücünü kendi projelerine taşı. Web sitende, mobil uygulamanda, botunda kullan.
+                    </div>
+                    <div class="sp-limits">
+                        <div>👑 Kurucu/Admin/Beta/Moderatör → <strong>♾️ Sınırsız</strong></div>
+                        <div>👥 Takım → <strong>100 adet</strong></div>
+                        <div>🌟 Pro → <strong>20 adet</strong></div>
+                        <div>🆓 Ücretsiz → <strong>2 adet</strong></div>
+                    </div>
+                </div>
+
+                <div class="special-card koc">
+                    <span class="sp-icon">🧭</span>
+                    <div class="sp-title">V27 Koç Asistanı</div>
+                    <div class="sp-desc">
+                        Samimi, yol gösteren, psikolojik destek veren AI koç. Sohbetler şifreli link ile paylaşılabilir.
+                    </div>
+                    <div class="sp-limits">
+                        <div>👑 Kurucu/Admin/Beta/Moderatör → <strong>♾️ Sınırsız</strong></div>
+                        <div>👥 Takım → <strong>1000/hafta</strong></div>
+                        <div>🌟 Pro → <strong>50/hafta</strong></div>
+                        <div>🆓 Ücretsiz → <strong>10/hafta</strong></div>
+                    </div>
+                </div>
+
+                <div class="special-card moderator">
+                    <span class="sp-icon">🎨</span>
+                    <div class="sp-title">Moderatör / Tasarımcı</div>
+                    <div class="sp-desc">
+                        Satın alınamaz, sadece kurucu atar. Butonu yok, yetkileri sınırsız.
+                    </div>
+                    <div class="sp-limits">
+                        <div>♾️ Sınırsız A27 API + AI sorgusu</div>
+                        <div>🎬 Video kesit aracı</div>
+                        <div>📨 Proje taleplerini yönlendirme</div>
+                        <div>💡 Tavsiye ve analiz sunma</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ÖNİZLEME -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// CANLI ÖNİZLEME</div>
+                <h2 class="section-title">AETHRION AI <span class="hl">Paneli</span></h2>
+                <p class="section-desc">
+                    İşte AETHRION AI panelinin tam görünümü. Sadece bir tıkla sen de kullanmaya başlayabilirsin.
+                </p>
+            </div>
+
+            <div class="preview-wrap">
+                <div class="preview-inner">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <div class="preview-dot red"></div>
+                            <div class="preview-dot yellow"></div>
+                            <div class="preview-dot green"></div>
+                        </div>
+                        <div class="preview-title-bar">
+                            <div class="vz-icon-sm">✨</div>
+                            <span>VİZYON AL · v7.10.0</span>
+                        </div>
+                        <div style="width:50px;"></div>
+                    </div>
+
+                    <div class="preview-modes">
+                        <div class="preview-mode-pill active">🌐 Normal</div>
+                        <div class="preview-mode-pill">🧠 Derin Düşünme</div>
+                        <div class="preview-mode-pill">🕵️ Ajan</div>
+                        <div class="preview-mode-pill">💻 Yazılımcı</div>
+                    </div>
+
+                    <div class="preview-chat">
+                        <div class="preview-msg user">
+                            <div class="role">👤 Sen</div>
+                            Merhaba! Bana 21 modelle ilgili bir özet çıkarır mısın?
+                        </div>
+                        <div class="preview-msg bot">
+                            <div class="role">✨ VİZYON AL</div>
+                            Tabii! Ben 21 farklı yapay zeka modeliyle çalışıyorum:
+                            <strong>13 yerli Ollama</strong> + <strong>8 bulut API</strong>.
+                            Her soru için modeller sırayla denenir ve en iyi cevap sana iletilir. 🚀
+                        </div>
+                        <div class="preview-msg user">
+                            <div class="role">👤 Sen</div>
+                            Dosya yükleyip analiz ettirebilir miyim?
+                        </div>
+                        <div class="preview-msg bot">
+                            <div class="role">✨ VİZYON AL</div>
+                            Kesinlikle! 📎 butonuyla fotoğraf, video, PDF, Word, Excel veya kod dosyası yükleyebilirsin.
+                            Analiz ederim, güncellersem sana <strong>indirme butonu</strong> veririm.
+                        </div>
+                    </div>
+
+                    <div class="preview-input-area">
+                        <div class="preview-btn">📎</div>
+                        <input type="text" class="preview-input" placeholder="AETHRION AI'a bir şey sor..." readonly>
+                        <div class="preview-btn">🎤</div>
+                        <div class="preview-btn" style="background:linear-gradient(135deg,#ff2d92,#b845ff);">🔊</div>
+                        <div class="preview-btn" style="width:auto;padding:0 22px;border-radius:25px;font-size:13px;font-weight:700;">⚡ Gönder</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SSS -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// SSS</div>
+                <h2 class="section-title">Sık Sorulan <span class="hl">Sorular</span></h2>
+            </div>
+
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-q">AETHRION AI nedir?</div>
+                    <div class="faq-a">21 farklı yapay zekayı tek panelde birleştiren çeyrek ekran AI aracıdır. Sağ üstteki 3 çizgi menüden veya <strong>/vizyon-al.html</strong> sayfasından açılır.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">4 mod nedir ve ne işe yarar?</div>
+                    <div class="faq-a">🌐 Normal (standart), 🧠 Derin Düşünme (uzun düşünür), 🕵️ Ajan (site otomasyonu), 💻 Yazılımcı (kod uzmanı). Modu üstteki butonlardan tek tıkla değiştirebilirsin.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">Ekran okuma nasıl çalışır?</div>
+                    <div class="faq-a">👁️ butonuyla tarayıcı ekran izni ister. İzin verirsen, tek kare (tek seferlik) veya canlı mod (sürekli) olarak ekranını analiz eder.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">Sesli sohbet nasıl başlatılır?</div>
+                    <div class="faq-a">🔊 butonuna tıkla → tam ekran ChatGPT tarzı sesli sohbet açılır. Mikrofona dokun, konuşmaya başla. Geri tuşuna basınca kesinlikle durur.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">Hangi dosya türleri destekleniyor?</div>
+                    <div class="faq-a">Fotoğraf, video, PDF, Word, Excel, kod dosyaları (JS, PY, HTML), ZIP, ses dosyaları ve daha fazlası. AI okur, analiz eder, sunum oluşturur ve indirilebilir link verir.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">AETHRION AI ücretsiz mi?</div>
+                    <div class="faq-a">Ücretsiz planda günde <strong>10 kullanım</strong> hakkın var. Pro'da <strong>500/gün</strong>, Takım'da <strong>sınırsız</strong>. Ekran okuma, sesli sohbet, dosya analiz için plan limitleri geçerlidir.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">Kendi projemde kullanabilir miyim?</div>
+                    <div class="faq-a">Evet! <strong>A27 API anahtarı</strong> ile AETHRION AI'ın gücünü kendi uygulamalarında kullanabilirsin. Dashboard → A27 API bölümünden anahtar oluştur.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="section">
+            <div class="cta-box">
+                <h2>Denemeye <span class="hl">Hazır mısın?</span></h2>
+                <p>
+                    21 yapay zekanın gücünü tek panelde keşfet. Ücretsiz başla, istediğin zaman yükselt.
+                    Ekran okuma, sesli sohbet, dosya analiz ve daha fazlası seni bekliyor.
+                </p>
+                <div class="cta-actions">
+                    <a href="https://vizyon2026.vercel.app/?openVizyonAl=1" class="btn btn-primary">
+                        <i class="fas fa-rocket"></i> Hemen Başlat
+                    </a>
+                    <a href="https://vizyon2026.vercel.app/#pricing" class="btn btn-secondary">
+                        <i class="fas fa-crown"></i> Paketleri Gör
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ============ ENGLISH ============ -->
+    <div id="lang-en" class="lang-content">
+        <section class="hero">
+            <div class="hero-orb"><div class="hero-orb-icon">✨</div></div>
+            <div class="hero-tag">
+                <span class="dot"></span>
+                VİZYON 2027 · NEXT-GEN AI PANEL
+            </div>
+            <h1 class="hero-title">
+                <span class="line1">VIZYON AL</span>
+                <span class="line2">21 AIs · ONE PANEL</span>
+            </h1>
+            <p class="hero-sub">
+                AETHRION AI combines <strong style="color:var(--accent);">21 different AI models</strong> (13 local Ollama + 8 cloud API) in one panel.
+                4 modes, <strong style="color:var(--purple);">screen reading</strong>, <strong style="color:var(--pink);">voice chat</strong>,
+                <strong style="color:var(--gold);">file analysis + presentation</strong> and <strong style="color:var(--accent2);">downloadable files</strong>.
+            </p>
+            <div class="hero-actions">
+                <a href="https://vizyon2026.vercel.app/?openVizyonAl=1" class="btn btn-primary">
+                    <i class="fas fa-rocket"></i> Launch AETHRION AI
+                </a>
+                <a href="#modlar" class="btn btn-secondary">
+                    <i class="fas fa-list"></i> Explore Modes
+                </a>
+            </div>
+            <div class="stats-bar">
+                <div class="stat-item"><span class="stat-num">21</span><div class="stat-label">AI Models</div></div>
+                <div class="stat-item"><span class="stat-num">4</span><div class="stat-label">Modes</div></div>
+                <div class="stat-item"><span class="stat-num">∞</span><div class="stat-label">Possibilities</div></div>
+                <div class="stat-item"><span class="stat-num">24/7</span><div class="stat-label">Access</div></div>
+            </div>
+        </section>
+
+        <section class="section" id="modlar">
+            <div class="section-header">
+                <div class="section-tag">// 4 MODES</div>
+                <h2 class="section-title">A <span class="hl">Mode</span> for Every Task</h2>
+            </div>
+            <div class="modes-grid">
+                <div class="mode-card normal">
+                    <div class="mode-icon">🌐</div>
+                    <h3 class="mode-title">🌐 Normal Mode</h3>
+                    <p class="mode-desc">Default mode where all models work equally. Ideal for daily questions and general tasks.</p>
+                </div>
+                <div class="mode-card deep">
+                    <div class="mode-icon">🧠</div>
+                    <h3 class="mode-title">🧠 Deep Thinking</h3>
+                    <p class="mode-desc">Thinks deeply, browses the web, combines all info. Shows the thought process with a thin blue line.</p>
+                </div>
+                <div class="mode-card agent">
+                    <div class="mode-icon">🕵️</div>
+                    <h3 class="mode-title">🕵️ Agent Mode</h3>
+                    <p class="mode-desc">Enters any site, completes all tasks including form filling, clicking, password entry.</p>
+                </div>
+                <div class="mode-card developer">
+                    <div class="mode-icon">💻</div>
+                    <h3 class="mode-title">💻 Developer</h3>
+                    <p class="mode-desc">Best code generation and bug fixing in any language. Expert at debugging and optimization.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// FEATURES</div>
+                <h2 class="section-title">AETHRION AI's <span class="hl">Power</span></h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#00ff9d;color:#00ff9d;">👁️</div>
+                    <h3 class="feature-title">Screen Reading <span class="badge-new">NEW</span></h3>
+                    <p class="feature-desc">If you permit, it can see your screen. Analyzes in single frame or live mode. Reads text, identifies buttons.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#ff2d92;color:#ff2d92;">🔊</div>
+                    <h3 class="feature-title">Voice Chat <span class="badge-new">NEW</span></h3>
+                    <p class="feature-desc">Full-screen ChatGPT-style voice chat. Al speaks, you speak. Center logo + wave animation.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#ffd11a;color:#ffd11a;">📎</div>
+                    <h3 class="feature-title">File Analysis <span class="badge-new">NEW</span></h3>
+                    <p class="feature-desc">Upload photos, videos, PDF, Word, Excel, code files. Preview box appears above the input.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#b845ff;color:#b845ff;">📥</div>
+                    <h3 class="feature-title">Presentation + Download <span class="badge-new">NEW</span></h3>
+                    <p class="feature-desc">After analysis, AI creates presentation/file and gives you a download button. PDF, HTML, MD or TXT.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#00e5ff;color:#00e5ff;">🎤</div>
+                    <h3 class="feature-title">Voice Command</h3>
+                    <p class="feature-desc">Ask by voice with 🎤 button. Your words are transcribed and sent to AI automatically.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#0096ff;color:#0096ff;">🧠</div>
+                    <h3 class="feature-title">Deep Think</h3>
+                    <p class="feature-desc">In deep thinking mode, shows the process under "THINKING:" heading, then gives a comprehensive answer.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// SPECIAL SYSTEMS</div>
+                <h2 class="section-title">AETHRION AI <span class="hl">Ecosystem</span></h2>
+            </div>
+            <div class="special-cards">
+                <div class="special-card v27api">
+                    <span class="sp-icon">🔑</span>
+                    <div class="sp-title">A27 API Key</div>
+                    <div class="sp-desc">Use AETHRION AI's power in your own projects. Web, mobile, bot.</div>
+                    <div class="sp-limits">
+                        <div>👑 Founder/Admin/Beta/Moderator → <strong>♾️ Unlimited</strong></div>
+                        <div>👥 Team → <strong>100 keys</strong></div>
+                        <div>🌟 Pro → <strong>20 keys</strong></div>
+                        <div>🆓 Free → <strong>2 keys</strong></div>
+                    </div>
+                </div>
+                <div class="special-card koc">
+                    <span class="sp-icon">🧭</span>
+                    <div class="sp-title">V27 Coach</div>
+                    <div class="sp-desc">Warm, guiding AI coach with psychological support. Password-protected sharing.</div>
+                    <div class="sp-limits">
+                        <div>👑 Founder/Admin/Beta/Moderator → <strong>♾️ Unlimited</strong></div>
+                        <div>👥 Team → <strong>1000/week</strong></div>
+                        <div>🌟 Pro → <strong>50/week</strong></div>
+                        <div>🆓 Free → <strong>10/week</strong></div>
+                    </div>
+                </div>
+                <div class="special-card moderator">
+                    <span class="sp-icon">🎨</span>
+                    <div class="sp-title">Moderator / Designer</div>
+                    <div class="sp-desc">Cannot be purchased, assigned only by founder. Hidden rank with unlimited powers.</div>
+                    <div class="sp-limits">
+                        <div>♾️ Unlimited A27 API + AI queries</div>
+                        <div>🎬 Video clip tool</div>
+                        <div>📨 Project request redirect</div>
+                        <div>💡 Advice and analysis</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// PREVIEW</div>
+                <h2 class="section-title">AETHRION AI <span class="hl">Panel</span></h2>
+            </div>
+            <div class="preview-wrap">
+                <div class="preview-inner">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <div class="preview-dot red"></div>
+                            <div class="preview-dot yellow"></div>
+                            <div class="preview-dot green"></div>
+                        </div>
+                        <div class="preview-title-bar">
+                            <div class="vz-icon-sm">✨</div>
+                            <span>VIZYON AL · v7.10.0</span>
+                        </div>
+                        <div style="width:50px;"></div>
+                    </div>
+                    <div class="preview-modes">
+                        <div class="preview-mode-pill active">🌐 Normal</div>
+                        <div class="preview-mode-pill">🧠 Deep</div>
+                        <div class="preview-mode-pill">🕵️ Agent</div>
+                        <div class="preview-mode-pill">💻 Dev</div>
+                    </div>
+                    <div class="preview-chat">
+                        <div class="preview-msg user"><div class="role">👤 You</div>Hi! Give me a summary of the 21 models.</div>
+                        <div class="preview-msg bot"><div class="role">✨ VIZYON AL</div>I work with 21 different AI models: <strong>13 local Ollama</strong> + <strong>8 cloud API</strong>. Models tried sequentially for each question. 🚀</div>
+                    </div>
+                    <div class="preview-input-area">
+                        <div class="preview-btn">📎</div>
+                        <input type="text" class="preview-input" placeholder="Ask AETHRION AI something..." readonly>
+                        <div class="preview-btn">🎤</div>
+                        <div class="preview-btn" style="background:linear-gradient(135deg,#ff2d92,#b845ff);">🔊</div>
+                        <div class="preview-btn" style="width:auto;padding:0 22px;border-radius:25px;font-size:13px;font-weight:700;">⚡ Send</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// FAQ</div>
+                <h2 class="section-title">Frequently Asked <span class="hl">Questions</span></h2>
+            </div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-q">What is AETHRION AI?</div>
+                    <div class="faq-a">A quarter-screen AI tool combining 21 AIs in one panel. Open via 3-line menu or <strong>/vizyon-al.html</strong>.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">What are the 4 modes?</div>
+                    <div class="faq-a">🌐 Normal, 🧠 Deep Thinking, 🕵️ Agent, 💻 Developer. Switch with one click from top buttons.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">How does screen reading work?</div>
+                    <div class="faq-a">The 👁️ button asks for browser screen permission. If granted, analyzes as single frame or live mode.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">How to start voice chat?</div>
+                    <div class="faq-a">Click 🔊 button → full-screen ChatGPT-style voice chat opens. Touch mic and start speaking.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="cta-box">
+                <h2>Ready to <span class="hl">Try?</span></h2>
+                <p>Experience the power of 21 AIs in one panel. Start free, upgrade anytime.</p>
+                <div class="cta-actions">
+                    <a href="https://vizyon2026.vercel.app/?openVizyonAl=1" class="btn btn-primary">
+                        <i class="fas fa-rocket"></i> Launch Now
+                    </a>
+                    <a href="https://vizyon2026.vercel.app/#pricing" class="btn btn-secondary">
+                        <i class="fas fa-crown"></i> See Plans
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ============ ARAPÇA ============ -->
+    <div id="lang-ar" class="lang-content" dir="rtl">
+        <section class="hero">
+            <div class="hero-orb"><div class="hero-orb-icon">✨</div></div>
+            <div class="hero-tag">
+                <span class="dot"></span>
+                فيجن 2027 · لوحة الذكاء الاصطناعي من الجيل الجديد
+            </div>
+            <h1 class="hero-title">
+                <span class="line1">فيجن آل</span>
+                <span class="line2">21 ذكاء اصطناعي · لوحة واحدة</span>
+            </h1>
+            <p class="hero-sub">
+                يجمع فيجن آل <strong style="color:var(--accent);">21 نموذج ذكاء اصطناعي</strong> (13 Ollama محلي + 8 API سحابي) في لوحة واحدة.
+                4 أوضاع، <strong style="color:var(--purple);">قراءة الشاشة</strong>، <strong style="color:var(--pink);">الدردشة الصوتية</strong>،
+                <strong style="color:var(--gold);">تحليل الملفات + العرض</strong> و <strong style="color:var(--accent2);">ملفات قابلة للتنزيل</strong>.
+            </p>
+            <div class="hero-actions">
+                <a href="https://vizyon2026.vercel.app/?openVizyonAl=1" class="btn btn-primary">
+                    <i class="fas fa-rocket"></i> ابدأ فيجن آل
+                </a>
+                <a href="#modlar" class="btn btn-secondary">
+                    <i class="fas fa-list"></i> اكتشف الأوضاع
+                </a>
+            </div>
+            <div class="stats-bar">
+                <div class="stat-item"><span class="stat-num">21</span><div class="stat-label">نموذج</div></div>
+                <div class="stat-item"><span class="stat-num">4</span><div class="stat-label">أوضاع</div></div>
+                <div class="stat-item"><span class="stat-num">∞</span><div class="stat-label">احتمالات</div></div>
+                <div class="stat-item"><span class="stat-num">7/24</span><div class="stat-label">وصول</div></div>
+            </div>
+        </section>
+
+        <section class="section" id="modlar">
+            <div class="section-header">
+                <div class="section-tag">// 4 أوضاع</div>
+                <h2 class="section-title">وضع <span class="hl">لكل مهمة</span></h2>
+            </div>
+            <div class="modes-grid">
+                <div class="mode-card normal">
+                    <div class="mode-icon">🌐</div>
+                    <h3 class="mode-title">🌐 الوضع العادي</h3>
+                    <p class="mode-desc">الوضع الافتراضي حيث تعمل جميع النماذج بالتساوي. مثالي للأسئلة اليومية والمهام العامة.</p>
+                </div>
+                <div class="mode-card deep">
+                    <div class="mode-icon">🧠</div>
+                    <h3 class="mode-title">🧠 التفكير العميق</h3>
+                    <p class="mode-desc">يفكر بعمق، يتصفح الويب، يجمع كل المعلومات. يُظهر عملية التفكير بخط أزرق رفيع.</p>
+                </div>
+                <div class="mode-card agent">
+                    <div class="mode-icon">🕵️</div>
+                    <h3 class="mode-title">🕵️ وضع الوكيل</h3>
+                    <p class="mode-desc">يدخل أي موقع، يكمل جميع المهام بما في ذلك ملء النماذج والنقر وإدخال كلمات المرور.</p>
+                </div>
+                <div class="mode-card developer">
+                    <div class="mode-icon">💻</div>
+                    <h3 class="mode-title">💻 المبرمج</h3>
+                    <p class="mode-desc">أفضل توليد للأكواد وإصلاح الأخطاء بأي لغة. خبير في التصحيح والتحسين.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// الميزات</div>
+                <h2 class="section-title">قوة <span class="hl">فيجن آل</span></h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#00ff9d;color:#00ff9d;">👁️</div>
+                    <h3 class="feature-title">قراءة الشاشة <span class="badge-new">جديد</span></h3>
+                    <p class="feature-desc">إذا سمحت، يمكنه رؤية شاشتك. يُحلل في وضع الإطار الواحد أو الوضع المباشر.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#ff2d92;color:#ff2d92;">🔊</div>
+                    <h3 class="feature-title">الدردشة الصوتية <span class="badge-new">جديد</span></h3>
+                    <p class="feature-desc">دردشة صوتية بملء الشاشة على غرار ChatGPT. آل يتحدث، أنت تتحدث.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#ffd11a;color:#ffd11a;">📎</div>
+                    <h3 class="feature-title">تحليل الملفات <span class="badge-new">جديد</span></h3>
+                    <p class="feature-desc">حمّل الصور ومقاطع الفيديو و PDF و Word و Excel والأكواد. يظهر صندوق المعاينة فوق الإدخال.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#b845ff;color:#b845ff;">📥</div>
+                    <h3 class="feature-title">العرض + التنزيل <span class="badge-new">جديد</span></h3>
+                    <p class="feature-desc">بعد التحليل، ينشئ الذكاء الاصطناعي عرضًا/ملفًا ويمنحك زر التنزيل. PDF أو HTML أو MD أو TXT.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#00e5ff;color:#00e5ff;">🎤</div>
+                    <h3 class="feature-title">الأمر الصوتي</h3>
+                    <p class="feature-desc">اسأل بصوتك عبر زر 🎤. يتم نسخ كلماتك تلقائيًا وإرسالها إلى الذكاء الاصطناعي.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="border-color:#0096ff;color:#0096ff;">🧠</div>
+                    <h3 class="feature-title">التفكير العميق</h3>
+                    <p class="feature-desc">في وضع التفكير العميق، يُظهر العملية تحت عنوان "أفكر:"، ثم يقدم إجابة شاملة.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// أنظمة خاصة</div>
+                <h2 class="section-title">نظام <span class="hl">فيجن آل البيئي</span></h2>
+            </div>
+            <div class="special-cards">
+                <div class="special-card v27api">
+                    <span class="sp-icon">🔑</span>
+                    <div class="sp-title">مفتاح A27 API</div>
+                    <div class="sp-desc">استخدم قوة فيجن آل في مشاريعك. الويب والجوال والبوت.</div>
+                    <div class="sp-limits">
+                        <div>👑 المؤسس/المشرف/بيتا/المشرف → <strong>♾️ غير محدود</strong></div>
+                        <div>👥 الفريق → <strong>100 مفتاح</strong></div>
+                        <div>🌟 Pro → <strong>20 مفتاحًا</strong></div>
+                        <div>🆓 مجاني → <strong>مفتاحان</strong></div>
+                    </div>
+                </div>
+                <div class="special-card koc">
+                    <span class="sp-icon">🧭</span>
+                    <div class="sp-title">مدرب V27</div>
+                    <div class="sp-desc">مدرب ذكاء اصطناعي دافئ وموجّه مع دعم نفسي. مشاركة محمية بكلمة مرور.</div>
+                    <div class="sp-limits">
+                        <div>👑 المؤسس/المشرف/بيتا/المشرف → <strong>♾️ غير محدود</strong></div>
+                        <div>👥 الفريق → <strong>1000/أسبوع</strong></div>
+                        <div>🌟 Pro → <strong>50/أسبوع</strong></div>
+                        <div>🆓 مجاني → <strong>10/أسبوع</strong></div>
+                    </div>
+                </div>
+                <div class="special-card moderator">
+                    <span class="sp-icon">🎨</span>
+                    <div class="sp-title">مشرف / مصمم</div>
+                    <div class="sp-desc">لا يمكن شراؤه، يعيّنه المؤسس فقط. رتبة مخفية بصلاحيات غير محدودة.</div>
+                    <div class="sp-limits">
+                        <div>♾️ A27 API غير محدود + استعلامات AI</div>
+                        <div>🎬 أداة قطع الفيديو</div>
+                        <div>📨 إعادة توجيه طلبات المشروع</div>
+                        <div>💡 النصيحة والتحليل</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-tag">// معاينة مباشرة</div>
+                <h2 class="section-title">لوحة <span class="hl">فيجن آل</span></h2>
+            </div>
+            <div class="preview-wrap">
+                <div class="preview-inner">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <div class="preview-dot red"></div>
+                            <div class="preview-dot yellow"></div>
+                            <div class="preview-dot green"></div>
+                        </div>
+                        <div class="preview-title-bar">
+                            <div class="vz-icon-sm">✨</div>
+                            <span>فيجن آل · v7.10.0</span>
+                        </div>
+                        <div style="width:50px;"></div>
+                    </div>
+                    <div class="preview-modes">
+                        <div class="preview-mode-pill active">🌐 عادي</div>
+                        <div class="preview-mode-pill">🧠 عميق</div>
+                        <div class="preview-mode-pill">🕵️ وكيل</div>
+                        <div class="preview-mode-pill">💻 مبرمج</div>
+                    </div>
+                    <div class="preview-chat">
+                        <div class="preview-msg user"><div class="role">👤 أنت</div>مرحبًا! أعطني ملخصًا عن 21 نموذجًا.</div>
+                        <div class="preview-msg bot"><div class="role">✨ فيجن آل</div>أعمل مع 21 نموذجًا مختلفًا للذكاء الاصطناعي: <strong>13 Ollama محلي</strong> + <strong>8 API سحابي</strong>. 🚀</div>
+                    </div>
+                    <div class="preview-input-area">
+                        <div class="preview-btn">📎</div>
+                        <input type="text" class="preview-input" placeholder="اسأل فيجن آل شيئًا..." readonly>
+                        <div class="preview-btn">🎤</div>
+                        <div class="preview-btn" style="background:linear-gradient(135deg,#ff2d92,#b845ff);">🔊</div>
+                        <div class="preview-btn" style="width:auto;padding:0 22px;border-radius:25px;font-size:13px;font-weight:700;">⚡ إرسال</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="cta-box">
+                <h2>هل أنت <span class="hl">مستعد؟</span></h2>
+                <p>جرب قوة 21 ذكاءً اصطناعيًا في لوحة واحدة. ابدأ مجانًا، وقم بالترقية في أي وقت.</p>
+                <div class="cta-actions">
+                    <a href="https://vizyon2026.vercel.app/?openVizyonAl=1" class="btn btn-primary">
+                        <i class="fas fa-rocket"></i> ابدأ الآن
+                    </a>
+                    <a href="https://vizyon2026.vercel.app/#pricing" class="btn btn-secondary">
+                        <i class="fas fa-crown"></i> عرض الخطط
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="bottom-footer">
+        <div class="footer-copy">
+            © 2027 <span>VİZYON 2027</span> · AETHRION AI v7.10.0 · 21 Model Tek Panel
+        </div>
+        <div class="footer-links">
+            <a href="https://vizyon2026.vercel.app/">🏠 Anasayfa</a>
+            <a href="https://vizyon2026.vercel.app/#pricing">💰 Paketler</a>
+            <a href="https://vizyon2026.vercel.app/#v27api">🔑 A27 API</a>
+            <a href="https://vizyon2026.vercel.app/bana-ogret.html">📖 Bana Öğret</a>
+            <a href="https://vizyon2026.vercel.app/topluluk.html">💬 Topluluk</a>
+        </div>
+    </footer>
+
+    <!-- ============ PARSE SDK ============ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/parse/5.0.0/parse.min.js"></script>
+
+    <script>
+        // ================================================================
+        // VİZYON 2027 — VİZYON AL SAYFASI v3.0 (v7.10.0)
+        // ✅ Back4App uyumlu (index.html + Cloud Code v7.10.0 ile senkron)
+        // ✅ Aurora arka plan + parçacıklar
+        // ✅ Efsane SVG logo + glassmorphism kartlar
+        // ✅ 3 dil (TR/EN/AR) + RTL desteği
+        // ✅ AETHRION AI paneli detaylı tanıtım
+        // ================================================================
+
+        // ===== Back4App Config (index.html v7.10.0 ile aynı) =====
+        Parse.initialize(
+            "Dr9SODgMburZ54QvC8RnIHc9dbjreozBbKLOpMjX",
+            "dCXRvnEcCcOFvpzVDAV9AAJnYvdrqaP1JFRkJzvv"
+        );
+        Parse.serverURL = "https://parseapi.back4app.com/";
+
+        // ===== DİL DEĞİŞTİRME =====
+        var LANG_TEXT = {
+            tr: { navBack: 'Anasayfa', navStart: 'Başlat' },
+            en: { navBack: 'Home', navStart: 'Launch' },
+            ar: { navBack: 'الرئيسية', navStart: 'ابدأ' }
+        };
+
+        function changeLanguage(lang) {
+            if (['tr', 'en', 'ar'].indexOf(lang) === -1) lang = 'tr';
+
+            // İçerikleri değiştir
+            document.querySelectorAll('.lang-content').forEach(function (el) {
+                el.classList.remove('active');
+            });
+            var target = document.getElementById('lang-' + lang);
+            if (target) target.classList.add('active');
+
+            // RTL desteği
+            document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+            document.documentElement.lang = (lang === 'ar') ? 'ar' : lang;
+
+            // Navbar metinleri
+            var t = LANG_TEXT[lang] || LANG_TEXT.tr;
+            var navBack = document.getElementById('navBackText');
+            var navStart = document.getElementById('navStartText');
+            if (navBack) navBack.textContent = t.navBack;
+            if (navStart) navStart.textContent = t.navStart;
+
+            // Navbar select güncelle
+            var sel = document.getElementById('langSelect');
+            if (sel && sel.value !== lang) sel.value = lang;
+
+            // Kaydet
+            try { localStorage.setItem('preferred_lang', lang); } catch (e) {}
+
+            console.log('🌐 Dil değiştirildi:', lang);
+        }
+        window.changeLanguage = changeLanguage;
+
+        // ===== PARÇACIK SİSTEMİ =====
+        (function initParticles() {
+            var container = document.getElementById('particles');
+            if (!container) return;
+            container.innerHTML = '';
+            var count = 30;
+            try {
+                if (window.matchMedia && window.matchMedia('(max-width: 480px)').matches) count = 15;
+                else if (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) count = 20;
+            } catch (e) {}
+            for (var i = 0; i < count; i++) {
+                var p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = (Math.random() * 100) + '%';
+                p.style.animationDuration = (5 + Math.random() * 25) + 's';
+                p.style.animationDelay = (-Math.random() * 35) + 's';
+                container.appendChild(p);
+            }
+            console.log('✨ vizyon-al.html parçacıklar hazır: ' + count);
+        })();
+
+        // ===== SAYFA BAŞLANGICI =====
+        document.addEventListener('DOMContentLoaded', function () {
+            // Dil tercihini yükle
+            var savedLang = null;
+            try { savedLang = localStorage.getItem('preferred_lang'); } catch (e) {}
+
+            var urlParams = new URLSearchParams(window.location.search);
+            var urlLang = urlParams.get('lang');
+
+            var finalLang = 'tr';
+            if (urlLang && ['tr', 'en', 'ar'].indexOf(urlLang) !== -1) finalLang = urlLang;
+            else if (savedLang && ['tr', 'en', 'ar'].indexOf(savedLang) !== -1) finalLang = savedLang;
+
+            changeLanguage(finalLang);
+
+            // Console bilgilendirme
+            console.log('%c✨ VİZYON 2027 — AETHRION AI Sayfası v3.0 (v7.10.0)',
+                'color:#b845ff;font-weight:bold;font-size:14px;');
+            console.log('%c✅ Back4App uyumlu — index.html + Cloud Code v7.10.0 ile senkron',
+                'color:#00ff9d;font-size:12px;');
+            console.log('%c🎯 AETHRION AI Özellikleri:', 'color:#00e5ff;font-size:12px;font-weight:bold;');
+            console.log('%c   → 21 model (13 Ollama + 8 Cloud API)', 'color:#8aa8d4;font-size:11px;');
+            console.log('%c   → 4 mod: Normal, Derin Düşünme, Ajan, Yazılımcı', 'color:#8aa8d4;font-size:11px;');
+            console.log('%c   → Ekran Okuma + Sesli Sohbet + Dosya Analiz', 'color:#8aa8d4;font-size:11px;');
+            console.log('%c   → Sunum + İndirilebilir Dosya', 'color:#8aa8d4;font-size:11px;');
+            console.log('%c⌨️ Klavye kısayolları: Ctrl+1/2/3 ile dil değiştir', 'color:#ffd11a;font-size:11px;');
+        });
+
+        // ===== Klavye kısayolları: Ctrl+1/2/3 ile dil =====
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === '1') { e.preventDefault(); changeLanguage('tr'); }
+                if (e.key === '2') { e.preventDefault(); changeLanguage('en'); }
+                if (e.key === '3') { e.preventDefault(); changeLanguage('ar'); }
+            }
+        });
+    </script>
+
+</body>
+</html>
