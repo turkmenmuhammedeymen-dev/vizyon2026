@@ -26652,27 +26652,32 @@ async function handleRegister() {
             }
         }
 
+        var verificationEmailSent = false;
         try {
             await Parse.Cloud.run('sendEmail', {
                 to: email,
                 subject: 'AETHRION Doğrulama Kodu',
-                html: '<h1>AETHRION\'a Hoş Geldin ' + name + '!</h1>' +
+                html: '<h1>AETHRION\\'a Hoş Geldin ' + name + '!</h1>' +
                       '<p>Doğrulama kodunuz: <strong style="font-size:24px;color:#d4af37;">' + verifyCode + '</strong></p>' +
                       '<p>15 dakika geçerlidir.</p>' +
                       '<p style="color:#b8c0d0;font-style:italic;">AETHRION — Intelligence Without Limits.</p>' +
                       '<p>AETHRION Ekibi</p>'
             });
-        } catch (e) {
-            console.log('Mail gönderilemedi:', e);
-            showNotification('Kayıt başarılı! Doğrulama kodunuz: ' + verifyCode, 'warning');
+            verificationEmailSent = true;
+        } catch (mailError) {
+            console.error('[AETHRION] Verification email could not be sent:', mailError);
             if (typeof window.addLogWarning === 'function') {
-                window.addLogWarning('Doğrulama maili gönderilemedi, kod ekranda gösterildi');
+                window.addLogWarning('Doğrulama e-postası gönderilemedi: ' + (mailError.message || 'Bilinmeyen hata'));
             }
         }
 
-        showNotification('Kayıt başarılı! Doğrulama kodunuz mail adresinize gönderildi.', 'success');
         switchTab('verify');
         document.getElementById('verifyEmail').value = email;
+        if (verificationEmailSent) {
+            showNotification('Kayıt oluşturuldu. Doğrulama kodunu e-postandan kontrol et.', 'success');
+        } else {
+            showNotification('Hesap oluşturuldu ancak doğrulama e-postası gönderilemedi. E-posta hizmeti düzeltilmeli; geçici kod: ' + verifyCode, 'warning');
+        }
     } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
         if (typeof window.addLogError === 'function') {
