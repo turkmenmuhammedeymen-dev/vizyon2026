@@ -49,7 +49,7 @@ function loadLateTheme() {
   });
   var link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = '/aethrion-experience.css?v=20261022-authfix2';
+  link.href = '/aethrion-experience.css?v=20261022-authfix3';
   link.setAttribute('data-aethrion-late-theme', 'true');
   document.body.appendChild(link);
 }
