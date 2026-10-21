@@ -55,7 +55,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 setTimeout(boot,800);setTimeout(boot,2200);
 })();
 
-(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='/aethrion-workspace-v2.css?v=20261022-v1';document.head.appendChild(l);var s=document.createElement('script');s.src='/aethrion-workspace-v2.js?v=20261022-v1';s.defer=true;document.body.appendChild(s)})();
+(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='/aethrion-workspace-v6.css?v=20261022-workspace7';document.head.appendChild(l);var s=document.createElement('script');s.src='/aethrion-workspace-v6.js?v=20261022-workspace7';s.async=true;document.body.appendChild(s)})();
 
 
 /* AETHRION auth guard v4: prevent duplicate submissions and wait for GIS initialization */
@@ -89,4 +89,53 @@ setTimeout(boot,800);setTimeout(boot,2200);
   wrapSubmit('verifyAccount','#formVerify .btn-primary','Doğrulanıyor…');
  }
  install();setTimeout(install,400);setTimeout(install,1400);setTimeout(install,2800);
+})();
+
+
+/* Google Identity Services: render the real Google button up front, not after a second click. */
+(function(){
+ 'use strict';
+ var mountBusy=false;
+ function notify(msg,type){try{if(typeof window.showNotification==='function')window.showNotification(msg,type||'warning')}catch(e){}}
+ function mountGoogleButton(){
+  var original=document.querySelector('#authModal .btn-google');
+  if(!original||!document.body)return false;
+  var host=document.getElementById('aethrionGoogleFallback');
+  if(!host){host=document.createElement('div');host.id='aethrionGoogleFallback';original.insertAdjacentElement('afterend',host)}
+  if(host.dataset.rendered==='1'){host.classList.add('is-visible');original.style.display='none';return true}
+  if(typeof window.google==='undefined'||!google.accounts||!google.accounts.id){return false}
+  if(!window._googleGISReady){
+   try{if(typeof window.handleGoogleLibraryLoad==='function')window.handleGoogleLibraryLoad()}catch(e){}
+   return false;
+  }
+  if(mountBusy)return false;
+  mountBusy=true;
+  try{
+   host.innerHTML='';
+   var width=Math.floor((original.parentElement&&original.parentElement.clientWidth)||320);
+   width=Math.max(240,Math.min(360,width));
+   google.accounts.id.renderButton(host,{type:'standard',theme:'outline',size:'large',shape:'rectangular',text:'continue_with',logo_alignment:'left',width:width,locale:'tr'});
+   host.dataset.rendered='1';
+   host.classList.add('is-visible');
+   original.style.display='none';
+   original.setAttribute('aria-hidden','true');
+   return true;
+  }catch(e){
+   console.error('[AETHRION] Google button render failed:',e);
+   host.dataset.rendered='0';
+   notify('Google giriş düğmesi oluşturulamadı. Google istemci kimliği ve yetkili alan adları kontrol edilmeli.','error');
+   return false;
+  }finally{mountBusy=false}
+ }
+ window.loginWithGoogle=function(){
+  if(mountGoogleButton())return;
+  notify('Google güvenli giriş bileşeni hazırlanıyor. Birkaç saniye sonra tekrar deneyin.','info');
+  [250,700,1300,2200,3500].forEach(function(t){setTimeout(mountGoogleButton,t)});
+ };
+ function boot(){
+  mountGoogleButton();
+  [350,900,1600,2800,4500,7000].forEach(function(t){setTimeout(mountGoogleButton,t)});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+ if(window.MutationObserver&&document.body)new MutationObserver(function(){if(!document.getElementById('aethrionGoogleFallback')||!document.getElementById('aethrionGoogleFallback').dataset.rendered)setTimeout(mountGoogleButton,150)}).observe(document.body,{subtree:true,childList:true});
 })();
