@@ -26025,117 +26025,7 @@ console.log('🇹🇷 AETHRION v1.0.0 — Intelligence Without Limits. — JS-1/
 // ============================================================
 // SPLASH EKRANI — 9 AŞAMALI PROGRESS
 // ============================================================
-(function initSplash() {
-    var progress = 0;
-    var splash = document.getElementById('splashScreen');
-    var statusEl = document.getElementById('splashStatus');
-    var percentEl = document.getElementById('splashPercent');
-    var stageEl = document.getElementById('splashStage');
-    var barEl = document.getElementById('splashProgressBar');
-    var readyEl = document.getElementById('splashReady');
-    var particlesEl = document.getElementById('splashParticles');
-
-    if (!splash) {
-        console.warn('⚠️ Splash ekranı bulunamadı');
-        return;
-    }
-
-    // Splash içi parçacıklar
-    if (particlesEl) {
-        var pCount = window.innerWidth < 768 ? 12 : 30;
-        for (var i = 0; i < pCount; i++) {
-            var sp = document.createElement('div');
-            sp.className = 'splash-particle';
-            sp.style.left = Math.random() * 100 + '%';
-            sp.style.animationDuration = (Math.random() * 6 + 5) + 's';
-            sp.style.animationDelay = Math.random() * 8 + 's';
-            particlesEl.appendChild(sp);
-        }
-    }
-
-    var stages = [
-        { p: 5,   text: 'AETHRION CORE BAŞLATILIYOR' },
-        { p: 18,  text: '13 OLLAMA MODELİ HAZIRLANIYOR' },
-        { p: 32,  text: '7 NVIDIA NIM MODELLERİ YÜKLENİYOR' },
-        { p: 46,  text: '8 BULUT API BAĞLANIYOR' },
-        { p: 60,  text: 'VERİTABANI BAĞLANTISI KURULUYOR' },
-        { p: 72,  text: 'GÜVENLİK KATMANI AKTİF' },
-        { p: 84,  text: 'AETHRION AGENTS HAZIR' },
-        { p: 94,  text: 'ARAYÜZ OPTİMİZE EDİLİYOR' },
-        { p: 100, text: 'HAZIR!' }
-    ];
-
-    var isCompleted = false;
-
-    function updateSplash() {
-        progress += Math.random() * 7 + 3;
-        if (progress > 100) progress = 100;
-
-        if (percentEl) percentEl.textContent = Math.floor(progress) + '%';
-        if (barEl) barEl.style.width = progress + '%';
-
-        var currentStage = stages[0];
-        for (var i = 0; i < stages.length; i++) {
-            if (progress >= stages[i].p) currentStage = stages[i];
-        }
-        if (stageEl) stageEl.textContent = currentStage.text;
-        if (statusEl) {
-            statusEl.innerHTML = '<span class="splash-status-dot"></span> ' + currentStage.text;
-        }
-
-        if (progress < 100) {
-            setTimeout(updateSplash, Math.random() * 140 + 70);
-        } else {
-            if (!isCompleted) {
-                isCompleted = true;
-                if (readyEl) {
-                    readyEl.textContent = '✨ AETHRION EKOSİSTEMİ HAZIR';
-                    readyEl.style.color = 'var(--accent2)';
-                    readyEl.style.textShadow = '0 0 25px rgba(184, 192, 208, 0.7)';
-                }
-                setTimeout(function () {
-                    hideSplash();
-                }, 500);
-            }
-        }
-    }
-
-    function hideSplash() {
-        if (!splash) return;
-        splash.classList.add('hidden');
-        splash.classList.add('hide');
-        splash.style.opacity = '0';
-        splash.style.visibility = 'hidden';
-        splash.style.pointerEvents = 'none';
-        splash.style.transition = 'opacity 0.5s ease, visibility 0.5s ease';
-        setTimeout(function () {
-            splash.style.display = 'none';
-            splash.style.zIndex = '-1';
-            document.body.style.overflow = '';
-            document.documentElement.style.overflow = '';
-            document.body.style.height = '';
-            document.body.style.width = '';
-        }, 550);
-    }
-    window.hideSplash = hideSplash;
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function () {
-            setTimeout(updateSplash, 250);
-        });
-    } else {
-        setTimeout(updateSplash, 250);
-    }
-
-    setTimeout(function () {
-        if (!isCompleted) {
-            progress = 100;
-            if (barEl) barEl.style.width = '100%';
-            if (percentEl) percentEl.textContent = '100%';
-            hideSplash();
-        }
-    }, 8000);
-})();
+// Splash progress is controlled by the single AethrionSplashController below.
 
 // ============================================================
 // PARÇACIK SİSTEMİ — 4 KATMAN
@@ -47783,6 +47673,21 @@ console.log('   → window.refreshUserList (FIX)');
         var stageEl   = document.getElementById('splashStage');
         var statusEl  = document.getElementById('splashStatus');
         var readyEl   = document.getElementById('splashReady');
+
+        // Create splash particles once; this controller is the only progress owner.
+        var particlesEl = document.getElementById('splashParticles');
+        if (particlesEl && !particlesEl.getAttribute('data-aethrion-initialized')) {
+            particlesEl.setAttribute('data-aethrion-initialized', 'true');
+            var particleCount = window.innerWidth < 768 ? 12 : 24;
+            for (var pi = 0; pi < particleCount; pi++) {
+                var particle = document.createElement('span');
+                particle.className = 'splash-particle';
+                particle.style.left = (Math.random() * 100) + '%';
+                particle.style.animationDuration = (5 + Math.random() * 6) + 's';
+                particle.style.animationDelay = (Math.random() * 5) + 's';
+                particlesEl.appendChild(particle);
+            }
+        }
 
         // Element yoksa hemen çık
         if (!splash) {
