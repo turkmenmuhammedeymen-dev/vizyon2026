@@ -10323,12 +10323,12 @@ Parse.Cloud.define("aethrionGetProjectAudit", async function (request) {
         events: events.map(function (event) {
             return {
                 id: event.id,
-                actorId: event.get("actor_id") || "",
+                actorId: (function (v) { v = String(v || ""); return /^[a-f0-9]{24}$/i.test(v) ? v : (v ? crypto.createHash("sha256").update(v).digest("hex").slice(0, 24) : ""); })(event.get("actor_id")),
                 actorEmail: "",
                 actorName: "Kullanıcı",
                 actorRole: event.get("actor_role") || "user",
                 action: event.get("action") || "",
-                targetId: event.get("target_id") || "",
+                targetId: (function (v) { v = String(v || ""); return /^[a-f0-9]{24}$/i.test(v) ? v : (v ? crypto.createHash("sha256").update(v).digest("hex").slice(0, 24) : ""); })(event.get("target_id")),
                 targetLabel: "İşlem hedefi",
                 source: event.get("source") || "server",
                 createdAt: event.get("created_at_server") || event.get("createdAt") || null
