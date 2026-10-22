@@ -153,8 +153,27 @@ function installCloseRecovery(){
   wrapped.__aeV6CloseWrapped=true;wrapped.__aeV6Original=original;window[name]=wrapped;
  });
 }
-function boot(){installRouter();patchWelcome();installCloseRecovery();if(logged()){document.body.classList.add('ae-shell-on');hideTrigger();customWelcome();var logo=q('.aews-logo');if(logo&&!q('img',logo))logo.innerHTML='<img src="/aethrion-mark.svg" alt="AETHRION" draggable="false">'}syncOverlayState()}
+function repairWorkspaceSurface(){
+ if(!logged()||!document.body.classList.contains('ae-shell-on'))return;
+ var sidebars=qa('#aeWorkspaceSidebar');
+ if(sidebars.length>1)sidebars.slice(1).forEach(function(node){if(node.parentNode)node.parentNode.removeChild(node)});
+ var sidebar=q('#aeWorkspaceSidebar');
+ if(!sidebar)return;
+ var brand=q('.aews-brand',sidebar),search=q('.aews-search',sidebar),nav=q('.aews-nav',sidebar),foot=q('.aews-footer',sidebar);
+ if(search&&brand&&brand.nextElementSibling!==search)brand.insertAdjacentElement('afterend',search);
+ if(search){
+  search.setAttribute('aria-label','Özellik arama');
+  var input=q('input[type="search"]',search);
+  if(input){input.id='aewsSearch';input.placeholder='Özellik ara…';input.setAttribute('aria-label','Özellik ara');input.autocomplete='off'}
+ }
+ if(nav&&search&&search.nextElementSibling!==nav)search.insertAdjacentElement('afterend',nav);
+ if(foot&&nav&&nav.nextElementSibling!==foot)nav.insertAdjacentElement('afterend',foot);
+ qa('#aewsSearch').forEach(function(node){if(!search||!search.contains(node))node.removeAttribute('id')});
+ qa('#aethrionFeaturesTrigger,#aethrionFeaturesButton,#aethrionFeaturesPanel,#aethrionExperienceDrawer,#aethrionExperienceBackdrop').forEach(function(node){if(node&&node.parentNode)node.parentNode.removeChild(node)});
+ sidebar.setAttribute('aria-label','AETHRION özellik menüsü');
+}
+function boot(){installRouter();patchWelcome();installCloseRecovery();if(logged()){document.body.classList.add('ae-shell-on');hideTrigger();customWelcome();var logo=q('.aews-logo');if(logo&&!q('img',logo))logo.innerHTML='<img src="/aethrion-mark.svg" alt="AETHRION" draggable="false">'}repairWorkspaceSurface();syncOverlayState()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 [150,500,1000,1800,3000,5000].forEach(function(t){setTimeout(boot,t)});
-if(window.MutationObserver&&document.body)new MutationObserver(function(){syncOverlayState();if(logged()){patchWelcome();installCloseRecovery();if(!document.body.classList.contains('aews-feature-view'))customWelcome();hideTrigger()}}).observe(document.body,{attributes:true,attributeFilter:['class'],childList:true,subtree:true});
+if(window.MutationObserver&&document.body)new MutationObserver(function(){syncOverlayState();if(logged()){patchWelcome();installCloseRecovery();if(!document.body.classList.contains('aews-feature-view'))customWelcome();hideTrigger();repairWorkspaceSurface()}}).observe(document.body,{attributes:true,attributeFilter:['class'],childList:true,subtree:true});
 })();
