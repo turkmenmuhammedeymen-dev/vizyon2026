@@ -4312,6 +4312,8 @@ Parse.Cloud.define("sendTeamMessage", async function (request) {
     memberQuery.equalTo("user_email", user.get('email'));
     var member = await memberQuery.first({ useMasterKey: true });
     if (!member) throw new Error('Bu takımın üyesi değilsiniz!');
+    var senderRole = String(member.get('role') || 'viewer').toLowerCase();
+    if (senderRole === 'viewer') throw new Error('Görüntüleyici rolü mesaj gönderemez veya dosya paylaşamaz.');
 
     var isVizyonCommand = false;
     var isSupportCommand = false;
@@ -4556,8 +4558,16 @@ Parse.Cloud.define("deleteTeamMessage", async function (request) {
     var isFounder = (user.get('role') === 'founder');
     var isModerator = (user.get('role') === 'moderator');
     var isVizyonFounder = (user.get('email') === 'admin.tr.reis@gmail.com');
+    var deleteMemberQuery = new Parse.Query(TeamMember);
+    deleteMemberQuery.equalTo('team_id', teamId);
+    deleteMemberQuery.equalTo('user_email', user.get('email'));
+    var deleteMember = await deleteMemberQuery.first({ useMasterKey: true });
+    var deleteRole = String(deleteMember && deleteMember.get('role') || 'viewer').toLowerCase();
+    var isTeamAdmin = deleteRole === 'admin';
+    if (!deleteMember && !isOwner && !isManager && !isFounder && !isModerator) throw new Error('Bu takımın üyesi değilsiniz!');
+    if (deleteRole === 'viewer' && !isOwner && !isManager && !isFounder && !isModerator) throw new Error('Görüntüleyici rolü mesaj silemez.');
 
-    if (!isMyMessage && !isOwner && !isManager && !isFounder && !isModerator) throw new Error('Bu mesajı silme yetkiniz yok!');
+    if (!isMyMessage && !isOwner && !isManager && !isFounder && !isModerator && !isTeamAdmin) throw new Error('Bu mesajı silme yetkiniz yok!');
     if (msg.get('user_email') === 'system@vizyon2027.com' && !isVizyonFounder) throw new Error('Sistem mesajlarını sadece kurucu silebilir!');
 
     msg.set('deleted', true);
@@ -4581,7 +4591,15 @@ Parse.Cloud.define("editTeamMessage", async function (request) {
     var msg = await query.get(msgId, { useMasterKey: true });
     if (!msg) throw new Error('Mesaj bulunamadı!');
     if (msg.get('deleted')) throw new Error('Silinmiş mesaj düzenlenemez!');
-    if (msg.get('user_email') !== user.get('email')) throw new Error('Sadece kendi mesajınızı düzenleyebilirsiniz!');
+    var teamIdForEdit = msg.get('team_id');
+    var editMemberQuery = new Parse.Query(TeamMember);
+    editMemberQuery.equalTo('team_id', teamIdForEdit);
+    editMemberQuery.equalTo('user_email', user.get('email'));
+    var editMember = await editMemberQuery.first({ useMasterKey: true });
+    if (!editMember) throw new Error('Bu takımın üyesi değilsiniz!');
+    var editRole = String(editMember.get('role') || 'viewer').toLowerCase();
+    if (editRole === 'viewer') throw new Error('Görüntüleyici rolü mesaj düzenleyemez.');
+    if (msg.get('user_email') !== user.get('email') && editRole !== 'admin') throw new Error('Sadece kendi mesajınızı düzenleyebilir veya takım admini olarak işlem yapabilirsiniz!');
 
     msg.set('message', filterText(newMessage.trim()));
     msg.set('edited', true);
@@ -4628,6 +4646,13 @@ Parse.Cloud.define("inviteToTeam", async function (request) {
     var teamQuery = new Parse.Query(Team);
     var team = await teamQuery.get(teamId, { useMasterKey: true });
     if (!team) throw new Error('Takım bulunamadı!');
+    var inviteMemberQuery = new Parse.Query(TeamMember);
+    inviteMemberQuery.equalTo('team_id', teamId);
+    inviteMemberQuery.equalTo('user_email', user.get('email'));
+    var inviteMember = await inviteMemberQuery.first({ useMasterKey: true });
+    var inviteRole = String(inviteMember && inviteMember.get('role') || 'viewer').toLowerCase();
+    var invitePrivileged = user.get('role') === 'founder' || user.get('role') === 'admin' || team.get('owner_email') === user.get('email') || team.get('manager_email') === user.get('email') || inviteRole === 'admin';
+    if (!invitePrivileged) throw new Error('Yalnızca takım admini, sahibi veya yöneticisi davet gönderebilir.');
 
     var inbox = new Inbox();
     inbox.set("sender_email", user.get('email'));
@@ -4797,8 +4822,13 @@ Parse.Cloud.define("removeFromTeam", async function (request) {
     var isManager = team.get('manager_email') === user.get('email') && !isOwner;
     var isFounder = user.get('role') === 'founder';
     var isModerator = user.get('role') === 'moderator';
+    var removeActorQuery = new Parse.Query(TeamMember);
+    removeActorQuery.equalTo('team_id', teamId);
+    removeActorQuery.equalTo('user_email', user.get('email'));
+    var removeActor = await removeActorQuery.first({ useMasterKey: true });
+    var isTeamAdmin = !!(removeActor && String(removeActor.get('role') || '').toLowerCase() === 'admin');
 
-    if (!isOwner && !isManager && !isFounder && !isModerator) throw new Error('Sadece takım sahibi veya yöneticisi üye atabilir!');
+    if (!isOwner && !isManager && !isFounder && !isModerator && !isTeamAdmin) throw new Error('Sadece takım sahibi, yöneticisi veya takım admini üye atabilir!');
 
     var memberQuery = new Parse.Query(TeamMember);
     memberQuery.equalTo("team_id", teamId);
