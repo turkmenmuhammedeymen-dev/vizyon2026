@@ -10252,22 +10252,88 @@ Parse.Cloud.define("aethrionGetDiagnostics", async function (request) {
         try { if (typeof process !== "undefined" && process.env && process.env[name]) return true; } catch (e) {}
         try { return !!(config && config.get && config.get(name)); } catch (e) { return false; }
     }
+    async function probe(url, key, headerName) {
+        if (typeof fetch !== "function") return { ok: false, detail: "Bu çalışma ortamında güvenli HTTP probe desteği yok." };
+        try {
+            var controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+            var timeoutId = controller ? setTimeout(function () { controller.abort(); }, 7000) : null;
+            var headers = {};
+            headers[headerName || "Authorization"] = headerName ? key : "Bearer " + key;
+            var response = await fetch(url, { method: "GET", headers: headers, signal: controller ? controller.signal : undefined });
+            if (timeoutId) clearTimeout(timeoutId);
+            if (response.ok) return { ok: true, detail: "Sağlayıcı uç noktası HTTP " + response.status + " yanıtı verdi." };
+            return { ok: false, detail: "Sağlayıcı uç noktası HTTP " + response.status + " döndürdü; erişim/limit yapılandırmasını kontrol edin." };
+        } catch (e) {
+            return { ok: false, detail: "Bağlantı probe başarısız veya zaman aşımına uğradı; ham hata ve hassas veriler gösterilmedi." };
+        }
+    }
+    async function secret(name) {
+        try { if (typeof process !== "undefined" && process.env && process.env[name]) return process.env[name]; } catch (e) {}
+        try { return config && config.get ? config.get(name) : null; } catch (e) { return null; }
+    }
     var providers = [
-        { name: "IPQS_API_KEY", label: "IPQS güvenlik kontrolü" },
-        { name: "OPENAI_API_KEY", label: "OpenAI sağlayıcı yapılandırması" },
-        { name: "NVIDIA_API_KEY", label: "NVIDIA sağlayıcı yapılandırması" },
-        { name: "DEEPSEEK_API_KEY", label: "DeepSeek sağlayıcı yapılandırması" },
-        { name: "GROQ_API_KEY", label: "Groq sağlayıcı yapılandırması" },
-        { name: "OLLAMA_BASE_URL", label: "Ollama uç nokta yapılandırması" },
-        { name: "VERCEL_READONLY_TOKEN", label: "Vercel salt okunur durum API erişimi" }
+        { key: "OPENAI_KEY", label: "OpenAI model erişimi", url: "https://api.openai.com/v1/models" },
+        { key: "DEEPSEEK_KEY", label: "DeepSeek model erişimi", url: "https://api.deepseek.com/models" },
+        { key: "GROQ_KEY", label: "Groq model erişimi", url: "https://api.groq.com/openai/v1/models" },
+        { key: "NVIDIA_API_KEY", label: "NVIDIA model erişimi", url: null },
+        { key: "OPENROUTER_KEY", label: "OpenRouter model erişimi", url: "https://openrouter.ai/api/v1/models" },
+        { key: "DEEPINFRA_KEY", label: "DeepInfra model erişimi", url: "https://api.deepinfra.com/v1/openai/models" },
+        { key: "CEREBRAS_KEY", label: "Cerebras model erişimi", url: "https://api.cerebras.ai/v1/models" },
+        { key: "GEMINI_KEY", label: "Gemini model erişimi", url: "https://generativelanguage.googleapis.com/v1beta/models", header: "x-goog-api-key" },
+        { key: "IPQS_API_KEY", label: "IPQS güvenlik yapılandırması", url: null }
     ];
-    providers.forEach(function (provider) {
-        var yes = configured(provider.name);
-        var isVercel = provider.name === "VERCEL_READONLY_TOKEN";
-        add(provider.label, yes ? "ok" : "warn", yes
-            ? (isVercel ? "Durum sorgusu için erişim yapılandırılmış; canlı dağıtım sonucu ayrıca sorgulanmalıdır." : "Yapılandırma anahtarı mevcut. Gerçek model/API bağlantısı bu testte çağrılmadı.")
-            : (isVercel ? "Dağıtım API bilgisi yapılandırılmamış; Vercel durumu buradan doğrulanamıyor." : "Yapılandırma bulunamadı veya bu ortamda görünür değil; anahtar değeri hiçbir zaman döndürülmez."));
-    });
+    for (var pi = 0; pi < providers.length; pi++) {
+        var provider = providers[pi];
+        var keyValue = await secret(provider.key);
+        if (!keyValue) {
+            add(provider.label, "warn", "Yapılandırma anahtarı bulunamadı veya bu ortamda görünür değil.");
+            continue;
+        }
+        if (provider.url) {
+            var result = await probe(provider.url, keyValue, provider.header);
+            add(provider.label, result.ok ? "ok" : "bad", result.detail);
+        } else if (provider.key === "NVIDIA_API_KEY") {
+            var base = await secret("NVIDIA_BASE_URL");
+            if (base) {
+                var nvidiaResult = await probe(String(base).replace(/\\/+$/, "") + "/models", keyValue);
+                add(provider.label, nvidiaResult.ok ? "ok" : "bad", nvidiaResult.detail);
+            } else {
+                add(provider.label, "warn", "API anahtarı mevcut ancak NVIDIA_BASE_URL eksik; uç nokta probe edilemedi.");
+            }
+        } else {
+            add(provider.label, "ok", "Güvenlik yapılandırması mevcut; bu kontrol sağlayıcıya test isteği göndermiyor.");
+        }
+    }
+
+    var vercelToken = await secret("VERCEL_READONLY_TOKEN");
+    var vercelProjectId = await secret("VERCEL_PROJECT_ID");
+    if (!vercelToken || !vercelProjectId) {
+        add("Vercel dağıtımı", "warn", "VERCEL_READONLY_TOKEN veya VERCEL_PROJECT_ID yapılandırılmadığı için canlı dağıtım durumu sorgulanamıyor.");
+    } else {
+        try {
+            var vercelTeamId = await secret("VERCEL_TEAM_ID");
+            var vercelUrl = "https://api.vercel.com/v6/deployments?projectId=" + encodeURIComponent(vercelProjectId) + "&limit=1";
+            if (vercelTeamId) vercelUrl += "&teamId=" + encodeURIComponent(vercelTeamId);
+            var controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+            var timeoutId = controller ? setTimeout(function () { controller.abort(); }, 7000) : null;
+            var vr = await fetch(vercelUrl, { headers: { Authorization: "Bearer " + vercelToken }, signal: controller ? controller.signal : undefined });
+            if (timeoutId) clearTimeout(timeoutId);
+            if (!vr.ok) {
+                add("Vercel dağıtımı", "bad", "Vercel API HTTP " + vr.status + " yanıtı verdi; salt okunur token/proje erişimini kontrol edin.");
+            } else {
+                var vd = await vr.json();
+                var deployment = vd && vd.deployments && vd.deployments[0];
+                if (!deployment) add("Vercel dağıtımı", "warn", "Vercel API yanıt verdi ancak bu proje için dağıtım bulunamadı.");
+                else {
+                    var state = String(deployment.readyState || deployment.state || "UNKNOWN").toUpperCase();
+                    var stateStatus = state === "READY" ? "ok" : (state === "ERROR" || state === "CANCELED" ? "bad" : "warn");
+                    add("Vercel dağıtımı", stateStatus, "En son dağıtım durumu: " + state + (deployment.createdAt ? " · oluşturulma: " + new Date(deployment.createdAt).toISOString() : "") + ".");
+                }
+            }
+        } catch (e) {
+            add("Vercel dağıtımı", "bad", "Vercel durum sorgusu başarısız veya zaman aşımına uğradı; ham hata ve token gösterilmedi.");
+        }
+    }
     add("Cloud Code", "ok", "Bu tanılama işlevinin yanıt vermesi, mevcut Cloud Code çağrısının çalıştığını doğrular.");
     return { success: true, generatedAt: new Date().toISOString(), checks: checks };
 });
