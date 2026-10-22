@@ -10409,14 +10409,16 @@ Parse.Cloud.define("aethrionGetTeamWorkspace", async function (request) {
     var isPrivileged = _aeIsPrivileged(user);
     var isOwner = String(team.get("owner_email") || "").toLowerCase() === String(user.get("email") || "").toLowerCase();
     var isManager = String(team.get("manager_email") || "").toLowerCase() === String(user.get("email") || "").toLowerCase();
+    var selfMembership = await new Parse.Query("TeamMember").equalTo("team_id", teamId).equalTo("user_email", user.get("email")).first({ useMasterKey: true });
+    var isTeamAdmin = !!(selfMembership && String(selfMembership.get("role") || "").toLowerCase() === "admin");
     return {
         team: { id: team.id, name: _aeSafeAuditText(team.get("name") || "Takım", 100) },
-        canManageRoles: isPrivileged || isOwner || isManager,
+        canManageRoles: isPrivileged || isOwner || isManager || isTeamAdmin,
         members: members.map(function (member) {
             return {
                 id: member.id,
                 email: _aeSafeAuditText(member.get("user_email") || "", 254),
-                role: _aeSafeAuditText(member.get("role") || "viewer", 32).toLowerCase(),
+                role: String(member.get("user_email") || "").toLowerCase() === String(team.get("owner_email") || "").toLowerCase() ? "admin" : (String(member.get("user_email") || "").toLowerCase() === String(team.get("manager_email") || "").toLowerCase() ? "admin" : _aeSafeAuditText(member.get("role") || "viewer", 32).toLowerCase()),
                 name: _aeSafeAuditText(member.get("user_name") || member.get("name") || member.get("user_email") || "Üye", 100)
             };
         })
@@ -10434,9 +10436,11 @@ Parse.Cloud.define("aethrionSetTeamMemberRole", async function (request) {
     if (!memberId) throw new Error("Üye kimliği gerekli.");
     var team = await _aeRequireTeamAccess(user, teamId);
     var email = String(user.get("email") || "").toLowerCase();
+    var selfMembership = await new Parse.Query("TeamMember").equalTo("team_id", teamId).equalTo("user_email", user.get("email")).first({ useMasterKey: true });
     var mayManage = _aeIsPrivileged(user) ||
         String(team.get("owner_email") || "").toLowerCase() === email ||
-        String(team.get("manager_email") || "").toLowerCase() === email;
+        String(team.get("manager_email") || "").toLowerCase() === email ||
+        !!(selfMembership && String(selfMembership.get("role") || "").toLowerCase() === "admin");
     if (!mayManage) throw new Error("Bu takımda rol değiştirme yetkiniz yok.");
     var member = await new Parse.Query("TeamMember").get(memberId, { useMasterKey: true });
     if (String(member.get("team_id") || "") !== teamId) throw new Error("Üye bu takıma ait değil.");
