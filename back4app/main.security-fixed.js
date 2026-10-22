@@ -173,8 +173,8 @@ var _aethrionVpnCache = new Map();
 
 async function _aethrionGetIPQSApiKey() {
     // Preferred: private Back4App Cloud Code environment variable.
-    // Optional fallback: Parse.Config IPQS_API_KEY ONLY if its dashboard setting
-    // "Requires master key?" is enabled. Never put this key in browser/client code.
+    // Optional fallback: Parse.Config IPQS_API_KEY ONLY if "Requires master key?" is enabled.
+    // Never place this secret in browser code or a publicly readable Parse Config parameter.
     var names = ['IPQS_API_KEY', 'IPQUALITYSCORE_API_KEY'];
     try {
         if (typeof process !== 'undefined' && process.env) {
@@ -195,15 +195,13 @@ async function _aethrionGetIPQSApiKey() {
             }
         }
     } catch (e) {
-        // Do not log config contents, credentials, or raw provider responses.
-        console.warn('[AETHRION Security] Server-side secret lookup from Parse.Config failed.');
+        console.warn('[AETHRION Security] Server-side Parse.Config secret lookup failed.');
     }
     return '';
 }
 
-// Prefer Parse's server-normalized IP. Use forwarded headers only when request.ip
-// is absent. In X-Forwarded-For, the left-most address is conventionally the client;
-// deployments must ensure the reverse proxy sanitizes this header.
+// Prefer Parse's server-normalized IP. Fall back to proxy headers only when request.ip
+// is absent. The hosting proxy must sanitize X-Forwarded-For before this fallback is trusted.
 function _aethrionGetClientIp(request) {
     if (!request) return '';
     function normalize(value) {
@@ -236,7 +234,6 @@ function _aethrionCacheReputation(ip, blocked, now) {
         var firstKey = _aethrionVpnCache.keys().next().value;
         if (firstKey) _aethrionVpnCache.delete(firstKey);
     }
-    // Keep negative/blocked classifications briefly to reduce stale false positives.
     _aethrionVpnCache.set(ip, {
         blocked: blocked === true,
         expiresAt: now + (blocked ? 60 * 1000 : 5 * 60 * 1000)
@@ -247,7 +244,6 @@ async function _aethrionLookupIpReputation(request, ip, apiKey) {
     var headers = (request && request.headers) || {};
     var userAgent = String(headers['user-agent'] || headers['User-Agent'] || '').slice(0, 512);
     var userLanguage = String(headers['accept-language'] || headers['Accept-Language'] || '').slice(0, 128);
-    var uaMobile = /android|iphone|ipad|ipod|mobile/i.test(userAgent);
     var params = [
         'ip=' + encodeURIComponent(ip),
         'strictness=0',
@@ -256,14 +252,14 @@ async function _aethrionLookupIpReputation(request, ip, apiKey) {
     ];
     if (userAgent) params.push('user_agent=' + encodeURIComponent(userAgent));
     if (userLanguage) params.push('user_language=' + encodeURIComponent(userLanguage));
-    else if (uaMobile) params.push('mobile=true');
+    else if (/android|iphone|ipad|ipod|mobile/i.test(userAgent)) params.push('mobile=true');
 
     var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
     var timeout = controller ? setTimeout(function () { controller.abort(); }, 8000) : null;
     var response;
     try {
         var url = 'https://ipqualityscore.com/api/json/ip?' + params.join('&');
-        // IPQS documents IPQS-KEY header authentication; avoids placing the secret in URL logs.
+        // IPQS supports the IPQS-KEY header; this avoids putting the key in URL logs.
         response = await fetch(url, {
             method: 'GET',
             headers: { 'IPQS-KEY': apiKey, 'Accept': 'application/json' },
@@ -272,16 +268,11 @@ async function _aethrionLookupIpReputation(request, ip, apiKey) {
     } finally {
         if (timeout) clearTimeout(timeout);
     }
-    if (!response || !response.ok) {
-        return { ok: false, code: 'REPUTATION_PROVIDER_HTTP_ERROR' };
-    }
+    if (!response || !response.ok) return { ok: false, code: 'REPUTATION_PROVIDER_HTTP_ERROR' };
     var data;
     try { data = await response.json(); }
     catch (e) { return { ok: false, code: 'REPUTATION_PROVIDER_INVALID_JSON' }; }
-    if (!data || data.success !== true) {
-        // Deliberately do not expose provider response text or the API key to the browser.
-        return { ok: false, code: 'REPUTATION_PROVIDER_REJECTED_REQUEST' };
-    }
+    if (!data || data.success !== true) return { ok: false, code: 'REPUTATION_PROVIDER_REJECTED_REQUEST' };
     var flags = {
         vpn: data.vpn === true || data.active_vpn === true,
         proxy: data.proxy === true || data.active_proxy === true,
@@ -294,46 +285,47 @@ async function _aethrionLookupIpReputation(request, ip, apiKey) {
         fraudScore: typeof data.fraud_score === 'number' ? data.fraud_score : null
     };
 }
-Parse.Cloud.define("aethrionSecurityCheck", async function (request) {
+
+async function _aethrionEnforceVpnPolicy(request) {
+    if (request && (request.master === true || request.isMaster === true)) return;
     var apiKey = await _aethrionGetIPQSApiKey();
-    if (!apiKey) {
-        return { ok: false, configured: false, blocked: true, code: 'VPN_CHECK_NOT_CONFIGURED' };
-    }
+    if (!apiKey) throw new Error('AETHRION_SECURITY_CONFIGURATION_REQUIRED: Configure IPQS_API_KEY in Back4App Environment Variables or a Parse.Config parameter protected by Requires master key.');
     var ip = _aethrionGetClientIp(request);
     if (!ip || ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') {
-        return { ok: false, configured: true, blocked: true, code: 'IP_UNAVAILABLE' };
+        throw new Error('AETHRION_SECURITY_IP_UNAVAILABLE: client IP could not be verified; access denied.');
     }
     var now = Date.now();
     var cached = _aethrionVpnCache.get(ip);
     if (cached && cached.expiresAt > now) {
-        return {
-            ok: true, configured: true, blocked: cached.blocked === true,
-            code: cached.blocked ? 'VPN_PROXY_OR_TOR' : 'CLEAR'
-        };
+        if (cached.blocked) throw new Error('AETHRION_VPN_PROXY_BLOCKED: VPN, proxy or Tor connections are not permitted.');
+        return;
     }
+    var result;
     try {
-        var result = await _aethrionLookupIpReputation(request, ip, apiKey);
-        if (!result || result.ok !== true) {
-            return {
-                ok: false, configured: true, blocked: true,
-                code: result && result.code ? result.code : 'REPUTATION_CHECK_FAILED'
-            };
-        }
-        _aethrionCacheReputation(ip, result.blocked, now);
-        return {
-            ok: true, configured: true, blocked: result.blocked === true,
-            code: result.blocked ? 'VPN_PROXY_OR_TOR' : 'CLEAR',
-            // Safe diagnostics only: no IP, API key, or raw IPQS payload.
-            checks: result.flags,
-            fraudScore: result.fraudScore
-        };
+        result = await _aethrionLookupIpReputation(request, ip, apiKey);
     } catch (error) {
-        console.error('[AETHRION Security] Browser gate reputation check failed; credentials and IP omitted.');
-        return { ok: false, configured: true, blocked: true, code: 'REPUTATION_CHECK_UNAVAILABLE' };
+        console.error('[AETHRION Security] IP reputation request failed; credential and IP values omitted.');
+        throw new Error('AETHRION_SECURITY_CHECK_UNAVAILABLE: IP reputation provider could not be reached; access denied.');
     }
-});
-
- if (cloudFunctionName !== 'aethrionSecurityCheck') {
+    if (!result || result.ok !== true) {
+        console.error('[AETHRION Security] IP reputation provider returned an unusable result: ' + String(result && result.code || 'UNKNOWN'));
+        throw new Error('AETHRION_SECURITY_CHECK_UNAVAILABLE: IP reputation provider could not verify this connection; access denied.');
+    }
+    _aethrionCacheReputation(ip, result.blocked, now);
+    if (result.blocked) throw new Error('AETHRION_VPN_PROXY_BLOCKED: VPN, proxy or Tor connections are not permitted.');
+}
+if (Parse && Parse.Cloud && typeof Parse.Cloud.define === 'function' && !Parse.Cloud.define.__aethrionVpnWrapped) {
+    var _aethrionOriginalCloudDefine = Parse.Cloud.define;
+    var _aethrionWrappedCloudDefine = function () {
+        var args = Array.prototype.slice.call(arguments);
+        var handlerIndex = args.length - 1;
+        var originalHandler = args[handlerIndex];
+        if (typeof originalHandler !== 'function') return _aethrionOriginalCloudDefine.apply(this, args);
+        var cloudFunctionName = typeof args[0] === 'string' ? args[0] : '';
+        args[handlerIndex] = async function (request) {
+            // The public gate function performs its own IPQS check and must return a
+            // structured result to the browser; every other function remains gated.
+            if (cloudFunctionName !== 'aethrionSecurityCheck') {
                 await _aethrionEnforceVpnPolicy(request);
             }
             return originalHandler.apply(this, arguments);
@@ -352,57 +344,30 @@ Parse.Cloud.define("aethrionSecurityCheck", async function (request) {
 // Public browser gate: no caller-supplied IP is accepted. Parse Server's request.ip
 // is the only address used; unknown IP/provider/configuration errors fail closed.
 Parse.Cloud.define("aethrionSecurityCheck", async function (request) {
-    var apiKey = _aethrionGetIPQSApiKey();
-    if (!apiKey) {
-        return { ok: false, configured: false, blocked: true, code: 'VPN_CHECK_NOT_CONFIGURED' };
-    }
-
+    var apiKey = await _aethrionGetIPQSApiKey();
+    if (!apiKey) return { ok: false, configured: false, blocked: true, code: 'VPN_CHECK_NOT_CONFIGURED' };
     var ip = _aethrionGetClientIp(request);
     if (!ip || ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') {
         return { ok: false, configured: true, blocked: true, code: 'IP_UNAVAILABLE' };
     }
-
     var now = Date.now();
     var cached = _aethrionVpnCache.get(ip);
     if (cached && cached.expiresAt > now) {
-        return {
-            ok: true, configured: true, blocked: cached.blocked === true,
-            code: cached.blocked ? 'VPN_PROXY_OR_TOR' : 'CLEAR'
-        };
+        return { ok: true, configured: true, blocked: cached.blocked === true,
+            code: cached.blocked ? 'VPN_PROXY_OR_TOR' : 'CLEAR' };
     }
-
     try {
-        var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-        var timeout = controller ? setTimeout(function () { controller.abort(); }, 6500) : null;
-        var response;
-        try {
-            var url = 'https://ipqualityscore.com/api/json/ip/' +
-                encodeURIComponent(apiKey) + '/' + encodeURIComponent(ip) +
-                '?strictness=1&allow_public_access_points=true';
-            response = await fetch(url, controller ? { method: 'GET', signal: controller.signal } : { method: 'GET' });
-        } finally {
-            if (timeout) clearTimeout(timeout);
+        var result = await _aethrionLookupIpReputation(request, ip, apiKey);
+        if (!result || result.ok !== true) {
+            return { ok: false, configured: true, blocked: true,
+                code: result && result.code ? result.code : 'REPUTATION_CHECK_FAILED' };
         }
-        if (!response || !response.ok) {
-            return { ok: false, configured: true, blocked: true, code: 'REPUTATION_PROVIDER_UNAVAILABLE' };
-        }
-        var data = await response.json();
-        if (!data || data.success !== true) {
-            return { ok: false, configured: true, blocked: true, code: 'REPUTATION_CHECK_FAILED' };
-        }
-        var blocked = data.vpn === true || data.active_vpn === true ||
-            data.proxy === true || data.tor === true || data.active_tor === true;
-        if (_aethrionVpnCache.size >= 1500) {
-            var firstKey = _aethrionVpnCache.keys().next().value;
-            if (firstKey) _aethrionVpnCache.delete(firstKey);
-        }
-        _aethrionVpnCache.set(ip, { blocked: blocked, expiresAt: now + 5 * 60 * 1000 });
-        return {
-            ok: true, configured: true, blocked: blocked,
-            code: blocked ? 'VPN_PROXY_OR_TOR' : 'CLEAR'
-        };
+        _aethrionCacheReputation(ip, result.blocked, now);
+        return { ok: true, configured: true, blocked: result.blocked === true,
+            code: result.blocked ? 'VPN_PROXY_OR_TOR' : 'CLEAR',
+            checks: result.flags, fraudScore: result.fraudScore };
     } catch (error) {
-        console.error('[AETHRION Security] Browser gate reputation check failed; access denied.');
+        console.error('[AETHRION Security] Browser gate reputation check failed; credentials and IP omitted.');
         return { ok: false, configured: true, blocked: true, code: 'REPUTATION_CHECK_UNAVAILABLE' };
     }
 });
@@ -10484,7 +10449,7 @@ Parse.Cloud.define("aethrionGetDiagnostics", async function (request) {
     ];
     for (var pi = 0; pi < providers.length; pi++) {
         var provider = providers[pi];
-        var keyValue = provider.key === 'IPQS_API_KEY' ? _aethrionGetIPQSApiKey() : await secret(provider.key);
+        var keyValue = provider.key === 'IPQS_API_KEY' ? await _aethrionGetIPQSApiKey() : await secret(provider.key);
         if (!keyValue) {
             add(provider.label, "warn", "Yapılandırma anahtarı bulunamadı veya bu ortamda görünür değil.");
             continue;
