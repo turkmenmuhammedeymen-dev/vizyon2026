@@ -1,0 +1,27 @@
+name: AETHRION validation
+on:
+  push:
+    branches: [main, "feat/**"]
+  pull_request:
+    branches: [main]
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Check JavaScript syntax
+        run: |
+          node --check aethrion-jarvis.js
+          node --check aethrion-identity.js
+          node --check aethrion-security-guard.js
+          node --check back4app/main.js
+      - name: Check required JARVIS and policy files
+        run: |
+          test -s aethrion-jarvis.html
+          test -s aethrion-jarvis.css
+          test -s docs/AETHRION-ECOSYSTEM-JARVIS.md
+          test -s docs/ROLE-ACCESS-MATRIX.md
+          test -s docs/RELEASE-AND-REGRESSION-CHECKLIST.md
