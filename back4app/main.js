@@ -10295,7 +10295,8 @@ Parse.Cloud.define("aethrionGetDiagnostics", async function (request) {
         } else if (provider.key === "NVIDIA_API_KEY") {
             var base = await secret("NVIDIA_BASE_URL");
             if (base) {
-                var nvidiaResult = await probe(String(base).replace(/\\/+$/, "") + "/models", keyValue);
+                var nvidiaBase = String(base); while (nvidiaBase.endsWith("/")) nvidiaBase = nvidiaBase.slice(0, -1);
+                var nvidiaResult = await probe(nvidiaBase + "/models", keyValue);
                 add(provider.label, nvidiaResult.ok ? "ok" : "bad", nvidiaResult.detail);
             } else {
                 add(provider.label, "warn", "API anahtarı mevcut ancak NVIDIA_BASE_URL eksik; uç nokta probe edilemedi.");
