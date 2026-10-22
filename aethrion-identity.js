@@ -319,6 +319,47 @@ function installAuthRepairs() {
   installGoogleLoginRepair();
 }
 
+function loadOpsStyles() {
+  if (document.querySelector('link[data-aethrion-ops-css]')) return;
+  var link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = '/aethrion-ops.css?v=20261022-1';
+  link.setAttribute('data-aethrion-ops-css', 'true');
+  document.head.appendChild(link);
+}
+function installOpsFeatureCards() {
+  if (!document.querySelector('#mainSite, #dashboard, #mainDashboard')) return;
+  if (document.querySelector('[data-aethrion-ops-cards]')) return;
+  var currentUser = window.Parse && window.Parse.User && window.Parse.User.current ? window.Parse.User.current() : null;
+  if (!currentUser) return;
+  var role = String(currentUser.get('role') || 'user').toLowerCase();
+  var privileged = role === 'founder' || role === 'admin';
+  var target = document.querySelector('#featuresMenu, #featureMenu, #features-menu, #feature-menu, .features-menu, .feature-menu, [data-feature-menu], #mainDashboard, #dashboard');
+  if (!target) return;
+  var section = document.createElement('section');
+  section.className = 'ae-tool-grid';
+  section.setAttribute('data-aethrion-ops-cards', 'true');
+  section.setAttribute('aria-label', 'Denetim ve sistem durumu');
+  function makeCard(icon, title, description, href) {
+    var card = document.createElement('article');
+    card.className = 'ae-tool-card';
+    var iconNode = document.createElement('div'); iconNode.className = 'ae-tool-icon'; iconNode.textContent = icon;
+    var h = document.createElement('h3'); h.textContent = title;
+    var p = document.createElement('p'); p.textContent = description;
+    var a = document.createElement('a'); a.href = href; a.textContent = 'Aç →';
+    card.appendChild(iconNode); card.appendChild(h); card.appendChild(p); card.appendChild(a);
+    return card;
+  }
+  section.appendChild(makeCard('🧾', 'Proje denetim kaydı', 'Paylaşılan takım projelerinde kullanıcıların bildirdiği işlemleri ve zaman çizelgesini incele.', '/aethrion-project-audit.html'));
+  if (privileged) section.appendChild(makeCard('◈', 'AETHRION Status & Diagnostics', 'Cloud Code, oturum, veri deposu ve sağlayıcı yapılandırma durumunu güvenli biçimde kontrol et.', '/aethrion-status.html'));
+  var heading = document.createElement('h2'); heading.className = 'ae-tool-eyebrow'; heading.textContent = 'DENETİM VE SİSTEM DURUMU';
+  var wrapper = document.createElement('section'); wrapper.setAttribute('data-aethrion-ops-wrapper', 'true'); wrapper.appendChild(heading); wrapper.appendChild(section);
+  if (target.matches('#mainDashboard, #dashboard')) {
+    target.appendChild(wrapper);
+  } else {
+    target.appendChild(wrapper);
+  }
+}
 function loadJarvisAssistant() {
   if (!document.querySelector('#mainSite, #splashScreen, #dashboard, #mainDashboard')) return;
   if (document.querySelector('script[data-aethrion-jarvis]')) return;
@@ -330,6 +371,7 @@ function loadJarvisAssistant() {
 }
 function polish() {
   loadLateTheme();
+  loadOpsStyles();
   updateBrandMetadata();
   updateFriendlyRoutes();
   ensurePolicyLinks();
@@ -337,6 +379,7 @@ function polish() {
   enableScrollMotion();
   installAuthRepairs();
   loadJarvisAssistant();
+  installOpsFeatureCards();
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', polish, { once: true });
 else polish();
