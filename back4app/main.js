@@ -10470,22 +10470,23 @@ Parse.Cloud.define("aethrionSetTeamMemberRole", async function (request) {
 // API anahtarıyla güvenli kullanım istatistiği; anahtar başına usage:read izni gerekir.
 Parse.Cloud.define("aethrionGetApiUsage", async function (request) {
     var apiKey = (request.headers && (request.headers["x-v27-api-key"] || request.headers["X-V27-Api-Key"])) || (request.params && request.params.apiKey);
-    if (!apiKey) throw new Error("API anahtarı gerekli.");
-    var validation = await Parse.Cloud.run("validateV27ApiKey", { apiKey: apiKey }, { useMasterKey: true });
-    if (!validation || !validation.valid) throw new Error("API anahtarı geçersiz veya iptal edilmiş.");
-    if (!Array.isArray(validation.scopes) || validation.scopes.indexOf("usage:read") === -1) throw new Error("Bu API anahtarında usage:read izni yok.");
-    var hash = crypto.createHash("sha256").update(apiKey).digest("hex");
+    if (!apiKey || String(apiKey).length > 512) throw new Error("API anahtarı gerekli.");
+    var hash = crypto.createHash("sha256").update(String(apiKey)).digest("hex");
     var query = new Parse.Query(V27ApiKey);
     query.equalTo("key_hash", hash);
     query.equalTo("is_active", true);
     var record = await query.first({ useMasterKey: true });
-    if (!record || record.get("user_email") !== validation.user_email) throw new Error("API anahtarı bulunamadı.");
+    if (!record) throw new Error("API anahtarı geçersiz veya iptal edilmiş.");
+    var expiresAt = record.get("expires_at");
+    if (expiresAt && new Date(expiresAt).getTime() < Date.now()) throw new Error("API anahtarının süresi dolmuş.");
+    var scopes = Array.isArray(record.get("allowed_scopes")) && record.get("allowed_scopes").length ? record.get("allowed_scopes") : ["chat"];
+    if (scopes.indexOf("usage:read") === -1) throw new Error("Bu API anahtarında usage:read izni yok.");
     return {
         success: true,
         keyName: _aeSafeAuditText(record.get("key_name") || "", 50),
         usageCount: Number(record.get("usage_count") || 0),
         lastUsedAt: record.get("last_used_at") || null,
-        expiresAt: record.get("expires_at") || null,
-        scopes: validation.scopes
+        expiresAt: expiresAt || null,
+        scopes: scopes
     };
 });
