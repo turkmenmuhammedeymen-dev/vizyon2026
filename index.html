@@ -52269,7 +52269,7 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 <script defer src="/aethrion-identity.js?v=20261022-identity6"></script>
 <script defer src="/aethrion-experience.js?v=20261022-workspace5"></script>
 <script defer src="/aethrion-auth-recovery.js?v=20261022-authflow6"></script>
-<script defer src="/aethrion-workspace-v5.js?v=20261022-workspace6"></script>
+<script defer src="/aethrion-workspace-v6.js?v=20261022-workspace7"></script>
 
 <!-- AETHRION runtime guard: ensure dashboard assistant entry point is callable -->
 <script id="aethrion-runtime-guard-v1">
@@ -52300,6 +52300,80 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
     bindRuntimeGuards();
   }
   window.addEventListener('load', bindRuntimeGuards, { once: true });
+})();
+</script>
+
+
+<!-- AETHRION workspace consolidation: one sidebar, one active workspace, no legacy bottom drawer -->
+<style id="aethrion-workspace-consolidation-v7">
+  html, body { max-width:100%; overflow-x:clip; }
+  body.ae-shell-on #dashboardArea,
+  body.ae-shell-on #dashboardArea * { box-sizing:border-box; }
+  body.ae-shell-on #dashboardArea { min-width:0!important; }
+  body.ae-shell-on #aethrionWorkspaceStage { width:100%!important; min-width:0!important; max-width:100%!important; overflow:hidden!important; }
+  body.ae-shell-on #aethrionWorkspaceStage .ae-ws-stage-head { min-width:0!important; flex-wrap:wrap!important; overflow-wrap:anywhere!important; }
+  body.ae-shell-on #aethrionWorkspaceStage .ae-ws-stage-head h2,
+  body.ae-shell-on #aethrionWorkspaceStage .ae-ws-stage-head p,
+  body.ae-shell-on #aethrionWorkspaceStage .ae-ws-stage-empty h3,
+  body.ae-shell-on #aethrionWorkspaceStage .ae-ws-stage-empty p { min-width:0!important; max-width:100%!important; overflow-wrap:anywhere!important; word-break:normal!important; }
+  body.ae-shell-on #aethrionWorkspaceStage .ae-ws-stage-frame { display:block!important; width:100%!important; min-width:0!important; min-height:70vh!important; border:0!important; background:#f5f8fc!important; }
+  body.ae-shell-on #aeWorkspaceSidebar { min-width:0!important; }
+  body.ae-shell-on #aeWorkspaceSidebar .aews-search { width:100%!important; min-width:0!important; }
+  body.ae-shell-on #aeWorkspaceSidebar .aews-search input { min-width:0!important; }
+  body.ae-shell-on #aeWorkspaceSidebar .aews-link { height:auto!important; min-height:42px!important; white-space:normal!important; }
+  body.ae-shell-on #aeWorkspaceSidebar .aews-link > span:last-child { min-width:0!important; white-space:normal!important; overflow-wrap:anywhere!important; line-height:1.4!important; }
+  body.ae-shell-on .aew-name, body.ae-shell-on .aew-copy { max-width:100%!important; overflow-wrap:anywhere!important; }
+  body.ae-shell-on .aew-name em { display:inline-block!important; max-width:100%!important; overflow-wrap:anywhere!important; }
+  body.ae-shell-on #aethrionExperienceDrawer,
+  body.ae-shell-on #aethrionExperienceBackdrop,
+  body.ae-shell-on #aethrionFeaturesPanel,
+  body.ae-shell-on #aethrionFeaturesBackdrop,
+  body.ae-shell-on #aethrionFeaturesTrigger,
+  body.ae-shell-on #aethrionFeaturesButton,
+  body.ae-shell-on .aed-search,
+  body.ae-shell-on .aethrion-sidebar,
+  body.ae-shell-on .aethrion-sidebar-toggle,
+  body.ae-shell-on .aethrion-sidebar-backdrop { display:none!important; visibility:hidden!important; pointer-events:none!important; }
+  #aethrionVpnBlock { position:fixed; inset:0; z-index:2147483647; display:flex; align-items:center; justify-content:center; padding:24px; background:#0b1726; color:#f5f8fc; font:500 16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  #aethrionVpnBlock .ae-vpn-card { width:min(560px,100%); padding:32px; border:1px solid rgba(180,205,230,.25); border-radius:20px; background:linear-gradient(145deg,#142a42,#0d1d30); box-shadow:0 25px 80px rgba(0,0,0,.45); }
+  #aethrionVpnBlock .ae-vpn-brand { margin:0 0 10px; color:#d8bd79; font-size:12px; font-weight:800; letter-spacing:.2em; }
+  #aethrionVpnBlock h1 { margin:0 0 12px; font-size:clamp(25px,5vw,36px); line-height:1.15; letter-spacing:-.03em; }
+  #aethrionVpnBlock p { margin:0 0 20px; color:#c0cfdf; }
+  #aethrionVpnBlock button { min-height:44px; padding:0 18px; border:1px solid #cdb16c; border-radius:10px; background:#d7bd7b; color:#13243a; font-weight:800; cursor:pointer; }
+  @media(max-width:768px) {
+    body.ae-shell-on #dashboardArea { width:100%!important; max-width:100%!important; margin:0!important; padding:12px!important; }
+    body.ae-shell-on #aethrionWorkspaceStage { min-height:calc(100dvh - 24px)!important; border-radius:14px!important; }
+    body.ae-shell-on #aethrionWorkspaceStage .ae-ws-stage-head { padding:16px!important; }
+    body.ae-shell-on #aethrionWorkspaceStage .ae-ws-stage-frame { min-height:65vh!important; }
+    #aethrionVpnBlock .ae-vpn-card { padding:24px; }
+  }
+</style>
+<script id="aethrionVpnProtectionClientV1">
+(function(){
+  'use strict';
+  function blockPage(){
+    if(document.getElementById('aethrionVpnBlock'))return;
+    var root=document.createElement('section');
+    root.id='aethrionVpnBlock';
+    root.setAttribute('role','alertdialog');
+    root.setAttribute('aria-modal','true');
+    root.setAttribute('aria-labelledby','aeVpnTitle');
+    root.innerHTML='<div class="ae-vpn-card"><div class="ae-vpn-brand">AETHRION SECURITY</div><h1 id="aeVpnTitle">Bağlantıya izin verilmiyor</h1><p>Bu bağlantı VPN, proxy veya Tor olarak işaretlendi. AETHRION’a erişmek için bu bağlantıyı kapatıp normal internet bağlantınızla tekrar deneyin.</p><button type="button" id="aeVpnRetry">Yeniden kontrol et</button></div>';
+    document.body.appendChild(root);
+    document.documentElement.style.overflow='hidden';
+    var btn=document.getElementById('aeVpnRetry');
+    if(btn)btn.addEventListener('click',function(){location.reload()});
+  }
+  function run(){
+    fetch('/api/security-check?ts='+Date.now(),{method:'GET',credentials:'same-origin',cache:'no-store',headers:{'Accept':'application/json'}})
+      .then(function(response){return response.json().catch(function(){return {ok:false,configured:true,blocked:true,code:'INVALID_SECURITY_RESPONSE'}})})
+      .then(function(result){
+        if(result&&result.blocked===true)blockPage();
+        else if(result&&result.configured===false)console.warn('[AETHRION Security] VPN protection is not active: configure IPQS_API_KEY in Vercel.');
+      })
+      .catch(function(error){console.warn('[AETHRION Security] Connection reputation check unavailable.',error)});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();
 </script>
 
