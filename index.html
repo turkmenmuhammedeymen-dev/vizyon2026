@@ -52422,7 +52422,7 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
   var started=Date.now();
   function attempt(){
    var SDK=window.Parse;
-   if(!SDK||!SDK.Cloud||typeof SDK.Cloud.run!=='function'||!SDK.applicationId){
+   if(!SDK||!SDK.Cloud||typeof SDK.Cloud.run!=='function'||!window.parseInitialized){
     if(Date.now()-started>15000)blockPage('unavailable');
     else setTimeout(attempt,250);
     return;
