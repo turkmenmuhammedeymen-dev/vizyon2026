@@ -22,3 +22,11 @@ Upload `back4app/main.js` as the app's Cloud Code `main.js`, set `IPQS_API_KEY` 
 
 ## Validation
 GitHub Actions runs JavaScript syntax checks on the Cloud Code and browser security guard. Passing syntax checks do not replace live tests of login, AI providers, file analysis, rate limits, and VPN/proxy detection.
+
+
+## AETHRION AI and JARVIS
+- AETHRION AI is the standard conversational assistant.
+- AETHRION JARVIS is the separate task-assistant mode with browser-based voice input/output where supported.
+- The current frontend uses the existing `vizyonAlChat` Cloud Code function. Full screen streaming, desktop control, web/tool automation, persistent project memory and advanced agent orchestration require separate backend/provider work; they are not claimed as live in this frontend-only phase.
+- The role policy and release checklist are in `docs/ROLE-ACCESS-MATRIX.md` and `docs/RELEASE-AND-REGRESSION-CHECKLIST.md`.
+- See `docs/AETHRION-ECOSYSTEM-JARVIS.md` for the implementation contract.
