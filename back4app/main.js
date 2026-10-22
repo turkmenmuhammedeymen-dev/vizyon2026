@@ -171,6 +171,18 @@ if (typeof globalThis.fetch === 'undefined') {
 // ================================================================
 var _aethrionVpnCache = new Map();
 
+function _aethrionGetIPQSApiKey() {
+    // IPQS credentials must be private Back4App runtime environment variables.
+    // Do not fall back to Parse.Config: client-readable config can expose secrets.
+    try {
+        if (typeof process !== 'undefined' && process.env) {
+            var value = process.env.IPQS_API_KEY;
+            if (typeof value === 'string' && value.trim()) return value.trim();
+        }
+    } catch (e) {}
+    return '';
+}
+
 // Prefer Parse Server's normalized client IP. Fall back to proxy headers only
 // when request.ip is unavailable; never accept an IP from request.params.
 function _aethrionGetClientIp(request) {
@@ -190,8 +202,7 @@ function _aethrionGetClientIp(request) {
 
 async function _aethrionEnforceVpnPolicy(request) {
     if (request && (request.master === true || request.isMaster === true)) return;
-    var apiKey = '';
-    try { apiKey = (typeof process !== 'undefined' && process.env && process.env.IPQS_API_KEY) || ''; } catch (e) {}
+    var apiKey = _aethrionGetIPQSApiKey();
     if (!apiKey) throw new Error('AETHRION_SECURITY_CONFIGURATION_REQUIRED: IPQS_API_KEY must be configured in Back4App Cloud Code.');
     var ip = _aethrionGetClientIp(request);
     if (!ip || ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') {
@@ -264,8 +275,7 @@ if (Parse && Parse.Cloud && typeof Parse.Cloud.define === 'function' && !Parse.C
 // Public browser gate: no caller-supplied IP is accepted. Parse Server's request.ip
 // is the only address used; unknown IP/provider/configuration errors fail closed.
 Parse.Cloud.define("aethrionSecurityCheck", async function (request) {
-    var apiKey = '';
-    try { apiKey = (typeof process !== 'undefined' && process.env && process.env.IPQS_API_KEY) || ''; } catch (e) {}
+    var apiKey = _aethrionGetIPQSApiKey();
     if (!apiKey) {
         return { ok: false, configured: false, blocked: true, code: 'VPN_CHECK_NOT_CONFIGURED' };
     }
@@ -10397,7 +10407,7 @@ Parse.Cloud.define("aethrionGetDiagnostics", async function (request) {
     ];
     for (var pi = 0; pi < providers.length; pi++) {
         var provider = providers[pi];
-        var keyValue = await secret(provider.key);
+        var keyValue = provider.key === 'IPQS_API_KEY' ? _aethrionGetIPQSApiKey() : await secret(provider.key);
         if (!keyValue) {
             add(provider.label, "warn", "Yapılandırma anahtarı bulunamadı veya bu ortamda görünür değil.");
             continue;
