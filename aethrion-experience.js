@@ -93,10 +93,8 @@ function ensureDrawer() {
   drawer.setAttribute('aria-hidden', 'true');
   drawer.innerHTML =
    '<div class="aed-head"><div class="aed-brand"><div class="aed-mark">A</div><div><h2 class="aed-title">AETHRION</h2><span class="aed-subtitle">Özellikler ve çalışma alanları</span></div></div><button class="aed-close" type="button" aria-label="Menüyü kapat">×</button></div>' +
-   '<div class="aed-search"><input id="aedSearch" type="search" autocomplete="off" placeholder="Özellik ara…" aria-label="Özellik ara"></div>' +
    '<div class="aed-list" id="aedList"></div><div class="aed-foot">Seçilen özellik, kullanılabilir uygulama paneline veya ilgili sayfasına yönlendirir. Erişim bazı özelliklerde oturum ya da plana bağlı olabilir.</div>';
   qs('.aed-close', drawer).addEventListener('click', closeDrawer);
-  qs('#aedSearch', drawer).addEventListener('input', function () { renderDrawerItems(this.value); });
   document.body.appendChild(drawer);
  }
  menuReady = true;
@@ -122,7 +120,7 @@ function renderDrawerItems(query) {
 }
 function openDrawer() {
  var drawer = ensureDrawer(), backdrop = qs('#aethrionExperienceBackdrop');
- renderDrawerItems(qs('#aedSearch', drawer).value);
+ renderDrawerItems('');
  drawer.classList.add('open');
  drawer.setAttribute('aria-hidden', 'false');
  backdrop.classList.add('show');
