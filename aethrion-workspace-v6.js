@@ -27,7 +27,7 @@ function logged(){try{return!!((window.Parse&&Parse.User&&Parse.User.current())|
 function userName(){try{var u=window.currentUser||(window.Parse&&Parse.User&&Parse.User.current());if(u&&typeof u.get==='function')return u.get('name')||u.get('username_display')||(u.get('email')||'').split('@')[0]||'Üye'}catch(e){}try{var v=JSON.parse(localStorage.getItem('aethrion_user')||'null');return v&&(v.name||v.username)||'Üye'}catch(e){return'Üye'}}
 function feature(label){var list=Array.isArray(window.FEATURE_LIST)?window.FEATURE_LIST:[];for(var i=0;i<list.length;i++){var f=list[i];if(f&&String(f.name||f.title||'')===label)return{action:String(f.action||f.onclick||''),href:String(f.href||f.url||'')};}var v=fallback[label]||['',''];return{action:v[0],href:v[1]}}
 function setActive(label){qa('.aews-link').forEach(function(b){var home=b.hasAttribute('data-aews-home');b.classList.toggle('is-active',home?label==='Ana ekran':b.getAttribute('data-aews-feature')===label)})}
-function hideTrigger(){['#aethrionFeaturesTrigger','#aethrionFeaturesButton','#aethrionExperienceDrawer','#aethrionExperienceBackdrop','#aethrionFeaturesPanel','.aethrion-sidebar','.aethrion-sidebar-toggle','.aethrion-sidebar-backdrop'].forEach(function(s){qa(s).forEach(function(el){el.style.setProperty('display','none','important');el.setAttribute('aria-hidden','true')})})}
+function hideTrigger(){['#aethrionFeaturesTrigger','#aethrionFeaturesButton','#aethrionExperienceDrawer','#aethrionExperienceBackdrop','#aethrionFeaturesPanel','#aethrionFeaturesBackdrop','.aethrion-sidebar','.aethrion-sidebar-toggle','.aethrion-sidebar-backdrop'].forEach(function(s){qa(s).forEach(function(el){if(el.id==='aeWorkspaceSidebar'||el.id==='aewsMobileToggle'||el.id==='aewsMobileShade')return;if(el.parentNode)el.parentNode.removeChild(el)})})}
 function customWelcome(){
  if(!logged()||document.body.classList.contains('aews-feature-view'))return;
  document.body.classList.add('ae-shell-on','logged-in-user');
@@ -125,5 +125,5 @@ function patchWelcome(){
 function boot(){installRouter();patchWelcome();if(logged()){document.body.classList.add('ae-shell-on');hideTrigger();customWelcome();var logo=q('.aews-logo');if(logo&&!q('img',logo))logo.innerHTML='<img src="/aethrion-mark.svg" alt="AETHRION" draggable="false">'}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 [150,500,1000,1800,3000,5000].forEach(function(t){setTimeout(boot,t)});
-if(window.MutationObserver&&document.body)new MutationObserver(function(){if(logged()){patchWelcome();if(!document.body.classList.contains('aews-feature-view'))customWelcome();hideTrigger()}}).observe(document.body,{attributes:true,attributeFilter:['class']});
+if(window.MutationObserver&&document.body)new MutationObserver(function(records){var childChange=records.some(function(r){return r.type==='childList'});if(logged()){patchWelcome();if(!document.body.classList.contains('aews-feature-view'))customWelcome();hideTrigger()}}).observe(document.body,{attributes:true,attributeFilter:['class'],childList:true,subtree:true});
 })();
