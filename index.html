@@ -52296,7 +52296,7 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
  repair();if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',repair,{once:true});
 })();
 </script>
-<script defer src="/aethrion-identity.js?v=20261022-identity7"></script>
+<script defer src="/aethrion-identity.js?v=20261023-identity8"></script>
 <script defer src="/aethrion-experience.js?v=20261022-workspace6"></script>
 <script defer src="/aethrion-auth-recovery.js?v=20261022-authflow6"></script>
 <script defer src="/aethrion-workspace-v5.js?v=20261022-workspace9"></script>
@@ -52399,13 +52399,21 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 <script id="aethrionVpnProtectionClientV1">
 (function(){
  'use strict';
- function blockPage(reason){
+ function blockPage(reason,code){
   document.documentElement.classList.remove('ae-security-pending');
   if(document.getElementById('aethrionVpnBlock'))return;
   var unavailable=reason==='unavailable';
   var title=unavailable?'Güvenlik kontrolü kullanılamıyor':'Bağlantıya izin verilmiyor';
+  var messages={
+   VPN_CHECK_NOT_CONFIGURED:'Sunucu tarafındaki IPQS güvenlik anahtarı yapılandırılmamış. Site yöneticisi Back4App Cloud Code ortam değişkenlerini kontrol etmelidir.',
+   IP_UNAVAILABLE:'Sunucu bu isteğin IP adresini güvenilir biçimde belirleyemedi. Lütfen normal bağlantınızla tekrar deneyin.',
+   REPUTATION_PROVIDER_UNAVAILABLE:'IPQS güvenlik hizmetine şu anda ulaşılamıyor. Biraz sonra yeniden deneyin.',
+   REPUTATION_CHECK_FAILED:'IPQS güvenlik yanıtı doğrulanamadı. Sunucu yöneticisi API anahtarını ve IPQS hesabı durumunu kontrol etmelidir.',
+   SDK_NOT_READY:'Güvenlik servisi başlatılamadı. Sayfayı yenileyip tekrar deneyin.',
+   CLOUD_FUNCTION_CALL_FAILED:'Back4App güvenlik kontrolü çağrısı başarısız oldu. Biraz sonra tekrar deneyin.'
+  };
   var message=unavailable
-   ?'Güvenlik kontrolü doğrulanamadığı için erişim durduruldu. Back4App Cloud Code ortam değişkeni, IP adresi veya IPQS yanıtı doğrulanamıyor olabilir.'
+   ?(messages[code]||'Güvenlik kontrolü tamamlanamadı. Lütfen yeniden deneyin; sorun sürerse site yöneticisi Back4App Cloud Code günlüklerini kontrol etmelidir.')
    :'Bu bağlantı VPN, proxy veya Tor olarak işaretlendi. AETHRION’a erişmek için VPN/proxy bağlantısını kapatıp normal internet bağlantınızla tekrar deneyin.';
   var root=document.createElement('section');root.id='aethrionVpnBlock';
   root.setAttribute('role','alertdialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-labelledby','aeVpnTitle');
@@ -52423,17 +52431,19 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
   function attempt(){
    var SDK=window.Parse;
    if(!SDK||!SDK.Cloud||typeof SDK.Cloud.run!=='function'||!window.parseInitialized){
-    if(Date.now()-started>15000)blockPage('unavailable');
+    if(Date.now()-started>15000)blockPage('unavailable','SDK_NOT_READY');
     else setTimeout(attempt,250);
     return;
    }
    SDK.Cloud.run('aethrionSecurityCheck',{})
     .then(function(result){
-     if(result&&result.blocked===true)blockPage('blocked');
-     else if(!result||result.configured!==true||result.ok!==true)blockPage('unavailable');
+     // A failed verification also returns blocked=true. Diagnose that before
+     // deciding whether the visitor was actually classified as VPN/proxy/Tor.
+     if(!result||result.configured!==true||result.ok!==true)blockPage('unavailable',result&&result.code);
+     else if(result.blocked===true)blockPage('blocked',result.code);
      else document.documentElement.classList.remove('ae-security-pending');
     })
-    .catch(function(){blockPage('unavailable')});
+    .catch(function(){blockPage('unavailable','CLOUD_FUNCTION_CALL_FAILED')});
   }
   attempt();
  }
