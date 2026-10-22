@@ -32276,7 +32276,7 @@ window.submitQuickV27Key = async function () {
             keyName: keyName,
             keyDescription: keyDesc,
             duration: window._v27QuickSelectedDuration || 'unlimited',
-            viaAETHRION AI: true
+            viaVizyonAl: true
         });
 
         if (!result.success) return showErr(result.error || 'Anahtar oluşturulamadı.');
@@ -44457,7 +44457,7 @@ window.submitQuickA27Key = async function () {
             keyName: keyName,
             keyDescription: keyDesc,
             duration: window._a27QuickSelectedDuration || 'unlimited',
-            viaAETHRION AI: true
+            viaVizyonAl: true
         });
 
         if (!result.success) return showErr(result.error || 'Anahtar oluşturulamadı.');
@@ -45591,7 +45591,7 @@ if (!window.submitQuickA27Key) {
                 keyName: keyName,
                 keyDescription: keyDesc,
                 duration: window._a27QuickSelectedDuration || 'unlimited',
-                viaAETHRION AI: true
+                viaVizyonAl: true
             });
             if (!result.success) {
                 if (errEl) { errEl.textContent = '❌ ' + (result.error || 'Anahtar oluşturulamadı.'); errEl.style.display = 'block'; }
@@ -51819,7 +51819,7 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
     // ═══════════════════════════════════════════════════════════
     // 10. CLOUD BUG FIX — revealV27KeyOnce
     // ═══════════════════════════════════════════════════════════
-    // createV27ApiKey'de viaAETHRION AI=true dönerse revealToken gelir.
+    // createV27ApiKey'de viaVizyonAl=true dönerse revealToken gelir.
     // Client submitQuickA27Key bunu çağırmalı. Override edelim:
     if (typeof window.submitQuickA27Key === 'function') {
         const orig = window.submitQuickA27Key;
@@ -51838,7 +51838,7 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
                 const result = await Parse.Cloud.run('createV27ApiKey', {
                     keyName, keyDescription: keyDesc,
                     duration: window._a27QuickSelectedDuration || 'unlimited',
-                    viaAETHRION AI: true
+                    viaVizyonAl: true
                 });
                 if (!result.success) {
                     if (errEl) { errEl.textContent = '❌ ' + (result.error || 'Anahtar oluşturulamadı.'); errEl.style.display = 'block'; }
