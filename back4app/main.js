@@ -4254,6 +4254,8 @@ Parse.Cloud.define("createTeam", async function (request) {
     member.set("team_id", team.id);
     member.set("user_email", user.get('email'));
     member.set("user_name", user.get('name') || 'Kullanıcı');
+    member.set("role", "viewer");
+    member.set("role", "admin");
     await member.save(null, { useMasterKey: true });
 
     user.set("teamId", team.id);
@@ -4690,6 +4692,7 @@ Parse.Cloud.define("acceptTeamInvite", async function (request) {
     member.set("team_id", teamId);
     member.set("user_email", user.get('email'));
     member.set("user_name", user.get('name') || 'Kullanıcı');
+    member.set("role", "viewer");
     await member.save(null, { useMasterKey: true });
 
     user.set("teamId", teamId);
