@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+<script>document.documentElement.classList.add('ae-security-pending');</script>
+<style>html.ae-security-pending body{visibility:hidden!important}</style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AETHRION — Intelligence Without Limits</title>
@@ -52381,10 +52383,10 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
     #aethrionVpnBlock .ae-vpn-card { padding:24px; }
   }
 </style>
-<!-- VPN/IPQS gate is initialized by the accessible inline gate below; avoid a duplicate API request. -->
 
 
-<!-- AETHRION VPN / proxy gate. Requires IPQS_API_KEY in Vercel environment variables. -->
+
+<!-- AETHRION VPN / proxy / Tor gate. IPQS_API_KEY is server-side in Back4App Cloud Code. -->
 <style id="aethrionVpnGateStylesV2">
 #aethrionVpnBlock{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;background:#091526;color:#f5f8fc;font:500 16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
 #aethrionVpnBlock .ae-vpn-card{width:min(560px,100%);padding:32px;box-sizing:border-box;border:1px solid rgba(180,205,230,.25);border-radius:20px;background:linear-gradient(145deg,#142a42,#0d1d30);box-shadow:0 25px 80px rgba(0,0,0,.45)}
@@ -52398,11 +52400,12 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 (function(){
  'use strict';
  function blockPage(reason){
+  document.documentElement.classList.remove('ae-security-pending');
   if(document.getElementById('aethrionVpnBlock'))return;
   var unavailable=reason==='unavailable';
   var title=unavailable?'Güvenlik kontrolü kullanılamıyor':'Bağlantıya izin verilmiyor';
   var message=unavailable
-   ?'VPN koruması doğrulanamadığı için erişim kapatıldı. Site yöneticisi Vercel ortam değişkenlerinde IPQS_API_KEY değerini tanımlamalı ve yeniden dağıtım yapmalıdır.'
+   ?'Güvenlik kontrolü doğrulanamadığı için erişim durduruldu. Back4App Cloud Code ortam değişkeni, IP adresi veya IPQS yanıtı doğrulanamıyor olabilir.'
    :'Bu bağlantı VPN, proxy veya Tor olarak işaretlendi. AETHRION’a erişmek için VPN/proxy bağlantısını kapatıp normal internet bağlantınızla tekrar deneyin.';
   var root=document.createElement('section');root.id='aethrionVpnBlock';
   root.setAttribute('role','alertdialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-labelledby','aeVpnTitle');
@@ -52416,13 +52419,23 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
   button.addEventListener('click',function(){location.reload()});
  }
  function run(){
-  fetch('/api/security-check?ts='+Date.now(),{method:'GET',credentials:'same-origin',cache:'no-store',headers:{'Accept':'application/json'}})
-   .then(function(response){return response.json().catch(function(){return{ok:false,configured:true,blocked:true,code:'INVALID_SECURITY_RESPONSE'}})})
-   .then(function(result){
-    if(result&&result.blocked===true)blockPage('blocked');
-    else if(!result||result.configured!==true||result.ok!==true)blockPage('unavailable');
-   })
-   .catch(function(){blockPage('unavailable')});
+  var started=Date.now();
+  function attempt(){
+   var SDK=window.Parse;
+   if(!SDK||!SDK.Cloud||typeof SDK.Cloud.run!=='function'||!window.parseInitialized){
+    if(Date.now()-started>15000)blockPage('unavailable');
+    else setTimeout(attempt,250);
+    return;
+   }
+   SDK.Cloud.run('aethrionSecurityCheck',{})
+    .then(function(result){
+     if(result&&result.blocked===true)blockPage('blocked');
+     else if(!result||result.configured!==true||result.ok!==true)blockPage('unavailable');
+     else document.documentElement.classList.remove('ae-security-pending');
+    })
+    .catch(function(){blockPage('unavailable')});
+  }
+  attempt();
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();
