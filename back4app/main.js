@@ -10297,8 +10297,8 @@ Parse.Cloud.define("aethrionRecordProjectAudit", async function (request) {
     event.set("actor_id", crypto.createHash("sha256").update(String(user.id)).digest("hex").slice(0, 24));
     event.set("actor_role", _aeRole(user));
     event.set("action", action);
-    event.set("target_id", _aeSafeAuditText(params.targetId, 128));
-    event.set("target_label", _aeSafeAuditText(params.targetLabel, 120));
+    event.set("target_id", params.targetId ? crypto.createHash("sha256").update(String(params.targetId)).digest("hex").slice(0, 24) : "");
+    event.set("target_label", "İşlem hedefi");
     event.set("source", "authenticated-client-event");
     event.set("created_at_server", new Date());
     await event.save(null, { useMasterKey: true });
@@ -10328,7 +10328,7 @@ Parse.Cloud.define("aethrionGetProjectAudit", async function (request) {
                 actorRole: event.get("actor_role") || "user",
                 action: event.get("action") || "",
                 targetId: event.get("target_id") || "",
-                targetLabel: event.get("target_label") || "",
+                targetLabel: "İşlem hedefi",
                 source: event.get("source") || "server",
                 createdAt: event.get("created_at_server") || event.get("createdAt") || null
             };
@@ -10513,8 +10513,8 @@ Parse.Cloud.define("aethrionSetTeamMemberRole", async function (request) {
         event.set("actor_id", crypto.createHash("sha256").update(String(user.id)).digest("hex").slice(0, 24));
         event.set("actor_role", _aeRole(user));
         event.set("action", "role_changed");
-        event.set("target_id", member.id);
-        event.set("target_label", _aeSafeAuditText(member.get("user_email") || "", 120));
+        event.set("target_id", crypto.createHash("sha256").update(String(member.id)).digest("hex").slice(0, 24));
+        event.set("target_label", "Takım üyesi");
         event.set("source", "server-role-change");
         event.set("created_at_server", new Date());
         event.set("previous_role", oldRole);
@@ -10557,8 +10557,8 @@ async function _aeWriteTeamAudit(user, teamId, action, targetId, targetLabel) {
         event.set("actor_id", crypto.createHash("sha256").update(String(user.id)).digest("hex").slice(0, 24));
         event.set("actor_role", _aeRole(user));
         event.set("action", _aeSafeAuditText(action, 48));
-        event.set("target_id", _aeSafeAuditText(targetId || "", 128));
-        event.set("target_label", _aeSafeAuditText(targetLabel || "", 120));
+        event.set("target_id", targetId ? crypto.createHash("sha256").update(String(targetId)).digest("hex").slice(0, 24) : "");
+        event.set("target_label", _aeSafeAuditText(targetLabel || "İşlem hedefi", 120));
         event.set("source", "server-confirmed-operation");
         event.set("created_at_server", new Date());
         await event.save(null, { useMasterKey: true });
