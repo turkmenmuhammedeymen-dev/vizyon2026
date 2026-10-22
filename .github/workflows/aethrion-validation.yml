@@ -1,0 +1,19 @@
+name: AETHRION syntax validation
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Check Back4App Cloud Code
+        run: node --check back4app/main.js
+      - name: Check Vercel security endpoint
+        run: node --check api/security-check.js
+      - name: Check browser security guard
+        run: node --check aethrion-security-guard.js

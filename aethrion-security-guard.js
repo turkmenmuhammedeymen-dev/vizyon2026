@@ -29,10 +29,8 @@
         return { ok: false, configured: true, blocked: true, code: 'INVALID_SECURITY_RESPONSE' };
       });
     }).then(function (result) {
-      if (result && result.blocked === true) {
+      if (!result || result.blocked === true || result.configured !== true || result.ok !== true) {
         blockPage();
-      } else if (result && result.configured === false) {
-        console.warn('[AETHRION Security] VPN protection is not active: configure IPQS_API_KEY in Vercel.');
       }
     }).catch(function (error) {
       console.warn('[AETHRION Security] Connection reputation check unavailable.', error);

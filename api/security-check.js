@@ -3,36 +3,48 @@
 /**
  * AETHRION server-side IP reputation check.
  * Configure IPQS_API_KEY in Vercel Project Settings -> Environment Variables.
- * Never place the provider key in browser code.
+ * Never place the provider key in browser code or in the repository.
  */
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const MAX_CACHE_ENTRIES = 1500;
+const ipCache = new Map();
+
+function reply(res, status, payload) {
+  return res.status(status).json(payload);
+}
+
 module.exports = async function securityCheck(req, res) {
   res.setHeader('Cache-Control', 'no-store, max-age=0');
+  res.setHeader('Pragma', 'no-cache');
   res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Vary', 'x-real-ip');
 
   if (req.method !== 'GET') {
     res.setHeader('Allow', 'GET');
-    return res.status(405).json({ ok: false, error: 'Method not allowed' });
+    return reply(res, 405, { ok: false, configured: true, blocked: true, code: 'METHOD_NOT_ALLOWED' });
   }
 
   const apiKey = process.env.IPQS_API_KEY;
   if (!apiKey) {
-    return res.status(503).json({
-      ok: false,
-      configured: false,
-      blocked: false,
-      code: 'VPN_CHECK_NOT_CONFIGURED'
+    return reply(res, 503, {
+      ok: false, configured: false, blocked: true, code: 'VPN_CHECK_NOT_CONFIGURED'
     });
   }
 
-  const realIp = String(req.headers['x-real-ip'] || '').trim();
-  const forwarded = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
-  const ip = realIp || forwarded;
-  if (!ip || ip === '::1' || ip === '127.0.0.1') {
-    return res.status(503).json({
-      ok: false,
-      configured: true,
-      blocked: true,
-      code: 'IP_UNAVAILABLE'
+  // Use the hosting platform's client-IP header only; do not trust arbitrary
+  // client-provided x-forwarded-for values as an authoritative identity.
+  const ip = String(req.headers['x-real-ip'] || '').trim();
+  if (!ip || ip === '::1' || ip === '127.0.0.1' || ip.indexOf(',') !== -1) {
+    return reply(res, 503, { ok: false, configured: true, blocked: true, code: 'IP_UNAVAILABLE' });
+  }
+
+  const now = Date.now();
+  const cached = ipCache.get(ip);
+  if (cached && cached.expiresAt > now) {
+    return reply(res, 200, {
+      ok: true, configured: true, blocked: cached.blocked,
+      reason: cached.blocked ? 'VPN_PROXY_OR_TOR' : 'CLEAR',
+      flags: cached.flags, cached: true
     });
   }
 
@@ -40,7 +52,6 @@ module.exports = async function securityCheck(req, res) {
     const url = 'https://ipqualityscore.com/api/json/ip/' +
       encodeURIComponent(apiKey) + '/' + encodeURIComponent(ip) +
       '?strictness=1&allow_public_access_points=true';
-
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 6500);
     let upstream;
@@ -51,44 +62,34 @@ module.exports = async function securityCheck(req, res) {
     }
 
     if (!upstream.ok) {
-      return res.status(503).json({
-        ok: false,
-        configured: true,
-        blocked: true,
-        code: 'REPUTATION_PROVIDER_UNAVAILABLE'
-      });
+      return reply(res, 503, { ok: false, configured: true, blocked: true, code: 'REPUTATION_PROVIDER_UNAVAILABLE' });
     }
-
     const data = await upstream.json();
     if (!data || data.success !== true) {
-      return res.status(503).json({
-        ok: false,
-        configured: true,
-        blocked: true,
-        code: 'REPUTATION_CHECK_FAILED'
-      });
+      return reply(res, 503, { ok: false, configured: true, blocked: true, code: 'REPUTATION_CHECK_FAILED' });
     }
 
-    const vpn = data.vpn === true || data.active_vpn === true;
-    const proxy = data.proxy === true;
-    const tor = data.tor === true || data.active_tor === true;
-    const blocked = vpn || proxy || tor;
+    const flags = {
+      vpn: data.vpn === true || data.active_vpn === true,
+      proxy: data.proxy === true,
+      tor: data.tor === true || data.active_tor === true
+    };
+    const blocked = flags.vpn || flags.proxy || flags.tor;
 
-    return res.status(200).json({
-      ok: true,
-      configured: true,
-      blocked,
+    if (ipCache.size >= MAX_CACHE_ENTRIES) {
+      const firstKey = ipCache.keys().next().value;
+      if (firstKey) ipCache.delete(firstKey);
+    }
+    ipCache.set(ip, { blocked, flags, expiresAt: now + CACHE_TTL_MS });
+
+    return reply(res, 200, {
+      ok: true, configured: true, blocked,
       reason: blocked ? 'VPN_PROXY_OR_TOR' : 'CLEAR',
-      flags: { vpn, proxy, tor }
+      flags, cached: false
     });
   } catch (error) {
-    // Fail closed once protection is configured: a failed reputation check
-    // must not silently become an allow decision.
-    return res.status(503).json({
-      ok: false,
-      configured: true,
-      blocked: true,
-      code: 'REPUTATION_CHECK_UNAVAILABLE'
+    return reply(res, 503, {
+      ok: false, configured: true, blocked: true, code: 'REPUTATION_CHECK_UNAVAILABLE'
     });
   }
 };

@@ -1,26 +1,19 @@
-# AETHRION VPN / Proxy Protection
+# AETHRION VPN / Proxy / Tor Protection
 
-## What the current implementation does
+## Required secrets — both runtimes
+1. In Vercel: Project Settings -> Environment Variables -> add `IPQS_API_KEY` for Production. Add Preview only if preview deployments should be protected.
+2. In Back4App: configure the same `IPQS_API_KEY` as a private Cloud Code runtime environment secret. The Vercel key is not automatically shared with Back4App.
+3. Deploy `back4app/main.js` as Back4App Cloud Code `main.js`.
+4. Merge/deploy the website only after the Vercel key is configured.
 
-- `/api/security-check` checks the visitor IP with IPQualityScore.
-- The browser gate on `index.html` fails closed: a detected VPN/proxy/Tor connection, missing configuration, invalid response, or failed reputation check prevents use of the main site.
-- The provider API key is server-only. Never place it in HTML, CSS, client JavaScript, or public repository files.
+## Enforcement
+- `/api/security-check` performs a server-side IPQualityScore check and fails closed if the key is missing, the IP is unavailable, or the provider fails.
+- `index.html` hides the page while the check is pending and displays a blocking screen for VPN/proxy/Tor or a failed/unconfigured check.
+- `back4app/main.js` wraps externally invoked Parse Cloud functions with the same server-side IP reputation check. Trusted master-key internal calls bypass the outer gate so Cloud Code can call its own functions.
+- A short in-memory cache reduces repeated provider requests; it is not persisted.
 
-## Required Vercel configuration
+## Important limitations
+The browser gate does not block the initial static HTML response before it reaches the browser. For true pre-response enforcement, configure a supported WAF/firewall rule at the hosting edge. IP reputation databases can produce false positives and cannot guarantee detection of every VPN or proxy. Test ordinary mobile-carrier, home and work connections as well as a known VPN.
 
-1. Open the Vercel project connected to this repository.
-2. Go to **Settings → Environment Variables**.
-3. Add `IPQS_API_KEY` using the private API key from the IPQualityScore account.
-4. Enable it for **Production**. Enable Preview only if you also want preview deployments protected.
-5. Redeploy the latest `main` commit.
-6. Test once with an ordinary connection and once with a known VPN/proxy connection.
-
-**Important:** If `IPQS_API_KEY` is absent, the main page is intentionally blocked rather than silently allowing access. Configure the key before expecting the site to open.
-
-## Enforcement limitation
-
-This repository is deployed as a static Vercel site. The current gate blocks use of the main page in the browser after the reputation check; it does **not** reject the original HTTP request before HTML is served, and it does not independently protect direct third-party Parse/Back4App API calls. Browser-side checks can be bypassed by a technically capable visitor.
-
-For strict site-wide enforcement, also configure a Vercel Firewall/WAF rule or a supported edge middleware in the deployment architecture, and enforce the same policy on backend/API endpoints. That requires access to the Vercel project settings and cannot be activated by a repository commit alone.
-
-VPN reputation services can produce false positives. Verify normal mobile-carrier, school/work, and home connections before treating this as a production access policy.
+## Recovery
+If the provider is unavailable or a secret is missing, the gate intentionally blocks access. Correct the secret/provider configuration and redeploy; do not silently allow requests to pass.

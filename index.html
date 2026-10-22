@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+<script>document.documentElement.classList.add('ae-security-pending');</script>
+<style>html.ae-security-pending body{visibility:hidden!important}</style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AETHRION — Intelligence Without Limits</title>
@@ -52381,7 +52383,7 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
     #aethrionVpnBlock .ae-vpn-card { padding:24px; }
   }
 </style>
-<script defer src="/aethrion-security-guard.js?v=20261022-security1"></script>
+
 
 
 <!-- AETHRION VPN / proxy gate. Requires IPQS_API_KEY in Vercel environment variables. -->
@@ -52398,6 +52400,7 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 (function(){
  'use strict';
  function blockPage(reason){
+  document.documentElement.classList.remove('ae-security-pending');
   if(document.getElementById('aethrionVpnBlock'))return;
   var unavailable=reason==='unavailable';
   var title=unavailable?'Güvenlik kontrolü kullanılamıyor':'Bağlantıya izin verilmiyor';
@@ -52421,6 +52424,7 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
    .then(function(result){
     if(result&&result.blocked===true)blockPage('blocked');
     else if(!result||result.configured!==true||result.ok!==true)blockPage('unavailable');
+    else document.documentElement.classList.remove('ae-security-pending');
    })
    .catch(function(){blockPage('unavailable')});
  }
