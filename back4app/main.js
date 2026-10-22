@@ -4606,7 +4606,7 @@ Parse.Cloud.define("editTeamMessage", async function (request) {
     var editTeam = await new Parse.Query(Team).get(teamIdForEdit, { useMasterKey: true });
     var editIsTeamAdmin = !!(editTeam && (editTeam.get('owner_email') === user.get('email') || editTeam.get('manager_email') === user.get('email'))) || user.get('role') === 'founder' || user.get('role') === 'admin' || editRole === 'admin';
     if (editRole === 'viewer' && !editIsTeamAdmin) throw new Error('Görüntüleyici rolü mesaj düzenleyemez.');
-    if (msg.get('user_email') !== user.get('email') && editRole !== 'admin') throw new Error('Sadece kendi mesajınızı düzenleyebilir veya takım admini olarak işlem yapabilirsiniz!');
+    if (msg.get('user_email') !== user.get('email') && !editIsTeamAdmin) throw new Error('Sadece kendi mesajınızı düzenleyebilir veya takım admini olarak işlem yapabilirsiniz!');
 
     msg.set('message', filterText(newMessage.trim()));
     msg.set('edited', true);
