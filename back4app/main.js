@@ -4254,7 +4254,6 @@ Parse.Cloud.define("createTeam", async function (request) {
     member.set("team_id", team.id);
     member.set("user_email", user.get('email'));
     member.set("user_name", user.get('name') || 'Kullanıcı');
-    member.set("role", "viewer");
     member.set("role", "admin");
     await member.save(null, { useMasterKey: true });
 
@@ -4285,6 +4284,7 @@ Parse.Cloud.define("joinTeamWithCode", async function (request) {
     member.set("team_id", team.id);
     member.set("user_email", user.get('email'));
     member.set("user_name", user.get('name') || 'Kullanıcı');
+    member.set("role", "viewer");
     await member.save(null, { useMasterKey: true });
 
     user.set("teamId", team.id);
@@ -6212,9 +6212,19 @@ Parse.Cloud.define("completeTeamTask", async function (request) {
     var user = request.user;
     if (!user) throw new Error('Giriş yapmalısınız!');
     var taskId = request.params.taskId;
+    if (!taskId) throw new Error('Görev ID gerekli!');
     var query = new Parse.Query(TeamTask);
     var task = await query.get(taskId, { useMasterKey: true });
     if (!task) throw new Error('Görev bulunamadı!');
+    var taskTeamId = String(task.get('team_id') || '');
+    if (!taskTeamId || taskTeamId !== String(user.get('teamId') || '')) throw new Error('Bu takım görevi üzerinde işlem yetkiniz yok.');
+    var taskMemberQuery = new Parse.Query(TeamMember);
+    taskMemberQuery.equalTo('team_id', taskTeamId);
+    taskMemberQuery.equalTo('user_email', user.get('email'));
+    var taskMember = await taskMemberQuery.first({ useMasterKey: true });
+    if (!taskMember) throw new Error('Bu takımın üyesi değilsiniz.');
+    var taskRole = String(taskMember.get('role') || 'viewer').toLowerCase();
+    if (taskRole === 'viewer') throw new Error('Görüntüleyici rolü takım görevlerini tamamlayamaz.');
 
     var completed = user.get('completed_team_tasks') || [];
     if (completed.indexOf(taskId) !== -1) throw new Error('Bu görev zaten tamamlanmış!');
