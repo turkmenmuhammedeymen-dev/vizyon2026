@@ -59,7 +59,7 @@ module.exports = async function securityCheck(req, res) {
     }
 
     const data = await upstream.json();
-    if (!data || data.success === false || data.message) {
+    if (!data || data.success !== true) {
       return res.status(503).json({
         ok: false,
         configured: true,
