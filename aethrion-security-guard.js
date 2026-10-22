@@ -32,10 +32,15 @@
       if (result && result.blocked === true) {
         blockPage();
       } else if (result && result.configured === false) {
-        console.warn('[AETHRION Security] VPN protection is not active: configure IPQS_API_KEY in Vercel.');
+        // Fail closed: do not allow site use until the provider key is configured.
+        blockPage();
+      } else {
+        // Unknown or malformed responses are not treated as an allow decision.
+        blockPage();
       }
-    }).catch(function (error) {
-      console.warn('[AETHRION Security] Connection reputation check unavailable.', error);
+    }).catch(function () {
+      // Fail closed when the reputation endpoint cannot be reached.
+      blockPage();
     });
   }
 
