@@ -10288,9 +10288,7 @@ Parse.Cloud.define("aethrionRecordProjectAudit", async function (request) {
     if (allowed.indexOf(action) === -1) throw new Error("İzin verilmeyen denetim eylemi.");
     var event = new AethrionProjectAudit();
     event.set("team_id", teamId);
-    event.set("actor_id", user.id);
-    event.set("actor_email", _aeSafeAuditText(user.get("email"), 254));
-    event.set("actor_name", _aeSafeAuditText(user.get("name") || user.get("username") || user.get("email"), 100));
+    event.set("actor_id", crypto.createHash("sha256").update(String(user.id)).digest("hex").slice(0, 24));
     event.set("actor_role", _aeRole(user));
     event.set("action", action);
     event.set("target_id", _aeSafeAuditText(params.targetId, 128));
@@ -10319,8 +10317,8 @@ Parse.Cloud.define("aethrionGetProjectAudit", async function (request) {
             return {
                 id: event.id,
                 actorId: event.get("actor_id") || "",
-                actorEmail: event.get("actor_email") || "",
-                actorName: event.get("actor_name") || "",
+                actorEmail: "",
+                actorName: "Kullanıcı",
                 actorRole: event.get("actor_role") || "user",
                 action: event.get("action") || "",
                 targetId: event.get("target_id") || "",
@@ -10506,9 +10504,7 @@ Parse.Cloud.define("aethrionSetTeamMemberRole", async function (request) {
     try {
         var event = new AethrionProjectAudit();
         event.set("team_id", teamId);
-        event.set("actor_id", user.id);
-        event.set("actor_email", _aeSafeAuditText(user.get("email"), 254));
-        event.set("actor_name", _aeSafeAuditText(user.get("name") || user.get("username") || user.get("email"), 100));
+        event.set("actor_id", crypto.createHash("sha256").update(String(user.id)).digest("hex").slice(0, 24));
         event.set("actor_role", _aeRole(user));
         event.set("action", "role_changed");
         event.set("target_id", member.id);
