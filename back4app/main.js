@@ -10527,6 +10527,31 @@ Parse.Cloud.define("aethrionSetTeamMemberRole", async function (request) {
 });
 
 // API anahtarıyla güvenli kullanım istatistiği; anahtar başına usage:read izni gerekir.
+Parse.Cloud.define("aethrionScrubAuditPersonalData", async function (request) {
+    var user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız.");
+    if (!_aeIsPrivileged(user)) throw new Error("Bu bakım işlemi yalnızca admin ve founder rollerine açıktır.");
+    var limit = Math.max(1, Math.min(100, parseInt(request.params && request.params.limit, 10) || 50));
+    var query = new Parse.Query("AethrionProjectAudit");
+    query.doesNotExist("privacy_scrubbed");
+    query.ascending("createdAt");
+    query.limit(limit);
+    var events = await query.find({ useMasterKey: true });
+    for (var i = 0; i < events.length; i++) {
+        var event = events[i];
+        var actorId = event.get("actor_id");
+        if (actorId) event.set("actor_id", crypto.createHash("sha256").update(String(actorId)).digest("hex").slice(0, 24));
+        var targetId = event.get("target_id");
+        if (targetId) event.set("target_id", crypto.createHash("sha256").update(String(targetId)).digest("hex").slice(0, 24));
+        event.unset("actor_email");
+        event.unset("actor_name");
+        event.set("target_label", "İşlem hedefi");
+        event.set("privacy_scrubbed", true);
+        await event.save(null, { useMasterKey: true });
+    }
+    return { success: true, processed: events.length, more: events.length === limit, message: "Kişisel alanlar temizlendi; more=true ise işlemi tekrar çalıştır." };
+});
+
 Parse.Cloud.define("aethrionGetApiUsage", async function (request) {
     var apiKey = (request.headers && (request.headers["x-v27-api-key"] || request.headers["X-V27-Api-Key"])) || (request.params && request.params.apiKey);
     if (!apiKey || String(apiKey).length > 512) throw new Error("API anahtarı gerekli.");
