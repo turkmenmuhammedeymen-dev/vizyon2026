@@ -52383,6 +52383,51 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 </style>
 <script defer src="/aethrion-security-guard.js?v=20261022-security1"></script>
 
+
+<!-- AETHRION VPN / proxy gate. Requires IPQS_API_KEY in Vercel environment variables. -->
+<style id="aethrionVpnGateStylesV2">
+#aethrionVpnBlock{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;background:#091526;color:#f5f8fc;font:500 16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+#aethrionVpnBlock .ae-vpn-card{width:min(560px,100%);padding:32px;box-sizing:border-box;border:1px solid rgba(180,205,230,.25);border-radius:20px;background:linear-gradient(145deg,#142a42,#0d1d30);box-shadow:0 25px 80px rgba(0,0,0,.45)}
+#aethrionVpnBlock .ae-vpn-brand{margin:0 0 10px;color:#d8bd79;font-size:12px;font-weight:800;letter-spacing:.2em}
+#aethrionVpnBlock h1{margin:0 0 12px;font-size:clamp(25px,5vw,36px);line-height:1.15;letter-spacing:-.03em}
+#aethrionVpnBlock p{margin:0 0 20px;color:#c0cfdf}
+#aethrionVpnBlock button{min-height:44px;padding:0 18px;border:1px solid #cdb16c;border-radius:10px;background:#d7bd7b;color:#13243a;font-weight:800;cursor:pointer}
+@media(max-width:600px){#aethrionVpnBlock{padding:14px}#aethrionVpnBlock .ae-vpn-card{padding:23px}}
+</style>
+<script id="aethrionVpnProtectionClientV1">
+(function(){
+ 'use strict';
+ function blockPage(reason){
+  if(document.getElementById('aethrionVpnBlock'))return;
+  var unavailable=reason==='unavailable';
+  var title=unavailable?'Güvenlik kontrolü kullanılamıyor':'Bağlantıya izin verilmiyor';
+  var message=unavailable
+   ?'VPN koruması doğrulanamadığı için erişim kapatıldı. Site yöneticisi Vercel ortam değişkenlerinde IPQS_API_KEY değerini tanımlamalı ve yeniden dağıtım yapmalıdır.'
+   :'Bu bağlantı VPN, proxy veya Tor olarak işaretlendi. AETHRION’a erişmek için VPN/proxy bağlantısını kapatıp normal internet bağlantınızla tekrar deneyin.';
+  var root=document.createElement('section');root.id='aethrionVpnBlock';
+  root.setAttribute('role','alertdialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-labelledby','aeVpnTitle');
+  var card=document.createElement('div');card.className='ae-vpn-card';
+  var brand=document.createElement('div');brand.className='ae-vpn-brand';brand.textContent='AETHRION SECURITY';
+  var heading=document.createElement('h1');heading.id='aeVpnTitle';heading.textContent=title;
+  var para=document.createElement('p');para.textContent=message;
+  var button=document.createElement('button');button.type='button';button.textContent='Yeniden kontrol et';
+  card.appendChild(brand);card.appendChild(heading);card.appendChild(para);card.appendChild(button);root.appendChild(card);
+  document.body.appendChild(root);document.documentElement.style.overflow='hidden';
+  button.addEventListener('click',function(){location.reload()});
+ }
+ function run(){
+  fetch('/api/security-check?ts='+Date.now(),{method:'GET',credentials:'same-origin',cache:'no-store',headers:{'Accept':'application/json'}})
+   .then(function(response){return response.json().catch(function(){return{ok:false,configured:true,blocked:true,code:'INVALID_SECURITY_RESPONSE'}})})
+   .then(function(result){
+    if(result&&result.blocked===true)blockPage('blocked');
+    else if(!result||result.configured!==true||result.ok!==true)blockPage('unavailable');
+   })
+   .catch(function(){blockPage('unavailable')});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
+})();
+</script>
+
 </body>
 </html>
 
