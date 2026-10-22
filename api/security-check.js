@@ -24,8 +24,9 @@ module.exports = async function securityCheck(req, res) {
     });
   }
 
+  const realIp = String(req.headers['x-real-ip'] || '').trim();
   const forwarded = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
-  const ip = forwarded || String(req.headers['x-real-ip'] || '').trim();
+  const ip = realIp || forwarded;
   if (!ip || ip === '::1' || ip === '127.0.0.1') {
     return res.status(503).json({
       ok: false,
