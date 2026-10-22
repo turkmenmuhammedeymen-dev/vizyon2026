@@ -4313,7 +4313,8 @@ Parse.Cloud.define("sendTeamMessage", async function (request) {
     var member = await memberQuery.first({ useMasterKey: true });
     if (!member) throw new Error('Bu takımın üyesi değilsiniz!');
     var senderRole = String(member.get('role') || 'viewer').toLowerCase();
-    if (senderRole === 'viewer') throw new Error('Görüntüleyici rolü mesaj gönderemez veya dosya paylaşamaz.');
+    var senderIsTeamAdmin = team.get('owner_email') === user.get('email') || team.get('manager_email') === user.get('email') || user.get('role') === 'founder' || user.get('role') === 'admin' || senderRole === 'admin';
+    if (senderRole === 'viewer' && !senderIsTeamAdmin) throw new Error('Görüntüleyici rolü mesaj gönderemez veya dosya paylaşamaz.');
 
     var isVizyonCommand = false;
     var isSupportCommand = false;
@@ -4598,7 +4599,9 @@ Parse.Cloud.define("editTeamMessage", async function (request) {
     var editMember = await editMemberQuery.first({ useMasterKey: true });
     if (!editMember) throw new Error('Bu takımın üyesi değilsiniz!');
     var editRole = String(editMember.get('role') || 'viewer').toLowerCase();
-    if (editRole === 'viewer') throw new Error('Görüntüleyici rolü mesaj düzenleyemez.');
+    var editTeam = await new Parse.Query(Team).get(teamIdForEdit, { useMasterKey: true });
+    var editIsTeamAdmin = !!(editTeam && (editTeam.get('owner_email') === user.get('email') || editTeam.get('manager_email') === user.get('email'))) || user.get('role') === 'founder' || user.get('role') === 'admin' || editRole === 'admin';
+    if (editRole === 'viewer' && !editIsTeamAdmin) throw new Error('Görüntüleyici rolü mesaj düzenleyemez.');
     if (msg.get('user_email') !== user.get('email') && editRole !== 'admin') throw new Error('Sadece kendi mesajınızı düzenleyebilir veya takım admini olarak işlem yapabilirsiniz!');
 
     msg.set('message', filterText(newMessage.trim()));
