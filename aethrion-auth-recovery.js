@@ -209,7 +209,7 @@ setTimeout(boot,800);setTimeout(boot,2200);
  function sessionExists(){
   try{if(window.Parse&&Parse.User&&typeof Parse.User.current==='function'&&Parse.User.current())return true}catch(e){}
   try{if(window.currentUser)return true}catch(e){}
-  return !!(document.body&&document.body.classList.contains('logged-in-user'));
+  return false;
  }
  function handlerFor(action){
   var fn=window[action.fn];
