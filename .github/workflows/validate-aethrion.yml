@@ -17,6 +17,8 @@ jobs:
           node --check aethrion-jarvis.js
           node --check aethrion-identity.js
           node --check aethrion-security-guard.js
+          node --check aethrion-audit.js
+          node --check aethrion-diagnostics.js
           node --check back4app/main.js
       - name: Check required JARVIS and policy files
         run: |
@@ -25,3 +27,8 @@ jobs:
           test -s docs/AETHRION-ECOSYSTEM-JARVIS.md
           test -s docs/ROLE-ACCESS-MATRIX.md
           test -s docs/RELEASE-AND-REGRESSION-CHECKLIST.md
+          test -s aethrion-project-audit.html
+          test -s aethrion-status.html
+          test -s aethrion-audit-icon.svg
+          test -s aethrion-status-icon.svg
+          test -s docs/AETHRION-AUDIT-DIAGNOSTICS.md
