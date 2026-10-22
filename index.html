@@ -52107,10 +52107,7 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 
     function runCleanup() {
         // 1. Statik Sidebar'ı DOM'dan tamamen sil
-        ['aethrionSidebar', 'aethrionSidebarToggle', 'aethrionSidebarBackdrop'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.remove();
-        });
+        /* Preserve the single dashboard sidebar; duplicate nodes are normalized by aethrionDomIntegrityV6. */
 
         // 2. Çift Özellikler Butonunu temizle (Sadece 1 tane kalsın)
         const triggers = document.querySelectorAll('#aethrionFeaturesTrigger');
