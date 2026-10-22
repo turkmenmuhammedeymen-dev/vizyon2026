@@ -125,8 +125,6 @@ function openDrawer() {
  drawer.setAttribute('aria-hidden', 'false');
  backdrop.classList.add('show');
  document.body.classList.add('aethrion-experience-menu-open');
- var input = qs('#aedSearch', drawer);
- if (input) setTimeout(function () { try { input.focus({ preventScroll:true }); } catch (e) { input.focus(); } }, 120);
 }
 function closeDrawer() {
  var drawer = qs('#aethrionExperienceDrawer'), backdrop = qs('#aethrionExperienceBackdrop');
