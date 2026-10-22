@@ -8773,8 +8773,7 @@ Parse.Cloud.define("validateV27ApiKey", async function (request) {
 
     return {
         valid: true,
-        user_email: record.get('user_email'),
-        key_name: record.get('key_name'),
+        key_name: _aeSafeAuditText(record.get('key_name') || '', 50),
         scopes: Array.isArray(record.get('allowed_scopes')) && record.get('allowed_scopes').length ? record.get('allowed_scopes') : ['chat'],
         expires_at: expiresAt
     };
