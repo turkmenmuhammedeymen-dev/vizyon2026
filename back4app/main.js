@@ -9462,221 +9462,181 @@ Parse.Cloud.define("fixDateColumnsMigration", async function (request) {
 // ========== [v7.10.1 YENİ] GOOGLE TOKEN DOĞRULAMA (FIXED) ======
 // ================================================================
 Parse.Cloud.define("verifyGoogleToken", async function (request) {
-    var idToken = request.params.idToken;
-    var accessToken = request.params.accessToken;
-    var userId = request.params.userId;
+    var params = request.params || {};
+    var idToken = typeof params.idToken === 'string' ? params.idToken.trim() : '';
+    var suppliedUserId = typeof params.userId === 'string' ? params.userId.trim() : '';
+    if (!idToken) return { success: false, error: 'Google kimlik belirteci alınamadı. Lütfen tekrar deneyin.' };
+    if (idToken.length > 10000) return { success: false, error: 'Google kimlik belirteci geçersiz.' };
 
-    if (!idToken && !accessToken) {
-        return { success: false, error: 'Google token gerekli!' };
-    }
-    if (!userId) {
-        return { success: false, error: 'Google user ID gerekli!' };
-    }
-
-    // Rate limiting
-    var _rlk = 'verifyGoogleToken:' + String(userId);
+    var rateKey = 'verifyGoogleToken:' + String((request && request.ip) || suppliedUserId || 'unknown');
     try {
-        await checkRateLimit(_rlk, 10, 5 * 60 * 1000);
-        await recordAttempt(_rlk);
+        await checkRateLimit(rateKey, 10, 5 * 60 * 1000);
+        await recordAttempt(rateKey);
     } catch (e) {
-        return { success: false, error: e.message };
+        return { success: false, error: e.message || 'Çok fazla deneme yapıldı.' };
     }
 
-    var googleUser = null;
+    // Google ID token is verified server-side; never trust email/name/sub sent by the browser.
+    var tokenInfo;
+    try {
+        var response = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(idToken));
+        if (!response || !response.ok) throw new Error('Google doğrulama servisi yanıt vermedi.');
+        tokenInfo = await response.json();
+    } catch (e) {
+        console.error('verifyGoogleToken tokeninfo hatası:', e.message);
+        return { success: false, error: 'Google hesabı doğrulanamadı. Lütfen tekrar deneyin.' };
+    }
 
-    // 1) ID Token varsa Google'da doğrula
-    if (idToken) {
+    if (!tokenInfo || tokenInfo.error || !tokenInfo.sub || !tokenInfo.email) {
+        return { success: false, error: 'Google kimlik bilgileri geçersiz.' };
+    }
+
+    var expectedClientId = '';
+    try {
+        expectedClientId = (typeof process !== 'undefined' && process.env && process.env.GOOGLE_CLIENT_ID) || '';
+    } catch (e) {}
+    if (!expectedClientId) {
         try {
-            var res = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(idToken));
-            var data = await res.json();
+            if (typeof getAPIKey === 'function') expectedClientId = await getAPIKey('GOOGLE_CLIENT_ID');
+        } catch (e) {}
+    }
+    if (!expectedClientId) {
+        expectedClientId = '648997195148-eoo5683g1ar0gmlckgq4b79tv91dkuut.apps.googleusercontent.com';
+    }
 
-            if (data.error) {
-                console.warn('Google ID token hatası:', data.error_description || data.error);
-            } else {
-                var expectedClientId = await getAPIKey('GOOGLE_CLIENT_ID');
-                if (expectedClientId && data.aud !== expectedClientId) {
-                    return { success: false, error: 'Google token Client ID uyuşmuyor!' };
-                }
-                if (data.sub !== userId) {
-                    return { success: false, error: 'Google user ID uyuşmuyor!' };
-                }
-                googleUser = {
-                    id: data.sub,
-                    email: data.email,
-                    name: data.name || '',
-                    picture: data.picture || '',
-                    emailVerified: data.email_verified === 'true' || data.email_verified === true
-                };
-            }
-        } catch (e) {
-            console.warn('Google ID token doğrulama hatası:', e.message);
+    var tokenIssuer = String(tokenInfo.iss || '');
+    var expiry = Number(tokenInfo.exp) || 0;
+    var verifiedEmail = tokenInfo.email_verified === true || tokenInfo.email_verified === 'true';
+    if (tokenInfo.aud !== expectedClientId || (tokenInfo.azp && tokenInfo.azp !== expectedClientId)) {
+        console.warn('verifyGoogleToken: token audience uyuşmazlığı.');
+        return { success: false, error: 'Google Client ID yapılandırması uyuşmuyor.' };
+    }
+    if (tokenIssuer !== 'accounts.google.com' && tokenIssuer !== 'https://accounts.google.com') {
+        return { success: false, error: 'Google token sağlayıcısı doğrulanamadı.' };
+    }
+    if (!expiry || expiry * 1000 <= Date.now()) {
+        return { success: false, error: 'Google oturum belirtecinin süresi dolmuş. Tekrar deneyin.' };
+    }
+    if (!verifiedEmail) {
+        return { success: false, error: 'Google e-posta adresiniz doğrulanmış olmalıdır.' };
+    }
+    if (suppliedUserId && suppliedUserId !== tokenInfo.sub) {
+        return { success: false, error: 'Google kullanıcı kimliği uyuşmuyor.' };
+    }
+    if (params.termsAccepted !== true || params.privacyAccepted !== true) {
+        return { success: false, error: 'Devam etmek için Kullanıcı Sözleşmesi ve Gizlilik Politikası onayı gereklidir.' };
+    }
+
+    var googleUser = {
+        id: String(tokenInfo.sub),
+        email: String(tokenInfo.email).trim().toLowerCase(),
+        name: String(tokenInfo.name || tokenInfo.given_name || tokenInfo.email.split('@')[0]).slice(0, 120),
+        picture: String(tokenInfo.picture || '').slice(0, 2048)
+    };
+
+    // Do not silently merge a Google identity into an unrelated password account
+    // merely because the email string matches; that requires an authenticated linking flow.
+    var linkedUser = null;
+    var emailUser = null;
+    try {
+        var linkedQuery = new Parse.Query(Parse.User);
+        linkedQuery.equalTo('authData.google.id', googleUser.id);
+        linkedUser = await linkedQuery.first({ useMasterKey: true });
+
+        var emailQuery = new Parse.Query(Parse.User);
+        emailQuery.equalTo('email', googleUser.email);
+        emailUser = await emailQuery.first({ useMasterKey: true });
+    } catch (e) {
+        console.error('verifyGoogleToken user lookup hatası:', e.message);
+        return { success: false, error: 'Hesap bilgileri şu anda kontrol edilemiyor. Lütfen tekrar deneyin.' };
+    }
+
+    if (emailUser && (!linkedUser || emailUser.id !== linkedUser.id)) {
+        var existingAuth = emailUser.get('authData') || {};
+        var existingGoogle = existingAuth.google || {};
+        if (String(existingGoogle.id || '') !== googleUser.id) {
+            return {
+                success: false,
+                error: 'Bu e-posta ile zaten bir AETHRION hesabı var. Güvenlik için önce mevcut hesabınıza e-posta/şifre ile giriş yapıp Google hesabınızı bağlayın.'
+            };
         }
     }
 
-    // 2) ID token yoksa access token ile dene
-    if (!googleUser && accessToken) {
-        try {
-            var res2 = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-                headers: { 'Authorization': 'Bearer ' + accessToken }
-            });
-            var data2 = await res2.json();
-
-            if (data2.error) {
-                console.warn('Google access token hatası:', data2.error.message || data2.error);
-            } else if (data2.id === userId || data2.sub === userId) {
-                googleUser = {
-                    id: data2.id || data2.sub,
-                    email: data2.email,
-                    name: data2.name || '',
-                    picture: data2.picture || '',
-                    emailVerified: data2.verified_email === true
-                };
-            }
-        } catch (e) {
-            console.warn('Google access token doğrulama hatası:', e.message);
-        }
-    }
-
-    if (!googleUser || !googleUser.email) {
-        return { success: false, error: 'Google kimlik bilgisi doğrulanamadı.' };
-    }
-
-    // ✅ 3) Parse'ın logInWith'ini kullan (authData otomatik yönetilir)
     var user;
-    var isNewUser = false;
-
+    var isNewUser = !linkedUser && !emailUser;
     try {
-        // Önce mevcut authData ile giriş dene
-        var authData = {
-            google: {
+        // Parse Server Google auth adapter expects provider data directly under authData:
+        // { authData: { id: "...", id_token: "..." } }, not authData.google nesting.
+        user = await Parse.User.logInWith('google', {
+            authData: {
                 id: googleUser.id,
-                access_token: accessToken || 'google-id-token'
+                id_token: idToken
             }
-        };
+        });
 
-        // logInWith: varsa kullanıcıyı döndürür, yoksa oluşturur
-        try {
-            user = await Parse.User.logInWith('google', {
-                authData: authData
-            }, { useMasterKey: true });
-        } catch (loginErr) {
-            console.log('logInWith başarısız, manuel oluşturuluyor:', loginErr.message);
-            user = null;
+        if (!user) throw new Error('Parse Server kullanıcı nesnesi döndürmedi.');
+
+        if (user.get('isBanned')) {
+            return { success: false, error: 'Hesabınız yasaklanmıştır.' };
         }
 
-        // Kullanıcı bulunamadıysa email ile kontrol et
-        if (!user) {
-            var emailQuery = new Parse.Query(Parse.User);
-            emailQuery.equalTo('email', googleUser.email);
-            var emailUser = await emailQuery.first({ useMasterKey: true });
-
-            if (emailUser) {
-                user = emailUser;
-                var existingAuthData = user.get('authData') || {};
-                existingAuthData.google = { id: googleUser.id, access_token: accessToken || 'google-id-token' };
-                user.set('authData', existingAuthData);
-                await user.save(null, { useMasterKey: true });
-            } else {
-                isNewUser = true;
-                user = new Parse.User();
-                user.set('username', googleUser.email);
-                user.set('email', googleUser.email);
-                user.set('name', googleUser.name || googleUser.email.split('@')[0]);
-                if (googleUser.picture) user.set('profile_picture', googleUser.picture);
-                user.set('role', 'user');
-                user.set('plan', 'free');
-                user.set('isVerified', googleUser.emailVerified);
-                user.set('isBanned', false);
-                user.set('points', 0);
-                user.set('level', 'Çaylak');
-                user.set('badges', []);
-                user.set('followers', []);
-                user.set('following', []);
-                user.set('wallet_balance', 0);
-                user.set('referral_count', 0);
-                user.set('parent_mode', false);
-                user.set('is_google_user', true);
-                user.set('profile_completed', false);
-                user.set('password_set', false);
-
-                // ✅ [v7.10.1 YENİ] Sözleşme onayını kaydet
-                var termsAccepted = request.params.termsAccepted === true;
-                var privacyAccepted = request.params.privacyAccepted === true;
-                if (termsAccepted && privacyAccepted) {
-                    user.set('terms_accepted', true);
-                    user.set('privacy_accepted', true);
-                    user.set('terms_accepted_at', new Date());
-                    console.log('✅ Google kullanıcısı sözleşme onayı kaydedildi:', googleUser.email);
-                }
-
-                // Rastgele güçlü şifre (Google ile giriş yaptığı için kullanılmayacak)
-                var randomPass = crypto.randomBytes(32).toString('hex');
-                user.set('password', randomPass);
-
-                await user.signUp(null, { useMasterKey: true });
-
-                // authData'yı logInWith ile bağla
-                try {
-                    await Parse.User.logInWith('google', {
-                        authData: authData
-                    }, { useMasterKey: true });
-                } catch (linkErr) {
-                    console.warn('authData bağlama hatası:', linkErr.message);
-                }
+        // Populate defaults without overwriting user-customized profile fields.
+        if (!user.get('email')) user.set('email', googleUser.email);
+        if (!user.get('username')) user.set('username', googleUser.email);
+        if (!user.get('name')) user.set('name', googleUser.name);
+        if (!user.get('profile_picture') && googleUser.picture) user.set('profile_picture', googleUser.picture);
+        if (!user.get('role')) user.set('role', 'user');
+        if (!user.get('plan')) user.set('plan', 'free');
+        if (user.get('isVerified') !== true) user.set('isVerified', true);
+        if (user.get('is_google_user') !== true) user.set('is_google_user', true);
+        if (user.get('points') == null) user.set('points', 0);
+        if (!user.get('level')) user.set('level', 'Çaylak');
+        if (!Array.isArray(user.get('badges'))) user.set('badges', []);
+        if (!Array.isArray(user.get('followers'))) user.set('followers', []);
+        if (!Array.isArray(user.get('following'))) user.set('following', []);
+        if (user.get('wallet_balance') == null) user.set('wallet_balance', 0);
+        if (user.get('referral_count') == null) user.set('referral_count', 0);
+        if (user.get('parent_mode') == null) user.set('parent_mode', false);
+        if (isNewUser) {
+            user.set('profile_completed', false);
+            user.set('password_set', false);
+            user.set('terms_accepted', true);
+            user.set('privacy_accepted', true);
+            user.set('terms_accepted_at', new Date());
+            user.set('privacy_accepted_at', new Date());
+            if (params.referralCode && typeof params.referralCode === 'string') {
+                user.set('signup_referral_code', params.referralCode.trim().slice(0, 64));
             }
         }
+        await user.save(null, { useMasterKey: true });
     } catch (e) {
-        console.error('verifyGoogleToken kullanıcı işlemi hatası:', e.message);
-        return { success: false, error: 'Kullanıcı işlenemedi: ' + e.message };
-    }
-
-    // Yasaklı mı?
-    try {
-        await user.fetch({ useMasterKey: true });
-    } catch (fetchErr) {
-        console.warn('Kullanıcı fetch hatası:', fetchErr.message);
-    }
-
-    if (user.get('isBanned')) {
-        return { success: false, error: 'Hesabınız yasaklanmıştır!' };
-    }
-
-    // ✅ 4) Session token
-    var sessionToken = user.getSessionToken();
-
-    if (!sessionToken) {
-        // Manuel session oluştur (son çare)
-        try {
-            var Session = Parse.Object.extend('_Session');
-            var session = new Session();
-            session.set('user', user);
-            session.set('installationId', 'google-' + Date.now());
-            session.set('restricted', false);
-            session.set('createdWith', { action: 'verifyGoogleToken', authProvider: 'google' });
-            await session.save(null, { useMasterKey: true });
-            sessionToken = session.get('sessionToken') || session.getSessionToken();
-        } catch (e2) {
-            console.error('Session oluşturma hatası:', e2.message);
-            return { success: false, error: 'Oturum oluşturulamadı: ' + e2.message };
+        console.error('verifyGoogleToken Parse Google login hatası:', e && e.message);
+        var message = String((e && e.message) || '');
+        if (/auth.*provider|google.*(not configured|configuration)|unsupported.*auth|unknown.*auth/i.test(message)) {
+            return { success: false, error: 'Google girişi Back4App tarafında etkin değil. Authentication > Settings bölümünde Google sağlayıcısını yapılandırın.' };
         }
+        if (/already exists|username.*taken|email.*taken|duplicate/i.test(message)) {
+            return { success: false, error: 'Bu e-posta ile bir hesap zaten var. Mevcut hesabınıza giriş yapıp Google bağlantısını tamamlayın.' };
+        }
+        return { success: false, error: 'Google ile AETHRION oturumu açılamadı. Back4App Google sağlayıcısı ayarlarını kontrol edin.' };
     }
 
+    var sessionToken = typeof user.getSessionToken === 'function' ? user.getSessionToken() : null;
     if (!sessionToken) {
-        return { success: false, error: 'Session token alınamadı.' };
+        return { success: false, error: 'Google hesabı doğrulandı ancak oturum belirteci oluşturulamadı. Back4App Google Authentication yapılandırmasını kontrol edin.' };
     }
 
     return {
         success: true,
         sessionToken: sessionToken,
         userId: user.id,
-        email: user.get('email'),
-        name: user.get('name'),
-        role: user.get('role'),
-        plan: user.get('plan'),
+        email: user.get('email') || googleUser.email,
+        name: user.get('name') || googleUser.name,
+        role: user.get('role') || 'user',
+        plan: user.get('plan') || 'free',
         isNewUser: isNewUser
     };
 });
-
 console.log('✅ [v7.10.1] verifyGoogleToken yüklendi');
 
 // ================================================================
