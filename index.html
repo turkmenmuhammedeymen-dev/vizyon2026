@@ -51855,25 +51855,17 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
     // C7 + M7: Statik #aethrionSidebar ve toggle'ını gizle
     // ═══════════════════════════════════════════════════════════
     function hideStaticSidebar() {
-        const staticIds = [
-            'aethrionSidebar',
-            'aethrionSidebarToggle',
-            'aethrionSidebarBackdrop'
-        ];
-        staticIds.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                el.style.display = 'none';
-                el.style.visibility = 'hidden';
-                el.style.pointerEvents = 'none';
-                el.setAttribute('data-aethrion-hidden', '1');
-            }
+        // Keep the actual dashboard navigation available; only duplicate nodes are removed earlier.
+        ['aethrionSidebar', 'aethrionSidebarToggle', 'aethrionSidebarBackdrop'].forEach(function(id) {
+            var nodes = document.querySelectorAll('[id="' + id + '"]');
+            if (!nodes.length) return;
+            var el = nodes[nodes.length - 1];
+            el.style.removeProperty('display');
+            el.style.visibility = 'visible';
+            el.style.pointerEvents = 'auto';
+            el.removeAttribute('data-aethrion-hidden');
         });
-        // Statik toggle'a tıklama engeli
-        document.querySelectorAll('.aethrion-sidebar-toggle').forEach(el => {
-            el.style.display = 'none';
-        });
-        console.log('✅ [AETHRION Fix] Statik sidebar gizlendi (dinamik panel aktif)');
+        console.log('✅ [AETHRION Fix] Dashboard sidebar korundu ve erişilebilir bırakıldı');
     }
 
     // ═══════════════════════════════════════════════════════════
