@@ -172,30 +172,49 @@ if (typeof globalThis.fetch === 'undefined') {
 var _aethrionVpnCache = new Map();
 
 function _aethrionGetIPQSApiKey() {
-    // IPQS credentials must be private Back4App runtime environment variables.
-    // Do not fall back to Parse.Config: client-readable config can expose secrets.
+    // SECURITY: use private Back4App Cloud Code environment secrets only.
+    // Never read Parse.Config for credentials: Parse.Config may be readable by clients.
+    // Supported private environment aliases make deployment configuration less brittle.
     try {
         if (typeof process !== 'undefined' && process.env) {
-            var value = process.env.IPQS_API_KEY;
-            if (typeof value === 'string' && value.trim()) return value.trim();
+            var names = ['IPQS_API_KEY', 'IPQUALITYSCORE_API_KEY', 'IPQS_KEY', 'AETHRION_IPQS_API_KEY'];
+            for (var i = 0; i < names.length; i++) {
+                var value = process.env[names[i]];
+                if (typeof value === 'string' && value.trim()) return value.trim();
+            }
         }
-    } catch (e) {}
+    } catch (e) {
+        console.error('[AETHRION Security] Could not read private IPQS environment configuration.');
+    }
     return '';
 }
 
-// Prefer Parse Server's normalized client IP. Fall back to proxy headers only
-// when request.ip is unavailable; never accept an IP from request.params.
+// Prefer Parse Server's normalized client IP. Only use headers when the platform
+// does not supply request.ip. X-Forwarded-For conventionally lists the original
+// client first and proxies after it; choosing the last hop can classify a proxy
+// gateway as the visitor and create false VPN detections.
+function _aethrionNormalizeClientIp(value) {
+    var ip = String(value || '').trim();
+    if (!ip) return '';
+    if (ip.charAt(0) === '[') {
+        var close = ip.indexOf(']');
+        if (close > 0) ip = ip.slice(1, close);
+    } else if (/^\\d{1,3}(?:\\.\\d{1,3}){3}:\\d+$/.test(ip)) {
+        ip = ip.slice(0, ip.lastIndexOf(':'));
+    }
+    return ip.trim();
+}
 function _aethrionGetClientIp(request) {
     if (!request) return '';
-    var direct = String(request.ip || '').trim();
+    var direct = _aethrionNormalizeClientIp(request.ip);
     if (direct) return direct;
     var headers = request.headers || {};
-    var realIp = String(headers['x-real-ip'] || headers['X-Real-IP'] || '').trim();
+    var realIp = _aethrionNormalizeClientIp(headers['x-real-ip'] || headers['X-Real-IP']);
     if (realIp) return realIp;
     var forwarded = String(headers['x-forwarded-for'] || headers['X-Forwarded-For'] || '').trim();
     if (forwarded) {
-        var hops = forwarded.split(',').map(function (part) { return part.trim(); }).filter(Boolean);
-        if (hops.length) return hops[hops.length - 1];
+        var hops = forwarded.split(',').map(function (part) { return _aethrionNormalizeClientIp(part); }).filter(Boolean);
+        if (hops.length) return hops[0];
     }
     return '';
 }
@@ -232,6 +251,8 @@ async function _aethrionEnforceVpnPolicy(request) {
             proxy: data.proxy === true,
             tor: data.tor === true || data.active_tor === true
         };
+        // Sanitized diagnostics only: never log the visitor IP or API key.
+        console.info('[AETHRION Security] IPQS flags:', JSON.stringify(flags));
         var blocked = flags.vpn || flags.proxy || flags.tor;
         if (_aethrionVpnCache.size >= 1500) {
             var firstKey = _aethrionVpnCache.keys().next().value;
@@ -313,8 +334,14 @@ Parse.Cloud.define("aethrionSecurityCheck", async function (request) {
         if (!data || data.success !== true) {
             return { ok: false, configured: true, blocked: true, code: 'REPUTATION_CHECK_FAILED' };
         }
-        var blocked = data.vpn === true || data.active_vpn === true ||
-            data.proxy === true || data.tor === true || data.active_tor === true;
+        var flags = {
+            vpn: data.vpn === true || data.active_vpn === true,
+            proxy: data.proxy === true,
+            tor: data.tor === true || data.active_tor === true
+        };
+        // Sanitized diagnostics only: never log the visitor IP or API key.
+        console.info('[AETHRION Security] Browser-gate IPQS flags:', JSON.stringify(flags));
+        var blocked = flags.vpn || flags.proxy || flags.tor;
         if (_aethrionVpnCache.size >= 1500) {
             var firstKey = _aethrionVpnCache.keys().next().value;
             if (firstKey) _aethrionVpnCache.delete(firstKey);
@@ -325,8 +352,10 @@ Parse.Cloud.define("aethrionSecurityCheck", async function (request) {
             code: blocked ? 'VPN_PROXY_OR_TOR' : 'CLEAR'
         };
     } catch (error) {
-        console.error('[AETHRION Security] Browser gate reputation check failed; access denied.');
-        return { ok: false, configured: true, blocked: true, code: 'REPUTATION_CHECK_UNAVAILABLE' };
+        // Log only a safe error category, not request data, IP address, or credentials.
+        var safeReason = error && error.name === 'AbortError' ? 'TIMEOUT' : 'REQUEST_OR_PARSE_ERROR';
+        console.error('[AETHRION Security] Browser gate reputation check failed:', safeReason);
+        return { ok: false, configured: true, blocked: true, code: safeReason === 'TIMEOUT' ? 'REPUTATION_CHECK_TIMEOUT' : 'REPUTATION_CHECK_UNAVAILABLE' };
     }
 });
 
