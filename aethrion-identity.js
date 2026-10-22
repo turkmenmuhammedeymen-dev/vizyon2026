@@ -393,7 +393,7 @@ function installOpsFeatureCards() {
   function makeCard(icon, title, description, href) {
     var card = document.createElement('article');
     card.className = 'ae-tool-card';
-    var iconNode = document.createElement('div'); iconNode.className = 'ae-tool-icon'; iconNode.textContent = icon;
+    var iconNode = document.createElement('div'); iconNode.className = 'ae-tool-icon'; var iconImage = document.createElement('img'); iconImage.src = title.indexOf('denetim') >= 0 ? '/aethrion-audit-icon.svg' : '/aethrion-status-icon.svg'; iconImage.alt = ''; iconImage.width = 28; iconImage.height = 28; iconNode.appendChild(iconImage);
     var h = document.createElement('h3'); h.textContent = title;
     var p = document.createElement('p'); p.textContent = description;
     var a = document.createElement('a'); a.href = href; a.textContent = 'Aç →';
