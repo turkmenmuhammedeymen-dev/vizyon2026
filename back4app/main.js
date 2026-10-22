@@ -199,7 +199,7 @@ function _aethrionNormalizeClientIp(value) {
     if (ip.charAt(0) === '[') {
         var close = ip.indexOf(']');
         if (close > 0) ip = ip.slice(1, close);
-    } else if (/^\\d{1,3}(?:\\.\\d{1,3}){3}:\\d+$/.test(ip)) {
+    } else if (/^\d{1,3}(?:\.\d{1,3}){3}:\d+$/.test(ip)) {
         ip = ip.slice(0, ip.lastIndexOf(':'));
     }
     return ip.trim();
