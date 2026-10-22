@@ -319,6 +319,15 @@ function installAuthRepairs() {
   installGoogleLoginRepair();
 }
 
+function loadJarvisAssistant() {
+  if (!document.querySelector('#mainSite, #splashScreen, #dashboard, #mainDashboard')) return;
+  if (document.querySelector('script[data-aethrion-jarvis]')) return;
+  var script = document.createElement('script');
+  script.src = '/aethrion-jarvis.js?v=20261022-1';
+  script.defer = true;
+  script.setAttribute('data-aethrion-jarvis', 'true');
+  document.head.appendChild(script);
+}
 function polish() {
   loadLateTheme();
   updateBrandMetadata();
@@ -327,6 +336,7 @@ function polish() {
   if (document.body) scan(document.body);
   enableScrollMotion();
   installAuthRepairs();
+  loadJarvisAssistant();
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', polish, { once: true });
 else polish();
