@@ -167,44 +167,104 @@ setTimeout(boot,800);setTimeout(boot,2200);
 })();
 
 
-/* AETHRION Auth Reliability Patch — normalize login/register/verification button events. */
+/* AETHRION Auth Flow v5 — pass the real event, show progress, and navigate only after a session exists. */
 (function(){
  'use strict';
- var inFlight=Object.create(null);
- function tell(message,type){
-  try{if(typeof window.showNotification==='function')window.showNotification(message,type||'error');else console.error('[AETHRION Auth]',message)}catch(e){console.error(message)}
- }
+ var active=Object.create(null), overlay=null, statusNode=null, fillNode=null, timer=null;
  var actions=[
   {selector:'#formLogin .btn-primary',form:'#formLogin',fn:'handleLogin',label:'Giriş'},
   {selector:'#formRegister .btn-primary',form:'#formRegister',fn:'handleRegister',label:'Kayıt'},
   {selector:'#formVerify .btn-primary',form:'#formVerify',fn:'verifyAccount',label:'Doğrulama'}
  ];
- function dispatch(action,button,event){
-  if(event){event.preventDefault();event.stopPropagation();if(event.stopImmediatePropagation)event.stopImmediatePropagation()}
-  if(inFlight[action.fn])return;
+ function notify(message,type){
+  try{if(typeof window.showNotification==='function')window.showNotification(message,type||'error');else console.error('[AETHRION Auth]',message)}catch(e){console.error(message)}
+ }
+ function ensureOverlay(){
+  if(overlay&&overlay.isConnected)return overlay;
+  overlay=document.getElementById('aeAuthProgressOverlay');
+  if(!overlay){
+   overlay=document.createElement('div');overlay.id='aeAuthProgressOverlay';overlay.className='ae-auth-progress';overlay.setAttribute('role','status');overlay.setAttribute('aria-live','polite');
+   overlay.innerHTML='<div class="ae-auth-progress-card"><div class="ae-auth-progress-brand"><span class="ae-auth-progress-mark" aria-hidden="true"></span><span class="ae-auth-progress-word">AETHRION</span></div><div class="ae-auth-progress-track"><span class="ae-auth-progress-track-fill"></span></div><h2 class="ae-auth-progress-title">Güvenli oturum başlatılıyor</h2><p class="ae-auth-progress-status">Kimlik bilgileriniz doğrulanıyor…</p><span class="ae-auth-progress-foot">GÜVENLİ KİMLİK DOĞRULAMA</span></div>';
+   document.body.appendChild(overlay);
+  }
+  statusNode=overlay.querySelector('.ae-auth-progress-status');fillNode=overlay.querySelector('.ae-auth-progress-track-fill');
+  return overlay;
+ }
+ function showProgress(message){
+  var el=ensureOverlay();el.classList.remove('is-success','is-error');el.classList.add('is-visible');
+  if(statusNode)statusNode.textContent=message||'Kimlik bilgileriniz doğrulanıyor…';
+  if(fillNode){fillNode.style.transition='none';fillNode.style.width='8%';void fillNode.offsetWidth;fillNode.style.transition='width 850ms cubic-bezier(.2,.75,.2,1)';fillNode.style.width='68%'}
+  document.body.classList.add('ae-auth-progress-open');
+ }
+ function setProgress(message,percent,success){
+  if(statusNode)statusNode.textContent=message;
+  if(fillNode)fillNode.style.width=percent+'%';
+  if(overlay)overlay.classList.toggle('is-success',!!success);
+ }
+ function hideProgress(){
+  if(timer){clearTimeout(timer);timer=null}
+  if(overlay)overlay.classList.remove('is-visible','is-success','is-error');
+  if(document.body)document.body.classList.remove('ae-auth-progress-open');
+ }
+ function sessionExists(){
+  try{if(window.Parse&&Parse.User&&typeof Parse.User.current==='function'&&Parse.User.current())return true}catch(e){}
+  try{if(window.currentUser)return true}catch(e){}
+  return !!(document.body&&document.body.classList.contains('logged-in-user'));
+ }
+ function handlerFor(action){
   var fn=window[action.fn];
-  if(typeof fn!=='function'){
-   tell(action.label+' işlemi başlatılamadı: gerekli işlev yüklenmemiş. Sayfayı yenileyin; sorun sürerse geliştirici konsolunu kontrol edin.','error');
-   return;
-  }
-  inFlight[action.fn]=true;
+  if(typeof fn!=='function')return null;
+  if(fn.__aeAuthDispatch)return fn.__aeAuthDispatch;
+  return fn;
+ }
+ function restoreButton(button,oldText){
+  if(!button)return;
+  button.disabled=false;button.removeAttribute('aria-busy');button.classList.remove('ae-auth-busy');
+  if(oldText)button.textContent=oldText;
+ }
+ async function dispatch(action,button,event){
+  if(event){event.preventDefault();event.stopPropagation();if(event.stopImmediatePropagation)event.stopImmediatePropagation()}
+  if(active[action.fn])return;
+  var fn=handlerFor(action);
+  if(!fn){notify(action.label+' işlemi başlatılamadı: gerekli işlev yüklenmemiş. Lütfen sayfayı yenileyin.','error');return}
+  active[action.fn]=true;
   var oldText=button?button.textContent:'';
-  if(button){button.disabled=true;button.setAttribute('aria-busy','true');button.classList.add('ae-auth-busy');
-   if(action.fn==='handleLogin')button.textContent='Giriş yapılıyor…';
-   else if(action.fn==='handleRegister')button.textContent='Hesap oluşturuluyor…';
-   else button.textContent='Doğrulanıyor…';
-  }
-  Promise.resolve().then(function(){return fn.call(button||window)}).catch(function(error){
+  if(button){button.disabled=true;button.setAttribute('aria-busy','true');button.classList.add('ae-auth-busy');button.textContent=action.fn==='handleLogin'?'Giriş yapılıyor…':action.fn==='handleRegister'?'Hesap oluşturuluyor…':'Doğrulanıyor…'}
+  var isLogin=action.fn==='handleLogin';
+  if(isLogin)showProgress('Kimlik bilgileriniz doğrulanıyor…');
+  var completed=false, errorSeen=null;
+  var startAt=Date.now();
+  try{
+   /* Important: the original event is passed through. Some legacy handlers require it. */
+   var result=fn.call(button||window,event);
+   await Promise.resolve(result);
+   if(isLogin){
+    while(Date.now()-startAt<14000){
+     if(sessionExists()){completed=true;break}
+     await new Promise(function(resolve){setTimeout(resolve,250)})
+    }
+    if(completed){
+     setProgress('Hesabınız açılıyor…',100,true);
+     await new Promise(function(resolve){setTimeout(resolve,900)});
+     /* The app dashboard is initialized on page load; reload only after a real session exists. */
+     window.location.assign('/#dashboardArea');
+     return;
+    }
+    hideProgress();
+    notify('Giriş tamamlanamadı. E-posta/şifrenizi kontrol edin; sorun sürerse sunucu yanıtını ve Back4App kimlik doğrulama ayarlarını incelemek gerekir.','error');
+   }
+  }catch(error){
+   errorSeen=error;
    console.error('[AETHRION] '+action.label+' işlemi başarısız:',error);
-   tell(action.label+' işlemi tamamlanamadı: '+((error&&error.message)||'Beklenmeyen bir hata oluştu.'),'error');
-  }).finally(function(){
-   inFlight[action.fn]=false;
-   if(button){button.disabled=false;button.removeAttribute('aria-busy');button.classList.remove('ae-auth-busy');if(oldText)button.textContent=oldText;}
-  });
+   if(isLogin)hideProgress();
+   notify(action.label+' işlemi tamamlanamadı: '+((error&&error.message)||'Beklenmeyen bir hata oluştu.'),'error');
+  }finally{
+   active[action.fn]=false;restoreButton(button,oldText);
+  }
  }
  function findAction(target){
   if(!target||!target.closest)return null;
-  for(var i=0;i<actions.length;i++){var button=target.closest(actions[i].selector);if(button)return {action:actions[i],button:button}}
+  for(var i=0;i<actions.length;i++){var button=target.closest(actions[i].selector);if(button)return{action:actions[i],button:button}}
   return null;
  }
  document.addEventListener('click',function(event){
@@ -213,11 +273,8 @@ setTimeout(boot,800);setTimeout(boot,2200);
  },true);
  document.addEventListener('submit',function(event){
   var form=event.target;if(!form||!form.matches)return;
-  for(var i=0;i<actions.length;i++){
-   if(form.matches(actions[i].form)){
-    var button=form.querySelector('.btn-primary');
-    dispatch(actions[i],button,event);return;
-   }
+  for(var i=0;i<actions.length;i++)if(form.matches(actions[i].form)){
+   dispatch(actions[i],form.querySelector('.btn-primary'),event);return;
   }
  },true);
 })();
