@@ -223,8 +223,13 @@ if (Parse && Parse.Cloud && typeof Parse.Cloud.define === 'function' && !Parse.C
         var handlerIndex = args.length - 1;
         var originalHandler = args[handlerIndex];
         if (typeof originalHandler !== 'function') return _aethrionOriginalCloudDefine.apply(this, args);
+        var cloudFunctionName = typeof args[0] === 'string' ? args[0] : '';
         args[handlerIndex] = async function (request) {
-            await _aethrionEnforceVpnPolicy(request);
+            // The public gate function performs its own IPQS check and must return a
+            // structured result to the browser; every other function remains gated.
+            if (cloudFunctionName !== 'aethrionSecurityCheck') {
+                await _aethrionEnforceVpnPolicy(request);
+            }
             return originalHandler.apply(this, arguments);
         };
         return _aethrionOriginalCloudDefine.apply(this, args);
@@ -237,6 +242,66 @@ if (Parse && Parse.Cloud && typeof Parse.Cloud.define === 'function' && !Parse.C
 // ================================================================
 // [MADDE 2] RATE LIMITING ALTYAPISI
 // ================================================================
+
+// Public browser gate: no caller-supplied IP is accepted. Parse Server's request.ip
+// is the only address used; unknown IP/provider/configuration errors fail closed.
+Parse.Cloud.define("aethrionSecurityCheck", async function (request) {
+    var apiKey = '';
+    try { apiKey = (typeof process !== 'undefined' && process.env && process.env.IPQS_API_KEY) || ''; } catch (e) {}
+    if (!apiKey) {
+        return { ok: false, configured: false, blocked: true, code: 'VPN_CHECK_NOT_CONFIGURED' };
+    }
+
+    var ip = String((request && request.ip) || '').trim();
+    if (!ip || ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') {
+        return { ok: false, configured: true, blocked: true, code: 'IP_UNAVAILABLE' };
+    }
+
+    var now = Date.now();
+    var cached = _aethrionVpnCache.get(ip);
+    if (cached && cached.expiresAt > now) {
+        return {
+            ok: true, configured: true, blocked: cached.blocked === true,
+            code: cached.blocked ? 'VPN_PROXY_OR_TOR' : 'CLEAR'
+        };
+    }
+
+    try {
+        var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        var timeout = controller ? setTimeout(function () { controller.abort(); }, 6500) : null;
+        var response;
+        try {
+            var url = 'https://ipqualityscore.com/api/json/ip/' +
+                encodeURIComponent(apiKey) + '/' + encodeURIComponent(ip) +
+                '?strictness=1&allow_public_access_points=true';
+            response = await fetch(url, controller ? { method: 'GET', signal: controller.signal } : { method: 'GET' });
+        } finally {
+            if (timeout) clearTimeout(timeout);
+        }
+        if (!response || !response.ok) {
+            return { ok: false, configured: true, blocked: true, code: 'REPUTATION_PROVIDER_UNAVAILABLE' };
+        }
+        var data = await response.json();
+        if (!data || data.success !== true) {
+            return { ok: false, configured: true, blocked: true, code: 'REPUTATION_CHECK_FAILED' };
+        }
+        var blocked = data.vpn === true || data.active_vpn === true ||
+            data.proxy === true || data.tor === true || data.active_tor === true;
+        if (_aethrionVpnCache.size >= 1500) {
+            var firstKey = _aethrionVpnCache.keys().next().value;
+            if (firstKey) _aethrionVpnCache.delete(firstKey);
+        }
+        _aethrionVpnCache.set(ip, { blocked: blocked, expiresAt: now + 5 * 60 * 1000 });
+        return {
+            ok: true, configured: true, blocked: blocked,
+            code: blocked ? 'VPN_PROXY_OR_TOR' : 'CLEAR'
+        };
+    } catch (error) {
+        console.error('[AETHRION Security] Browser gate reputation check failed; access denied.');
+        return { ok: false, configured: true, blocked: true, code: 'REPUTATION_CHECK_UNAVAILABLE' };
+    }
+});
+
 var _rateLimitStore = new Map();
 var _RATE_LIMIT_CLASS = "RateLimitAttempt";
 
