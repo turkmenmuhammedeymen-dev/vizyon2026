@@ -13,12 +13,12 @@ AETHRION is a browser-based AI and productivity ecosystem deployed on Vercel fro
 The repository uses the root as the Vercel static site root. There is no `public/` directory. HTML, CSS, JavaScript, SVG, JSON and policy pages live at the root or under `api/`.
 
 ## VPN/proxy/Tor protection
-The site gate uses `/api/security-check` and IPQualityScore. Set `IPQS_API_KEY` as a private Vercel environment variable for Production. The Back4App Cloud Code file in `back4app/main.js` independently checks direct Parse Cloud calls; configure the same secret separately in the Back4App server-side Cloud Code runtime. The Vercel secret is not automatically shared with Back4App. Never commit the key.
+The browser gate calls the Back4App Cloud Code function `aethrionSecurityCheck` using the site's existing Parse SDK. The IPQS key is read only by Back4App server-side Cloud Code through `process.env.IPQS_API_KEY`; it must never be placed in HTML, client JavaScript, Parse Config visible to clients, or source control. The browser sends no IP address; Back4App must use its trusted `request.ip` value. Missing configuration, unavailable IP data, or provider errors fail closed.
 
-See [VPN-BLOCKING-SETUP.md](./VPN-BLOCKING-SETUP.md) and [CLOUD-CODE-DEPLOYMENT.md](./CLOUD-CODE-DEPLOYMENT.md). The browser gate runs after the HTML response begins; it is not a substitute for a WAF/edge firewall. IPQS/provider errors fail closed, so a missing secret or provider outage blocks access.
+The legacy Vercel `/api/security-check` route has been removed so the site no longer depends on a separate Vercel IPQS secret for its browser gate. The gate blocks the visible page while the check is pending and stops access if the result is missing, blocked, or invalid. This is a browser access gate, not a substitute for an edge firewall/WAF; direct static assets may be served before client-side JavaScript runs.
 
 ## Back4App deployment
-Upload `back4app/main.js` as the app's Cloud Code `main.js`, deploy Cloud Code, then test authenticated and unauthenticated workflows. Legacy function names are retained, including `vizyonAlChat`, `vizyonAlScreenRead`, `vizyonAlLiveScreenStream`, `vizyonAlFileAnalyze`, `kocChat`, `getKocHistory`, `shareKocConversation`, `createV27ApiKey`, `createVideoClip`, `generate3DWithHF`, `sendFounderMessage` and `smartTranslate`.
+Upload `back4app/main.js` as the app's Cloud Code `main.js`, set `IPQS_API_KEY` as a private server-side environment variable, and deploy Cloud Code. Legacy function names are retained, including `vizyonAlChat`, `vizyonAlScreenRead`, `vizyonAlLiveScreenStream`, `vizyonAlFileAnalyze`, `kocChat`, `getKocHistory`, `shareKocConversation`, `createV27ApiKey`, `createVideoClip`, `generate3DWithHF`, `sendFounderMessage` and `smartTranslate`.
 
 ## Validation
-GitHub Actions runs JavaScript syntax checks on the Cloud Code and server-side security files. Passing syntax checks do not replace live tests of login, AI providers, file analysis, rate limits, and VPN/proxy detection.
+GitHub Actions runs JavaScript syntax checks on the Cloud Code and browser security guard. Passing syntax checks do not replace live tests of login, AI providers, file analysis, rate limits, and VPN/proxy detection.
