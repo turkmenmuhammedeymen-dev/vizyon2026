@@ -123,8 +123,38 @@ function patchWelcome(){
   window.showWelcomeScreen=wrapped;window.renderWelcome=wrapped;window.goHome=wrapped;
  }
 }
-function boot(){installRouter();patchWelcome();if(logged()){document.body.classList.add('ae-shell-on');hideTrigger();customWelcome();var logo=q('.aews-logo');if(logo&&!q('img',logo))logo.innerHTML='<img src="/aethrion-mark.svg" alt="AETHRION" draggable="false">'}}
+function overlayIsVisible(el){
+ if(!el)return false;var s=window.getComputedStyle(el);
+ return s.display!=='none'&&s.visibility!=='hidden'&&s.opacity!=='0'&&el.getAttribute('aria-hidden')!=='true';
+}
+function syncOverlayState(){
+ var selectors=['#fullAIPanel','#kocPanelOverlay','#vizyonAlPanel','#aethrionAlPanel','#full3DBuilder','#videoEditorOverlay','#voiceChatFullscreen','#vzVoiceFullscreen','.modal-overlay.open'];
+ var active=selectors.some(function(sel){return qa(sel).some(overlayIsVisible)});
+ document.body.classList.toggle('ae-overlay-active',active);
+}
+function restoreWorkspaceAfterClose(){
+ if(!logged()||overlayStillOpen())return;
+ document.body.classList.remove('aews-feature-view','aews-nav-open');
+ document.body.classList.add('ae-shell-on','logged-in-user','aews-home-view');
+ var dash=q('#dashboardArea'),main=q('#mainSite'),stage=q('#aethrionWorkspaceStage');
+ if(dash){dash.style.setProperty('display','block','important');dash.style.setProperty('visibility','visible','important')}
+ if(main)main.style.setProperty('display','none','important');
+ if(stage)stage.style.setProperty('display','none','important');
+ customWelcome();syncOverlayState();
+}
+function overlayStillOpen(){
+ var selectors=['#fullAIPanel','#kocPanelOverlay','#vizyonAlPanel','#aethrionAlPanel','#full3DBuilder','#videoEditorOverlay','#voiceChatFullscreen','#vzVoiceFullscreen','.modal-overlay.open'];
+ return selectors.some(function(sel){return qa(sel).some(overlayIsVisible)});
+}
+function installCloseRecovery(){
+ ['closeFullAIPanel','closeAethrionAlPanel','closeVizyonAlPanel','closeKocPanel','close3DBuilder','closeVideoEditor','closeVideoStudio','closeVoiceChatFullscreen','closeVizyonAlScreenRead','closeAethrionAiPanel'].forEach(function(name){
+  var original=window[name];if(typeof original!=='function'||original.__aeV6CloseWrapped)return;
+  var wrapped=function(){var result=original.apply(this,arguments);setTimeout(restoreWorkspaceAfterClose,90);return result};
+  wrapped.__aeV6CloseWrapped=true;wrapped.__aeV6Original=original;window[name]=wrapped;
+ });
+}
+function boot(){installRouter();patchWelcome();installCloseRecovery();if(logged()){document.body.classList.add('ae-shell-on');hideTrigger();customWelcome();var logo=q('.aews-logo');if(logo&&!q('img',logo))logo.innerHTML='<img src="/aethrion-mark.svg" alt="AETHRION" draggable="false">'}syncOverlayState()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 [150,500,1000,1800,3000,5000].forEach(function(t){setTimeout(boot,t)});
-if(window.MutationObserver&&document.body)new MutationObserver(function(records){var childChange=records.some(function(r){return r.type==='childList'});if(logged()){patchWelcome();if(!document.body.classList.contains('aews-feature-view'))customWelcome();hideTrigger()}}).observe(document.body,{attributes:true,attributeFilter:['class'],childList:true,subtree:true});
+if(window.MutationObserver&&document.body)new MutationObserver(function(){syncOverlayState();if(logged()){patchWelcome();installCloseRecovery();if(!document.body.classList.contains('aews-feature-view'))customWelcome();hideTrigger()}}).observe(document.body,{attributes:true,attributeFilter:['class'],childList:true,subtree:true});
 })();
