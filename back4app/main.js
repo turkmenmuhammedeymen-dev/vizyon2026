@@ -166,7 +166,7 @@ if (typeof globalThis.fetch === 'undefined') {
 // ================================================================
 // AETHRION SECURITY GATE — Back4App Cloud Code
 // Configure IPQS_API_KEY as a private Cloud Code runtime secret.
-// Also configure it separately in Vercel for the website gate.
+// The website gate calls this Back4App function; no Vercel IPQS secret is needed.
 // Never put the key in source code or client-side configuration.
 // ================================================================
 var _aethrionVpnCache = new Map();
