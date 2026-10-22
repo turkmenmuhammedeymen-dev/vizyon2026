@@ -134,6 +134,10 @@ function closeDrawer() {
 }
 function ensureTrigger() {
  if (!document.body) return;
+ if (document.body.classList.contains('ae-shell-on')) {
+  qsa('#aethrionFeaturesTrigger').forEach(function(node){if(node.parentNode)node.parentNode.removeChild(node)});
+  return;
+ }
  var user = authUser();
  var logged = !!user || document.body.classList.contains('logged-in-user');
  var buttons = qsa('#aethrionFeaturesTrigger');
@@ -396,6 +400,11 @@ function wrapDashboard() {
  window.showDashboard = wrapped;
 }
 function applyOverrides() {
+ /* Workspace v6 owns the authenticated dashboard: never let this legacy drawer/router overwrite it. */
+ if (document.body && document.body.classList.contains('ae-shell-on')) {
+  qsa('#aethrionFeaturesTrigger,#aethrionFeaturesButton,#aethrionFeaturesPanel,#aethrionExperienceDrawer,#aethrionExperienceBackdrop').forEach(function(node){if(node.parentNode)node.parentNode.removeChild(node)});
+  return;
+ }
  window.openAethrionFeaturesPanel = openDrawer;
  window.closeAethrionFeaturesPanel = closeDrawer;
  window.toggleAethrionFeaturesPanel = function () {
