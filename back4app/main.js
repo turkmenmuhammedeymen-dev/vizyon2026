@@ -183,20 +183,17 @@ function _aethrionGetIPQSApiKey() {
     return '';
 }
 
-// Prefer Parse Server's normalized client IP. Fall back to proxy headers only
-// when request.ip is unavailable; never accept an IP from request.params.
+// Use Parse Server's normalized client IP first. A proxy header is only a
+// fallback when the deployment's trusted proxy explicitly sets it. Never parse
+// X-Forwarded-For here: choosing the wrong hop can classify the proxy itself,
+// while trusting an arbitrary chain can enable IP spoofing.
 function _aethrionGetClientIp(request) {
     if (!request) return '';
     var direct = String(request.ip || '').trim();
     if (direct) return direct;
     var headers = request.headers || {};
     var realIp = String(headers['x-real-ip'] || headers['X-Real-IP'] || '').trim();
-    if (realIp) return realIp;
-    var forwarded = String(headers['x-forwarded-for'] || headers['X-Forwarded-For'] || '').trim();
-    if (forwarded) {
-        var hops = forwarded.split(',').map(function (part) { return part.trim(); }).filter(Boolean);
-        if (hops.length) return hops[hops.length - 1];
-    }
+    if (realIp && realIp.indexOf(',') === -1 && !/\s/.test(realIp)) return realIp;
     return '';
 }
 
@@ -233,6 +230,15 @@ async function _aethrionEnforceVpnPolicy(request) {
             tor: data.tor === true || data.active_tor === true
         };
         var blocked = flags.vpn || flags.proxy || flags.tor;
+        if (blocked) {
+            console.warn('[AETHRION Security] IPQS classification:', JSON.stringify({
+                vpn: flags.vpn,
+                proxy: flags.proxy,
+                tor: flags.tor,
+                fraudScore: typeof data.fraud_score === 'number' ? data.fraud_score : null,
+                connectionType: typeof data.connection_type === 'string' ? data.connection_type : null
+            }));
+        }
         if (_aethrionVpnCache.size >= 1500) {
             var firstKey = _aethrionVpnCache.keys().next().value;
             if (firstKey) _aethrionVpnCache.delete(firstKey);
@@ -313,8 +319,20 @@ Parse.Cloud.define("aethrionSecurityCheck", async function (request) {
         if (!data || data.success !== true) {
             return { ok: false, configured: true, blocked: true, code: 'REPUTATION_CHECK_FAILED' };
         }
-        var blocked = data.vpn === true || data.active_vpn === true ||
-            data.proxy === true || data.tor === true || data.active_tor === true;
+        var vpnFlag = data.vpn === true || data.active_vpn === true;
+        var proxyFlag = data.proxy === true;
+        var torFlag = data.tor === true || data.active_tor === true;
+        var blocked = vpnFlag || proxyFlag || torFlag;
+        // Log only provider classification signals, never the client's IP or API key.
+        if (blocked) {
+            console.warn('[AETHRION Security] IPQS classification:', JSON.stringify({
+                vpn: vpnFlag,
+                proxy: proxyFlag,
+                tor: torFlag,
+                fraudScore: typeof data.fraud_score === 'number' ? data.fraud_score : null,
+                connectionType: typeof data.connection_type === 'string' ? data.connection_type : null
+            }));
+        }
         if (_aethrionVpnCache.size >= 1500) {
             var firstKey = _aethrionVpnCache.keys().next().value;
             if (firstKey) _aethrionVpnCache.delete(firstKey);
