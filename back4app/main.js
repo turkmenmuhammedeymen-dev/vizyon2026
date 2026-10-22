@@ -8482,6 +8482,10 @@ async function _createV27ApiKeyCore(user, params, viaVizyonAl) {
     var keyName = params.keyName;
     var keyDescription = params.keyDescription || '';
     var duration = params.duration || 'unlimited';
+    var allowedScopeNames = ['chat', 'usage:read'];
+    var requestedScopes = Array.isArray(params.scopes) ? params.scopes : ['chat'];
+    var keyScopes = Array.from(new Set(requestedScopes.map(function (s) { return String(s || '').trim().toLowerCase(); }).filter(function (s) { return allowedScopeNames.indexOf(s) >= 0; })));
+    if (!keyScopes.length) throw new Error('En az bir geçerli API izni seçmelisiniz.');
 
     if (!keyName || keyName.trim().length < 2) throw new Error('Anahtar adı en az 2 karakter olmalıdır!');
     if (keyName.trim().length > 50) throw new Error('Anahtar adı en fazla 50 karakter olabilir!');
@@ -8527,6 +8531,7 @@ async function _createV27ApiKeyCore(user, params, viaVizyonAl) {
     record.set('user_name', user.get('name') || user.get('username') || 'Kullanıcı');
     record.set('key_name', keyName.trim());
     record.set('key_description', keyDescription.trim());
+    record.set('allowed_scopes', keyScopes);
     record.set('key_hash', keyHash);
     record.set('key_prefix', keyPrefix);
     record.set('key_masked', keyMasked);
@@ -8643,6 +8648,7 @@ Parse.Cloud.define("getMyV27ApiKeys", async function (request) {
             id: k.id,
             key_name: k.get('key_name'),
             key_description: k.get('key_description') || '',
+            scopes: Array.isArray(k.get('allowed_scopes')) && k.get('allowed_scopes').length ? k.get('allowed_scopes') : ['chat'],
             key_prefix: k.get('key_prefix'),
             key_masked: k.get('key_masked'),
             duration: k.get('duration'),
@@ -8710,6 +8716,7 @@ Parse.Cloud.define("validateV27ApiKey", async function (request) {
         valid: true,
         user_email: record.get('user_email'),
         key_name: record.get('key_name'),
+        scopes: Array.isArray(record.get('allowed_scopes')) && record.get('allowed_scopes').length ? record.get('allowed_scopes') : ['chat'],
         expires_at: expiresAt
     };
 });
@@ -8726,6 +8733,7 @@ Parse.Cloud.define("v27ApiChat", async function (request) {
 
     var validation = await Parse.Cloud.run('validateV27ApiKey', { apiKey: apiKey }, { useMasterKey: true });
     if (!validation.valid) throw new Error(validation.error);
+    if (!Array.isArray(validation.scopes) || validation.scopes.indexOf('chat') === -1) throw new Error('Bu API anahtarında chat izni yok.');
 
     var reply = await Parse.Cloud.run('superAI', { prompt: prompt }, { useMasterKey: true });
     return { success: true, reply: cleanResponse(reply) };
@@ -8757,6 +8765,7 @@ Parse.Cloud.define("v27ApiRest", async function (request) {
 
     var validation = await Parse.Cloud.run('validateV27ApiKey', { apiKey: apiKey }, { useMasterKey: true });
     if (!validation || !validation.valid) throw new Error((validation && validation.error) || 'Geçersiz API anahtarı!');
+    if (!Array.isArray(validation.scopes) || validation.scopes.indexOf('chat') === -1) throw new Error('Bu API anahtarında chat izni yok.');
 
     var systemPrefix = '';
     if (lang === 'tr') {
@@ -10384,4 +10393,99 @@ Parse.Cloud.define("aethrionGetDiagnostics", async function (request) {
     }
     add("Cloud Code", "ok", "Bu tanılama işlevinin yanıt vermesi, mevcut Cloud Code çağrısının çalıştığını doğrular.");
     return { success: true, generatedAt: new Date().toISOString(), checks: checks };
+});
+
+
+// AETHRION TEAMS: üyeleri güvenli listeleme ve rol atama
+Parse.Cloud.define("aethrionGetTeamWorkspace", async function (request) {
+    var user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız.");
+    var teamId = _aeSafeAuditText(request.params && request.params.teamId, 128);
+    var team = await _aeRequireTeamAccess(user, teamId);
+    var query = new Parse.Query("TeamMember");
+    query.equalTo("team_id", teamId);
+    query.limit(200);
+    var members = await query.find({ useMasterKey: true });
+    var isPrivileged = _aeIsPrivileged(user);
+    var isOwner = String(team.get("owner_email") || "").toLowerCase() === String(user.get("email") || "").toLowerCase();
+    var isManager = String(team.get("manager_email") || "").toLowerCase() === String(user.get("email") || "").toLowerCase();
+    return {
+        team: { id: team.id, name: _aeSafeAuditText(team.get("name") || "Takım", 100) },
+        canManageRoles: isPrivileged || isOwner || isManager,
+        members: members.map(function (member) {
+            return {
+                id: member.id,
+                email: _aeSafeAuditText(member.get("user_email") || "", 254),
+                role: _aeSafeAuditText(member.get("role") || "viewer", 32).toLowerCase(),
+                name: _aeSafeAuditText(member.get("user_name") || member.get("name") || member.get("user_email") || "Üye", 100)
+            };
+        })
+    };
+});
+
+Parse.Cloud.define("aethrionSetTeamMemberRole", async function (request) {
+    var user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız.");
+    var params = request.params || {};
+    var teamId = _aeSafeAuditText(params.teamId, 128);
+    var memberId = _aeSafeAuditText(params.memberId, 128);
+    var role = String(params.role || "").toLowerCase();
+    if (["admin", "editor", "viewer"].indexOf(role) === -1) throw new Error("Rol admin, editor veya viewer olmalıdır.");
+    if (!memberId) throw new Error("Üye kimliği gerekli.");
+    var team = await _aeRequireTeamAccess(user, teamId);
+    var email = String(user.get("email") || "").toLowerCase();
+    var mayManage = _aeIsPrivileged(user) ||
+        String(team.get("owner_email") || "").toLowerCase() === email ||
+        String(team.get("manager_email") || "").toLowerCase() === email;
+    if (!mayManage) throw new Error("Bu takımda rol değiştirme yetkiniz yok.");
+    var member = await new Parse.Query("TeamMember").get(memberId, { useMasterKey: true });
+    if (String(member.get("team_id") || "") !== teamId) throw new Error("Üye bu takıma ait değil.");
+    if (String(member.get("user_email") || "").toLowerCase() === String(team.get("owner_email") || "").toLowerCase() && role !== "admin") {
+        throw new Error("Takım sahibinin rolü düşürülemez.");
+    }
+    var oldRole = String(member.get("role") || "viewer").toLowerCase();
+    member.set("role", role);
+    await member.save(null, { useMasterKey: true });
+    try {
+        var event = new AethrionProjectAudit();
+        event.set("team_id", teamId);
+        event.set("actor_id", user.id);
+        event.set("actor_email", _aeSafeAuditText(user.get("email"), 254));
+        event.set("actor_name", _aeSafeAuditText(user.get("name") || user.get("username") || user.get("email"), 100));
+        event.set("actor_role", _aeRole(user));
+        event.set("action", "role_changed");
+        event.set("target_id", member.id);
+        event.set("target_label", _aeSafeAuditText(member.get("user_email") || "", 120));
+        event.set("source", "server-role-change");
+        event.set("created_at_server", new Date());
+        event.set("previous_role", oldRole);
+        event.set("new_role", role);
+        await event.save(null, { useMasterKey: true });
+    } catch (auditError) {
+        console.error("AETHRION Teams denetim kaydı oluşturulamadı.");
+    }
+    return { success: true, memberId: member.id, role: role };
+});
+
+// API anahtarıyla güvenli kullanım istatistiği; anahtar başına usage:read izni gerekir.
+Parse.Cloud.define("aethrionGetApiUsage", async function (request) {
+    var apiKey = (request.headers && (request.headers["x-v27-api-key"] || request.headers["X-V27-Api-Key"])) || (request.params && request.params.apiKey);
+    if (!apiKey) throw new Error("API anahtarı gerekli.");
+    var validation = await Parse.Cloud.run("validateV27ApiKey", { apiKey: apiKey }, { useMasterKey: true });
+    if (!validation || !validation.valid) throw new Error("API anahtarı geçersiz veya iptal edilmiş.");
+    if (!Array.isArray(validation.scopes) || validation.scopes.indexOf("usage:read") === -1) throw new Error("Bu API anahtarında usage:read izni yok.");
+    var hash = crypto.createHash("sha256").update(apiKey).digest("hex");
+    var query = new Parse.Query(V27ApiKey);
+    query.equalTo("key_hash", hash);
+    query.equalTo("is_active", true);
+    var record = await query.first({ useMasterKey: true });
+    if (!record || record.get("user_email") !== validation.user_email) throw new Error("API anahtarı bulunamadı.");
+    return {
+        success: true,
+        keyName: _aeSafeAuditText(record.get("key_name") || "", 50),
+        usageCount: Number(record.get("usage_count") || 0),
+        lastUsedAt: record.get("last_used_at") || null,
+        expiresAt: record.get("expires_at") || null,
+        scopes: validation.scopes
+    };
 });
