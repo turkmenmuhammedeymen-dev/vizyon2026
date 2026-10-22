@@ -323,7 +323,7 @@ function loadOpsStyles() {
   if (document.querySelector('link[data-aethrion-ops-css]')) return;
   var link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = '/aethrion-ops.css?v=20261022-1';
+  link.href = '/aethrion-ops.css?v=20261023-2';
   link.setAttribute('data-aethrion-ops-css', 'true');
   document.head.appendChild(link);
 }
