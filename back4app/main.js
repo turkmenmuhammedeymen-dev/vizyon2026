@@ -10168,6 +10168,53 @@ async function _aeRequireTeamAccess(user, teamId) {
     return team;
 }
 
+Parse.Cloud.define("aethrionListAuditTeams", async function (request) {
+    var user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız.");
+    var email = String(user.get("email") || "");
+    var role = _aeRole(user);
+    var found = {};
+    var teams = [];
+    async function addTeam(team) {
+        if (!team || !team.id || found[team.id]) return;
+        found[team.id] = true;
+        teams.push({ id: team.id, name: _aeSafeAuditText(team.get("name") || "Paylaşılan takım", 100) });
+    }
+    if (role === "founder" || role === "admin") {
+        var allQuery = new Parse.Query("Team");
+        allQuery.ascending("name");
+        allQuery.limit(100);
+        var allTeams = await allQuery.find({ useMasterKey: true });
+        for (var ai = 0; ai < allTeams.length; ai++) await addTeam(allTeams[ai]);
+    } else {
+        var memberQuery = new Parse.Query("TeamMember");
+        memberQuery.equalTo("user_email", email);
+        memberQuery.limit(100);
+        var memberships = await memberQuery.find({ useMasterKey: true });
+        for (var mi = 0; mi < memberships.length; mi++) {
+            var teamId = memberships[mi].get("team_id");
+            if (!teamId) continue;
+            try { await addTeam(await new Parse.Query("Team").get(teamId, { useMasterKey: true })); } catch (e) {}
+        }
+        var ownerQuery = new Parse.Query("Team");
+        ownerQuery.equalTo("owner_email", email);
+        ownerQuery.limit(100);
+        var owned = await ownerQuery.find({ useMasterKey: true });
+        for (var oi = 0; oi < owned.length; oi++) await addTeam(owned[oi]);
+        var managerQuery = new Parse.Query("Team");
+        managerQuery.equalTo("manager_email", email);
+        managerQuery.limit(100);
+        var managed = await managerQuery.find({ useMasterKey: true });
+        for (var gi = 0; gi < managed.length; gi++) await addTeam(managed[gi]);
+        var currentTeamId = String(user.get("teamId") || "");
+        if (currentTeamId && !found[currentTeamId]) {
+            try { await addTeam(await new Parse.Query("Team").get(currentTeamId, { useMasterKey: true })); } catch (e) {}
+        }
+    }
+    teams.sort(function(a,b){ return a.name.localeCompare(b.name); });
+    return { success: true, teams: teams };
+});
+
 Parse.Cloud.define("aethrionRecordProjectAudit", async function (request) {
     var user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız.");
