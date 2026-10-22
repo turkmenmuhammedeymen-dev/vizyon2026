@@ -6187,6 +6187,11 @@ Parse.Cloud.define("getTeamTasks", async function (request) {
     if (!user) throw new Error('Giriş yapmalısınız!');
     var teamId = user.get('teamId');
     if (!teamId) throw new Error('Bir takıma üye değilsiniz!');
+    var taskReadMemberQuery = new Parse.Query(TeamMember);
+    taskReadMemberQuery.equalTo('team_id', teamId);
+    taskReadMemberQuery.equalTo('user_email', user.get('email'));
+    var taskReadMember = await taskReadMemberQuery.first({ useMasterKey: true });
+    if (!taskReadMember) throw new Error('Bu takımın üyesi değilsiniz.');
 
     var today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -6224,7 +6229,9 @@ Parse.Cloud.define("completeTeamTask", async function (request) {
     var taskMember = await taskMemberQuery.first({ useMasterKey: true });
     if (!taskMember) throw new Error('Bu takımın üyesi değilsiniz.');
     var taskRole = String(taskMember.get('role') || 'viewer').toLowerCase();
-    if (taskRole === 'viewer') throw new Error('Görüntüleyici rolü takım görevlerini tamamlayamaz.');
+    var taskTeam = await new Parse.Query(Team).get(taskTeamId, { useMasterKey: true });
+    var taskPrivileged = !!(taskTeam && (taskTeam.get('owner_email') === user.get('email') || taskTeam.get('manager_email') === user.get('email'))) || user.get('role') === 'founder' || user.get('role') === 'admin';
+    if (taskRole === 'viewer' && !taskPrivileged) throw new Error('Görüntüleyici rolü takım görevlerini tamamlayamaz.');
 
     var completed = user.get('completed_team_tasks') || [];
     if (completed.indexOf(taskId) !== -1) throw new Error('Bu görev zaten tamamlanmış!');
