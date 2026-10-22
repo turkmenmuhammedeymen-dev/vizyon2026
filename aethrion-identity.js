@@ -323,7 +323,7 @@ function loadOpsStyles() {
   if (document.querySelector('link[data-aethrion-ops-css]')) return;
   var link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = '/aethrion-ops.css?v=20261022-1';
+  link.href = '/aethrion-ops.css?v=20261023-2';
   link.setAttribute('data-aethrion-ops-css', 'true');
   document.head.appendChild(link);
 }
@@ -380,34 +380,40 @@ function installAuditTelemetry() {
 function installOpsFeatureCards() {
   if (!document.querySelector('#mainSite, #dashboard, #mainDashboard')) return;
   if (document.querySelector('[data-aethrion-ops-cards]')) return;
-  var currentUser = window.Parse && window.Parse.User && window.Parse.User.current ? window.Parse.User.current() : null;
-  if (!currentUser) return;
-  var role = String(currentUser.get('role') || 'user').toLowerCase();
+  var P = window.Parse;
+  var user = P && P.User && typeof P.User.current === 'function' ? P.User.current() : null;
+  if (!user) return;
+  var role = String(user.get('role') || 'user').toLowerCase();
   var privileged = role === 'founder' || role === 'admin';
-  var target = document.querySelector('#featuresMenu, #featureMenu, #features-menu, #feature-menu, .features-menu, .feature-menu, [data-feature-menu], #mainDashboard, #dashboard, #mainSite');
-  if (!target) return;
+  var nav = document.querySelector('#featuresMenu, #featureMenu, #features-menu, #feature-menu, .features-menu, .feature-menu, [data-feature-menu], #sidebar, .sidebar, .dashboard-sidebar, .side-menu, .sidebar-menu, nav[aria-label*="özellik" i], nav[aria-label*="feature" i]');
   var section = document.createElement('section');
   section.className = 'ae-tool-grid';
   section.setAttribute('data-aethrion-ops-cards', 'true');
-  section.setAttribute('aria-label', 'Denetim ve sistem durumu');
-  function makeCard(icon, title, description, href) {
-    var card = document.createElement('article');
-    card.className = 'ae-tool-card';
-    var iconNode = document.createElement('div'); iconNode.className = 'ae-tool-icon'; var iconImage = document.createElement('img'); iconImage.src = title.indexOf('denetim') >= 0 ? '/aethrion-audit-icon.svg' : '/aethrion-status-icon.svg'; iconImage.alt = ''; iconImage.width = 28; iconImage.height = 28; iconNode.appendChild(iconImage);
+  section.setAttribute('aria-label', 'AETHRION platform araçları');
+  function makeCard(title, description, href, iconPath) {
+    var card = document.createElement('article'); card.className = 'ae-tool-card';
+    var iconNode = document.createElement('div'); iconNode.className = 'ae-tool-icon';
+    var img = document.createElement('img'); img.src = iconPath; img.alt = ''; img.width = 28; img.height = 28; img.loading = 'lazy'; iconNode.appendChild(img);
     var h = document.createElement('h3'); h.textContent = title;
     var p = document.createElement('p'); p.textContent = description;
-    var a = document.createElement('a'); a.href = href; a.textContent = 'Aç →';
-    card.appendChild(iconNode); card.appendChild(h); card.appendChild(p); card.appendChild(a);
-    return card;
+    var a = document.createElement('a'); a.href = href; a.textContent = 'Aç →'; a.setAttribute('aria-label', title + ' sayfasını aç');
+    card.append(iconNode, h, p, a); return card;
   }
-  section.appendChild(makeCard('🧾', 'Proje denetim kaydı', 'Paylaşılan takım projelerinde kullanıcıların bildirdiği işlemleri ve zaman çizelgesini incele.', '/aethrion-project-audit.html'));
-  if (privileged) section.appendChild(makeCard('◈', 'AETHRION Status & Diagnostics', 'Cloud Code, oturum, veri deposu ve sağlayıcı yapılandırma durumunu güvenli biçimde kontrol et.', '/aethrion-status.html'));
-  var heading = document.createElement('h2'); heading.className = 'ae-tool-eyebrow'; heading.textContent = 'DENETİM VE SİSTEM DURUMU';
-  var wrapper = document.createElement('section'); wrapper.setAttribute('data-aethrion-ops-wrapper', 'true'); wrapper.appendChild(heading); wrapper.appendChild(section);
-  if (target.matches('#mainDashboard, #dashboard')) {
-    target.appendChild(wrapper);
-  } else {
-    target.appendChild(wrapper);
+  section.appendChild(makeCard('AETHRION Developer Platform', 'API belgeleri, anahtar izinleri ve kullanım istatistikleri.', '/aethrion-developer.html', '/aethrion-status-icon.svg'));
+  section.appendChild(makeCard('AETHRION Teams', 'Takımlar, üyeler, rol yönetimi ve denetlenebilir işlem geçmişi.', '/aethrion-teams.html', '/aethrion-audit-icon.svg'));
+  if (privileged) {
+    section.appendChild(makeCard('Proje denetim kaydı', 'Takım projelerindeki kayıtlı olayları incele.', '/aethrion-project-audit.html', '/aethrion-audit-icon.svg'));
+    section.appendChild(makeCard('AETHRION Status & Diagnostics', 'Cloud Code, oturum, veri deposu, model ve dağıtım kontrolleri.', '/aethrion-status.html', '/aethrion-status-icon.svg'));
+  }
+  var heading = document.createElement('h2'); heading.className = 'ae-tool-eyebrow'; heading.textContent = 'AETHRION PLATFORM ARAÇLARI';
+  var wrapper = document.createElement('section'); wrapper.className = 'ae-ops-navigation'; wrapper.setAttribute('data-aethrion-ops-wrapper', 'true'); wrapper.append(heading, section);
+  if (nav) nav.appendChild(wrapper);
+  else {
+    // Menu selector is absent on this app variant: expose a compact, keyboard-accessible tools drawer, not a panel at the page bottom.
+    var launcher = document.createElement('button'); launcher.type = 'button'; launcher.className = 'ae-ops-drawer-launcher'; launcher.textContent = 'AETHRION Araçları'; launcher.setAttribute('aria-expanded', 'false');
+    var drawer = document.createElement('aside'); drawer.className = 'ae-ops-drawer'; drawer.hidden = true; drawer.setAttribute('aria-label', 'AETHRION platform araçları'); drawer.appendChild(wrapper);
+    launcher.addEventListener('click', function () { drawer.hidden = !drawer.hidden; launcher.setAttribute('aria-expanded', drawer.hidden ? 'false' : 'true'); });
+    document.body.append(launcher, drawer);
   }
 }
 function loadJarvisAssistant() {

@@ -4254,6 +4254,7 @@ Parse.Cloud.define("createTeam", async function (request) {
     member.set("team_id", team.id);
     member.set("user_email", user.get('email'));
     member.set("user_name", user.get('name') || 'Kullanıcı');
+    member.set("role", "admin");
     await member.save(null, { useMasterKey: true });
 
     user.set("teamId", team.id);
@@ -4283,6 +4284,7 @@ Parse.Cloud.define("joinTeamWithCode", async function (request) {
     member.set("team_id", team.id);
     member.set("user_email", user.get('email'));
     member.set("user_name", user.get('name') || 'Kullanıcı');
+    member.set("role", "viewer");
     await member.save(null, { useMasterKey: true });
 
     user.set("teamId", team.id);
@@ -4312,6 +4314,9 @@ Parse.Cloud.define("sendTeamMessage", async function (request) {
     memberQuery.equalTo("user_email", user.get('email'));
     var member = await memberQuery.first({ useMasterKey: true });
     if (!member) throw new Error('Bu takımın üyesi değilsiniz!');
+    var senderRole = String(member.get('role') || 'viewer').toLowerCase();
+    var senderIsTeamAdmin = team.get('owner_email') === user.get('email') || team.get('manager_email') === user.get('email') || user.get('role') === 'founder' || user.get('role') === 'admin' || senderRole === 'admin';
+    if (senderRole === 'viewer' && !senderIsTeamAdmin) throw new Error('Görüntüleyici rolü mesaj gönderemez veya dosya paylaşamaz.');
 
     var isVizyonCommand = false;
     var isSupportCommand = false;
@@ -4532,6 +4537,7 @@ Parse.Cloud.define("sendTeamMessage", async function (request) {
         }
     }
 
+    await _aeWriteTeamAudit(user, teamId, 'comment_added', '', fileUrl ? 'Takım dosyası/mesajı' : 'Takım mesajı');
     return { success: true };
 });
 
@@ -4556,8 +4562,16 @@ Parse.Cloud.define("deleteTeamMessage", async function (request) {
     var isFounder = (user.get('role') === 'founder');
     var isModerator = (user.get('role') === 'moderator');
     var isVizyonFounder = (user.get('email') === 'admin.tr.reis@gmail.com');
+    var deleteMemberQuery = new Parse.Query(TeamMember);
+    deleteMemberQuery.equalTo('team_id', teamId);
+    deleteMemberQuery.equalTo('user_email', user.get('email'));
+    var deleteMember = await deleteMemberQuery.first({ useMasterKey: true });
+    var deleteRole = String(deleteMember && deleteMember.get('role') || 'viewer').toLowerCase();
+    var isTeamAdmin = deleteRole === 'admin';
+    if (!deleteMember && !isOwner && !isManager && !isFounder && !isModerator) throw new Error('Bu takımın üyesi değilsiniz!');
+    if (deleteRole === 'viewer' && !isOwner && !isManager && !isFounder && !isModerator) throw new Error('Görüntüleyici rolü mesaj silemez.');
 
-    if (!isMyMessage && !isOwner && !isManager && !isFounder && !isModerator) throw new Error('Bu mesajı silme yetkiniz yok!');
+    if (!isMyMessage && !isOwner && !isManager && !isFounder && !isModerator && !isTeamAdmin) throw new Error('Bu mesajı silme yetkiniz yok!');
     if (msg.get('user_email') === 'system@vizyon2027.com' && !isVizyonFounder) throw new Error('Sistem mesajlarını sadece kurucu silebilir!');
 
     msg.set('deleted', true);
@@ -4566,6 +4580,7 @@ Parse.Cloud.define("deleteTeamMessage", async function (request) {
     if (isVizyonFounder && !isMyMessage) msg.set('deleted_by_founder', true);
     await msg.save(null, { useMasterKey: true });
 
+    await _aeWriteTeamAudit(user, teamId, 'comment_deleted', msgId, 'Takım mesajı');
     return { success: true, message: 'Mesaj silindi.' };
 });
 
@@ -4581,13 +4596,24 @@ Parse.Cloud.define("editTeamMessage", async function (request) {
     var msg = await query.get(msgId, { useMasterKey: true });
     if (!msg) throw new Error('Mesaj bulunamadı!');
     if (msg.get('deleted')) throw new Error('Silinmiş mesaj düzenlenemez!');
-    if (msg.get('user_email') !== user.get('email')) throw new Error('Sadece kendi mesajınızı düzenleyebilirsiniz!');
+    var teamIdForEdit = msg.get('team_id');
+    var editMemberQuery = new Parse.Query(TeamMember);
+    editMemberQuery.equalTo('team_id', teamIdForEdit);
+    editMemberQuery.equalTo('user_email', user.get('email'));
+    var editMember = await editMemberQuery.first({ useMasterKey: true });
+    if (!editMember) throw new Error('Bu takımın üyesi değilsiniz!');
+    var editRole = String(editMember.get('role') || 'viewer').toLowerCase();
+    var editTeam = await new Parse.Query(Team).get(teamIdForEdit, { useMasterKey: true });
+    var editIsTeamAdmin = !!(editTeam && (editTeam.get('owner_email') === user.get('email') || editTeam.get('manager_email') === user.get('email'))) || user.get('role') === 'founder' || user.get('role') === 'admin' || editRole === 'admin';
+    if (editRole === 'viewer' && !editIsTeamAdmin) throw new Error('Görüntüleyici rolü mesaj düzenleyemez.');
+    if (msg.get('user_email') !== user.get('email') && !editIsTeamAdmin) throw new Error('Sadece kendi mesajınızı düzenleyebilir veya takım admini olarak işlem yapabilirsiniz!');
 
     msg.set('message', filterText(newMessage.trim()));
     msg.set('edited', true);
     msg.set('edited_at', new Date());
     await msg.save(null, { useMasterKey: true });
 
+    await _aeWriteTeamAudit(user, teamIdForEdit, 'comment_updated', msgId, 'Takım mesajı');
     return { success: true, message: 'Mesaj düzenlendi.' };
 });
 
@@ -4628,6 +4654,13 @@ Parse.Cloud.define("inviteToTeam", async function (request) {
     var teamQuery = new Parse.Query(Team);
     var team = await teamQuery.get(teamId, { useMasterKey: true });
     if (!team) throw new Error('Takım bulunamadı!');
+    var inviteMemberQuery = new Parse.Query(TeamMember);
+    inviteMemberQuery.equalTo('team_id', teamId);
+    inviteMemberQuery.equalTo('user_email', user.get('email'));
+    var inviteMember = await inviteMemberQuery.first({ useMasterKey: true });
+    var inviteRole = String(inviteMember && inviteMember.get('role') || 'viewer').toLowerCase();
+    var invitePrivileged = user.get('role') === 'founder' || user.get('role') === 'admin' || team.get('owner_email') === user.get('email') || team.get('manager_email') === user.get('email') || inviteRole === 'admin';
+    if (!invitePrivileged) throw new Error('Yalnızca takım admini, sahibi veya yöneticisi davet gönderebilir.');
 
     var inbox = new Inbox();
     inbox.set("sender_email", user.get('email'));
@@ -4638,6 +4671,7 @@ Parse.Cloud.define("inviteToTeam", async function (request) {
     inbox.set("status", "pending");
     inbox.set("message", user.get('name') + ' sizi "' + team.get('name') + '" takımına davet etti!');
     await inbox.save(null, { useMasterKey: true });
+    await _aeWriteTeamAudit(user, teamId, 'team_invite_sent', '', 'Takım daveti');
     return { success: true };
 });
 
@@ -4662,6 +4696,7 @@ Parse.Cloud.define("acceptTeamInvite", async function (request) {
     member.set("team_id", teamId);
     member.set("user_email", user.get('email'));
     member.set("user_name", user.get('name') || 'Kullanıcı');
+    member.set("role", "viewer");
     await member.save(null, { useMasterKey: true });
 
     user.set("teamId", teamId);
@@ -4797,8 +4832,13 @@ Parse.Cloud.define("removeFromTeam", async function (request) {
     var isManager = team.get('manager_email') === user.get('email') && !isOwner;
     var isFounder = user.get('role') === 'founder';
     var isModerator = user.get('role') === 'moderator';
+    var removeActorQuery = new Parse.Query(TeamMember);
+    removeActorQuery.equalTo('team_id', teamId);
+    removeActorQuery.equalTo('user_email', user.get('email'));
+    var removeActor = await removeActorQuery.first({ useMasterKey: true });
+    var isTeamAdmin = !!(removeActor && String(removeActor.get('role') || '').toLowerCase() === 'admin');
 
-    if (!isOwner && !isManager && !isFounder && !isModerator) throw new Error('Sadece takım sahibi veya yöneticisi üye atabilir!');
+    if (!isOwner && !isManager && !isFounder && !isModerator && !isTeamAdmin) throw new Error('Sadece takım sahibi, yöneticisi veya takım admini üye atabilir!');
 
     var memberQuery = new Parse.Query(TeamMember);
     memberQuery.equalTo("team_id", teamId);
@@ -4820,6 +4860,7 @@ Parse.Cloud.define("removeFromTeam", async function (request) {
         targetUser.set('teamId', null);
         await targetUser.save(null, { useMasterKey: true });
     }
+    await _aeWriteTeamAudit(user, teamId, 'member_removed', '', 'Takım üyesi kaldırıldı');
     return { success: true, message: targetEmail + ' takımdan atıldı!' };
 });
 
@@ -6151,6 +6192,11 @@ Parse.Cloud.define("getTeamTasks", async function (request) {
     if (!user) throw new Error('Giriş yapmalısınız!');
     var teamId = user.get('teamId');
     if (!teamId) throw new Error('Bir takıma üye değilsiniz!');
+    var taskReadMemberQuery = new Parse.Query(TeamMember);
+    taskReadMemberQuery.equalTo('team_id', teamId);
+    taskReadMemberQuery.equalTo('user_email', user.get('email'));
+    var taskReadMember = await taskReadMemberQuery.first({ useMasterKey: true });
+    if (!taskReadMember) throw new Error('Bu takımın üyesi değilsiniz.');
 
     var today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -6176,9 +6222,21 @@ Parse.Cloud.define("completeTeamTask", async function (request) {
     var user = request.user;
     if (!user) throw new Error('Giriş yapmalısınız!');
     var taskId = request.params.taskId;
+    if (!taskId) throw new Error('Görev ID gerekli!');
     var query = new Parse.Query(TeamTask);
     var task = await query.get(taskId, { useMasterKey: true });
     if (!task) throw new Error('Görev bulunamadı!');
+    var taskTeamId = String(task.get('team_id') || '');
+    if (!taskTeamId || taskTeamId !== String(user.get('teamId') || '')) throw new Error('Bu takım görevi üzerinde işlem yetkiniz yok.');
+    var taskMemberQuery = new Parse.Query(TeamMember);
+    taskMemberQuery.equalTo('team_id', taskTeamId);
+    taskMemberQuery.equalTo('user_email', user.get('email'));
+    var taskMember = await taskMemberQuery.first({ useMasterKey: true });
+    if (!taskMember) throw new Error('Bu takımın üyesi değilsiniz.');
+    var taskRole = String(taskMember.get('role') || 'viewer').toLowerCase();
+    var taskTeam = await new Parse.Query(Team).get(taskTeamId, { useMasterKey: true });
+    var taskPrivileged = !!(taskTeam && (taskTeam.get('owner_email') === user.get('email') || taskTeam.get('manager_email') === user.get('email'))) || user.get('role') === 'founder' || user.get('role') === 'admin';
+    if (taskRole === 'viewer' && !taskPrivileged) throw new Error('Görüntüleyici rolü takım görevlerini tamamlayamaz.');
 
     var completed = user.get('completed_team_tasks') || [];
     if (completed.indexOf(taskId) !== -1) throw new Error('Bu görev zaten tamamlanmış!');
@@ -6188,6 +6246,7 @@ Parse.Cloud.define("completeTeamTask", async function (request) {
     var points = task.get('points') || 0;
     await addPointsWithBonus(user, points, 'Takım görevi');
     await user.save(null, { useMasterKey: true });
+    await _aeWriteTeamAudit(user, taskTeamId, 'task_completed', taskId, 'Takım görevi tamamlandı');
     return { success: true, remaining_points: user.get('points'), message: 'Görev tamamlandı! +' + points + ' puan' };
 });
 
@@ -8482,6 +8541,10 @@ async function _createV27ApiKeyCore(user, params, viaVizyonAl) {
     var keyName = params.keyName;
     var keyDescription = params.keyDescription || '';
     var duration = params.duration || 'unlimited';
+    var allowedScopeNames = ['chat', 'usage:read'];
+    var requestedScopes = Array.isArray(params.scopes) ? params.scopes : ['chat'];
+    var keyScopes = Array.from(new Set(requestedScopes.map(function (s) { return String(s || '').trim().toLowerCase(); }).filter(function (s) { return allowedScopeNames.indexOf(s) >= 0; })));
+    if (!keyScopes.length) throw new Error('En az bir geçerli API izni seçmelisiniz.');
 
     if (!keyName || keyName.trim().length < 2) throw new Error('Anahtar adı en az 2 karakter olmalıdır!');
     if (keyName.trim().length > 50) throw new Error('Anahtar adı en fazla 50 karakter olabilir!');
@@ -8527,6 +8590,7 @@ async function _createV27ApiKeyCore(user, params, viaVizyonAl) {
     record.set('user_name', user.get('name') || user.get('username') || 'Kullanıcı');
     record.set('key_name', keyName.trim());
     record.set('key_description', keyDescription.trim());
+    record.set('allowed_scopes', keyScopes);
     record.set('key_hash', keyHash);
     record.set('key_prefix', keyPrefix);
     record.set('key_masked', keyMasked);
@@ -8643,6 +8707,7 @@ Parse.Cloud.define("getMyV27ApiKeys", async function (request) {
             id: k.id,
             key_name: k.get('key_name'),
             key_description: k.get('key_description') || '',
+            scopes: Array.isArray(k.get('allowed_scopes')) && k.get('allowed_scopes').length ? k.get('allowed_scopes') : ['chat'],
             key_prefix: k.get('key_prefix'),
             key_masked: k.get('key_masked'),
             duration: k.get('duration'),
@@ -8708,8 +8773,8 @@ Parse.Cloud.define("validateV27ApiKey", async function (request) {
 
     return {
         valid: true,
-        user_email: record.get('user_email'),
-        key_name: record.get('key_name'),
+        key_name: _aeSafeAuditText(record.get('key_name') || '', 50),
+        scopes: Array.isArray(record.get('allowed_scopes')) && record.get('allowed_scopes').length ? record.get('allowed_scopes') : ['chat'],
         expires_at: expiresAt
     };
 });
@@ -8726,6 +8791,7 @@ Parse.Cloud.define("v27ApiChat", async function (request) {
 
     var validation = await Parse.Cloud.run('validateV27ApiKey', { apiKey: apiKey }, { useMasterKey: true });
     if (!validation.valid) throw new Error(validation.error);
+    if (!Array.isArray(validation.scopes) || validation.scopes.indexOf('chat') === -1) throw new Error('Bu API anahtarında chat izni yok.');
 
     var reply = await Parse.Cloud.run('superAI', { prompt: prompt }, { useMasterKey: true });
     return { success: true, reply: cleanResponse(reply) };
@@ -8757,6 +8823,7 @@ Parse.Cloud.define("v27ApiRest", async function (request) {
 
     var validation = await Parse.Cloud.run('validateV27ApiKey', { apiKey: apiKey }, { useMasterKey: true });
     if (!validation || !validation.valid) throw new Error((validation && validation.error) || 'Geçersiz API anahtarı!');
+    if (!Array.isArray(validation.scopes) || validation.scopes.indexOf('chat') === -1) throw new Error('Bu API anahtarında chat izni yok.');
 
     var systemPrefix = '';
     if (lang === 'tr') {
@@ -10222,18 +10289,17 @@ Parse.Cloud.define("aethrionRecordProjectAudit", async function (request) {
     var teamId = _aeSafeAuditText(params.teamId, 128);
     await _aeRequireTeamAccess(user, teamId);
     var action = _aeSafeAuditText(params.action, 48);
-    var allowed = ["project_created", "project_updated", "project_deleted", "project_shared", "project_unshared", "member_added", "member_removed", "role_changed", "file_uploaded", "file_removed", "comment_added", "settings_changed", "export_requested"];
+    var allowed = ["project_created", "project_updated", "project_deleted", "project_shared", "project_unshared", "member_added", "member_removed", "role_changed", "file_uploaded", "file_removed", "comment_added", "comment_updated", "comment_deleted", "team_invite_sent", "task_completed", "settings_changed", "export_requested"];
     if (allowed.indexOf(action) === -1) throw new Error("İzin verilmeyen denetim eylemi.");
     var event = new AethrionProjectAudit();
     event.set("team_id", teamId);
-    event.set("actor_id", user.id);
-    event.set("actor_email", _aeSafeAuditText(user.get("email"), 254));
-    event.set("actor_name", _aeSafeAuditText(user.get("name") || user.get("username") || user.get("email"), 100));
+    event.set("actor_id", crypto.createHash("sha256").update(String(user.id)).digest("hex").slice(0, 24));
     event.set("actor_role", _aeRole(user));
     event.set("action", action);
-    event.set("target_id", _aeSafeAuditText(params.targetId, 128));
-    event.set("target_label", _aeSafeAuditText(params.targetLabel, 120));
+    event.set("target_id", params.targetId ? crypto.createHash("sha256").update(String(params.targetId)).digest("hex").slice(0, 24) : "");
+    event.set("target_label", "İşlem hedefi");
     event.set("source", "authenticated-client-event");
+    event.set("privacy_scrubbed", true);
     event.set("created_at_server", new Date());
     await event.save(null, { useMasterKey: true });
     return { success: true, id: event.id, source: "authenticated-client-event", note: "Bu kayıt, kimliği doğrulanmış kullanıcının bildirdiği olayı kaydeder; dış sistemdeki işlemin başarılı olduğunun tek başına kanıtı değildir." };
@@ -10256,13 +10322,13 @@ Parse.Cloud.define("aethrionGetProjectAudit", async function (request) {
         events: events.map(function (event) {
             return {
                 id: event.id,
-                actorId: event.get("actor_id") || "",
-                actorEmail: event.get("actor_email") || "",
-                actorName: event.get("actor_name") || "",
+                actorId: (function (v) { v = String(v || ""); return /^[a-f0-9]{24}$/i.test(v) ? v : (v ? crypto.createHash("sha256").update(v).digest("hex").slice(0, 24) : ""); })(event.get("actor_id")),
+                actorEmail: "",
+                actorName: "Kullanıcı",
                 actorRole: event.get("actor_role") || "user",
                 action: event.get("action") || "",
-                targetId: event.get("target_id") || "",
-                targetLabel: event.get("target_label") || "",
+                targetId: (function (v) { v = String(v || ""); return /^[a-f0-9]{24}$/i.test(v) ? v : (v ? crypto.createHash("sha256").update(v).digest("hex").slice(0, 24) : ""); })(event.get("target_id")),
+                targetLabel: "İşlem hedefi",
                 source: event.get("source") || "server",
                 createdAt: event.get("created_at_server") || event.get("createdAt") || null
             };
@@ -10385,3 +10451,147 @@ Parse.Cloud.define("aethrionGetDiagnostics", async function (request) {
     add("Cloud Code", "ok", "Bu tanılama işlevinin yanıt vermesi, mevcut Cloud Code çağrısının çalıştığını doğrular.");
     return { success: true, generatedAt: new Date().toISOString(), checks: checks };
 });
+
+
+// AETHRION TEAMS: üyeleri güvenli listeleme ve rol atama
+Parse.Cloud.define("aethrionGetTeamWorkspace", async function (request) {
+    var user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız.");
+    var teamId = _aeSafeAuditText(request.params && request.params.teamId, 128);
+    var team = await _aeRequireTeamAccess(user, teamId);
+    var query = new Parse.Query("TeamMember");
+    query.equalTo("team_id", teamId);
+    query.limit(200);
+    var members = await query.find({ useMasterKey: true });
+    var isPrivileged = _aeIsPrivileged(user);
+    var isOwner = String(team.get("owner_email") || "").toLowerCase() === String(user.get("email") || "").toLowerCase();
+    var isManager = String(team.get("manager_email") || "").toLowerCase() === String(user.get("email") || "").toLowerCase();
+    var selfMembership = await new Parse.Query("TeamMember").equalTo("team_id", teamId).equalTo("user_email", user.get("email")).first({ useMasterKey: true });
+    var isTeamAdmin = !!(selfMembership && String(selfMembership.get("role") || "").toLowerCase() === "admin");
+    return {
+        team: { id: team.id, name: _aeSafeAuditText(team.get("name") || "Takım", 100) },
+        canManageRoles: isPrivileged || isOwner || isManager || isTeamAdmin,
+        members: members.map(function (member) {
+            return {
+                id: member.id,
+                email: _aeSafeAuditText(member.get("user_email") || "", 254),
+                role: String(member.get("user_email") || "").toLowerCase() === String(team.get("owner_email") || "").toLowerCase() ? "admin" : (String(member.get("user_email") || "").toLowerCase() === String(team.get("manager_email") || "").toLowerCase() ? "admin" : _aeSafeAuditText(member.get("role") || "viewer", 32).toLowerCase()),
+                name: _aeSafeAuditText(member.get("user_name") || member.get("name") || member.get("user_email") || "Üye", 100)
+            };
+        })
+    };
+});
+
+Parse.Cloud.define("aethrionSetTeamMemberRole", async function (request) {
+    var user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız.");
+    var params = request.params || {};
+    var teamId = _aeSafeAuditText(params.teamId, 128);
+    var memberId = _aeSafeAuditText(params.memberId, 128);
+    var role = String(params.role || "").toLowerCase();
+    if (["admin", "editor", "viewer"].indexOf(role) === -1) throw new Error("Rol admin, editor veya viewer olmalıdır.");
+    if (!memberId) throw new Error("Üye kimliği gerekli.");
+    var team = await _aeRequireTeamAccess(user, teamId);
+    var email = String(user.get("email") || "").toLowerCase();
+    var selfMembership = await new Parse.Query("TeamMember").equalTo("team_id", teamId).equalTo("user_email", user.get("email")).first({ useMasterKey: true });
+    var mayManage = _aeIsPrivileged(user) ||
+        String(team.get("owner_email") || "").toLowerCase() === email ||
+        String(team.get("manager_email") || "").toLowerCase() === email ||
+        !!(selfMembership && String(selfMembership.get("role") || "").toLowerCase() === "admin");
+    if (!mayManage) throw new Error("Bu takımda rol değiştirme yetkiniz yok.");
+    var member = await new Parse.Query("TeamMember").get(memberId, { useMasterKey: true });
+    if (String(member.get("team_id") || "") !== teamId) throw new Error("Üye bu takıma ait değil.");
+    if (String(member.get("user_email") || "").toLowerCase() === String(team.get("owner_email") || "").toLowerCase() && role !== "admin") {
+        throw new Error("Takım sahibinin rolü düşürülemez.");
+    }
+    var oldRole = String(member.get("role") || "viewer").toLowerCase();
+    member.set("role", role);
+    await member.save(null, { useMasterKey: true });
+    try {
+        var event = new AethrionProjectAudit();
+        event.set("team_id", teamId);
+        event.set("actor_id", crypto.createHash("sha256").update(String(user.id)).digest("hex").slice(0, 24));
+        event.set("actor_role", _aeRole(user));
+        event.set("action", "role_changed");
+        event.set("target_id", crypto.createHash("sha256").update(String(member.id)).digest("hex").slice(0, 24));
+        event.set("target_label", "Takım üyesi");
+        event.set("source", "server-role-change");
+    event.set("privacy_scrubbed", true);
+        event.set("created_at_server", new Date());
+        event.set("previous_role", oldRole);
+        event.set("new_role", role);
+        await event.save(null, { useMasterKey: true });
+    } catch (auditError) {
+        console.error("AETHRION Teams denetim kaydı oluşturulamadı.");
+    }
+    return { success: true, memberId: member.id, role: role };
+});
+
+// API anahtarıyla güvenli kullanım istatistiği; anahtar başına usage:read izni gerekir.
+Parse.Cloud.define("aethrionScrubAuditPersonalData", async function (request) {
+    var user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız.");
+    if (!_aeIsPrivileged(user)) throw new Error("Bu bakım işlemi yalnızca admin ve founder rollerine açıktır.");
+    var limit = Math.max(1, Math.min(100, parseInt(request.params && request.params.limit, 10) || 50));
+    var query = new Parse.Query("AethrionProjectAudit");
+    query.doesNotExist("privacy_scrubbed");
+    query.ascending("createdAt");
+    query.limit(limit);
+    var events = await query.find({ useMasterKey: true });
+    for (var i = 0; i < events.length; i++) {
+        var event = events[i];
+        var actorId = event.get("actor_id");
+        if (actorId) event.set("actor_id", crypto.createHash("sha256").update(String(actorId)).digest("hex").slice(0, 24));
+        var targetId = event.get("target_id");
+        if (targetId) event.set("target_id", crypto.createHash("sha256").update(String(targetId)).digest("hex").slice(0, 24));
+        event.unset("actor_email");
+        event.unset("actor_name");
+        event.set("target_label", "İşlem hedefi");
+        event.set("privacy_scrubbed", true);
+        await event.save(null, { useMasterKey: true });
+    }
+    return { success: true, processed: events.length, more: events.length === limit, message: "Kişisel alanlar temizlendi; more=true ise işlemi tekrar çalıştır." };
+});
+
+Parse.Cloud.define("aethrionGetApiUsage", async function (request) {
+    var apiKey = (request.headers && (request.headers["x-v27-api-key"] || request.headers["X-V27-Api-Key"])) || (request.params && request.params.apiKey);
+    if (!apiKey || String(apiKey).length > 512) throw new Error("API anahtarı gerekli.");
+    var hash = crypto.createHash("sha256").update(String(apiKey)).digest("hex");
+    var query = new Parse.Query(V27ApiKey);
+    query.equalTo("key_hash", hash);
+    query.equalTo("is_active", true);
+    var record = await query.first({ useMasterKey: true });
+    if (!record) throw new Error("API anahtarı geçersiz veya iptal edilmiş.");
+    var expiresAt = record.get("expires_at");
+    if (expiresAt && new Date(expiresAt).getTime() < Date.now()) throw new Error("API anahtarının süresi dolmuş.");
+    var scopes = Array.isArray(record.get("allowed_scopes")) && record.get("allowed_scopes").length ? record.get("allowed_scopes") : ["chat"];
+    if (scopes.indexOf("usage:read") === -1) throw new Error("Bu API anahtarında usage:read izni yok.");
+    return {
+        success: true,
+        keyName: _aeSafeAuditText(record.get("key_name") || "", 50),
+        usageCount: Number(record.get("usage_count") || 0),
+        lastUsedAt: record.get("last_used_at") || null,
+        expiresAt: expiresAt || null,
+        scopes: scopes
+    };
+});
+
+async function _aeWriteTeamAudit(user, teamId, action, targetId, targetLabel) {
+    try {
+        var event = new AethrionProjectAudit();
+        event.set("team_id", _aeSafeAuditText(teamId, 128));
+        event.set("actor_id", crypto.createHash("sha256").update(String(user.id)).digest("hex").slice(0, 24));
+        event.set("actor_role", _aeRole(user));
+        event.set("action", _aeSafeAuditText(action, 48));
+        event.set("target_id", targetId ? crypto.createHash("sha256").update(String(targetId)).digest("hex").slice(0, 24) : "");
+        event.set("target_label", _aeSafeAuditText(targetLabel || "İşlem hedefi", 120));
+        event.set("source", "server-confirmed-operation");
+    event.set("privacy_scrubbed", true);
+        event.set("created_at_server", new Date());
+        await event.save(null, { useMasterKey: true });
+        return true;
+    } catch (e) {
+        console.error("AETHRION denetim kaydı yazılamadı; kişisel veri veya hata ayrıntısı kaydedilmedi.");
+        return false;
+    }
+}
