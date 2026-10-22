@@ -170,12 +170,30 @@ if (typeof globalThis.fetch === 'undefined') {
 // Never put the key in source code or client-side configuration.
 // ================================================================
 var _aethrionVpnCache = new Map();
+
+// Prefer Parse Server's normalized client IP. Fall back to proxy headers only
+// when request.ip is unavailable; never accept an IP from request.params.
+function _aethrionGetClientIp(request) {
+    if (!request) return '';
+    var direct = String(request.ip || '').trim();
+    if (direct) return direct;
+    var headers = request.headers || {};
+    var realIp = String(headers['x-real-ip'] || headers['X-Real-IP'] || '').trim();
+    if (realIp) return realIp;
+    var forwarded = String(headers['x-forwarded-for'] || headers['X-Forwarded-For'] || '').trim();
+    if (forwarded) {
+        var hops = forwarded.split(',').map(function (part) { return part.trim(); }).filter(Boolean);
+        if (hops.length) return hops[hops.length - 1];
+    }
+    return '';
+}
+
 async function _aethrionEnforceVpnPolicy(request) {
     if (request && (request.master === true || request.isMaster === true)) return;
     var apiKey = '';
     try { apiKey = (typeof process !== 'undefined' && process.env && process.env.IPQS_API_KEY) || ''; } catch (e) {}
     if (!apiKey) throw new Error('AETHRION_SECURITY_CONFIGURATION_REQUIRED: IPQS_API_KEY must be configured in Back4App Cloud Code.');
-    var ip = String((request && request.ip) || '').trim();
+    var ip = _aethrionGetClientIp(request);
     if (!ip || ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') {
         throw new Error('AETHRION_SECURITY_IP_UNAVAILABLE: client IP could not be verified; access denied.');
     }
@@ -252,7 +270,7 @@ Parse.Cloud.define("aethrionSecurityCheck", async function (request) {
         return { ok: false, configured: false, blocked: true, code: 'VPN_CHECK_NOT_CONFIGURED' };
     }
 
-    var ip = String((request && request.ip) || '').trim();
+    var ip = _aethrionGetClientIp(request);
     if (!ip || ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') {
         return { ok: false, configured: true, blocked: true, code: 'IP_UNAVAILABLE' };
     }
