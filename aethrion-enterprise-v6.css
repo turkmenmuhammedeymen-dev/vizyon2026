@@ -1,0 +1,104 @@
+/* AETHRION Enterprise Interface v6 — global visual consistency, accessibility and responsive polish */
+:root{
+  --ae-v6-ink:#13243a;--ae-v6-muted:#63758b;--ae-v6-line:#dce5ef;--ae-v6-paper:#fff;
+  --ae-v6-blue:#2359a8;--ae-v6-blue-deep:#173e79;--ae-v6-cyan:#2d9cb3;
+  --ae-v6-shadow:0 18px 50px rgba(24,47,79,.09);--ae-v6-shadow-hover:0 24px 60px rgba(24,47,79,.15);
+}
+html{scroll-behavior:smooth;scroll-padding-top:92px}
+body{color:var(--ae-v6-ink);background:#f5f8fc;letter-spacing:-.008em}
+body:before{opacity:.42!important}
+::selection{background:rgba(35,89,168,.18);color:#102746}
+:focus-visible{outline:3px solid rgba(45,156,179,.6)!important;outline-offset:3px!important}
+a{transition:color .18s ease,opacity .18s ease}
+button,.btn,.btn-primary,.btn-secondary,.nav-link,.modal-tab{transition:transform .18s ease,box-shadow .18s ease,background-color .18s ease,border-color .18s ease,color .18s ease}
+button:disabled,.btn-primary:disabled{cursor:wait!important;opacity:.72}
+button:not(:disabled):active,.btn:not(:disabled):active{transform:translateY(1px)}
+/* Header and primary navigation */
+header,.site-header,.navbar,.top-nav,.main-nav,.nav-container{backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.site-header,.navbar,.top-nav,.main-nav{border-bottom:1px solid rgba(193,207,224,.65)!important;box-shadow:0 8px 30px rgba(20,43,73,.045)!important}
+.nav-link,.navbar a,.main-nav a{font-weight:600;letter-spacing:-.01em}
+.nav-link:hover,.navbar a:hover,.main-nav a:hover{color:var(--ae-v6-blue)!important}
+/* Hero hierarchy: editorial spacing, readable line lengths, restrained motion */
+.hero,.hero-section,.main-hero,.landing-hero{isolation:isolate}
+.hero h1,.hero-section h1,.main-hero h1,.landing-hero h1{max-width:1000px;margin-inline:auto;font-family:Manrope,'DM Sans',system-ui,sans-serif;font-weight:800;letter-spacing:-.055em;line-height:1.04;text-wrap:balance}
+.hero p,.hero-section p,.main-hero p,.landing-hero p{max-width:760px;line-height:1.75;color:#52657d}
+h1,h2,h3,h4{font-family:Manrope,'DM Sans',system-ui,sans-serif;text-wrap:balance}
+h2{letter-spacing:-.035em}
+section{scroll-margin-top:96px}
+.section-title,.section-heading{letter-spacing:-.035em}
+/* Universal surfaces and feature cards */
+.card,.feature-card,.tool-card,.model-card,.pricing-card,.project-card,.community-card,.dashboard-card,.stat-card,.panel-card,.glass-card,.feature-box{
+  border:1px solid rgba(202,215,230,.82)!important;border-radius:20px!important;
+  box-shadow:0 10px 30px rgba(24,47,79,.055)!important;
+  background:rgba(255,255,255,.94)!important;
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease!important;
+}
+.card:hover,.feature-card:hover,.tool-card:hover,.model-card:hover,.pricing-card:hover,.project-card:hover,.community-card:hover,.dashboard-card:hover,.stat-card:hover,.panel-card:hover,.glass-card:hover,.feature-box:hover{
+  border-color:rgba(73,125,189,.48)!important;box-shadow:var(--ae-v6-shadow-hover)!important;transform:translateY(-3px)
+}
+.card p,.feature-card p,.tool-card p,.model-card p{line-height:1.65}
+.badge,.tag,.pill{border-radius:999px}
+hr{border:0;border-top:1px solid var(--ae-v6-line);margin:1.5rem 0}
+/* Forms: coherent height, spacing and clear focus feedback */
+input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select,.form-input,.form-select{
+  min-height:46px;border:1px solid #cbd7e5!important;border-radius:12px!important;
+  background:#fff!important;color:#162a43!important;box-shadow:inset 0 1px 2px rgba(15,36,63,.025);
+  padding:12px 14px;transition:border-color .18s ease,box-shadow .18s ease!important
+}
+textarea{min-height:112px;resize:vertical}
+input::placeholder,textarea::placeholder{color:#8b9aad!important}
+input:focus,textarea:focus,select:focus,.form-input:focus{border-color:#5c8bc6!important;box-shadow:0 0 0 4px rgba(35,89,168,.11)!important;outline:0!important}
+input[type=checkbox],input[type=radio]{accent-color:var(--ae-v6-blue)}
+.btn-primary,button.btn-primary,.primary-button{
+  border:1px solid transparent!important;border-radius:12px!important;
+  background:linear-gradient(135deg,#2d66b4,#214c91)!important;color:#fff!important;
+  font-weight:700!important;box-shadow:0 8px 20px rgba(35,89,168,.2)!important
+}
+.btn-primary:hover,button.btn-primary:hover,.primary-button:hover{background:linear-gradient(135deg,#2559a1,#173e79)!important;box-shadow:0 12px 26px rgba(35,89,168,.26)!important;transform:translateY(-1px)}
+.btn-secondary,button.btn-secondary{border-radius:12px!important;border:1px solid #d3deea!important;background:#fff!important;color:#24466f!important}
+button,.btn-primary,.btn-secondary{min-height:40px}
+.password-toggle-btn{min-width:42px;border-radius:10px!important}
+/* Auth overlay — elevated, focused and usable on small screens */
+#authModal{z-index:10020!important;position:fixed!important;inset:0!important;align-items:center!important;justify-content:center!important;padding:22px!important;overflow-y:auto!important;background:rgba(12,27,47,.58)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+#authModal .modal{width:min(100%,480px)!important;max-height:min(90dvh,860px)!important;overflow:auto!important;margin:auto!important;border:1px solid rgba(255,255,255,.75)!important;border-radius:24px!important;background:rgba(255,255,255,.98)!important;box-shadow:0 35px 100px rgba(4,18,38,.32)!important;color:#172a42!important}
+#authModal .modal-header{padding:24px 26px 16px!important;border-bottom:1px solid #e5ebf3!important}
+#authModal .modal-header h3{font-size:1.35rem!important;font-weight:800!important;letter-spacing:-.035em}
+#authModal .modal-body{padding:22px 26px 26px!important}
+#authModal .modal-tabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px!important;padding:8px 24px!important;background:#f5f8fc!important}
+#authModal .modal-tab{border-radius:10px!important;font-weight:700!important}
+#authModal .modal-tab.active{background:#e4edf9!important;color:#214f91!important;box-shadow:inset 0 0 0 1px #c9d9ed}
+#authModal .form-input{width:100%;margin:6px 0}
+#authModal .btn-google,#authModal .btn-facebook{width:100%;min-height:46px;border-radius:12px!important;margin:4px 0;font-weight:700!important}
+#authModal .modal-close{width:38px;min-width:38px;height:38px;border-radius:10px!important;background:#f0f4f8!important;color:#344960!important}
+#authModal .modal-close:hover{background:#e3ebf4!important}
+/* Dashboard shell and left navigation */
+.dashboard-container{background:#f4f7fb!important;color:var(--ae-v6-ink)}
+.aethrion-sidebar{background:linear-gradient(180deg,#11233c 0%,#162f50 100%)!important;border-right:1px solid rgba(255,255,255,.09)!important;box-shadow:12px 0 40px rgba(10,25,45,.12)!important}
+.aethrion-sidebar a,.aethrion-sidebar button{border-radius:10px}
+.aethrion-sidebar a:hover,.aethrion-sidebar button:hover{background:rgba(255,255,255,.09)!important}
+.aethrion-sidebar-toggle{border-radius:12px!important;box-shadow:0 8px 24px rgba(14,35,62,.2)!important}
+.dashboard-container .section-title,.dashboard-container h2{color:#172c46}
+.dashboard-container .panel,.dashboard-container .content-panel{border-radius:18px}
+/* Notification and loading states */
+.notification{border-radius:14px!important;box-shadow:0 16px 42px rgba(15,34,58,.2)!important;backdrop-filter:blur(12px)}
+.ae-auth-progress{z-index:11000!important}
+.ae-auth-progress-card{border:1px solid rgba(255,255,255,.8)!important;border-radius:26px!important;box-shadow:0 35px 100px rgba(4,18,38,.32)!important}
+.ae-auth-busy{position:relative;pointer-events:none}
+.ae-auth-busy:after{content:'';display:inline-block;width:12px;height:12px;margin-left:9px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:aeV6Spin .7s linear infinite;vertical-align:-1px}
+@keyframes aeV6Spin{to{transform:rotate(360deg)}}
+@keyframes aeV6Rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.hero-section,.hero,.main-hero,.landing-hero{animation:aeV6Rise .55s ease-out both}
+@media(max-width:760px){
+  html{scroll-padding-top:72px}
+  .hero h1,.hero-section h1,.main-hero h1,.landing-hero h1{font-size:clamp(2.2rem,9vw,3.6rem)!important;letter-spacing:-.045em}
+  .hero p,.hero-section p,.main-hero p,.landing-hero p{font-size:1rem;line-height:1.7}
+  .card,.feature-card,.tool-card,.model-card,.pricing-card,.project-card,.community-card,.dashboard-card,.stat-card,.panel-card,.glass-card,.feature-box{border-radius:16px!important}
+  #authModal{padding:12px!important;align-items:flex-end!important}
+  #authModal .modal{width:100%!important;max-height:92dvh!important;border-radius:22px 22px 16px 16px!important}
+  #authModal .modal-header{padding:20px 20px 14px!important}
+  #authModal .modal-body{padding:18px 20px 22px!important}
+  #authModal .modal-tabs{padding:8px 18px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
