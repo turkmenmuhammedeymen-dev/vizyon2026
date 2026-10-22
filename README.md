@@ -3,29 +3,22 @@
 AETHRION is a browser-based AI and productivity ecosystem deployed on Vercel from this GitHub repository.
 
 ## Main areas
-
 - AI workspace and assistant interfaces
 - Model catalogue and API documentation
 - 3D Studio, code editor, video tools and learning resources
 - Community, projects, account and security pages
 - Turkish-first interface with responsive desktop and mobile layouts
 
-## Deployment
+## Deployment layout
+The repository uses the root as the Vercel static site root. There is no `public/` directory. HTML, CSS, JavaScript, SVG, JSON and policy pages live at the root or under `api/`.
 
-The repository is connected to Vercel and uses the repository root as the static site root. There is no `public/` directory; HTML, CSS, JavaScript, SVG, JSON, and policy pages are stored at the repository root or under `api/`.
+## VPN/proxy/Tor protection
+The browser gate calls the Back4App Cloud Code function `aethrionSecurityCheck` using the site's existing Parse SDK. The IPQS key is read only by Back4App server-side Cloud Code through `process.env.IPQS_API_KEY`; it must never be placed in HTML, client JavaScript, Parse Config visible to clients, or source control. The browser sends no IP address; Back4App must use its trusted `request.ip` value. Missing configuration, unavailable IP data, or provider errors fail closed.
 
-Changes pushed to `main` are expected to trigger a Vercel deployment. Always confirm the deployment status in Vercel before testing the live website.
+The legacy Vercel `/api/security-check` route has been removed so the site no longer depends on a separate Vercel IPQS secret for its browser gate. The gate blocks the visible page while the check is pending and stops access if the result is missing, blocked, or invalid. This is a browser access gate, not a substitute for an edge firewall/WAF; direct static assets may be served before client-side JavaScript runs.
 
-## Security configuration
+## Back4App deployment
+Upload `back4app/main.js` as the app's Cloud Code `main.js`, set `IPQS_API_KEY` as a private server-side environment variable, and deploy Cloud Code. Legacy function names are retained, including `vizyonAlChat`, `vizyonAlScreenRead`, `vizyonAlLiveScreenStream`, `vizyonAlFileAnalyze`, `kocChat`, `getKocHistory`, `shareKocConversation`, `createV27ApiKey`, `createVideoClip`, `generate3DWithHF`, `sendFounderMessage` and `smartTranslate`.
 
-The API route `api/security-check.js` uses IPQualityScore for VPN/proxy/Tor reputation checks. Configure the secret `IPQS_API_KEY` in Vercel Project Settings → Environment Variables, then redeploy. Never commit the key to this repository.
-
-Read [VPN-BLOCKING-SETUP.md](./VPN-BLOCKING-SETUP.md) for the current gate behavior and the distinction between browser-side blocking and true edge/firewall enforcement.
-
-## Workspace maintenance
-
-The authenticated workspace is consolidated around `aethrion-workspace-v5.js` and `aethrion-workspace-v6.js`, with corresponding CSS. The v6 layer owns the logged-in workspace shell; legacy feature drawers must not override it. Preserve legacy IDs and cloud-function names when changing integration code.
-
-## Important
-
-A successful GitHub commit confirms source changes only. It does not prove that Vercel has deployed the latest commit or that third-party AI, authentication, microphone, Back4App, and API services work end-to-end. Test those flows against the deployed environment.
+## Validation
+GitHub Actions runs JavaScript syntax checks on the Cloud Code and browser security guard. Passing syntax checks do not replace live tests of login, AI providers, file analysis, rate limits, and VPN/proxy detection.
