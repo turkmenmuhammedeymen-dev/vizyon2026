@@ -10132,3 +10132,142 @@ console.log('    → webSearch + sendEmail (Google + Resend)');
 console.log('    → Vizyon Al: 4 mod (normal/deep/agent/developer)');
 console.log('    → vizyonAlScreenRead + vizyonAlLiveScreenStream');
 console.log('    → vizyonAlFileAnalyze + vizyonAlFileCreate');
+
+// ================================================================
+// AETHRION AUDIT TRAIL + STATUS DIAGNOSTICS (2026-10-22)
+// Secrets are never returned; event fields are strictly allowlisted.
+// ================================================================
+var AethrionProjectAudit = Parse.Object.extend("AethrionProjectAudit");
+
+function _aeSafeAuditText(value, maxLength) {
+    return String(value == null ? "" : value).replace(/[\\x00-\\x1f\\x7f]/g, " ").trim().slice(0, maxLength);
+}
+function _aeRole(user) {
+    return String(user && user.get ? user.get("role") || "user" : "user").toLowerCase();
+}
+function _aeIsPrivileged(user) {
+    var role = _aeRole(user);
+    return role === "founder" || role === "admin";
+}
+async function _aeRequireTeamAccess(user, teamId) {
+    if (!user) throw new Error("Giriş yapmalısınız.");
+    teamId = _aeSafeAuditText(teamId, 128);
+    if (!teamId) throw new Error("Takım kimliği gerekli.");
+    var team = await new Parse.Query("Team").get(teamId, { useMasterKey: true });
+    if (!team) throw new Error("Takım bulunamadı.");
+    var email = String(user.get("email") || "").toLowerCase();
+    var role = _aeRole(user);
+    if (role === "founder" || role === "admin" || String(team.get("owner_email") || "").toLowerCase() === email || String(team.get("manager_email") || "").toLowerCase() === email) {
+        return team;
+    }
+    var memberQuery = new Parse.Query("TeamMember");
+    memberQuery.equalTo("team_id", teamId);
+    memberQuery.equalTo("user_email", user.get("email"));
+    var member = await memberQuery.first({ useMasterKey: true });
+    if (!member && String(user.get("teamId") || "") !== teamId) throw new Error("Bu takımın denetim kayıtlarına erişim yetkiniz yok.");
+    return team;
+}
+
+Parse.Cloud.define("aethrionRecordProjectAudit", async function (request) {
+    var user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız.");
+    var params = request.params || {};
+    var teamId = _aeSafeAuditText(params.teamId, 128);
+    await _aeRequireTeamAccess(user, teamId);
+    var action = _aeSafeAuditText(params.action, 48);
+    var allowed = ["project_created", "project_updated", "project_deleted", "project_shared", "project_unshared", "member_added", "member_removed", "role_changed", "file_uploaded", "file_removed", "comment_added", "settings_changed", "export_requested"];
+    if (allowed.indexOf(action) === -1) throw new Error("İzin verilmeyen denetim eylemi.");
+    var event = new AethrionProjectAudit();
+    event.set("team_id", teamId);
+    event.set("actor_id", user.id);
+    event.set("actor_email", _aeSafeAuditText(user.get("email"), 254));
+    event.set("actor_name", _aeSafeAuditText(user.get("name") || user.get("username") || user.get("email"), 100));
+    event.set("actor_role", _aeRole(user));
+    event.set("action", action);
+    event.set("target_id", _aeSafeAuditText(params.targetId, 128));
+    event.set("target_label", _aeSafeAuditText(params.targetLabel, 120));
+    event.set("source", "authenticated-client-event");
+    event.set("created_at_server", new Date());
+    await event.save(null, { useMasterKey: true });
+    return { success: true, id: event.id, source: "authenticated-client-event", note: "Bu kayıt, kimliği doğrulanmış kullanıcının bildirdiği olayı kaydeder; dış sistemdeki işlemin başarılı olduğunun tek başına kanıtı değildir." };
+});
+
+Parse.Cloud.define("aethrionGetProjectAudit", async function (request) {
+    var user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız.");
+    var params = request.params || {};
+    var teamId = _aeSafeAuditText(params.teamId, 128);
+    await _aeRequireTeamAccess(user, teamId);
+    var limit = Math.max(1, Math.min(100, parseInt(params.limit, 10) || 50));
+    var query = new Parse.Query("AethrionProjectAudit");
+    query.equalTo("team_id", teamId);
+    query.descending("createdAt");
+    query.limit(limit);
+    var events = await query.find({ useMasterKey: true });
+    return {
+        success: true,
+        events: events.map(function (event) {
+            return {
+                id: event.id,
+                actorId: event.get("actor_id") || "",
+                actorEmail: event.get("actor_email") || "",
+                actorName: event.get("actor_name") || "",
+                actorRole: event.get("actor_role") || "user",
+                action: event.get("action") || "",
+                targetId: event.get("target_id") || "",
+                targetLabel: event.get("target_label") || "",
+                source: event.get("source") || "server",
+                createdAt: event.get("created_at_server") || event.get("createdAt") || null
+            };
+        })
+    };
+});
+
+Parse.Cloud.define("aethrionGetDiagnostics", async function (request) {
+    var user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız.");
+    if (!_aeIsPrivileged(user)) throw new Error("Bu panel yalnızca yönetici ve kurucu hesaplarına açıktır.");
+    var checks = [];
+    function add(name, status, detail) { checks.push({ name: name, status: status, detail: detail }); }
+
+    add("Oturum ve yetki", "ok", "Kimliği doğrulanmış yönetici/kurucu oturumu doğrulandı.");
+    try {
+        var userQuery = new Parse.Query(Parse.User);
+        userQuery.equalTo("objectId", user.id);
+        var dbUser = await userQuery.first({ useMasterKey: true });
+        add("Parse veri deposu", dbUser ? "ok" : "warn", dbUser ? "Düşük etkili kullanıcı sorgusu başarılı." : "Kullanıcı kaydı sorgudan dönmedi.");
+    } catch (e) {
+        add("Parse veri deposu", "bad", "Veri deposu sorgusu başarısız. Back4App bağlantısını ve Cloud Code loglarını kontrol edin.");
+    }
+
+    var config = null;
+    try {
+        config = await Parse.Config.get({ useMasterKey: true });
+        add("Parse Config", "ok", "Sunucu yapılandırmasına erişildi; gizli değerler gösterilmiyor.");
+    } catch (e) {
+        add("Parse Config", "bad", "Sunucu yapılandırması okunamadı. Back4App Config ve izinleri kontrol edin.");
+    }
+
+    function configured(name) {
+        try { if (typeof process !== "undefined" && process.env && process.env[name]) return true; } catch (e) {}
+        try { return !!(config && config.get && config.get(name)); } catch (e) { return false; }
+    }
+    var providers = [
+        { name: "IPQS_API_KEY", label: "IPQS güvenlik kontrolü" },
+        { name: "OPENAI_API_KEY", label: "OpenAI sağlayıcı yapılandırması" },
+        { name: "NVIDIA_API_KEY", label: "NVIDIA sağlayıcı yapılandırması" },
+        { name: "DEEPSEEK_API_KEY", label: "DeepSeek sağlayıcı yapılandırması" },
+        { name: "GROQ_API_KEY", label: "Groq sağlayıcı yapılandırması" },
+        { name: "OLLAMA_BASE_URL", label: "Ollama uç nokta yapılandırması" },
+        { name: "VERCEL_READONLY_TOKEN", label: "Vercel salt okunur durum API erişimi" }
+    ];
+    providers.forEach(function (provider) {
+        var yes = configured(provider.name);
+        var isVercel = provider.name === "VERCEL_READONLY_TOKEN";
+        add(provider.label, yes ? "ok" : "warn", yes
+            ? (isVercel ? "Durum sorgusu için erişim yapılandırılmış; canlı dağıtım sonucu ayrıca sorgulanmalıdır." : "Yapılandırma anahtarı mevcut. Gerçek model/API bağlantısı bu testte çağrılmadı.")
+            : (isVercel ? "Dağıtım API bilgisi yapılandırılmamış; Vercel durumu buradan doğrulanamıyor." : "Yapılandırma bulunamadı veya bu ortamda görünür değil; anahtar değeri hiçbir zaman döndürülmez."));
+    });
+    add("Cloud Code", "ok", "Bu tanılama işlevinin yanıt vermesi, mevcut Cloud Code çağrısının çalıştığını doğrular.");
+    return { success: true, generatedAt: new Date().toISOString(), checks: checks };
+});
