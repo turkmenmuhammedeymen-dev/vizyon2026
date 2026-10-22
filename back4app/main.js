@@ -4537,6 +4537,7 @@ Parse.Cloud.define("sendTeamMessage", async function (request) {
         }
     }
 
+    await _aeWriteTeamAudit(user, teamId, 'comment_added', '', fileUrl ? 'Takım dosyası/mesajı' : 'Takım mesajı');
     return { success: true };
 });
 
@@ -4579,6 +4580,7 @@ Parse.Cloud.define("deleteTeamMessage", async function (request) {
     if (isVizyonFounder && !isMyMessage) msg.set('deleted_by_founder', true);
     await msg.save(null, { useMasterKey: true });
 
+    await _aeWriteTeamAudit(user, teamId, 'comment_deleted', msgId, 'Takım mesajı');
     return { success: true, message: 'Mesaj silindi.' };
 });
 
@@ -4611,6 +4613,7 @@ Parse.Cloud.define("editTeamMessage", async function (request) {
     msg.set('edited_at', new Date());
     await msg.save(null, { useMasterKey: true });
 
+    await _aeWriteTeamAudit(user, teamIdForEdit, 'comment_updated', msgId, 'Takım mesajı');
     return { success: true, message: 'Mesaj düzenlendi.' };
 });
 
@@ -4668,6 +4671,7 @@ Parse.Cloud.define("inviteToTeam", async function (request) {
     inbox.set("status", "pending");
     inbox.set("message", user.get('name') + ' sizi "' + team.get('name') + '" takımına davet etti!');
     await inbox.save(null, { useMasterKey: true });
+    await _aeWriteTeamAudit(user, teamId, 'team_invite_sent', '', 'Takım daveti');
     return { success: true };
 });
 
@@ -4856,6 +4860,7 @@ Parse.Cloud.define("removeFromTeam", async function (request) {
         targetUser.set('teamId', null);
         await targetUser.save(null, { useMasterKey: true });
     }
+    await _aeWriteTeamAudit(user, teamId, 'member_removed', '', 'Takım üyesi kaldırıldı');
     return { success: true, message: targetEmail + ' takımdan atıldı!' };
 });
 
@@ -6241,6 +6246,7 @@ Parse.Cloud.define("completeTeamTask", async function (request) {
     var points = task.get('points') || 0;
     await addPointsWithBonus(user, points, 'Takım görevi');
     await user.save(null, { useMasterKey: true });
+    await _aeWriteTeamAudit(user, taskTeamId, 'task_completed', taskId, 'Takım görevi tamamlandı');
     return { success: true, remaining_points: user.get('points'), message: 'Görev tamamlandı! +' + points + ' puan' };
 });
 
@@ -10284,7 +10290,7 @@ Parse.Cloud.define("aethrionRecordProjectAudit", async function (request) {
     var teamId = _aeSafeAuditText(params.teamId, 128);
     await _aeRequireTeamAccess(user, teamId);
     var action = _aeSafeAuditText(params.action, 48);
-    var allowed = ["project_created", "project_updated", "project_deleted", "project_shared", "project_unshared", "member_added", "member_removed", "role_changed", "file_uploaded", "file_removed", "comment_added", "settings_changed", "export_requested"];
+    var allowed = ["project_created", "project_updated", "project_deleted", "project_shared", "project_unshared", "member_added", "member_removed", "role_changed", "file_uploaded", "file_removed", "comment_added", "comment_updated", "comment_deleted", "team_invite_sent", "task_completed", "settings_changed", "export_requested"];
     if (allowed.indexOf(action) === -1) throw new Error("İzin verilmeyen denetim eylemi.");
     var event = new AethrionProjectAudit();
     event.set("team_id", teamId);
@@ -10543,3 +10549,22 @@ Parse.Cloud.define("aethrionGetApiUsage", async function (request) {
         scopes: scopes
     };
 });
+
+async function _aeWriteTeamAudit(user, teamId, action, targetId, targetLabel) {
+    try {
+        var event = new AethrionProjectAudit();
+        event.set("team_id", _aeSafeAuditText(teamId, 128));
+        event.set("actor_id", crypto.createHash("sha256").update(String(user.id)).digest("hex").slice(0, 24));
+        event.set("actor_role", _aeRole(user));
+        event.set("action", _aeSafeAuditText(action, 48));
+        event.set("target_id", _aeSafeAuditText(targetId || "", 128));
+        event.set("target_label", _aeSafeAuditText(targetLabel || "", 120));
+        event.set("source", "server-confirmed-operation");
+        event.set("created_at_server", new Date());
+        await event.save(null, { useMasterKey: true });
+        return true;
+    } catch (e) {
+        console.error("AETHRION denetim kaydı yazılamadı; kişisel veri veya hata ayrıntısı kaydedilmedi.");
+        return false;
+    }
+}
