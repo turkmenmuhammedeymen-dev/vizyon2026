@@ -20496,9 +20496,10 @@ header,nav,.navbar,.top-nav,.site-header{backdrop-filter:blur(18px);-webkit-back
 @keyframes ae-rise-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion:no-preference){main h1,main .hero h1,.hero-section h1{animation:ae-rise-in .65s ease-out both}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}@media(max-width:640px){:root{--ae-radius:17px}body:before{background-size:30px 30px}h1{letter-spacing:-.025em}}
 </style>
-<link rel="stylesheet" href="/aethrion-experience.css?v=20261022-authfix3">
+<link rel="stylesheet" href="/aethrion-experience.css?v=20261022-enterprise6">
 <link rel="stylesheet" href="/aethrion-corporate-v4.css?v=20261022-v7">
 <link rel="stylesheet" href="/aethrion-workspace-v5.css?v=20261022-v5">
+<link rel="stylesheet" href="/aethrion-enterprise-v6.css?v=20261022-enterprise6">
 </head>
 <body>
 
@@ -22830,7 +22831,74 @@ def root():
 <!-- + Tüm ID/class'lar korundu                                   -->
 <!-- ============================================================ -->
 
-<div id="dashboardArea" class="dashboard-container" style="display:none;">
+<div id="authModal" class="modal-overlay" onclick="if(event.target===this) window.closeModal('authModal')">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Hesap Oluştur</h3>
+            <button class="modal-close" onclick="window.closeModal('authModal')">×</button>
+        </div>
+        <div class="modal-tabs">
+            <button class="modal-tab" onclick="window.switchTab('login')">Giriş</button>
+            <button class="modal-tab active" onclick="window.switchTab('register')">Kayıt</button>
+            <button class="modal-tab" onclick="window.switchTab('verify')">Doğrula</button>
+        </div>
+        <div class="modal-body">
+            <button class="btn-google" onclick="window.requireSocialTerms('google')"><i class="fab fa-google"></i> Google ile Giriş Yap</button>
+            <button class="btn-facebook" onclick="window.requireSocialTerms('facebook')"><i class="fab fa-facebook"></i> Facebook ile Giriş Yap</button>
+            <div style="text-align:center;margin:8px 0 16px;color:var(--text3);font-size:12px;">veya</div>
+            <div id="formRegister">
+                <input id="rName" placeholder="Ad Soyad" class="form-input">
+                <input id="rEmail" placeholder="E-posta" class="form-input">
+                <input id="rUsername" placeholder="Kullanıcı Adı" class="form-input">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <input id="rPass" type="password" placeholder="Şifre (8+)" class="form-input" style="flex:1;">
+                    <button type="button" class="password-toggle-btn" onclick="window.togglePassword('rPass', this)"><i class="fas fa-eye"></i></button>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <input id="rPass2" type="password" placeholder="Şifre Tekrar" class="form-input" style="flex:1;">
+                    <button type="button" class="password-toggle-btn" onclick="window.togglePassword('rPass2', this)"><i class="fas fa-eye"></i></button>
+                </div>
+                <input id="rReferralCode" placeholder="Davet Kodu (varsa)" class="form-input">
+                <label style="display:flex;align-items:flex-start;gap:10px;margin:12px 0;cursor:pointer;">
+                    <input type="checkbox" id="registerTermsCheck" style="width:18px;height:18px;accent-color:var(--accent);">
+                    <span style="font-size:12px;color:var(--text2);"><a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank" style="color:var(--accent);">Kullanıcı Sözleşmesi</a>'ni kabul ediyorum.</span>
+                </label>
+                <label style="display:flex;align-items:flex-start;gap:10px;margin:12px 0;cursor:pointer;">
+                    <input type="checkbox" id="registerPrivacyCheck" style="width:18px;height:18px;accent-color:var(--accent);">
+                    <span style="font-size:12px;color:var(--text2);"><a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank" style="color:var(--accent);">Gizlilik Politikası</a>'nı kabul ediyorum.</span>
+                </label>
+                <button class="btn-primary" onclick="window.handleRegister()" style="width:100%;">Kayıt Ol</button>
+            </div>
+            <div id="formLogin" style="display:none;">
+                <input id="lEmail" placeholder="E-posta" class="form-input">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <input id="lPass" type="password" placeholder="Şifre" class="form-input" style="flex:1;" onkeypress="if(event.key==='Enter') window.handleLogin()">
+                    <button type="button" class="password-toggle-btn" onclick="window.togglePassword('lPass', this)"><i class="fas fa-eye"></i></button>
+                </div>
+                <label style="display:flex;align-items:flex-start;gap:10px;margin:12px 0;cursor:pointer;">
+                    <input type="checkbox" id="loginTermsCheck" style="width:18px;height:18px;accent-color:var(--accent);">
+                    <span style="font-size:12px;color:var(--text2);"><a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank" style="color:var(--accent);">Kullanıcı Sözleşmesi</a>'ni kabul ediyorum.</span>
+                </label>
+                <label style="display:flex;align-items:flex-start;gap:10px;margin:12px 0;cursor:pointer;">
+                    <input type="checkbox" id="loginPrivacyCheck" style="width:18px;height:18px;accent-color:var(--accent);">
+                    <span style="font-size:12px;color:var(--text2);"><a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank" style="color:var(--accent);">Gizlilik Politikası</a>'nı kabul ediyorum.</span>
+                </label>
+                <button class="btn-primary" onclick="window.handleLogin()" style="width:100%;">Giriş Yap</button>
+                <div style="text-align:center;margin-top:14px;">
+                    <a href="javascript:void(0)" onclick="window.openResetPasswordModal()" style="color:var(--accent);font-size:13px;">Şifremi unuttum</a>
+                </div>
+                <div style="text-align:center;margin-top:10px;">
+                    <a href="javascript:void(0)" onclick="window.closeModal('authModal');window.openRecoveryLoginModal()" style="color:var(--accent2);font-size:12px;">📧 Kurtarma maili ile giriş yap</a>
+                </div>
+            </div>
+            <div id="formVerify" style="display:none;">
+                <input id="verifyEmail" placeholder="E-posta" class="form-input">
+                <input id="verifyCode" placeholder="Doğrulama Kodu" class="form-input">
+                <button class="btn-primary" onclick="window.verifyAccount()" style="width:100%;">Doğrula</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div id="dashboardArea" class="dashboard-container" style="display:none;">
 
@@ -23121,9 +23189,6 @@ def root():
     <!-- ============================================================ -->
     <!-- ===== DASHBOARD HEADER ==================================== -->
     <!-- ============================================================ -->
-    <div class="dashboard-header">
-        ...
-
     <!-- ============================================================ -->
     <!-- ===== DASHBOARD HEADER ==================================== -->
     <!-- ============================================================ -->
@@ -24293,74 +24358,7 @@ def root():
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- [v1.0.0 FIX] AUTH MODAL — Giriş/Kayıt/Doğrulama           -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<div id="authModal" class="modal-overlay" onclick="if(event.target===this) window.closeModal('authModal')">
-    <div class="modal">
-        <div class="modal-header">
-            <h3>Hesap Oluştur</h3>
-            <button class="modal-close" onclick="window.closeModal('authModal')">×</button>
-        </div>
-        <div class="modal-tabs">
-            <button class="modal-tab" onclick="window.switchTab('login')">Giriş</button>
-            <button class="modal-tab active" onclick="window.switchTab('register')">Kayıt</button>
-            <button class="modal-tab" onclick="window.switchTab('verify')">Doğrula</button>
-        </div>
-        <div class="modal-body">
-            <button class="btn-google" onclick="window.requireSocialTerms('google')"><i class="fab fa-google"></i> Google ile Giriş Yap</button>
-            <button class="btn-facebook" onclick="window.requireSocialTerms('facebook')"><i class="fab fa-facebook"></i> Facebook ile Giriş Yap</button>
-            <div style="text-align:center;margin:8px 0 16px;color:var(--text3);font-size:12px;">veya</div>
-            <div id="formRegister">
-                <input id="rName" placeholder="Ad Soyad" class="form-input">
-                <input id="rEmail" placeholder="E-posta" class="form-input">
-                <input id="rUsername" placeholder="Kullanıcı Adı" class="form-input">
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <input id="rPass" type="password" placeholder="Şifre (8+)" class="form-input" style="flex:1;">
-                    <button type="button" class="password-toggle-btn" onclick="window.togglePassword('rPass', this)"><i class="fas fa-eye"></i></button>
-                </div>
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <input id="rPass2" type="password" placeholder="Şifre Tekrar" class="form-input" style="flex:1;">
-                    <button type="button" class="password-toggle-btn" onclick="window.togglePassword('rPass2', this)"><i class="fas fa-eye"></i></button>
-                </div>
-                <input id="rReferralCode" placeholder="Davet Kodu (varsa)" class="form-input">
-                <label style="display:flex;align-items:flex-start;gap:10px;margin:12px 0;cursor:pointer;">
-                    <input type="checkbox" id="registerTermsCheck" style="width:18px;height:18px;accent-color:var(--accent);">
-                    <span style="font-size:12px;color:var(--text2);"><a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank" style="color:var(--accent);">Kullanıcı Sözleşmesi</a>'ni kabul ediyorum.</span>
-                </label>
-                <label style="display:flex;align-items:flex-start;gap:10px;margin:12px 0;cursor:pointer;">
-                    <input type="checkbox" id="registerPrivacyCheck" style="width:18px;height:18px;accent-color:var(--accent);">
-                    <span style="font-size:12px;color:var(--text2);"><a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank" style="color:var(--accent);">Gizlilik Politikası</a>'nı kabul ediyorum.</span>
-                </label>
-                <button class="btn-primary" onclick="window.handleRegister()" style="width:100%;">Kayıt Ol</button>
-            </div>
-            <div id="formLogin" style="display:none;">
-                <input id="lEmail" placeholder="E-posta" class="form-input">
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <input id="lPass" type="password" placeholder="Şifre" class="form-input" style="flex:1;" onkeypress="if(event.key==='Enter') window.handleLogin()">
-                    <button type="button" class="password-toggle-btn" onclick="window.togglePassword('lPass', this)"><i class="fas fa-eye"></i></button>
-                </div>
-                <label style="display:flex;align-items:flex-start;gap:10px;margin:12px 0;cursor:pointer;">
-                    <input type="checkbox" id="loginTermsCheck" style="width:18px;height:18px;accent-color:var(--accent);">
-                    <span style="font-size:12px;color:var(--text2);"><a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank" style="color:var(--accent);">Kullanıcı Sözleşmesi</a>'ni kabul ediyorum.</span>
-                </label>
-                <label style="display:flex;align-items:flex-start;gap:10px;margin:12px 0;cursor:pointer;">
-                    <input type="checkbox" id="loginPrivacyCheck" style="width:18px;height:18px;accent-color:var(--accent);">
-                    <span style="font-size:12px;color:var(--text2);"><a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank" style="color:var(--accent);">Gizlilik Politikası</a>'nı kabul ediyorum.</span>
-                </label>
-                <button class="btn-primary" onclick="window.handleLogin()" style="width:100%;">Giriş Yap</button>
-                <div style="text-align:center;margin-top:14px;">
-                    <a href="javascript:void(0)" onclick="window.openResetPasswordModal()" style="color:var(--accent);font-size:13px;">Şifremi unuttum</a>
-                </div>
-                <div style="text-align:center;margin-top:10px;">
-                    <a href="javascript:void(0)" onclick="window.closeModal('authModal');window.openRecoveryLoginModal()" style="color:var(--accent2);font-size:12px;">📧 Kurtarma maili ile giriş yap</a>
-                </div>
-            </div>
-            <div id="formVerify" style="display:none;">
-                <input id="verifyEmail" placeholder="E-posta" class="form-input">
-                <input id="verifyCode" placeholder="Doğrulama Kodu" class="form-input">
-                <button class="btn-primary" onclick="window.verifyAccount()" style="width:100%;">Doğrula</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 </div> <!-- dashboardArea sonu -->
 <!-- ===== HTML-2 SONU — dashboardArea kapandı ===== -->
@@ -48283,6 +48281,7 @@ body {
 })();
 </script>
 
+<script>
 // ================================================================
 // [AETHRION v1.0.0 FIX] EKSİK ROL PANELLERİNİ DİNAMİK OLUŞTUR
 // Bu script HTML'de olmayan admin/founder/moderator/beta panellerini
@@ -48471,6 +48470,7 @@ body {
 })();
 </script>
 
+<script>
 // ═══════════════════════════════════════════════════════════════
 // [AETHRION SAFETY NET] Otomatik Acil Temizlik
 // Sayfa 3 saniye içinde açılmazsa veya bir modal takılırsa
@@ -51854,25 +51854,17 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
     // C7 + M7: Statik #aethrionSidebar ve toggle'ını gizle
     // ═══════════════════════════════════════════════════════════
     function hideStaticSidebar() {
-        const staticIds = [
-            'aethrionSidebar',
-            'aethrionSidebarToggle',
-            'aethrionSidebarBackdrop'
-        ];
-        staticIds.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                el.style.display = 'none';
-                el.style.visibility = 'hidden';
-                el.style.pointerEvents = 'none';
-                el.setAttribute('data-aethrion-hidden', '1');
-            }
+        // Keep the actual dashboard navigation available; only duplicate nodes are removed earlier.
+        ['aethrionSidebar', 'aethrionSidebarToggle', 'aethrionSidebarBackdrop'].forEach(function(id) {
+            var nodes = document.querySelectorAll('[id="' + id + '"]');
+            if (!nodes.length) return;
+            var el = nodes[nodes.length - 1];
+            el.style.removeProperty('display');
+            el.style.visibility = 'visible';
+            el.style.pointerEvents = 'auto';
+            el.removeAttribute('data-aethrion-hidden');
         });
-        // Statik toggle'a tıklama engeli
-        document.querySelectorAll('.aethrion-sidebar-toggle').forEach(el => {
-            el.style.display = 'none';
-        });
-        console.log('✅ [AETHRION Fix] Statik sidebar gizlendi (dinamik panel aktif)');
+        console.log('✅ [AETHRION Fix] Dashboard sidebar korundu ve erişilebilir bırakıldı');
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -52106,10 +52098,7 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 
     function runCleanup() {
         // 1. Statik Sidebar'ı DOM'dan tamamen sil
-        ['aethrionSidebar', 'aethrionSidebarToggle', 'aethrionSidebarBackdrop'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.remove();
-        });
+        /* Preserve the single dashboard sidebar; duplicate nodes are normalized by aethrionDomIntegrityV6. */
 
         // 2. Çift Özellikler Butonunu temizle (Sadece 1 tane kalsın)
         const triggers = document.querySelectorAll('#aethrionFeaturesTrigger');
@@ -52158,9 +52147,23 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 })();
 </script>
 
-<script defer src="/aethrion-identity.js?v=20261022-authfix3"></script>
+
+<script id="aethrionDomIntegrityV6">
+(function(){
+ 'use strict';
+ function keepOne(id,keepLast){var nodes=Array.prototype.slice.call(document.querySelectorAll('[id="'+id+'"]'));if(nodes.length<2)return;var keep=keepLast?nodes[nodes.length-1]:nodes[0];nodes.forEach(function(node){if(node!==keep&&node.parentNode)node.parentNode.removeChild(node);});}
+ function repair(){
+  ['particles','customCursor','customCursorRing','notification'].forEach(function(id){keepOne(id,false);});
+  ['aethrionSidebarToggle','aethrionSidebarBackdrop','aethrionSidebar','aethrionResponsibilityModal','moderatorListContainer'].forEach(function(id){keepOne(id,true);});
+  keepOne('dashboardArea',false);
+  var auth=document.getElementById('authModal');if(auth&&auth.closest('#dashboardArea')){var dashboard=auth.closest('#dashboardArea');dashboard.parentNode.insertBefore(auth,dashboard);}
+ }
+ repair();if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',repair,{once:true});
+})();
+</script>
+<script defer src="/aethrion-identity.js?v=20261022-identity6"></script>
 <script defer src="/aethrion-experience.js?v=20261022-workspace5"></script>
-<script defer src="/aethrion-auth-recovery.js?v=20261022-authfix6"></script>
+<script defer src="/aethrion-auth-recovery.js?v=20261022-authflow6"></script>
 <script defer src="/aethrion-workspace-v5.js?v=20261022-workspace6"></script>
 </body>
 </html>
