@@ -20500,7 +20500,7 @@ header,nav,.navbar,.top-nav,.site-header{backdrop-filter:blur(18px);-webkit-back
 <link rel="stylesheet" href="/aethrion-corporate-v4.css?v=20261022-v7">
 <link rel="stylesheet" href="/aethrion-workspace-v5.css?v=20261022-v5">
 <link rel="stylesheet" href="/aethrion-enterprise-v6.css?v=20261022-enterprise6">
-<link rel="stylesheet" href="/aethrion-workspace-v6.css?v=20261022-workspace8">
+<link rel="stylesheet" href="/aethrion-workspace-v6.css?v=20261022-workspace9">
 
 <!-- AETHRION CORPORATE UI OVERRIDES — accessibility, consistency, responsive layout -->
 <style id="aethrion-corporate-ui-v1">
@@ -20600,6 +20600,33 @@ nav,.navbar { background:rgba(9,16,29,.94)!important; border-bottom:1px solid rg
 }
 </style>
 
+
+<style id="aethrion-overlap-repair-v2">
+/* One navigation system: remove competing feature-search controls. */
+.aews-search,.aed-search,#aewsSearch,#aedSearch{display:none!important;visibility:hidden!important;pointer-events:none!important}
+body.ae-shell-on #aeWorkspaceSidebar{gap:0!important}
+body.ae-shell-on #aeWorkspaceSidebar #aewsNav{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain!important;padding-bottom:18px!important}
+body.ae-shell-on #aeWorkspaceSidebar .aews-footer{position:relative!important;flex:0 0 auto!important;margin-top:auto!important;padding-bottom:max(6px,env(safe-area-inset-bottom))!important}
+body.ae-shell-on #dashboardArea,body.ae-shell-on #dashboardArea *{box-sizing:border-box}
+body.ae-shell-on #dashboardArea .aew-name,body.ae-shell-on #dashboardArea .aew-copy,body.ae-shell-on #dashboardArea .ae-ws-stage-head h2,body.ae-shell-on #dashboardArea .ae-ws-stage-head p{max-width:100%!important;min-width:0!important;overflow-wrap:anywhere!important;word-break:normal!important}
+body.ae-shell-on #aethrionWorkspaceStage{min-width:0!important}
+body.ae-shell-on .ae-ws-stage-frame{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important}
+#mainSite section,#mainSite footer{position:relative;clear:both}
+#mainSite .features-grid,#mainSite .feature-grid,#mainSite .features-container,#mainSite .category-grid,#mainSite .models-grid,#mainSite .pricing-grid,#mainSite .ecosystem-grid,#mainSite .tech-grid{
+ display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr))!important;gap:20px!important;align-items:stretch!important
+}
+#mainSite .feature-card,#mainSite .category-card,#mainSite .model-card,#mainSite .tool-card,#mainSite .price-card,#mainSite .pricing-card,#mainSite .ecosystem-card{
+ position:relative!important;inset:auto!important;min-width:0!important;max-width:100%!important;height:auto!important;overflow-wrap:anywhere!important
+}
+#mainSite .feature-title,#mainSite .category-title,#mainSite .model-mini-name,#mainSite .model-tile-name,#mainSite .feature-desc,#mainSite .category-desc,#mainSite .feature-card p{
+ min-width:0!important;max-width:100%!important;overflow-wrap:anywhere!important;word-break:normal!important
+}
+#mainSite footer{margin-top:clamp(40px,7vw,88px)!important;padding-bottom:max(36px,env(safe-area-inset-bottom))!important;clear:both!important}
+@media(max-width:600px){
+ #mainSite .features-grid,#mainSite .feature-grid,#mainSite .features-container,#mainSite .category-grid,#mainSite .models-grid,#mainSite .pricing-grid,#mainSite .ecosystem-grid,#mainSite .tech-grid{grid-template-columns:minmax(0,1fr)!important;gap:14px!important}
+ #mainSite .feature-card,#mainSite .category-card,#mainSite .model-card,#mainSite .tool-card,#mainSite .price-card,#mainSite .pricing-card,#mainSite .ecosystem-card{width:100%!important}
+}
+</style>
 </head>
 <body>
 
@@ -52270,8 +52297,8 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 <script defer src="/aethrion-identity.js?v=20261022-identity6"></script>
 <script defer src="/aethrion-experience.js?v=20261022-workspace5"></script>
 <script defer src="/aethrion-auth-recovery.js?v=20261022-authflow6"></script>
-<script defer src="/aethrion-workspace-v5.js?v=20261022-workspace7"></script>
-<script defer src="/aethrion-workspace-v6.js?v=20261022-workspace8"></script>
+<script defer src="/aethrion-workspace-v5.js?v=20261022-workspace9"></script>
+<script defer src="/aethrion-workspace-v6.js?v=20261022-workspace9"></script>
 
 <!-- AETHRION runtime guard: ensure dashboard assistant entry point is callable -->
 <script id="aethrion-runtime-guard-v1">
