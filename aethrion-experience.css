@@ -530,3 +530,74 @@ button,input,select,textarea{font:inherit}
 .ae-auth-progress.is-success .ae-auth-progress-status{color:#177453}
 @keyframes aeAuthLogoFill{0%{transform:scaleY(.04)}45%{transform:scaleY(.58)}78%{transform:scaleY(.84)}100%{transform:scaleY(.96)}}
 @media(prefers-reduced-motion:reduce){.ae-auth-progress-mark:after{animation-duration:8s}.ae-auth-progress,.ae-auth-progress-track-fill{transition:none}}
+
+
+/* Enterprise refinement: consistent surfaces, hierarchy and responsive spacing across the public site. */
+:where(.navbar,.top-nav,.main-nav,.site-header,header.site-header){
+ background:rgba(255,255,255,.94)!important;border-bottom:1px solid #e4eaf2!important;
+ box-shadow:0 5px 24px rgba(17,39,68,.035)!important;backdrop-filter:blur(14px)
+}
+:where(#mainSite .hero-copy h1,.api-hero h1,.guide-hero h1,.legal-hero h1){
+ color:#122b49!important;font-size:clamp(2.25rem,5vw,4.5rem)!important;line-height:1.08!important;
+ letter-spacing:-.045em!important;font-weight:780!important;max-width:17ch
+}
+:where(#mainSite .hero-copy p,.api-hero p,.guide-hero p,.legal-hero p){
+ color:#566b83!important;font-size:clamp(1rem,1.3vw,1.12rem)!important;line-height:1.8!important;max-width:68ch
+}
+:where(#mainSite .section-header,.section-header,.api-section-header,.guide-section-header){
+ margin-bottom:clamp(22px,3vw,38px)!important
+}
+:where(#mainSite .section-header h2,.section-header h2,.api-section-header h2,.guide-section-header h2){
+ color:#17314f!important;letter-spacing:-.025em!important;line-height:1.2!important;font-weight:760!important
+}
+:where(#mainSite .feature-card,#mainSite .category-card,#mainSite .model-mini-card,#mainSite .model-tile,#mainSite .price-card,.policy-card,.api-card,.guide-card){
+ background:linear-gradient(180deg,#fff 0%,#fbfdff 100%)!important;border:1px solid #e1e9f2!important;
+ box-shadow:0 8px 26px rgba(20,46,78,.055)!important;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease!important
+}
+:where(#mainSite .feature-card,#mainSite .category-card,#mainSite .model-mini-card,#mainSite .model-tile,#mainSite .price-card,.api-card,.guide-card):hover{
+ transform:translateY(-3px);border-color:#b9cde3!important;box-shadow:0 16px 36px rgba(20,46,78,.1)!important
+}
+:where(#mainSite .feature-card h3,#mainSite .category-card h3,#mainSite .model-mini-card h3,#mainSite .model-tile h3,.policy-card h2,.api-card h3,.guide-card h3){
+ color:#1b3554!important;letter-spacing:-.012em!important;line-height:1.35!important
+}
+:where(#mainSite .feature-card p,#mainSite .category-card p,#mainSite .model-mini-card p,#mainSite .model-tile p,.policy-card p,.api-card p,.guide-card p){
+ color:#5b6e84!important;line-height:1.7!important
+}
+:where(#mainSite .hero-copy,.api-hero,.guide-hero,.legal-hero){
+ border-radius:24px
+}
+:where(#mainSite a:not(.btn):not(.button),.site-footer a,.footer a){
+ text-underline-offset:3px
+}
+:where(.site-footer,footer,.footer){
+ color:#5c6d82
+}
+:where(.site-footer,.footer) a:hover{color:#214f83}
+:where(#authModal .modal-content,#socialAuthTermsModal .modal-content){
+ border:1px solid #e0e8f1!important;border-radius:20px!important;overflow:hidden;
+ box-shadow:0 28px 90px rgba(10,31,57,.2)!important
+}
+:where(#authModal .modal-header,#socialAuthTermsModal .modal-header){
+ padding:22px 24px!important;border-bottom:1px solid #e8eef5!important
+}
+:where(#authModal .modal-body,#socialAuthTermsModal .modal-body){
+ padding:24px!important
+}
+:where(#authModal label,#socialAuthTermsModal label){
+ color:#243e5c!important;font-weight:650!important;font-size:.92rem!important
+}
+:where(#authModal input,#socialAuthTermsModal input){
+ background:#fbfdff!important;border:1px solid #d7e1ed!important;color:#182f4c!important
+}
+:where(#authModal .btn-primary,#socialAuthTermsModal .btn-primary){
+ box-shadow:0 7px 16px rgba(23,63,114,.16)!important
+}
+:where(.ae-ws-stage,.ae-ws-stage-head,.ae-ws-stage-frame){
+ min-width:0;max-width:100%
+}
+@media(max-width:760px){
+ :where(#mainSite .hero-copy,.api-hero,.guide-hero,.legal-hero){border-radius:16px}
+ :where(#mainSite .feature-card,#mainSite .category-card,#mainSite .model-mini-card,#mainSite .model-tile,#mainSite .price-card,.policy-card,.api-card,.guide-card){box-shadow:0 5px 18px rgba(20,46,78,.05)!important}
+ :where(#authModal .modal-header,#socialAuthTermsModal .modal-header){padding:18px!important}
+ :where(#authModal .modal-body,#socialAuthTermsModal .modal-body){padding:18px!important}
+}
