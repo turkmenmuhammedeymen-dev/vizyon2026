@@ -3758,6 +3758,9 @@ Parse.Cloud.define("verifyFacebookToken", async function (request) {
 Parse.Cloud.define("facebookLogin", async function (request) {
     var accessToken = request.params.accessToken;
     var userID = request.params.userID;
+    if (request.params.termsAccepted !== true || request.params.privacyAccepted !== true) {
+        return { success: false, error: 'Facebook ile devam etmek için Kullanıcı Sözleşmesi ve Gizlilik Politikası onayı gereklidir.' };
+    }
     if (!accessToken || !userID) throw new Error('Access token ve user ID gerekli!');
 
     var _rlk = 'facebookLogin:' + String(userID);
@@ -9784,19 +9787,12 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
     if (email === 'admin.tr.reis') email = founderEmail;
     var user = null;
     var loginName = email;
+    var isFounderLogin = email === founderEmail;
 
     try {
-        if (email === founderEmail) {
+        if (isFounderLogin) {
             var configuredFounderPass = await getAPIKey('FOUNDER_PASS');
-            if (!configuredFounderPass) {
-                console.error('[AETHRION Auth] FOUNDER_PASS is not configured in private Back4App runtime settings.');
-                return { success: false, error: 'Kurucu hesabının sunucu parolası yapılandırılmamış. Back4App Cloud Code ayarlarını kontrol edin.' };
-            }
-            // Only the configured secret can trigger founder-account provisioning/synchronization.
-            if (password !== configuredFounderPass) {
-                return { success: false, error: 'Kurucu e-postası için Back4App yapılandırmasındaki şifre kullanılmalıdır.' };
-            }
-
+            var founderSecretMatches = !!configuredFounderPass && password === configuredFounderPass;
             var founderQuery = new Parse.Query(Parse.User);
             founderQuery.equalTo('username', founderEmail);
             user = await founderQuery.first({ useMasterKey: true });
@@ -9806,11 +9802,21 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
                 user = await founderQuery.first({ useMasterKey: true });
             }
 
-            if (!user) {
-                user = new Parse.User();
-                user.set('username', founderEmail);
+            if (founderSecretMatches) {
+                // The private FOUNDER_PASS may provision/synchronize the designated founder account.
+                if (!user) {
+                    user = new Parse.User();
+                    user.set('username', founderEmail);
+                    user.set('email', founderEmail);
+                    user.set('name', 'Eymen');
+                    user.set('points', 0);
+                    user.set('level', 'Çaylak');
+                    user.set('referral_code', 'A27-EYME-1144');
+                }
+                user.set('username', user.get('username') || founderEmail);
                 user.set('email', founderEmail);
-                user.set('name', 'Eymen');
+                user.set('password', configuredFounderPass);
+                user.set('name', user.get('name') || 'Eymen');
                 user.set('role', 'founder');
                 user.set('plan', 'team');
                 user.set('isVerified', true);
@@ -9818,23 +9824,22 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
                 user.set('profile_completed', true);
                 user.set('terms_accepted', true);
                 user.set('privacy_accepted', true);
-                user.set('terms_accepted_at', new Date());
-                user.set('points', 0);
-                user.set('level', 'Çaylak');
-                user.set('referral_code', 'A27-EYME-1144');
+                if (!user.get('terms_accepted_at')) user.set('terms_accepted_at', new Date());
+                if (!user.get('privacy_accepted_at')) user.set('privacy_accepted_at', new Date());
+                await user.save(null, { useMasterKey: true });
+                loginName = user.get('username') || founderEmail;
+            } else {
+                // Existing founder accounts may still sign in with their current Parse password.
+                // Never reset a password or grant a role until Parse has authenticated it.
+                if (!user) {
+                    if (!configuredFounderPass) {
+                        console.error('[AETHRION Auth] FOUNDER_PASS is missing and the founder account does not exist.');
+                        return { success: false, error: 'Kurucu hesabı henüz oluşturulmamış ve FOUNDER_PASS yapılandırılmamış. Back4App Cloud Code ayarlarını kontrol edin.' };
+                    }
+                    return { success: false, error: 'E-posta veya şifre hatalı.' };
+                }
+                loginName = user.get('username') || founderEmail;
             }
-
-            // Sync only after the caller supplied the exact private configured secret.
-            user.set('username', user.get('username') || founderEmail);
-            user.set('email', founderEmail);
-            user.set('password', configuredFounderPass);
-            user.set('name', user.get('name') || 'Eymen');
-            user.set('role', 'founder');
-            user.set('plan', 'team');
-            user.set('isVerified', true);
-            user.set('profile_completed', true);
-            await user.save(null, { useMasterKey: true });
-            loginName = user.get('username') || founderEmail;
         } else {
             var emailQuery = new Parse.Query(Parse.User);
             emailQuery.equalTo('email', email);
@@ -9860,6 +9865,14 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
         if (!loggedInUser) return { success: false, error: 'Giriş tamamlanamadı. Lütfen tekrar deneyin.' };
         if (loggedInUser.get('isBanned') === true) {
             return { success: false, error: 'Bu hesap devre dışı bırakılmış. Destek ekibiyle iletişime geçin.' };
+        }
+        if (isFounderLogin) {
+            // Elevate only after the designated founder identity has successfully authenticated.
+            loggedInUser.set('role', 'founder');
+            loggedInUser.set('plan', 'team');
+            loggedInUser.set('isVerified', true);
+            loggedInUser.set('profile_completed', true);
+            await loggedInUser.save(null, { useMasterKey: true });
         }
         if (loggedInUser.get('isVerified') !== true) {
             return { success: false, code: 'EMAIL_NOT_VERIFIED', error: 'Hesabınız henüz doğrulanmamış. E-posta doğrulama kodunu girin.' };
