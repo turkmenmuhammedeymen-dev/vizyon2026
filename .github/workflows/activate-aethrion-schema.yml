@@ -1,0 +1,55 @@
+name: Activate AETHRION JSON-LD on the homepage
+on:
+  push:
+    branches: [main]
+    paths:
+      - "aethrion-schema.js"
+      - ".github/workflows/activate-aethrion-schema.yml"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: activate-aethrion-schema
+  cancel-in-progress: false
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - name: Add schema loader to index.html if missing
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const file = 'index.html';
+          let html = fs.readFileSync(file, 'utf8');
+          const loader = '<script src="/aethrion-schema.js" defer></script>';
+          if (!/<script\b[^>]*src=["']\/aethrion-schema\.js(?:\?[^"']*)?["'][^>]*>/i.test(html)) {
+            if (!/<\/head>/i.test(html)) {
+              throw new Error('index.html does not contain a closing </head>; refusing to modify the page.');
+            }
+            html = html.replace(/<\/head>/i, '    ' + loader + '\n</head>');
+            fs.writeFileSync(file, html, 'utf8');
+            console.log('Inserted AETHRION JSON-LD loader into index.html.');
+          } else {
+            console.log('AETHRION JSON-LD loader already exists; no change needed.');
+          }
+          NODE
+      - name: Commit homepage activation
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- index.html; then
+            echo "No homepage change required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Activate AETHRION JSON-LD on homepage"
+          git push origin HEAD:main
