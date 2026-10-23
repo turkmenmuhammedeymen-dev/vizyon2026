@@ -45,6 +45,14 @@
   }
 
   function run() {
+    var initialSDK = window.Parse;
+    var parseScript = document.querySelector('script[src*="parse.min.js"], script[src*="parse@"]');
+    // Static policy/info pages do not initialize Parse. Do not cover them with a 15-second
+    // security overlay when no Cloud Code request can be made from that page.
+    if ((!initialSDK || !initialSDK.Cloud || typeof initialSDK.Cloud.run !== 'function') && !parseScript) {
+      console.info('[AETHRION Security] Static page has no Parse SDK; skipping the overlay and keeping the page available.');
+      return;
+    }
     checkingPage();
     var started = Date.now();
     function attempt() {
