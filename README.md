@@ -3,20 +3,17 @@
 AETHRION is a browser-based AI and productivity ecosystem deployed on Vercel from this GitHub repository.
 
 ## Main areas
-- AI workspace and assistant interfaces
-- Model catalogue and API documentation
+- AETHRION AI conversational assistant and AETHRION JARVIS task-planning mode
+- Browser-supported voice input and speech output where available and permitted
+- AI model catalogue and A27 API documentation
 - 3D Studio, code editor, video tools and learning resources
-- Community, projects, account and security pages
+- Community, projects, team collaboration, account and security pages
 - Turkish-first interface with responsive desktop and mobile layouts
 
 ## SEO structured data
-The refreshed JSON-LD graph is maintained in `aethrion-schema.js` and describes AETHRION as an organization, website and browser-based web application. It includes the documented AI, developer and creative productivity areas, while avoiding claims that planned JARVIS/desktop-control functions are already live.
+The JSON-LD graph is maintained in `aethrion-schema.js`. It describes AETHRION as an organization, website and browser-based web application, and lists the shipped voice-assistant and productivity areas without claiming that desktop control or full autonomous external actions are already live.
 
-**Activation required:** the script must be referenced from the root `index.html` inside its `<head>`:
-```html
-<script src="/aethrion-schema.js" defer></script>
-```
-The GitHub connector returned an empty body for the current large `index.html`, so that file was not overwritten blindly. Until the script tag is added to the live HTML, the new JSON-LD file exists in the repository but will not be emitted on the website.
+The GitHub Actions workflow `.github/workflows/activate-aethrion-schema.yml` adds the loader `<script src="/aethrion-schema.js" defer></script>` to the root `index.html` if it is missing. It makes a separate commit so the GitHub-connected Vercel deployment can publish the homepage change without replacing the large HTML file through an API client.
 
 ## Deployment layout
 The repository uses the root as the Vercel static site root. There is no `public/` directory. HTML, CSS, JavaScript, SVG, JSON and policy pages live at the root or under `api/`.
@@ -34,7 +31,7 @@ GitHub Actions runs JavaScript syntax checks on the Cloud Code and browser secur
 
 ## AETHRION AI and JARVIS
 - AETHRION AI is the standard conversational assistant.
-- AETHRION JARVIS is the separate task-assistant mode with browser-based voice input/output where supported.
-- The current frontend uses the existing `vizyonAlChat` Cloud Code function. Full screen streaming, desktop control, web/tool automation, persistent project memory and advanced agent orchestration require separate backend/provider work; they are not claimed as live in this frontend-only phase.
+- AETHRION JARVIS is a separate task-assistant mode with browser-based voice input/output where supported.
+- The current frontend uses the existing `vizyonAlChat` Cloud Code function. Full screen streaming, desktop control, web/tool automation, persistent project memory and advanced agent orchestration require separate backend/provider work; they are not claimed as live in this frontend phase.
 - The role policy and release checklist are in `docs/ROLE-ACCESS-MATRIX.md` and `docs/RELEASE-AND-REGRESSION-CHECKLIST.md`.
 - See `docs/AETHRION-ECOSYSTEM-JARVIS.md` for the implementation contract.
