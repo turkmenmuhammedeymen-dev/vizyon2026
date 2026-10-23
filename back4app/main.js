@@ -302,29 +302,41 @@ async function _aethrionCheckIpReputation(apiKey, ip) {
 async function _aethrionEnforceVpnPolicy(request) {
     if (request && (request.master === true || request.isMaster === true)) return;
 
-    // Reliability-first behavior: block only when IPQS successfully confirms a
-    // VPN/proxy/Tor flag. A missing secret, unavailable IP, or provider outage
-    // must not disable registration/login and every unrelated Cloud Function.
-    // This is a deliberate degraded mode; keep rate limits and auth checks active.
-    var apiKey = _aethrionGetIPQSApiKey();
-    if (!apiKey) {
-        console.warn('[AETHRION Security] IPQS unavailable: private runtime key is not configured; reputation gate is in degraded mode.');
-        return;
-    }
+    // Reliability-first policy: only a successful, positive VPN/proxy/Tor result
+    // blocks a request. IPQS credit/quota errors, missing keys, missing client IP,
+    // network failures, and unexpected provider exceptions must not take down auth,
+    // verification email delivery, or unrelated Cloud Functions. Rate limits and
+    // each function's own authorization checks remain active in degraded mode.
+    try {
+        var apiKey = _aethrionGetIPQSApiKey();
+        if (!apiKey) {
+            console.warn('[AETHRION Security] IPQS key missing; reputation gate is in degraded mode.');
+            return;
+        }
 
-    var ip = _aethrionGetClientIp(request);
-    if (!ip || ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') {
-        console.warn('[AETHRION Security] IPQS unavailable: client IP could not be resolved; reputation gate is in degraded mode.');
-        return;
-    }
+        var ip = _aethrionGetClientIp(request);
+        if (!ip || ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') {
+            console.warn('[AETHRION Security] Client IP unavailable; reputation gate is in degraded mode.');
+            return;
+        }
 
-    var result = await _aethrionCheckIpReputation(apiKey, ip);
-    if (!result.ok) {
-        console.warn('[AETHRION Security] IPQS provider unavailable (' + String(result.code || 'UNKNOWN') + '); continuing in degraded mode.');
+        var result = await _aethrionCheckIpReputation(apiKey, ip);
+        if (!result || result.ok !== true) {
+            console.warn('[AETHRION Security] IPQS provider unavailable (' + String((result && result.code) || 'UNKNOWN') + '); continuing in degraded mode.');
+            return;
+        }
+
+        if (result.blocked === true) {
+            throw new Error('AETHRION_VPN_PROXY_BLOCKED: VPN, proxy or Tor connections are not permitted.');
+        }
+    } catch (error) {
+        var errorMessage = String((error && error.message) || '');
+        // Preserve an explicit confirmed VPN/proxy/Tor denial; degrade only on
+        // unexpected reputation-provider/runtime failures.
+        if (errorMessage.indexOf('AETHRION_VPN_PROXY_BLOCKED:') === 0) throw error;
+        var errorName = error && error.name ? String(error.name) : 'UnknownError';
+        console.warn('[AETHRION Security] Reputation gate exception; continuing in degraded mode:', errorName);
         return;
-    }
-    if (result.blocked) {
-        throw new Error('AETHRION_VPN_PROXY_BLOCKED: VPN, proxy or Tor connections are not permitted.');
     }
 }
 
