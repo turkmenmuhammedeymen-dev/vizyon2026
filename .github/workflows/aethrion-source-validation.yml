@@ -1,0 +1,76 @@
+name: AETHRION source validation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  syntax-and-auth-wiring:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Check Back4App Cloud Code syntax
+        run: node --check back4app/main.js
+      - name: Check every inline JavaScript block in index.html
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const os = require('os');
+          const path = require('path');
+          const { spawnSync } = require('child_process');
+          const html = fs.readFileSync('index.html', 'utf8');
+          const scriptRe = /<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi;
+          let match;
+          let checked = 0;
+          const errors = [];
+          while ((match = scriptRe.exec(html)) !== null) {
+            const attrs = match[1] || '';
+            const code = match[2] || '';
+            if (/\bsrc\s*=/.test(attrs)) continue;
+            if (/\btype\s*=\s*["']application\/ld\+json["']/i.test(attrs)) continue;
+            if (!code.trim()) continue;
+            checked++;
+            const file = path.join(os.tmpdir(), 'aethrion-inline-' + checked + '.js');
+            fs.writeFileSync(file, code, 'utf8');
+            const result = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
+            if (result.status !== 0) {
+              errors.push('Inline script #' + checked + ' near HTML byte ' + match.index + '\n' +
+                (result.stderr || result.stdout || 'node --check failed'));
+            }
+            fs.rmSync(file, { force: true });
+          }
+          console.log('Checked ' + checked + ' inline JavaScript blocks.');
+          if (errors.length) {
+            console.error(errors.join('\n\n'));
+            process.exit(1);
+          }
+          const required = [
+            'id="rName"', 'id="rEmail"', 'id="rUsername"', 'id="rPass"', 'id="rPass2"',
+            'id="registerTermsCheck"', 'id="registerPrivacyCheck"',
+            'id="lEmail"', 'id="lPass"', 'id="loginTermsCheck"', 'id="loginPrivacyCheck"',
+            'window.__aethrionSafeAuthAction(\'register\', this)',
+            'window.__aethrionSafeAuthAction(\'login\', this)',
+            'window.handleRegister = handleRegister',
+            'window.handleLogin = handleLogin'
+          ];
+          const missing = required.filter(value => !html.includes(value));
+          if (missing.length) {
+            console.error('Missing authentication wiring: ' + missing.join(', '));
+            process.exit(1);
+          }
+          if (html.indexOf('AETHRION auth click guard:') > html.lastIndexOf('</body>')) {
+            console.error('Authentication click guard must be inside the document body.');
+            process.exit(1);
+          }
+          console.log('Authentication form wiring checks passed.');
+          NODE
