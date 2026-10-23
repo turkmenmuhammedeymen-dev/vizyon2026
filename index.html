@@ -51230,10 +51230,14 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
   S.Cloud.run('aethrionSecurityCheck',{}).then(function(result){
    if(finished)return;finished=true;
    if(result&&result.blocked===true&&result.code==='VPN_PROXY_OR_TOR'){blockConfirmed('VPN_PROXY_OR_TOR');return;}
-   // Fail closed when the reputation provider cannot verify the connection; otherwise VPN/proxy users
-   // can bypass the gate whenever IPQS is down or misconfigured.
-   if(!result||result.ok!==true||result.configured!==true||result.blocked===true||result.degraded===true){
+   // Block confirmed VPN/proxy/Tor connections. If IPQS is configured but temporarily
+   // unavailable (for example, exhausted credits), keep the public site available and
+   // show a non-blocking notice. VPN detection remains degraded until the provider recovers.
+   if(!result||result.ok!==true||result.configured!==true||result.blocked===true){
     blockConfirmed(result&&result.code?result.code:'SECURITY_CHECK_DEGRADED');return;
+   }
+   if(result.degraded===true){
+    addNotice(result.warningCode||result.code||'REPUTATION_CHECK_UNAVAILABLE');return;
    }
    removePending();
   }).catch(function(){if(!finished){finished=true;blockConfirmed('CLOUD_FUNCTION_CALL_FAILED');}});
