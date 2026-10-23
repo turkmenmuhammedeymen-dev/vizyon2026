@@ -177,7 +177,7 @@ function _aethrionGetIPQSApiKey() {
     // Do NOT store IPQS_API_KEY in client-readable Parse.Config.
     try {
         if (typeof process !== 'undefined' && process.env) {
-            var names = ['IPQS_API_KEY', 'IPQUALITYSCORE_API_KEY', 'IPQS_KEY'];
+            var names = ['IPQS_API_KEY', 'AETHRION_IPQS_API_KEY', 'IPQUALITYSCORE_API_KEY', 'IPQS_KEY'];
             for (var i = 0; i < names.length; i++) {
                 var value = process.env[names[i]];
                 if (typeof value === 'string' && value.trim()) {
@@ -270,7 +270,7 @@ async function _aethrionCheckIpReputation(apiKey, ip) {
         }
 
         var flags = {
-            vpn: data.vpn === true || data.active_vpn === true,
+            vpn: data.active_vpn === true || (data.vpn === true && data.active_vpn !== false),
             proxy: data.proxy === true,
             tor: data.tor === true || data.active_tor === true
         };
