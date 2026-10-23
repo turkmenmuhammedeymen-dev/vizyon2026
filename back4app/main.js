@@ -2779,13 +2779,13 @@ Parse.Cloud.define("vizyonAlChat", async function (request) {
 
     var systemPrompt = '';
     if (mode === 'deep') {
-        systemPrompt = 'Sen VİZYON AL\'sın ve şu an DERİN DÜŞÜNME MODUNDASIN.\n\nKURALLAR:\n1. Önce çok uzun ve derin düşün.\n2. Düşünme sürecini "DÜŞÜNÜYORUM:" başlığı altında yaz.\n3. Sonra net ve kapsamlı bir cevap ver.\n4. HER ZAMAN TÜRKÇE.\n\nVİZYON2027 Site Bilgisi:\n' + siteContext + '\n\nKullanıcı sorusu:';
+        systemPrompt = 'Sen AETHRION AI\'sın ve şu an DERİN DÜŞÜNME MODUNDASIN.\n\nKURALLAR:\n1. Konuyu dikkatle analiz et.\n2. Kısa gerekçe özetini "GEREKÇE ÖZETİ:" başlığı altında yaz.\n3. Sonra net ve kapsamlı bir cevap ver.\n4. HER ZAMAN TÜRKÇE.\n\nAETHRION Site Bilgisi:\n' + siteContext + '\n\nKullanıcı sorusu:';
     } else if (mode === 'agent') {
-        systemPrompt = 'Sen VİZYON AL\'sın ve şu an AJAN MODUNDASIN.\n\nKURALLAR:\n1. Her siteye girebilir, her işlemi yapabilirsin.\n2. Görevi yapmak için adımları sırala.\n3. HER ZAMAN TÜRKÇE.\n\nVİZYON2027 Site Bilgisi:\n' + siteContext + '\n\nKullanıcı görevi:';
+        systemPrompt = 'Sen AETHRION AI\'sın ve şu an AJAN MODUNDASIN.\n\nKURALLAR:\n1. Yalnızca uygulamada gerçekten mevcut ve izin verilmiş araçları kullan; erişimin olmayan işlemler için erişimin varmış gibi davranma.\n2. Görevi adımlara ayır; dış dünyada yan etki oluşturan işlemlerden önce kullanıcı onayı iste.\n3. HER ZAMAN TÜRKÇE.\n\nAETHRION Site Bilgisi:\n' + siteContext + '\n\nKullanıcı görevi:';
     } else if (mode === 'developer') {
-        systemPrompt = 'Sen VİZYON AL\'sın ve şu an YAZILIMCI MODUNDASIN.\n\nKURALLAR:\n1. En iyi kod üretimini sağla. Her dilde.\n2. Kod bloklarını ```dil ... ``` şeklinde ver.\n3. Çalışan, eksiksiz kod ver.\n4. HER ZAMAN TÜRKÇE.\n\nVİZYON2027 Site Bilgisi:\n' + siteContext + '\n\nKullanıcı kod talebi:';
+        systemPrompt = 'Sen AETHRION AI\'sın ve şu an YAZILIMCI MODUNDASIN.\n\nKURALLAR:\n1. En iyi kod üretimini sağla. Her dilde.\n2. Kod bloklarını ```dil ... ``` şeklinde ver.\n3. Çalışan, eksiksiz kod ver.\n4. HER ZAMAN TÜRKÇE.\n\nAETHRION Site Bilgisi:\n' + siteContext + '\n\nKullanıcı kod talebi:';
     } else {
-        systemPrompt = 'Sen VİZYON AL\'sın (VİZYON2027 AI Asistanı).\n\nKURALLAR:\n1. HER ZAMAN TÜRKÇE.\n2. Doğal, akıcı, samimi.\n3. Kısa, net ve öz ol.\n4. Site hakkında soru sorulursa bilgi verebilirsin.\n\nKullanıcı sorusu:';
+        systemPrompt = 'Sen AETHRION AI\'sın (AETHRION yapay zekâ asistanı).\n\nKURALLAR:\n1. HER ZAMAN TÜRKÇE.\n2. Doğal, akıcı, samimi.\n3. Kısa, net ve öz ol.\n4. Site hakkında soru sorulursa bilgi verebilirsin.\n\nKullanıcı sorusu:';
     }
 
     var fullPrompt = systemPrompt + '\n\n' + message;
@@ -2801,7 +2801,7 @@ Parse.Cloud.define("vizyonAlChat", async function (request) {
         };
     } catch (e) {
         console.error('vizyonAlChat hatası:', e.message);
-        return { success: false, error: 'Vizyon Al cevap veremedi: ' + e.message };
+        return { success: false, error: 'AETHRION AI cevap veremedi: ' + e.message };
     }
 });
 
@@ -4194,13 +4194,13 @@ Parse.Cloud.define("getComments", async function (request) {
         var query = new Parse.Query(Comment);
         query.descending('createdAt');
         query.limit(30);
-        var comments = await query.find({ useMasterKey: true });
+        var comments = await query.find({ useMasterKey: true }); var viewerEmail = request.user ? String(request.user.get('email') || '').trim().toLowerCase() : '';
         return {
             success: true,
             comments: comments.map(function (c) {
                 return {
                     id: c.id,
-                    user_email: c.get('user_email'),
+                    user_email: viewerEmail && String(c.get('user_email') || '').trim().toLowerCase() === viewerEmail ? c.get('user_email') : null,
                     user_name: c.get('user_name'),
                     user_role: c.get('user_role'),
                     comment: c.get('comment'),
@@ -6237,14 +6237,14 @@ Parse.Cloud.define("getProducts", async function (request) {
     var query = new Parse.Query(Product);
     query.equalTo('status', 'approved');
     query.descending('createdAt');
-    var products = await query.find({ useMasterKey: true });
+    var products = await query.find({ useMasterKey: true }); var viewerEmail = request.user ? String(request.user.get('email') || '').trim().toLowerCase() : '';
     return products.map(function (p) {
         return {
             id: p.id,
             title: p.get('title_'),
             price: p.get('price'),
             file: p.get('file'),
-            seller: p.get('user_email') || 'Bilinmiyor',
+            seller: viewerEmail && String(p.get('user_email') || '').trim().toLowerCase() === viewerEmail ? p.get('user_email') : 'Satıcı',
             createdAt: p.get('createdAt')
         };
     });
@@ -7432,7 +7432,7 @@ Parse.Cloud.define("editPoll", async function (request) {
 // ================================================================
 // ========== DUYURU ==============================================
 // ================================================================
-Parse.Cloud.define("getAnnouncements", async function (request) {
+Parse.Cloud.define("getAnnouncements", async function (request) { var viewerEmail = request.user ? String(request.user.get('email') || '').trim().toLowerCase() : '';
     var query = new Parse.Query(Announcement);
     query.descending('createdAt');
     query.limit(10);
@@ -7442,7 +7442,7 @@ Parse.Cloud.define("getAnnouncements", async function (request) {
             id: a.id,
             title: a.get('title_'),
             content: a.get('content'),
-            created_by: a.get('created_by_email'),
+            created_by: viewerEmail && String(a.get('created_by_email') || '').trim().toLowerCase() === viewerEmail ? a.get('created_by_email') : null,
             createdAt: a.get('createdAt')
         };
     });
@@ -8139,14 +8139,14 @@ Parse.Cloud.define("getMarketProjects", async function (request) {
         var query = new Parse.Query(MarketProject);
         query.equalTo("is_active", true);
         query.descending("createdAt");
-        var items = await query.find({ useMasterKey: true });
+        var items = await query.find({ useMasterKey: true }); var viewerEmail = request.user ? String(request.user.get('email') || '').trim().toLowerCase() : '';
         return items.map(function (item) {
             return {
                 id: item.id,
                 title: item.get('title'),
                 description: item.get('description'),
                 price_points: item.get('price_points'),
-                owner_email: item.get('owner_email'),
+                owner_email: viewerEmail && String(item.get('owner_email') || '').trim().toLowerCase() === viewerEmail ? item.get('owner_email') : null,
                 owner_name: item.get('owner_name'),
                 imageUrl: item.get('imageUrl'),
                 type: item.get('type'),
