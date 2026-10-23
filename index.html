@@ -25220,6 +25220,11 @@ window.loginWithGoogle = function () {
 
 // --- Google GIS callback ---
 window.handleGoogleLoginResponse = async function (response) {
+    if (window.__aethrionSocialConsentGranted !== 'google') {
+        window._googleLoginInProgress = false;
+        showNotification('Google ile devam etmeden önce Kullanıcı Sözleşmesi ve Gizlilik Politikası onaylanmalıdır.', 'error');
+        return;
+    }
     if (!response || !response.credential) {
         console.warn('⚠️ Google credential alınamadı');
         window._googleLoginInProgress = false;
@@ -25264,6 +25269,7 @@ window.handleGoogleLoginResponse = async function (response) {
 
         var user = await Parse.User.become(result.sessionToken);
         if (!user) throw new Error('Oturum açılamadı (become başarısız).');
+        window.__aethrionSocialConsentGranted = null;
 
         if (user.get('isBanned')) {
             await Parse.User.logOut();
@@ -25320,6 +25326,7 @@ window.handleGoogleLoginResponse = async function (response) {
 
         window._googleLoginInProgress = false;
     } catch (e) {
+        window.__aethrionSocialConsentGranted = null;
         console.error('Google login hatası:', e);
         window._googleLoginInProgress = false;
         showNotification('❌ Google giriş hatası: ' + e.message, 'error');
@@ -25342,13 +25349,9 @@ window.requireSocialTerms = function (provider) {
 
     var modal = document.getElementById('socialAuthTermsModal');
     if (!modal) {
-        // Fallback: modal yoksa direkt çalıştır
-        console.warn('socialAuthTermsModal bulunamadı, direkt giriş yapılıyor.');
-        if (provider === 'google' && typeof window.loginWithGoogle === 'function') {
-            window.loginWithGoogle();
-        } else if (provider === 'facebook' && typeof window.loginWithFacebook === 'function') {
-            window.loginWithFacebook();
-        }
+        // Fail closed: never bypass consent because the legal modal failed to load.
+        console.error('[AETHRION Auth] Social consent modal is missing; sign-in was not started.');
+        showNotification('Sözleşme ve gizlilik onay penceresi yüklenemedi. Güvenliğiniz için sosyal giriş başlatılmadı; sayfayı yenileyin.', 'error');
         return;
     }
 
@@ -25397,6 +25400,7 @@ window.confirmSocialAuthTerms = function () {
         }
     } catch (e) {}
 
+    window.__aethrionSocialConsentGranted = provider;
     window.closeModal('socialAuthTermsModal');
     window._pendingSocialProvider = null;
 
@@ -25636,7 +25640,7 @@ async function handleLogin() {
     }
     if (!loginPrivacyCheck || !loginPrivacyCheck.checked) {
         showNotification('❌ Giriş yapmak için Gizlilik Politikası\'nı kabul etmelisiniz.', 'error');
-        return;
+        return false;
     }
 
     if (!email || !pass) {
@@ -25756,6 +25760,11 @@ window.handleLogin = handleLogin;
 // [AETHRION] FACEBOOK İLE GİRİŞ — Checkbox zorunluluğu
 // ============================================================
 window.loginWithFacebook = async function () {
+    if (window.__aethrionSocialConsentGranted !== 'facebook') {
+        if (typeof window.requireSocialTerms === 'function') window.requireSocialTerms('facebook');
+        else showNotification('Sözleşme ve gizlilik onayı yüklenmedi. Facebook girişi başlatılmadı.', 'error');
+        return;
+    }
     try {
         if (typeof FB === 'undefined') {
             showNotification('❌ Facebook SDK yüklenemedi. Sayfayı yenileyin veya reklam engelleyicinizi kapatın.', 'error');
@@ -25875,6 +25884,7 @@ window.loginWithFacebook = async function () {
             console.log('✅ FB profili zaten tamamlanmış.');
         }
     } catch (e) {
+        window.__aethrionSocialConsentGranted = null;
         console.error('Facebook giriş hatası:', e);
         if (typeof window.addLogError === 'function') {
             window.addLogError('Facebook giriş hatası: ' + e.message);
