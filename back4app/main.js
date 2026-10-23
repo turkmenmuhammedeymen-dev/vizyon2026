@@ -1009,15 +1009,28 @@ Parse.Cloud.define("checkRoleAccess", async function (request) {
 Parse.Cloud.define("verifyUser", async function (request) {
     var email = String((request.params && request.params.email) || '').trim().toLowerCase();
     var code = String((request.params && request.params.code) || '').trim();
-    if (!email || !code) return { success: false, error: 'E-posta ve kod gerekli!' };
+    if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) || !/^\\d{6}$/.test(code)) {
+        return { success: false, error: 'Geçerli e-posta adresi ve 6 haneli kod gerekli!' };
+    }
+
+    var rateKey = getRateLimitKey(request, 'verifyUser:' + email);
+    await checkRateLimit(rateKey, 10, 10 * 60 * 1000);
+    await recordAttempt(rateKey);
+
     var query = new Parse.Query(Parse.User);
     query.equalTo('email', email);
     var user = await query.first({ useMasterKey: true });
     if (!user) return { success: false, error: 'Kullanıcı bulunamadı!' };
     if (user.get('isVerified') === true) return { success: true, message: 'Hesap zaten doğrulanmış.' };
-    if (String(user.get('verificationCode') || '') !== code) return { success: false, error: 'Geçersiz kod!' };
+
+    var storedCode = String(user.get('verificationCode') || '');
+    if (storedCode !== code) return { success: false, error: 'Geçersiz kod!' };
     var expiry = user.get('verificationCodeExpires');
-    if (!expiry || new Date(expiry).getTime() < Date.now()) return { success: false, error: 'Kod süresi doldu! Yeni kod isteyin.' };
+    var expiryTime = expiry ? new Date(expiry).getTime() : 0;
+    if (!expiryTime || !Number.isFinite(expiryTime) || expiryTime <= Date.now()) {
+        return { success: false, error: 'Kodun süresi doldu! Yeni kod isteyin.' };
+    }
+
     user.set('isVerified', true);
     user.set('verificationCode', null);
     user.set('verificationCodeExpires', null);
@@ -1055,9 +1068,7 @@ Parse.Cloud.define("resendAccountVerification", async function (request) {
         '<p>Doğrulama kodunuz: <strong style="font-size:24px">' + code + '</strong></p>' +
         '<p>Kod 15 dakika geçerlidir. Bu isteği siz yapmadıysanız bu e-postayı yok sayın.</p>' +
         '<p>AETHRION — Intelligence Without Limits.</p>';
-    var mail = await Parse.Cloud.run('sendEmail', {
-        to: email, subject: 'AETHRION doğrulama kodunuz', html: html
-    }, { useMasterKey: true });
+    var mail = await _aethrionSendEmail(email, 'AETHRION doğrulama kodunuz', html);
     if (!mail || mail.success !== true) {
         console.error('[AETHRION Auth] Verification email delivery failed; provider diagnostics were recorded server-side.');
         throw new Error('E-posta gönderilemedi. Back4App ortam değişkenlerini / e-posta sağlayıcısı ayarlarını kontrol edin ve tekrar deneyin.');
@@ -2359,31 +2370,53 @@ Parse.Cloud.define("webSearch", async function (request) {
 // ================================================================
 // ========== sendEmail - HİBRİT =================================
 // ================================================================
-Parse.Cloud.define("sendEmail", async function (request) {
-    var to = request.params.to;
-    var subject = request.params.subject;
-    var html = request.params.html;
-    if (!request.master && !request.user) throw new Error('Yetkisiz erişim!');
-    if (!request.master) {
-        var _rlk = 'sendEmail:' + (to || 'unknown').toLowerCase();
-        await checkRateLimit(_rlk);
-        await recordAttempt(_rlk);
+// Shared email delivery implementation. Internal Cloud Code functions call this
+// directly so delivery does not depend on nested Cloud.run master-key semantics.
+async function _aethrionSendEmail(to, subject, html) {
+    to = String(to || '').trim().toLowerCase();
+    subject = String(subject || '').trim();
+    html = String(html || '');
+    if (!to || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(to)) {
+        return { success: false, error: 'Geçerli alıcı e-posta adresi gerekli.' };
     }
-    if (!to) return { success: false, error: 'Alıcı e-posta adresi gerekli!' };
     if (!subject) return { success: false, error: 'Konu gerekli!' };
     if (!html) return { success: false, error: 'İçerik gerekli!' };
-    console.log('📧 E-posta gönderiliyor → ' + to);
 
-    var googleResult = await tryGoogleAppsScript(to, subject, html);
-    if (googleResult.success) return { success: true, provider: 'google', message: 'Mail gönderildi (Google Apps Script)', id: googleResult.id || null };
+    console.log('[AETHRION Mail] Delivery requested; recipient redacted.');
+    try {
+        var googleResult = await tryGoogleAppsScript(to, subject, html);
+        if (googleResult && googleResult.success === true) {
+            return { success: true, provider: 'google', message: 'Mail gönderildi (Google Apps Script)', id: googleResult.id || null };
+        }
 
-    var resendResult = await tryResend(to, subject, html);
-    if (resendResult.success) return { success: true, provider: 'resend', message: 'Mail gönderildi (Resend)', id: resendResult.id || null };
+        var resendResult = await tryResend(to, subject, html);
+        if (resendResult && resendResult.success === true) {
+            return { success: true, provider: 'resend', message: 'Mail gönderildi (Resend)', id: resendResult.id || null };
+        }
 
-    return {
-        success: false,
-        error: 'Her iki mail servisi de başarısız oldu.\nGoogle: ' + (googleResult.error || 'bilinmiyor') + '\nResend: ' + (resendResult.error || 'bilinmiyor')
-    };
+        console.error('[AETHRION Mail] Both delivery providers failed.', {
+            google: String((googleResult && googleResult.error) || 'unknown').slice(0, 240),
+            resend: String((resendResult && resendResult.error) || 'unknown').slice(0, 240)
+        });
+        return { success: false, error: 'E-posta gönderilemedi. E-posta sağlayıcısı yapılandırmasını kontrol edin.' };
+    } catch (e) {
+        console.error('[AETHRION Mail] Delivery helper failed:', String((e && e.message) || 'unknown').slice(0, 240));
+        return { success: false, error: 'E-posta gönderimi sırasında sunucu hatası oluştu.' };
+    }
+}
+
+Parse.Cloud.define("sendEmail", async function (request) {
+    var params = request.params || {};
+    var to = params.to;
+    var subject = params.subject;
+    var html = params.html;
+    if (!request.master && !request.user) throw new Error('Yetkisiz erişim!');
+    if (!request.master) {
+        var _rlk = 'sendEmail:' + String(to || 'unknown').trim().toLowerCase();
+        await checkRateLimit(_rlk, 5, 10 * 60 * 1000);
+        await recordAttempt(_rlk);
+    }
+    return await _aethrionSendEmail(to, subject, html);
 });
 
 // ================================================================
@@ -2513,7 +2546,7 @@ async function tryResend(to, subject, html) {
 
         var fromAddress = await getAPIKey('RESEND_FROM_EMAIL');
         if (!fromAddress || fromAddress.length < 5) {
-            fromAddress = 'Vizyon2027 <onboarding@resend.dev>';
+            fromAddress = 'AETHRION <onboarding@resend.dev>';
             console.warn('⚠️ [Resend] RESEND_FROM_EMAIL yok, varsayılan kullanılıyor');
         }
 
