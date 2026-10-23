@@ -1,16 +1,32 @@
 /**
- * AETHRION — JSON-LD structured data
+ * AETHRION — JSON-LD structured data fallback
  * Version: 2026-10-23
  *
- * This file is loaded by the root page after the schema activation workflow
- * adds its script tag to index.html. Keep feature claims aligned with the
- * shipped frontend; do not claim desktop control or full autonomous actions.
+ * The homepage contains its primary, crawlable JSON-LD graph inline. This file
+ * must not append a second Organization/WebSite graph when that inline graph
+ * already exists. It only supplies a fallback for pages that have no AETHRION
+ * graph at all.
  */
 (function () {
   'use strict';
 
   if (typeof document === 'undefined') return;
-  if (document.querySelector('script[data-aethrion-jsonld="true"]')) return;
+
+  function hasAethrionGraph() {
+    var nodes = document.querySelectorAll('script[type="application/ld+json"]');
+    for (var i = 0; i < nodes.length; i++) {
+      try {
+        var parsed = JSON.parse(nodes[i].textContent || '');
+        var graph = Array.isArray(parsed['@graph']) ? parsed['@graph'] : [parsed];
+        if (graph.some(function (node) {
+          return node && node['@type'] === 'Organization' && node.name === 'AETHRION';
+        })) return true;
+      } catch (e) {}
+    }
+    return false;
+  }
+
+  if (document.querySelector('script[data-aethrion-jsonld="true"]') || hasAethrionGraph()) return;
 
   var siteUrl = 'https://vizyon2026.vercel.app/';
   var graph = {
@@ -22,10 +38,7 @@
         name: 'AETHRION',
         url: siteUrl,
         description: 'A browser-based AI, developer and creative productivity ecosystem.',
-        logo: {
-          '@type': 'ImageObject',
-          url: siteUrl + 'logo.svg'
-        },
+        logo: { '@type': 'ImageObject', url: siteUrl + 'logo.svg' },
         sameAs: [
           'https://www.instagram.com/aethrion.official/',
           'https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U'
@@ -37,7 +50,7 @@
         url: siteUrl,
         name: 'AETHRION',
         alternateName: 'AETHRION — Intelligence Without Limits',
-        description: 'AI conversation, voice interaction, developer resources and creative workspaces.',
+        description: 'AI conversation, browser-supported voice interaction, developer resources and creative workspaces.',
         inLanguage: ['tr', 'en'],
         publisher: { '@id': siteUrl + '#organization' }
       },
@@ -68,14 +81,10 @@
           'Code editor and developer resources',
           'Video tools',
           'Team collaboration interfaces and project workflows',
+          'Developer Platform API key management and diagnostics where enabled',
+          'Privacy-conscious sanitized security diagnostics where enabled',
           'Community features and learning resources',
           'Account and security controls'
-        ],
-        isRelatedTo: [
-          { '@type': 'WebPage', '@id': siteUrl + 'aethrion-assistant.html', name: 'AETHRION AI Assistant' },
-          { '@type': 'WebPage', '@id': siteUrl + 'aethrion-jarvis.html', name: 'AETHRION JARVIS Voice Experience' },
-          { '@type': 'WebPage', '@id': siteUrl + '3d-studio.html', name: 'AETHRION 3D Studio' },
-          { '@type': 'WebPage', '@id': siteUrl + 'api.html', name: 'AETHRION A27 API' }
         ]
       },
       {
@@ -83,7 +92,7 @@
         '@id': siteUrl + 'aethrion-jarvis.html',
         url: siteUrl + 'aethrion-jarvis.html',
         name: 'AETHRION JARVIS — Voice AI and Task Planning',
-        description: 'A browser-based voice interaction and task-planning interface. Microphone and speech capabilities depend on browser support and user permission. Desktop control and autonomous external actions are not represented as currently enabled.',
+        description: 'A browser-based voice interaction and task-planning interface. Speech features depend on browser support and user permission. This page does not enable desktop control, screen sharing or autonomous external actions.',
         inLanguage: ['tr', 'en'],
         isPartOf: { '@id': siteUrl + '#website' },
         about: { '@id': siteUrl + '#webapplication' }
