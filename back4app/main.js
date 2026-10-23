@@ -9781,6 +9781,7 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
     }
 
     var founderEmail = 'admin.tr.reis@gmail.com';
+    if (email === 'admin.tr.reis') email = founderEmail;
     var user = null;
     var loginName = email;
 
@@ -9831,7 +9832,6 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
             user.set('role', 'founder');
             user.set('plan', 'team');
             user.set('isVerified', true);
-            user.set('isBanned', false);
             user.set('profile_completed', true);
             await user.save(null, { useMasterKey: true });
             loginName = user.get('username') || founderEmail;
@@ -9862,7 +9862,7 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
             return { success: false, error: 'Bu hesap devre dışı bırakılmış. Destek ekibiyle iletişime geçin.' };
         }
         if (loggedInUser.get('isVerified') !== true) {
-            return { success: false, error: 'Hesabınız henüz doğrulanmamış. E-posta doğrulama kodunu girin.' };
+            return { success: false, code: 'EMAIL_NOT_VERIFIED', error: 'Hesabınız henüz doğrulanmamış. E-posta doğrulama kodunu girin.' };
         }
 
         return {
