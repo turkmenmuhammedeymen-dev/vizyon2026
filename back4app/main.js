@@ -354,7 +354,8 @@ if (Parse && Parse.Cloud && typeof Parse.Cloud.define === 'function' && !Parse.C
 // ================================================================
 
 // Public browser gate: no caller-supplied IP is accepted. Parse Server's request.ip
-// is the only address used; unknown IP/provider/configuration errors fail closed.
+// is the only address used. Confirmed VPN/proxy/Tor is blocked; provider outages return
+// an explicit degraded state so the browser can keep the site available and show a warning.
 Parse.Cloud.define("aethrionSecurityCheck", async function (request) {
     var apiKey = _aethrionGetIPQSApiKey();
     if (!apiKey) {
@@ -371,7 +372,7 @@ Parse.Cloud.define("aethrionSecurityCheck", async function (request) {
     var result = await _aethrionCheckIpReputation(apiKey, ip);
     if (!result.ok) {
         console.warn('[AETHRION Security] Public gate is in degraded mode:', String(result.code || 'UNKNOWN'));
-        return { ok: true, configured: true, blocked: false, degraded: true, code: result.code || 'REPUTATION_CHECK_UNAVAILABLE' };
+        return { ok: true, configured: true, blocked: false, degraded: true, code: 'DEGRADED_ALLOW', warningCode: result.code || 'REPUTATION_CHECK_UNAVAILABLE' };
     }
 
     return {
