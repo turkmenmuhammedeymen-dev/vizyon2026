@@ -553,16 +553,28 @@ var SystemConfig = Parse.Object.extend("SystemConfig");
 // ========== YARDIMCI FONKSİYONLAR ===============================
 // ================================================================
 async function getAPIKey(keyName) {
+    // Private Back4App runtime variables take priority; Parse.Config remains a
+    // backwards-compatible fallback for non-secret settings.
+    try {
+        if (typeof process !== 'undefined' && process.env) {
+            var envValue = process.env[keyName] || process.env['AETHRION_' + keyName];
+            if (typeof envValue === 'string' && envValue.trim()) {
+                console.log('✅ ' + keyName + ' private runtime environment variable is configured.');
+                return envValue.trim();
+            }
+        }
+    } catch (e) {
+        console.warn('[AETHRION Config] Runtime environment lookup unavailable for ' + String(keyName));
+    }
     try {
         var config = await Parse.Config.get({ useMasterKey: true });
         var value = config.get(keyName);
-        if (value) {
-            console.log('✅ ' + keyName + ' Config\'den okundu.');
+        if (value !== undefined && value !== null && String(value).trim()) {
+            console.log('✅ ' + keyName + " Config'den okundu.");
             return value;
-        } else {
-            console.warn('⚠️ ' + keyName + ' Config\'de bulunamadı!');
-            return null;
         }
+        console.warn('⚠️ ' + keyName + " runtime environment / Config'de bulunamadı.");
+        return null;
     } catch (e) {
         console.error('❌ Config okunamadı (' + keyName + '): ' + e.message);
         return null;
@@ -995,20 +1007,62 @@ Parse.Cloud.define("checkRoleAccess", async function (request) {
 });
 
 Parse.Cloud.define("verifyUser", async function (request) {
-    var email = request.params.email;
-    var code = request.params.code;
+    var email = String((request.params && request.params.email) || '').trim().toLowerCase();
+    var code = String((request.params && request.params.code) || '').trim();
     if (!email || !code) return { success: false, error: 'E-posta ve kod gerekli!' };
     var query = new Parse.Query(Parse.User);
     query.equalTo('email', email);
     var user = await query.first({ useMasterKey: true });
     if (!user) return { success: false, error: 'Kullanıcı bulunamadı!' };
-    if (user.get('verificationCode') !== code) return { success: false, error: 'Geçersiz kod!' };
-    if (new Date(user.get('verificationCodeExpires')) < new Date()) return { success: false, error: 'Kod süresi doldu!' };
+    if (user.get('isVerified') === true) return { success: true, message: 'Hesap zaten doğrulanmış.' };
+    if (String(user.get('verificationCode') || '') !== code) return { success: false, error: 'Geçersiz kod!' };
+    var expiry = user.get('verificationCodeExpires');
+    if (!expiry || new Date(expiry).getTime() < Date.now()) return { success: false, error: 'Kod süresi doldu! Yeni kod isteyin.' };
     user.set('isVerified', true);
     user.set('verificationCode', null);
     user.set('verificationCodeExpires', null);
     await user.save(null, { useMasterKey: true });
     return { success: true, message: 'Hesap doğrulandı!' };
+});
+
+// Re-send account verification without exposing verification codes to the browser.
+Parse.Cloud.define("resendAccountVerification", async function (request) {
+    var email = String((request.params && request.params.email) || '').trim().toLowerCase();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        throw new Error('Geçerli bir e-posta adresi girin.');
+    }
+    var rateKey = getRateLimitKey(request, 'resendAccountVerification:' + email);
+    await checkRateLimit(rateKey, 3, 15 * 60 * 1000);
+    await recordAttempt(rateKey);
+
+    var query = new Parse.Query(Parse.User);
+    query.equalTo('email', email);
+    var user = await query.first({ useMasterKey: true });
+    if (!user || user.get('isVerified') === true) {
+        return { success: true, message: 'Hesap uygunsa yeni doğrulama kodu gönderildi.' };
+    }
+
+    var code = String(Math.floor(100000 + Math.random() * 900000));
+    user.set('verificationCode', code);
+    user.set('verificationCodeExpires', new Date(Date.now() + 15 * 60 * 1000));
+    await user.save(null, { useMasterKey: true });
+
+    var safeName = String(user.get('name') || 'Kullanıcı')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    var html = '<h1>AETHRION doğrulama kodu</h1>' +
+        '<p>Merhaba ' + safeName + ',</p>' +
+        '<p>Doğrulama kodunuz: <strong style="font-size:24px">' + code + '</strong></p>' +
+        '<p>Kod 15 dakika geçerlidir. Bu isteği siz yapmadıysanız bu e-postayı yok sayın.</p>' +
+        '<p>AETHRION — Intelligence Without Limits.</p>';
+    var mail = await Parse.Cloud.run('sendEmail', {
+        to: email, subject: 'AETHRION doğrulama kodunuz', html: html
+    }, { useMasterKey: true });
+    if (!mail || mail.success !== true) {
+        console.error('[AETHRION Auth] Verification email delivery failed; provider diagnostics were recorded server-side.');
+        throw new Error('E-posta gönderilemedi. Back4App ortam değişkenlerini / e-posta sağlayıcısı ayarlarını kontrol edin ve tekrar deneyin.');
+    }
+    return { success: true, message: 'Hesap uygunsa yeni doğrulama kodu gönderildi.' };
 });
 
 Parse.Cloud.define("saveChatHistory", async function (request) {

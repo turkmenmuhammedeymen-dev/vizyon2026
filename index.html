@@ -21871,8 +21871,9 @@ def root():
             </div>
             <div id="formVerify" style="display:none;">
                 <input id="verifyEmail" type="email" name="verifyEmail" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="E-posta" class="form-input">
-                <input id="verifyCode" placeholder="Doğrulama Kodu" class="form-input">
+                <input id="verifyCode" placeholder="Doğrulama Kodu" class="form-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
                 <button class="btn-primary" onclick="window.verifyAccount()" style="width:100%;">Doğrula</button>
+                <button type="button" class="btn-secondary" onclick="window.resendAccountVerification()" style="width:100%;margin-top:10px;">Yeni Kod Gönder</button>
             </div>
         </div>
     </div>
@@ -25521,15 +25522,20 @@ async function handleRegister() {
 
         var verificationEmailSent = false;
         try {
-            await Parse.Cloud.run('sendEmail', {
+            var safeEmailName = String(name).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            var mailResult = await Parse.Cloud.run('sendEmail', {
                 to: email,
                 subject: 'AETHRION Doğrulama Kodu',
-                html: '<h1>AETHRION&#39;a Hoş Geldin ' + name + '!</h1>' +
+                html: '<h1>AETHRION&#39;a Hoş Geldin ' + safeEmailName + '!</h1>' +
                       '<p>Doğrulama kodunuz: <strong style="font-size:24px;color:#d4af37;">' + verifyCode + '</strong></p>' +
                       '<p>15 dakika geçerlidir.</p>' +
                       '<p style="color:#b8c0d0;font-style:italic;">AETHRION — Intelligence Without Limits.</p>' +
                       '<p>AETHRION Ekibi</p>'
             });
+            if (!mailResult || mailResult.success !== true) {
+                throw new Error((mailResult && mailResult.error) || 'E-posta sağlayıcısı gönderimi onaylamadı.');
+            }
             verificationEmailSent = true;
         } catch (mailError) {
             console.error('[AETHRION] Verification email could not be sent:', mailError);
@@ -25543,7 +25549,7 @@ async function handleRegister() {
         if (verificationEmailSent) {
             showNotification('Kayıt oluşturuldu. Doğrulama kodunu e-postandan kontrol et.', 'success');
         } else {
-            showNotification('Hesap oluşturuldu ancak doğrulama e-postası gönderilemedi. E-posta hizmeti düzeltilmeli; geçici kod: ' + verifyCode, 'warning');
+            showNotification('Hesap oluşturuldu ancak doğrulama e-postası gönderilemedi. Doğrulama ekranındaki “Yeni Kod Gönder” seçeneğini kullanın veya destekle iletişime geçin.', 'warning');
         }
     } catch (e) {
         showNotification('Hata: ' + e.message, 'error');
@@ -25559,8 +25565,28 @@ window.handleRegister = handleRegister;
 // ============================================================
 // [AETHRION] DOĞRULAMA
 // ============================================================
+window.resendAccountVerification = async function () {
+    var emailInput = document.getElementById('verifyEmail');
+    var email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+    if (!email) {
+        showNotification('Yeni kod istemeden önce e-posta adresinizi girin.', 'error');
+        return;
+    }
+    var button = document.querySelector('#formVerify button[onclick="window.resendAccountVerification()"]');
+    if (button) { button.disabled = true; button.dataset.originalText = button.textContent; button.textContent = 'Gönderiliyor…'; }
+    try {
+        var result = await Parse.Cloud.run('resendAccountVerification', { email: email });
+        if (!result || result.success !== true) throw new Error((result && result.error) || 'Kod gönderilemedi.');
+        showNotification('Hesap uygunsa yeni doğrulama kodu gönderildi. Gelen kutusu ve spam klasörünü kontrol edin.', 'success');
+    } catch (e) {
+        showNotification(e.message || 'Kod gönderilemedi. E-posta ayarlarını kontrol edin.', 'error');
+    } finally {
+        if (button) { button.disabled = false; button.textContent = button.dataset.originalText || 'Yeni Kod Gönder'; }
+    }
+};
+
 async function verifyAccount() {
-    var email = document.getElementById('verifyEmail').value.trim();
+    var email = document.getElementById('verifyEmail').value.trim().toLowerCase();
     var code = document.getElementById('verifyCode').value.trim();
 
     if (!email || !code) {
@@ -32527,6 +32553,8 @@ window.showDashboard = async function () {
         if (mainSite) mainSite.style.display = 'none';
         var userPanel = document.getElementById('userPanel');
         if (userPanel) userPanel.style.display = 'none';
+        // Keep the authenticated dashboard visible past the page-level CSS guard.
+        if (currentUser && document.body) document.body.classList.add('logged-in-user');
         var dash = document.getElementById('dashboardArea');
         if (!dash) {
             dash = document.createElement('div');
