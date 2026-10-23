@@ -1,5 +1,6 @@
 // ================================================================
 // AETHRION — FULL CLOUD CODE (Back4App UYUMLU)
+// Reliability patch: graceful IPQS outage handling; confirmed VPN/proxy/Tor still blocked.
 // v7.10.0 legacy baseline + AETHRION security hardening
 // ================================================================
 // ✅ BACK4APP UYUMLU (Parse Server Standard + Node.js)
@@ -293,20 +294,26 @@ async function _aethrionCheckIpReputation(apiKey, ip) {
 async function _aethrionEnforceVpnPolicy(request) {
     if (request && (request.master === true || request.isMaster === true)) return;
 
+    // Reliability-first behavior: block only when IPQS successfully confirms a
+    // VPN/proxy/Tor flag. A missing secret, unavailable IP, or provider outage
+    // must not disable registration/login and every unrelated Cloud Function.
+    // This is a deliberate degraded mode; keep rate limits and auth checks active.
     var apiKey = _aethrionGetIPQSApiKey();
     if (!apiKey) {
-        console.error('[AETHRION Security] IPQS_API_KEY is missing from private Cloud Code environment variables.');
-        throw new Error('AETHRION_SECURITY_CONFIGURATION_REQUIRED: configure IPQS_API_KEY in Back4App Cloud Code environment variables.');
+        console.warn('[AETHRION Security] IPQS unavailable: private runtime key is not configured; reputation gate is in degraded mode.');
+        return;
     }
 
     var ip = _aethrionGetClientIp(request);
     if (!ip || ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') {
-        throw new Error('AETHRION_SECURITY_IP_UNAVAILABLE: client IP could not be verified; access denied.');
+        console.warn('[AETHRION Security] IPQS unavailable: client IP could not be resolved; reputation gate is in degraded mode.');
+        return;
     }
 
     var result = await _aethrionCheckIpReputation(apiKey, ip);
     if (!result.ok) {
-        throw new Error('AETHRION_SECURITY_CHECK_UNAVAILABLE: ' + result.code);
+        console.warn('[AETHRION Security] IPQS provider unavailable (' + String(result.code || 'UNKNOWN') + '); continuing in degraded mode.');
+        return;
     }
     if (result.blocked) {
         throw new Error('AETHRION_VPN_PROXY_BLOCKED: VPN, proxy or Tor connections are not permitted.');
@@ -343,25 +350,27 @@ if (Parse && Parse.Cloud && typeof Parse.Cloud.define === 'function' && !Parse.C
 Parse.Cloud.define("aethrionSecurityCheck", async function (request) {
     var apiKey = _aethrionGetIPQSApiKey();
     if (!apiKey) {
-        console.error('[AETHRION Security] Public gate cannot find IPQS_API_KEY in private Cloud Code environment variables.');
-        return { ok: false, configured: false, blocked: true, code: 'VPN_CHECK_NOT_CONFIGURED' };
+        console.warn('[AETHRION Security] Public gate is in degraded mode: private runtime key is missing.');
+        return { ok: true, configured: false, blocked: false, degraded: true, code: 'VPN_CHECK_NOT_CONFIGURED' };
     }
 
     var ip = _aethrionGetClientIp(request);
     if (!ip || ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') {
-        return { ok: false, configured: true, blocked: true, code: 'IP_UNAVAILABLE' };
+        console.warn('[AETHRION Security] Public gate is in degraded mode: client IP could not be resolved.');
+        return { ok: true, configured: true, blocked: false, degraded: true, code: 'IP_UNAVAILABLE' };
     }
 
     var result = await _aethrionCheckIpReputation(apiKey, ip);
     if (!result.ok) {
-        console.warn('[AETHRION Security] Public gate failed:', result.code);
-        return { ok: false, configured: true, blocked: true, code: result.code };
+        console.warn('[AETHRION Security] Public gate is in degraded mode:', String(result.code || 'UNKNOWN'));
+        return { ok: true, configured: true, blocked: false, degraded: true, code: result.code || 'REPUTATION_CHECK_UNAVAILABLE' };
     }
 
     return {
         ok: true,
         configured: true,
         blocked: result.blocked === true,
+        degraded: false,
         code: result.blocked ? 'VPN_PROXY_OR_TOR' : 'CLEAR'
     };
 });
