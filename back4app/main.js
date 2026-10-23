@@ -216,29 +216,65 @@ function _aethrionHeader(headers, name) {
 // Prefer Parse Server's normalized client IP. Only fall back to proxy headers
 // when request.ip is absent. For X-Forwarded-For, the left-most entry is the
 // originating client in the standard proxy chain; never use request.params IPs.
+function _aethrionIsPublicIp(value) {
+    var ip = _aethrionNormalizeIp(value);
+    if (!ip) return false;
+
+    var version = 0;
+    try { version = require('net').isIP(ip); } catch (e) {}
+    if (!version) return false;
+
+    if (version === 4) {
+        var p = ip.split('.').map(function (v) { return Number(v); });
+        if (p.length !== 4 || p.some(function (v) { return !Number.isInteger(v) || v < 0 || v > 255; })) return false;
+        var a = p[0], b = p[1], c = p[2];
+        if (a === 0 || a === 10 || a === 127 || a >= 224) return false;
+        if (a === 169 && b === 254) return false;
+        if (a === 172 && b >= 16 && b <= 31) return false;
+        if (a === 192 && (b === 168 || (b === 0 && (c === 0 || c === 2)))) return false;
+        if (a === 100 && b >= 64 && b <= 127) return false;
+        if (a === 198 && (b === 18 || b === 19 || (b === 51 && c === 100))) return false;
+        if (a === 203 && b === 0 && c === 113) return false;
+        return true;
+    }
+
+    var lower = ip.toLowerCase();
+    if (lower === '::' || lower === '::1') return false;
+    if (/^(fc|fd)/.test(lower) || /^fe[89ab]/.test(lower) || /^ff/.test(lower)) return false;
+    if (/^2001:db8(?::|$)/.test(lower)) return false;
+    return true;
+}
+
+// Prefer a public client address; a private address reported by an internal proxy
+// is not sent to IPQS. Header values are considered only if they contain a public IP.
 function _aethrionGetClientIp(request) {
     if (!request) return '';
     var direct = _aethrionNormalizeIp(request.ip);
-    if (direct && direct !== '127.0.0.1' && direct !== '::1') return direct;
+    if (_aethrionIsPublicIp(direct)) return direct;
 
     var headers = request.headers || {};
-    var realIp = _aethrionNormalizeIp(_aethrionHeader(headers, 'x-real-ip'));
-    if (realIp && realIp !== '127.0.0.1' && realIp !== '::1') return realIp;
+    var names = ['cf-connecting-ip', 'true-client-ip', 'x-real-ip'];
+    for (var i = 0; i < names.length; i++) {
+        var candidate = _aethrionNormalizeIp(_aethrionHeader(headers, names[i]));
+        if (_aethrionIsPublicIp(candidate)) return candidate;
+    }
 
     var forwarded = _aethrionHeader(headers, 'x-forwarded-for');
     if (forwarded) {
         var hops = forwarded.split(',').map(function (part) {
             return _aethrionNormalizeIp(part);
-        }).filter(Boolean);
-        if (hops.length) {
-            var clientIp = hops[0];
-            if (clientIp !== '127.0.0.1' && clientIp !== '::1') return clientIp;
+        });
+        for (var j = 0; j < hops.length; j++) {
+            if (_aethrionIsPublicIp(hops[j])) return hops[j];
         }
     }
     return '';
 }
 
 async function _aethrionCheckIpReputation(apiKey, ip) {
+    // Use Parse.Cloud.httpRequest directly instead of the global fetch polyfill.
+    // This handles Back4App response.data/text variants and avoids JSON parsing
+    // failures when the runtime's HTTP response does not expose response.text.
     var now = Date.now();
     var cached = _aethrionVpnCache.get(ip);
     if (cached && cached.expiresAt > now) {
@@ -246,25 +282,39 @@ async function _aethrionCheckIpReputation(apiKey, ip) {
     }
 
     try {
-        var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-        var timeout = controller ? setTimeout(function () { controller.abort(); }, 6500) : null;
-        var response;
-        try {
-            var url = 'https://ipqualityscore.com/api/json/ip/' +
-                encodeURIComponent(apiKey) + '/' + encodeURIComponent(ip) +
-                '?strictness=1&allow_public_access_points=true';
-            response = await fetch(url, controller ? { method: 'GET', signal: controller.signal } : { method: 'GET' });
-        } finally {
-            if (timeout) clearTimeout(timeout);
+        if (!Parse || !Parse.Cloud || typeof Parse.Cloud.httpRequest !== 'function') {
+            return { ok: false, blocked: true, code: 'HTTP_CLIENT_UNAVAILABLE' };
         }
 
-        if (!response || !response.ok) {
+        var url = 'https://ipqualityscore.com/api/json/ip/' +
+            encodeURIComponent(apiKey) + '/' + encodeURIComponent(ip) +
+            '?strictness=1&allow_public_access_points=true';
+
+        var response = await Parse.Cloud.httpRequest({
+            url: url,
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            timeout: 9000
+        });
+
+        var status = Number(response && response.status) || 0;
+        if (!response || status < 200 || status >= 300) {
+            console.warn('[AETHRION Security] IPQS returned a non-success HTTP status:', status || 'unknown');
             return { ok: false, blocked: true, code: 'REPUTATION_PROVIDER_UNAVAILABLE' };
         }
 
-        var data = await response.json();
-        if (!data || data.success !== true) {
-            // Do not cache failed provider responses; a transient error should recover.
+        var data = response.data;
+        if (typeof data === 'string') {
+            try { data = JSON.parse(data); } catch (parseError) { data = null; }
+        }
+        if ((!data || typeof data !== 'object') && typeof response.text === 'string') {
+            try { data = JSON.parse(response.text); } catch (parseTextError) { data = null; }
+        }
+        if ((!data || typeof data !== 'object') && response.buffer && typeof response.buffer.toString === 'function') {
+            try { data = JSON.parse(response.buffer.toString('utf8')); } catch (parseBufferError) { data = null; }
+        }
+        if (!data || typeof data !== 'object' || data.success !== true) {
+            console.warn('[AETHRION Security] IPQS response could not be validated (response body not logged).');
             return { ok: false, blocked: true, code: 'REPUTATION_CHECK_FAILED' };
         }
 
@@ -281,15 +331,18 @@ async function _aethrionCheckIpReputation(apiKey, ip) {
         }
         _aethrionVpnCache.set(ip, { blocked: blocked, expiresAt: now + 5 * 60 * 1000 });
 
-        return { ok: true, blocked: blocked, code: blocked ? 'VPN_PROXY_OR_TOR' : 'CLEAR' };
+        return {
+            ok: true,
+            blocked: blocked,
+            code: blocked ? 'VPN_PROXY_OR_TOR' : 'CLEAR'
+        };
     } catch (error) {
-        // Log only a reason code/name; never log the API key or full client IP.
+        // Never log API keys, raw IP addresses, or provider response bodies.
         var errorName = error && error.name ? String(error.name) : 'UnknownError';
-        console.warn('[AETHRION Security] IPQS lookup unavailable:', errorName);
+        console.warn('[AETHRION Security] IPQS lookup failed:', errorName);
         return { ok: false, blocked: true, code: 'REPUTATION_CHECK_UNAVAILABLE' };
     }
 }
-
 async function _aethrionEnforceVpnPolicy(request) {
     if (request && (request.master === true || request.isMaster === true)) return;
 
