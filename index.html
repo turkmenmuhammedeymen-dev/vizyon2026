@@ -51205,7 +51205,13 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
   if(!S||!S.Cloud||typeof S.Cloud.run!=='function'||!window.parseInitialized){if(Date.now()-started>12000){finished=true;addNotice('SDK_NOT_READY');}else setTimeout(attempt,250);return;}
   S.Cloud.run('aethrionSecurityCheck',{}).then(function(result){
    if(finished)return;finished=true;
-   if(result&&result.blocked===true&&result.code==='VPN_PROXY_OR_TOR'){blockConfirmed();}
+   if(result&&result.blocked===true&&result.code==='VPN_PROXY_OR_TOR'){blockConfirmed();return;}
+   // A reputation-provider error is not proof that the visitor uses a VPN. Keep the site usable,
+   // record the degraded state in diagnostics, and reserve the visible banner for setup/transport failures.
+   else if(result&&result.ok===true&&result.degraded===true&&/^REPUTATION_/.test(String(result.code||''))){
+    console.warn('[AETHRION Security] IP reputation provider is degraded; see Back4App Cloud Code logs for the provider reason.',String(result.code||'UNKNOWN'));
+    removePending();
+   }
    else if(!result||result.ok!==true||result.blocked===true||result.configured===false||result.degraded===true){addNotice(result&&result.code?result.code:'SECURITY_CHECK_DEGRADED');}
    else removePending();
   }).catch(function(){if(!finished){finished=true;addNotice('CLOUD_FUNCTION_CALL_FAILED');}});
@@ -51258,4 +51264,37 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 </html>
 
 
+
+
+<!-- AETHRION UI repair: the experience drawer must be an overlay, never ordinary page content. -->
+<style id="aethrionExperienceDrawerVisibilityFix">
+  #aethrionExperienceBackdrop {
+    position: fixed !important; inset: 0 !important; z-index: 2147483002 !important;
+    display: none !important; opacity: 0 !important; visibility: hidden !important;
+    pointer-events: none !important; transition: opacity .22s ease, visibility .22s ease !important;
+  }
+  #aethrionExperienceBackdrop.show {
+    display: block !important; opacity: 1 !important; visibility: visible !important;
+    pointer-events: auto !important;
+  }
+  #aethrionExperienceDrawer {
+    position: fixed !important; top: 0 !important; right: 0 !important; bottom: 0 !important;
+    z-index: 2147483003 !important; width: min(440px, 100vw) !important; max-width: 100vw !important;
+    height: 100vh !important; height: 100dvh !important; box-sizing: border-box !important;
+    display: flex !important; flex-direction: column !important; overflow: hidden !important;
+    transform: translateX(105%) !important; opacity: 0 !important; visibility: hidden !important;
+    pointer-events: none !important; transition: transform .24s ease, opacity .24s ease, visibility .24s ease !important;
+  }
+  #aethrionExperienceDrawer.open {
+    transform: translateX(0) !important; opacity: 1 !important; visibility: visible !important;
+    pointer-events: auto !important;
+  }
+  #aethrionExperienceDrawer .aed-head { flex: 0 0 auto !important; }
+  #aethrionExperienceDrawer .aed-list { flex: 1 1 auto !important; min-height: 0 !important; overflow-y: auto !important; overscroll-behavior: contain !important; }
+  #aethrionExperienceDrawer .aed-foot { flex: 0 0 auto !important; }
+  body.aethrion-experience-menu-open { overflow: hidden !important; }
+  @media (prefers-reduced-motion: reduce) {
+    #aethrionExperienceDrawer, #aethrionExperienceBackdrop { transition: none !important; }
+  }
+</style>
 
