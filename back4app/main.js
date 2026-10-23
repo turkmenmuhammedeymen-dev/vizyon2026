@@ -1112,7 +1112,7 @@ Parse.Cloud.define("checkRoleAccess", async function (request) {
 Parse.Cloud.define("verifyUser", async function (request) {
     var email = String((request.params && request.params.email) || '').trim().toLowerCase();
     var code = String((request.params && request.params.code) || '').trim();
-    if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) || !/^\\d{6}$/.test(code)) {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^\\d{6}$/.test(code)) {
         return { success: false, error: 'Geçerli e-posta adresi ve 6 haneli kod gerekli!' };
     }
 
