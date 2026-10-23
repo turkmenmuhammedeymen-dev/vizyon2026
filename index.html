@@ -21845,7 +21845,7 @@ def root():
                     <input type="checkbox" id="registerPrivacyCheck" style="width:18px;height:18px;accent-color:var(--accent);">
                     <span style="font-size:12px;color:var(--text2);"><a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank" style="color:var(--accent);">Gizlilik Politikası</a>'nı kabul ediyorum.</span>
                 </label>
-                <button class="btn-primary" onclick="window.handleRegister()" style="width:100%;">Kayıt Ol</button>
+                <button class="btn-primary" type="button" onclick="window.__aethrionSafeAuthAction('register', this)" style="width:100%;">Kayıt Ol</button>
             </div>
             <div id="formLogin" style="display:none;">
                 <input id="lEmail" type="email" name="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="E-posta" class="form-input">
@@ -21861,7 +21861,7 @@ def root():
                     <input type="checkbox" id="loginPrivacyCheck" style="width:18px;height:18px;accent-color:var(--accent);">
                     <span style="font-size:12px;color:var(--text2);"><a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank" style="color:var(--accent);">Gizlilik Politikası</a>'nı kabul ediyorum.</span>
                 </label>
-                <button class="btn-primary" onclick="window.handleLogin()" style="width:100%;">Giriş Yap</button>
+                <button class="btn-primary" type="button" onclick="window.__aethrionSafeAuthAction('login', this)" style="width:100%;">Giriş Yap</button>
                 <div style="text-align:center;margin-top:14px;">
                     <a href="javascript:void(0)" onclick="window.openResetPasswordModal()" style="color:var(--accent);font-size:13px;">Şifremi unuttum</a>
                 </div>
@@ -51382,3 +51382,48 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 
 </body>
 </html>
+
+
+
+<!-- AETHRION auth click guard: visible feedback and safe async error handling -->
+<script id="aethrion-auth-click-guard">
+(function () {
+  'use strict';
+  window.__aethrionSafeAuthAction = async function (kind, button) {
+    var label = kind === 'register' ? 'Kayıt Ol' : 'Giriş Yap';
+    var handler = kind === 'register' ? window.handleRegister : window.handleLogin;
+    var originalText = button && button.textContent ? button.textContent : label;
+    try {
+      if (typeof handler !== 'function') {
+        var missing = 'Kimlik doğrulama arayüzü yüklenemedi. Sayfayı yenileyin; sorun sürerse JavaScript hatasını kontrol edin.';
+        if (typeof window.showNotification === 'function') window.showNotification(missing, 'error');
+        else window.alert(missing);
+        console.error('[AETHRION Auth] Missing auth handler:', kind);
+        return false;
+      }
+      if (button) {
+        button.disabled = true;
+        button.setAttribute('aria-busy', 'true');
+        button.textContent = kind === 'register' ? 'Kayıt kontrol ediliyor…' : 'Giriş kontrol ediliyor…';
+      }
+      if (typeof window.showNotification === 'function') {
+        window.showNotification(kind === 'register' ? 'Kayıt isteği işleniyor…' : 'Giriş isteği işleniyor…', 'info');
+      }
+      await Promise.resolve(handler());
+      return true;
+    } catch (error) {
+      console.error('[AETHRION Auth] UI handler failed:', kind, error);
+      var message = error && error.message ? error.message : 'Beklenmeyen bir arayüz hatası oluştu.';
+      if (typeof window.showNotification === 'function') window.showNotification('İşlem tamamlanamadı: ' + message, 'error');
+      else window.alert('İşlem tamamlanamadı: ' + message);
+      return false;
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.removeAttribute('aria-busy');
+        button.textContent = originalText;
+      }
+    }
+  };
+})();
+</script>
