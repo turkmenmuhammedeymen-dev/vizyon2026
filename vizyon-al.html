@@ -1505,7 +1505,7 @@
         </section>
 
         <!-- 4 MOD -->
-        <section class="section" id="modlar">
+        <section class="section" id="modlar" data-anchor-base="modlar">
             <div class="section-header">
                 <div class="section-tag">// 4 FARKLI MOD</div>
                 <h2 class="section-title">Her İş İçin <span class="hl">Ayrı Mod</span></h2>
@@ -1869,7 +1869,7 @@
             </div>
         </section>
 
-        <section class="section" id="modlar">
+        <section class="section" id="modlar-en" data-anchor-base="modlar">
             <div class="section-header">
                 <div class="section-tag">// 4 MODES</div>
                 <h2 class="section-title">A <span class="hl">Mode</span> for Every Task</h2>
@@ -2093,7 +2093,7 @@
             </div>
         </section>
 
-        <section class="section" id="modlar">
+        <section class="section" id="modlar-ar" data-anchor-base="modlar">
             <div class="section-header">
                 <div class="section-tag">// 4 أوضاع</div>
                 <h2 class="section-title">وضع <span class="hl">لكل مهمة</span></h2>
@@ -2300,7 +2300,16 @@
             ar: { navBack: 'الرئيسية', navStart: 'ابدأ' }
         };
 
-        function changeLanguage(lang) {
+        function normalizeLanguageAnchors(lang) {
+    document.querySelectorAll(".lang-content [data-anchor-base]").forEach(function (el) {
+        var root = el.closest(".lang-content");
+        var suffix = root && root.id ? root.id.replace(/^lang-/, "") : "tr";
+        var base = el.getAttribute("data-anchor-base");
+        el.id = suffix === lang ? base : base + "-" + suffix;
+    });
+}
+
+function changeLanguage(lang) {
             if (['tr', 'en', 'ar'].indexOf(lang) === -1) lang = 'tr';
 
             // İçerikleri değiştir
@@ -2309,6 +2318,7 @@
             });
             var target = document.getElementById('lang-' + lang);
             if (target) target.classList.add('active');
+            normalizeLanguageAnchors(lang);
 
             // RTL desteği
             document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
