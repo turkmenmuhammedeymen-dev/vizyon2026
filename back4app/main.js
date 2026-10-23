@@ -260,13 +260,21 @@ async function _aethrionCheckIpReputation(apiKey, ip) {
         }
 
         if (!response || !response.ok) {
-            return { ok: false, blocked: true, code: 'REPUTATION_PROVIDER_UNAVAILABLE' };
+            // A failed provider request does not establish that the visitor is using a VPN.
+            console.warn('[AETHRION Security] IPQS HTTP request failed; status:', response && Number(response.status) || 'NO_RESPONSE');
+            return { ok: false, blocked: false, code: 'REPUTATION_PROVIDER_UNAVAILABLE' };
         }
 
         var data = await response.json();
         if (!data || data.success !== true) {
-            // Do not cache failed provider responses; a transient error should recover.
-            return { ok: false, blocked: true, code: 'REPUTATION_CHECK_FAILED' };
+            // IPQS uses success:false for invalid IPs, exhausted credits, and other provider-side errors.
+            // Keep the message bounded and strip control characters; never log the API key or client IP.
+            var providerMessage = data && typeof data.message === 'string'
+                ? data.message.replace(/[\r\n\t]+/g, ' ').slice(0, 180)
+                : 'No provider error message returned';
+            console.warn('[AETHRION Security] IPQS rejected reputation request:', providerMessage);
+            // Do not cache failed provider responses; retry after the underlying issue is fixed.
+            return { ok: false, blocked: false, code: 'REPUTATION_CHECK_FAILED' };
         }
 
         var flags = {
@@ -287,7 +295,7 @@ async function _aethrionCheckIpReputation(apiKey, ip) {
         // Log only a reason code/name; never log the API key or full client IP.
         var errorName = error && error.name ? String(error.name) : 'UnknownError';
         console.warn('[AETHRION Security] IPQS lookup unavailable:', errorName);
-        return { ok: false, blocked: true, code: 'REPUTATION_CHECK_UNAVAILABLE' };
+        return { ok: false, blocked: false, code: 'REPUTATION_CHECK_UNAVAILABLE' };
     }
 }
 
