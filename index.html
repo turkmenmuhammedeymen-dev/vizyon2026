@@ -25645,7 +25645,19 @@ async function handleLogin() {
     }
 
     try {
-        var user = await Parse.User.logIn(email, pass);
+        window.__aethrionLastAuthError = '';
+        var authResult = await Parse.Cloud.run('aethrionLoginWithEmail', {
+            email: email,
+            password: pass
+        });
+        if (!authResult || authResult.success !== true) {
+            throw new Error((authResult && authResult.error) || 'Giriş tamamlanamadı. E-posta ve şifreyi kontrol edin.');
+        }
+        if (!authResult.sessionToken) {
+            throw new Error('Sunucu oturum belirteci döndürmedi. Back4App Cloud Code dağıtımını kontrol edin.');
+        }
+        var user = await Parse.User.become(authResult.sessionToken);
+        if (!user) throw new Error('Oturum açılamadı. Lütfen tekrar deneyin.');
 
         if (user.get('isBanned')) {
             await Parse.User.logOut();
@@ -25717,6 +25729,7 @@ async function handleLogin() {
                 ' (rol: ' + user.get('role') + ', plan: ' + user.get('plan') + ')');
         }
     } catch (e) {
+        window.__aethrionLastAuthError = String((e && e.message) || 'Bilinmeyen kimlik doğrulama hatası').slice(0, 240);
         console.error('Giriş hatası:', e.message);
         showNotification('Giriş başarısız: ' + e.message, 'error');
         if (typeof window.addLogError === 'function') {
