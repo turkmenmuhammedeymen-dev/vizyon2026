@@ -9781,6 +9781,7 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
     }
 
     var founderEmail = 'admin.tr.reis@gmail.com';
+    if (email === 'admin.tr.reis') email = founderEmail;
     var user = null;
     var loginName = email;
 
@@ -9831,7 +9832,6 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
             user.set('role', 'founder');
             user.set('plan', 'team');
             user.set('isVerified', true);
-            user.set('isBanned', false);
             user.set('profile_completed', true);
             await user.save(null, { useMasterKey: true });
             loginName = user.get('username') || founderEmail;
@@ -9862,7 +9862,7 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
             return { success: false, error: 'Bu hesap devre dışı bırakılmış. Destek ekibiyle iletişime geçin.' };
         }
         if (loggedInUser.get('isVerified') !== true) {
-            return { success: false, error: 'Hesabınız henüz doğrulanmamış. E-posta doğrulama kodunu girin.' };
+            return { success: false, code: 'EMAIL_NOT_VERIFIED', error: 'Hesabınız henüz doğrulanmamış. E-posta doğrulama kodunu girin.' };
         }
 
         return {
@@ -10749,6 +10749,43 @@ Parse.Cloud.define("aethrionGetTeamWorkspace", async function (request) {
             };
         })
     };
+});
+
+Parse.Cloud.define("aethrionGetTeamSchedule", async function (request) {
+    var user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız.");
+    var teamId = _aeSafeAuditText(request.params && request.params.teamId, 128);
+    await _aeRequireTeamAccess(user, teamId);
+    var now = Date.now();
+    var query = new Parse.Query("TeamTask");
+    query.equalTo("team_id", teamId);
+    query.greaterThanOrEqualTo("date", new Date(now - 90 * 86400000));
+    query.lessThanOrEqualTo("date", new Date(now + 180 * 86400000));
+    query.ascending("date"); query.limit(200);
+    var tasks = await query.find({ useMasterKey: true });
+    var completed = Array.isArray(user.get("completed_team_tasks")) ? user.get("completed_team_tasks") : [];
+    return { success: true, events: tasks.map(function (task) {
+        return { id: task.id, title: _aeSafeAuditText(task.get("task_text") || task.get("title") || "Takım etkinliği", 180),
+            startsAt: task.get("date") || task.createdAt || null, points: Number(task.get("points") || 0), completed: completed.indexOf(task.id) !== -1 };
+    }) };
+});
+
+Parse.Cloud.define("aethrionGetMyAiUsage", async function (request) {
+    var user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız.");
+    var email = String(user.get("email") || "").toLowerCase();
+    if (!email) return { success: true, items: [] };
+    var query = new Parse.Query(FeatureUsage);
+    query.equalTo("user_email", email); query.descending("last_updated"); query.limit(100);
+    var records = await query.find({ useMasterKey: true });
+    var items = records.filter(function (record) {
+        return /aethrion|vizyonal|koc|assistant|chat|voice|screenread|fileanalyze|nvidia|groq|deepseek|openai|gemini/i.test(String(record.get("feature") || ""));
+    }).slice(0, 30).map(function (record) {
+        return { feature: _aeSafeAuditText(record.get("feature") || "AI", 80), count: Math.max(0, Number(record.get("count") || 0)),
+            period: _aeSafeAuditText(record.get("period") || "day", 16), periodKey: _aeSafeAuditText(record.get("period_key") || "", 32),
+            lastUpdated: record.get("last_updated") || record.updatedAt || record.createdAt || null };
+    });
+    return { success: true, items: items };
 });
 
 Parse.Cloud.define("aethrionSetTeamMemberRole", async function (request) {
