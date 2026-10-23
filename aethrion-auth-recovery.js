@@ -37,7 +37,7 @@ function improveAuthForms(){
  var formFields=[
   ['rName','name','name'],['rEmail','email','email'],['rUsername','text','username'],
   ['rPass','password','new-password'],['rPass2','password','new-password'],
-  ['lEmail','email','email'],['lPass','password','current-password'],['verifyEmail','email','email']
+  ['lEmail','text','username'],['lPass','password','current-password'],['verifyEmail','email','email']
  ];
  formFields.forEach(function(row){var el=document.getElementById(row[0]);if(!el)return;el.setAttribute('type',row[1]);el.setAttribute('autocomplete',row[2]);if(row[0].indexOf('Email')>=0||row[0]==='rEmail'||row[0]==='lEmail')el.setAttribute('inputmode','email')});
  var register=document.querySelector('#formRegister .btn-primary');
@@ -98,6 +98,7 @@ setTimeout(boot,800);setTimeout(boot,2200);
  var mountBusy=false;
  function notify(msg,type){try{if(typeof window.showNotification==='function')window.showNotification(msg,type||'warning')}catch(e){}}
  function mountGoogleButton(){
+  if(window.__aethrionSocialConsentGranted!=='google')return false;
   var original=document.querySelector('#authModal .btn-google');
   if(!original||!document.body)return false;
   var host=document.getElementById('aethrionGoogleFallback');
@@ -231,15 +232,17 @@ setTimeout(boot,800);setTimeout(boot,2200);
   var oldText=button?button.textContent:'';
   if(button){button.disabled=true;button.setAttribute('aria-busy','true');button.classList.add('ae-auth-busy');button.textContent=action.fn==='handleLogin'?'Giriş yapılıyor…':action.fn==='handleRegister'?'Hesap oluşturuluyor…':'Doğrulanıyor…'}
   var isLogin=action.fn==='handleLogin';
-  if(isLogin)showProgress('Kimlik bilgileriniz doğrulanıyor…');
+  if(isLogin){window.__aethrionLastAuthError='';showProgress('Kimlik bilgileriniz doğrulanıyor…');}
   var completed=false, errorSeen=null;
   var startAt=Date.now();
   try{
    /* Important: the original event is passed through. Some legacy handlers require it. */
    var result=fn.call(button||window,event);
    result=await Promise.resolve(result);
-   if(isLogin && result===false){
+   if(isLogin && result!==true){
     hideProgress();
+    var detail=String(window.__aethrionLastAuthError||'').trim();
+    if(detail)notify('Giriş tamamlanamadı: '+detail,'error');
     return;
    }
    if(isLogin){
@@ -257,7 +260,7 @@ setTimeout(boot,800);setTimeout(boot,2200);
     }
     hideProgress();
     var authDetail = String(window.__aethrionLastAuthError || '').trim();
-    notify(authDetail ? 'Giriş tamamlanamadı: ' + authDetail : 'Giriş tamamlanamadı. E-posta/şifrenizi kontrol edin; sorun sürerse sunucu yanıtını ve Back4App kimlik doğrulama ayarlarını incelemek gerekir.','error');
+    notify(authDetail ? 'Giriş tamamlanamadı: ' + authDetail : 'Kimlik doğrulama isteği tamamlandı ancak tarayıcıda etkin bir Parse oturumu oluşmadı. Back4App sessionToken yanıtını ve Parse.User.become adımını kontrol edin.','error');
    }
   }catch(error){
    errorSeen=error;
