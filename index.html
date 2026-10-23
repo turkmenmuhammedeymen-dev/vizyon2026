@@ -51233,11 +51233,20 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
    // Block confirmed VPN/proxy/Tor connections. If IPQS is configured but temporarily
    // unavailable (for example, exhausted credits), keep the public site available and
    // show a non-blocking notice. VPN detection remains degraded until the provider recovers.
-   if(!result||result.ok!==true||result.configured!==true||result.blocked===true){
+   if(!result||result.ok!==true){
     blockConfirmed(result&&result.code?result.code:'SECURITY_CHECK_DEGRADED');return;
    }
+   if(result.blocked===true){
+    blockConfirmed(result.code||'VPN_PROXY_OR_TOR');return;
+   }
+   // A provider outage or missing IPQS key is a degraded reputation check, not an
+   // authentication outage. Keep the public site usable while preserving confirmed blocks.
    if(result.degraded===true){
-    addNotice(result.warningCode||result.code||'REPUTATION_CHECK_UNAVAILABLE');return;
+    addNotice(result.warningCode||result.code||'REPUTATION_CHECK_UNAVAILABLE');
+    removePending();return;
+   }
+   if(result.configured!==true){
+    blockConfirmed(result.code||'VPN_CHECK_NOT_CONFIGURED');return;
    }
    removePending();
   }).catch(function(){if(!finished){finished=true;blockConfirmed('CLOUD_FUNCTION_CALL_FAILED');}});
