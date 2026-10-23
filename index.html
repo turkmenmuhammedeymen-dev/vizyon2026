@@ -51283,5 +51283,89 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 </script>
 
 
+
+<!-- AETHRION central public configuration bootstrap.
+     Configure JSON values in Back4App Parse.Config:
+     AETHRION_PUBLIC_CONFIG_JSON, AETHRION_PLAN_LIMITS_JSON,
+     AETHRION_FEATURE_FLAGS_JSON, AETHRION_PUBLIC_MODELS_JSON.
+     Never put passwords, API keys, tokens, or encryption secrets in these public JSON values. -->
+<script id="aethrionCentralConfigBootstrap">
+(function () {
+  'use strict';
+  window.AETHRION_CONFIG = window.AETHRION_CONFIG || {
+    version: 1, publicConfig: {}, planLimits: {}, featureFlags: {}, models: {}
+  };
+
+  function applyPlanLimits(planLimits) {
+    if (!planLimits || typeof planLimits !== 'object' || !window.PLAN_LIMITS) return;
+    var allowedPlans = ['free', 'pro', 'team', 'admin', 'founder', 'beta', 'moderator'];
+    allowedPlans.forEach(function (planName) {
+      var target = window.PLAN_LIMITS[planName];
+      var incoming = planLimits[planName];
+      if (!target || !incoming || typeof incoming !== 'object' || Array.isArray(incoming)) return;
+      Object.keys(incoming).forEach(function (key) {
+        if (!Object.prototype.hasOwnProperty.call(target, key)) return;
+        var oldValue = target[key], nextValue = incoming[key];
+        if (typeof oldValue === 'number' && typeof nextValue === 'number' &&
+            Number.isFinite(nextValue) && nextValue >= -1) {
+          target[key] = nextValue;
+        } else if (typeof oldValue === 'boolean' && typeof nextValue === 'boolean') {
+          target[key] = nextValue;
+        } else if (typeof oldValue === 'string' && typeof nextValue === 'string' &&
+                   nextValue.length <= 120 && !/PASS|TOKEN|SECRET|API.?KEY/i.test(key)) {
+          target[key] = nextValue;
+        } else if (Array.isArray(oldValue) && Array.isArray(nextValue) &&
+                   nextValue.length <= 100 && nextValue.every(function (item) { return typeof item === 'string'; })) {
+          target[key] = nextValue.slice();
+        }
+      });
+    });
+  }
+
+  function applyBrand(brand) {
+    if (!brand || typeof brand !== 'object') return;
+    if (typeof brand.siteName === 'string' && brand.siteName.trim() && brand.siteName.length <= 100) {
+      document.title = brand.siteName.trim();
+    }
+    if (typeof brand.description === 'string' && brand.description.trim() && brand.description.length <= 300) {
+      var description = document.querySelector('meta[name="description"]');
+      if (description) description.setAttribute('content', brand.description.trim());
+    }
+  }
+
+  function loadConfig() {
+    var startedAt = Date.now();
+    function attempt() {
+      var S = window.Parse;
+      if (!S || !S.Cloud || typeof S.Cloud.run !== 'function' || !window.parseInitialized) {
+        if (Date.now() - startedAt < 12000) window.setTimeout(attempt, 250);
+        return;
+      }
+      S.Cloud.run('getAethrionPublicConfig', {}).then(function (result) {
+        if (!result || result.success !== true) return;
+        window.AETHRION_CONFIG.version = result.version || 1;
+        window.AETHRION_CONFIG.publicConfig = result.publicConfig || {};
+        window.AETHRION_CONFIG.planLimits = result.planLimits || {};
+        window.AETHRION_CONFIG.featureFlags = result.featureFlags || {};
+        window.AETHRION_CONFIG.models = result.models || {};
+        applyPlanLimits(window.AETHRION_CONFIG.planLimits);
+        applyBrand(window.AETHRION_CONFIG.publicConfig.brand);
+        window.dispatchEvent(new CustomEvent('aethrion:config-loaded', { detail: window.AETHRION_CONFIG }));
+        console.info('[AETHRION Config] Central public configuration loaded.');
+      }).catch(function () {
+        console.warn('[AETHRION Config] Central configuration unavailable; built-in defaults remain active.');
+      });
+    }
+    attempt();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadConfig, { once: true });
+  } else {
+    loadConfig();
+  }
+})();
+</script>
+
 </body>
 </html>
