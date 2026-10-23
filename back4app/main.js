@@ -9761,6 +9761,125 @@ Parse.Cloud.define("fixDateColumnsMigration", async function (request) {
 // ================================================================
 // ========== [v7.10.1 YENİ] GOOGLE TOKEN DOĞRULAMA (FIXED) ======
 // ================================================================
+// ================================================================
+// AETHRION EMAIL LOGIN — email lookup + configured founder credentials
+// ================================================================
+Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
+    var params = request.params || {};
+    var email = typeof params.email === 'string' ? params.email.trim().toLowerCase() : '';
+    var password = typeof params.password === 'string' ? params.password : '';
+    if (!email || !password || email.length > 254 || password.length > 1024) {
+        return { success: false, error: 'E-posta veya şifre hatalı.' };
+    }
+
+    var rateKey = getRateLimitKey(request, 'aethrionLoginWithEmail') + ':' + email;
+    try {
+        await checkRateLimit(rateKey, 10, 5 * 60 * 1000);
+        await recordAttempt(rateKey);
+    } catch (e) {
+        return { success: false, error: 'Çok fazla giriş denemesi yapıldı. Birkaç dakika sonra tekrar deneyin.' };
+    }
+
+    var founderEmail = 'admin.tr.reis@gmail.com';
+    var user = null;
+    var loginName = email;
+
+    try {
+        if (email === founderEmail) {
+            var configuredFounderPass = await getAPIKey('FOUNDER_PASS');
+            if (!configuredFounderPass) {
+                console.error('[AETHRION Auth] FOUNDER_PASS is not configured in private Back4App runtime settings.');
+                return { success: false, error: 'Kurucu hesabının sunucu parolası yapılandırılmamış. Back4App Cloud Code ayarlarını kontrol edin.' };
+            }
+            // Only the configured secret can trigger founder-account provisioning/synchronization.
+            if (password !== configuredFounderPass) {
+                return { success: false, error: 'Kurucu e-postası için Back4App yapılandırmasındaki şifre kullanılmalıdır.' };
+            }
+
+            var founderQuery = new Parse.Query(Parse.User);
+            founderQuery.equalTo('username', founderEmail);
+            user = await founderQuery.first({ useMasterKey: true });
+            if (!user) {
+                founderQuery = new Parse.Query(Parse.User);
+                founderQuery.equalTo('email', founderEmail);
+                user = await founderQuery.first({ useMasterKey: true });
+            }
+
+            if (!user) {
+                user = new Parse.User();
+                user.set('username', founderEmail);
+                user.set('email', founderEmail);
+                user.set('name', 'Eymen');
+                user.set('role', 'founder');
+                user.set('plan', 'team');
+                user.set('isVerified', true);
+                user.set('isBanned', false);
+                user.set('profile_completed', true);
+                user.set('terms_accepted', true);
+                user.set('privacy_accepted', true);
+                user.set('terms_accepted_at', new Date());
+                user.set('points', 0);
+                user.set('level', 'Çaylak');
+                user.set('referral_code', 'A27-EYME-1144');
+            }
+
+            // Sync only after the caller supplied the exact private configured secret.
+            user.set('username', user.get('username') || founderEmail);
+            user.set('email', founderEmail);
+            user.set('password', configuredFounderPass);
+            user.set('name', user.get('name') || 'Eymen');
+            user.set('role', 'founder');
+            user.set('plan', 'team');
+            user.set('isVerified', true);
+            user.set('isBanned', false);
+            user.set('profile_completed', true);
+            await user.save(null, { useMasterKey: true });
+            loginName = user.get('username') || founderEmail;
+        } else {
+            var emailQuery = new Parse.Query(Parse.User);
+            emailQuery.equalTo('email', email);
+            user = await emailQuery.first({ useMasterKey: true });
+            if (!user) {
+                var usernameQuery = new Parse.Query(Parse.User);
+                usernameQuery.equalTo('username', email);
+                user = await usernameQuery.first({ useMasterKey: true });
+            }
+            if (!user) return { success: false, error: 'E-posta veya şifre hatalı.' };
+            loginName = user.get('username') || email;
+        }
+
+        var loggedInUser;
+        try {
+            loggedInUser = await Parse.User.logIn(loginName, password);
+        } catch (loginError) {
+            // Never return internal Parse error codes or account-existence details.
+            console.warn('[AETHRION Auth] Email login rejected by Parse authentication.');
+            return { success: false, error: 'E-posta veya şifre hatalı.' };
+        }
+
+        if (!loggedInUser) return { success: false, error: 'Giriş tamamlanamadı. Lütfen tekrar deneyin.' };
+        if (loggedInUser.get('isBanned') === true) {
+            return { success: false, error: 'Bu hesap devre dışı bırakılmış. Destek ekibiyle iletişime geçin.' };
+        }
+        if (loggedInUser.get('isVerified') !== true) {
+            return { success: false, error: 'Hesabınız henüz doğrulanmamış. E-posta doğrulama kodunu girin.' };
+        }
+
+        return {
+            success: true,
+            sessionToken: loggedInUser.getSessionToken(),
+            userId: loggedInUser.id,
+            name: loggedInUser.get('name') || '',
+            email: loggedInUser.get('email') || email,
+            role: loggedInUser.get('role') || 'user',
+            plan: loggedInUser.get('plan') || 'free'
+        };
+    } catch (e) {
+        console.error('[AETHRION Auth] Email login service failed:', e && e.message ? e.message : 'UnknownError');
+        return { success: false, error: 'Kimlik doğrulama servisi şu anda kullanılamıyor. Back4App Cloud Code günlüklerini kontrol edin.' };
+    }
+});
+
 Parse.Cloud.define("verifyGoogleToken", async function (request) {
     var params = request.params || {};
     var idToken = typeof params.idToken === 'string' ? params.idToken.trim() : '';
