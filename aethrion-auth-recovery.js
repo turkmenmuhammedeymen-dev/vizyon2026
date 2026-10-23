@@ -251,7 +251,8 @@ setTimeout(boot,800);setTimeout(boot,2200);
      return;
     }
     hideProgress();
-    notify('Giriş tamamlanamadı. E-posta/şifrenizi kontrol edin; sorun sürerse sunucu yanıtını ve Back4App kimlik doğrulama ayarlarını incelemek gerekir.','error');
+    var authDetail = String(window.__aethrionLastAuthError || '').trim();
+    notify(authDetail ? 'Giriş tamamlanamadı: ' + authDetail : 'Giriş tamamlanamadı. E-posta/şifrenizi kontrol edin; sorun sürerse sunucu yanıtını ve Back4App kimlik doğrulama ayarlarını incelemek gerekir.','error');
    }
   }catch(error){
    errorSeen=error;
