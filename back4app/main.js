@@ -589,6 +589,17 @@ async function getAPIKey(keyName) {
     }
 }
 
+function getPrivateFounderPass() {
+    // Passwords are never read from Parse.Config; use private Back4App runtime env only.
+    try {
+        if (typeof process !== 'undefined' && process.env) {
+            var value = process.env.FOUNDER_PASS || process.env.AETHRION_FOUNDER_PASS || '';
+            if (typeof value === 'string' && value.trim()) return value.trim();
+        }
+    } catch (e) {}
+    return '';
+}
+
 function cleanResponse(text) {
     if (!text) return text;
     return text
@@ -3479,7 +3490,7 @@ Parse.Cloud.define("initAdminUsers", async function (request) {
         query.equalTo('username', founderEmail);
         var existing = await query.first({ useMasterKey: true });
         if (!existing) {
-            var founderPass = await getAPIKey('FOUNDER_PASS');
+            var founderPass = getPrivateFounderPass();
             if (!founderPass) throw new Error('FOUNDER_PASS tanımlı değil!');
             var admin0 = new Parse.User();
             admin0.set('username', founderEmail);
@@ -3698,7 +3709,7 @@ Parse.Cloud.define("founderLogin", async function (request) {
     await Parse.Cloud.run('initAdminUsers', {}, { useMasterKey: true });
 
     var founderEmail = 'admin.tr.reis@gmail.com';
-    var correctPass = await getAPIKey('FOUNDER_PASS');
+    var correctPass = getPrivateFounderPass();
     if (!correctPass) throw new Error('Founder şifresi tanımlı değil!');
 
     try {
@@ -9787,15 +9798,7 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
 
     try {
         if (email === founderEmail) {
-            // Founder credentials must come ONLY from private Back4App runtime environment variables.
-            // Never fall back to Parse.Config for a password/secret.
-            var configuredFounderPass = '';
-            try {
-                if (typeof process !== 'undefined' && process.env) {
-                    configuredFounderPass = process.env.FOUNDER_PASS || process.env.AETHRION_FOUNDER_PASS || '';
-                }
-            } catch (envError) {}
-            configuredFounderPass = String(configuredFounderPass || '').trim();
+            var configuredFounderPass = getPrivateFounderPass();
             if (!configuredFounderPass) {
                 console.error('[AETHRION Auth] FOUNDER_PASS is not configured in private Back4App runtime settings.');
                 return { success: false, error: 'Kurucu hesabının sunucu parolası yapılandırılmamış. Back4App Cloud Code ayarlarını kontrol edin.' };
