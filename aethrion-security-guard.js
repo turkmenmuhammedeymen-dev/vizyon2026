@@ -55,7 +55,7 @@
         return;
       }
       SDK.Cloud.run('aethrionSecurityCheck', {}).then(function (result) {
-        if (!result || result.ok !== true || result.configured !== true || result.blocked === true) {
+        if (!result || result.ok !== true || result.configured !== true || result.degraded === true || result.blocked === true) {
           blockPage(result && result.code ? result.code : 'INVALID_SECURITY_RESPONSE');
           return;
         }
