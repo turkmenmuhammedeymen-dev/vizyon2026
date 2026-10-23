@@ -41,7 +41,7 @@
     document.documentElement.style.overflow = 'hidden';
     var btn = document.getElementById('aeVpnRetry');
     if (btn) btn.addEventListener('click', function () { location.reload(); });
-    if (!isVpn) console.warn('[AETHRION Security] Gate failed closed. Code:', reason || 'UNKNOWN');
+    if (!isVpn) console.warn('[AETHRION Security] Confirmed block reason:', reason || 'UNKNOWN');
   }
 
   function run() {
@@ -50,19 +50,22 @@
     function attempt() {
       var SDK = window.Parse;
       if (!SDK || !SDK.Cloud || typeof SDK.Cloud.run !== 'function') {
-        if (Date.now() - started > 15000) blockPage('PARSE_SDK_UNAVAILABLE');
+        if (Date.now() - started > 15000) { console.warn('[AETHRION Security] Parse SDK unavailable; site remains accessible in degraded mode.'); clearChecking(); }
         else setTimeout(attempt, 250);
         return;
       }
       SDK.Cloud.run('aethrionSecurityCheck', {}).then(function (result) {
-        if (!result || result.ok !== true || result.configured !== true || result.degraded === true || result.blocked === true) {
-          blockPage(result && result.code ? result.code : 'INVALID_SECURITY_RESPONSE');
+        if (result && result.blocked === true && result.code === 'VPN_PROXY_OR_TOR') {
+          blockPage('VPN_PROXY_OR_TOR');
           return;
+        }
+        if (!result || result.ok !== true || result.configured !== true || result.degraded === true) {
+          console.warn('[AETHRION Security] Reputation check unavailable/degraded; allowing access on an unconfirmed result.', result && result.code ? result.code : 'INVALID_SECURITY_RESPONSE');
         }
         clearChecking();
       }).catch(function (error) {
-        console.warn('[AETHRION Security] Back4App gate check failed.', error);
-        blockPage('SECURITY_CHECK_UNAVAILABLE');
+        console.warn('[AETHRION Security] Cloud check failed; allowing access in degraded mode.', error && error.message ? error.message : 'UNKNOWN');
+        clearChecking();
       });
     }
     attempt();
