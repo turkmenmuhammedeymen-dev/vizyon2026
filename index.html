@@ -51203,31 +51203,29 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
   var b=document.createElement('button');b.type='button';b.textContent='Yeniden kontrol et';b.style.cssText='flex-shrink:0;border:1px solid #cdb16c;border-radius:8px;background:#d7bd7b;color:#13243a;font-weight:800;padding:8px 10px;cursor:pointer';b.addEventListener('click',function(){location.reload();});
   n.appendChild(msg);n.appendChild(b);(document.body||document.documentElement).appendChild(n);
  }
- function blockConfirmed(){
+ function blockConfirmed(reason){
   removePending();if(document.getElementById('aethrionVpnBlock'))return;
   var r=document.createElement('div');r.id='aethrionVpnBlock';r.style.cssText='position:fixed;inset:0;z-index:2147483647;background:#080d18;color:#f5f7ff;display:grid;place-items:center;padding:20px;font:500 15px/1.6 system-ui,sans-serif';
   var c=document.createElement('section');c.style.cssText='width:min(620px,100%);padding:30px;border:1px solid rgba(215,189,123,.5);border-radius:20px;background:#111a2b;box-shadow:0 20px 70px rgba(0,0,0,.45)';
   var brand=document.createElement('div');brand.textContent='AETHRION SECURITY';brand.style.cssText='color:#d8bd79;font-size:12px;font-weight:800;letter-spacing:.2em;margin-bottom:10px';
   var title=document.createElement('h1');title.textContent='Bağlantıya izin verilmiyor';title.style.cssText='margin:0 0 12px;font-size:clamp(25px,5vw,36px);line-height:1.15';
-  var p=document.createElement('p');p.textContent='IPQS bu bağlantıyı VPN, proxy veya Tor olarak işaretledi. Bu sonuç yanlış görünüyorsa farklı bir normal bağlantıyla tekrar deneyin veya site yöneticisinin IPQS sınıflandırmasını incelemesini isteyin.';
+  var p=document.createElement('p');p.textContent=reason==='VPN_PROXY_OR_TOR'?'IPQS bu bağlantıyı VPN, proxy veya Tor olarak işaretledi. Bu sonuç yanlış görünüyorsa normal internet bağlantısıyla tekrar deneyin.':'AETHRION güvenlik kontrolü bağlantıyı doğrulayamadı ('+String(reason||'SECURITY_CHECK_UNAVAILABLE')+'). Güvenli erişim için kontrol başarıyla tamamlanana kadar giriş engellendi. Lütfen bağlantıyı ve güvenlik servisi yapılandırmasını kontrol edip yeniden deneyin.';
   var b=document.createElement('button');b.type='button';b.textContent='Yeniden kontrol et';b.style.cssText='min-height:44px;padding:0 18px;border:1px solid #cdb16c;border-radius:10px;background:#d7bd7b;color:#13243a;font-weight:800;cursor:pointer';b.addEventListener('click',function(){location.reload();});
   c.appendChild(brand);c.appendChild(title);c.appendChild(p);c.appendChild(b);r.appendChild(c);(document.body||document.documentElement).appendChild(r);
  }
  function run(){var started=Date.now();function attempt(){
   if(finished)return;var S=window.Parse;
-  if(!S||!S.Cloud||typeof S.Cloud.run!=='function'||!window.parseInitialized){if(Date.now()-started>12000){finished=true;addNotice('SDK_NOT_READY');}else setTimeout(attempt,250);return;}
+  if(!S||!S.Cloud||typeof S.Cloud.run!=='function'||!window.parseInitialized){if(Date.now()-started>12000){finished=true;blockConfirmed('SDK_NOT_READY');}else setTimeout(attempt,250);return;}
   S.Cloud.run('aethrionSecurityCheck',{}).then(function(result){
    if(finished)return;finished=true;
-   if(result&&result.blocked===true&&result.code==='VPN_PROXY_OR_TOR'){blockConfirmed();return;}
-   // A reputation-provider error is not proof that the visitor uses a VPN. Keep the site usable,
-   // record the degraded state in diagnostics, and reserve the visible banner for setup/transport failures.
-   else if(result&&result.ok===true&&result.degraded===true&&/^REPUTATION_/.test(String(result.code||''))){
-    console.warn('[AETHRION Security] IP reputation provider is degraded; see Back4App Cloud Code logs for the provider reason.',String(result.code||'UNKNOWN'));
-    removePending();
+   if(result&&result.blocked===true&&result.code==='VPN_PROXY_OR_TOR'){blockConfirmed('VPN_PROXY_OR_TOR');return;}
+   // Fail closed when the reputation provider cannot verify the connection; otherwise VPN/proxy users
+   // can bypass the gate whenever IPQS is down or misconfigured.
+   if(!result||result.ok!==true||result.configured!==true||result.blocked===true||result.degraded===true){
+    blockConfirmed(result&&result.code?result.code:'SECURITY_CHECK_DEGRADED');return;
    }
-   else if(!result||result.ok!==true||result.blocked===true||result.configured===false||result.degraded===true){addNotice(result&&result.code?result.code:'SECURITY_CHECK_DEGRADED');}
-   else removePending();
-  }).catch(function(){if(!finished){finished=true;addNotice('CLOUD_FUNCTION_CALL_FAILED');}});
+   removePending();
+  }).catch(function(){if(!finished){finished=true;blockConfirmed('CLOUD_FUNCTION_CALL_FAILED');}});
  }attempt();}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();
