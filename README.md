@@ -9,6 +9,15 @@ AETHRION is a browser-based AI and productivity ecosystem deployed on Vercel fro
 - Community, projects, account and security pages
 - Turkish-first interface with responsive desktop and mobile layouts
 
+## SEO structured data
+The refreshed JSON-LD graph is maintained in `aethrion-schema.js` and describes AETHRION as an organization, website and browser-based web application. It includes the documented AI, developer and creative productivity areas, while avoiding claims that planned JARVIS/desktop-control functions are already live.
+
+**Activation required:** the script must be referenced from the root `index.html` inside its `<head>`:
+```html
+<script src="/aethrion-schema.js" defer></script>
+```
+The GitHub connector returned an empty body for the current large `index.html`, so that file was not overwritten blindly. Until the script tag is added to the live HTML, the new JSON-LD file exists in the repository but will not be emitted on the website.
+
 ## Deployment layout
 The repository uses the root as the Vercel static site root. There is no `public/` directory. HTML, CSS, JavaScript, SVG, JSON and policy pages live at the root or under `api/`.
 
@@ -22,7 +31,6 @@ Upload `back4app/main.js` as the app's Cloud Code `main.js`, set `IPQS_API_KEY` 
 
 ## Validation
 GitHub Actions runs JavaScript syntax checks on the Cloud Code and browser security guard. Passing syntax checks do not replace live tests of login, AI providers, file analysis, rate limits, and VPN/proxy detection.
-
 
 ## AETHRION AI and JARVIS
 - AETHRION AI is the standard conversational assistant.
