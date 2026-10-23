@@ -9787,7 +9787,15 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
 
     try {
         if (email === founderEmail) {
-            var configuredFounderPass = await getAPIKey('FOUNDER_PASS');
+            // Founder credentials must come ONLY from private Back4App runtime environment variables.
+            // Never fall back to Parse.Config for a password/secret.
+            var configuredFounderPass = '';
+            try {
+                if (typeof process !== 'undefined' && process.env) {
+                    configuredFounderPass = process.env.FOUNDER_PASS || process.env.AETHRION_FOUNDER_PASS || '';
+                }
+            } catch (envError) {}
+            configuredFounderPass = String(configuredFounderPass || '').trim();
             if (!configuredFounderPass) {
                 console.error('[AETHRION Auth] FOUNDER_PASS is not configured in private Back4App runtime settings.');
                 return { success: false, error: 'Kurucu hesabının sunucu parolası yapılandırılmamış. Back4App Cloud Code ayarlarını kontrol edin.' };
