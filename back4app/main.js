@@ -9862,7 +9862,7 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
             return { success: false, error: 'Bu hesap devre dışı bırakılmış. Destek ekibiyle iletişime geçin.' };
         }
         if (loggedInUser.get('isVerified') !== true) {
-            return { success: false, error: 'Hesabınız henüz doğrulanmamış. E-posta doğrulama kodunu girin.' };
+            return { success: false, code: 'UNVERIFIED', error: 'Hesabınız henüz doğrulanmamış. E-posta doğrulama kodunu girin.' };
         }
 
         return {
