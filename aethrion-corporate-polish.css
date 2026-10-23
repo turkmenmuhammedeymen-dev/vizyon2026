@@ -1,0 +1,79 @@
+/* AETHRION Corporate Polish — 2026-10-24
+   Additive visual consistency, keyboard focus, responsive cards and reduced-motion support.
+   Existing feature-specific styles and legacy selectors are intentionally preserved. */
+:root {
+  --aethrion-polish-border: rgba(148, 163, 184, .22);
+  --aethrion-polish-gold: #d9b45b;
+  --aethrion-polish-surface: rgba(16, 27, 44, .94);
+}
+:where(button, a, input, select, textarea, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid var(--aethrion-polish-gold) !important;
+  outline-offset: 3px !important;
+}
+#mainSite :is(.feature-card, .category-card, .model-card, .tool-card, .price-card, .pricing-card, .ecosystem-card, .tech-card) {
+  border: 1px solid var(--aethrion-polish-border) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .18) !important;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease !important;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+#mainSite :is(.feature-card, .category-card, .model-card, .tool-card, .price-card, .pricing-card, .ecosystem-card, .tech-card):hover {
+  border-color: rgba(217, 180, 91, .48) !important;
+  box-shadow: 0 16px 38px rgba(0, 0, 0, .25) !important;
+  transform: translateY(-3px);
+}
+#mainSite :is(.section-title, .feature-title, .category-title) {
+  text-wrap: balance;
+  line-height: 1.2;
+}
+#mainSite :is(p, .feature-desc, .category-desc) {
+  line-height: 1.65;
+}
+#authModal :is(input, select, textarea),
+#mainSite :is(input, select, textarea) {
+  max-width: 100%;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+#authModal :is(input, select, textarea):focus,
+#mainSite :is(input, select, textarea):focus {
+  border-color: rgba(217, 180, 91, .8) !important;
+  box-shadow: 0 0 0 3px rgba(217, 180, 91, .13) !important;
+}
+.aethrion-sidebar {
+  box-shadow: 18px 0 54px rgba(0, 0, 0, .28);
+  border-right: 1px solid rgba(217, 180, 91, .18);
+}
+.aethrion-sidebar-item {
+  min-height: 48px;
+  border-radius: 12px;
+  transition: background-color .18s ease, border-color .18s ease, transform .18s ease;
+}
+.aethrion-sidebar-item:focus-visible {
+  outline-offset: -2px !important;
+}
+.aethrion-sidebar-backdrop {
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+@media (max-width: 640px) {
+  #mainSite :is(.features-grid, .feature-grid, .features-container, .category-grid, .models-grid, .pricing-grid, .ecosystem-grid, .tech-grid) {
+    gap: 14px !important;
+  }
+  #mainSite :is(.feature-card, .category-card, .model-card, .tool-card, .price-card, .pricing-card, .ecosystem-card, .tech-card) {
+    border-radius: 15px !important;
+  }
+  #authModal .modal {
+    width: min(100% - 24px, 520px) !important;
+    max-height: calc(100dvh - 24px);
+    overflow: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
