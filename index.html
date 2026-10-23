@@ -21775,7 +21775,7 @@ def root():
                 <h4>Yasal</h4>
                 <ul>
                     <li><a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a></li>
-                    <li><a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank">Kullanıcı Sözleşmesi</a></li>
+                    <li><a href="/kullanici-sozlesmesi.html" target="_blank">Kullanıcı Sözleşmesi</a></li>
                 </ul>
             </div>
             <div class="footer-col">
@@ -21839,7 +21839,7 @@ def root():
                 <input id="rReferralCode" placeholder="Davet Kodu (varsa)" class="form-input">
                 <label style="display:flex;align-items:flex-start;gap:10px;margin:12px 0;cursor:pointer;">
                     <input type="checkbox" id="registerTermsCheck" style="width:18px;height:18px;accent-color:var(--accent);">
-                    <span style="font-size:12px;color:var(--text2);"><a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank" style="color:var(--accent);">Kullanıcı Sözleşmesi</a>'ni kabul ediyorum.</span>
+                    <span style="font-size:12px;color:var(--text2);"><a href="/kullanici-sozlesmesi.html" target="_blank" style="color:var(--accent);">Kullanıcı Sözleşmesi</a>'ni kabul ediyorum.</span>
                 </label>
                 <label style="display:flex;align-items:flex-start;gap:10px;margin:12px 0;cursor:pointer;">
                     <input type="checkbox" id="registerPrivacyCheck" style="width:18px;height:18px;accent-color:var(--accent);">
@@ -21855,7 +21855,7 @@ def root():
                 </div>
                 <label style="display:flex;align-items:flex-start;gap:10px;margin:12px 0;cursor:pointer;">
                     <input type="checkbox" id="loginTermsCheck" style="width:18px;height:18px;accent-color:var(--accent);">
-                    <span style="font-size:12px;color:var(--text2);"><a href="https://vizyon2026.vercel.app/kullanici-sozlesmesi.html" target="_blank" style="color:var(--accent);">Kullanıcı Sözleşmesi</a>'ni kabul ediyorum.</span>
+                    <span style="font-size:12px;color:var(--text2);"><a href="/kullanici-sozlesmesi.html" target="_blank" style="color:var(--accent);">Kullanıcı Sözleşmesi</a>'ni kabul ediyorum.</span>
                 </label>
                 <label style="display:flex;align-items:flex-start;gap:10px;margin:12px 0;cursor:pointer;">
                     <input type="checkbox" id="loginPrivacyCheck" style="width:18px;height:18px;accent-color:var(--accent);">
@@ -25632,7 +25632,7 @@ async function handleLogin() {
 
     if (!loginTermsCheck || !loginTermsCheck.checked) {
         showNotification('❌ Giriş yapmak için Kullanıcı Sözleşmesi\'ni kabul etmelisiniz.', 'error');
-        return;
+        return false;
     }
     if (!loginPrivacyCheck || !loginPrivacyCheck.checked) {
         showNotification('❌ Giriş yapmak için Gizlilik Politikası\'nı kabul etmelisiniz.', 'error');
@@ -25651,6 +25651,14 @@ async function handleLogin() {
             password: pass
         });
         if (!authResult || authResult.success !== true) {
+            if (authResult && authResult.code === 'EMAIL_NOT_VERIFIED') {
+                window.__aethrionLastAuthError = authResult.error || 'Hesap e-posta doğrulaması bekliyor.';
+                showNotification(window.__aethrionLastAuthError, 'warning');
+                switchTab('verify');
+                var verifyEmailInput = document.getElementById('verifyEmail');
+                if (verifyEmailInput) verifyEmailInput.value = email;
+                return false;
+            }
             throw new Error((authResult && authResult.error) || 'Giriş tamamlanamadı. E-posta ve şifreyi kontrol edin.');
         }
         if (!authResult.sessionToken) {
@@ -25728,6 +25736,8 @@ async function handleLogin() {
             window.addLogSuccess('Kullanıcı girişi başarılı: ' + email +
                 ' (rol: ' + user.get('role') + ', plan: ' + user.get('plan') + ')');
         }
+        window.__aethrionLastAuthError = '';
+        return true;
     } catch (e) {
         window.__aethrionLastAuthError = String((e && e.message) || 'Bilinmeyen kimlik doğrulama hatası').slice(0, 240);
         console.error('Giriş hatası:', e.message);
@@ -25735,6 +25745,7 @@ async function handleLogin() {
         if (typeof window.addLogError === 'function') {
             window.addLogError('Giriş hatası: ' + e.message, { email: email });
         }
+        return false;
     }
 }
 
@@ -50035,7 +50046,7 @@ window.addEventListener('load', function() {
 <!-- devre dışı bırakır. SADECE BU ÇALIŞIR.                       -->
 <!-- 
 
-</body> etiketinden HEMEN ÖNCE ekle.                         -->
+ etiketinden HEMEN ÖNCE ekle.                         -->
 <!-- ============================================================ -->
 <script>
 (function AethrionUnifiedRouter() {
@@ -51271,41 +51282,6 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 })();
 </script>
 
+
 </body>
 </html>
-
-
-
-
-<!-- AETHRION UI repair: the experience drawer must be an overlay, never ordinary page content. -->
-<style id="aethrionExperienceDrawerVisibilityFix">
-  #aethrionExperienceBackdrop {
-    position: fixed !important; inset: 0 !important; z-index: 2147483002 !important;
-    display: none !important; opacity: 0 !important; visibility: hidden !important;
-    pointer-events: none !important; transition: opacity .22s ease, visibility .22s ease !important;
-  }
-  #aethrionExperienceBackdrop.show {
-    display: block !important; opacity: 1 !important; visibility: visible !important;
-    pointer-events: auto !important;
-  }
-  #aethrionExperienceDrawer {
-    position: fixed !important; top: 0 !important; right: 0 !important; bottom: 0 !important;
-    z-index: 2147483003 !important; width: min(440px, 100vw) !important; max-width: 100vw !important;
-    height: 100vh !important; height: 100dvh !important; box-sizing: border-box !important;
-    display: flex !important; flex-direction: column !important; overflow: hidden !important;
-    transform: translateX(105%) !important; opacity: 0 !important; visibility: hidden !important;
-    pointer-events: none !important; transition: transform .24s ease, opacity .24s ease, visibility .24s ease !important;
-  }
-  #aethrionExperienceDrawer.open {
-    transform: translateX(0) !important; opacity: 1 !important; visibility: visible !important;
-    pointer-events: auto !important;
-  }
-  #aethrionExperienceDrawer .aed-head { flex: 0 0 auto !important; }
-  #aethrionExperienceDrawer .aed-list { flex: 1 1 auto !important; min-height: 0 !important; overflow-y: auto !important; overscroll-behavior: contain !important; }
-  #aethrionExperienceDrawer .aed-foot { flex: 0 0 auto !important; }
-  body.aethrion-experience-menu-open { overflow: hidden !important; }
-  @media (prefers-reduced-motion: reduce) {
-    #aethrionExperienceDrawer, #aethrionExperienceBackdrop { transition: none !important; }
-  }
-</style>
-
