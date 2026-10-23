@@ -237,7 +237,11 @@ setTimeout(boot,800);setTimeout(boot,2200);
   try{
    /* Important: the original event is passed through. Some legacy handlers require it. */
    var result=fn.call(button||window,event);
-   await Promise.resolve(result);
+   result=await Promise.resolve(result);
+   if(isLogin && result===false){
+    hideProgress();
+    return;
+   }
    if(isLogin){
     while(Date.now()-startAt<14000){
      if(sessionExists()){completed=true;break}
@@ -247,7 +251,8 @@ setTimeout(boot,800);setTimeout(boot,2200);
      setProgress('Hesabınız açılıyor…',100,true);
      await new Promise(function(resolve){setTimeout(resolve,900)});
      /* The app dashboard is initialized on page load; reload only after a real session exists. */
-     window.location.assign('/#dashboardArea');
+     hideProgress();
+     if(window.location.hash!=='#dashboardArea')window.location.hash='dashboardArea';
      return;
     }
     hideProgress();
