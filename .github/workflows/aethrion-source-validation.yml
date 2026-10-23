@@ -29,29 +29,29 @@ jobs:
           const path = require('path');
           const { spawnSync } = require('child_process');
           const html = fs.readFileSync('index.html', 'utf8');
-          const scriptRe = /<script\\b([^>]*)>([\\s\\S]*?)<\\/script\\s*>/gi;
+          const scriptRe = /<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi;
           let match;
           let checked = 0;
           const errors = [];
           while ((match = scriptRe.exec(html)) !== null) {
             const attrs = match[1] || '';
             const code = match[2] || '';
-            if (/\\bsrc\\s*=/.test(attrs)) continue;
-            if (/\\btype\\s*=\\s*["']application\\/ld\\+json["']/i.test(attrs)) continue;
+            if (/\bsrc\s*=/.test(attrs)) continue;
+            if (/\btype\s*=\s*["']application\/ld\+json["']/i.test(attrs)) continue;
             if (!code.trim()) continue;
             checked++;
             const file = path.join(os.tmpdir(), 'aethrion-inline-' + checked + '.js');
             fs.writeFileSync(file, code, 'utf8');
             const result = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
             if (result.status !== 0) {
-              errors.push('Inline script #' + checked + ' near HTML byte ' + match.index + '\\n' +
+              errors.push('Inline script #' + checked + ' near HTML byte ' + match.index + '\n' +
                 (result.stderr || result.stdout || 'node --check failed'));
             }
             fs.rmSync(file, { force: true });
           }
           console.log('Checked ' + checked + ' inline JavaScript blocks.');
           if (errors.length) {
-            console.error(errors.join('\\n\\n'));
+            console.error(errors.join('\n\n'));
             process.exit(1);
           }
           const required = [
