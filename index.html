@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<script>document.documentElement.classList.add('ae-security-pending');</script>
-<style>html.ae-security-pending body{visibility:hidden!important}</style>
+<!-- Security check runs asynchronously; keep the app visible during outages. -->
     <meta charset="UTF-8">
     <meta name="theme-color" content="#0b1020">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -39,7 +38,10 @@
       "@type": "Organization",
       "@id": "https://vizyon2026.vercel.app/#organization",
       "name": "AETHRION",
-      "alternateName": ["AETHRION AI", "A27"],
+      "alternateName": [
+        "AETHRION AI",
+        "A27"
+      ],
       "url": "https://vizyon2026.vercel.app/",
       "logo": {
         "@type": "ImageObject",
@@ -47,15 +49,29 @@
         "contentUrl": "https://vizyon2026.vercel.app/logo.svg",
         "caption": "AETHRION — Intelligence Without Limits."
       },
-      "description": "AETHRION is a web-based AI and productivity ecosystem combining enabled AI-provider integrations with creative, developer, collaboration and learning tools. Specific capabilities depend on current deployments and enabled third-party services.",
+      "description": "AETHRION is a web-based AI and productivity ecosystem with enabled AI-provider integrations, creative tools, developer utilities, collaboration features and learning resources. Availability depends on current deployment and third-party services.",
       "slogan": "Intelligence Without Limits.",
       "email": "aethrion.official@gmail.com",
       "sameAs": [
         "https://www.instagram.com/aethrion.official/",
         "https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U"
       ],
-      "areaServed": ["TR", "AZ", "DE", "US", "GB", "FR", "NL"],
-      "knowsLanguage": ["tr-TR", "en-US", "es-ES", "ru-RU", "fr-FR"]
+      "areaServed": [
+        "TR",
+        "AZ",
+        "DE",
+        "US",
+        "GB",
+        "FR",
+        "NL"
+      ],
+      "knowsLanguage": [
+        "tr-TR",
+        "en-US",
+        "es-ES",
+        "ru-RU",
+        "fr-FR"
+      ]
     },
     {
       "@type": "WebSite",
@@ -63,42 +79,60 @@
       "url": "https://vizyon2026.vercel.app/",
       "name": "AETHRION",
       "alternateName": "AETHRION AI",
-      "inLanguage": ["tr-TR", "en-US"],
-      "publisher": {"@id": "https://vizyon2026.vercel.app/#organization"}
+      "inLanguage": [
+        "tr-TR",
+        "en-US"
+      ],
+      "publisher": {
+        "@id": "https://vizyon2026.vercel.app/#organization"
+      }
     },
     {
       "@type": "WebPage",
       "@id": "https://vizyon2026.vercel.app/#webpage",
       "url": "https://vizyon2026.vercel.app/",
       "name": "AETHRION — Intelligence Without Limits",
-      "description": "AETHRION AI ecosystem with enabled AI assistant integrations, voice interaction, file analysis, creative tools, 3D Studio, video tools, A27 API, team collaboration, Academy and productivity workflows.",
-      "dateModified": "2026-10-23",
+      "description": "AETHRION brings enabled AI assistance, voice and file workflows, 3D and video creation tools, developer utilities, team collaboration and productivity features into a browser-based ecosystem.",
+      "isPartOf": {
+        "@id": "https://vizyon2026.vercel.app/#website"
+      },
+      "about": {
+        "@id": "https://vizyon2026.vercel.app/#app"
+      },
+      "mainEntity": {
+        "@id": "https://vizyon2026.vercel.app/#app"
+      },
       "inLanguage": "tr-TR",
-      "isPartOf": {"@id": "https://vizyon2026.vercel.app/#website"},
-      "about": {"@id": "https://vizyon2026.vercel.app/#software"}
+      "dateModified": "2026-10-23"
     },
     {
       "@type": "SoftwareApplication",
-      "@id": "https://vizyon2026.vercel.app/#software",
+      "@id": "https://vizyon2026.vercel.app/#app",
       "name": "AETHRION AI",
-      "alternateName": ["AETHRION", "A27"],
+      "alternateName": [
+        "AETHRION",
+        "A27"
+      ],
       "url": "https://vizyon2026.vercel.app/",
       "applicationCategory": "BusinessApplication",
-      "applicationSubCategory": "AI assistant and productivity platform",
+      "applicationSubCategory": "AI assistant, developer and productivity platform",
       "operatingSystem": "Modern web browser",
-      "description": "A browser-based ecosystem for AI-assisted work, creative workflows, developer utilities and collaboration. Integrations and feature availability depend on the deployed configuration and third-party service status.",
-      "publisher": {"@id": "https://vizyon2026.vercel.app/#organization"},
+      "description": "A browser-based AI and productivity ecosystem. Integrations and feature availability depend on deployed configuration and third-party service status.",
+      "publisher": {
+        "@id": "https://vizyon2026.vercel.app/#organization"
+      },
       "featureList": [
-        "AI assistant with configurable provider integrations",
-        "Browser-based voice interaction where supported",
-        "File analysis and presentation workflows where enabled",
-        "3D Studio and creative tools",
-        "Video Studio and video editing tools where enabled",
-        "A27 API key and developer platform",
-        "Team collaboration, roles and audit-related tools where enabled",
+        "AI assistant with configurable provider integrations and multiple interaction modes, where enabled",
+        "Browser-based voice interaction and assistant workflows, where supported",
+        "File analysis and presentation workflows, where enabled",
+        "3D Studio and creative design tools",
+        "Video Studio and video editing workflows, where enabled",
+        "A27 developer platform and API key management",
+        "Team collaboration with role and audit-related tools, where enabled",
+        "Privacy-aware diagnostics and log redaction",
         "AETHRION Academy and learning resources",
         "Job listings and productivity workflows",
-        "Privacy-aware diagnostics and security controls"
+        "Account registration, sign-in and account verification"
       ],
       "dateModified": "2026-10-23"
     }
@@ -51118,69 +51152,36 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 </style>
 <script id="aethrionVpnProtectionClientV1">
 (function(){
- 'use strict';
- function blockPage(reason,code){
-  document.documentElement.classList.remove('ae-security-pending');
-  var unavailable=reason==='unavailable';
-  var messages={
-   VPN_CHECK_NOT_CONFIGURED:'Güvenlik servisi yapılandırılamadı. Site yöneticisi Back4App Cloud Code ortam değişkenlerini kontrol etmelidir.',
-   IP_UNAVAILABLE:'Sunucu bağlantının IP adresini belirleyemedi. Ağ/proxy yapılandırması kontrol edilmelidir.',
-   REPUTATION_PROVIDER_UNAVAILABLE:'IPQS güvenlik hizmetine şu anda ulaşılamıyor.',
-   REPUTATION_CHECK_FAILED:'IPQS güvenlik yanıtı doğrulanamadı. API anahtarı ve hesap durumu kontrol edilmelidir.',
-   REPUTATION_CHECK_UNAVAILABLE:'IPQS bağlantısı tamamlanamadı; tekrar denenebilir.',
-   SDK_NOT_READY:'Güvenlik servisi başlatılamadı.',
-   CLOUD_FUNCTION_CALL_FAILED:'Back4App güvenlik kontrolü çağrısı başarısız oldu.'
-  };
-  var message=unavailable
-   ?(messages[code]||'Güvenlik kontrolü tamamlanamadı. Sayfa gösterilecek; korumalı sunucu işlemleri doğrulama düzelene kadar kullanılamayabilir.')
-   :'Bu bağlantı VPN, proxy veya Tor olarak işaretlendi. VPN/proxy kullanmıyorsan IPQS yanlış sınıflandırması ihtimali için site yöneticisi bağlantı IP kontrolünü incelemelidir.';
-  if(unavailable){
-   if(document.getElementById('aethrionSecurityNotice'))return;
-   var notice=document.createElement('aside');
-   notice.id='aethrionSecurityNotice';
-   notice.setAttribute('role','status');
-   notice.style.cssText='position:fixed;z-index:2147483000;top:12px;left:50%;transform:translateX(-50%);width:min(720px,calc(100% - 24px));padding:14px 16px;border:1px solid rgba(255,190,80,.45);border-radius:14px;background:#151b2b;color:#f5f7ff;box-shadow:0 12px 40px rgba(0,0,0,.35);font:500 14px/1.5 system-ui,sans-serif';
-   var text=document.createElement('span');text.textContent=message+(code?' ('+code+')':'');
-   var retry=document.createElement('button');retry.type='button';retry.textContent='Yeniden kontrol et';
-   retry.style.cssText='display:block;margin-top:10px;padding:8px 12px;border:0;border-radius:8px;background:#8b7cff;color:#fff;font-weight:700;cursor:pointer';
-   retry.addEventListener('click',function(){location.reload()});
-   notice.appendChild(text);notice.appendChild(retry);document.body.appendChild(notice);
-   console.warn('[AETHRION Security] Verification unavailable; public page remains visible. Code:',code||'UNKNOWN');
-   return;
-  }
-  if(document.getElementById('aethrionVpnBlock'))return;
-  var root=document.createElement('section');root.id='aethrionVpnBlock';
-  root.setAttribute('role','alertdialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-labelledby','aeVpnTitle');
-  var card=document.createElement('div');card.className='ae-vpn-card';
-  var brand=document.createElement('div');brand.className='ae-vpn-brand';brand.textContent='AETHRION SECURITY';
-  var heading=document.createElement('h1');heading.id='aeVpnTitle';heading.textContent='Bağlantıya izin verilmiyor';
-  var para=document.createElement('p');para.textContent=message;
-  var button=document.createElement('button');button.type='button';button.textContent='Yeniden kontrol et';
-  card.appendChild(brand);card.appendChild(heading);card.appendChild(para);card.appendChild(button);root.appendChild(card);
-  document.body.appendChild(root);document.documentElement.style.overflow='hidden';
-  button.addEventListener('click',function(){location.reload()});
+ 'use strict';var finished=false;
+ function removePending(){document.documentElement.classList.remove('ae-security-pending');}
+ function addNotice(code){
+  removePending();if(document.getElementById('aethrionSecurityNotice'))return;
+  var n=document.createElement('aside');n.id='aethrionSecurityNotice';n.setAttribute('role','status');
+  n.style.cssText='position:fixed;z-index:2147483000;top:10px;left:50%;transform:translateX(-50%);width:min(700px,calc(100% - 24px));padding:10px 12px;border:1px solid rgba(255,190,80,.45);border-radius:12px;background:#151b2b;color:#f5f7ff;box-shadow:0 8px 28px rgba(0,0,0,.25);font:500 13px/1.45 system-ui,sans-serif;display:flex;gap:10px;align-items:center;justify-content:space-between;pointer-events:auto';
+  var msg=document.createElement('span');msg.textContent='Güvenlik servisine şu an ulaşılamadı ('+String(code||'UNKNOWN')+'). Site açık kalıyor; bazı korumalı işlemler geçici olarak etkilenebilir.';
+  var b=document.createElement('button');b.type='button';b.textContent='Yeniden kontrol et';b.style.cssText='flex-shrink:0;border:1px solid #cdb16c;border-radius:8px;background:#d7bd7b;color:#13243a;font-weight:800;padding:8px 10px;cursor:pointer';b.addEventListener('click',function(){location.reload();});
+  n.appendChild(msg);n.appendChild(b);(document.body||document.documentElement).appendChild(n);
  }
- function run(){
-  var started=Date.now();
-  function attempt(){
-   var SDK=window.Parse;
-   if(!SDK||!SDK.Cloud||typeof SDK.Cloud.run!=='function'||!window.parseInitialized){
-    if(Date.now()-started>15000)blockPage('unavailable','SDK_NOT_READY');
-    else setTimeout(attempt,250);
-    return;
-   }
-   SDK.Cloud.run('aethrionSecurityCheck',{})
-    .then(function(result){
-     // A failed verification also returns blocked=true. Diagnose that before
-     // deciding whether the visitor was actually classified as VPN/proxy/Tor.
-     if(!result||result.configured!==true||result.ok!==true)blockPage('unavailable',result&&result.code);
-     else if(result.blocked===true)blockPage('blocked',result.code);
-     else document.documentElement.classList.remove('ae-security-pending');
-    })
-    .catch(function(){blockPage('unavailable','CLOUD_FUNCTION_CALL_FAILED')});
-  }
-  attempt();
+ function blockConfirmed(){
+  removePending();if(document.getElementById('aethrionVpnBlock'))return;
+  var r=document.createElement('div');r.id='aethrionVpnBlock';r.style.cssText='position:fixed;inset:0;z-index:2147483647;background:#080d18;color:#f5f7ff;display:grid;place-items:center;padding:20px;font:500 15px/1.6 system-ui,sans-serif';
+  var c=document.createElement('section');c.style.cssText='width:min(620px,100%);padding:30px;border:1px solid rgba(215,189,123,.5);border-radius:20px;background:#111a2b;box-shadow:0 20px 70px rgba(0,0,0,.45)';
+  var brand=document.createElement('div');brand.textContent='AETHRION SECURITY';brand.style.cssText='color:#d8bd79;font-size:12px;font-weight:800;letter-spacing:.2em;margin-bottom:10px';
+  var title=document.createElement('h1');title.textContent='Bağlantıya izin verilmiyor';title.style.cssText='margin:0 0 12px;font-size:clamp(25px,5vw,36px);line-height:1.15';
+  var p=document.createElement('p');p.textContent='IPQS bu bağlantıyı VPN, proxy veya Tor olarak işaretledi. Bu sonuç yanlış görünüyorsa farklı bir normal bağlantıyla tekrar deneyin veya site yöneticisinin IPQS sınıflandırmasını incelemesini isteyin.';
+  var b=document.createElement('button');b.type='button';b.textContent='Yeniden kontrol et';b.style.cssText='min-height:44px;padding:0 18px;border:1px solid #cdb16c;border-radius:10px;background:#d7bd7b;color:#13243a;font-weight:800;cursor:pointer';b.addEventListener('click',function(){location.reload();});
+  c.appendChild(brand);c.appendChild(title);c.appendChild(p);c.appendChild(b);r.appendChild(c);(document.body||document.documentElement).appendChild(r);
  }
+ function run(){var started=Date.now();function attempt(){
+  if(finished)return;var S=window.Parse;
+  if(!S||!S.Cloud||typeof S.Cloud.run!=='function'||!window.parseInitialized){if(Date.now()-started>12000){finished=true;addNotice('SDK_NOT_READY');}else setTimeout(attempt,250);return;}
+  S.Cloud.run('aethrionSecurityCheck',{}).then(function(result){
+   if(finished)return;finished=true;
+   if(result&&result.blocked===true&&result.code==='VPN_PROXY_OR_TOR'){blockConfirmed();}
+   else if(!result||result.ok!==true||result.blocked===true||result.configured===false||result.degraded===true){addNotice(result&&result.code?result.code:'SECURITY_CHECK_DEGRADED');}
+   else removePending();
+  }).catch(function(){if(!finished){finished=true;addNotice('CLOUD_FUNCTION_CALL_FAILED');}});
+ }attempt();}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();
 </script>
@@ -51189,7 +51190,7 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 <style id="aethrionAuthInputReliabilityPatch">
 #authModal{z-index:2147483001!important;pointer-events:auto!important}
 #authModal .modal,#authModal .modal-body,#authModal input,#authModal button{pointer-events:auto!important}
-#authModal input.form-input{position:relative;z-index:1;touch-action:manipulation;user-select:text;-webkit-user-select:text;caret-color:var(--text,#fff)}
+#authModal input.form-input{position:relative;z-index:2147483002!important;pointer-events:auto!important;touch-action:manipulation;user-select:text;-webkit-user-select:text;caret-color:var(--text,#fff);-webkit-appearance:none;appearance:none}
 #authModal input.form-input:focus{outline:2px solid var(--accent,#d4af37)!important;outline-offset:1px}
 </style>
 <script id="aethrionAuthInputReliabilityPatchJS">
@@ -51212,6 +51213,9 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
       el.readOnly=false;
       el.tabIndex=0;
       el.style.pointerEvents='auto';
+      el.style.position='relative';
+      el.style.zIndex='2147483002';
+      el.addEventListener('pointerdown',function(){el.disabled=false;el.readOnly=false;},true);
     });
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',prepareAethrionAuthInputs,{once:true});
