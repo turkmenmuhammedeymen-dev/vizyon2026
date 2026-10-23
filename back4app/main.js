@@ -560,45 +560,116 @@ var SystemConfig = Parse.Object.extend("SystemConfig");
 // ================================================================
 // ========== YARDIMCI FONKSİYONLAR ===============================
 // ================================================================
-async function getAPIKey(keyName) {
-    // Private Back4App runtime variables take priority; Parse.Config remains a
-    // backwards-compatible fallback for non-secret settings.
-    try {
-        if (typeof process !== 'undefined' && process.env) {
-            var envValue = process.env[keyName] || process.env['AETHRION_' + keyName];
-            if (typeof envValue === 'string' && envValue.trim()) {
-                console.log('✅ ' + keyName + ' private runtime environment variable is configured.');
-                return envValue.trim();
-            }
-        }
-    } catch (e) {
-        console.warn('[AETHRION Config] Runtime environment lookup unavailable for ' + String(keyName));
+// ================================================================
+// AETHRION CENTRAL CONFIGURATION RESOLVER
+// Private runtime environment variables take priority. Parse.Config is
+// cached as the compatibility/configuration source for existing deployments.
+// Passwords and founder credentials are deliberately private-env-only.
+// ================================================================
+var _aethrionParseConfigCache = null;
+var _aethrionParseConfigPromise = null;
+
+async function _aethrionGetParseConfig() {
+    if (_aethrionParseConfigCache) return _aethrionParseConfigCache;
+    if (!_aethrionParseConfigPromise) {
+        _aethrionParseConfigPromise = Parse.Config.get({ useMasterKey: true }).then(function (config) {
+            _aethrionParseConfigCache = config;
+            return config;
+        }).catch(function (error) {
+            _aethrionParseConfigPromise = null;
+            throw error;
+        });
     }
+    return _aethrionParseConfigPromise;
+}
+
+function _aethrionReadPrivateEnv(keyName) {
     try {
-        var config = await Parse.Config.get({ useMasterKey: true });
-        var value = config.get(keyName);
-        if (value !== undefined && value !== null && String(value).trim()) {
-            console.log('✅ ' + keyName + " Config'den okundu.");
-            return value;
-        }
-        console.warn('⚠️ ' + keyName + " runtime environment / Config'de bulunamadı.");
-        return null;
-    } catch (e) {
-        console.error('❌ Config okunamadı (' + keyName + '): ' + e.message);
+        if (typeof process === 'undefined' || !process.env) return null;
+        var value = process.env[keyName] || process.env['AETHRION_' + keyName];
+        return (typeof value === 'string' && value.trim()) ? value.trim() : null;
+    } catch (error) {
+        console.warn('[AETHRION Config] Private environment lookup unavailable for ' + String(keyName));
         return null;
     }
 }
 
-function getPrivateFounderPass() {
-    // Passwords are never read from Parse.Config; use private Back4App runtime env only.
+async function getAethrionConfigValue(keyName, options) {
+    options = options || {};
+    var envValue = _aethrionReadPrivateEnv(keyName);
+    if (envValue !== null) return envValue;
+
+    if (options.privateOnly === true) return null;
+
     try {
-        if (typeof process !== 'undefined' && process.env) {
-            var value = process.env.FOUNDER_PASS || process.env.AETHRION_FOUNDER_PASS || '';
-            if (typeof value === 'string' && value.trim()) return value.trim();
+        var config = await _aethrionGetParseConfig();
+        var value = config.get(keyName);
+        if (value !== undefined && value !== null && String(value).trim() !== '') {
+            // Keep old Parse.Config deployments working, but flag secret migration.
+            if (/(PASS|PASSWORD|API.?KEY|TOKEN|SECRET|ENCRYPTION|CREDENTIAL|PRIVATE)/i.test(String(keyName))) {
+                console.warn('[AETHRION Config] ' + String(keyName) + ' is still stored in Parse.Config; migrate it to a private Back4App environment variable.');
+            }
+            return value;
         }
-    } catch (e) {}
-    return '';
+        console.warn('[AETHRION Config] Missing configuration key: ' + String(keyName));
+        return null;
+    } catch (error) {
+        console.error('[AETHRION Config] Could not read configuration (' + String(keyName) + '): ' + (error && error.message ? error.message : 'unknown error'));
+        return null;
+    }
 }
+
+async function getAPIKey(keyName) {
+    return getAethrionConfigValue(keyName);
+}
+
+function getPrivateFounderPass() {
+    // Founder password must never fall back to Parse.Config.
+    return _aethrionReadPrivateEnv('FOUNDER_PASS') || _aethrionReadPrivateEnv('AETHRION_FOUNDER_PASS') || '';
+}
+
+// Public configuration is an explicit allowlist. Never return the whole Parse.Config
+// object or any runtime environment variables to a browser.
+function _aethrionSanitizePublicValue(value, depth) {
+    if (depth > 6 || value === null || value === undefined) return null;
+    if (typeof value === 'string') return value.slice(0, 5000);
+    if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+    if (typeof value === 'boolean') return value;
+    if (Array.isArray(value)) return value.slice(0, 200).map(function (item) {
+        return _aethrionSanitizePublicValue(item, depth + 1);
+    }).filter(function (item) { return item !== null; });
+    if (typeof value !== 'object') return null;
+    var output = {};
+    Object.keys(value).slice(0, 100).forEach(function (key) {
+        if (/(PASS|PASSWORD|API.?KEY|TOKEN|SECRET|ENCRYPTION|CREDENTIAL|PRIVATE|AUTH|COOKIE|SESSION)/i.test(key)) return;
+        output[key] = _aethrionSanitizePublicValue(value[key], depth + 1);
+    });
+    return output;
+}
+
+function _aethrionParsePublicJson(value) {
+    if (value && typeof value === 'object') return value;
+    if (typeof value !== 'string' || !value.trim()) return {};
+    try {
+        var parsed = JSON.parse(value);
+        return parsed && typeof parsed === 'object' ? parsed : {};
+    } catch (error) {
+        console.warn('[AETHRION Config] Invalid public JSON configuration; defaults will be used.');
+        return {};
+    }
+}
+
+Parse.Cloud.define('getAethrionPublicConfig', async function () {
+    var config = await _aethrionGetParseConfig();
+    return {
+        success: true,
+        version: 1,
+        publicConfig: _aethrionSanitizePublicValue(_aethrionParsePublicJson(config.get('AETHRION_PUBLIC_CONFIG_JSON')), 0),
+        planLimits: _aethrionSanitizePublicValue(_aethrionParsePublicJson(config.get('AETHRION_PLAN_LIMITS_JSON')), 0),
+        featureFlags: _aethrionSanitizePublicValue(_aethrionParsePublicJson(config.get('AETHRION_FEATURE_FLAGS_JSON')), 0),
+        models: _aethrionSanitizePublicValue(_aethrionParsePublicJson(config.get('AETHRION_PUBLIC_MODELS_JSON')), 0)
+    };
+});
 
 function cleanResponse(text) {
     if (!text) return text;
