@@ -18,10 +18,8 @@ The external aethrion-schema.js is a fallback only: it detects an existing AETHR
 ## Deployment layout
 The repository uses the root as the Vercel static site root. There is no public/ directory. HTML, CSS, JavaScript, SVG, JSON and policy pages live at the root or under api/.
 
-## VPN/proxy/Tor protection
-The browser gate calls the Back4App Cloud Code function aethrionSecurityCheck using the site's existing Parse SDK. The IPQS key is read only by Back4App server-side Cloud Code through process.env.IPQS_API_KEY; it must never be placed in HTML, client JavaScript, Parse Config visible to clients, or source control. The browser sends no IP address; Back4App must use its trusted request.ip value. Missing configuration, unavailable IP data, or provider errors enter degraded mode and do not falsely block visitors. VPN enforcement is only available when the private IPQS key and provider are healthy.
-
-The legacy Vercel /api/security-check route has been removed so the site no longer depends on a separate Vercel IPQS secret for its browser gate. The gate blocks the visible page while the check is pending and blocks only a confirmed IPQS VPN/proxy/Tor verdict. Provider/configuration failures are logged and allow the page to remain available; VPN enforcement cannot be guaranteed during an outage. This is a browser access gate, not a substitute for an edge firewall/WAF; direct static assets may be served before client-side JavaScript runs.
+## Access policy
+Access is not restricted based on VPN, proxy, or Tor reputation. Authentication, account roles, rate limits and feature permissions remain governed by existing account and server-side authorization checks.
 
 ## Back4App deployment
 Upload back4app/main.js as the app's Cloud Code main.js, set IPQS_API_KEY as a private server-side environment variable, and deploy Cloud Code. Legacy function names are retained, including vizyonAlChat, vizyonAlScreenRead, vizyonAlLiveScreenStream, vizyonAlFileAnalyze, kocChat, getKocHistory, shareKocConversation, createV27ApiKey, createVideoClip, generate3DWithHF, sendFounderMessage and smartTranslate.
