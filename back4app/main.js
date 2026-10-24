@@ -10688,6 +10688,80 @@ Parse.Cloud.define("aethrionGetDiagnostics", async function (request) {
 });
 
 
+// AETHRION TEAMS: secure team chat with bounded file attachments.
+Parse.Cloud.define("aethrionGetTeamMessages", async function (request) {
+    var user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız.");
+    var teamId = _aeSafeAuditText(request.params && request.params.teamId, 128);
+    await _aeRequireTeamAccess(user, teamId);
+    var limit = Math.max(1, Math.min(100, parseInt(request.params && request.params.limit, 10) || 50));
+    var query = new Parse.Query(TeamMessage);
+    query.equalTo("team_id", teamId);
+    query.descending("createdAt");
+    query.limit(limit);
+    var rows = await query.find({ useMasterKey: true });
+    rows = rows.filter(function (row) { return row.get("deleted") !== true; }).reverse();
+    return { success: true, messages: rows.map(function (row) {
+        return {
+            id: row.id,
+            userEmail: _aeSafeAuditText(row.get("user_email") || "", 254),
+            userName: _aeSafeAuditText(row.get("user_name") || "Takım üyesi", 100),
+            message: _aeSafeAuditText(row.get("message") || "", 4000),
+            fileUrl: row.get("fileUrl") || null,
+            fileName: _aeSafeAuditText(row.get("fileName") || "", 180),
+            fileType: _aeSafeAuditText(row.get("fileType") || "", 120),
+            createdAt: row.createdAt || null
+        };
+    }) };
+});
+
+Parse.Cloud.define("aethrionSendTeamMessage", async function (request) {
+    var user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız.");
+    var params = request.params || {};
+    var teamId = _aeSafeAuditText(params.teamId, 128);
+    var text = _aeSafeAuditText(params.message || "", 4000);
+    var fileBase64 = typeof params.fileBase64 === "string" ? params.fileBase64 : "";
+    var fileName = String(params.fileName || "").replace(/[^a-zA-Z0-9._ -]/g, "_").slice(0, 150);
+    var fileType = String(params.fileType || "application/octet-stream").slice(0, 120);
+    await _aeRequireTeamAccess(user, teamId);
+    if (!text && !fileBase64) throw new Error("Mesaj veya dosya eklemelisiniz.");
+    if (fileBase64.length > 7 * 1024 * 1024) throw new Error("Takım dosyası en fazla 5 MB olabilir.");
+    var fileUrl = null;
+    if (fileBase64) {
+        if (!fileName) fileName = "aethrion-team-file";
+        var allowed = /^image\/(png|jpeg|webp|gif)$|^application\/pdf$|^text\/(plain|markdown|csv)$|^application\/json$/i.test(fileType) ||
+            /\.(txt|md|csv|json|js|ts|py|html|css|xml|ya?ml|log|pdf|png|jpe?g|webp|gif)$/i.test(fileName);
+        if (!allowed) throw new Error("Bu dosya türü desteklenmiyor. Görsel, PDF, metin veya kod dosyası seçin.");
+        var parseFile = new Parse.File(fileName, { base64: fileBase64 });
+        await parseFile.save(null, { useMasterKey: true });
+        fileUrl = parseFile.url();
+    }
+    var row = new TeamMessage();
+    row.set("team_id", teamId);
+    row.set("user_email", String(user.get("email") || "").toLowerCase());
+    row.set("user_name", _aeSafeAuditText(user.get("name") || user.get("username_display") || user.get("email") || "Takım üyesi", 100));
+    row.set("message", text);
+    row.set("fileUrl", fileUrl);
+    row.set("fileName", fileName || "");
+    row.set("fileType", fileType);
+    row.set("deleted", false);
+    await row.save(null, { useMasterKey: true });
+    try {
+        var event = new AethrionProjectAudit();
+        event.set("team_id", teamId);
+        event.set("actor_id", crypto.createHash("sha256").update(String(user.id)).digest("hex").slice(0, 24));
+        event.set("actor_role", _aeRole(user));
+        event.set("action", "file_uploaded");
+        event.set("target_label", fileBase64 ? "Takım dosyası" : "Takım mesajı");
+        event.set("source", "server-team-message");
+        event.set("privacy_scrubbed", true);
+        event.set("created_at_server", new Date());
+        await event.save(null, { useMasterKey: true });
+    } catch (auditError) { console.error("AETHRION Teams mesaj denetim kaydı yazılamadı."); }
+    return { success: true, message: { id: row.id, fileUrl: fileUrl, fileName: fileName, createdAt: row.createdAt || new Date() } };
+});
+
 // AETHRION TEAMS: üyeleri güvenli listeleme ve rol atama
 Parse.Cloud.define("aethrionGetTeamWorkspace", async function (request) {
     var user = request.user;
