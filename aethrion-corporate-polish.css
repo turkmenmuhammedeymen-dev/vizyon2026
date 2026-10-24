@@ -77,3 +77,87 @@
     transition-duration: .01ms !important;
   }
 }
+
+
+/* AETHRION Enterprise UI layer — notification visibility, responsive surfaces, and readable controls. */
+/* Notifications must always remain above auth modals and overlays. */
+#notification.notification,
+.notification {
+  position: fixed !important;
+  top: max(14px, env(safe-area-inset-top, 0px)) !important;
+  bottom: auto !important;
+  left: 50% !important;
+  right: auto !important;
+  width: min(520px, calc(100vw - 28px)) !important;
+  max-width: 520px !important;
+  box-sizing: border-box !important;
+  z-index: 2147483647 !important;
+  padding: 15px 20px !important;
+  border: 1px solid rgba(217, 180, 91, .48) !important;
+  border-left: 4px solid var(--aethrion-polish-gold, #d9b45b) !important;
+  border-radius: 16px !important;
+  background: rgba(8, 15, 29, .985) !important;
+  color: #f8fafc !important;
+  font-size: clamp(14px, 2.4vw, 16px) !important;
+  line-height: 1.55 !important;
+  font-weight: 550 !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+  box-shadow: 0 18px 55px rgba(0, 0, 0, .58), 0 0 0 1px rgba(255,255,255,.04) !important;
+  backdrop-filter: blur(18px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(140%) !important;
+  transform: translate3d(-50%, -150%, 0) !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transition: transform .24s ease, opacity .24s ease, visibility .24s ease !important;
+  margin: 0 !important;
+}
+#notification.notification.show,
+.notification.show {
+  transform: translate3d(-50%, 0, 0) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+#notification.notification.error,
+.notification.error {
+  border-left-color: #ff6678 !important;
+  border-color: rgba(255, 102, 120, .58) !important;
+}
+#notification.notification.warning,
+.notification.warning {
+  border-left-color: #f5bd4f !important;
+  border-color: rgba(245, 189, 79, .55) !important;
+}
+#notification.notification.success,
+.notification.success {
+  border-left-color: #45d49a !important;
+  border-color: rgba(69, 212, 154, .5) !important;
+}
+@media (max-width: 640px) {
+  #notification.notification, .notification {
+    top: max(10px, env(safe-area-inset-top, 0px)) !important;
+    width: calc(100vw - 24px) !important;
+    max-width: none !important;
+    padding: 13px 15px !important;
+    border-radius: 14px !important;
+    font-size: 14px !important;
+  }
+  #authModal .modal, .modal {
+    max-width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px - env(safe-area-inset-top, 0px));
+    padding: clamp(18px, 5vw, 30px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  button, .btn-primary, .btn-secondary, [role="button"] {
+    min-height: 42px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #notification.notification, .notification,
+  #mainSite :is(.feature-card, .category-card, .model-card, .tool-card, .price-card, .pricing-card, .ecosystem-card, .tech-card) {
+    transition: none !important;
+    animation: none !important;
+  }
+}
