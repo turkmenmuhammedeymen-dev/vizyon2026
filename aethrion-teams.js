@@ -1,4 +1,4 @@
-(function(){'use strict';var status=document.getElementById('teamsStatus'),select=document.getElementById('teamSelect'),members=document.getElementById('members'),audit=document.getElementById('audit'),summary=document.getElementById('teamSummary'),schedule=document.getElementById('teamSchedule'),aiUsage=document.getElementById('aiUsage');
+(function(){'use strict';var status=document.getElementById('teamsStatus'),select=document.getElementById('teamSelect'),members=document.getElementById('members'),audit=document.getElementById('audit'),summary=document.getElementById('teamSummary'),schedule=document.getElementById('teamSchedule'),aiUsage=document.getElementById('aiUsage');var chatMessages=document.getElementById('teamChatMessages'),chatForm=document.getElementById('teamChatForm'),chatInput=document.getElementById('teamChatInput'),chatFile=document.getElementById('teamChatFile'),chatFileLabel=document.getElementById('teamChatFileLabel'),chatSend=document.getElementById('teamChatSend'),selectedChatFile=null;
 function el(t,c,x){var n=document.createElement(t);if(c)n.className=c;if(x!==undefined)n.textContent=String(x);return n}
 function say(t,k){status.textContent=t;status.dataset.kind=k||''}
 function P(){if(!window.Parse||!Parse.User||!Parse.User.current||!Parse.User.current())throw new Error('Giriş yapmalısın.');return Parse}
@@ -19,6 +19,55 @@ async function loadSchedule(id){
   if(!r.events||!r.events.length)showError(schedule,'Geçmiş 90 gün veya gelecek 180 gün içinde tarihli takım görevi bulunamadı.');
  }catch(e){showError(schedule,'Takvim alınamadı. TeamTask.date alanı ve Cloud Code dağıtımını kontrol et.')}
 }
+function renderTeamMessages(rows){
+ if(!chatMessages)return;chatMessages.textContent='';
+ (rows||[]).forEach(function(m){
+  var isAi=!!m.isAI||String(m.userEmail||'').toLowerCase()==='aethrion-ai@system.local';
+  var c=el('article','ae-tool-card'+(isAi?' ae-tool-chat-ai':''));
+  c.append(el('h3','',isAi?'AETHRION AI':(m.userName||m.userEmail||'Takım üyesi')));
+  if(m.message)c.append(el('p','',m.message));
+  if(m.fileUrl){var a=el('a','ae-tool-chat-file',m.fileName||'Ekli dosyayı aç');a.href=m.fileUrl;a.target='_blank';a.rel='noopener noreferrer';c.append(a)}
+  c.append(el('p','ae-tool-muted',m.createdAt?new Date(m.createdAt).toLocaleString():''));
+  chatMessages.append(c);
+ });
+ if(!rows||!rows.length)showError(chatMessages,'Henüz takım mesajı yok. İlk mesajı sen gönder.');
+ chatMessages.scrollTop=chatMessages.scrollHeight;
+}
+async function loadTeamMessages(id){
+ if(!chatMessages)return;
+ try{var r=await P().Cloud.run('aethrionGetTeamMessages',{teamId:id,limit:60});renderTeamMessages(r.messages||[])}
+ catch(e){showError(chatMessages,'Takım sohbeti yüklenemedi. Takım erişimini ve güncel Back4App main.js dağıtımını kontrol et.')}
+}
+function readFileBase64(file){
+ return new Promise(function(resolve,reject){var reader=new FileReader();reader.onload=function(){var data=String(reader.result||'').split(',')[1];if(!data)reject(new Error('Dosya okunamadı.'));else resolve(data)};reader.onerror=function(){reject(new Error('Dosya okunamadı.'))};reader.readAsDataURL(file)});
+}
+if(chatFile)chatFile.addEventListener('change',function(){
+ var f=this.files&&this.files[0];if(!f){selectedChatFile=null;if(chatFileLabel)chatFileLabel.textContent='Dosya sınırı 5 MB';return}
+ if(f.size>5*1024*1024){say('Takım dosyası en fazla 5 MB olabilir.','error');this.value='';selectedChatFile=null;return}
+ var allowed=/^(image\\/(png|jpeg|webp|gif)|application\\/pdf|text\\/(plain|markdown|csv)|application\\/json)$/i.test(f.type)||/\\.(txt|md|csv|json|js|ts|py|html|css|xml|ya?ml|log|pdf|png|jpe?g|webp|gif)$/i.test(f.name);
+ if(!allowed){say('Bu dosya türü desteklenmiyor. Görsel, PDF, metin veya kod dosyası seç.','error');this.value='';selectedChatFile=null;return}
+ selectedChatFile=f;if(chatFileLabel)chatFileLabel.textContent='📎 '+f.name;say('Dosya eklendi. @AETHRION AI etiketiyle analiz isteyebilirsin.','success');
+});
+if(chatForm)chatForm.addEventListener('submit',async function(event){
+ event.preventDefault();if(!select||!select.value){say('Önce bir takım seç.','warn');return}
+ var text=chatInput?chatInput.value.trim():'';var file=selectedChatFile;if(!text&&!file){say('Mesaj yaz veya dosya ekle.','warn');return}
+ if(chatSend)chatSend.disabled=true;
+ try{
+  var base64=file?await readFileBase64(file):'';
+  await P().Cloud.run('aethrionSendTeamMessage',{teamId:select.value,message:text,fileBase64:base64,fileName:file?file.name:'',fileType:file?(file.type||'application/octet-stream'):''});
+  if(chatInput)chatInput.value='';
+  selectedChatFile=null;if(chatFile)chatFile.value='';if(chatFileLabel)chatFileLabel.textContent='Dosya sınırı 5 MB';
+  say('Takım mesajı gönderildi.','success');
+  if(/@(aethrion(?:\\s+ai)?|jarvis)\\b/i.test(text)){
+   say('AETHRION AI mesajı ve eki analiz ediyor…','busy');
+   var question=text.replace(/@(aethrion(?:\\s+ai)?|jarvis)\\b/ig,'').trim()||'Bu takım mesajını ve ekli dosyayı analiz et.';
+   var ai=await P().Cloud.run('aethrionTeamAskAI',{teamId:select.value,message:question,fileBase64:base64,fileName:file?file.name:'',fileType:file?(file.type||'application/octet-stream'):''});
+   if(!ai||ai.success!==true)say((ai&&ai.error)||'Takım AI yanıt veremedi.','error');else say('AETHRION AI yanıtı takıma eklendi.','success');
+  }
+  await loadTeamMessages(select.value);
+ }catch(e){say('Mesaj gönderilemedi: '+String(e&&e.message||e||'Bilinmeyen hata').slice(0,180),'error')}
+ finally{if(chatSend)chatSend.disabled=false}
+});
 async function loadAiUsage(){
  if(!aiUsage)return;
  aiUsage.textContent='';
@@ -34,7 +83,7 @@ async function loadAiUsage(){
   if(!r.items||!r.items.length)showError(aiUsage,'Henüz AETHRION AI kullanım sayacı bulunamadı. Sayaçlar yalnızca ilgili özellik kullanım kaydı tuttuğunda görünür.');
  }catch(e){showError(aiUsage,'Kullanım özeti alınamadı. Giriş durumunu ve aethrionGetMyAiUsage Cloud Function dağıtımını kontrol et.')}
 }
-async function loadTeam(id){if(!id)return;members.textContent='';audit.textContent='';summary.textContent='';var p=P();try{await loadSchedule(id);var r=await p.Cloud.run('aethrionGetTeamWorkspace',{teamId:id});summary.append(el('p','ae-tool-badge',r.team.name+(r.canManageRoles?' · Rol yönetimi açık':' · Salt okunur')));(r.members||[]).forEach(function(m){var c=el('article','ae-tool-card');c.append(el('h3','',m.name||m.email));c.append(el('p','',m.email));if(r.canManageRoles){var label=el('label','','Üye rolü');var s=el('select','');['admin','editor','viewer'].forEach(function(role){var o=el('option','',role);o.value=role;o.selected=role===m.role;s.append(o)});label.append(s);var b=el('button','ae-tool-button','Rolü kaydet');b.type='button';b.addEventListener('click',async function(){b.disabled=true;try{await p.Cloud.run('aethrionSetTeamMemberRole',{teamId:id,memberId:m.id,role:s.value});say('Üye rolü güncellendi. Denetim kaydı yazıldı.','success');await loadTeam(id)}catch(e){say('Rol değiştirilemedi. Sunucu yetkisini ve takım üyeliğini kontrol et.','error');b.disabled=false}});c.append(label,b)}else c.append(el('p','ae-tool-muted','Rol: '+m.role));members.append(c)});if(!r.members||!r.members.length)showError(members,'Bu takım için üye kaydı bulunamadı.');var ar=await p.Cloud.run('aethrionGetProjectAudit',{teamId:id,limit:50});(ar.events||[]).forEach(function(ev){var c=el('article','ae-tool-card');c.append(el('h3','',ev.action||'İşlem'));c.append(el('p','', 'Kullanıcı ref: '+String(ev.actorId||'anonim').slice(0,24)+' · '+(ev.targetLabel||'İşlem hedefi')));c.append(el('p','ae-tool-muted',ev.createdAt?new Date(ev.createdAt).toLocaleString():'Zaman bilgisi yok'));audit.append(c)});if(!ar.events||!ar.events.length)showError(audit,'Henüz denetim kaydı bulunmuyor.')}catch(e){showError(members,'Takım bilgileri alınamadı. Bu takım için erişimin olmayabilir veya Back4App Cloud Code henüz dağıtılmamış olabilir.');showError(audit,'Denetim kayıtları alınamadı.');say('Takım yüklenemedi; erişim ve dağıtımı kontrol et.','error')}}
+async function loadTeam(id){if(!id)return;members.textContent='';audit.textContent='';summary.textContent='';var p=P();try{await loadSchedule(id);await loadTeamMessages(id);var r=await p.Cloud.run('aethrionGetTeamWorkspace',{teamId:id});summary.append(el('p','ae-tool-badge',r.team.name+(r.canManageRoles?' · Rol yönetimi açık':' · Salt okunur')));(r.members||[]).forEach(function(m){var c=el('article','ae-tool-card');c.append(el('h3','',m.name||m.email));c.append(el('p','',m.email));if(r.canManageRoles){var label=el('label','','Üye rolü');var s=el('select','');['admin','editor','viewer'].forEach(function(role){var o=el('option','',role);o.value=role;o.selected=role===m.role;s.append(o)});label.append(s);var b=el('button','ae-tool-button','Rolü kaydet');b.type='button';b.addEventListener('click',async function(){b.disabled=true;try{await p.Cloud.run('aethrionSetTeamMemberRole',{teamId:id,memberId:m.id,role:s.value});say('Üye rolü güncellendi. Denetim kaydı yazıldı.','success');await loadTeam(id)}catch(e){say('Rol değiştirilemedi. Sunucu yetkisini ve takım üyeliğini kontrol et.','error');b.disabled=false}});c.append(label,b)}else c.append(el('p','ae-tool-muted','Rol: '+m.role));members.append(c)});if(!r.members||!r.members.length)showError(members,'Bu takım için üye kaydı bulunamadı.');var ar=await p.Cloud.run('aethrionGetProjectAudit',{teamId:id,limit:50});(ar.events||[]).forEach(function(ev){var c=el('article','ae-tool-card');c.append(el('h3','',ev.action||'İşlem'));c.append(el('p','', 'Kullanıcı ref: '+String(ev.actorId||'anonim').slice(0,24)+' · '+(ev.targetLabel||'İşlem hedefi')));c.append(el('p','ae-tool-muted',ev.createdAt?new Date(ev.createdAt).toLocaleString():'Zaman bilgisi yok'));audit.append(c)});if(!ar.events||!ar.events.length)showError(audit,'Henüz denetim kaydı bulunmuyor.')}catch(e){showError(members,'Takım bilgileri alınamadı. Bu takım için erişimin olmayabilir veya Back4App Cloud Code henüz dağıtılmamış olabilir.');showError(audit,'Denetim kayıtları alınamadı.');say('Takım yüklenemedi; erişim ve dağıtımı kontrol et.','error')}}
 select.addEventListener('change',function(){loadTeam(select.value)});
 try{if(!Parse||!Parse.User.current())say('Takım alanını kullanmak için giriş yapmalısın.','warn');else {loadAiUsage();loadTeams().then(function(){if(select.value)say('Takım çalışma alanı yüklendi.','success')}).catch(function(){say('Takımlar alınamadı. Oturum, üyelik ve Cloud Code dağıtımını kontrol et.','error')})}}catch(e){say('Parse bağlantısı hazır değil. Ana uygulamadan giriş yapıp yeniden dene.','warn')}
 })();
