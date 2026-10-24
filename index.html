@@ -51498,3 +51498,114 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 })();
 </script>
 
+
+
+<!-- AETHRION AUTH FLOW REPAIR — foreground modal + visible async state -->
+<style id="aethrionAuthForegroundRepair20261024">
+  #authModal.modal-overlay,
+  #socialAuthTermsModal.modal-overlay,
+  #profileCompletionModal.modal-overlay,
+  #resetPasswordModal.modal-overlay,
+  #recoveryLoginModal.modal-overlay {
+    position: fixed !important; inset: 0 !important; z-index: 2147483000 !important;
+    isolation: isolate !important; align-items: center !important; justify-content: center !important;
+    padding: max(16px, env(safe-area-inset-top, 0px)) 12px max(16px, env(safe-area-inset-bottom, 0px)) !important;
+    overflow-y: auto !important; overscroll-behavior: contain !important; box-sizing: border-box !important;
+  }
+  #authModal.modal-overlay.open, #socialAuthTermsModal.modal-overlay.open,
+  #profileCompletionModal.modal-overlay.open, #resetPasswordModal.modal-overlay.open,
+  #recoveryLoginModal.modal-overlay.open { display: flex !important; visibility: visible !important; opacity: 1 !important; }
+  #authModal > .modal { position: relative !important; z-index: 1 !important; width: min(520px, 100%) !important;
+    max-width: 100% !important; max-height: calc(100dvh - 32px) !important; overflow-y: auto !important;
+    overscroll-behavior: contain !important; margin: auto !important; }
+  #authModal .modal-body { min-width: 0 !important; }
+  #authModal input, #authModal button, #socialAuthTermsModal input, #socialAuthTermsModal button { pointer-events: auto !important; }
+  #aethrionAuthBusyOverlay { position: fixed !important; inset: 0 !important; z-index: 2147483646 !important;
+    display: none; align-items: center !important; justify-content: center !important; padding: 24px !important;
+    background: rgba(3,6,14,.84) !important; backdrop-filter: blur(14px) saturate(135%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(135%) !important; color: #f8fafc !important;
+    font: 600 15px/1.55 system-ui,sans-serif !important; }
+  #aethrionAuthBusyOverlay[aria-hidden="false"] { display: flex !important; }
+  #aethrionAuthBusyOverlay .aethrion-auth-busy-card { width: min(360px,100%) !important; padding: 26px 22px !important;
+    border-radius: 22px !important; text-align: center !important; background: rgba(10,17,31,.98) !important;
+    border: 1px solid rgba(223,195,123,.6) !important; box-shadow: 0 24px 80px rgba(0,0,0,.6) !important; }
+  #aethrionAuthBusyOverlay .aethrion-auth-spinner { width: 42px !important; height: 42px !important;
+    margin: 0 auto 18px !important; border: 3px solid rgba(255,255,255,.16) !important;
+    border-top-color: #dfc37b !important; border-radius: 50% !important; animation: aethrionAuthSpin .8s linear infinite !important; }
+  @keyframes aethrionAuthSpin { to { transform: rotate(360deg); } }
+  @media (max-width:600px) { #authModal.modal-overlay { align-items: flex-start !important;
+    padding-top: max(12px,env(safe-area-inset-top,0px)) !important; }
+    #authModal > .modal { max-height: calc(100dvh - 24px) !important; border-radius: 18px !important; } }
+  @media (prefers-reduced-motion:reduce) { #aethrionAuthBusyOverlay .aethrion-auth-spinner { animation: none !important; } }
+</style>
+<script id="aethrionAuthForegroundRepairRuntime20261024">
+(function () {
+  'use strict';
+  var busyDepth = 0, busyTimer = null, busyNode = null;
+  function ensureAuthModal() {
+    var modal = document.getElementById('authModal');
+    if (modal && modal.parentNode !== document.body) document.body.appendChild(modal);
+    if (modal) { modal.style.zIndex = '2147483000'; modal.setAttribute('aria-modal','true'); modal.setAttribute('role','dialog'); }
+    return modal;
+  }
+  function getBusyNode() {
+    if (busyNode && busyNode.isConnected) return busyNode;
+    busyNode = document.getElementById('aethrionAuthBusyOverlay');
+    if (!busyNode) {
+      busyNode = document.createElement('div'); busyNode.id = 'aethrionAuthBusyOverlay';
+      busyNode.setAttribute('role','status'); busyNode.setAttribute('aria-live','polite'); busyNode.setAttribute('aria-hidden','true');
+      busyNode.innerHTML = '<div class="aethrion-auth-busy-card"><div class="aethrion-auth-spinner" aria-hidden="true"></div><div class="aethrion-auth-busy-title">AETHRION güvenli bağlantı kuruyor</div><div class="aethrion-auth-busy-message">Sunucudan yanıt bekleniyor…</div></div>';
+      document.body.appendChild(busyNode);
+    }
+    return busyNode;
+  }
+  function showBusy(label) {
+    busyDepth++; var node = getBusyNode(), msg = node.querySelector('.aethrion-auth-busy-message');
+    if (msg) msg.textContent = label || 'Sunucudan yanıt bekleniyor…';
+    node.setAttribute('aria-hidden','false'); node.style.display = 'flex';
+    if (busyTimer) clearTimeout(busyTimer);
+    busyTimer = setTimeout(function () {
+      var m = node.querySelector('.aethrion-auth-busy-message');
+      if (m && node.getAttribute('aria-hidden') === 'false') m.textContent = 'İşlem uzadı. Sunucu yanıtı veya bağlantı kontrol edilmeli…';
+    }, 12000);
+  }
+  function hideBusy() {
+    busyDepth = Math.max(0,busyDepth-1); if (busyDepth) return;
+    if (busyTimer) { clearTimeout(busyTimer); busyTimer = null; }
+    if (busyNode) { busyNode.setAttribute('aria-hidden','true'); busyNode.style.display='none'; }
+  }
+  window.__aethrionShowAuthBusy = showBusy; window.__aethrionHideAuthBusy = hideBusy;
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',ensureAuthModal,{once:true}); else ensureAuthModal();
+  var priorAction = window.__aethrionSafeAuthAction;
+  window.__aethrionSafeAuthAction = async function (kind, button) {
+    var handler = kind === 'register' ? window.handleRegister : window.handleLogin;
+    if (typeof handler !== 'function') {
+      if (typeof priorAction === 'function') return priorAction(kind,button);
+      var missing = 'Kimlik doğrulama fonksiyonu yüklenemedi. Sayfayı yenileyip tekrar deneyin.';
+      if (typeof window.showNotification === 'function') window.showNotification(missing,'error'); else window.alert(missing);
+      return false;
+    }
+    var oldText = button ? button.textContent : '';
+    if (button) { button.disabled=true; button.setAttribute('aria-busy','true'); }
+    showBusy(kind === 'register' ? 'Hesabınız güvenli şekilde oluşturuluyor…' : 'E-posta ve şifre doğrulanıyor…');
+    try { return (await Promise.resolve(handler())) !== false; }
+    catch (error) {
+      console.error('[AETHRION Auth UI]',error);
+      if (typeof window.showNotification === 'function') window.showNotification('İşlem tamamlanamadı: '+(error&&error.message||'Bilinmeyen hata'),'error');
+      return false;
+    } finally {
+      hideBusy();
+      if (button) { button.disabled=false; button.removeAttribute('aria-busy'); button.textContent=oldText; }
+    }
+  };
+  ['loginWithGoogle','loginWithFacebook'].forEach(function (name) {
+    var previous = window[name];
+    if (typeof previous !== 'function' || previous.__aethrionBusyWrapped) return;
+    var wrapped = async function () {
+      showBusy(name === 'loginWithGoogle' ? 'Google hesabı güvenli biçimde doğrulanıyor…' : 'Facebook hesabı güvenli biçimde doğrulanıyor…');
+      try { return await previous.apply(this,arguments); } finally { hideBusy(); }
+    };
+    wrapped.__aethrionBusyWrapped = true; window[name] = wrapped;
+  });
+})();
+</script>
