@@ -2294,7 +2294,7 @@ async function _aethrionSendEmail(to, subject, html) {
     to = String(to || '').trim().toLowerCase();
     subject = String(subject || '').trim();
     html = String(html || '');
-    if (!to || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(to)) {
+    if (!to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
         return { success: false, error: 'Geçerli alıcı e-posta adresi gerekli.' };
     }
     if (!subject) return { success: false, error: 'Konu gerekli!' };
