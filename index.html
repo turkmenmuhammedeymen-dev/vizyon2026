@@ -24924,6 +24924,36 @@ if (document.readyState === 'loading') {
     setTimeout(window.handleGoogleLibraryLoad, 800);
 }
 
+// If One Tap is unavailable, offer Google's official rendered sign-in button.
+function showAethrionGoogleFallback() {
+    if (typeof google === 'undefined' || !google.accounts || !google.accounts.id || typeof google.accounts.id.renderButton !== 'function') {
+        showNotification('Google giriş penceresi açılamadı. Google hizmetini ve bağlantıyı kontrol edip tekrar deneyin.', 'error');
+        return;
+    }
+    var layer = document.getElementById('aethrionGoogleFallback');
+    if (!layer) {
+        layer = document.createElement('div');
+        layer.id = 'aethrionGoogleFallback';
+        layer.setAttribute('role', 'dialog');
+        layer.setAttribute('aria-modal', 'true');
+        layer.setAttribute('aria-label', 'Google ile giriş');
+        layer.style.cssText = 'position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(3,6,14,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)';
+        layer.innerHTML = '<div style="width:min(380px,100%);padding:26px 22px;border:1px solid rgba(212,175,55,.45);border-radius:22px;background:#0a1221;color:#f7f9fc;text-align:center;box-shadow:0 24px 90px rgba(0,0,0,.6)"><button type="button" data-aethrion-google-close aria-label="Kapat" style="float:right;border:0;background:transparent;color:#f7f9fc;font-size:24px;cursor:pointer">×</button><h3 style="margin:8px 0 10px">Google ile devam et</h3><p style="color:#c4ccda;font-size:13px;line-height:1.5">Hızlı giriş açılamadı. Güvenli devam etmek için Google düğmesini kullan.</p><div id="aethrionGoogleFallbackButton" style="display:flex;justify-content:center;min-height:44px;margin-top:18px"></div></div>';
+        layer.addEventListener('click', function (event) {
+            if (event.target === layer || (event.target.closest && event.target.closest('[data-aethrion-google-close]'))) {
+                layer.remove();
+                window._googleLoginInProgress = false;
+            }
+        });
+        document.body.appendChild(layer);
+    }
+    var slot = document.getElementById('aethrionGoogleFallbackButton');
+    if (slot) {
+        slot.textContent = '';
+        google.accounts.id.renderButton(slot, { type: 'standard', theme: 'filled_black', size: 'large', text: 'continue_with', shape: 'pill', width: 300 });
+    }
+}
+
 // --- Google butonuna basıldığında çağrılır ---
 window.loginWithGoogle = function () {
     if (window._googleLoginInProgress) {
@@ -24949,10 +24979,11 @@ window.loginWithGoogle = function () {
 
     try {
         google.accounts.id.prompt(function (notification) {
-            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                console.log('ℹ️ Google One Tap gösterilemedi, popup deneniyor...');
+            if (notification && (notification.isNotDisplayed() || notification.isSkippedMoment())) {
+                console.log('ℹ️ Google One Tap gösterilemedi; resmi Google giriş düğmesi gösteriliyor.');
                 window._googleLoginInProgress = false;
-                showNotification('⚠️ Google giriş penceresi açılamadı. Lütfen tekrar deneyin.', 'warning');
+                showNotification('Google hızlı giriş açılamadı; alternatif Google giriş düğmesi açılıyor.', 'warning');
+                showAethrionGoogleFallback();
             }
         });
     } catch (e) {
@@ -24964,6 +24995,8 @@ window.loginWithGoogle = function () {
 
 // --- Google GIS callback ---
 window.handleGoogleLoginResponse = async function (response) {
+    var googleFallback = document.getElementById('aethrionGoogleFallback');
+    if (googleFallback) googleFallback.remove();
     if (!response || !response.credential) {
         console.warn('⚠️ Google credential alınamadı');
         window._googleLoginInProgress = false;
