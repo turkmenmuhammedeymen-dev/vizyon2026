@@ -46,6 +46,13 @@
       overlay.innerHTML = '<div class="ae-auth-progress-card"><div class="ae-auth-progress-brand">AETHRION</div><div class="ae-auth-progress-track"><span class="ae-auth-progress-track-fill"></span></div><h2 class="ae-auth-progress-title">Güvenli işlem</h2><p class="ae-auth-progress-status">Lütfen bekleyin…</p><span class="ae-auth-progress-foot">SECURE ACCOUNT</span></div>';
       document.body.appendChild(overlay);
     }
+    // Keep the progress layer in the top-level stacking context and above the auth modal.
+    if (document.body && overlay.parentNode !== document.body) document.body.appendChild(overlay);
+    overlay.style.position = 'fixed';
+    overlay.style.zIndex = '2147483647';
+    overlay.style.inset = '0';
+    var authModal = document.getElementById('authModal');
+    if (authModal) authModal.style.zIndex = '2147483001';
     statusNode = overlay.querySelector('.ae-auth-progress-status');
     progressNode = overlay.querySelector('.ae-auth-progress-track-fill');
     return overlay;
@@ -53,6 +60,9 @@
 
   function showProgress(message) {
     var el = ensureOverlay();
+    // Re-append before showing so no later-created modal can paint over progress.
+    if (document.body && el.parentNode !== document.body) document.body.appendChild(el);
+    el.style.zIndex = '2147483647';
     el.classList.add('is-visible');
     if (statusNode) statusNode.textContent = message;
     if (progressNode) { progressNode.style.width = '8%'; window.requestAnimationFrame(function () { if (progressNode) progressNode.style.width = '72%'; }); }
