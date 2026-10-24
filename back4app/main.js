@@ -675,7 +675,7 @@ async function getPrivateFounderEmail() {
     } catch (error) {
         console.warn('[AETHRION Config] Founder email configuration could not be read; using the legacy default.');
     }
-    return await getPrivateFounderEmail();
+    return 'admin.tr.reis@gmail.com';
 }
 
 // Public configuration is an explicit allowlist. Never return the whole Parse.Config
