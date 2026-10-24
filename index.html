@@ -29445,17 +29445,22 @@ window.sendVizyonAlMessage = async function () {
 
         if (window.currentUploadedFile) {
             var file = window.currentUploadedFile;
-            var base64 = await new Promise(function (resolve, reject) {
-                var reader = new FileReader();
-                reader.onload = function (e) { resolve(e.target.result.split(',')[1]); };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-
+            var preparedFile;
+            if (typeof window.aethrionPrepareFileForAI === 'function') {
+                preparedFile = await window.aethrionPrepareFileForAI(file);
+            } else {
+                var base64 = await new Promise(function (resolve, reject) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) { resolve(e.target.result.split(',')[1]); };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+                preparedFile = { fileBase64: base64, fileName: file.name, fileType: file.type || 'application/octet-stream' };
+            }
             result = await Parse.Cloud.run('vizyonAlFileAnalyze', {
-                fileBase64: base64,
-                fileName: file.name,
-                fileType: file.type,
+                fileBase64: preparedFile.fileBase64,
+                fileName: preparedFile.fileName || file.name,
+                fileType: preparedFile.fileType || file.type || 'application/octet-stream',
                 question: msg || 'Bu dosyayı analiz et ve özetle.'
             });
         } else {
@@ -41629,17 +41634,22 @@ window.sendAethrionAlMessage = async function () {
 
         if (window.currentUploadedFile) {
             var file = window.currentUploadedFile;
-            var base64 = await new Promise(function (resolve, reject) {
-                var reader = new FileReader();
-                reader.onload = function (e) { resolve(e.target.result.split(',')[1]); };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-
+            var preparedFile;
+            if (typeof window.aethrionPrepareFileForAI === 'function') {
+                preparedFile = await window.aethrionPrepareFileForAI(file);
+            } else {
+                var base64 = await new Promise(function (resolve, reject) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) { resolve(e.target.result.split(',')[1]); };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+                preparedFile = { fileBase64: base64, fileName: file.name, fileType: file.type || 'application/octet-stream' };
+            }
             result = await Parse.Cloud.run('vizyonAlFileAnalyze', {
-                fileBase64: base64,
-                fileName: file.name,
-                fileType: file.type,
+                fileBase64: preparedFile.fileBase64,
+                fileName: preparedFile.fileName || file.name,
+                fileType: preparedFile.fileType || file.type || 'application/octet-stream',
                 question: msg || 'Bu dosyayı analiz et ve özetle.'
             });
         } else {
@@ -50872,6 +50882,7 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
 </script>
 <script defer src="/aethrion-identity.js?v=20261023-identity8"></script>
 <script defer src="/aethrion-experience.js?v=20261022-workspace6"></script>
+<script defer src="/aethrion-file-tools.js?v=20261024-filetools1"></script>
 <script defer src="/aethrion-auth-recovery.js?v=20261024-authflow7"></script>
 <script defer src="/aethrion-jarvis.js?v=20261024-attachments2"></script>
 <script defer src="/aethrion-workspace-v5.js?v=20261022-workspace9"></script>
