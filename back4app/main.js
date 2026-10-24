@@ -10763,6 +10763,56 @@ Parse.Cloud.define("aethrionSendTeamMessage", async function (request) {
 });
 
 // AETHRION TEAMS: üyeleri güvenli listeleme ve rol atama
+Parse.Cloud.define("aethrionTeamAskAI", async function (request) {
+    var user = request.user;
+    if (!user) throw new Error("Giriş yapmalısınız.");
+    var params = request.params || {};
+    var teamId = _aeSafeAuditText(params.teamId, 128);
+    var message = _aeSafeAuditText(params.message || "", 3000);
+    var fileBase64 = typeof params.fileBase64 === "string" ? params.fileBase64 : "";
+    var fileName = String(params.fileName || "dosya").slice(0, 180);
+    var fileType = String(params.fileType || "application/octet-stream").toLowerCase().slice(0, 120);
+    await _aeRequireTeamAccess(user, teamId);
+    if (fileBase64.length > 11 * 1024 * 1024) throw new Error("AI eki en fazla 8 MB olabilir.");
+    var answer = "";
+    try {
+        var sessionToken = typeof user.getSessionToken === "function" ? user.getSessionToken() : null;
+        if (fileBase64) {
+            var analysis = await Parse.Cloud.run("vizyonAlFileAnalyze", {
+                fileBase64: fileBase64,
+                fileName: fileName,
+                fileType: fileType,
+                question: message || "Bu takım dosyasını oku, özetle ve önemli noktalarını açıkla."
+            }, sessionToken ? { sessionToken: sessionToken } : {});
+            if (!analysis || analysis.success !== true) throw new Error((analysis && analysis.error) || "Dosya analizi başarısız.");
+            answer = String(analysis.reply || "");
+        } else {
+            if (!message) throw new Error("AI'ya yöneltilecek bir mesaj gerekli.");
+            var chat = await Parse.Cloud.run("vizyonAlChat", {
+                message: "Takım bağlamında yanıt ver. Soruyu ve ek açıklamaları dikkate al: " + message,
+                mode: "normal"
+            }, sessionToken ? { sessionToken: sessionToken } : {});
+            answer = typeof chat === "string" ? chat : String((chat && (chat.reply || chat.response || chat.text || chat.message)) || "");
+        }
+        if (!answer) throw new Error("AI boş yanıt döndürdü.");
+        answer = answer.slice(0, 12000);
+        var aiRow = new TeamMessage();
+        aiRow.set("team_id", teamId);
+        aiRow.set("user_email", "aethrion-ai@system.local");
+        aiRow.set("user_name", "AETHRION AI");
+        aiRow.set("message", answer);
+        aiRow.set("fileUrl", null);
+        aiRow.set("fileName", "");
+        aiRow.set("fileType", "text/plain");
+        aiRow.set("deleted", false);
+        await aiRow.save(null, { useMasterKey: true });
+        return { success: true, reply: answer, messageId: aiRow.id };
+    } catch (error) {
+        console.error("[AETHRION Teams AI] Request failed:", String(error && error.message || error).slice(0, 220));
+        return { success: false, error: "AETHRION AI yanıt veremedi. AI hizmeti ve dosya türünü kontrol edip tekrar deneyin." };
+    }
+});
+
 Parse.Cloud.define("aethrionGetTeamWorkspace", async function (request) {
     var user = request.user;
     if (!user) throw new Error("Giriş yapmalısınız.");
