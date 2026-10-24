@@ -19,10 +19,10 @@ The external aethrion-schema.js is a fallback only: it detects an existing AETHR
 The repository uses the root as the Vercel static site root. There is no public/ directory. HTML, CSS, JavaScript, SVG, JSON and policy pages live at the root or under api/.
 
 ## Access policy
-Access is not restricted based on VPN, proxy, or Tor reputation. Authentication, account roles, rate limits and feature permissions remain governed by existing account and server-side authorization checks.
+Authentication, account roles, rate limits and feature permissions remain governed by existing account and server-side authorization checks.
 
 ## Back4App deployment
-Upload back4app/main.js as the app's Cloud Code main.js, set IPQS_API_KEY as a private server-side environment variable, and deploy Cloud Code. Legacy function names are retained, including vizyonAlChat, vizyonAlScreenRead, vizyonAlLiveScreenStream, vizyonAlFileAnalyze, kocChat, getKocHistory, shareKocConversation, createV27ApiKey, createVideoClip, generate3DWithHF, sendFounderMessage and smartTranslate.
+Upload back4app/main.js as the app's Cloud Code main.js and deploy Cloud Code. Keep all production API credentials in private server-side environment variables. Legacy function names are retained, including vizyonAlChat, vizyonAlScreenRead, vizyonAlLiveScreenStream, vizyonAlFileAnalyze, kocChat, getKocHistory, shareKocConversation, createV27ApiKey, createVideoClip, generate3DWithHF, sendFounderMessage and smartTranslate.
 
 ## Validation
 GitHub Actions runs JavaScript syntax checks on the Cloud Code and browser security guard. Passing syntax checks do not replace live tests of login, AI providers, file analysis, rate limits, and VPN/proxy detection.
