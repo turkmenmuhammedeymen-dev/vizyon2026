@@ -270,3 +270,30 @@ body { text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; 
     transition-duration: .01ms !important;
   }
 }
+
+
+/* AETHRION authentication and feedback layers: visible above dashboard/content stacking contexts. */
+#authModal,
+#socialAuthTermsModal,
+#profileCompletionModal,
+#recoveryLoginModal {
+  z-index: 2147483000 !important;
+}
+#notification.notification,
+.notification#notification {
+  z-index: 2147483647 !important;
+  top: max(12px, env(safe-area-inset-top, 0px)) !important;
+  bottom: auto !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) translateY(0) !important;
+  width: min(540px, calc(100vw - 24px)) !important;
+  max-width: calc(100vw - 24px) !important;
+  box-sizing: border-box !important;
+  pointer-events: none;
+}
+#notification.notification.show,
+.notification#notification.show {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
