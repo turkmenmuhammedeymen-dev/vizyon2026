@@ -50934,107 +50934,17 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
   body.ae-shell-on .aethrion-sidebar,
   body.ae-shell-on .aethrion-sidebar-toggle,
   body.ae-shell-on .aethrion-sidebar-backdrop { display:none!important; visibility:hidden!important; pointer-events:none!important; }
-  #aethrionVpnBlock { position:fixed; inset:0; z-index:2147483647; display:flex; align-items:center; justify-content:center; padding:24px; background:#0b1726; color:#f5f8fc; font:500 16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; }
-  #aethrionVpnBlock .ae-vpn-card { width:min(560px,100%); padding:32px; border:1px solid rgba(180,205,230,.25); border-radius:20px; background:linear-gradient(145deg,#142a42,#0d1d30); box-shadow:0 25px 80px rgba(0,0,0,.45); }
-  #aethrionVpnBlock .ae-vpn-brand { margin:0 0 10px; color:#d8bd79; font-size:12px; font-weight:800; letter-spacing:.2em; }
-  #aethrionVpnBlock h1 { margin:0 0 12px; font-size:clamp(25px,5vw,36px); line-height:1.15; letter-spacing:-.03em; }
-  #aethrionVpnBlock p { margin:0 0 20px; color:#c0cfdf; }
-  #aethrionVpnBlock button { min-height:44px; padding:0 18px; border:1px solid #cdb16c; border-radius:10px; background:#d7bd7b; color:#13243a; font-weight:800; cursor:pointer; }
   @media(max-width:768px) {
     body.ae-shell-on #dashboardArea { width:100%!important; max-width:100%!important; margin:0!important; padding:12px!important; }
     body.ae-shell-on #aethrionWorkspaceStage { min-height:calc(100dvh - 24px)!important; border-radius:14px!important; }
     body.ae-shell-on #aethrionWorkspaceStage .ae-ws-stage-head { padding:16px!important; }
     body.ae-shell-on #aethrionWorkspaceStage .ae-ws-stage-frame { min-height:65vh!important; }
-    #aethrionVpnBlock .ae-vpn-card { padding:24px; }
-  }
+    }
 </style>
 
 
 
-<!-- AETHRION VPN / proxy / Tor gate. IPQS_API_KEY is server-side in Back4App Cloud Code. -->
-<style id="aethrionVpnGateStylesV2">
-#aethrionVpnBlock{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;background:#091526;color:#f5f8fc;font:500 16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
-#aethrionVpnBlock .ae-vpn-card{width:min(560px,100%);padding:32px;box-sizing:border-box;border:1px solid rgba(180,205,230,.25);border-radius:20px;background:linear-gradient(145deg,#142a42,#0d1d30);box-shadow:0 25px 80px rgba(0,0,0,.45)}
-#aethrionVpnBlock .ae-vpn-brand{margin:0 0 10px;color:#d8bd79;font-size:12px;font-weight:800;letter-spacing:.2em}
-#aethrionVpnBlock h1{margin:0 0 12px;font-size:clamp(25px,5vw,36px);line-height:1.15;letter-spacing:-.03em}
-#aethrionVpnBlock p{margin:0 0 20px;color:#c0cfdf}
-#aethrionVpnBlock button{min-height:44px;padding:0 18px;border:1px solid #cdb16c;border-radius:10px;background:#d7bd7b;color:#13243a;font-weight:800;cursor:pointer}
-@media(max-width:600px){#aethrionVpnBlock{padding:14px}#aethrionVpnBlock .ae-vpn-card{padding:23px}}
-</style>
-<script id="aethrionVpnProtectionClientV1">
-(function(){
- 'use strict';var finished=false;
- function removePending(){document.documentElement.classList.remove('ae-security-pending');}
- function addNotice(code){
-  removePending();if(document.getElementById('aethrionSecurityNotice'))return;
-  var n=document.createElement('aside');n.id='aethrionSecurityNotice';n.setAttribute('role','status');
-  n.style.cssText='position:fixed;z-index:2147483000;top:10px;left:50%;transform:translateX(-50%);width:min(700px,calc(100% - 24px));padding:10px 12px;border:1px solid rgba(255,190,80,.45);border-radius:12px;background:#151b2b;color:#f5f7ff;box-shadow:0 8px 28px rgba(0,0,0,.25);font:500 13px/1.45 system-ui,sans-serif;display:flex;gap:10px;align-items:center;justify-content:space-between;pointer-events:auto';
-  var msg=document.createElement('span');msg.textContent='Güvenlik servisine şu an ulaşılamadı ('+String(code||'UNKNOWN')+'). Site açık kalıyor; bazı korumalı işlemler geçici olarak etkilenebilir.';
-  var b=document.createElement('button');b.type='button';b.textContent='Yeniden kontrol et';b.style.cssText='flex-shrink:0;border:1px solid #cdb16c;border-radius:8px;background:#d7bd7b;color:#13243a;font-weight:800;padding:8px 10px;cursor:pointer';b.addEventListener('click',function(){location.reload();});
-  n.appendChild(msg);n.appendChild(b);(document.body||document.documentElement).appendChild(n);
- }
- function blockConfirmed(reason){
-  removePending();if(document.getElementById('aethrionVpnBlock'))return;
-  var r=document.createElement('div');r.id='aethrionVpnBlock';r.style.cssText='position:fixed;inset:0;z-index:2147483647;background:#080d18;color:#f5f7ff;display:grid;place-items:center;padding:20px;font:500 15px/1.6 system-ui,sans-serif';
-  var c=document.createElement('section');c.style.cssText='width:min(620px,100%);padding:30px;border:1px solid rgba(215,189,123,.5);border-radius:20px;background:#111a2b;box-shadow:0 20px 70px rgba(0,0,0,.45)';
-  var brand=document.createElement('div');brand.textContent='AETHRION SECURITY';brand.style.cssText='color:#d8bd79;font-size:12px;font-weight:800;letter-spacing:.2em;margin-bottom:10px';
-  var title=document.createElement('h1');title.textContent='Bağlantıya izin verilmiyor';title.style.cssText='margin:0 0 12px;font-size:clamp(25px,5vw,36px);line-height:1.15';
-  var p=document.createElement('p');p.textContent=reason==='VPN_PROXY_OR_TOR'?'IPQS bu bağlantıyı VPN, proxy veya Tor olarak işaretledi. Bu sonuç yanlış görünüyorsa normal internet bağlantısıyla tekrar deneyin.':'AETHRION güvenlik kontrolü bağlantıyı doğrulayamadı ('+String(reason||'SECURITY_CHECK_UNAVAILABLE')+'). Güvenli erişim için kontrol başarıyla tamamlanana kadar giriş engellendi. Lütfen bağlantıyı ve güvenlik servisi yapılandırmasını kontrol edip yeniden deneyin.';
-  var b=document.createElement('button');b.type='button';b.textContent='Yeniden kontrol et';b.style.cssText='min-height:44px;padding:0 18px;border:1px solid #cdb16c;border-radius:10px;background:#d7bd7b;color:#13243a;font-weight:800;cursor:pointer';b.addEventListener('click',function(){location.reload();});
-  c.appendChild(brand);c.appendChild(title);c.appendChild(p);c.appendChild(b);r.appendChild(c);(document.body||document.documentElement).appendChild(r);
- }
- function run(){var started=Date.now();function attempt(){
-  if(finished)return;var S=window.Parse;
-  if(!S||!S.Cloud||typeof S.Cloud.run!=='function'||!window.parseInitialized){if(Date.now()-started>12000){finished=true;addNotice('SDK_NOT_READY');removePending();}else setTimeout(attempt,250);return;}
-  S.Cloud.run('aethrionSecurityCheck',{}).then(function(result){
-   if(finished)return;finished=true;
-   if(result&&result.blocked===true&&result.code==='VPN_PROXY_OR_TOR'){blockConfirmed('VPN_PROXY_OR_TOR');return;}
-   // Block confirmed VPN/proxy/Tor connections. If IPQS is configured but temporarily
-   // unavailable (for example, exhausted credits), keep the public site available and
-   // show a non-blocking notice. VPN detection remains degraded until the provider recovers.
-   if(!result||result.ok!==true){
-    // Reputation-provider failure is not evidence of VPN use.
-    addNotice(result&&result.code?result.code:'SECURITY_CHECK_DEGRADED');
-    removePending();return;
-   }
-   if(result.blocked===true){
-    blockConfirmed(result.code||'VPN_PROXY_OR_TOR');return;
-   }
-   // A provider outage or missing IPQS key is a degraded reputation check, not an
-   // authentication outage. Keep the public site usable while preserving confirmed blocks.
-   if(result.degraded===true){
-    addNotice(result.warningCode||result.code||'REPUTATION_CHECK_UNAVAILABLE');
-    removePending();return;
-   }
-   if(result.configured!==true){
-    addNotice(result.code||'VPN_CHECK_NOT_CONFIGURED');
-    removePending();return;
-   }
-   removePending();
-  }).catch(function(error){
-   if(!finished){
-    finished=true;
-    // Record safe diagnostics so the real Parse/Cloud Code failure can be identified.
-    // Never print credentials, API keys, tokens, or request payloads.
-    try {
-     var detail = {
-      name: error && error.name ? String(error.name).slice(0,80) : 'UnknownError',
-      code: error && error.code != null ? String(error.code).slice(0,100) : '',
-      message: error && error.message ? String(error.message).slice(0,240) : '',
-      status: error && (error.status || error.statusCode) ? String(error.status || error.statusCode).slice(0,40) : ''
-     };
-     console.error('[AETHRION Security] aethrionSecurityCheck request rejected; verify Cloud Code deployment, Parse app configuration and network.', detail);
-    } catch (_) {}
-    // A failed security endpoint must not lock every user out; confirmed positive
-    // VPN/proxy/Tor results above are still blocked.
-    addNotice('CLOUD_FUNCTION_CALL_FAILED');
-    removePending();
-   }
-  });
- }attempt();}
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
-})();
-</script>
+
 
 
 <style id="aethrionAuthInputReliabilityPatch">
@@ -51231,43 +51141,20 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
     box-shadow: 0 20px 70px rgba(0,0,0,.62), 0 0 0 1px rgba(255,255,255,.04) !important;
     backdrop-filter: blur(18px) saturate(135%) !important;
     -webkit-backdrop-filter:  
-<!-- AETHRION JARVIS: official companion links (external products; not bundled into this web app) -->
-<style id="aethrionJarvisCompanionLinksCSS">
-#aethrionJarvisCompanionLinks{position:fixed;left:18px;bottom:18px;z-index:2147483000;width:min(330px,calc(100vw - 36px));padding:14px;border:1px solid rgba(212,175,55,.38);border-radius:16px;background:rgba(8,12,22,.94);color:#f5f7ff;box-shadow:0 16px 50px rgba(0,0,0,.4);backdrop-filter:blur(16px);font:500 13px/1.45 system-ui,sans-serif}
-#aethrionJarvisCompanionLinks .aj-title{font-weight:800;letter-spacing:.08em;color:#d8bd79;margin:0 0 9px}
-#aethrionJarvisCompanionLinks .aj-links{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-#aethrionJarvisCompanionLinks a{display:flex;align-items:center;justify-content:center;min-height:38px;padding:7px 9px;border:1px solid rgba(212,175,55,.32);border-radius:9px;background:rgba(255,255,255,.045);color:#fff;text-decoration:none;text-align:center;font-weight:700}
-#aethrionJarvisCompanionLinks a:hover{background:rgba(212,175,55,.15)}
-#aethrionJarvisCompanionLinks .aj-note{margin:8px 0 0;color:#aeb8ca;font-size:11px}
-@media(max-width:600px){#aethrionJarvisCompanionLinks{left:10px;bottom:10px;width:min(290px,calc(100vw - 20px));padding:10px}#aethrionJarvisCompanionLinks .aj-links{grid-template-columns:1fr 1fr}}
+<!-- AETHRION JARVIS: official AETHRION community links -->
+<style id="aethrionJarvisOfficialLinksCSS">
+#aethrionJarvisOfficialLinks{position:fixed;left:18px;bottom:18px;z-index:2147483000;width:min(310px,calc(100vw - 36px));padding:14px;border:1px solid rgba(212,175,55,.38);border-radius:16px;background:rgba(8,12,22,.95);color:#f5f7ff;box-shadow:0 16px 50px rgba(0,0,0,.4);backdrop-filter:blur(16px);font:500 13px/1.45 system-ui,sans-serif}
+#aethrionJarvisOfficialLinks .aj-title{font-weight:800;letter-spacing:.08em;color:#d8bd79;margin:0 0 9px}
+#aethrionJarvisOfficialLinks .aj-links{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#aethrionJarvisOfficialLinks a{display:flex;align-items:center;justify-content:center;min-height:40px;padding:8px;border:1px solid rgba(212,175,55,.32);border-radius:9px;background:rgba(255,255,255,.045);color:#fff;text-decoration:none;text-align:center;font-weight:700}
+#aethrionJarvisOfficialLinks a:hover{background:rgba(212,175,55,.15)}
+#aethrionJarvisOfficialLinks .aj-note{margin:8px 0 0;color:#aeb8ca;font-size:11px}
+@media(max-width:600px){#aethrionJarvisOfficialLinks{left:10px;bottom:10px;width:min(290px,calc(100vw - 20px));padding:10px}}
 </style>
-<script id="aethrionJarvisCompanionLinksJS">
-(function(){
- 'use strict';
- var desktopUrl='https://unlualp.com/';
- var iphoneUrl='https://apps.apple.com/tr/app/alpai-sesli-yapay-zek%C3%A2/id6817297312?l=tr';
- var videoUrl='https://www.youtube.com/watch?v=ngODHC-iIf8';
- function mount(){
-  var overlay=document.getElementById('jarvisOverlay');
-  if(!overlay||!overlay.isConnected)return;
-  var panel=document.getElementById('aethrionJarvisCompanionLinks');
-  if(!panel){
-   panel=document.createElement('aside');panel.id='aethrionJarvisCompanionLinks';
-   panel.setAttribute('aria-label','JARVIS ve ALPAI bağlantıları');
-   panel.innerHTML='<div class="aj-title">JARVIS V4 · ALPAI</div><div class="aj-links"><a href="'+desktopUrl+'" target="_blank" rel="noopener noreferrer">Windows / Mac</a><a href="'+iphoneUrl+'" target="_blank" rel="noopener noreferrer">iPhone uygulaması</a><a href="'+videoUrl+'" target="_blank" rel="noopener noreferrer">Kurulum videosu</a><a href="'+desktopUrl+'" target="_blank" rel="noopener noreferrer">Resmî site</a></div><p class="aj-note">Harici bağlantılar: AETHRION hesabı veya verileri bu uygulamalarla otomatik paylaşılmaz.</p>';
-   overlay.appendChild(panel);
-  }
- }
- function watch(){
-  mount();
-  if(window.MutationObserver&&!window.__aethrionJarvisCompanionObserver){
-   window.__aethrionJarvisCompanionObserver=new MutationObserver(mount);
-   window.__aethrionJarvisCompanionObserver.observe(document.documentElement,{childList:true,subtree:true});
-  }
- }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watch,{once:true});else watch();
-})();
+<script id="aethrionJarvisOfficialLinksJS">
+(function(){'use strict';function mount(){var overlay=document.getElementById('jarvisOverlay');if(!overlay||!overlay.isConnected)return;var panel=document.getElementById('aethrionJarvisOfficialLinks');if(!panel){panel=document.createElement('aside');panel.id='aethrionJarvisOfficialLinks';panel.setAttribute('aria-label','AETHRION resmî sosyal kanalları');panel.innerHTML='<div class="aj-title">AETHRION COMMUNITY</div><div class="aj-links"><a href="https://www.instagram.com/aethrion.official/" target="_blank" rel="noopener noreferrer">Instagram</a><a href="https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U" target="_blank" rel="noopener noreferrer">WhatsApp Kanalı</a></div><p class="aj-note">Resmî AETHRION bağlantıları. Harici hesaplarda şifrenizi paylaşmayın.</p>';overlay.appendChild(panel);}}function watch(){mount();if(window.MutationObserver&&!window.__aethrionJarvisOfficialLinksObserver){window.__aethrionJarvisOfficialLinksObserver=new MutationObserver(mount);window.__aethrionJarvisOfficialLinksObserver.observe(document.documentElement,{childList:true,subtree:true});}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watch,{once:true});else watch();})();
 </script>
+
 
 blur(18px) saturate(135%) !important;
     transform: translate3d(-50%, -160%, 0) !important;
