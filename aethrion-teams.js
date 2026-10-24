@@ -44,7 +44,7 @@ function readFileBase64(file){
 if(chatFile)chatFile.addEventListener('change',function(){
  var f=this.files&&this.files[0];if(!f){selectedChatFile=null;if(chatFileLabel)chatFileLabel.textContent='Dosya sınırı 5 MB';return}
  if(f.size>5*1024*1024){say('Takım dosyası en fazla 5 MB olabilir.','error');this.value='';selectedChatFile=null;return}
- var allowed=/^(image\\/(png|jpeg|webp|gif)|application\\/pdf|text\\/(plain|markdown|csv)|application\\/json)$/i.test(f.type)||/\\.(txt|md|csv|json|js|ts|py|html|css|xml|ya?ml|log|pdf|png|jpe?g|webp|gif)$/i.test(f.name);
+ var allowed=/^(image\/(png|jpeg|webp|gif)|application\/pdf|text\/(plain|markdown|csv)|application\/json)$/i.test(f.type)||/\.(txt|md|csv|json|js|ts|py|html|css|xml|ya?ml|log|pdf|png|jpe?g|webp|gif)$/i.test(f.name);
  if(!allowed){say('Bu dosya türü desteklenmiyor. Görsel, PDF, metin veya kod dosyası seç.','error');this.value='';selectedChatFile=null;return}
  selectedChatFile=f;if(chatFileLabel)chatFileLabel.textContent='📎 '+f.name;say('Dosya eklendi. @AETHRION AI etiketiyle analiz isteyebilirsin.','success');
 });
