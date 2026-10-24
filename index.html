@@ -50937,7 +50937,7 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
  }
  function run(){var started=Date.now();function attempt(){
   if(finished)return;var S=window.Parse;
-  if(!S||!S.Cloud||typeof S.Cloud.run!=='function'||!window.parseInitialized){if(Date.now()-started>12000){finished=true;blockConfirmed('SDK_NOT_READY');}else setTimeout(attempt,250);return;}
+  if(!S||!S.Cloud||typeof S.Cloud.run!=='function'||!window.parseInitialized){if(Date.now()-started>12000){finished=true;addNotice('SDK_NOT_READY');removePending();}else setTimeout(attempt,250);return;}
   S.Cloud.run('aethrionSecurityCheck',{}).then(function(result){
    if(finished)return;finished=true;
    if(result&&result.blocked===true&&result.code==='VPN_PROXY_OR_TOR'){blockConfirmed('VPN_PROXY_OR_TOR');return;}
@@ -50945,7 +50945,9 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
    // unavailable (for example, exhausted credits), keep the public site available and
    // show a non-blocking notice. VPN detection remains degraded until the provider recovers.
    if(!result||result.ok!==true){
-    blockConfirmed(result&&result.code?result.code:'SECURITY_CHECK_DEGRADED');return;
+    // Reputation-provider failure is not evidence of VPN use.
+    addNotice(result&&result.code?result.code:'SECURITY_CHECK_DEGRADED');
+    removePending();return;
    }
    if(result.blocked===true){
     blockConfirmed(result.code||'VPN_PROXY_OR_TOR');return;
@@ -50957,10 +50959,19 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
     removePending();return;
    }
    if(result.configured!==true){
-    blockConfirmed(result.code||'VPN_CHECK_NOT_CONFIGURED');return;
+    addNotice(result.code||'VPN_CHECK_NOT_CONFIGURED');
+    removePending();return;
    }
    removePending();
-  }).catch(function(){if(!finished){finished=true;blockConfirmed('CLOUD_FUNCTION_CALL_FAILED');}});
+  }).catch(function(){
+   if(!finished){
+    finished=true;
+    // A failed security endpoint must not lock every user out; confirmed positive
+    // VPN/proxy/Tor results above are still blocked.
+    addNotice('CLOUD_FUNCTION_CALL_FAILED');
+    removePending();
+   }
+  });
  }attempt();}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();
