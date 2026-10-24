@@ -10734,7 +10734,7 @@ Parse.Cloud.define("aethrionSendTeamMessage", async function (request) {
     if (fileBase64) {
         if (!fileName) fileName = "aethrion-team-file";
         var allowed = /^image\/(png|jpeg|webp|gif)$|^application\/pdf$|^text\/(plain|markdown|csv)$|^application\/json$/i.test(fileType) ||
-            /\.(txt|md|csv|json|js|ts|py|html|css|xml|ya?ml|log|pdf|png|jpe?g|webp|gif)$/i.test(fileName);
+            /\.(docx|xlsx|xls|txt|md|csv|json|js|ts|py|html|css|xml|ya?ml|log|pdf|png|jpe?g|webp|gif)$/i.test(fileName);
         if (!allowed) throw new Error("Bu dosya türü desteklenmiyor. Görsel, PDF, metin veya kod dosyası seçin.");
         var parseFile = new Parse.File(fileName, { base64: fileBase64 });
         await parseFile.save(null, { useMasterKey: true });
