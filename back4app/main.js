@@ -243,6 +243,7 @@ async function _aethrionCheckIpReputation(apiKey, ip) {
     var now = Date.now();
     var cached = _aethrionVpnCache.get(ip);
     if (cached && cached.expiresAt > now) {
+        if (cached.ok === false) return { ok: false, blocked: false, code: cached.code || 'REPUTATION_CHECK_FAILED' };
         return { ok: true, blocked: cached.blocked === true, code: cached.blocked ? 'VPN_PROXY_OR_TOR' : 'CLEAR' };
     }
 
@@ -262,6 +263,7 @@ async function _aethrionCheckIpReputation(apiKey, ip) {
         if (!response || !response.ok) {
             // A failed provider request does not establish that the visitor is using a VPN.
             console.warn('[AETHRION Security] IPQS HTTP request failed; status:', response && Number(response.status) || 'NO_RESPONSE');
+            _aethrionVpnCache.set(ip, { ok: false, blocked: false, code: 'REPUTATION_PROVIDER_UNAVAILABLE', expiresAt: now + 2 * 60 * 1000 });
             return { ok: false, blocked: false, code: 'REPUTATION_PROVIDER_UNAVAILABLE' };
         }
 
@@ -273,7 +275,8 @@ async function _aethrionCheckIpReputation(apiKey, ip) {
                 ? data.message.replace(/[\r\n\t]+/g, ' ').slice(0, 180)
                 : 'No provider error message returned';
             console.warn('[AETHRION Security] IPQS rejected reputation request:', providerMessage);
-            // Do not cache failed provider responses; retry after the underlying issue is fixed.
+            // Cache provider-side failures briefly; an outage is not proof of VPN/proxy use.
+            _aethrionVpnCache.set(ip, { ok: false, blocked: false, code: 'REPUTATION_CHECK_FAILED', expiresAt: now + 2 * 60 * 1000 });
             return { ok: false, blocked: false, code: 'REPUTATION_CHECK_FAILED' };
         }
 
@@ -288,7 +291,7 @@ async function _aethrionCheckIpReputation(apiKey, ip) {
             var firstKey = _aethrionVpnCache.keys().next().value;
             if (firstKey) _aethrionVpnCache.delete(firstKey);
         }
-        _aethrionVpnCache.set(ip, { blocked: blocked, expiresAt: now + 5 * 60 * 1000 });
+        _aethrionVpnCache.set(ip, { ok: true, blocked: blocked, expiresAt: now + 5 * 60 * 1000 });
 
         return { ok: true, blocked: blocked, code: blocked ? 'VPN_PROXY_OR_TOR' : 'CLEAR' };
     } catch (error) {
@@ -1079,7 +1082,10 @@ Parse.Cloud.define("initSchemas", async function (request) {
             var columns = schemaDefinitions[className];
             for (var coli = 0; coli < columns.length; coli++) {
                 var col = columns[coli];
-                if (col === "date" || col === "lastUpdated" || col === "lastClaimDate" ||
+                if (col === "date" && (className === "DailyTask" || className === "SocialTask" || className === "Quiz")) {
+                    // Deployed classes use YYYY-MM-DD string keys; probe the existing type safely.
+                    dummy.set(col, new Date().toISOString().slice(0, 10));
+                } else if (col === "date" || col === "lastUpdated" || col === "lastClaimDate" ||
                     col === "lastClaimTime" || col === "streakStartDate" || col === "end_date" ||
                     col === "subscribedAt" || col === "attemptedAt" || col === "lastMessageTime" ||
                     col === "createdAtClient" || col === "updatedAtClient" || col === "joined_at" ||
@@ -1093,7 +1099,8 @@ Parse.Cloud.define("initSchemas", async function (request) {
                            col === "total_lessons" || col === "order" || col === "correct_answer" ||
                            col === "streakCount" || col === "penalty_points" || col === "total_points" ||
                            col === "rank" || col === "usage_count" || col === "messageCount" ||
-                           col === "total_count" || col === "start_time" || col === "end_time") {
+                           col === "total_count" || col === "start_time" || col === "end_time" ||
+                           col === "salary" || col === "views") {
                     dummy.set(col, 0);
                 } else if (col === "is_favorite" || col === "is_archived" || col === "is_trashed" ||
                            col === "is_published" || col === "is_read" || col === "is_active" ||
@@ -6385,16 +6392,19 @@ Parse.Cloud.define("purchaseStoreItem", async function (request) {
 // ================================================================
 // ========== GÖREVLER ============================================
 // ================================================================
+// ISO date key helper for Parse classes whose deployed "date" column is String.
+function _aethrionDateKeyUTC(value) {
+    var d = value instanceof Date ? value : new Date(value || Date.now());
+    if (!Number.isFinite(d.getTime())) d = new Date();
+    return d.toISOString().slice(0, 10);
+}
+
 Parse.Cloud.define("getDailyTasks", async function (request) {
     var user = request.user;
     if (!user) throw new Error('Giriş yapmalısınız!');
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);
-    var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-
+    var todayKey = _aethrionDateKeyUTC(new Date());
     var query = new Parse.Query(DailyTask);
-    query.greaterThanOrEqualTo('date', today);
-    query.lessThan('date', tomorrow);
+    query.equalTo('date', todayKey);
     var tasks = await query.find({ useMasterKey: true });
     var completed = user.get('completed_daily_tasks') || [];
     return tasks.map(function (t) {
@@ -6429,13 +6439,9 @@ Parse.Cloud.define("completeDailyTask", async function (request) {
 Parse.Cloud.define("getSocialTasks", async function (request) {
     var user = request.user;
     if (!user) throw new Error('Giriş yapmalısınız!');
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);
-    var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-
+    var todayKey = _aethrionDateKeyUTC(new Date());
     var query = new Parse.Query(SocialTask);
-    query.greaterThanOrEqualTo('date', today);
-    query.lessThan('date', tomorrow);
+    query.equalTo('date', todayKey);
     query.equalTo('is_active', true);
     var tasks = await query.find({ useMasterKey: true });
     var completed = user.get('completed_social_tasks') || [];
@@ -6977,13 +6983,9 @@ Parse.Cloud.define("completeLesson", async function (request) {
 // ========== ZEKA TESTİ ==========================================
 // ================================================================
 Parse.Cloud.define("getQuizQuestions", async function (request) {
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);
-    var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-
+    var todayKey = _aethrionDateKeyUTC(new Date());
     var query = new Parse.Query(Quiz);
-    query.greaterThanOrEqualTo('date', today);
-    query.lessThan('date', tomorrow);
+    query.equalTo('date', todayKey);
     query.equalTo('is_active', true);
     var quizes = await query.find({ useMasterKey: true });
     if (quizes.length > 0) {
@@ -9401,9 +9403,10 @@ Parse.Cloud.job("refreshDailyTasks", async function (request) {
     console.log('🔄 Günlük görevler yenileniyor...');
     var today = new Date();
     today.setHours(0, 0, 0, 0);
+    var todayKey = _aethrionDateKeyUTC(today);
 
     var oldQuery = new Parse.Query(DailyTask);
-    oldQuery.lessThan('date', today);
+    oldQuery.lessThan('date', todayKey);
     var oldTasks = await oldQuery.find({ useMasterKey: true });
     for (var oi = 0; oi < oldTasks.length; oi++) await oldTasks[oi].destroy({ useMasterKey: true });
 
@@ -9416,7 +9419,7 @@ Parse.Cloud.job("refreshDailyTasks", async function (request) {
     ];
     for (var ti = 0; ti < tasks.length; ti++) {
         var task = new DailyTask();
-        task.set('date', today);
+        task.set('date', todayKey);
         task.set('task_text', tasks[ti].task_text);
         task.set('points', tasks[ti].points);
         await task.save(null, { useMasterKey: true });
@@ -9477,9 +9480,10 @@ Parse.Cloud.job("refreshSocialTasks", async function (request) {
     console.log('🔄 Topluluk görevleri yenileniyor...');
     var today = new Date();
     today.setHours(0, 0, 0, 0);
+    var todayKey = _aethrionDateKeyUTC(today);
 
     var oldQuery = new Parse.Query(SocialTask);
-    oldQuery.lessThan('date', today);
+    oldQuery.lessThan('date', todayKey);
     var oldTasks = await oldQuery.find({ useMasterKey: true });
     for (var oi = 0; oi < oldTasks.length; oi++) await oldTasks[oi].destroy({ useMasterKey: true });
 
@@ -9490,7 +9494,7 @@ Parse.Cloud.job("refreshSocialTasks", async function (request) {
     ];
     for (var ti = 0; ti < tasks.length; ti++) {
         var task = new SocialTask();
-        task.set('date', today);
+        task.set('date', todayKey);
         task.set('platform', tasks[ti].platform);
         task.set('url', tasks[ti].url);
         task.set('points_reward', tasks[ti].points_reward);
