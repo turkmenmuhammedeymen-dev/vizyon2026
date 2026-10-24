@@ -2744,11 +2744,18 @@ Parse.Cloud.define("vizyonAlLiveScreenStream", async function (request) {
 Parse.Cloud.define("vizyonAlFileAnalyze", async function (request) {
     var user = request.user;
     if (!user) throw new Error('Giriş yapmalısınız!');
-    var fileBase64 = request.params.fileBase64;
-    var fileName = request.params.fileName || 'dosya';
-    var fileType = request.params.fileType || 'unknown';
-    var question = request.params.question || 'Bu dosyayı analiz et ve özetle.';
+    var fileBase64 = typeof request.params.fileBase64 === 'string' ? request.params.fileBase64 : '';
+    var fileName = String(request.params.fileName || 'dosya').slice(0, 180);
+    var fileType = String(request.params.fileType || 'application/octet-stream').toLowerCase().slice(0, 120);
+    var question = String(request.params.question || 'Bu dosyayı analiz et ve özetle.').slice(0, 4000);
     if (!fileBase64) throw new Error('Dosya içeriği gerekli!');
+    if (fileBase64.length > 11 * 1024 * 1024) throw new Error('Dosya 8 MB sınırını aşıyor.');
+    var isImage = fileType.indexOf('image/') === 0;
+    var isPdf = fileType === 'application/pdf' || /\\.pdf$/i.test(fileName);
+    var isText = fileType.indexOf('text/') === 0 || /^(application\\/(json|xml|javascript|x-javascript))$/.test(fileType) || /\\.(txt|md|csv|json|js|ts|py|html|css|xml|ya?ml|log|sql|sh)$/i.test(fileName);
+    if (!isImage && !isPdf && !isText) {
+        return { success: false, error: 'Bu dosya türü henüz doğrudan çözümlenemiyor. Görsel, PDF, TXT, MD, CSV, JSON veya kod dosyası kullanın.' };
+    }
 
     var _rlk = 'vizyonAlFileAnalyze:' + user.get('email');
     try {
@@ -2757,8 +2764,8 @@ Parse.Cloud.define("vizyonAlFileAnalyze", async function (request) {
     } catch (e) { console.warn('Rate limit uyarısı:', e.message); }
 
     try {
-        // Görsel ise Gemini vision kullan
-        if (fileType.indexOf('image/') === 0) {
+        // Gemini görselleri ve PDF belgelerini doğrudan analiz edebilir.
+        if (isImage || isPdf) {
             var key = await getAPIKey('GEMINI_KEY');
             if (!key) return { success: false, error: 'GEMINI_KEY eksik.' };
             var mimeType = fileType;
@@ -2774,11 +2781,11 @@ Parse.Cloud.define("vizyonAlFileAnalyze", async function (request) {
             var data = await res.json();
             if (!res.ok || data.error) return { success: false, error: (data.error && data.error.message) || 'HTTP ' + res.status };
             if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
-                return { success: true, reply: data.candidates[0].content.parts[0].text, fileType: 'image' };
+                return { success: true, reply: data.candidates[0].content.parts[0].text, fileType: isPdf ? 'pdf' : 'image' };
             }
             return { success: false, error: 'Beklenmedik format' };
         } else {
-            // Metin/PDF/Word/Excel — base64'ü metne çevir
+            // Metin ve kaynak kod dosyaları base64'ten UTF-8 metne dönüştürülür.
             var decoded = '';
             try {
                 decoded = Buffer.from(fileBase64, 'base64').toString('utf8');
