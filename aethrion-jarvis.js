@@ -56,7 +56,7 @@ function checkDueReminders(){
   if(changed)writeReminders(remaining);
 }
 function durationFrom(text){
-  var m=String(text).match(/(\\d{1,6})\\s*(saniye|saniyelik|sn|dakika|dk|saat|sa|hour|hours|minute|minutes|second|seconds)/i);
+  var m=String(text).match(/(\d{1,6})\s*(saniye|saniyelik|sn|dakika|dk|saat|sa|hour|hours|minute|minutes|second|seconds)/i);
   if(!m)return null;var n=Number(m[1]),unit=m[2].toLowerCase();if(!Number.isFinite(n)||n<1)return null;
   var multiplier=/^(saniye|saniyelik|sn|second|seconds)$/.test(unit)?1000:/^(dakika|dk|minute|minutes)$/.test(unit)?60000:3600000;
   var ms=n*multiplier;return ms>0&&ms<=86400000?{ms:ms,label:m[0]}:null;
@@ -79,8 +79,8 @@ function handleLocalCommand(raw){
     if(!d2){message('assistant','Hatırlatıcı için süre belirt. Örnek: “10 dakika sonra su içmeyi hatırlat”.');status('Hatırlatıcı için süre bekleniyor.','idle');return true;}
     var reminderText=text
       .replace(/hatırlatıcı|hatirlatici|hatırlat|hatirlat|remind me/ig,'')
-      .replace(/\\d{1,6}\\s*(saniye|saniyelik|sn|dakika|dk|saat|sa|hour|hours|minute|minutes|second|seconds)/ig,'')
-      .replace(/sonra|in/ig,'').replace(/^[\\s:,-]+|[\\s:,-]+$/g,'').trim();
+      .replace(/\d{1,6}\s*(saniye|saniyelik|sn|dakika|dk|saat|sa|hour|hours|minute|minutes|second|seconds)/ig,'')
+      .replace(/sonra|in/ig,'').replace(/^[\s:,-]+|[\s:,-]+$/g,'').trim();
     if(!reminderText)reminderText='Planladığın işi yap';
     items.push({id:String(Date.now()),text:reminderText,dueAt:Date.now()+d2.ms});writeReminders(items);requestReminderPermission();
     var due=new Date(Date.now()+d2.ms).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
