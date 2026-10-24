@@ -29,7 +29,7 @@ document.getElementById('aeJvAttach').addEventListener('click',function(){docume
 document.getElementById('aeJvFileInput').addEventListener('change',function(){
  var f=this.files&&this.files[0];if(!f){selectedFile=null;return;}
  if(f.size>8*1024*1024){status('Dosya en fazla 8 MB olabilir.','error');this.value='';selectedFile=null;return;}
- var allowed=/^(image\\/(png|jpeg|webp|gif)|application\\/pdf|text\\/(plain|markdown|csv)|application\\/json)$/i.test(f.type)||/\\.(txt|md|csv|json|js|ts|py|html|css|xml|ya?ml|log)$/i.test(f.name);
+ var allowed=/^(image\/(png|jpeg|webp|gif)|application\/pdf|text\/(plain|markdown|csv)|application\/json)$/i.test(f.type)||/\.(txt|md|csv|json|js|ts|py|html|css|xml|ya?ml|log)$/i.test(f.name);
  if(!allowed){status('Bu dosya türü henüz desteklenmiyor. Görsel, PDF, TXT, MD, CSV, JSON veya kod dosyası seç.','error');this.value='';selectedFile=null;return;}
  selectedFile=f;var label=document.getElementById('aeJvFileLabel');if(label)label.textContent='📎 '+f.name;
  status('Dosya eklendi. Gönder’e basınca AETHRION AI dosyayı analiz edecek.','success');
