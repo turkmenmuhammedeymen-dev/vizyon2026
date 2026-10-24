@@ -161,3 +161,53 @@
     animation: none !important;
   }
 }
+
+
+/* Shared baseline for standalone AETHRION pages and embedded product surfaces. */
+:where(button, input, select, textarea, [role="button"], .btn, .btn-primary, .btn-secondary) {
+  font: inherit;
+  max-width: 100%;
+}
+:where(button, [role="button"], .btn, .btn-primary, .btn-secondary) {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: filter .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+:where(button, [role="button"], .btn, .btn-primary, .btn-secondary):active {
+  transform: translateY(1px);
+}
+:where(input, select, textarea) {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+:where(img, video, canvas, iframe, svg) {
+  max-width: 100%;
+}
+:where(table) {
+  max-width: 100%;
+}
+:where(.card, .feature-card, .tool-card, .model-card, .pricing-card, .feature-box, .content-card, .info-card, .service-card, .product-card, .project-card) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+:where(h1, h2, h3, .page-title, .section-title) {
+  text-wrap: balance;
+}
+:where(p, li, label, .description, .subtitle) {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 760px) {
+  :where(.container, .page-container, .content-container, .main-container) {
+    width: min(100% - 28px, 100%) !important;
+    max-width: 100% !important;
+  }
+  :where(.grid, .cards-grid, .features-grid, .tools-grid, .models-grid, .pricing-grid) {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  }
+  :where(pre, .code-block, .table-container) {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+}
