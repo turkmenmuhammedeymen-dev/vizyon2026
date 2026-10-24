@@ -372,6 +372,7 @@ if (Parse && Parse.Cloud && typeof Parse.Cloud.define === 'function' && !Parse.C
 // is the only address used. Confirmed VPN/proxy/Tor is blocked; provider outages return
 // an explicit degraded state so the browser can keep the site available and show a warning.
 Parse.Cloud.define("aethrionSecurityCheck", async function (request) {
+    console.info("[AETHRION Security] aethrionSecurityCheck invoked.");
     // This public health/reputation endpoint must never lock the entire site out
     // because the provider, key, IP metadata, or runtime is temporarily unavailable.
     // Only a successful, positive VPN/proxy/Tor result is a blocking signal.
