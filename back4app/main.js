@@ -372,31 +372,53 @@ if (Parse && Parse.Cloud && typeof Parse.Cloud.define === 'function' && !Parse.C
 // is the only address used. Confirmed VPN/proxy/Tor is blocked; provider outages return
 // an explicit degraded state so the browser can keep the site available and show a warning.
 Parse.Cloud.define("aethrionSecurityCheck", async function (request) {
-    var apiKey = _aethrionGetIPQSApiKey();
-    if (!apiKey) {
-        console.warn('[AETHRION Security] Public gate is in degraded mode: private runtime key is missing.');
-        return { ok: true, configured: false, blocked: false, degraded: true, code: 'VPN_CHECK_NOT_CONFIGURED' };
-    }
+    // This public health/reputation endpoint must never lock the entire site out
+    // because the provider, key, IP metadata, or runtime is temporarily unavailable.
+    // Only a successful, positive VPN/proxy/Tor result is a blocking signal.
+    try {
+        var apiKey = _aethrionGetIPQSApiKey();
+        if (!apiKey) {
+            console.warn('[AETHRION Security] IPQS key missing; reputation check is degraded.');
+            return { ok: true, configured: false, blocked: false, degraded: true, code: 'VPN_CHECK_NOT_CONFIGURED' };
+        }
 
-    var ip = _aethrionGetClientIp(request);
-    if (!ip || ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') {
-        console.warn('[AETHRION Security] Public gate is in degraded mode: client IP could not be resolved.');
-        return { ok: true, configured: true, blocked: false, degraded: true, code: 'IP_UNAVAILABLE' };
-    }
+        var ip = _aethrionGetClientIp(request);
+        if (!ip || ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') {
+            console.warn('[AETHRION Security] Client IP unavailable; reputation check is degraded.');
+            return { ok: true, configured: true, blocked: false, degraded: true, code: 'IP_UNAVAILABLE' };
+        }
 
-    var result = await _aethrionCheckIpReputation(apiKey, ip);
-    if (!result.ok) {
-        console.warn('[AETHRION Security] Public gate is in degraded mode:', String(result.code || 'UNKNOWN'));
-        return { ok: true, configured: true, blocked: false, degraded: true, code: 'DEGRADED_ALLOW', warningCode: result.code || 'REPUTATION_CHECK_UNAVAILABLE' };
-    }
+        var result = await _aethrionCheckIpReputation(apiKey, ip);
+        if (!result || result.ok !== true) {
+            console.warn('[AETHRION Security] IPQS check degraded:', String((result && result.code) || 'UNKNOWN'));
+            return {
+                ok: true,
+                configured: true,
+                blocked: false,
+                degraded: true,
+                code: 'DEGRADED_ALLOW',
+                warningCode: (result && result.code) || 'REPUTATION_CHECK_UNAVAILABLE'
+            };
+        }
 
-    return {
-        ok: true,
-        configured: true,
-        blocked: result.blocked === true,
-        degraded: false,
-        code: result.blocked ? 'VPN_PROXY_OR_TOR' : 'CLEAR'
-    };
+        return {
+            ok: true,
+            configured: true,
+            blocked: result.blocked === true,
+            degraded: false,
+            code: result.blocked === true ? 'VPN_PROXY_OR_TOR' : 'CLEAR'
+        };
+    } catch (error) {
+        var errorName = error && error.name ? String(error.name) : 'UnknownError';
+        console.warn('[AETHRION Security] Public gate runtime error; allowing degraded access:', errorName);
+        return {
+            ok: true,
+            configured: false,
+            blocked: false,
+            degraded: true,
+            code: 'SECURITY_CHECK_DEGRADED'
+        };
+    }
 });
 
 var _rateLimitStore = new Map();
