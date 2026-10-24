@@ -51011,9 +51011,20 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
     removePending();return;
    }
    removePending();
-  }).catch(function(){
+  }).catch(function(error){
    if(!finished){
     finished=true;
+    // Record safe diagnostics so the real Parse/Cloud Code failure can be identified.
+    // Never print credentials, API keys, tokens, or request payloads.
+    try {
+     var detail = {
+      name: error && error.name ? String(error.name).slice(0,80) : 'UnknownError',
+      code: error && error.code != null ? String(error.code).slice(0,100) : '',
+      message: error && error.message ? String(error.message).slice(0,240) : '',
+      status: error && (error.status || error.statusCode) ? String(error.status || error.statusCode).slice(0,40) : ''
+     };
+     console.error('[AETHRION Security] aethrionSecurityCheck request rejected; verify Cloud Code deployment, Parse app configuration and network.', detail);
+    } catch (_) {}
     // A failed security endpoint must not lock every user out; confirmed positive
     // VPN/proxy/Tor results above are still blocked.
     addNotice('CLOUD_FUNCTION_CALL_FAILED');
@@ -51219,7 +51230,46 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
     overflow-wrap: anywhere !important;
     box-shadow: 0 20px 70px rgba(0,0,0,.62), 0 0 0 1px rgba(255,255,255,.04) !important;
     backdrop-filter: blur(18px) saturate(135%) !important;
-    -webkit-backdrop-filter: blur(18px) saturate(135%) !important;
+    -webkit-backdrop-filter:  
+<!-- AETHRION JARVIS: official companion links (external products; not bundled into this web app) -->
+<style id="aethrionJarvisCompanionLinksCSS">
+#aethrionJarvisCompanionLinks{position:fixed;left:18px;bottom:18px;z-index:2147483000;width:min(330px,calc(100vw - 36px));padding:14px;border:1px solid rgba(212,175,55,.38);border-radius:16px;background:rgba(8,12,22,.94);color:#f5f7ff;box-shadow:0 16px 50px rgba(0,0,0,.4);backdrop-filter:blur(16px);font:500 13px/1.45 system-ui,sans-serif}
+#aethrionJarvisCompanionLinks .aj-title{font-weight:800;letter-spacing:.08em;color:#d8bd79;margin:0 0 9px}
+#aethrionJarvisCompanionLinks .aj-links{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+#aethrionJarvisCompanionLinks a{display:flex;align-items:center;justify-content:center;min-height:38px;padding:7px 9px;border:1px solid rgba(212,175,55,.32);border-radius:9px;background:rgba(255,255,255,.045);color:#fff;text-decoration:none;text-align:center;font-weight:700}
+#aethrionJarvisCompanionLinks a:hover{background:rgba(212,175,55,.15)}
+#aethrionJarvisCompanionLinks .aj-note{margin:8px 0 0;color:#aeb8ca;font-size:11px}
+@media(max-width:600px){#aethrionJarvisCompanionLinks{left:10px;bottom:10px;width:min(290px,calc(100vw - 20px));padding:10px}#aethrionJarvisCompanionLinks .aj-links{grid-template-columns:1fr 1fr}}
+</style>
+<script id="aethrionJarvisCompanionLinksJS">
+(function(){
+ 'use strict';
+ var desktopUrl='https://unlualp.com/';
+ var iphoneUrl='https://apps.apple.com/tr/app/alpai-sesli-yapay-zek%C3%A2/id6817297312?l=tr';
+ var videoUrl='https://www.youtube.com/watch?v=ngODHC-iIf8';
+ function mount(){
+  var overlay=document.getElementById('jarvisOverlay');
+  if(!overlay||!overlay.isConnected)return;
+  var panel=document.getElementById('aethrionJarvisCompanionLinks');
+  if(!panel){
+   panel=document.createElement('aside');panel.id='aethrionJarvisCompanionLinks';
+   panel.setAttribute('aria-label','JARVIS ve ALPAI bağlantıları');
+   panel.innerHTML='<div class="aj-title">JARVIS V4 · ALPAI</div><div class="aj-links"><a href="'+desktopUrl+'" target="_blank" rel="noopener noreferrer">Windows / Mac</a><a href="'+iphoneUrl+'" target="_blank" rel="noopener noreferrer">iPhone uygulaması</a><a href="'+videoUrl+'" target="_blank" rel="noopener noreferrer">Kurulum videosu</a><a href="'+desktopUrl+'" target="_blank" rel="noopener noreferrer">Resmî site</a></div><p class="aj-note">Harici bağlantılar: AETHRION hesabı veya verileri bu uygulamalarla otomatik paylaşılmaz.</p>';
+   overlay.appendChild(panel);
+  }
+ }
+ function watch(){
+  mount();
+  if(window.MutationObserver&&!window.__aethrionJarvisCompanionObserver){
+   window.__aethrionJarvisCompanionObserver=new MutationObserver(mount);
+   window.__aethrionJarvisCompanionObserver.observe(document.documentElement,{childList:true,subtree:true});
+  }
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watch,{once:true});else watch();
+})();
+</script>
+
+blur(18px) saturate(135%) !important;
     transform: translate3d(-50%, -160%, 0) !important;
     opacity: 0 !important;
     visibility: hidden !important;
