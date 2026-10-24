@@ -26,8 +26,61 @@ recognition.onerror=function(e){status(e.error==='not-allowed'?'Mikrofon izni ve
 });
 document.getElementById('aeJvForm').addEventListener('submit',function(e){e.preventDefault();send();});
 }
+
+/* Browser-safe local tools: timers, reminders, date/time. OS-level actions require a trusted desktop companion. */
+var reminderStorageKey='aethrion_jarvis_reminders';
+function readReminders(){try{var v=JSON.parse(localStorage.getItem(reminderStorageKey)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}}
+function writeReminders(items){try{localStorage.setItem(reminderStorageKey,JSON.stringify(items.slice(-100)))}catch(e){status('Hatırlatıcılar bu tarayıcıda kaydedilemedi.','error')}}
+function notifyLocal(title,body){
+  if('Notification' in window&&Notification.permission==='granted'){try{new Notification(title,{body:body,tag:'aethrion-jarvis-'+Date.now()})}catch(e){}}
+  message('assistant',body);status(body,'success');speak(body);
+}
+function requestReminderPermission(){
+  if(!('Notification' in window)||Notification.permission!=='default')return;
+  try{Notification.requestPermission()}catch(e){}
+}
+function checkDueReminders(){
+  var now=Date.now(),items=readReminders(),remaining=[],changed=false;
+  items.forEach(function(item){if(item&&Number(item.dueAt)<=now){notifyLocal('AETHRION JARVIS',item.text||'Hatırlatıcın var.');changed=true}else if(item&&Number(item.dueAt)>now)remaining.push(item)});
+  if(changed)writeReminders(remaining);
+}
+function durationFrom(text){
+  var m=String(text).match(/(\\d{1,6})\\s*(saniye|saniyelik|sn|dakika|dk|saat|sa|hour|hours|minute|minutes|second|seconds)/i);
+  if(!m)return null;var n=Number(m[1]),unit=m[2].toLowerCase();if(!Number.isFinite(n)||n<1)return null;
+  var multiplier=/^(saniye|saniyelik|sn|second|seconds)$/.test(unit)?1000:/^(dakika|dk|minute|minutes)$/.test(unit)?60000:3600000;
+  var ms=n*multiplier;return ms>0&&ms<=86400000?{ms:ms,label:m[0]}:null;
+}
+function handleLocalCommand(raw){
+  var text=String(raw||'').trim(),low=text.toLocaleLowerCase('tr-TR');
+  if(/^(saat kaç|saat kac|şu an saat kaç|su an saat kac|what time is it)\??$/.test(low)){
+    notifyLocal('AETHRION JARVIS','Şu an saat '+new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})+'.');return true;
+  }
+  if(/^(bugün tarih ne|bugun tarih ne|bugünün tarihi ne|bugunun tarihi ne|tarih kaç|tarih kac|what is today's date)\??$/.test(low)){
+    notifyLocal('AETHRION JARVIS','Bugünün tarihi '+new Date().toLocaleDateString('tr-TR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+'.');return true;
+  }
+  if(/(zamanlayıcı|zamanlayici|timer|geri sayım|geri sayim)/i.test(text)){
+    var d=durationFrom(text);if(!d){message('assistant','Zamanlayıcı için süre belirt. Örnek: “5 dakika zamanlayıcı başlat”.');status('Süre bekleniyor.','idle');return true;}
+    var label='Zamanlayıcı tamamlandı ('+d.label+').';status(d.label+' için zamanlayıcı başladı.','success');message('assistant',d.label+' için zamanlayıcı başlatıldı.');
+    window.setTimeout(function(){notifyLocal('AETHRION JARVIS',label)},Math.min(d.ms,2147483647));return true;
+  }
+  if(/hatırlat|hatirlat|hatırlatıcı|hatirlatici|remind me/i.test(text)){
+    var d2=durationFrom(text),items=readReminders();
+    if(!d2){message('assistant','Hatırlatıcı için süre belirt. Örnek: “10 dakika sonra su içmeyi hatırlat”.');status('Hatırlatıcı için süre bekleniyor.','idle');return true;}
+    var reminderText=text
+      .replace(/hatırlatıcı|hatirlatici|hatırlat|hatirlat|remind me/ig,'')
+      .replace(/\\d{1,6}\\s*(saniye|saniyelik|sn|dakika|dk|saat|sa|hour|hours|minute|minutes|second|seconds)/ig,'')
+      .replace(/sonra|in/ig,'').replace(/^[\\s:,-]+|[\\s:,-]+$/g,'').trim();
+    if(!reminderText)reminderText='Planladığın işi yap';
+    items.push({id:String(Date.now()),text:reminderText,dueAt:Date.now()+d2.ms});writeReminders(items);requestReminderPermission();
+    var due=new Date(Date.now()+d2.ms).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+    message('assistant','Hatırlatıcı kuruldu: “'+reminderText+'” — yaklaşık '+due+'. Sayfa açıkken kontrol edilir.');status('Hatırlatıcı kaydedildi.','success');return true;
+  }
+  return false;
+}
+
 async function send(){
 if(busy)return;var input=document.getElementById('aeJvInput'),button=document.getElementById('aeJvSend'),text=input?input.value.trim():'';if(!text)return;
+if(handleLocalCommand(text)){input.value='';return;}
 var P=window.Parse;if(!P||!P.Cloud||typeof P.Cloud.run!=='function'){status('AI bağlantısı hazır değil; bu modül ana uygulamadaki Parse bağlantısını gerektirir.','error');return;}
 if(!P.User||!P.User.current||!P.User.current()){status('Önce AETHRION hesabına giriş yap.','error');return;}
 busy=true;input.value='';button.disabled=true;message('user',text);status(mode==='agent'?'JARVIS görevi değerlendiriyor…':'AETHRION AI yanıt hazırlıyor…','busy');
@@ -36,4 +89,5 @@ catch(e){message('assistant','İstek tamamlanamadı. Bağlantıyı veya AI hizme
 finally{busy=false;button.disabled=false;input.focus();}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+checkDueReminders();window.setInterval(checkDueReminders,15000);window.addEventListener('focus',checkDueReminders);
 })();
