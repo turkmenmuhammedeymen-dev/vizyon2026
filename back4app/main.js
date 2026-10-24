@@ -2752,9 +2752,12 @@ Parse.Cloud.define("vizyonAlFileAnalyze", async function (request) {
     if (fileBase64.length > 11 * 1024 * 1024) throw new Error('Dosya 8 MB sınırını aşıyor.');
     var isImage = fileType.indexOf('image/') === 0;
     var isPdf = fileType === 'application/pdf' || /\.pdf$/i.test(fileName);
+    var isAudio = fileType.indexOf('audio/') === 0;
+    var isVideo = fileType.indexOf('video/') === 0;
+    var isMedia = isImage || isPdf || isAudio || isVideo;
     var isText = fileType.indexOf('text/') === 0 || /^(application\/(json|xml|javascript|x-javascript))$/.test(fileType) || /\.(txt|md|csv|json|js|ts|py|html|css|xml|ya?ml|log|sql|sh)$/i.test(fileName);
-    if (!isImage && !isPdf && !isText) {
-        return { success: false, error: 'Bu dosya türü henüz doğrudan çözümlenemiyor. Görsel, PDF, TXT, MD, CSV, JSON veya kod dosyası kullanın.' };
+    if (!isMedia && !isText) {
+        return { success: false, error: 'Dosya türü çözümlenemedi. Görsel, PDF, ses/video, metin veya kod dosyası kullanın.' };
     }
 
     var _rlk = 'vizyonAlFileAnalyze:' + user.get('email');
@@ -2765,7 +2768,7 @@ Parse.Cloud.define("vizyonAlFileAnalyze", async function (request) {
 
     try {
         // Gemini görselleri ve PDF belgelerini doğrudan analiz edebilir.
-        if (isImage || isPdf) {
+        if (isMedia) {
             var key = await getAPIKey('GEMINI_KEY');
             if (!key) return { success: false, error: 'GEMINI_KEY eksik.' };
             var mimeType = fileType;
@@ -2781,7 +2784,7 @@ Parse.Cloud.define("vizyonAlFileAnalyze", async function (request) {
             var data = await res.json();
             if (!res.ok || data.error) return { success: false, error: (data.error && data.error.message) || 'HTTP ' + res.status };
             if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
-                return { success: true, reply: data.candidates[0].content.parts[0].text, fileType: isPdf ? 'pdf' : 'image' };
+                return { success: true, reply: data.candidates[0].content.parts[0].text, fileType: isPdf ? 'pdf' : (isAudio ? 'audio' : (isVideo ? 'video' : 'image')) };
             }
             return { success: false, error: 'Beklenmedik format' };
         } else {
