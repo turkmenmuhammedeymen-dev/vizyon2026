@@ -19479,6 +19479,38 @@ body.ae-shell-on .ae-ws-stage-frame{display:block!important;width:100%!important
 </style>
     <script src="/aethrion-schema.js" defer></script>
     <link rel="stylesheet" href="/aethrion-corporate-polish.css?v=20261024-4">
+
+<style id="aethrion-homepage-repair-2026-10">
+/* Homepage CTA: keep the download action beside the primary AI action. */
+.hero-actions { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+.hero-actions .download-hero-btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  min-height:46px; padding:12px 20px; border:1px solid rgba(217,180,91,.58);
+  border-radius:999px; color:#f4e4b5;
+  background:linear-gradient(135deg,rgba(217,180,91,.13),rgba(139,107,255,.10));
+  box-shadow:0 8px 24px rgba(0,0,0,.18); font-weight:700;
+  white-space:nowrap; cursor:pointer; transition:transform .2s ease,border-color .2s ease,background .2s ease;
+}
+.hero-actions .download-hero-btn:hover { transform:translateY(-2px); border-color:rgba(217,180,91,.95); background:linear-gradient(135deg,rgba(217,180,91,.22),rgba(139,107,255,.16)); }
+@media(max-width:640px) {
+  .hero-actions { gap:9px; }
+  .hero-actions .download-hero-btn { width:100%; }
+}
+/* Keep the dynamically-created feature drawer fully hidden until explicitly opened. */
+#aethrionFeaturesPanel { visibility:hidden; pointer-events:none; right:-105%; z-index:2147483001; }
+#aethrionFeaturesPanel.open { visibility:visible; pointer-events:auto; right:0; }
+#aethrionFeaturesBackdrop { display:block; visibility:hidden; opacity:0; pointer-events:none; }
+#aethrionFeaturesBackdrop.show { visibility:visible; opacity:1; pointer-events:auto; }
+#aethrionFeaturesPanel .aethrion-features-group { margin:0 0 18px; }
+#aethrionFeaturesPanel .aethrion-features-group-title { padding:8px 10px; color:#d9b45b; font-size:11px; font-weight:700; letter-spacing:1.5px; }
+#aethrionFeaturesPanel .aethrion-features-list { display:grid; gap:8px; }
+#aethrionFeaturesPanel .aethrion-feature-item { display:flex; align-items:center; gap:12px; width:100%; padding:12px; text-align:left; color:#f3f4f6; background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.09); border-radius:12px; cursor:pointer; }
+#aethrionFeaturesPanel .aethrion-feature-item:hover { background:rgba(217,180,91,.08); border-color:rgba(217,180,91,.35); }
+#aethrionFeaturesPanel .aethrion-feature-text { display:flex; flex:1; min-width:0; flex-direction:column; gap:4px; }
+#aethrionFeaturesPanel .aethrion-feature-name { color:#f7f7fb; font-weight:700; }
+#aethrionFeaturesPanel .aethrion-feature-desc { color:#a8a9b8; font-size:12px; line-height:1.45; overflow-wrap:anywhere; }
+#aethrionFeaturesPanel .aethrion-features-footer { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; padding:14px 16px; border-top:1px solid rgba(255,255,255,.09); color:#9293a5; font-size:11px; }
+</style>
 </head>
 <body>
 
@@ -20667,6 +20699,7 @@ body.aethrion-sidebar-open {
                 <p class="hero-sub">Yapay zekâ araçlarını, üretim alanlarını ve geliştirici kaynaklarını tek bir deneyimde keşfedin. Model seçenekleri, AETHRION Coach, A27 API ve 3D Studio ile fikirlerinizi düzenli bir çalışma akışına dönüştürün.</p>
                 <div class="hero-actions">
                     <button class="btn-primary" type="button" onclick="openFullAIPanel()">✦ AETHRION AI'ı Aç</button>
+                    <button class="btn-secondary download-hero-btn" type="button" onclick="showDownloadOptions()" aria-label="AETHRION uygulamasını indir">↓ Uygulamayı İndir</button>
                     <button class="btn-secondary" type="button" onclick="openKocPanel()">AETHRION Coach</button>
                     <a class="btn-secondary" href="/aethrion-assistant.html">Agents Alanı ↗</a>
                     <a class="btn-secondary" href="/3d-studio.html">3D Studio</a>
@@ -49590,6 +49623,21 @@ window.addEventListener('load', function() {
 });
 </script>
 
+<script>
+/* AETHRION homepage repair: reset stale feature-drawer state on first load. */
+(function () {
+  function resetStaleFeatureDrawer() {
+    var panel = document.getElementById('aethrionFeaturesPanel');
+    var backdrop = document.getElementById('aethrionFeaturesBackdrop');
+    if (panel) panel.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('show');
+    document.body.classList.remove('aethrion-features-open');
+    window.aethrionFeaturesPanelOpen = false;
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', resetStaleFeatureDrawer, { once: true });
+  else resetStaleFeatureDrawer();
+})();
+</script>
 <script>
 // ═══════════════════════════════════════════════════════════════
 // ☢️ [AETHRION GOD MODE] - HER ŞEYİ SIFIRLA VE DÜZELT ☢️
