@@ -61,6 +61,7 @@
     var extMatch = name.toLowerCase().match(/\.([a-z0-9]{1,8})$/);
     var ext = extMatch ? extMatch[1] : '';
     var type = String(file.type || '').toLowerCase();
+    if (!type) { if (ext === 'pdf') type = 'application/pdf'; else if (/^(mp3|wav|ogg|m4a|aac)$/.test(ext)) type = 'audio/' + ext; else if (/^(mp4|mov|avi|mkv|webm)$/.test(ext)) type = 'video/' + ext; }
     if (type.indexOf('image/') === 0 || type === 'application/pdf' || type.indexOf('audio/') === 0 || type.indexOf('video/') === 0 || ext === 'pdf') {
       return { fileBase64: await fileToBase64(file), fileName: name, fileType: type || (ext === 'pdf' ? 'application/pdf' : 'application/octet-stream') };
     }
