@@ -2751,8 +2751,8 @@ Parse.Cloud.define("vizyonAlFileAnalyze", async function (request) {
     if (!fileBase64) throw new Error('Dosya içeriği gerekli!');
     if (fileBase64.length > 11 * 1024 * 1024) throw new Error('Dosya 8 MB sınırını aşıyor.');
     var isImage = fileType.indexOf('image/') === 0;
-    var isPdf = fileType === 'application/pdf' || /\\.pdf$/i.test(fileName);
-    var isText = fileType.indexOf('text/') === 0 || /^(application\\/(json|xml|javascript|x-javascript))$/.test(fileType) || /\\.(txt|md|csv|json|js|ts|py|html|css|xml|ya?ml|log|sql|sh)$/i.test(fileName);
+    var isPdf = fileType === 'application/pdf' || /\.pdf$/i.test(fileName);
+    var isText = fileType.indexOf('text/') === 0 || /^(application\/(json|xml|javascript|x-javascript))$/.test(fileType) || /\.(txt|md|csv|json|js|ts|py|html|css|xml|ya?ml|log|sql|sh)$/i.test(fileName);
     if (!isImage && !isPdf && !isText) {
         return { success: false, error: 'Bu dosya türü henüz doğrudan çözümlenemiyor. Görsel, PDF, TXT, MD, CSV, JSON veya kod dosyası kullanın.' };
     }
