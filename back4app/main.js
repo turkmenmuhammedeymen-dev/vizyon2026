@@ -3139,10 +3139,10 @@ Parse.Cloud.define("toggleVizyonSupport", async function (request) {
             config.set('key', 'vizyonSupportActive');
         }
         config.set('value', { enabled: enabled });
-        config.set('description', 'Vizyon Destek aktif/pasif');
+        config.set('description', 'AETHRION Destek aktif/pasif');
         config.set('updated_by', user.get('email'));
         await config.save(null, { useMasterKey: true });
-        console.log('📨 Vizyon Destek: ' + (enabled ? 'AÇIK' : 'KAPALI'));
+        console.log('📨 AETHRION Destek: ' + (enabled ? 'AÇIK' : 'KAPALI'));
         return { success: true, enabled: enabled };
     } catch (e) {
         return { success: false, error: e.message };
@@ -4366,7 +4366,7 @@ Parse.Cloud.define("joinTeamWithCode", async function (request) {
     return { success: true, teamId: team.id };
 });
 
-// ✅ [v7.10.0 FIX] sendTeamMessage — @vizyonal/@vizyondestek takım sohbeti FIX
+// ✅ [v7.10.0 FIX] sendTeamMessage — AETHRION AI/DESTEK takım sohbeti FIX
 Parse.Cloud.define("sendTeamMessage", async function (request) {
     var user = request.user;
     if (!user) throw new Error('Giriş yapmalısınız!');
@@ -4399,13 +4399,13 @@ Parse.Cloud.define("sendTeamMessage", async function (request) {
     var lowerCommand = command.toLowerCase();
 
     // Offline tetikleyiciler
-    var offlineTriggers = ['@vizyondestektheoffline', '@vizyonaltheoffline', 'vizyonal the offline', 'vizyondestek the offline'];
+    var offlineTriggers = ['@aethrion destek the offline', '@aethrion ai the offline', '@vizyondestektheoffline', '@vizyonaltheoffline', 'aethrion ai the offline', 'aethrion destek the offline', 'vizyonal the offline', 'vizyondestek the offline'];
     for (var oi = 0; oi < offlineTriggers.length; oi++) {
         if (lowerCommand.indexOf(offlineTriggers[oi]) !== -1) { isOfflineCommand = true; break; }
     }
 
     if (!isOfflineCommand) {
-        // V27 API tetikleyiciler
+        // A27 API tetikleyiciler
         var v27Triggers = ['@a27', 'a27 api', 'aethrion api', '@v27', 'v27 api', 'vizyon api'];
         for (var v27i = 0; v27i < v27Triggers.length; v27i++) {
             if (lowerCommand.indexOf(v27Triggers[v27i]) !== -1) {
@@ -4425,8 +4425,8 @@ Parse.Cloud.define("sendTeamMessage", async function (request) {
             }
         }
 
-        // Vizyon Destek tetikleyiciler
-        var supportTriggers = ['@vizyondestek', 'vizyon destek', 'vizyondetsek', 'vizyondestek'];
+        // AETHRION Destek tetikleyiciler
+        var supportTriggers = ['@aethrion destek', 'aethrion destek', '@vizyondestek', 'vizyon destek', 'vizyondetsek', 'vizyondestek'];
         for (var si = 0; si < supportTriggers.length; si++) {
             if (lowerCommand.indexOf(supportTriggers[si]) !== -1) {
                 isSupportCommand = true;
@@ -4469,7 +4469,7 @@ Parse.Cloud.define("sendTeamMessage", async function (request) {
         return { success: true };
     }
 
-    // V27 API KOMUTU
+    // A27 API KOMUTU
     if (isV27Command) {
         var msgV27 = new TeamMessage();
         msgV27.set("team_id", teamId);
@@ -4532,7 +4532,7 @@ Parse.Cloud.define("sendTeamMessage", async function (request) {
                     msgGreet.set("team_id", teamId);
                     msgGreet.set("user_email", 'system@vizyon2027.com');
                     msgGreet.set("user_name", '🧠 AETHRION DESTEK');
-                    msgGreet.set("message", '🧠 AETHRION DESTEK: Merhaba! Ben Vizyon Destek. Size nasıl yardımcı olabilirim?');
+                    msgGreet.set("message", '🧠 AETHRION DESTEK: Merhaba! Ben AETHRION Destek. Size nasıl yardımcı olabilirim?');
                     await msgGreet.save(null, { useMasterKey: true });
                     return { success: true };
                 }
@@ -5366,7 +5366,7 @@ Parse.Cloud.define("getCoachAdvice", async function (request) {
     var question = request.params.question;
     if (!question) throw new Error('Soru gerekli!');
     try {
-        var prompt = 'Sen V27 Koç\'sun. Kullanıcı sordu: "' + question + '". Motive edici, yol gösterici ve günlük 3 görev öner. Kısa ve net olsun.';
+        var prompt = 'Sen AETHRION Koç\'sun. Kullanıcı sordu: "' + question + '". Motive edici, yol gösterici ve günlük 3 görev öner. Kısa ve net olsun.';
         var reply = await Parse.Cloud.run("superAI", { prompt: prompt }, { useMasterKey: true });
         return { advice: reply };
     } catch (e) {
@@ -6700,12 +6700,12 @@ Parse.Cloud.define("getCourseDetails", async function (request) {
         };
     } else if (courseId === 'sample5') {
         return {
-            id: 'sample5', title: '🔑 V27 API', description: 'A27 API anahtarı ile uygulama geliştir.',
+            id: 'sample5', title: '🔑 A27 API', description: 'A27 API anahtarı ile uygulama geliştir.',
             lessons: [
                 { id: 'l16', title: 'A27 API Anahtarı Alma', content: 'Dashboard\'dan A27 API anahtarı oluştur.', points_reward: 10 },
-                { id: 'l17', title: 'v27ApiChat Kullanımı', content: 'V27 API\'yi kendi uygulamanda kullan.', points_reward: 20 },
+                { id: 'l17', title: 'v27ApiChat Kullanımı', content: 'A27 API\'yi kendi uygulamanda kullan.', points_reward: 20 },
                 { id: 'l18', title: 'Rate Limiting', content: 'Dakikada 60 istek limitini anla.', points_reward: 15 },
-                { id: 'l19', title: 'Örnek Proje', content: 'V27 API ile basit bir chatbot yap.', points_reward: 25 }
+                { id: 'l19', title: 'Örnek Proje', content: 'A27 API ile basit bir chatbot yap.', points_reward: 25 }
             ]
         };
     }
