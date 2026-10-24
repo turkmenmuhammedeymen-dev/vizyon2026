@@ -25532,11 +25532,20 @@ window.handleLogin = handleLogin;
 // ============================================================
 // [AETHRION] FACEBOOK İLE GİRİŞ — Checkbox zorunluluğu
 // ============================================================
+async function waitForAethrionFacebookSDK(timeoutMs) {
+    var deadline = Date.now() + (Number(timeoutMs) || 8000);
+    while (Date.now() < deadline) {
+        if (typeof FB !== 'undefined' && FB && typeof FB.login === 'function') return true;
+        await new Promise(function (resolve) { window.setTimeout(resolve, 200); });
+    }
+    return typeof FB !== 'undefined' && FB && typeof FB.login === 'function';
+}
+
 window.loginWithFacebook = async function () {
     try {
-        if (typeof FB === 'undefined') {
-            showNotification('❌ Facebook SDK yüklenemedi. Sayfayı yenileyin veya reklam engelleyicinizi kapatın.', 'error');
-            console.error('⚠️ FB SDK bulunamadı.');
+        if (!(await waitForAethrionFacebookSDK(8000))) {
+            showNotification('Facebook bağlantısı başlatılamadı. SDK yüklenemedi; bağlantıyı kontrol edip tekrar deneyin.', 'error');
+            console.error('⚠️ Facebook SDK 8 saniye içinde hazır olmadı.');
             if (typeof window.addLogError === 'function') {
                 window.addLogError('Facebook SDK yüklenemedi');
             }
