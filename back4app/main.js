@@ -636,9 +636,46 @@ async function getAPIKey(keyName) {
     return getAethrionConfigValue(keyName);
 }
 
-function getPrivateFounderPass() {
-    // Founder password must never fall back to Parse.Config.
-    return _aethrionReadPrivateEnv('FOUNDER_PASS') || _aethrionReadPrivateEnv('AETHRION_FOUNDER_PASS') || '';
+async function getPrivateFounderPass() {
+    // Private runtime secrets are preferred. Parse.Config compatibility is retained for existing deployments.
+    var envKeys = ['FOUNDER_PASS', 'AETHRION_FOUNDER_PASS', 'FOUNDER_PASSWORD', 'AETHRION_FOUNDER_PASSWORD'];
+    for (var ei = 0; ei < envKeys.length; ei++) {
+        var envValue = _aethrionReadPrivateEnv(envKeys[ei]);
+        if (envValue) return envValue;
+    }
+    try {
+        var config = await _aethrionGetParseConfig();
+        var configKeys = ['FOUNDER_PASS', 'AETHRION_FOUNDER_PASS', 'FOUNDER_PASSWORD', 'AETHRION_FOUNDER_PASSWORD', 'founderPassword', 'KURUCU_SIFRESI', 'kurucuSifresi'];
+        for (var ci = 0; ci < configKeys.length; ci++) {
+            var configured = config && typeof config.get === 'function' ? config.get(configKeys[ci]) : null;
+            if (typeof configured === 'string' && configured.trim()) {
+                console.warn('[AETHRION Config] Founder password loaded from Parse.Config; use a private Back4App runtime variable when possible.');
+                return configured.trim();
+            }
+        }
+    } catch (error) {
+        console.warn('[AETHRION Config] Founder password configuration could not be read.');
+    }
+    return '';
+}
+
+async function getPrivateFounderEmail() {
+    var envKeys = ['FOUNDER_EMAIL', 'AETHRION_FOUNDER_EMAIL'];
+    for (var ei = 0; ei < envKeys.length; ei++) {
+        var envValue = _aethrionReadPrivateEnv(envKeys[ei]);
+        if (envValue && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(envValue)) return envValue.trim().toLowerCase();
+    }
+    try {
+        var config = await _aethrionGetParseConfig();
+        var configKeys = ['FOUNDER_EMAIL', 'AETHRION_FOUNDER_EMAIL', 'founderEmail', 'kurucuEmail'];
+        for (var ci = 0; ci < configKeys.length; ci++) {
+            var configured = config && typeof config.get === 'function' ? config.get(configKeys[ci]) : null;
+            if (typeof configured === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(configured.trim())) return configured.trim().toLowerCase();
+        }
+    } catch (error) {
+        console.warn('[AETHRION Config] Founder email configuration could not be read; using the legacy default.');
+    }
+    return await getPrivateFounderEmail();
 }
 
 // Public configuration is an explicit allowlist. Never return the whole Parse.Config
@@ -3569,12 +3606,12 @@ Parse.Cloud.define("initAdminUsers", async function (request) {
     }
     try {
         // FOUNDER
-        var founderEmail = 'admin.tr.reis@gmail.com';
+        var founderEmail = await getPrivateFounderEmail();
         var query = new Parse.Query(Parse.User);
         query.equalTo('username', founderEmail);
         var existing = await query.first({ useMasterKey: true });
         if (!existing) {
-            var founderPass = getPrivateFounderPass();
+            var founderPass = await getPrivateFounderPass();
             if (!founderPass) throw new Error('FOUNDER_PASS tanımlı değil!');
             var admin0 = new Parse.User();
             admin0.set('username', founderEmail);
@@ -3792,8 +3829,8 @@ Parse.Cloud.define("founderLogin", async function (request) {
 
     await Parse.Cloud.run('initAdminUsers', {}, { useMasterKey: true });
 
-    var founderEmail = 'admin.tr.reis@gmail.com';
-    var correctPass = getPrivateFounderPass();
+    var founderEmail = await getPrivateFounderEmail();
+    var correctPass = await getPrivateFounderPass();
     if (!correctPass) throw new Error('Founder şifresi tanımlı değil!');
 
     try {
@@ -4806,7 +4843,7 @@ Parse.Cloud.define("deleteTeamMessage", async function (request) {
     var isManager = (team.get('manager_email') === user.get('email'));
     var isFounder = (user.get('role') === 'founder');
     var isModerator = (user.get('role') === 'moderator');
-    var isVizyonFounder = (user.get('email') === 'admin.tr.reis@gmail.com');
+    var isVizyonFounder = String(user.get('email') || '').toLowerCase() === String(await getPrivateFounderEmail()).toLowerCase();
     var deleteMemberQuery = new Parse.Query(TeamMember);
     deleteMemberQuery.equalTo('team_id', teamId);
     deleteMemberQuery.equalTo('user_email', user.get('email'));
@@ -5365,7 +5402,7 @@ Parse.Cloud.define("vizyonSupportAI", async function (request) {
     if (!message) throw new Error('Mesaj gerekli!');
 
     // KURUCU ÖZEL KOMUTLAR
-    if (user.get('email').toLowerCase() === 'admin.tr.reis@gmail.com') {
+    if (user.get('email').toLowerCase() === String(await getPrivateFounderEmail()).toLowerCase()) {
         var lower = message.toLowerCase();
         var response = null;
 
@@ -6274,7 +6311,7 @@ Parse.Cloud.define("buyProduct", async function (request) {
     }
 
     var adminQuery = new Parse.Query(Parse.User);
-    adminQuery.equalTo('email', 'admin.tr.reis@gmail.com');
+    adminQuery.equalTo('email', await getPrivateFounderEmail());
     var admin = await adminQuery.first({ useMasterKey: true });
     if (admin) {
         var adminWallet = admin.get('wallet_balance') || 0;
@@ -8059,7 +8096,7 @@ Parse.Cloud.define("applyReferral", async function (request) {
     var founderSpecialCode = (await getAPIKey('FOUNDER_REFERRAL_CODE')) || 'Eymen1144';
     if (code === founderSpecialCode) {
         var founderQuery = new Parse.Query(Parse.User);
-        founderQuery.equalTo('email', 'admin.tr.reis@gmail.com');
+        founderQuery.equalTo('email', await getPrivateFounderEmail());
         var founder = await founderQuery.first({ useMasterKey: true });
         if (!founder) throw new Error('Kurucu bulunamadı!');
 
@@ -8067,7 +8104,7 @@ Parse.Cloud.define("applyReferral", async function (request) {
 
         var inbox = new Inbox();
         inbox.set('sender_email', user.get('email'));
-        inbox.set('receiver_email', 'admin.tr.reis@gmail.com');
+        inbox.set('receiver_email', await getPrivateFounderEmail());
         inbox.set('type', 'referral_request');
         inbox.set('message', user.get('name') + ' (' + user.get('email') + ') sizin davet kodunuzu kullanmak istiyor. Onay verir misiniz?');
         await inbox.save(null, { useMasterKey: true });
@@ -8194,7 +8231,7 @@ Parse.Cloud.define("buyMarketProject", async function (request) {
     }
 
     var founderQuery = new Parse.Query(Parse.User);
-    founderQuery.equalTo('email', 'admin.tr.reis@gmail.com');
+    founderQuery.equalTo('email', await getPrivateFounderEmail());
     var founder = await founderQuery.first({ useMasterKey: true });
     if (founder) {
         var founderPoints = founder.get('points') || 0;
@@ -9875,14 +9912,14 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
         return { success: false, error: 'Çok fazla giriş denemesi yapıldı. Birkaç dakika sonra tekrar deneyin.' };
     }
 
-    var founderEmail = 'admin.tr.reis@gmail.com';
+    var founderEmail = await getPrivateFounderEmail();
     if (email === 'admin.tr.reis') email = founderEmail;
     var user = null;
     var loginName = email;
 
     try {
         if (email === founderEmail) {
-            var configuredFounderPass = getPrivateFounderPass();
+            var configuredFounderPass = await getPrivateFounderPass();
             if (!configuredFounderPass) {
                 console.error('[AETHRION Auth] FOUNDER_PASS is not configured in private Back4App runtime settings.');
                 return { success: false, error: 'Kurucu hesabının sunucu parolası yapılandırılmamış. Back4App Cloud Code ayarlarını kontrol edin.' };
@@ -10698,6 +10735,59 @@ Parse.Cloud.define("aethrionGetProjectAudit", async function (request) {
             };
         })
     };
+});
+
+
+/* Public aggregate counters. No user identifiers or private fields are returned. */
+var _aethrionPublicStatsCache = null;
+var _aethrionPublicStatsCacheAt = 0;
+Parse.Cloud.define("getPublicStats", async function () {
+    if (_aethrionPublicStatsCache && Date.now() - _aethrionPublicStatsCacheAt < 300000) {
+        return Object.assign({}, _aethrionPublicStatsCache);
+    }
+    try {
+        var cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        var activeQuery = new Parse.Query(Parse.User);
+        activeQuery.greaterThanOrEqualTo("updatedAt", cutoff);
+        var activeUsers = await activeQuery.count({ useMasterKey: true });
+
+        var totalQueries = 0;
+        for (var offset = 0; offset < 20000; offset += 1000) {
+            var usageQuery = new Parse.Query(QueryStat);
+            usageQuery.ascending("createdAt");
+            usageQuery.limit(1000);
+            if (offset > 0) usageQuery.skip(offset);
+            var usageRows = await usageQuery.find({ useMasterKey: true });
+            for (var qi = 0; qi < usageRows.length; qi++) {
+                totalQueries += Math.max(0, Number(usageRows[qi].get("count") || 0));
+            }
+            if (usageRows.length < 1000) break;
+        }
+
+        var completedProjects = 0;
+        var projectQuery = new Parse.Query(Project);
+        projectQuery.limit(1000);
+        var projectRows = await projectQuery.find({ useMasterKey: true });
+        for (var pi = 0; pi < projectRows.length; pi++) {
+            var projectStatus = String(projectRows[pi].get("status") || projectRows[pi].get("state") || "").toLowerCase();
+            if (projectStatus === "completed" || projectStatus === "complete" ||
+                projectRows[pi].get("is_completed") === true || projectRows[pi].get("completed") === true) {
+                completedProjects++;
+            }
+        }
+
+        _aethrionPublicStatsCache = {
+            success: true,
+            activeUsers: Math.max(0, Number(activeUsers) || 0),
+            totalQueries: Math.max(0, Number(totalQueries) || 0),
+            completedProjects: Math.max(0, Number(completedProjects) || 0)
+        };
+        _aethrionPublicStatsCacheAt = Date.now();
+        return Object.assign({}, _aethrionPublicStatsCache);
+    } catch (error) {
+        console.error("[AETHRION Stats] Public aggregate counters could not be calculated.");
+        return { success: false, activeUsers: 0, totalQueries: 0, completedProjects: 0 };
+    }
 });
 
 Parse.Cloud.define("aethrionGetDiagnostics", async function (request) {
