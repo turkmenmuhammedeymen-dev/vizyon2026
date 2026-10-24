@@ -2764,7 +2764,10 @@ Parse.Cloud.define("vizyonAlFileAnalyze", async function (request) {
     try {
         await checkRateLimit(_rlk, 30, 60 * 1000);
         await recordAttempt(_rlk);
-    } catch (e) { console.warn('Rate limit uyarısı:', e.message); }
+    } catch (e) {
+        console.warn('[AETHRION File Analysis] Rate limit enforced.');
+        return { success: false, error: 'Çok fazla dosya analizi isteği gönderdiniz. Bir dakika sonra tekrar deneyin.' };
+    }
 
     try {
         // Gemini görselleri ve PDF belgelerini doğrudan analiz edebilir.
