@@ -5,14 +5,14 @@
 // ✅ BACK4APP UYUMLU (Parse Server Standard + Node.js)
 // ✅ OTOMATİK SCHEMA (Tüm sınıflar/kolonlar initSchemas'ta)
 // ✅ 21 AI MODELİ (13 Ollama + 8 Bulut API)
-// ✅ V27 API ANAHTAR SİSTEMİ (AES-256-GCM)
-// ✅ V27 KOÇ ASİSTANI
+// ✅ A27 API ANAHTAR SİSTEMİ (AES-256-GCM)
+// ✅ AETHRION KOÇ ASİSTANI
 // ✅ AETHRION AI PANELİ (4 mod + ekran + sesli + dosya + sunum)
 // ✅ MODERATÖR / TASARIMCI RÜTBESİ
 // ✅ PLAN LİMİT SİSTEMİ (Free/Pro/Team)
 // ✅ LOGS SİSTEMİ (Backend Sync)
 // ✅ VİDEO STÜDYOSU (Senaryo/Reels/Analiz/Kesit)
-// ✅ VİZYON DEVRİYE (7/24)
+// ✅ AETHRION DEVRİYE (7/24)
 // ✅ 13 ZAMANLANMIŞ JOB
 // ✅ 160+ CLOUD FUNCTION
 // ================================================================
@@ -602,8 +602,8 @@ async function addPointsWithBonus(user, points, reason) {
 async function checkAndUpdateLevel(user) {
     var points = user.get('points') || 0;
     var level = 'Çaylak';
-    if (points >= 20000) level = 'V27 Efsanesi';
-    else if (points >= 5000) level = 'V27 Uzmanı';
+    if (points >= 20000) level = 'AETHRION Efsanesi';
+    else if (points >= 5000) level = 'AETHRION Uzmanı';
     else if (points >= 1000) level = 'Üye';
     else level = 'Çaylak';
     var oldLevel = user.get('level') || 'Çaylak';
@@ -611,7 +611,7 @@ async function checkAndUpdateLevel(user) {
         user.set('level', level);
         await user.save(null, { useMasterKey: true });
         await sendNotificationToUser(user, '🎊 Tebrikler! Seviyeniz "' + level + '" oldu!', 'level_up');
-        if (level === 'V27 Efsanesi') {
+        if (level === 'AETHRION Efsanesi') {
             var badges = user.get('badges') || [];
             if (badges.indexOf('efsane') === -1) {
                 badges.push('efsane');
@@ -1843,7 +1843,7 @@ Parse.Cloud.define("callLocalLlama", async function (request) {
     var maxTokens = isCodeModel ? 2048 : 1500;
     var topP = isCodeModel ? 0.9 : 0.95;
 
-    var systemPrompt = 'Sen AETHRION AI\'sın (V27). Türkçe konuşan, samimi ve yardımsever bir yapay zeka asistanısın.\n' +
+    var systemPrompt = 'Sen AETHRION AI\'sın. Türkçe konuşan, samimi ve yardımsever bir yapay zeka asistanısın.\n' +
         '\nKESİN KURALLAR:\n' +
         '1. HER ZAMAN TÜRKÇE CEVAP VER.\n' +
         '2. Doğal ve akıcı Türkçe olsun.\n' +
@@ -1948,7 +1948,7 @@ Parse.Cloud.define("callNvidiaNIM", async function (request) {
     if (!apiKey) { console.error('❌ NVIDIA_API_KEY yok!'); return null; }
     if (!baseUrl) baseUrl = 'https://integrate.api.nvidia.com/v1';
 
-    var systemPrompt = 'Sen AETHRION AI\'sın (V27). Türkçe konuşan, samimi ve yardımsever bir yapay zeka asistanısın.\nKESİN KURAL: HER ZAMAN TÜRKÇE CEVAP VER.\nDoğal ve akıcı Türkçe kullan. Kısa, net ve öz ol.';
+    var systemPrompt = 'Sen AETHRION AI\'sın. Türkçe konuşan, samimi ve yardımsever bir yapay zeka asistanısın.\nKESİN KURAL: HER ZAMAN TÜRKÇE CEVAP VER.\nDoğal ve akıcı Türkçe kullan. Kısa, net ve öz ol.';
 
     try {
         var response = await fetch(baseUrl + '/chat/completions', {
@@ -2541,8 +2541,8 @@ Parse.Cloud.define("getSiteInfoForVizyonAl", async function (request) {
             version: 'v7.10.0',
             features: [
                 '21 farklı AI modeli (13 Ollama + 8 bulut)',
-                'V27 API anahtarı sistemi',
-                'V27 Koç Asistanı',
+                'A27 API anahtarı sistemi',
+                'AETHRION Koç Asistanı',
                 'AETHRION AI Paneli (4 mod)',
                 'Sesli Sohbet',
                 'Dosya Analiz + Sunum',
@@ -2551,11 +2551,11 @@ Parse.Cloud.define("getSiteInfoForVizyonAl", async function (request) {
                 '3D Stüdyo (90+ şekil)',
                 'Takım çalışması',
                 'Aylık yarışma',
-                'V27 Akademi',
+                'AETHRION Academy',
                 'Puan mağazası',
                 'Ebeveyn kontrolü',
                 'Moderatör / Tasarımcı rütbesi',
-                'Vizyon Devriye (7/24)'
+                'AETHRION Devriye (7/24)'
             ]
         };
     } catch (e) {
@@ -3113,10 +3113,10 @@ Parse.Cloud.define("toggleVizyonPatrol", async function (request) {
             config.set('key', 'vizyonPatrolActive');
         }
         config.set('value', { enabled: enabled });
-        config.set('description', 'Vizyon Devriye aktif/pasif');
+        config.set('description', 'AETHRION Devriye aktif/pasif');
         config.set('updated_by', user.get('email'));
         await config.save(null, { useMasterKey: true });
-        console.log('🛡️ Vizyon Devriye: ' + (enabled ? 'AÇIK' : 'KAPALI'));
+        console.log('🛡️ AETHRION Devriye: ' + (enabled ? 'AÇIK' : 'KAPALI'));
         return { success: true, enabled: enabled };
     } catch (e) {
         return { success: false, error: e.message };
@@ -3198,7 +3198,7 @@ Parse.Cloud.define("toggleVizyonSupport", async function (request) {
 //    - vizyonSupportAI
 //    - getSupportReply, getCoachAdvice
 //
-// 9. V27 KOÇ ASİSTANI (FULL)
+// 9. AETHRION KOÇ ASİSTANI (FULL)
 //    - getKocLimitForUser
 //    - getCurrentWeekStart
 //    - getOrCreateKocUsage
@@ -3308,7 +3308,7 @@ Parse.Cloud.define("toggleVizyonSupport", async function (request) {
 //     - getUserApiKeyValue, deleteUserApiKey
 //     - updateUserApiKey, setApiPassword, verifyApiPassword
 //
-// 35. V27 API ANAHTAR SİSTEMİ (FULL)
+// 35. A27 API ANAHTAR SİSTEMİ (FULL)
 //     - getV27ApiKeyLimit, durationToMs, durationLabel
 //     - generateV27KeyString, maskV27Key
 //     - createV27ApiKey, getMyV27ApiKeys
@@ -4406,7 +4406,7 @@ Parse.Cloud.define("sendTeamMessage", async function (request) {
 
     if (!isOfflineCommand) {
         // V27 API tetikleyiciler
-        var v27Triggers = ['@v27', 'v27 api', 'vizyon api'];
+        var v27Triggers = ['@a27', 'a27 api', 'aethrion api', '@v27', 'v27 api', 'vizyon api'];
         for (var v27i = 0; v27i < v27Triggers.length; v27i++) {
             if (lowerCommand.indexOf(v27Triggers[v27i]) !== -1) {
                 isV27Command = true;
@@ -4416,7 +4416,7 @@ Parse.Cloud.define("sendTeamMessage", async function (request) {
         }
 
         // AETHRION AI tetikleyiciler
-        var aiTriggers = ['@vizyonal', 'vizyon al', 'vizyonal'];
+        var aiTriggers = ['@aethrion ai', '@aethrion', '@jarvis', '@vizyonal', 'vizyon al', 'vizyonal'];
         for (var ai = 0; ai < aiTriggers.length; ai++) {
             if (lowerCommand.indexOf(aiTriggers[ai]) !== -1) {
                 isVizyonCommand = true;
@@ -4461,7 +4461,7 @@ Parse.Cloud.define("sendTeamMessage", async function (request) {
         msgOff.set("team_id", teamId);
         msgOff.set("user_email", 'system@vizyon2027.com');
         msgOff.set("user_name", '🧠 AETHRION AI');
-        msgOff.set("message", '🧠 AETHRION AI: Anladım, sohbetten ayrılıyorum. Beni tekrar çağırmak için @vizyonal veya @vizyondestek yazabilirsiniz. 👋');
+        msgOff.set("message", '🧠 AETHRION AI: Anladım, sohbetten ayrılıyorum. Beni tekrar çağırmak için @AETHRION AI veya @AETHRION DESTEK yazabilirsiniz. 👋');
         msgOff.set("deleted", false);
         msgOff.set("deleted_by_founder", false);
         msgOff.set("edited", false);
@@ -4474,9 +4474,9 @@ Parse.Cloud.define("sendTeamMessage", async function (request) {
         var msgV27 = new TeamMessage();
         msgV27.set("team_id", teamId);
         msgV27.set("user_email", 'system@vizyon2027.com');
-        msgV27.set("user_name", '🔑 V27 API DESTEK');
-        msgV27.set("message", '🔑 **V27 API Anahtarı Bilgisi**\n\n' +
-            'V27 API anahtarı oluşturmak için:\n' +
+        msgV27.set("user_name", '🔑 A27 API DESTEK');
+        msgV27.set("message", '🔑 **A27 API Anahtarı Bilgisi**\n\n' +
+            'A27 API anahtarı oluşturmak için:\n' +
             '1. Dashboard\'a gidin\n' +
             '2. "AETHRION Yapay Zekasının API Anahtarı" bölümünü bulun\n' +
             '3. "Anahtarını Al" butonuna tıklayın\n' +
@@ -4542,7 +4542,7 @@ Parse.Cloud.define("sendTeamMessage", async function (request) {
                     msgNoSupport.set("team_id", teamId);
                     msgNoSupport.set("user_email", 'system@vizyon2027.com');
                     msgNoSupport.set("user_name", '🧠 AETHRION DESTEK');
-                    msgNoSupport.set("message", '🧠 AETHRION DESTEK: Bu konuda yetkim yok. Ben sadece AETHRION sitesi hakkında yardım, destek, şikayet ve öneriler için buradayım. Diğer konular için lütfen @vizyonal yazarak AETHRION AI\'ya sorun. 🙏');
+                    msgNoSupport.set("message", '🧠 AETHRION DESTEK: Bu konuda yetkim yok. Ben sadece AETHRION sitesi hakkında yardım, destek, şikayet ve öneriler için buradayım. Diğer konular için lütfen @AETHRION AI yazarak tekrar sorun. 🙏');
                     await msgNoSupport.save(null, { useMasterKey: true });
                     return { success: true };
                 }
@@ -5322,7 +5322,7 @@ Parse.Cloud.define("vizyonSupportAI", async function (request) {
         var isSupportRelated = classResult && classResult.toUpperCase().indexOf('DESTEK') !== -1;
 
         if (!isSupportRelated) {
-            return { reply: 'Bu konuda yetkim yok. Ben sadece AETHRION sitesi hakkında yardım, destek, şikayet ve öneriler için buradayım. Diğer konular için lütfen @vizyonal yazarak AETHRION AI\'ya sorun. 🙏' };
+            return { reply: 'Bu konuda yetkim yok. Ben sadece AETHRION sitesi hakkında yardım, destek, şikayet ve öneriler için buradayım. Diğer konular için lütfen @AETHRION AI yazarak tekrar sorun. 🙏' };
         }
 
         var siteContent2 = await getSiteContent();
@@ -5346,7 +5346,7 @@ Parse.Cloud.define("getSupportReply", async function (request) {
     var question = request.params.question;
     if (!question) throw new Error('Soru gerekli!');
     try {
-        var prompt = 'Sen V27 Asistan\'sın. Kullanıcı sordu: "' + question + '". Destek talebine yardımcı ol. Cevap kısa ve net olsun.';
+        var prompt = 'Sen AETHRION AI\'sın. Kullanıcı sordu: "' + question + '". Destek talebine yardımcı ol. Cevap kısa ve net olsun.';
         var reply = await Parse.Cloud.run("superAI", { prompt: prompt }, { useMasterKey: true });
         return { reply: reply };
     } catch (e) {
@@ -5375,7 +5375,7 @@ Parse.Cloud.define("getCoachAdvice", async function (request) {
 });
 
 // ================================================================
-// ========== V27 KOÇ ASİSTANI (FULL) =============================
+// ========== AETHRION KOÇ ASİSTANI (FULL) =============================
 // ================================================================
 function getKocLimitForUser(user) {
     if (!user) return 0;
@@ -5506,7 +5506,7 @@ Parse.Cloud.define("kocChat", async function (request) {
     else if (plan === 'pro') roleContext += 'Bu kullanıcı PRO paket üyesi. ';
     else roleContext += 'Bu kullanıcı ÜCRETSİZ üye. ';
 
-    var systemPrompt = 'Sen V27 KOÇ\'sun. Kullanıcılara çok samimi, sıcak, destekleyici bir dille yaklaşırsın. ' +
+    var systemPrompt = 'Sen AETHRION KOÇ\'sun. Kullanıcılara çok samimi, sıcak, destekleyici bir dille yaklaşırsın. ' +
         'Psikolojik destek, yol haritası, rehberlik, moral verme ve pratik çözümler sun. ' +
         'Kullanıcıya "kardeşim", "dostum" gibi samimi hitaplar kullanabilirsin ama asla saygısızlık yapma. ' +
         'Cevapların Türkçe, net, kısa ve motive edici olsun. ' + roleContext;
@@ -5552,7 +5552,7 @@ Parse.Cloud.define("kocChat", async function (request) {
         coachMsg.set('text', reply);
         coachMsg.set('is_read', true);
         coachMsg.set('is_ai', true);
-        coachMsg.set('ai_name', '🧭 V27 KOÇ');
+        coachMsg.set('ai_name', '🧭 AETHRION KOÇ');
         await coachMsg.save(null, { useMasterKey: true });
     } catch (msgSaveErr) {
         console.error('❌ Koç mesajları kaydedilemedi:', msgSaveErr.message);
@@ -5754,7 +5754,7 @@ Parse.Cloud.define("getSharedKocConversation", async function (request) {
     var messages = msgs.map(function (m) {
         var isCoach = m.get('is_ai') === true || m.get('from_email') === 'system@vizyon2027.com';
         return {
-            name: isCoach ? '🧭 V27 KOÇ' : userName,
+            name: isCoach ? '🧭 AETHRION KOÇ' : userName,
             text: m.get('text') || '',
             file: m.get('file') || null,
             fileName: m.get('fileName') || null,
@@ -6653,7 +6653,7 @@ Parse.Cloud.define("getCourses", async function (request) {
         { id: 'sample2', title: '🧊 3D Modelleme ve Tasarım', description: 'Three.js ile 3D nesneler oluşturun.', total_lessons: 3, completed: false },
         { id: 'sample3', title: '📊 Veri Analizi ve Görselleştirme', description: 'Python ile veri analizi.', total_lessons: 5, completed: false },
         { id: 'sample4', title: '🔐 Güvenlik ve Ebeveyn Kontrolleri', description: 'Kullanıcı güvenliği ve ebeveyn ayarları.', total_lessons: 3, completed: false },
-        { id: 'sample5', title: '🔑 V27 API ile Kendi Projeni Yap', description: 'V27 API anahtarı ile uygulama geliştir.', total_lessons: 4, completed: false }
+        { id: 'sample5', title: '🔑 A27 API ile Kendi Projeni Yap', description: 'A27 API anahtarı ile uygulama geliştir.', total_lessons: 4, completed: false }
     ];
 });
 
@@ -6700,9 +6700,9 @@ Parse.Cloud.define("getCourseDetails", async function (request) {
         };
     } else if (courseId === 'sample5') {
         return {
-            id: 'sample5', title: '🔑 V27 API', description: 'V27 API anahtarı ile uygulama geliştir.',
+            id: 'sample5', title: '🔑 V27 API', description: 'A27 API anahtarı ile uygulama geliştir.',
             lessons: [
-                { id: 'l16', title: 'V27 API Anahtarı Alma', content: 'Dashboard\'dan V27 API anahtarı oluştur.', points_reward: 10 },
+                { id: 'l16', title: 'A27 API Anahtarı Alma', content: 'Dashboard\'dan A27 API anahtarı oluştur.', points_reward: 10 },
                 { id: 'l17', title: 'v27ApiChat Kullanımı', content: 'V27 API\'yi kendi uygulamanda kullan.', points_reward: 20 },
                 { id: 'l18', title: 'Rate Limiting', content: 'Dakikada 60 istek limitini anla.', points_reward: 15 },
                 { id: 'l19', title: 'Örnek Proje', content: 'V27 API ile basit bir chatbot yap.', points_reward: 25 }
@@ -8550,7 +8550,7 @@ Parse.Cloud.define("verifyApiPassword", async function (request) {
 });
 
 // ================================================================
-// ========== V27 API ANAHTAR SİSTEMİ (FULL) ======================
+// ========== A27 API ANAHTAR SİSTEMİ (FULL) ======================
 // ================================================================
 function getV27ApiKeyLimit(user) {
     var role = user.get('role');
@@ -8679,7 +8679,7 @@ async function _createV27ApiKeyCore(user, params, viaVizyonAl) {
         }
     }
 
-    console.log('🔑 V27 API anahtarı oluşturuldu: ' + user.get('email') + ' → ' + keyName + (viaVizyonAl ? ' (AETHRION AI)' : ''));
+    console.log('🔑 A27 API anahtarı oluşturuldu: ' + user.get('email') + ' → ' + keyName + (viaVizyonAl ? ' (AETHRION AI)' : ''));
 
     var base = {
         success: true,
@@ -9074,7 +9074,7 @@ Parse.Cloud.define("getAllUsers", async function (request) {
 });
 
 // ================================================================
-// ========== VİZYON LOG ==========================================
+// ========== AETHRION LOG ==========================================
 // ================================================================
 Parse.Cloud.define("getVizyonLog", async function (request) {
     var user = request.user;
@@ -9338,7 +9338,7 @@ Parse.Cloud.job("refreshAcademyCourses", async function (request) {
         { title: '🧊 3D Modelleme ve Tasarım', description: 'Three.js ile 3D nesneler oluşturun.', total_lessons: 3 },
         { title: '📊 Veri Analizi ve Görselleştirme', description: 'Python ile veri analizi.', total_lessons: 5 },
         { title: '🔐 Güvenlik ve Ebeveyn Kontrolleri', description: 'Kullanıcı güvenliği ve ebeveyn ayarları.', total_lessons: 3 },
-        { title: '🔑 V27 API ile Kendi Projeni Yap', description: 'V27 API anahtarı ile uygulama geliştir.', total_lessons: 4 }
+        { title: '🔑 A27 API ile Kendi Projeni Yap', description: 'A27 API anahtarı ile uygulama geliştir.', total_lessons: 4 }
     ];
 
     for (var ci = 0; ci < courseData.length; ci++) {
@@ -9475,9 +9475,9 @@ Parse.Cloud.job("checkStreakReminders", async function (request) {
     return 'Streak hatırlatmaları tamamlandı. ' + sentCount + ' gönderildi.';
 });
 
-// 12. ✅ [v7.10.0 YENİ] VİZYON DEVRİYE (7/24 OTOMATİK MODERASYON)
+// 12. ✅ [v7.10.0 YENİ] AETHRION DEVRİYE (7/24 OTOMATİK MODERASYON)
 Parse.Cloud.job("vizyonPatrol", async function (request) {
-    console.log('🛡️ Vizyon Devriye başlatılıyor...');
+    console.log('🛡️ AETHRION Devriye başlatılıyor...');
 
     // Önce aktif mi kontrol et
     try {
@@ -9485,8 +9485,8 @@ Parse.Cloud.job("vizyonPatrol", async function (request) {
         configQuery.equalTo('key', 'vizyonPatrolActive');
         var config = await configQuery.first({ useMasterKey: true });
         if (config && config.get('value') && config.get('value').enabled === false) {
-            console.log('⏸️ Vizyon Devriye KAPALI, atlanıyor.');
-            return 'Vizyon Devriye kapalı.';
+            console.log('⏸️ AETHRION Devriye KAPALI, atlanıyor.');
+            return 'AETHRION Devriye kapalı.';
         }
     } catch (e) {
         console.warn('Patrol config kontrolü başarısız:', e.message);
@@ -9533,7 +9533,7 @@ Parse.Cloud.job("vizyonPatrol", async function (request) {
                         inbox.set('sender_email', 'system@vizyon2027.com');
                         inbox.set('receiver_email', userEmail);
                         inbox.set('type', 'patrol_warning');
-                        inbox.set('message', '⚠️ Vizyon Devriye Uyarısı: ' + reason + ' tespit edildi. Lütfen topluluk kurallarına uyun.');
+                        inbox.set('message', '⚠️ AETHRION Devriye Uyarısı: ' + reason + ' tespit edildi. Lütfen topluluk kurallarına uyun.');
                         await inbox.save(null, { useMasterKey: true });
                     }
                 } catch (e) {}
@@ -9542,7 +9542,7 @@ Parse.Cloud.job("vizyonPatrol", async function (request) {
                 try {
                     var log = new VizyonLog();
                     log.set('user_email', 'system@vizyon2027.com');
-                    log.set('user_name', '🛡️ Vizyon Devriye');
+                    log.set('user_name', '🛡️ AETHRION Devriye');
                     log.set('action', 'patrol_warning');
                     log.set('message', '⚠️ ' + reason + ' tespit edildi. Kullanıcı: ' + userEmail);
                     await log.save(null, { useMasterKey: true });
@@ -9550,7 +9550,7 @@ Parse.Cloud.job("vizyonPatrol", async function (request) {
             }
         }
     } catch (e) {
-        console.error('Vizyon Devriye tarama hatası:', e.message);
+        console.error('AETHRION Devriye tarama hatası:', e.message);
     }
 
     // Son 24 saatteki yorumları tara
@@ -9575,16 +9575,16 @@ Parse.Cloud.job("vizyonPatrol", async function (request) {
                 // Yorumu otomatik sil
                 try {
                     await comment.destroy({ useMasterKey: true });
-                    console.log('🗑️ Vizyon Devriye: Uygunsuz yorum silindi');
+                    console.log('🗑️ AETHRION Devriye: Uygunsuz yorum silindi');
                 } catch (e) {}
             }
         }
     } catch (e) {
-        console.error('Vizyon Devriye yorum tarama hatası:', e.message);
+        console.error('AETHRION Devriye yorum tarama hatası:', e.message);
     }
 
-    console.log('✅ Vizyon Devriye tamamlandı. ' + issueCount + ' sorun tespit edildi.');
-    return 'Vizyon Devriye tamamlandı. ' + issueCount + ' sorun tespit edildi.';
+    console.log('✅ AETHRION Devriye tamamlandı. ' + issueCount + ' sorun tespit edildi.');
+    return 'AETHRION Devriye tamamlandı. ' + issueCount + ' sorun tespit edildi.';
 });
 
 // 13. ✅ [v7.10.0 YENİ] FeatureUsage temizleme (haftada 1'den eski)
