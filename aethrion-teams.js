@@ -44,8 +44,8 @@ function readFileBase64(file){
 if(chatFile)chatFile.addEventListener('change',function(){
  var f=this.files&&this.files[0];if(!f){selectedChatFile=null;if(chatFileLabel)chatFileLabel.textContent='Dosya sınırı 5 MB';return}
  if(f.size>5*1024*1024){say('Takım dosyası en fazla 5 MB olabilir.','error');this.value='';selectedChatFile=null;return}
- var allowed=/^(image\/(png|jpeg|webp|gif)|application\/pdf|text\/(plain|markdown|csv)|application\/json)$/i.test(f.type)||/\.(txt|md|csv|json|js|ts|py|html|css|xml|ya?ml|log|pdf|png|jpe?g|webp|gif)$/i.test(f.name);
- if(!allowed){say('Bu dosya türü desteklenmiyor. Görsel, PDF, metin veya kod dosyası seç.','error');this.value='';selectedChatFile=null;return}
+ var allowed=/^(image\/|application\/pdf|audio\/|video\/|text\/|application\/json)/i.test(f.type)||/\.(docx|xlsx|xls|txt|md|csv|json|js|ts|py|html|css|xml|ya?ml|log|pdf|png|jpe?g|webp|gif)$/i.test(f.name);
+ if(!allowed){say('Bu dosya türü desteklenmiyor. Görsel, PDF, ses/video, DOCX, XLSX, metin veya kod dosyası seç.','error');this.value='';selectedChatFile=null;return}
  selectedChatFile=f;if(chatFileLabel)chatFileLabel.textContent='📎 '+f.name;say('Dosya eklendi. @AETHRION AI etiketiyle analiz isteyebilirsin.','success');
 });
 if(chatForm)chatForm.addEventListener('submit',async function(event){
@@ -54,6 +54,7 @@ if(chatForm)chatForm.addEventListener('submit',async function(event){
  if(chatSend)chatSend.disabled=true;
  try{
   var base64=file?await readFileBase64(file):'';
+  var preparedForAI=file?(typeof window.aethrionPrepareFileForAI==='function'?await window.aethrionPrepareFileForAI(file):{fileBase64:base64,fileName:file.name,fileType:file.type||'application/octet-stream'}):null;
   await P().Cloud.run('aethrionSendTeamMessage',{teamId:select.value,message:text,fileBase64:base64,fileName:file?file.name:'',fileType:file?(file.type||'application/octet-stream'):''});
   if(chatInput)chatInput.value='';
   selectedChatFile=null;if(chatFile)chatFile.value='';if(chatFileLabel)chatFileLabel.textContent='Dosya sınırı 5 MB';
@@ -61,7 +62,7 @@ if(chatForm)chatForm.addEventListener('submit',async function(event){
   if(/@(aethrion(?:\\s+ai)?|jarvis)\\b/i.test(text)){
    say('AETHRION AI mesajı ve eki analiz ediyor…','busy');
    var question=text.replace(/@(aethrion(?:\\s+ai)?|jarvis)\\b/ig,'').trim()||'Bu takım mesajını ve ekli dosyayı analiz et.';
-   var ai=await P().Cloud.run('aethrionTeamAskAI',{teamId:select.value,message:question,fileBase64:base64,fileName:file?file.name:'',fileType:file?(file.type||'application/octet-stream'):''});
+   var ai=await P().Cloud.run('aethrionTeamAskAI',{teamId:select.value,message:question,fileBase64:preparedForAI?preparedForAI.fileBase64:'',fileName:preparedForAI?(preparedForAI.fileName||file.name):'',fileType:preparedForAI?(preparedForAI.fileType||file.type||'application/octet-stream'):''});
    if(!ai||ai.success!==true)say((ai&&ai.error)||'Takım AI yanıt veremedi.','error');else say('AETHRION AI yanıtı takıma eklendi.','success');
   }
   await loadTeamMessages(select.value);
