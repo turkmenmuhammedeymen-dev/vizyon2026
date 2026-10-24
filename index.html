@@ -27704,12 +27704,54 @@ window.sendDashboardAI = async function () {
 
     var inp = document.getElementById('dashboardAiInput');
     var msg = inp.value.trim();
-    if (!msg) return;
+    var dashboardFileInput = document.getElementById('dashboardFileInput');
+    var attachedFile = dashboardFileInput && dashboardFileInput.files && dashboardFileInput.files[0] || null;
+    if (!msg && !attachedFile) return;
 
     var thisRequestId = 'req_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
     window.currentAIRequestId = thisRequestId;
 
     var container = document.getElementById('dashboardAiMessages');
+    if (attachedFile) {
+        var fileReqId = 'req_file_' + Date.now();
+        window.currentAIRequestId = fileReqId;
+        var userLine = (msg ? msg + '\n' : '') + '📎 ' + attachedFile.name;
+        container.innerHTML += renderUserMessage(userLine);
+        inp.value = '';
+        var fileStop = document.getElementById('dashboardStopAIResponseBtn');
+        if (fileStop) fileStop.style.display = 'inline-block';
+        var thinking = document.createElement('div');
+        thinking.className = 'ai-message bot ai-thinking-indicator';
+        thinking.textContent = 'AETHRION AI dosyayı okuyor ve analiz ediyor…';
+        container.appendChild(thinking);
+        container.scrollTop = container.scrollHeight;
+        try {
+            var prepared = typeof window.aethrionPrepareFileForAI === 'function' ? await window.aethrionPrepareFileForAI(attachedFile) : null;
+            if (!prepared) {
+                var dataUrl = await new Promise(function(resolve,reject){var reader=new FileReader();reader.onload=function(){resolve(String(reader.result||''))};reader.onerror=function(){reject(new Error('Dosya okunamadı.'))};reader.readAsDataURL(attachedFile)});
+                prepared = {fileBase64:dataUrl.split(',')[1],fileName:attachedFile.name,fileType:attachedFile.type||'application/octet-stream'};
+            }
+            var analysis = await Parse.Cloud.run('vizyonAlFileAnalyze', {fileBase64:prepared.fileBase64,fileName:prepared.fileName||attachedFile.name,fileType:prepared.fileType||attachedFile.type||'application/octet-stream',question:msg||'Bu dosyayı oku, özetle ve önemli noktalarını açıkla.'});
+            if (window.currentAIRequestId !== fileReqId) return;
+            if (thinking.parentNode) thinking.parentNode.removeChild(thinking);
+            var fileAnswer = document.createElement('div');
+            fileAnswer.className = 'ai-message bot';
+            fileAnswer.textContent = analysis && analysis.success ? String(analysis.reply || 'Dosya analiz edildi ancak metin yanıtı dönmedi.') : String(analysis && analysis.error || 'Dosya analizi tamamlanamadı.');
+            container.appendChild(fileAnswer);
+            if (!analysis || analysis.success !== true) showNotification(fileAnswer.textContent, 'error');
+            else if (typeof window.incrementUsage === 'function') window.incrementUsage('fileAnalyzePerDay','day',1);
+        } catch (error) {
+            if (thinking.parentNode) thinking.parentNode.removeChild(thinking);
+            var fileError = document.createElement('div'); fileError.className='ai-message bot'; fileError.textContent='Dosya analizi başarısız: '+String(error&&error.message||error); container.appendChild(fileError);
+            showNotification(fileError.textContent,'error');
+        } finally {
+            if (dashboardFileInput) dashboardFileInput.value = '';
+            if (fileStop) fileStop.style.display = 'none';
+            container.scrollTop = container.scrollHeight;
+        }
+        return;
+    }
+
     container.innerHTML += renderUserMessage(msg);
     inp.value = '';
     container.scrollTop = container.scrollHeight;
@@ -27932,8 +27974,41 @@ async function sendFullAI() {
     }
 
     var msg = inp.value.trim();
-    if (!msg) {
-        showNotification('Lütfen bir mesaj yazın!', 'warning');
+    var attachedFullFile = window.currentFullAIFile || null;
+    if (!msg && !attachedFullFile) {
+        showNotification('Mesaj yazın veya analiz için dosya ekleyin!', 'warning');
+        return;
+    }
+
+    if (attachedFullFile) {
+        var fullFileRequestId = 'req_full_file_' + Date.now();
+        window.currentAIRequestId = fullFileRequestId;
+        var fullUser = document.createElement('div'); fullUser.className='ai-msg user';
+        fullUser.textContent = (msg ? msg + '\n' : '') + '📎 ' + attachedFullFile.name;
+        chat.appendChild(fullUser); inp.value='';
+        var fullStop = document.getElementById('fullAIStopBtn'); if(fullStop)fullStop.style.display='inline-block';
+        var fullThinking = document.createElement('div'); fullThinking.className='ai-msg bot ai-thinking-indicator'; fullThinking.textContent='AETHRION AI dosyayı analiz ediyor…'; chat.appendChild(fullThinking); chat.scrollTop=chat.scrollHeight;
+        try {
+            var preparedFull = typeof window.aethrionPrepareFileForAI === 'function' ? await window.aethrionPrepareFileForAI(attachedFullFile) : null;
+            if (!preparedFull) {
+                var fullDataUrl = await new Promise(function(resolve,reject){var reader=new FileReader();reader.onload=function(){resolve(String(reader.result||''))};reader.onerror=function(){reject(new Error('Dosya okunamadı.'))};reader.readAsDataURL(attachedFullFile)});
+                preparedFull = {fileBase64:fullDataUrl.split(',')[1],fileName:attachedFullFile.name,fileType:attachedFullFile.type||'application/octet-stream'};
+            }
+            var fullAnalysis = await Parse.Cloud.run('vizyonAlFileAnalyze', {fileBase64:preparedFull.fileBase64,fileName:preparedFull.fileName||attachedFullFile.name,fileType:preparedFull.fileType||attachedFullFile.type||'application/octet-stream',question:msg||'Bu dosyayı oku, özetle ve önemli noktalarını açıkla.'});
+            if(window.currentAIRequestId!==fullFileRequestId)return;
+            if(fullThinking.parentNode)fullThinking.parentNode.removeChild(fullThinking);
+            var fullAnswer=document.createElement('div');fullAnswer.className='ai-msg bot';fullAnswer.textContent=fullAnalysis&&fullAnalysis.success?String(fullAnalysis.reply||'Dosya analiz edildi ancak yanıt dönmedi.'):String(fullAnalysis&&fullAnalysis.error||'Dosya analizi tamamlanamadı.');chat.appendChild(fullAnswer);
+            if(!fullAnalysis||fullAnalysis.success!==true)showNotification(fullAnswer.textContent,'error');
+            else if(typeof window.incrementUsage==='function')window.incrementUsage('fileAnalyzePerDay','day',1);
+        } catch(error) {
+            if(fullThinking.parentNode)fullThinking.parentNode.removeChild(fullThinking);
+            var fullError=document.createElement('div');fullError.className='ai-msg bot';fullError.textContent='Dosya analizi başarısız: '+String(error&&error.message||error);chat.appendChild(fullError);showNotification(fullError.textContent,'error');
+        } finally {
+            window.currentFullAIFile=null;
+            var fullInput=document.getElementById('fullAIFileInput');if(fullInput)fullInput.value='';
+            var preview=document.getElementById('fullAIFilePreviewContainer');if(preview)preview.textContent='';
+            if(fullStop)fullStop.style.display='none';chat.scrollTop=chat.scrollHeight;
+        }
         return;
     }
 
@@ -28011,6 +28086,8 @@ async function sendFullAI() {
 async function uploadFullFile(input) {
     var file = input.files[0];
     if (!file) return;
+    if (file.size > 8 * 1024 * 1024) { showNotification('Dosya en fazla 8 MB olabilir.', 'error'); input.value=''; return; }
+    window.currentFullAIFile = file;
 
     // Plan limit kontrolü
     if (typeof window.checkFeatureLimit === 'function') {
