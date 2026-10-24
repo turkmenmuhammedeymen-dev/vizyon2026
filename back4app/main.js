@@ -167,9 +167,9 @@ if (typeof globalThis.fetch === 'undefined') {
 // [MADDE 2] RATE LIMITING ALTYAPISI
 // ================================================================
 
-// Public browser gate: no caller-supplied IP is accepted. Parse Server's request.ip
-// is the only address used. Confirmed VPN/proxy/Tor is blocked; provider outages return
-// an explicit degraded state so the browser can keep the site available and show a warning.
+// Security note: this backend does not block sign-in based on VPN/proxy/Tor status.
+// Parse Server request.ip may still be used for rate limiting and abuse prevention.
+// Keep authentication and rate limiting independent from VPN usage.
 var _rateLimitStore = new Map();
 var _RATE_LIMIT_CLASS = "RateLimitAttempt";
 
@@ -9259,7 +9259,7 @@ Parse.Cloud.job("refreshSocialTasks", async function (request) {
     for (var oi = 0; oi < oldTasks.length; oi++) await oldTasks[oi].destroy({ useMasterKey: true });
 
     var tasks = [
-        { platform: 'Instagram', url: 'https://www.instagram.com/vizyon2027.info', points_reward: 15, penalty_points: 0 },
+        { platform: 'Instagram', url: 'https://www.instagram.com/aethrion.official/', points_reward: 15, penalty_points: 0 },
         { platform: 'WhatsApp', url: 'https://whatsapp.com/channel/0029VbCpnvuG8l5FQVQMLy1U', points_reward: 10, penalty_points: 0 },
         { platform: 'YouTube', url: '#', points_reward: 20, penalty_points: 0 }
     ];
