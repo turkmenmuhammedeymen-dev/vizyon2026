@@ -1945,8 +1945,14 @@ Parse.Cloud.define("callNvidiaNIM", async function (request) {
 
     var apiKey = await getAPIKey('NVIDIA_API_KEY');
     var baseUrl = await getAPIKey('NVIDIA_BASE_URL');
+    if (!baseUrl) baseUrl = await getAPIKey('NVIDIA_NIM_BASE_URL');
     if (!apiKey) { console.error('❌ NVIDIA_API_KEY yok!'); return null; }
     if (!baseUrl) baseUrl = 'https://integrate.api.nvidia.com/v1';
+    baseUrl = String(baseUrl).trim().replace(/\/+$/, '').replace(/\/chat\/completions$/i, '');
+    if (!/^https:\/\//i.test(baseUrl)) {
+        console.error('❌ NVIDIA_BASE_URL https:// ile başlamalı.');
+        return null;
+    }
 
     var systemPrompt = 'Sen AETHRION AI\'sın. Türkçe konuşan, samimi ve yardımsever bir yapay zeka asistanısın.\nKESİN KURAL: HER ZAMAN TÜRKÇE CEVAP VER.\nDoğal ve akıcı Türkçe kullan. Kısa, net ve öz ol.';
 
@@ -2307,6 +2313,15 @@ async function _aethrionSendEmail(to, subject, html) {
             return { success: true, provider: 'google', message: 'Mail gönderildi (Google Apps Script)', id: googleResult.id || null };
         }
 
+        // When the dedicated Apps Script provider is configured, do not silently
+        // send a second copy through Resend if Google's response is ambiguous.
+        var googleUrlConfigured = await getAPIKey('GOOGLE_SCRIPT_URL');
+        var googleTokenConfigured = await getAPIKey('APPS_SCRIPT_TOKEN');
+        if (googleUrlConfigured && googleTokenConfigured) {
+            console.error('[AETHRION Mail] Google provider failed; secondary send suppressed to avoid duplicate messages.');
+            return { success: false, error: 'Google Apps Script e-posta gönderimini doğrulayamadı. Ayarları kontrol edip yeniden deneyin.' };
+        }
+
         var resendResult = await tryResend(to, subject, html);
         if (resendResult && resendResult.success === true) {
             return { success: true, provider: 'resend', message: 'Mail gönderildi (Resend)', id: resendResult.id || null };
@@ -2343,8 +2358,12 @@ Parse.Cloud.define("sendEmail", async function (request) {
 async function tryGoogleAppsScript(to, subject, html) {
     try {
         var url = await getAPIKey('GOOGLE_SCRIPT_URL');
+        var token = await getAPIKey('APPS_SCRIPT_TOKEN');
         if (!url) {
             return { success: false, error: 'GOOGLE_SCRIPT_URL Config\'de tanımlı değil!' };
+        }
+        if (!token || typeof token !== 'string' || !token.trim()) {
+            return { success: false, error: 'APPS_SCRIPT_TOKEN Back4App Config/Environment ayarında tanımlı değil!' };
         }
 
         if (url.indexOf('script.google.com') === -1) {
@@ -2358,10 +2377,12 @@ async function tryGoogleAppsScript(to, subject, html) {
         console.log('📧 [Google] POST →', url.substring(0, 60) + '...');
 
         var payload = {
+            token: token.trim(),
             to: to,
             recipient: to,
             subject: subject,
             html: html,
+            text: String(html || '').replace(/<br\s*\/?\s*>/gi, '\n').replace(/<\/p>/gi, '\n').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim(),
             body: html
         };
 
@@ -2389,6 +2410,9 @@ async function tryGoogleAppsScript(to, subject, html) {
         }
 
         var trimmed = rawText.trim();
+        if (statusCode < 200 || statusCode >= 300) {
+            return { success: false, error: 'Google Apps Script HTTP ' + statusCode + ' yanıtı döndürdü.' };
+        }
 
         // HTML hata sayfası kontrolü
         if (trimmed.charAt(0) === '<' ||
@@ -2442,9 +2466,9 @@ async function tryGoogleAppsScript(to, subject, html) {
             };
         }
 
-        // Belirsiz ama HTML değil → başarılı say
-        console.warn('⚠️ [Google] Yanıt belirsiz, başarılı sayılıyor');
-        return { success: true, id: null };
+        // Only an explicit success response may stop the fallback provider.
+        console.warn('⚠️ [Google] JSON yanıtı başarıyı doğrulamadı.');
+        return { success: false, error: 'Google Apps Script gönderimi başarıyla doğrulamadı.' };
 
     } catch (e) {
         console.error('❌ [Google] Exception:', e.message);
@@ -9781,8 +9805,15 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
         if (loggedInUser.get('isBanned') === true) {
             return { success: false, error: 'Bu hesap devre dışı bırakılmış. Destek ekibiyle iletişime geçin.' };
         }
-        if (loggedInUser.get('isVerified') !== true) {
-            return { success: false, code: 'EMAIL_NOT_VERIFIED', error: 'Hesabınız henüz doğrulanmamış. E-posta doğrulama kodunu girin.' };
+        var verificationState = loggedInUser.get('isVerified');
+        var pendingVerificationCode = String(loggedInUser.get('verificationCode') || '');
+        if (verificationState === false || pendingVerificationCode) {
+            return { success: false, code: 'EMAIL_NOT_VERIFIED', error: 'Hesabınız henüz doğrulanmamış. E-posta doğrulama kodunu girin veya yeni kod isteyin.' };
+        }
+        // Older accounts created before the verification flag existed should not be locked out.
+        if (verificationState !== true) {
+            loggedInUser.set('isVerified', true);
+            await loggedInUser.save(null, { useMasterKey: true });
         }
 
         return {
