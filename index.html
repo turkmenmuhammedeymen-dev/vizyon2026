@@ -21551,7 +21551,7 @@ def root():
             <div class="footer-col">
                 <h4>Yasal</h4>
                 <ul>
-                    <li><a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank">Gizlilik Politikası</a></li>
+                    <li><a href="/gizlilik.html" target="_blank">Gizlilik Politikası</a></li>
                     <li><a href="/kullanici-sozlesmesi.html" target="_blank">Kullanıcı Sözleşmesi</a></li>
                 </ul>
             </div>
@@ -21620,7 +21620,7 @@ def root():
                 </label>
                 <label style="display:flex;align-items:flex-start;gap:10px;margin:12px 0;cursor:pointer;">
                     <input type="checkbox" id="registerPrivacyCheck" style="width:18px;height:18px;accent-color:var(--accent);">
-                    <span style="font-size:12px;color:var(--text2);"><a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank" style="color:var(--accent);">Gizlilik Politikası</a>'nı kabul ediyorum.</span>
+                    <span style="font-size:12px;color:var(--text2);"><a href="/gizlilik.html" target="_blank" style="color:var(--accent);">Gizlilik Politikası</a>'nı kabul ediyorum.</span>
                 </label>
                 <button class="btn-primary" type="button" onclick="window.__aethrionSafeAuthAction('register', this)" style="width:100%;">Kayıt Ol</button>
             </div>
@@ -21636,7 +21636,7 @@ def root():
                 </label>
                 <label style="display:flex;align-items:flex-start;gap:10px;margin:12px 0;cursor:pointer;">
                     <input type="checkbox" id="loginPrivacyCheck" style="width:18px;height:18px;accent-color:var(--accent);">
-                    <span style="font-size:12px;color:var(--text2);"><a href="https://vizyon2026.vercel.app/gizlilik.html" target="_blank" style="color:var(--accent);">Gizlilik Politikası</a>'nı kabul ediyorum.</span>
+                    <span style="font-size:12px;color:var(--text2);"><a href="/gizlilik.html" target="_blank" style="color:var(--accent);">Gizlilik Politikası</a>'nı kabul ediyorum.</span>
                 </label>
                 <button class="btn-primary" type="button" onclick="window.__aethrionSafeAuthAction('login', this)" style="width:100%;">Giriş Yap</button>
                 <div style="text-align:center;margin-top:14px;">
@@ -25321,8 +25321,16 @@ async function handleRegister() {
             }
         }
 
-        switchTab('verify');
-        document.getElementById('verifyEmail').value = email;
+        if (typeof window.switchTab !== 'function') {
+            throw new Error('Doğrulama ekranı yüklenemedi. Sayfayı yenileyip tekrar deneyin.');
+        }
+        window.switchTab('verify');
+        var verifyEmailInput = document.getElementById('verifyEmail');
+        if (verifyEmailInput) {
+            verifyEmailInput.value = email;
+            verifyEmailInput.readOnly = false;
+            verifyEmailInput.disabled = false;
+        }
         if (verificationEmailSent) {
             showNotification('Kayıt oluşturuldu. Doğrulama kodunu e-postandan kontrol et.', 'success');
         } else {
@@ -25431,9 +25439,13 @@ async function handleLogin() {
             if (authResult && authResult.code === 'EMAIL_NOT_VERIFIED') {
                 window.__aethrionLastAuthError = authResult.error || 'Hesap e-posta doğrulaması bekliyor.';
                 showNotification(window.__aethrionLastAuthError, 'warning');
-                switchTab('verify');
+                window.switchTab('verify');
                 var verifyEmailInput = document.getElementById('verifyEmail');
-                if (verifyEmailInput) verifyEmailInput.value = email;
+                if (verifyEmailInput) {
+                    verifyEmailInput.value = email;
+                    verifyEmailInput.readOnly = false;
+                    verifyEmailInput.disabled = false;
+                }
                 return false;
             }
             throw new Error((authResult && authResult.error) || 'Giriş tamamlanamadı. E-posta ve şifreyi kontrol edin.');
