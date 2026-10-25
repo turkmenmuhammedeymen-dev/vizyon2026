@@ -9807,12 +9807,15 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
         }
         var verificationState = loggedInUser.get('isVerified');
         var pendingVerificationCode = String(loggedInUser.get('verificationCode') || '');
-        if (verificationState === false || pendingVerificationCode) {
+        if (pendingVerificationCode) {
             return { success: false, code: 'EMAIL_NOT_VERIFIED', error: 'Hesabınız henüz doğrulanmamış. E-posta doğrulama kodunu girin veya yeni kod isteyin.' };
         }
-        // Older accounts created before the verification flag existed should not be locked out.
+        // Legacy accounts with no pending code predate the code-verification flow.
+        // Keep these accounts usable; new registrations always store a pending code.
         if (verificationState !== true) {
             loggedInUser.set('isVerified', true);
+            loggedInUser.set('verificationCode', null);
+            loggedInUser.set('verificationCodeExpires', null);
             await loggedInUser.save(null, { useMasterKey: true });
         }
 
