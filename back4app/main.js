@@ -2507,12 +2507,17 @@ async function tryResend(to, subject, html) {
         }
 
         var fromAddress = await getAPIKey('RESEND_FROM_EMAIL');
-        if (!fromAddress || fromAddress.length < 5) {
-            fromAddress = 'AETHRION <onboarding@resend.dev>';
-            console.warn('⚠️ [Resend] RESEND_FROM_EMAIL yok, varsayılan kullanılıyor');
+        if (!fromAddress || String(fromAddress).trim().length < 5) {
+            // Support the common EMAIL_FROM alias used by existing deployments.
+            fromAddress = await getAPIKey('EMAIL_FROM');
         }
+        if (!fromAddress || String(fromAddress).trim().length < 5) {
+            fromAddress = 'AETHRION <onboarding@resend.dev>';
+            console.warn('⚠️ [Resend] Sender address is not configured; using the Resend onboarding sender.');
+        }
+        fromAddress = String(fromAddress).trim();
 
-        console.log('📧 [Resend] POST → from:', fromAddress, '| to:', to);
+        console.log('📧 [Resend] POST → sender configured; recipient redacted.');
 
         var payload = {
             from: fromAddress,
@@ -2521,18 +2526,28 @@ async function tryResend(to, subject, html) {
             html: html
         };
 
-        // ✅ SADECE NATIVE FETCH KULLAN
-        var fetchResp = await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + apiKey,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-
+        // Bound both connection and response-body time so a provider outage cannot
+        // leave verification requests waiting indefinitely.
+        var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        var timeoutId = controller ? setTimeout(function () { controller.abort(); }, 12000) : null;
+        var fetchResp;
+        var rawText;
+        try {
+            fetchResp = await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + apiKey,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload),
+                signal: controller ? controller.signal : undefined
+            });
+            var statusCode = fetchResp.status;
+            rawText = await fetchResp.text();
+        } finally {
+            if (timeoutId) clearTimeout(timeoutId);
+        }
         var statusCode = fetchResp.status;
-        var rawText = await fetchResp.text();
 
         console.log('📧 [Resend] HTTP', statusCode, '| Yanıt:', rawText.substring(0, 200));
 
