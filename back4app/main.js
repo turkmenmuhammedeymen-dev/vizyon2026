@@ -2313,25 +2313,35 @@ async function _aethrionSendEmail(to, subject, html) {
             return { success: true, provider: 'google', message: 'Mail gönderildi (Google Apps Script)', id: googleResult.id || null };
         }
 
-        // When the dedicated Apps Script provider is configured, do not silently
-        // send a second copy through Resend if Google's response is ambiguous.
+        // Do not use a second provider after an ambiguous network/empty-response
+        // result, because the first provider may already have accepted the message.
+        // For explicit configuration/HTTP/application errors, a configured Resend
+        // provider is a safe recovery path and prevents a broken Google setup from
+        // blocking all verification emails.
+        var googleError = String((googleResult && googleResult.error) || '');
+        var ambiguousGoogleResult = /boş yanıt döndü|HTTP hatası|AbortError|aborted|fetch failed|network|ağ hatası/i.test(googleError);
         var googleUrlConfigured = await getAPIKey('GOOGLE_SCRIPT_URL');
         var googleTokenConfigured = await getAPIKey('APPS_SCRIPT_TOKEN');
-        if (googleUrlConfigured && googleTokenConfigured) {
-            console.error('[AETHRION Mail] Google provider failed; secondary send suppressed to avoid duplicate messages.');
-            return { success: false, error: 'Google Apps Script e-posta gönderimini doğrulayamadı. Ayarları kontrol edip yeniden deneyin.' };
+        if (googleUrlConfigured && googleTokenConfigured && ambiguousGoogleResult) {
+            console.error('[AETHRION Mail] Google result is ambiguous; secondary provider suppressed to avoid duplicate email.');
+            return { success: false, error: 'Google Apps Script yanıtı kesinleştirilemedi; çift e-posta göndermemek için otomatik yedek durduruldu. Lütfen tekrar deneyin.' };
         }
 
         var resendResult = await tryResend(to, subject, html);
         if (resendResult && resendResult.success === true) {
-            return { success: true, provider: 'resend', message: 'Mail gönderildi (Resend)', id: resendResult.id || null };
+            console.warn('[AETHRION Mail] Verification email delivered by Resend fallback after Google provider failure.');
+            return { success: true, provider: 'resend', message: 'Mail gönderildi (yedek sağlayıcı)', id: resendResult.id || null };
         }
 
-        console.error('[AETHRION Mail] Both delivery providers failed.', {
-            google: String((googleResult && googleResult.error) || 'unknown').slice(0, 240),
+        console.error('[AETHRION Mail] Delivery providers failed.', {
+            googleConfigured: !!googleUrlConfigured,
+            googleTokenConfigured: !!googleTokenConfigured,
+            google: googleError.slice(0, 240),
             resend: String((resendResult && resendResult.error) || 'unknown').slice(0, 240)
         });
-        return { success: false, error: 'E-posta gönderilemedi. E-posta sağlayıcısı yapılandırmasını kontrol edin.' };
+        var detail = googleError || 'Google Apps Script yapılandırması eksik.';
+        var resendDetail = String((resendResult && resendResult.error) || 'Resend sağlayıcısı yapılandırması eksik.');
+        return { success: false, error: 'E-posta gönderilemedi. Google: ' + detail.slice(0, 180) + ' | Yedek: ' + resendDetail.slice(0, 180) };
     } catch (e) {
         console.error('[AETHRION Mail] Delivery helper failed:', String((e && e.message) || 'unknown').slice(0, 240));
         return { success: false, error: 'E-posta gönderimi sırasında sunucu hatası oluştu.' };
@@ -2387,15 +2397,25 @@ async function tryGoogleAppsScript(to, subject, html) {
         };
 
         // ✅ SADECE NATIVE FETCH KULLAN
-        var fetchResp = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json; charset=utf-8',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(payload),
-            redirect: 'follow'
-        });
+        // Bound the provider request so a slow Apps Script response cannot leave
+        // account-verification UI waiting indefinitely.
+        var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        var timeoutId = controller ? setTimeout(function () { controller.abort(); }, 12000) : null;
+        var fetchResp;
+        try {
+            fetchResp = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload),
+                redirect: 'follow',
+                signal: controller ? controller.signal : undefined
+            });
+        } finally {
+            if (timeoutId) clearTimeout(timeoutId);
+        }
 
         var statusCode = fetchResp.status;
         var rawText = await fetchResp.text();
