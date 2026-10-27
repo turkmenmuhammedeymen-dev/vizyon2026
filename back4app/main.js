@@ -2547,7 +2547,6 @@ async function tryResend(to, subject, html) {
         } finally {
             if (timeoutId) clearTimeout(timeoutId);
         }
-        var statusCode = fetchResp.status;
 
         console.log('📧 [Resend] HTTP', statusCode, '| Yanıt:', rawText.substring(0, 200));
 
