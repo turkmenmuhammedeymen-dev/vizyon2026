@@ -3726,14 +3726,38 @@ Parse.Cloud.define("facebookLogin", async function (request) {
     var user;
     var wasNewUser = false;
     try {
+        // Check the provider identity first, then detect collisions by email/username.
+        // Never let Parse attempt an implicit duplicate-user creation and surface its
+        // generic "Account already exists for this username" error to the user.
         var existingQuery = new Parse.Query(Parse.User);
         existingQuery.equalTo('authData.facebook.id', data.id);
         var existing = await existingQuery.first({ useMasterKey: true });
-        if (!existing) wasNewUser = true;
+        if (!existing) {
+            var collision = null;
+            var normalizedFacebookEmail = String(data.email || '').trim().toLowerCase();
+            if (normalizedFacebookEmail) {
+                var emailQuery = new Parse.Query(Parse.User);
+                emailQuery.equalTo('email', normalizedFacebookEmail);
+                collision = await emailQuery.first({ useMasterKey: true });
+                if (!collision) {
+                    var usernameEmailQuery = new Parse.Query(Parse.User);
+                    usernameEmailQuery.equalTo('username', normalizedFacebookEmail);
+                    collision = await usernameEmailQuery.first({ useMasterKey: true });
+                }
+            }
+            if (!collision) {
+                var usernameQuery = new Parse.Query(Parse.User);
+                usernameQuery.equalTo('username', String(data.name || '').trim());
+                if (String(data.name || '').trim()) collision = await usernameQuery.first({ useMasterKey: true });
+            }
+            if (collision) {
+                throw new Error('Bu bilgilerle eşleşen bir AETHRION hesabı zaten var. Güvenlik için önce mevcut hesabınıza e-posta/şifre ile giriş yapın; ardından Ayarlar > Güvenlik ve Gizlilik bölümünden Facebook hesabınızı bağlayın.');
+            }
+            wasNewUser = true;
+        }
 
         user = await Parse.User.logInWith('facebook', {
-            authData: { id: data.id, access_token: accessToken },
-            useMasterKey: true
+            authData: { id: data.id, access_token: accessToken }
         });
     } catch (e) {
         console.error('❌ facebookLogin logInWith hatası:', e.message);
@@ -9919,6 +9943,11 @@ Parse.Cloud.define("verifyGoogleToken", async function (request) {
         var emailQuery = new Parse.Query(Parse.User);
         emailQuery.equalTo('email', googleUser.email);
         emailUser = await emailQuery.first({ useMasterKey: true });
+        if (!emailUser) {
+            var usernameQuery = new Parse.Query(Parse.User);
+            usernameQuery.equalTo('username', googleUser.email);
+            emailUser = await usernameQuery.first({ useMasterKey: true });
+        }
     } catch (e) {
         console.error('verifyGoogleToken user lookup hatası:', e.message);
         return { success: false, error: 'Hesap bilgileri şu anda kontrol edilemiyor. Lütfen tekrar deneyin.' };
@@ -9930,7 +9959,7 @@ Parse.Cloud.define("verifyGoogleToken", async function (request) {
         if (String(existingGoogle.id || '') !== googleUser.id) {
             return {
                 success: false,
-                error: 'Bu e-posta ile zaten bir AETHRION hesabı var. Güvenlik için önce mevcut hesabınıza e-posta/şifre ile giriş yapıp Google hesabınızı bağlayın.'
+                error: 'Bu e-posta veya kullanıcı adıyla eşleşen bir AETHRION hesabı zaten var. Güvenlik için önce mevcut hesabınıza e-posta/şifre ile giriş yapın; ardından Ayarlar > Güvenlik ve Gizlilik bölümünden Google hesabınızı bağlayın.'
             };
         }
     }
