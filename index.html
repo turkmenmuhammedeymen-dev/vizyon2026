@@ -25196,35 +25196,73 @@ window.confirmSocialAuthTerms = function () {
 // [AETHRION] KAYIT — Checkbox zorunluluğu + 28 model
 // ============================================================
 async function handleRegister() {
-    // Keep any active session intact while a user is creating another account.
-    var name = document.getElementById('rName').value.trim();
-    var email = document.getElementById('rEmail').value.trim().toLowerCase();
-    var username = document.getElementById('rUsername').value.trim();
-    var p1 = document.getElementById('rPass').value;
-    var p2 = document.getElementById('rPass2').value;
-    var referralCode = document.getElementById('rReferralCode').value.trim();
+    var nameInput = document.getElementById('rName');
+    var emailInput = document.getElementById('rEmail');
+    var usernameInput = document.getElementById('rUsername');
+    var passInput = document.getElementById('rPass');
+    var pass2Input = document.getElementById('rPass2');
+    var referralInput = document.getElementById('rReferralCode');
+    var name = nameInput ? nameInput.value.trim() : '';
+    var email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+    var username = usernameInput ? usernameInput.value.trim() : '';
+    var p1 = passInput ? passInput.value : '';
+    var p2 = pass2Input ? pass2Input.value : '';
+    var referralCode = referralInput ? referralInput.value.trim() : '';
+    var terms = document.getElementById('registerTermsCheck');
+    var privacy = document.getElementById('registerPrivacyCheck');
+    var signupCompleted = false;
 
-    var registerTermsCheck = document.getElementById('registerTermsCheck');
-    var registerPrivacyCheck = document.getElementById('registerPrivacyCheck');
-
-    if (!registerTermsCheck || !registerTermsCheck.checked) {
-        showNotification('❌ Kayıt olmak için Kullanıcı Sözleşmesi\'ni kabul etmelisiniz.', 'error');
-        return;
+    function withTimeout(promise, ms, message) {
+        var timer;
+        return Promise.race([
+            Promise.resolve(promise),
+            new Promise(function (_, reject) {
+                timer = window.setTimeout(function () { reject(new Error(message)); }, ms);
+            })
+        ]).finally(function () { if (timer) window.clearTimeout(timer); });
     }
-    if (!registerPrivacyCheck || !registerPrivacyCheck.checked) {
-        showNotification('❌ Kayıt olmak için Gizlilik Politikası\'nı kabul etmelisiniz.', 'error');
-        return;
-    }
 
-    if (!name || !email || !username || p1.length < 8 || p1 !== p2) {
-        showNotification('Tüm alanları doldurun, şifreler aynı ve min 8 karakter', 'error');
-        if (typeof window.addLogWarning === 'function') {
-            window.addLogWarning('Kayıt formu eksik dolduruldu');
+    function openVerificationStep() {
+        if (typeof window.switchTab === 'function') {
+            window.switchTab('verify');
+        } else {
+            var registerForm = document.getElementById('formRegister');
+            var loginForm = document.getElementById('formLogin');
+            var verifyForm = document.getElementById('formVerify');
+            if (registerForm) registerForm.style.display = 'none';
+            if (loginForm) loginForm.style.display = 'none';
+            if (verifyForm) verifyForm.style.display = 'block';
         }
-        return;
+        var verifyEmailInput = document.getElementById('verifyEmail');
+        if (verifyEmailInput) {
+            verifyEmailInput.value = email;
+            verifyEmailInput.readOnly = false;
+            verifyEmailInput.disabled = false;
+            verifyEmailInput.style.pointerEvents = 'auto';
+        }
+    }
+
+    if (!terms || !terms.checked) {
+        showNotification('Kayıt olmak için Kullanıcı Sözleşmesi\'ni kabul etmelisiniz.', 'error');
+        return false;
+    }
+    if (!privacy || !privacy.checked) {
+        showNotification('Kayıt olmak için Gizlilik Politikası\'nı kabul etmelisiniz.', 'error');
+        return false;
+    }
+    if (!name || !email || !username || p1.length < 8 || p1 !== p2) {
+        showNotification('Tüm alanları doldurun; şifreler aynı ve en az 8 karakter olmalı.', 'error');
+        if (typeof window.addLogWarning === 'function') window.addLogWarning('Kayıt formu eksik dolduruldu');
+        return false;
+    }
+    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+        showNotification('Geçerli bir e-posta adresi girin.', 'error');
+        return false;
     }
 
     try {
+        if (!window.Parse || !window.Parse.User) throw new Error('Kimlik doğrulama servisi hazır değil. Sayfayı yenileyip tekrar deneyin.');
+
         var user = new Parse.User();
         user.set('username', email);
         user.set('email', email);
@@ -25255,92 +25293,82 @@ async function handleRegister() {
         user.set('completed_team_tasks', []);
         user.set('profile_completed', true);
         user.set('password_set', true);
-
-        // Sözleşme onayı
         user.set('terms_accepted', true);
         user.set('privacy_accepted', true);
         user.set('terms_accepted_at', new Date());
 
         var namePart = name.substring(0, 4).toUpperCase();
         var randomPart = Math.floor(1000 + Math.random() * 9000);
-        var refCode = 'A27-' + namePart + '-' + randomPart;
-        user.set('referral_code', refCode);
+        user.set('referral_code', 'A27-' + namePart + '-' + randomPart);
         user.set('invited_by', referralCode || '');
-
-        var verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
-        user.set('verificationCode', verifyCode);
-        user.set('verificationCodeExpires', new Date(Date.now() + 15 * 60000));
-
         user.set('usage_vizyonAlPerDay', 0);
         user.set('usage_voiceChatMinutesPerDay', 0);
         user.set('usage_fileAnalyzePerDay', 0);
         user.set('usage_videoCreatePerMonth', 0);
         user.set('usage_lastReset', new Date());
 
-        await user.signUp();
+        // Bound signup wait so the progress overlay can never cover the auth UI indefinitely.
+        await withTimeout(
+            user.signUp(),
+            25000,
+            'Kayıt sunucusu 25 saniye içinde yanıt vermedi. Bağlantıyı kontrol edin; aynı e-postayla tekrar denemeden önce hesabın oluşup oluşmadığını kontrol edin.'
+        );
+        signupCompleted = true;
 
         if (typeof window.addLogSuccess === 'function') {
-            window.addLogSuccess('Yeni AETHRION kullanıcı kaydı: ' + email + ' (sözleşme kabul edildi)');
+            window.addLogSuccess('Yeni AETHRION kullanıcı kaydı oluşturuldu; e-posta doğrulaması bekleniyor.');
         }
 
-        if (referralCode) {
-            try {
-                await Parse.Cloud.run('applyReferral', { code: referralCode });
-                if (typeof window.addLogInfo === 'function') {
-                    window.addLogInfo('Davet kodu uygulandı: ' + referralCode);
-                }
-            } catch (e) {
-                console.log('Davet kodu uygulanamadı:', e);
-                if (typeof window.addLogWarning === 'function') {
-                    window.addLogWarning('Davet kodu uygulanamadı: ' + e.message);
-                }
-            }
-        }
+        // Move to the verification form immediately after account creation. Email delivery
+        // is asynchronous so a slow mail provider cannot leave the "registering" overlay up.
+        openVerificationStep();
+        showNotification('Hesabınız oluşturuldu. Doğrulama kodu e-postanıza gönderiliyor…', 'info');
 
-        var verificationEmailSent = false;
-        try {
-            var safeEmailName = String(name).replace(/&/g, '&amp;').replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-            var mailResult = await Parse.Cloud.run('sendEmail', {
-                to: email,
-                subject: 'AETHRION Doğrulama Kodu',
-                html: '<h1>AETHRION&#39;a Hoş Geldin ' + safeEmailName + '!</h1>' +
-                      '<p>Doğrulama kodunuz: <strong style="font-size:24px;color:#d4af37;">' + verifyCode + '</strong></p>' +
-                      '<p>15 dakika geçerlidir.</p>' +
-                      '<p style="color:#b8c0d0;font-style:italic;">AETHRION — Intelligence Without Limits.</p>' +
-                      '<p>AETHRION Ekibi</p>'
-            });
+        // Generate and persist the verification code only on the server; do not expose it
+        // in browser code or wait for the mail provider before showing the verification form.
+        withTimeout(
+            Parse.Cloud.run('resendAccountVerification', { email: email }),
+            20000,
+            'E-posta sağlayıcısı 20 saniye içinde yanıt vermedi.'
+        ).then(function (mailResult) {
             if (!mailResult || mailResult.success !== true) {
                 throw new Error((mailResult && mailResult.error) || 'E-posta sağlayıcısı gönderimi onaylamadı.');
             }
-            verificationEmailSent = true;
-        } catch (mailError) {
-            console.error('[AETHRION] Verification email could not be sent:', mailError);
+            showNotification('Doğrulama kodu e-postanıza gönderildi. Gelen kutusu ve spam klasörünü kontrol edin.', 'success');
+            if (typeof window.addLogSuccess === 'function') window.addLogSuccess('Doğrulama e-postası gönderimi onaylandı.');
+        }).catch(function (mailError) {
+            console.error('[AETHRION Auth] Verification email delivery failed:', mailError);
             if (typeof window.addLogWarning === 'function') {
-                window.addLogWarning('Doğrulama e-postası gönderilemedi: ' + (mailError.message || 'Bilinmeyen hata'));
+                window.addLogWarning('Doğrulama e-postası gönderilemedi; doğrulama ekranından yeni kod isteyebilirsiniz.');
             }
+            showNotification('Hesabınız oluşturuldu ancak e-posta gönderimi tamamlanamadı. Doğrulama ekranındaki “Yeni Kod Gönder” düğmesini kullanın.', 'warning');
+        });
+
+        // Referral processing is non-critical and must not block account verification.
+        if (referralCode) {
+            withTimeout(Parse.Cloud.run('applyReferral', { code: referralCode }), 8000, 'Davet kodu işlemi zaman aşımına uğradı.')
+                .then(function () {
+                    if (typeof window.addLogInfo === 'function') window.addLogInfo('Davet kodu uygulandı.');
+                })
+                .catch(function (referralError) {
+                    console.warn('[AETHRION Auth] Referral processing failed:', referralError);
+                    if (typeof window.addLogWarning === 'function') window.addLogWarning('Davet kodu daha sonra tekrar uygulanabilir.');
+                });
         }
 
-        if (typeof window.switchTab !== 'function') {
-            throw new Error('Doğrulama ekranı yüklenemedi. Sayfayı yenileyip tekrar deneyin.');
-        }
-        window.switchTab('verify');
-        var verifyEmailInput = document.getElementById('verifyEmail');
-        if (verifyEmailInput) {
-            verifyEmailInput.value = email;
-            verifyEmailInput.readOnly = false;
-            verifyEmailInput.disabled = false;
-        }
-        if (verificationEmailSent) {
-            showNotification('Kayıt oluşturuldu. Doğrulama kodunu e-postandan kontrol et.', 'success');
-        } else {
-            showNotification('Hesap oluşturuldu ancak doğrulama e-postası gönderilemedi. Doğrulama ekranındaki “Yeni Kod Gönder” seçeneğini kullanın veya destekle iletişime geçin.', 'warning');
-        }
+        return true;
     } catch (e) {
-        showNotification('Hata: ' + e.message, 'error');
-        if (typeof window.addLogError === 'function') {
-            window.addLogError('Kayıt hatası: ' + e.message, { email: email });
+        console.error('[AETHRION Auth] Registration failed:', e);
+        if (signupCompleted) {
+            try { openVerificationStep(); } catch (_) {}
+            showNotification('Hesabınız oluşturuldu. Doğrulama ekranından yeni kod isteyebilirsiniz.', 'warning');
+            return true;
         }
+        showNotification('Kayıt tamamlanamadı: ' + (e && e.message ? e.message : 'Bilinmeyen hata'), 'error');
+        if (typeof window.addLogError === 'function') {
+            window.addLogError('Kayıt hatası: ' + (e && e.message ? e.message : 'Bilinmeyen hata'));
+        }
+        return false;
     }
 }
 
