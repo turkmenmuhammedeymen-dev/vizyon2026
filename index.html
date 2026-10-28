@@ -312,8 +312,8 @@
 
 
 
-    <script src="/aethrion-schema.js" defer></script>
-    <link rel="stylesheet" href="/aethrion-corporate-polish.css?v=20261024-4">
+    <!-- aethrion-schema.js merged into app.js -->
+<link rel="stylesheet" href="/aethrion-corporate-polish.css?v=20261024-4">
 
 
     <link rel="stylesheet" href="style.css">
@@ -3401,14 +3401,13 @@ def root():
 
 
 
-<script defer src="/aethrion-identity.js?v=20261023-identity8"></script>
-<script defer src="/aethrion-experience.js?v=20261022-workspace6"></script>
-<script defer src="/aethrion-file-tools.js?v=20261024-filetools2"></script>
-<script defer src="/aethrion-auth-recovery.js?v=20261024-authflow7"></script>
-<script defer src="/aethrion-jarvis.js?v=20261024-attachments3"></script>
-<script defer src="/aethrion-workspace-v5.js?v=20261022-workspace9"></script>
-<script defer src="/aethrion-workspace-v6.js?v=20261022-workspace9"></script>
-
+<!-- aethrion-identity.js merged into app.js -->
+<!-- aethrion-experience.js merged into app.js -->
+<!-- aethrion-file-tools.js merged into app.js -->
+<!-- aethrion-auth-recovery.js merged into app.js -->
+<!-- aethrion-jarvis.js merged into app.js -->
+<!-- aethrion-workspace-v5.js merged into app.js -->
+<!-- aethrion-workspace-v6.js merged into app.js -->
 <!-- AETHRION runtime guard: ensure dashboard assistant entry point is callable -->
 
 
@@ -3439,65 +3438,3 @@ def root():
     <script src="app.js"></script>
 </body>
 </html>
-
-<!-- AETHRION FINAL UI / ACCESSIBILITY PATCH — 2026-10-24 -->
-
-
-
-
-blur(18px) saturate(135%) !important;
-    transform: translate3d(-50%, -160%, 0) !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    z-index: 2147483647 !important;
-    transition: transform .24s ease, opacity .24s ease, visibility .24s ease !important;
-    isolation: isolate !important;
-    margin: 0 !important;
-  }
-  #notification.notification.show, .notification#notification.show {
-    transform: translate3d(-50%, 0, 0) !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-  }
-  #notification.notification.error { border-color: rgba(255, 100, 120, .75) !important; border-left-color: #ff7186 !important; }
-  #notification.notification.warning { border-color: rgba(245, 189, 79, .72) !important; border-left-color: #f5bd4f !important; }
-  #notification.notification.success { border-color: rgba(69, 212, 154, .65) !important; border-left-color: #45d49a !important; }
-  #notification .aethrion-toast-close {
-    position: absolute !important; top: 8px !important; right: 8px !important;
-    width: 32px !important; height: 32px !important; min-height: 32px !important;
-    padding: 0 !important; border-radius: 9px !important;
-    border: 1px solid rgba(255,255,255,.13) !important;
-    background: rgba(255,255,255,.07) !important; color: #fff !important;
-    font-size: 21px !important; line-height: 1 !important; cursor: pointer !important;
-  }
-  #notification .aethrion-toast-close:hover { background: rgba(255,255,255,.15) !important; }
-  :where(button, a, input, select, textarea, [role="button"], [tabindex]):focus-visible {
-    outline: 2px solid #dfc37b !important; outline-offset: 3px !important;
-  }
-  .navbar-avatar-menu { max-width: min(90vw, 340px); max-height: min(70dvh, 560px); overflow-y: auto; overscroll-behavior: contain; }
-  .navbar-avatar-menu button { min-height: 44px; }
-  @media (max-width: 640px) {
-    #notification.notification, .notification#notification {
-      top: max(10px, env(safe-area-inset-top, 0px)) !important;
-      width: calc(100vw - 20px) !important; max-width: calc(100vw - 20px) !important;
-      padding: 13px 44px 13px 14px !important; border-radius: 13px !important;
-      max-height: min(45dvh, 260px) !important;
-    }
-    .navbar-avatar-menu { right: -6px; min-width: min(220px, calc(100vw - 28px)); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    #notification.notification, .notification#notification,
-    .navbar-avatar-menu, .navbar-avatar-menu button {
-      transition: none !important; animation: none !important; scroll-behavior: auto !important;
-    }
-  }
-</style>
-
-
-
-
-<!-- AETHRION AUTH FLOW REPAIR — foreground modal + visible async state -->
-
-
