@@ -36,6 +36,237 @@
   }
 })(window);
 
+
+/* ===== AETHRION CORE AUTH RESTORE (2026-10-28) =====
+ * The HTML auth controls call these globals. Keep this compatibility layer
+ * before feature modules so registration, sign-in and email verification exist.
+ */
+(function aethrionCoreAuth(global) {
+  'use strict';
+  if (global.__aethrionCoreAuthInstalled) return;
+  global.__aethrionCoreAuthInstalled = true;
+
+  function byId(id) { return document.getElementById(id); }
+  function value(id) { var el = byId(id); return el ? String(el.value || '').trim() : ''; }
+  function emailValue(id) { return value(id).toLowerCase(); }
+  function validEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+  function setVisible(id, visible) {
+    var el = byId(id);
+    if (el) el.style.display = visible ? '' : 'none';
+  }
+  function notify(message, type) {
+    if (typeof global.showNotification === 'function' && !global.showNotification.__aeCoreFallback) {
+      try { global.showNotification(message, type || 'info'); return; } catch (e) {}
+    }
+    var host = byId('notificationModal');
+    if (host) {
+      host.textContent = String(message || '');
+      host.style.display = 'block';
+      host.setAttribute('role', 'status');
+      global.setTimeout(function () { if (host) host.style.display = 'none'; }, 6500);
+    } else if (type === 'error') {
+      global.alert(String(message || 'İşlem tamamlanamadı.'));
+    } else {
+      console.info('[AETHRION]', String(message || ''));
+    }
+  }
+  if (typeof global.showNotification !== 'function') {
+    var fallbackNotify = function (message, type) { notify(message, type); };
+    fallbackNotify.__aeCoreFallback = true;
+    global.showNotification = fallbackNotify;
+  }
+  function authModal(show) {
+    var modal = byId('authModal');
+    if (!modal) return;
+    modal.style.display = show ? 'flex' : 'none';
+    modal.setAttribute('aria-hidden', show ? 'false' : 'true');
+  }
+  if (typeof global.openModal !== 'function') {
+    global.openModal = function (id) {
+      var el = byId(id);
+      if (el) { el.style.display = 'flex'; el.setAttribute('aria-hidden', 'false'); }
+    };
+  }
+  if (typeof global.closeModal !== 'function') {
+    global.closeModal = function (id) {
+      var el = byId(id);
+      if (el) { el.style.display = 'none'; el.setAttribute('aria-hidden', 'true'); }
+    };
+  }
+  if (typeof global.switchTab !== 'function') {
+    global.switchTab = function (tab) {
+      tab = ['login', 'register', 'verify'].indexOf(tab) >= 0 ? tab : 'login';
+      setVisible('formLogin', tab === 'login');
+      setVisible('formRegister', tab === 'register');
+      setVisible('formVerify', tab === 'verify');
+      var modal = byId('authModal');
+      if (modal) {
+        modal.querySelectorAll('.modal-tab').forEach(function (button) {
+          var text = (button.textContent || '').toLocaleLowerCase('tr');
+          var active = (tab === 'login' && text.indexOf('giriş') >= 0) ||
+            (tab === 'register' && text.indexOf('kayıt') >= 0) ||
+            (tab === 'verify' && text.indexOf('doğrula') >= 0);
+          button.classList.toggle('active', active);
+        });
+      }
+      authModal(true);
+      if (tab === 'verify') {
+        var email = value('rEmail') || value('lEmail');
+        if (email && byId('verifyEmail')) byId('verifyEmail').value = email;
+      }
+      return true;
+    };
+  }
+  if (typeof global.openAuthModal !== 'function') {
+    global.openAuthModal = function (tab) { global.switchTab(tab || 'login'); };
+  }
+  async function ensureParse() {
+    if (!global.Parse || !global.Parse.User || !global.Parse.Cloud) {
+      throw new Error('Back4App SDK yüklenemedi. İnternet bağlantısını kontrol edip sayfayı yenileyin.');
+    }
+    if (typeof global.initBack4app === 'function') await global.initBack4app();
+    if (!global.Parse.applicationId) throw new Error('Back4App bağlantısı başlatılamadı.');
+  }
+  async function cloudRun(name, params, timeoutMs) {
+    var request = global.Parse.Cloud.run(name, params || {});
+    var timeout = new Promise(function (_, reject) {
+      global.setTimeout(function () {
+        reject(new Error('Sunucu isteği zaman aşımına uğradı. Biraz sonra tekrar deneyin.'));
+      }, timeoutMs || 18000);
+    });
+    return await Promise.race([request, timeout]);
+  }
+  function accepted(id, message) {
+    var el = byId(id);
+    return !!(el && el.checked) || (notify(message, 'warning'), false);
+  }
+  function dashboard() {
+    var area = byId('dashboardArea');
+    if (area) area.style.display = 'block';
+    document.body.classList.add('aethrion-authenticated');
+    authModal(false);
+    if (typeof global.onAethrionLoginSuccess === 'function') {
+      try { global.onAethrionLoginSuccess(global.Parse.User.current()); } catch (e) {}
+    }
+    try { global.dispatchEvent(new CustomEvent('aethrion:authenticated', { detail: { user: global.Parse.User.current() } })); } catch (e) {}
+  }
+
+  if (typeof global.handleRegister !== 'function') {
+    global.handleRegister = async function () {
+      var name = value('rName');
+      var email = emailValue('rEmail');
+      var displayUsername = value('rUsername');
+      var password = value('rPass');
+      var confirm = value('rPass2');
+      if (!name || !email || !password || !confirm) { notify('Ad, e-posta ve şifre alanlarını doldurun.', 'warning'); return false; }
+      if (!validEmail(email)) { notify('Geçerli bir e-posta adresi girin.', 'warning'); return false; }
+      if (password.length < 8) { notify('Şifre en az 8 karakter olmalı.', 'warning'); return false; }
+      if (password !== confirm) { notify('Şifreler eşleşmiyor.', 'warning'); return false; }
+      if (!accepted('registerTermsCheck', 'Kayıt olmak için Kullanıcı Sözleşmesi’ni kabul edin.')) return false;
+      await ensureParse();
+      var user = new global.Parse.User();
+      // Email is the canonical Parse username so the visible email login works.
+      user.set('username', email);
+      user.set('email', email);
+      user.set('password', password);
+      user.set('name', name);
+      user.set('displayUsername', displayUsername || email.split('@')[0]);
+      user.set('role', 'member');
+      user.set('plan', 'free');
+      user.set('isVerified', false);
+      var referral = value('rReferralCode');
+      if (referral) user.set('referralCodeUsed', referral);
+      await user.signUp();
+      if (byId('verifyEmail')) byId('verifyEmail').value = email;
+      if (byId('verifyCode')) byId('verifyCode').value = '';
+      global.switchTab('verify');
+      try {
+        var sent = await cloudRun('resendAccountVerification', { email: email }, 20000);
+        if (sent && sent.success) {
+          notify('Hesabınız oluşturuldu. E-posta doğrulama kodunu gelen kutunuzdan alın ve doğrulama ekranına girin.', 'success');
+        } else {
+          notify('Hesabınız oluşturuldu ancak kod gönderimi doğrulanamadı. “Yeni Kod Gönder” seçeneğini kullanın.', 'warning');
+        }
+      } catch (mailError) {
+        console.error('[AETHRION] Verification email send failed:', mailError);
+        notify('Hesabınız oluşturuldu; doğrulama e-postası gönderilemedi. E-posta servisi ayarlarını kontrol edin ve “Yeni Kod Gönder” seçeneğini deneyin.', 'warning');
+      }
+      return true;
+    };
+  }
+  if (typeof global.handleLogin !== 'function') {
+    global.handleLogin = async function () {
+      var email = emailValue('lEmail');
+      var password = value('lPass');
+      if (!email || !password) { notify('E-posta ve şifrenizi girin.', 'warning'); return false; }
+      if (!validEmail(email)) { notify('Giriş için geçerli e-posta adresi girin.', 'warning'); return false; }
+      if (!accepted('loginTermsCheck', 'Devam etmek için Kullanıcı Sözleşmesi’ni kabul edin.')) return false;
+      if (!accepted('loginPrivacyCheck', 'Devam etmek için Gizlilik Politikası’nı kabul edin.')) return false;
+      await ensureParse();
+      var user;
+      try {
+        user = await global.Parse.User.logIn(email, password);
+      } catch (firstError) {
+        // Older accounts may have a separate username rather than email as username.
+        throw firstError;
+      }
+      if (user && user.get('isVerified') === false) {
+        await global.Parse.User.logOut();
+        if (byId('verifyEmail')) byId('verifyEmail').value = email;
+        global.switchTab('verify');
+        notify('Hesabınız henüz doğrulanmadı. E-postanıza gelen 6 haneli kodu girin.', 'warning');
+        return true;
+      }
+      dashboard();
+      notify('Giriş başarılı. AETHRION çalışma alanınız açılıyor.', 'success');
+      return true;
+    };
+  }
+  if (typeof global.verifyAccount !== 'function') {
+    global.verifyAccount = async function () {
+      var email = emailValue('verifyEmail');
+      var code = value('verifyCode').replace(/\s/g, '');
+      if (!validEmail(email) || !/^\d{6}$/.test(code)) {
+        notify('Geçerli e-posta adresi ve 6 haneli doğrulama kodu girin.', 'warning');
+        return false;
+      }
+      await ensureParse();
+      var result = await cloudRun('verifyUser', { email: email, code: code }, 18000);
+      if (!result || result.success !== true) {
+        throw new Error((result && result.error) || 'Doğrulama başarısız. Kodu kontrol edin veya yeni kod isteyin.');
+      }
+      global.switchTab('login');
+      if (byId('lEmail')) byId('lEmail').value = email;
+      if (byId('lPass')) byId('lPass').value = '';
+      notify('E-posta doğrulandı. Şimdi e-posta ve şifrenizle giriş yapabilirsiniz.', 'success');
+      return true;
+    };
+  }
+  if (typeof global.resendAccountVerification !== 'function') {
+    global.resendAccountVerification = async function () {
+      var email = emailValue('verifyEmail') || emailValue('rEmail');
+      if (!validEmail(email)) { notify('Önce geçerli e-posta adresinizi girin.', 'warning'); return false; }
+      await ensureParse();
+      var result = await cloudRun('resendAccountVerification', { email: email }, 18000);
+      if (result && result.success) {
+        notify(result.message || 'Hesap uygunsa yeni doğrulama kodu gönderildi. E-postanızı kontrol edin.', 'success');
+        return true;
+      }
+      throw new Error((result && result.error) || 'Yeni doğrulama kodu gönderilemedi.');
+    };
+  }
+  if (typeof global.logout !== 'function') {
+    global.logout = async function () {
+      try { if (global.Parse && global.Parse.User) await global.Parse.User.logOut(); } catch (e) {}
+      authModal(true);
+      global.switchTab('login');
+      if (byId('dashboardArea')) byId('dashboardArea').style.display = 'none';
+    };
+  }
+})(window);
+/* ===== END AETHRION CORE AUTH RESTORE ===== */
+
+
 /* AETHRION unified first-party JavaScript bundle. Keep module order unchanged. */
 
 /* ===== aethrion-schema.js ===== */
