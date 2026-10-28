@@ -1009,7 +1009,10 @@ Parse.Cloud.define("resendAccountVerification", async function (request) {
     var mail = await _aethrionSendEmail(email, 'AETHRION doğrulama kodunuz', html);
     if (!mail || mail.success !== true) {
         console.error('[AETHRION Auth] Verification email delivery failed; provider diagnostics were recorded server-side.');
-        throw new Error('E-posta gönderilemedi. Back4App ortam değişkenlerini / e-posta sağlayıcısı ayarlarını kontrol edin ve tekrar deneyin.');
+        // Return a bounded, actionable provider diagnostic so the UI can distinguish
+        // missing configuration from a rejected/failed mail-provider request.
+        var mailDiagnostic = String((mail && mail.error) || 'E-posta sağlayıcısı gönderimi onaylamadı.').replace(/[\r\n]+/g, ' ').slice(0, 300);
+        throw new Error('E-posta gönderilemedi: ' + mailDiagnostic);
     }
     return { success: true, message: 'Hesap uygunsa yeni doğrulama kodu gönderildi.' };
 });
