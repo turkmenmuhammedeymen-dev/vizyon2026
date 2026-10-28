@@ -183,6 +183,8 @@
       var referral = value('rReferralCode');
       if (referral) user.set('referralCodeUsed', referral);
       await user.signUp();
+      // New accounts must not retain an authenticated session before email verification.
+      try { await global.Parse.User.logOut(); } catch (logoutError) { console.warn('[AETHRION] Could not clear pre-verification session:', logoutError); }
       if (byId('verifyEmail')) byId('verifyEmail').value = email;
       if (byId('verifyCode')) byId('verifyCode').value = '';
       global.switchTab('verify');
