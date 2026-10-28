@@ -130,10 +130,17 @@
     showProgress(action.message);
     var timeoutId;
     try {
-      await ensureParseReady();
-      var task = Promise.resolve().then(function () { return action.fn.call(button || window); });
+      // Bound the complete flow, including Parse initialization. Previously the timeout
+      // started only after initBack4app(), so a stalled initializer could leave the
+      // button disabled forever even after the progress overlay hid itself.
+      var task = (async function () {
+        await ensureParseReady();
+        return await action.fn.call(button || window);
+      })();
       var timeout = new Promise(function (_, reject) {
-        timeoutId = window.setTimeout(function () { reject(new Error('Kimlik doğrulama 35 saniye içinde tamamlanmadı. Sunucu yanıt vermedi veya sağlayıcı ayarı eksik. Tekrar deneyin; sorun sürerse Back4App Cloud Code günlüklerini kontrol edin.')); }, 35000);
+        timeoutId = window.setTimeout(function () {
+          reject(new Error('Kimlik doğrulama 35 saniye içinde tamamlanmadı. Sunucu yanıt vermedi veya sağlayıcı ayarı eksik. Tekrar deneyin; sorun sürerse Back4App Cloud Code günlüklerini kontrol edin.'));
+        }, 35000);
       });
       var result = await Promise.race([task, timeout]);
       hideProgress(result === true);
