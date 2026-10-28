@@ -3436,5 +3436,26 @@ def root():
 
 
     <script src="app.js"></script>
+    <!-- Independent splash failsafe: never allow a failed app.js boot to block every page control. -->
+    <script>
+    (function () {
+      function releaseAethrionSplash() {
+        var splash = document.getElementById('splashScreen');
+        if (!splash) return;
+        splash.style.setProperty('pointer-events', 'none', 'important');
+        splash.style.setProperty('visibility', 'hidden', 'important');
+        splash.style.setProperty('opacity', '0', 'important');
+        splash.style.setProperty('display', 'none', 'important');
+        splash.setAttribute('aria-hidden', 'true');
+      }
+      window.setTimeout(releaseAethrionSplash, 4200);
+      window.addEventListener('error', function () {
+        window.setTimeout(releaseAethrionSplash, 500);
+      });
+      window.addEventListener('unhandledrejection', function () {
+        window.setTimeout(releaseAethrionSplash, 500);
+      });
+    })();
+    </script>
 </body>
 </html>
