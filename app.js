@@ -2257,7 +2257,8 @@ async function handleRegister() {
             if (typeof window.addLogWarning === 'function') {
                 window.addLogWarning('Doğrulama e-postası gönderilemedi; doğrulama ekranından yeni kod isteyebilirsiniz.');
             }
-            showNotification('Hesabınız oluşturuldu ancak e-posta gönderimi tamamlanamadı. Doğrulama ekranındaki “Yeni Kod Gönder” düğmesini kullanın.', 'warning');
+            var deliveryDetail = String((mailError && mailError.message) || 'E-posta sağlayıcısı yanıt vermedi.').replace(/[\\r\\n]+/g, ' ').slice(0, 220);
+            showNotification('Hesabınız oluşturuldu ancak doğrulama e-postası gönderilemedi: ' + deliveryDetail + ' Yeni Kod Gönder ile tekrar deneyin.', 'warning');
         });
 
         // Referral processing is non-critical and must not block account verification.
