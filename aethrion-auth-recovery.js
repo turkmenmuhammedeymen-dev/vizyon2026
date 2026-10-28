@@ -119,7 +119,7 @@
     if (window.Parse.applicationId !== expectedAppId) {
       throw new Error('Back4App App ID doğrulanamadı. Sayfayı yenileyip tekrar deneyin.');
     }
-    if (!window.Parse.serverURL || String(window.Parse.serverURL).replace(/\\/$/, '') !== expectedServer.replace(/\\/$/, '')) {
+    if (!window.Parse.serverURL || String(window.Parse.serverURL).replace(/\/$/, '') !== expectedServer.replace(/\/$/, '')) {
       window.Parse.serverURL = expectedServer;
     }
     window.parseInitialized = true;
