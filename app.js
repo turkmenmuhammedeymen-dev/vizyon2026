@@ -1953,6 +1953,18 @@ window.handleGoogleLoginResponse = async function (response) {
 
         closeModal('authModal');
         await window.showDashboard();
+        // Reconcile legacy dashboard guards/overrides after a confirmed Parse session.
+        // A successful login must never silently return to the landing page.
+        var authDashboard = document.getElementById('dashboardArea');
+        var authMainSite = document.getElementById('mainSite');
+        if (Parse.User.current() && authDashboard) {
+            document.body.classList.add('logged-in-user');
+            authDashboard.style.setProperty('display', 'block', 'important');
+            authDashboard.style.setProperty('visibility', 'visible', 'important');
+            authDashboard.style.setProperty('opacity', '1', 'important');
+            if (authMainSite) authMainSite.style.setProperty('display', 'none', 'important');
+        }
+        if (!Parse.User.current()) throw new Error('Giriş doğrulandı ancak oturum bu cihazda kaydedilemedi. Tekrar giriş yapın.');
         if (typeof window.updateCommentUI === 'function') window.updateCommentUI();
         if (typeof window.loadComments === 'function') await window.loadComments();
         if (typeof window.refreshUserLimits === 'function') window.refreshUserLimits();
