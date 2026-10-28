@@ -163,6 +163,7 @@
       if (password.length < 8) { notify('Şifre en az 8 karakter olmalı.', 'warning'); return false; }
       if (password !== confirm) { notify('Şifreler eşleşmiyor.', 'warning'); return false; }
       if (!accepted('registerTermsCheck', 'Kayıt olmak için Kullanıcı Sözleşmesi’ni kabul edin.')) return false;
+      if (!accepted('registerPrivacyCheck', 'Kayıt olmak için Gizlilik Politikası’nı kabul edin.')) return false;
       await ensureParse();
       var user = new global.Parse.User();
       // Email is the canonical Parse username so the visible email login works.
