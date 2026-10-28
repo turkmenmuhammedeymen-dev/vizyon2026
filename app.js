@@ -189,7 +189,7 @@
       if (byId('verifyCode')) byId('verifyCode').value = '';
       global.switchTab('verify');
       try {
-        var sent = await cloudRun('resendAccountVerification', { email: email }, 20000);
+        var sent = await cloudRun('resendAccountVerification', { email: email }, 8000);
         if (sent && sent.success) {
           notify('Hesabınız oluşturuldu. E-posta doğrulama kodunu gelen kutunuzdan alın ve doğrulama ekranına girin.', 'success');
         } else {
