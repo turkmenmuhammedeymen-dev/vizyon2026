@@ -30,8 +30,8 @@ jobs:
           const app = fs.readFileSync('app.js', 'utf8');
           const expectedAppId = 'Dr9SODgMburZ54QvC8RnIHc9dbjreozBbKLOpMjX';
           const expectedJsKey = 'dCXRvnEcCcOFvpzVDAV9AAJnYvdrqaP1JFRkJzvv';
-          const appIdAssignments = [...app.matchAll(/APPLICATION_ID\\s*=\\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
-          const keyAssignments = [...app.matchAll(/JAVASCRIPT_KEY\\s*=\\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
+          const appIdAssignments = [...app.matchAll(/APPLICATION_ID\s*=\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
+          const keyAssignments = [...app.matchAll(/JAVASCRIPT_KEY\s*=\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
           if (appIdAssignments.length !== 1 || appIdAssignments[0] !== expectedAppId) {
             throw new Error('app.js must contain exactly one canonical Back4App Application ID.');
           }
@@ -50,7 +50,7 @@ jobs:
               }
               try {
                 const content = fs.readFileSync(full, 'utf8');
-                const calls = /Parse\\.initialize\\s*\\(\\s*["']([^"']+)["']\\s*,\\s*["']([^"']+)["']/g;
+                const calls = /Parse\.initialize\s*\(\s*["']([^"']+)["']\s*,\s*["']([^"']+)["']/g;
                 let match;
                 while ((match = calls.exec(content)) !== null) {
                   if (match[1] !== expectedAppId || match[2] !== expectedJsKey) {
@@ -60,7 +60,7 @@ jobs:
               } catch (_) {}
             }
           }
-          if (mismatches.length) throw new Error(mismatches.join('\\n'));
+          if (mismatches.length) throw new Error(mismatches.join('\n'));
           console.log('Canonical Back4App IDs verified in app.js and every literal Parse.initialize call.');
           NODE
       - name: Check every inline JavaScript block in index.html
