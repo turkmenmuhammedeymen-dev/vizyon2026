@@ -30,8 +30,8 @@ jobs:
           const app = fs.readFileSync('app.js', 'utf8');
           const expectedAppId = 'Dr9SODgMburZ54QvC8RnIHc9dbjreozBbKLOpMjX';
           const expectedJsKey = 'dCXRvnEcCcOFvpzVDAV9AAJnYvdrqaP1JFRkJzvv';
-          const appIdAssignments = [...app.matchAll(/APPLICATION_ID\\s*=\\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
-          const keyAssignments = [...app.matchAll(/JAVASCRIPT_KEY\\s*=\\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
+          const appIdAssignments = [...app.matchAll(/APPLICATION_ID\s*=\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
+          const keyAssignments = [...app.matchAll(/JAVASCRIPT_KEY\s*=\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
           if (appIdAssignments.length !== 1 || appIdAssignments[0] !== expectedAppId) {
             throw new Error('app.js must contain exactly one canonical Back4App Application ID.');
           }
@@ -49,7 +49,7 @@ jobs:
                 if (!['.git', 'node_modules', '.vercel'].includes(entry.name)) roots.push(full);
                 continue;
               }
-              const normalized = full.replace(/\\\\/g, '/').replace(/^\.\\//, '');
+              const normalized = full.replace(/^\.\//, '');
               if (excluded.has(normalized)) continue;
               try {
                 const content = fs.readFileSync(full, 'utf8');
