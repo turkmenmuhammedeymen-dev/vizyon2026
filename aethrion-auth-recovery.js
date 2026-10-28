@@ -97,11 +97,32 @@
   }
 
   async function ensureParseReady() {
-    if (!window.Parse || !window.Parse.User) throw new Error('Kimlik doğrulama bileşeni yüklenemedi. Sayfayı yenileyip tekrar deneyin.');
-    if (window.parseInitialized || window.Parse.applicationId) return true;
-    if (typeof window.initBack4app !== 'function') throw new Error('Sunucu bağlantısı henüz hazır değil.');
-    var result = await window.initBack4app();
-    if (result === false || (!window.parseInitialized && !window.Parse.applicationId)) throw new Error('Back4App bağlantısı başlatılamadı.');
+    var expectedAppId = 'Dr9SODgMburZ54QvC8RnIHc9dbjreozBbKLOpMjX';
+    var expectedServer = 'https://parseapi.back4app.com/';
+    if (!window.Parse || !window.Parse.User || !window.Parse.Cloud) {
+      throw new Error('Kimlik doğrulama bileşeni yüklenemedi. Sayfayı yenileyip tekrar deneyin.');
+    }
+
+    // A truthy applicationId alone is not proof that this app's Parse client is
+    // correctly configured. Never silently continue with another app or server.
+    if (window.Parse.applicationId && window.Parse.applicationId !== expectedAppId) {
+      throw new Error('Back4App App ID uyuşmuyor. AETHRION istemci yapılandırmasını kontrol edin.');
+    }
+
+    if (!window.parseInitialized && typeof window.initBack4app === 'function') {
+      var result = await window.initBack4app();
+      if (result === false) throw new Error('Back4App bağlantısı başlatılamadı.');
+    } else if (!window.Parse.applicationId) {
+      throw new Error('Back4App bağlantısı henüz başlatılmadı.');
+    }
+
+    if (window.Parse.applicationId !== expectedAppId) {
+      throw new Error('Back4App App ID doğrulanamadı. Sayfayı yenileyip tekrar deneyin.');
+    }
+    if (!window.Parse.serverURL || String(window.Parse.serverURL).replace(/\\/$/, '') !== expectedServer.replace(/\\/$/, '')) {
+      window.Parse.serverURL = expectedServer;
+    }
+    window.parseInitialized = true;
     return true;
   }
 
