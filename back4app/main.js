@@ -3768,7 +3768,7 @@ Parse.Cloud.define("facebookLogin", async function (request) {
     var graphUrl = 'https://graph.facebook.com/me?fields=id,name,email,picture&access_token=' + accessToken;
     var res, data;
     try {
-        res = await fetch(graphUrl);
+        res = await _aethrionAuthFetch(graphUrl, 12000);
         data = await res.json();
     } catch (e) {
         throw new Error('Facebook bağlantı hatası: ' + e.message);
