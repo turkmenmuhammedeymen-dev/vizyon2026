@@ -1,3 +1,6 @@
+/* Canonical AETHRION Back4App public client configuration. */
+var APPLICATION_ID = 'Dr9SODgMburZ54QvC8RnIHc9dbjreozBbKLOpMjX';
+var JAVASCRIPT_KEY = 'dCXRvnEcCcOFvpzVDAV9AAJnYvdrqaP1JFRkJzvv';
 /* Extracted inline script 1; source attributes: none */
 // ✅ [v7.10.1] Google Identity Services için hazırlık
   window._googleGISReady = false;
