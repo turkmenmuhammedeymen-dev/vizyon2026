@@ -115,7 +115,7 @@
       await ensureParseReady();
       var task = Promise.resolve().then(function () { return action.fn.call(button || window); });
       var timeout = new Promise(function (_, reject) {
-        timeoutId = window.setTimeout(function () { reject(new Error('İşlem 45 saniyeyi aştı. Bağlantıyı kontrol edip tekrar deneyin.')); }, 45000);
+        timeoutId = window.setTimeout(function () { reject(new Error('Kimlik doğrulama 20 saniye içinde tamamlanmadı. Sunucu yanıt vermedi veya sağlayıcı ayarı eksik. Tekrar deneyin; sorun sürerse Back4App Cloud Code günlüklerini kontrol edin.')); }, 20000);
       });
       var result = await Promise.race([task, timeout]);
       hideProgress(result === true);
