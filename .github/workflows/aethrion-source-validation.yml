@@ -30,17 +30,16 @@ jobs:
           const app = fs.readFileSync('app.js', 'utf8');
           const expectedAppId = 'Dr9SODgMburZ54QvC8RnIHc9dbjreozBbKLOpMjX';
           const expectedJsKey = 'dCXRvnEcCcOFvpzVDAV9AAJnYvdrqaP1JFRkJzvv';
-          const appIdAssignments = [...app.matchAll(/APPLICATION_ID\s*=\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
-          const keyAssignments = [...app.matchAll(/JAVASCRIPT_KEY\s*=\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
+          const appIdAssignments = [...app.matchAll(/APPLICATION_ID\\s*=\\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
+          const keyAssignments = [...app.matchAll(/JAVASCRIPT_KEY\\s*=\\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
           if (appIdAssignments.length !== 1 || appIdAssignments[0] !== expectedAppId) {
             throw new Error('app.js must contain exactly one canonical Back4App Application ID.');
           }
           if (keyAssignments.length !== 1 || keyAssignments[0] !== expectedJsKey) {
             throw new Error('app.js must contain exactly one canonical Back4App JavaScript key.');
           }
-          const excluded = new Set(['app.js', '.github/workflows/aethrion-source-validation.yml']);
           const roots = ['.'];
-          const found = [];
+          const mismatches = [];
           while (roots.length) {
             const current = roots.pop();
             for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
@@ -49,16 +48,20 @@ jobs:
                 if (!['.git', 'node_modules', '.vercel'].includes(entry.name)) roots.push(full);
                 continue;
               }
-              const normalized = full.replace(/^\.\//, '');
-              if (excluded.has(normalized)) continue;
               try {
                 const content = fs.readFileSync(full, 'utf8');
-                if (content.includes(expectedAppId) || content.includes(expectedJsKey)) found.push(normalized);
+                const calls = /Parse\\.initialize\\s*\\(\\s*["']([^"']+)["']\\s*,\\s*["']([^"']+)["']/g;
+                let match;
+                while ((match = calls.exec(content)) !== null) {
+                  if (match[1] !== expectedAppId || match[2] !== expectedJsKey) {
+                    mismatches.push(full + ' has a non-canonical Parse.initialize pair');
+                  }
+                }
               } catch (_) {}
             }
           }
-          if (found.length) throw new Error('Back4App client credentials found outside app.js: ' + found.join(', '));
-          console.log('Canonical Back4App client configuration verified; no duplicate credential literals found.');
+          if (mismatches.length) throw new Error(mismatches.join('\\n'));
+          console.log('Canonical Back4App IDs verified in app.js and every literal Parse.initialize call.');
           NODE
       - name: Check every inline JavaScript block in index.html
         shell: bash
