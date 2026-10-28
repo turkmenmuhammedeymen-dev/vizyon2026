@@ -58,22 +58,40 @@
     return overlay;
   }
 
+  var progressFailsafeTimer = null;
+
   function showProgress(message) {
     var el = ensureOverlay();
-    // Re-append before showing so no later-created modal can paint over progress.
+    if (progressFailsafeTimer) window.clearTimeout(progressFailsafeTimer);
     if (document.body && el.parentNode !== document.body) document.body.appendChild(el);
     el.style.zIndex = '2147483647';
     el.classList.add('is-visible');
+    el.setAttribute('aria-hidden', 'false');
     if (statusNode) statusNode.textContent = message;
     if (progressNode) { progressNode.style.width = '8%'; window.requestAnimationFrame(function () { if (progressNode) progressNode.style.width = '72%'; }); }
+    progressFailsafeTimer = window.setTimeout(function () {
+      if (overlay && overlay.classList.contains('is-visible')) {
+        overlay.classList.remove('is-visible');
+        overlay.setAttribute('aria-hidden', 'true');
+        notify('İşlem zaman aşımına uğradı. Sayfanın geri kalanı kullanılabilir; tekrar deneyin.', 'warning');
+      }
+      progressFailsafeTimer = null;
+    }, 12000);
   }
 
   function hideProgress(success) {
+    if (progressFailsafeTimer) {
+      window.clearTimeout(progressFailsafeTimer);
+      progressFailsafeTimer = null;
+    }
     if (!overlay) return;
     if (success && statusNode) statusNode.textContent = 'İşlem tamamlandı.';
     if (progressNode) progressNode.style.width = success ? '100%' : '8%';
     window.setTimeout(function () {
-      if (overlay) overlay.classList.remove('is-visible');
+      if (overlay) {
+        overlay.classList.remove('is-visible');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
       if (progressNode) progressNode.style.width = '8%';
     }, success ? 220 : 0);
   }
