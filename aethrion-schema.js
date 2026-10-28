@@ -12,6 +12,32 @@
 
   if (typeof document === 'undefined') return;
 
+  // Add a first-party, keyboard-accessible link to the narrated product tour.
+  // This is independent of JSON-LD fallback handling below.
+  function addVideoGuideLink() {
+    function insertLink() {
+      if (document.querySelector('a[href="/aethrion-video-rehberi.html"][data-aethrion-video-guide]')) return;
+      var nav = document.querySelector('.nav-links');
+      if (!nav) return;
+      var item = document.createElement('li');
+      var link = document.createElement('a');
+      link.href = '/aethrion-video-rehberi.html';
+      link.setAttribute('data-aethrion-video-guide', 'true');
+      link.setAttribute('aria-label', 'AETHRION sesli video rehberini izle');
+      link.textContent = '▶ Sesli Video Rehberi';
+      item.appendChild(link);
+      var guide = nav.querySelector('a[href*="bana-ogret.html"]');
+      if (guide && guide.parentNode) guide.parentNode.insertBefore(item, guide.nextSibling);
+      else nav.appendChild(item);
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', insertLink, { once: true });
+    } else {
+      insertLink();
+    }
+  }
+  addVideoGuideLink();
+
   function hasAethrionGraph() {
     var nodes = document.querySelectorAll('script[type="application/ld+json"]');
     for (var i = 0; i < nodes.length; i++) {
