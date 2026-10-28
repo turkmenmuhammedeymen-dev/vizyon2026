@@ -1,3 +1,41 @@
+/* AETHRION Back4App client bootstrap.
+ * These are public Parse client credentials; never place master keys here.
+ * The Parse SDK is loaded by index.html before this bundle.
+ */
+(function initAETHRIONBack4App(global) {
+  'use strict';
+  var APPLICATION_ID = 'Dr9SODgMburZ54QvC8RnIHc9dbjreozBbKLOpMjX';
+  var JAVASCRIPT_KEY = 'dCXRvnEcCcOFvpzVDAV9AAJnYvdrqaP1JFRkJzvv';
+  var SERVER_URL = 'https://parseapi.back4app.com';
+
+  global.initBack4app = async function () {
+    if (!global.Parse || !global.Parse.User) {
+      throw new Error('Back4App SDK yüklenemedi. İnternet bağlantısını ve Parse SDK kaynağını kontrol edin.');
+    }
+    if (global.Parse.applicationId && global.Parse.applicationId !== APPLICATION_ID) {
+      throw new Error('Back4App Application ID uyuşmazlığı. Sayfayı yenileyin ve önbelleği temizleyin.');
+    }
+    if (!global.parseInitialized && !global.Parse.applicationId) {
+      global.Parse.initialize(APPLICATION_ID, JAVASCRIPT_KEY);
+    }
+    global.Parse.serverURL = SERVER_URL;
+    global.parseInitialized = true;
+    return true;
+  };
+
+  // Initialize early; auth recovery also calls initBack4app defensively.
+  try {
+    if (global.Parse && global.Parse.User) {
+      global.Parse.initialize(APPLICATION_ID, JAVASCRIPT_KEY);
+      global.Parse.serverURL = SERVER_URL;
+      global.parseInitialized = true;
+    }
+  } catch (error) {
+    global.parseInitialized = false;
+    console.error('[AETHRION] Back4App bootstrap failed:', error);
+  }
+})(window);
+
 /* AETHRION unified first-party JavaScript bundle. Keep module order unchanged. */
 
 /* ===== aethrion-schema.js ===== */
