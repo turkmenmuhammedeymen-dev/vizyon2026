@@ -2321,7 +2321,7 @@ window.resendAccountVerification = async function () {
     var button = document.querySelector('#formVerify button[onclick="window.resendAccountVerification()"]');
     if (button) { button.disabled = true; button.dataset.originalText = button.textContent; button.textContent = 'Gönderiliyor…'; }
     try {
-        var result = await Parse.Cloud.run('resendAccountVerification', { email: email });
+        var result = await aethrionAuthCallWithTimeout(function () { return Parse.Cloud.run('resendAccountVerification', { email: email }); }, 15000, 'Doğrulama e-posta servisi 15 saniye içinde yanıt vermedi. Tekrar deneyin.');
         if (!result || result.success !== true) throw new Error((result && result.error) || 'Kod gönderilemedi.');
         showNotification('Hesap uygunsa yeni doğrulama kodu gönderildi. Gelen kutusu ve spam klasörünü kontrol edin.', 'success');
     } catch (e) {
