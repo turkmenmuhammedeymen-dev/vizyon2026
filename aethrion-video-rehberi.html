@@ -66,7 +66,7 @@ function sayCurrent(){
  synth.speak(u);syncButtons()
 }
 function syncButtons(){el('playBtn').textContent=playing&&!paused?'▶ Oynatılıyor':'▶ '+(started?'Devam et':'Rehberi oynat');el('pauseBtn').disabled=!playing||paused;el('stopBtn').disabled=!started}
-function play(){if(!synth){el('notice').textContent='Tarayıcında yerleşik sesli anlatım desteği bulunamadı.';return}if(paused){synth.resume();paused=false;playing=true;el('notice').textContent='Anlatım devam ediyor.';syncButtons();return}if(playing)return;playing=true;sayCurrent()}
+function play(){if(!synth){el('notice').textContent='Tarayıcında yerleşik sesli anlatım desteği bulunamadı.';return}if(paused){synth.resume();paused=false;playing=true;el('notice').textContent='Anlatım devam ediyor.';syncButtons();return}if(playing)return;if(started&&index===chapters.length-1){index=0;render()}playing=true;sayCurrent()}
 function pause(){if(synth&&playing&&!paused){synth.pause();paused=true;el('notice').textContent='Anlatım duraklatıldı.';syncButtons()}}
 function stop(){if(synth)synth.cancel();playing=false;paused=false;started=false;index=0;render();el('notice').textContent='Rehber başa alındı. Hazır olduğunda oynat.';syncButtons()}
 function jump(i,autoplay){if(synth)synth.cancel();index=Math.max(0,Math.min(chapters.length-1,i));render();if(autoplay){playing=true;paused=false;sayCurrent()}else{playing=false;paused=false;el('notice').textContent='Bölüm seçildi. Dinlemek için oynat düğmesine bas.';syncButtons()}}
