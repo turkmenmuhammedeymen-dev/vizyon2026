@@ -2452,16 +2452,72 @@ async function handleLogin() {
         }));
 
         closeModal('authModal');
-        await window.showDashboard();
-        if (typeof window.updateCommentUI === 'function') window.updateCommentUI();
-        if (typeof window.loadComments === 'function') await window.loadComments();
-        if (typeof window.updatePointsDisplay === 'function') {
-            window.updatePointsDisplay(user.get('points') || 0);
+
+        // Legacy dashboard wrappers have accumulated over time and some run
+        // asynchronous initializers that never settle. Never let those wrappers
+        // keep a valid authenticated session trapped on the login screen.
+        var dashboardNode = document.getElementById('dashboardArea');
+        var mainSiteNode = document.getElementById('mainSite');
+        var dashboardWork = Promise.resolve().then(function () {
+            return typeof window.showDashboard === 'function' ? window.showDashboard() : false;
+        }).catch(function (dashboardError) {
+            console.warn('[AETHRION Auth] Dashboard initializer failed; authenticated fallback will be used.', dashboardError);
+            return false;
+        });
+        var dashboardTimer;
+        try {
+            await Promise.race([
+                dashboardWork,
+                new Promise(function (resolve) {
+                    dashboardTimer = window.setTimeout(function () { resolve(false); }, 5000);
+                })
+            ]);
+        } finally {
+            if (dashboardTimer) window.clearTimeout(dashboardTimer);
         }
 
-        if (typeof window.refreshUserLimits === 'function') {
-            window.refreshUserLimits();
+        // Guarantee a usable dashboard even if an old showDashboard override
+        // hangs, throws, or forgets to create the container.
+        dashboardNode = document.getElementById('dashboardArea');
+        if (!dashboardNode) {
+            dashboardNode = document.createElement('div');
+            dashboardNode.id = 'dashboardArea';
+            dashboardNode.className = 'dashboard-container';
+            document.body.appendChild(dashboardNode);
         }
+        document.body.classList.add('logged-in-user', 'dashboard-open');
+        document.documentElement.classList.add('dashboard-open');
+        dashboardNode.style.setProperty('display', 'block', 'important');
+        dashboardNode.style.setProperty('visibility', 'visible', 'important');
+        dashboardNode.style.setProperty('opacity', '1', 'important');
+        dashboardNode.style.setProperty('pointer-events', 'auto', 'important');
+        if (mainSiteNode) mainSiteNode.style.setProperty('display', 'none', 'important');
+
+        // Dashboard extras are non-critical; cap their wait independently so
+        // a comments/API failure cannot turn a successful login into a hang.
+        function runPostLoginTask(task, label, timeoutMs) {
+            if (typeof task !== 'function') return Promise.resolve();
+            var timer;
+            return Promise.race([
+                Promise.resolve().then(task).catch(function (err) {
+                    console.warn('[AETHRION Auth] Optional post-login task failed:', label, err);
+                }),
+                new Promise(function (resolve) {
+                    timer = window.setTimeout(function () {
+                        console.warn('[AETHRION Auth] Optional post-login task timed out:', label);
+                        resolve();
+                    }, timeoutMs || 2500);
+                })
+            ]).finally(function () { if (timer) window.clearTimeout(timer); });
+        }
+        await Promise.all([
+            runPostLoginTask(window.updateCommentUI, 'updateCommentUI', 2000),
+            runPostLoginTask(window.loadComments, 'loadComments', 2500),
+            runPostLoginTask(function () {
+                if (typeof window.updatePointsDisplay === 'function') window.updatePointsDisplay(user.get('points') || 0);
+                if (typeof window.refreshUserLimits === 'function') window.refreshUserLimits();
+            }, 'refresh dashboard limits', 2000)
+        ]);
 
         if (user.get('parent_mode')) {
             var pb = document.getElementById('parentSettingsBtn');
