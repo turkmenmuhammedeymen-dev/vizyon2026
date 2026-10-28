@@ -292,6 +292,26 @@ Parse.Cloud.job("cleanupRateLimitAttempts", async function (request) {
     }
 });
 
+// Auth-provider network guard: never leave login requests waiting indefinitely.
+async function _aethrionAuthFetch(url, timeoutMs) {
+    var timeout = Math.max(3000, Math.min(20000, Number(timeoutMs) || 12000));
+    var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timer;
+    try {
+        return await Promise.race([
+            fetch(url, controller ? { signal: controller.signal } : {}),
+            new Promise(function (_, reject) {
+                timer = setTimeout(function () {
+                    try { if (controller) controller.abort(); } catch (e) {}
+                    reject(new Error('Kimlik sağlayıcısı zaman aşımına uğradı.'));
+                }, timeout);
+            })
+        ]);
+    } finally {
+        if (timer) clearTimeout(timer);
+    }
+}
+
 console.log('✅ Cloud Code başarıyla yüklendi! (v7.10.0 Back4App)');
 
 // ================================================================
@@ -3718,7 +3738,7 @@ Parse.Cloud.define("verifyFacebookToken", async function (request) {
 
     try {
         var graphUrl = 'https://graph.facebook.com/me?fields=id,name,email,picture&access_token=' + accessToken;
-        var res = await fetch(graphUrl);
+        var res = await _aethrionAuthFetch(graphUrl, 12000);
         var data = await res.json();
         if (data.error) return { success: false, error: 'Facebook token doğrulanamadı: ' + data.error.message };
         if (data.id !== userID) return { success: false, error: 'Facebook ID uyuşmuyor!' };
@@ -9910,7 +9930,7 @@ Parse.Cloud.define("verifyGoogleToken", async function (request) {
     // Google ID token is verified server-side; never trust email/name/sub sent by the browser.
     var tokenInfo;
     try {
-        var response = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(idToken));
+        var response = await _aethrionAuthFetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(idToken), 12000);
         if (!response || !response.ok) throw new Error('Google doğrulama servisi yanıt vermedi.');
         tokenInfo = await response.json();
     } catch (e) {
