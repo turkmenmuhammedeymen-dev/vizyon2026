@@ -57,7 +57,14 @@
       } catch (error) {
         console.warn('[AETHRION Auth Recovery] Dashboard initializer failed; using authenticated fallback.', String(error && error.message || error).slice(0, 180));
       }
-      if (showAuthenticatedDashboard()) return true;
+      if (showAuthenticatedDashboard()) {
+        // Legacy timers/guards can run after the initial dashboard promise settles.
+        // Re-assert the authenticated view briefly while those old initializers drain.
+        [250, 800, 1600, 3000, 6000].forEach(function (delay) {
+          window.setTimeout(showAuthenticatedDashboard, delay);
+        });
+        return true;
+      }
       hideBusyLayers();
       return false;
     };
