@@ -58,17 +58,20 @@
     if (typeof global.showNotification === 'function' && !global.showNotification.__aeCoreFallback) {
       try { global.showNotification(message, type || 'info'); return; } catch (e) {}
     }
-    var host = byId('notificationModal');
-    if (host) {
-      host.textContent = String(message || '');
-      host.style.display = 'block';
-      host.setAttribute('role', 'status');
-      global.setTimeout(function () { if (host) host.style.display = 'none'; }, 6500);
-    } else if (type === 'error') {
-      global.alert(String(message || 'İşlem tamamlanamadı.'));
-    } else {
-      console.info('[AETHRION]', String(message || ''));
+    var toast = byId('aeCoreAuthToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'aeCoreAuthToast';
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      toast.style.cssText = 'position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:2147483646;width:min(560px,calc(100vw - 28px));padding:14px 18px;border-radius:14px;border:1px solid rgba(212,175,55,.45);background:#0b1220;color:#f7f9fc;box-shadow:0 18px 55px rgba(0,0,0,.35);font:500 14px/1.5 Inter,system-ui,sans-serif;display:none;';
+      document.body.appendChild(toast);
     }
+    toast.textContent = String(message || '');
+    toast.style.display = 'block';
+    toast.style.borderColor = type === 'error' ? '#ef4444' : (type === 'success' ? '#22c55e' : 'rgba(212,175,55,.45)');
+    if (toast.__aeHideTimer) global.clearTimeout(toast.__aeHideTimer);
+    toast.__aeHideTimer = global.setTimeout(function () { toast.style.display = 'none'; }, 6500);
   }
   if (typeof global.showNotification !== 'function') {
     var fallbackNotify = function (message, type) { notify(message, type); };
@@ -128,13 +131,15 @@
     if (!global.Parse.applicationId) throw new Error('Back4App bağlantısı başlatılamadı.');
   }
   async function cloudRun(name, params, timeoutMs) {
+    var timer;
     var request = global.Parse.Cloud.run(name, params || {});
     var timeout = new Promise(function (_, reject) {
-      global.setTimeout(function () {
+      timer = global.setTimeout(function () {
         reject(new Error('Sunucu isteği zaman aşımına uğradı. Biraz sonra tekrar deneyin.'));
       }, timeoutMs || 18000);
     });
-    return await Promise.race([request, timeout]);
+    try { return await Promise.race([request, timeout]); }
+    finally { if (timer) global.clearTimeout(timer); }
   }
   function accepted(id, message) {
     var el = byId(id);
