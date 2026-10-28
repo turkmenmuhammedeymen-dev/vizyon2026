@@ -3435,7 +3435,7 @@ def root():
 <!-- AETHRION auth click guard: visible feedback and safe async error handling -->
 
 
-    <script src="app.js"></script>
+    <script src="app.js?v=20261028-clickfix-2"></script>
     <!-- Independent splash failsafe: never allow a failed app.js boot to block every page control. -->
     <script>
     (function () {
@@ -3448,12 +3448,36 @@ def root():
         splash.style.setProperty('display', 'none', 'important');
         splash.setAttribute('aria-hidden', 'true');
       }
-      window.setTimeout(releaseAethrionSplash, 4200);
+      // Release any stale full-screen layer even when cached/older app code is running.
+      function releaseBlockingLayers() {
+        releaseAethrionSplash();
+        var progress = document.getElementById('aeAuthProgressOverlay');
+        if (progress && progress.classList.contains('is-visible')) {
+          progress.classList.remove('is-visible');
+          progress.style.setProperty('pointer-events', 'none', 'important');
+          progress.setAttribute('aria-hidden', 'true');
+        }
+      }
+      window.setTimeout(releaseBlockingLayers, 3500);
+      window.setTimeout(releaseBlockingLayers, 6000);
+      window.setTimeout(releaseBlockingLayers, 12000);
+      document.addEventListener('pointerdown', function (event) {
+        var splash = document.getElementById('splashScreen');
+        if (splash && (event.target === splash || splash.contains(event.target))) {
+          releaseAethrionSplash();
+        }
+        var progress = document.getElementById('aeAuthProgressOverlay');
+        if (progress && progress.classList.contains('is-visible')) {
+          progress.classList.remove('is-visible');
+          progress.style.setProperty('pointer-events', 'none', 'important');
+          progress.setAttribute('aria-hidden', 'true');
+        }
+      }, true);
       window.addEventListener('error', function () {
-        window.setTimeout(releaseAethrionSplash, 500);
+        window.setTimeout(releaseBlockingLayers, 250);
       });
       window.addEventListener('unhandledrejection', function () {
-        window.setTimeout(releaseAethrionSplash, 500);
+        window.setTimeout(releaseBlockingLayers, 250);
       });
     })();
     </script>
