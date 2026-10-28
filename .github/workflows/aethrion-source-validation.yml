@@ -19,6 +19,8 @@ jobs:
           node-version: '20'
       - name: Check Back4App Cloud Code syntax
         run: node --check back4app/main.js
+      - name: Check unified frontend JavaScript syntax
+        run: node --check app.js
       - name: Check every inline JavaScript block in index.html
         shell: bash
         run: |
@@ -60,8 +62,22 @@ jobs:
             'id="lEmail"', 'id="lPass"', 'id="loginTermsCheck"', 'id="loginPrivacyCheck"',
             'window.__aethrionSafeAuthAction(\'register\', this)',
             'window.__aethrionSafeAuthAction(\'login\', this)',
-            'window.handleRegister = handleRegister',
-            'window.handleLogin = handleLogin'
+          ];
+          const app = fs.readFileSync('app.js', 'utf8');
+          const requiredApp = [
+            'global.handleRegister = async function',
+            'global.handleLogin = async function',
+            'global.verifyAccount = async function',
+            'global.resendAccountVerification = async function',
+            'resendAccountVerification',
+            'verifyUser'
+          ];
+          const missingApp = requiredApp.filter(value => !app.includes(value));
+          if (missingApp.length) {
+            console.error('Missing frontend authentication handlers: ' + missingApp.join(', '));
+            process.exit(1);
+          }
+          const missing = required.filter(value => !html.includes(value));
           ];
           const missing = required.filter(value => !html.includes(value));
           if (missing.length) {
