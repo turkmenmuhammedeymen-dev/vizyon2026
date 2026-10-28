@@ -1952,7 +1952,23 @@ window.handleGoogleLoginResponse = async function (response) {
         }));
 
         closeModal('authModal');
-        await window.showDashboard();
+        // The legacy app wraps showDashboard in several independent initializers.
+        // Bound that chain so a never-settling initializer cannot block a valid login.
+        var dashboardAttempt = null;
+        try {
+            dashboardAttempt = Promise.resolve().then(function () { return window.showDashboard(); });
+            var dashboardTimer;
+            try {
+                await Promise.race([
+                    dashboardAttempt,
+                    new Promise(function (resolve) { dashboardTimer = window.setTimeout(resolve, 5000); })
+                ]);
+            } finally {
+                if (dashboardTimer) window.clearTimeout(dashboardTimer);
+            }
+        } catch (dashboardError) {
+            console.warn('[AETHRION Auth] Dashboard initializer failed; applying authenticated fallback.', dashboardError);
+        }
         // Reconcile legacy dashboard guards/overrides after a confirmed Parse session.
         // A successful login must never silently return to the landing page.
         var authDashboard = document.getElementById('dashboardArea');
