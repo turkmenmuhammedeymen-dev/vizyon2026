@@ -12,14 +12,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - name: Check JavaScript syntax
+      - name: Check JavaScript syntax across the repository
         run: |
-          node --check aethrion-jarvis.js
-          node --check aethrion-identity.js
-          node --check aethrion-security-guard.js
-          node --check aethrion-audit.js
-          node --check aethrion-diagnostics.js
-          node --check back4app/main.js
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            echo "Checking $file"
+            node --check "$file"
+          done < <(find . -type f -name '*.js' -not -path './.git/*' -print0)
       - name: Check required JARVIS and policy files
         run: |
           test -s aethrion-jarvis.html
