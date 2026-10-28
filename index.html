@@ -25025,7 +25025,7 @@ window.handleGoogleLoginResponse = async function (response) {
         var urlRefCode = typeof window.getReferralCodeFromUrl === 'function'
             ? window.getReferralCodeFromUrl() : '';
 
-        var result = await Parse.Cloud.run('verifyGoogleToken', {
+        var result = await aethrionAuthCallWithTimeout(function () { return Parse.Cloud.run('verifyGoogleToken', {
             idToken: response.credential,
             userId: googleUserId,
             email: googleEmail,
@@ -25033,7 +25033,7 @@ window.handleGoogleLoginResponse = async function (response) {
             referralCode: urlRefCode,
             termsAccepted: true,
             privacyAccepted: true
-        });
+        }); }, 18000, 'Google giriş sunucusu 18 saniye içinde yanıt vermedi. Back4App Cloud Code ayarlarını kontrol edin.');
 
         if (!result || !result.success) {
             throw new Error((result && result.error) || 'Google girişi başarısız.');
@@ -25195,6 +25195,20 @@ window.confirmSocialAuthTerms = function () {
 // ============================================================
 // [AETHRION] KAYIT — Checkbox zorunluluğu + 28 model
 // ============================================================
+async function aethrionAuthCallWithTimeout(call, ms, message) {
+    var timer;
+    try {
+        return await Promise.race([
+            Promise.resolve().then(call),
+            new Promise(function (_, reject) {
+                timer = window.setTimeout(function () { reject(new Error(message || 'Kimlik doğrulama sunucusu zaman aşımına uğradı.')); }, Math.max(5000, Math.min(20000, Number(ms) || 15000)));
+            })
+        ]);
+    } finally {
+        if (timer) window.clearTimeout(timer);
+    }
+}
+
 async function handleRegister() {
     var nameInput = document.getElementById('rName');
     var emailInput = document.getElementById('rEmail');
@@ -25408,10 +25422,10 @@ async function verifyAccount() {
     }
 
     try {
-        var result = await Parse.Cloud.run('verifyUser', {
+        var result = await aethrionAuthCallWithTimeout(function () { return Parse.Cloud.run('verifyUser', {
             email: email,
             code: code
-        });
+        }); }, 15000, 'Doğrulama sunucusu 15 saniye içinde yanıt vermedi. Tekrar deneyin.');
 
         if (result.success) {
             showNotification('✅ Hesap doğrulandı! Giriş yapabilirsiniz.', 'success');
@@ -25459,10 +25473,10 @@ async function handleLogin() {
 
     try {
         window.__aethrionLastAuthError = '';
-        var authResult = await Parse.Cloud.run('aethrionLoginWithEmail', {
+        var authResult = await aethrionAuthCallWithTimeout(function () { return Parse.Cloud.run('aethrionLoginWithEmail', {
             email: email,
             password: pass
-        });
+        }); }, 18000, 'Giriş sunucusu 18 saniye içinde yanıt vermedi. Back4App Cloud Code durumunu kontrol edip tekrar deneyin.');
         if (!authResult || authResult.success !== true) {
             if (authResult && authResult.code === 'EMAIL_NOT_VERIFIED') {
                 window.__aethrionLastAuthError = authResult.error || 'Hesap e-posta doğrulaması bekliyor.';
@@ -25625,13 +25639,13 @@ window.loginWithFacebook = async function () {
         var urlRefCode = typeof window.getReferralCodeFromUrl === 'function'
             ? window.getReferralCodeFromUrl() : null;
 
-        var result = await Parse.Cloud.run('facebookLogin', {
+        var result = await aethrionAuthCallWithTimeout(function () { return Parse.Cloud.run('facebookLogin', {
             accessToken: accessToken,
             userID: userID,
             referralCode: urlRefCode || '',
             termsAccepted: true,
             privacyAccepted: true
-        });
+        }); }, 18000, 'Facebook giriş sunucusu 18 saniye içinde yanıt vermedi. Back4App Cloud Code ayarlarını kontrol edin.');
 
         if (!result || !result.success) {
             throw new Error(result && result.error ? result.error : 'Facebook girişi başarısız oldu.');
