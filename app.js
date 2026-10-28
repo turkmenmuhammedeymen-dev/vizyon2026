@@ -27289,3 +27289,29 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
     wrapped.__aethrionBusyWrapped = true; window[name] = wrapped;
   });
 })();
+
+
+/* Compatibility bridge: keep legacy auth implementations reachable to the split auth module. */
+(function (global) {
+  'use strict';
+  var legacyRegister = global.handleRegister;
+  var legacyLogin = global.handleLogin;
+  var legacyVerify = global.verifyAccount;
+  var legacyResend = global.resendAccountVerification;
+  global.handleRegister = async function () {
+    if (typeof legacyRegister !== 'function') throw new Error('Kayıt işlevi yüklenemedi.');
+    return legacyRegister.apply(this, arguments);
+  };
+  global.handleLogin = async function () {
+    if (typeof legacyLogin !== 'function') throw new Error('Giriş işlevi yüklenemedi.');
+    return legacyLogin.apply(this, arguments);
+  };
+  global.verifyAccount = async function () {
+    if (typeof legacyVerify !== 'function') throw new Error('Doğrulama işlevi yüklenemedi.');
+    return legacyVerify.apply(this, arguments);
+  };
+  global.resendAccountVerification = async function () {
+    if (typeof legacyResend !== 'function') throw new Error('Doğrulama kodu gönderme işlevi yüklenemedi.');
+    return legacyResend.apply(this, arguments);
+  };
+})(window);
