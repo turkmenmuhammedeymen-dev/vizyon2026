@@ -27354,12 +27354,25 @@ Body: { "prompt": "Merhaba", "lang": "tr" }</pre>
     var oldText = button ? button.textContent : '';
     if (button) { button.disabled=true; button.setAttribute('aria-busy','true'); }
     showBusy(kind === 'register' ? 'Hesabınız güvenli şekilde oluşturuluyor…' : 'E-posta ve şifre doğrulanıyor…');
-    try { return (await Promise.resolve(handler())) !== false; }
+    var handlerTimer;
+    try {
+      var handlerTask = Promise.resolve().then(function () { return handler(); });
+      var handlerResult = await Promise.race([
+        handlerTask,
+        new Promise(function (_, reject) {
+          handlerTimer = setTimeout(function () {
+            reject(new Error('Kimlik doğrulama 32 saniye içinde tamamlanmadı. İşlem serbest bırakıldı; bağlantıyı ve Back4App Cloud Code durumunu kontrol edin.'));
+          }, 32000);
+        })
+      ]);
+      return handlerResult !== false;
+    }
     catch (error) {
       console.error('[AETHRION Auth UI]',error);
       if (typeof window.showNotification === 'function') window.showNotification('İşlem tamamlanamadı: '+(error&&error.message||'Bilinmeyen hata'),'error');
       return false;
     } finally {
+      if (handlerTimer) clearTimeout(handlerTimer);
       hideBusy();
       if (button) { button.disabled=false; button.removeAttribute('aria-busy'); button.textContent=oldText; }
     }
