@@ -70,6 +70,16 @@
       }
     }
     if (kind === 'ai' && typeof w.refreshAethrionAIQuota === 'function') w.refreshAethrionAIQuota();
+    var chat = node('vzChat');
+    if (chat && chat.children.length <= 1) {
+      var first = chat.querySelector('.vz-msg.bot');
+      if (first) {
+        first.innerHTML = kind === 'agents'
+          ? '<div class="vz-role">✨ AETHRION AGENTS · 28 MODEL</div><div class="vz-message-body">AETHRION Agents alanına hoş geldin. Ajan araçları ve ekran izinleri için önce sorumluluk onayını tamamla.</div>'
+          : '<div class="vz-role">✨ AETHRION AI · 28 MODEL</div><div class="vz-message-body">Merhaba! 13 Ollama + 7 NVIDIA NIM + 8 bulut API olmak üzere 28 modelle çalışan AETHRION AI sohbetine hoş geldin. Ücretsiz kullanım hakkı günlük 24 mesajdır. Mesajını yazıp Gönder düğmesine basabilirsin.</div>';
+      }
+    }
+    if (kind === 'ai' && typeof w.refreshAethrionAIQuota === 'function') w.refreshAethrionAIQuota();
     var input = node('vzInput');
     if (input) w.setTimeout(function () { try { input.focus({ preventScroll: true }); } catch (_) {} }, 80);
     return true;
