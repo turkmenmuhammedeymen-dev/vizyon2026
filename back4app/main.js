@@ -2387,7 +2387,7 @@ Parse.Cloud.define("getAethrionAIQuota", async function (request) {
     var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
     var role = user ? String(user.get('role') || 'user').toLowerCase() : 'visitor';
     var plan = user ? String(user.get('plan') || 'free').toLowerCase() : 'free';
-    var unlimited = ['admin', 'founder', 'beta', 'moderator'].indexOf(role) !== -1 || plan === 'team';
+    var unlimited = ['admin', 'founder', 'moderator'].indexOf(role) !== -1 || plan === 'team';
     var limit = unlimited ? 'Sınırsız' : (plan === 'pro' ? 2000 : 24);
     var identity = user ? String(user.get('email') || user.id) : String(request.ip || request.installationId || '');
     if (!identity) return { success: false, error: 'Kullanım hakkı kontrol edilemedi.' };
@@ -4226,7 +4226,7 @@ Parse.Cloud.define("useQuery", async function (request) {
         }
         var role = user.get('role');
         var plan = user.get('plan');
-        if (['admin', 'founder', 'beta', 'moderator'].indexOf(role) !== -1 || plan === 'team') limit = Infinity;
+        if (['admin', 'founder', 'moderator'].indexOf(role) !== -1 || plan === 'team') limit = Infinity;
         else if (plan === 'pro') limit = 2000;
         else limit = 100;
 
