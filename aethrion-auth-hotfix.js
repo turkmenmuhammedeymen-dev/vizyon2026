@@ -197,7 +197,7 @@
         }
       }
       if(!user)throw cloudError||new Error('Sunucu oturum oluşturmadı.');
-      if(user.get('isVerified')===false&&user.get('emailVerified')!==true){
+      if(user.get('isVerified')===false&&user.get('emailVerified')!==true&&!!user.get('verificationCode')){
         try{await window.Parse.User.logOut()}catch(_){}
         authTab('verify');if(field('verifyEmail'))field('verifyEmail').value=email;
         notify('Hesap henüz doğrulanmamış. E-postandaki kodu gir veya yeni kod iste.','warning');return false
