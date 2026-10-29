@@ -470,15 +470,22 @@ function updateFriendlyRoutes() {
   });
 }
 function ensurePolicyLinks() {
-  var footer = document.querySelector('footer,.site-footer,.footer');
-  if (!footer || footer.querySelector('[data-ae-policy-nav]')) return;
-  var existing = footer.querySelectorAll('a[href*="gizlilik"],a[href*="kullanici-sozlesmesi"],a[href*="kvkk"],a[href*="api-kullanim"]');
-  if (existing.length >= 4) return;
-  var nav = document.createElement('nav');
-  nav.className = 'ae-legal-nav';
-  nav.setAttribute('aria-label', 'Yasal ve güvenlik belgeleri');
-  nav.setAttribute('data-ae-policy-nav', '');
-  nav.innerHTML =
+  /* Never use the generic .footer class: it also appears on cards/modals and can place legal links in the wrong UI. */
+  var footer = document.querySelector('#mainSite > footer') ||
+    document.querySelector('#mainSite footer') ||
+    document.querySelector('footer.site-footer, .site-footer') ||
+    document.querySelector('footer');
+  if (!footer) return;
+  var nav = document.querySelector('[data-ae-policy-nav]');
+  if (nav && nav.parentElement !== footer) footer.appendChild(nav);
+  if (!nav) {
+    var existing = footer.querySelectorAll('a[href*="gizlilik"],a[href*="kullanici-sozlesmesi"],a[href*="kvkk"],a[href*="api-kullanim"]');
+    if (existing.length >= 4) return;
+    nav = document.createElement('nav');
+    nav.className = 'ae-legal-nav';
+    nav.setAttribute('aria-label', 'Yasal ve güvenlik belgeleri');
+    nav.setAttribute('data-ae-policy-nav', '');
+    nav.innerHTML =
     '<div><strong>Yasal ve güvenlik belgeleri</strong><small>Gizlilik, hesap, API ve hizmet koşullarını inceleyin.</small></div>' +
     '<div class="ae-legal-links">' +
     '<a href="/gizlilik.html">Gizlilik Politikası</a>' +
@@ -499,7 +506,19 @@ function ensurePolicyLinks() {
     '<a href="/sorumlu-aciklama.html">Sorumlu Açıklama</a>' +
     '<a href="/iletisim-ve-basvuru.html">Destek ve Başvuru</a>' +
     '</div>';
-  footer.appendChild(nav);
+    footer.appendChild(nav);
+  }
+  /* Keep the legal navigation in normal document flow at the actual page footer. */
+  nav.style.setProperty('position', 'static', 'important');
+  nav.style.setProperty('inset', 'auto', 'important');
+  nav.style.setProperty('top', 'auto', 'important');
+  nav.style.setProperty('right', 'auto', 'important');
+  nav.style.setProperty('bottom', 'auto', 'important');
+  nav.style.setProperty('left', 'auto', 'important');
+  nav.style.setProperty('transform', 'none', 'important');
+  nav.style.setProperty('z-index', 'auto', 'important');
+  nav.style.setProperty('width', '100%', 'important');
+  nav.style.setProperty('pointer-events', 'auto', 'important');
 }
 function enableScrollMotion() {
   if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -916,6 +935,11 @@ function ensureDrawer() {
  if (!backdrop) {
   backdrop = document.createElement('div');
   backdrop.id = 'aethrionExperienceBackdrop';
+  backdrop.style.setProperty('position', 'fixed', 'important');
+  backdrop.style.setProperty('inset', '0', 'important');
+  backdrop.style.setProperty('z-index', '2147481000', 'important');
+  backdrop.style.setProperty('display', 'none', 'important');
+  backdrop.style.setProperty('pointer-events', 'none', 'important');
   backdrop.addEventListener('click', closeDrawer);
   document.body.appendChild(backdrop);
  }
@@ -925,6 +949,20 @@ function ensureDrawer() {
   drawer.id = 'aethrionExperienceDrawer';
   drawer.setAttribute('aria-label', 'AETHRION özellikler menüsü');
   drawer.setAttribute('aria-hidden', 'true');
+  drawer.style.setProperty('position', 'fixed', 'important');
+  drawer.style.setProperty('inset', '0 0 0 auto', 'important');
+  drawer.style.setProperty('z-index', '2147481001', 'important');
+  drawer.style.setProperty('display', 'none', 'important');
+  drawer.style.setProperty('flex-direction', 'column', 'important');
+  drawer.style.setProperty('width', 'min(460px, 100vw)', 'important');
+  drawer.style.setProperty('height', '100dvh', 'important');
+  drawer.style.setProperty('max-height', '100dvh', 'important');
+  drawer.style.setProperty('overflow', 'hidden', 'important');
+  drawer.style.setProperty('box-sizing', 'border-box', 'important');
+  drawer.style.setProperty('background', '#fff', 'important');
+  drawer.style.setProperty('transform', 'translate3d(105%,0,0)', 'important');
+  drawer.style.setProperty('visibility', 'hidden', 'important');
+  drawer.style.setProperty('pointer-events', 'none', 'important');
   drawer.innerHTML =
    '<div class="aed-head"><div class="aed-brand"><div class="aed-mark">A</div><div><h2 class="aed-title">AETHRION</h2><span class="aed-subtitle">Özellikler ve çalışma alanları</span></div></div><button class="aed-close" type="button" aria-label="Menüyü kapat">×</button></div>' +
    '<div class="aed-list" id="aedList"></div><div class="aed-foot">Seçilen özellik, kullanılabilir uygulama paneline veya ilgili sayfasına yönlendirir. Erişim bazı özelliklerde oturum ya da plana bağlı olabilir.</div>';
@@ -955,6 +993,14 @@ function renderDrawerItems(query) {
 function openDrawer() {
  var drawer = ensureDrawer(), backdrop = qs('#aethrionExperienceBackdrop');
  renderDrawerItems('');
+ drawer.style.setProperty('display', 'flex', 'important');
+ drawer.style.setProperty('visibility', 'visible', 'important');
+ drawer.style.setProperty('pointer-events', 'auto', 'important');
+ drawer.style.setProperty('transform', 'translate3d(0,0,0)', 'important');
+ backdrop.style.setProperty('display', 'block', 'important');
+ backdrop.style.setProperty('visibility', 'visible', 'important');
+ backdrop.style.setProperty('pointer-events', 'auto', 'important');
+ backdrop.style.setProperty('opacity', '1', 'important');
  drawer.classList.add('open');
  drawer.setAttribute('aria-hidden', 'false');
  backdrop.classList.add('show');
@@ -962,8 +1008,21 @@ function openDrawer() {
 }
 function closeDrawer() {
  var drawer = qs('#aethrionExperienceDrawer'), backdrop = qs('#aethrionExperienceBackdrop');
- if (drawer) { drawer.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true'); }
- if (backdrop) backdrop.classList.remove('show');
+ if (drawer) {
+  drawer.classList.remove('open');
+  drawer.setAttribute('aria-hidden', 'true');
+  drawer.style.setProperty('display', 'none', 'important');
+  drawer.style.setProperty('visibility', 'hidden', 'important');
+  drawer.style.setProperty('pointer-events', 'none', 'important');
+  drawer.style.setProperty('transform', 'translate3d(105%,0,0)', 'important');
+ }
+ if (backdrop) {
+  backdrop.classList.remove('show');
+  backdrop.style.setProperty('display', 'none', 'important');
+  backdrop.style.setProperty('visibility', 'hidden', 'important');
+  backdrop.style.setProperty('pointer-events', 'none', 'important');
+  backdrop.style.setProperty('opacity', '0', 'important');
+ }
  if (document.body) document.body.classList.remove('aethrion-experience-menu-open');
 }
 function ensureTrigger() {
@@ -1253,7 +1312,7 @@ function applyOverrides() {
  window.renderWelcome = showWelcome;
  window.goHome = showWelcome;
  wrapDashboard();
- ensureDrawer();
+ /* Create the feature drawer only when the user opens it; do not append UI to the homepage at boot. */
  ensureTrigger();
 }
 function observeSession() {
