@@ -601,3 +601,96 @@ button,input,select,textarea{font:inherit}
  :where(#authModal .modal-header,#socialAuthTermsModal .modal-header){padding:18px!important}
  :where(#authModal .modal-body,#socialAuthTermsModal .modal-body){padding:18px!important}
 }
+
+
+/* AETHRION interaction/layout repair — the feature drawer must be an actual hidden overlay,
+   not a normal <aside> appended at the end of the homepage. */
+#aethrionExperienceBackdrop {
+  position:fixed!important;
+  inset:0!important;
+  z-index:2147481000!important;
+  display:block!important;
+  opacity:0!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+  transition:opacity .22s ease,visibility .22s ease!important;
+}
+#aethrionExperienceBackdrop.show {
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+#aethrionExperienceDrawer {
+  position:fixed!important;
+  inset:0 0 0 auto!important;
+  z-index:2147481001!important;
+  display:flex!important;
+  flex-direction:column!important;
+  width:min(460px,100vw)!important;
+  height:100dvh!important;
+  max-height:100dvh!important;
+  box-sizing:border-box!important;
+  padding:0!important;
+  margin:0!important;
+  overflow:hidden!important;
+  transform:translate3d(105%,0,0)!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+  transition:transform .24s ease,visibility .24s ease!important;
+}
+#aethrionExperienceDrawer.open {
+  transform:translate3d(0,0,0)!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+#aethrionExperienceDrawer .aed-head {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  flex:0 0 auto!important;
+  gap:12px!important;
+  padding:18px 20px!important;
+}
+#aethrionExperienceDrawer .aed-list {
+  display:block!important;
+  flex:1 1 auto!important;
+  min-height:0!important;
+  overflow:auto!important;
+  overscroll-behavior:contain!important;
+  padding:12px 16px!important;
+}
+#aethrionExperienceDrawer .aed-foot {
+  position:static!important;
+  inset:auto!important;
+  flex:0 0 auto!important;
+  padding:12px 18px calc(12px + env(safe-area-inset-bottom))!important;
+  border-top:1px solid #e2e9f1!important;
+  background:#f8fafc!important;
+  font-size:11px!important;
+  line-height:1.55!important;
+}
+#aethrionExperienceDrawer .aed-close,
+#aethrionExperienceDrawer .aed-item {
+  cursor:pointer!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
+.ae-legal-nav {
+  position:static!important;
+  inset:auto!important;
+  z-index:auto!important;
+  transform:none!important;
+  width:min(1380px,100%)!important;
+  margin:20px auto 0!important;
+  clear:both!important;
+  pointer-events:auto!important;
+}
+.ae-legal-nav a {
+  position:static!important;
+  pointer-events:auto!important;
+}
+@media(max-width:600px) {
+  #aethrionExperienceDrawer { width:100vw!important; }
+  #aethrionExperienceDrawer .aed-head { padding:15px 16px!important; }
+  #aethrionExperienceDrawer .aed-list { padding:10px 12px!important; }
+}
