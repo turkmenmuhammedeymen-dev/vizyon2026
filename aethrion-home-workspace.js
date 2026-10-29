@@ -1,121 +1,136 @@
-/* AETHRION in-page workspace launcher.
- * Keeps the home page mounted and opens workspace routes in an accessible full-screen shell.
+/* AETHRION workspace router.
+ * The homepage's legacy 28-model chat panel is the actual chat UI; do not route
+ * the primary AI button to the marketing/catalog page.
  */
 (function (w, d) {
   'use strict';
   if (w.__aethrionWorkspaceLauncher) return;
   w.__aethrionWorkspaceLauncher = true;
-  var overlay = null, frame = null, previousFocus = null;
+  var panel = null;
+  var priorOverflow = '';
 
-  var routes = {
-    ai: { url: '/aethrion-ai.html', title: 'AETHRION AI', subtitle: 'Intelligence Without Limits.' },
-    coach: { url: '/aethrion-assistant.html', title: 'AETHRION Coach', subtitle: 'Kişisel çalışma alanın' },
-    agents: { url: '/aethrion-assistant.html', title: 'AETHRION Agents', subtitle: 'Akıllı görev ve üretim alanı' }
-  };
-
-  function build() {
-    if (overlay && overlay.isConnected) return overlay;
+  function node(id) { return d.getElementById(id); }
+  function notify(message, type) {
+    if (typeof w.showNotification === 'function') {
+      try { w.showNotification(message, type || 'warning'); return; } catch (_) {}
+    }
+    console.warn('[AETHRION workspace]', message);
+  }
+  function installStyles() {
+    if (node('aeWorkspaceLauncherStyles')) return;
     var style = d.createElement('style');
     style.id = 'aeWorkspaceLauncherStyles';
     style.textContent = [
-      '#aeWorkspaceOverlay{position:fixed;inset:0;z-index:2147483000;display:block;background:#060913;color:#f7f8fc;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,visibility .18s ease;font-family:Inter,system-ui,sans-serif}',
-      '#aeWorkspaceOverlay.ae-open{opacity:1;visibility:visible;pointer-events:auto}',
-      '#aeWorkspaceFrame{position:absolute;inset:0;display:block;width:100%;height:100%;min-height:100%;border:0;background:#080d18}',
-      '#aeWorkspaceClose{position:absolute;z-index:4;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 15px;border:1px solid rgba(226,190,91,.55);border-radius:13px;background:rgba(8,13,24,.88);backdrop-filter:blur(16px);color:#f8fafc;font:700 13px Inter,system-ui,sans-serif;cursor:pointer;touch-action:manipulation;box-shadow:0 8px 28px rgba(0,0,0,.28)}',
-      '#aeWorkspaceClose:hover{background:rgba(226,190,91,.16);border-color:#e2be5b}',
-      '#aeWorkspaceLoading{position:absolute;z-index:2;inset:0;display:grid;place-content:center;justify-items:center;gap:14px;pointer-events:none;background:radial-gradient(ellipse at 50% 30%,rgba(226,190,91,.08),transparent 55%),#080d18;color:#c7d0df;font-size:13px;letter-spacing:.08em;transition:opacity .25s}',
-      '#aeWorkspaceLoading:before{content:"";width:27px;height:27px;border:2px solid rgba(226,190,91,.22);border-top-color:#e2be5b;border-radius:50%;animation:aeWorkspaceSpin .8s linear infinite}',
-      '@keyframes aeWorkspaceSpin{to{transform:rotate(360deg)}}',
-      '@media(max-width:600px){#aeWorkspaceClose{min-height:40px;padding:0 12px;font-size:12px}}',
-      '@media(prefers-reduced-motion:reduce){#aeWorkspaceOverlay,#aeWorkspaceClose{transition:none}#aeWorkspaceLoading:before{animation:none}}'
+      '#vizyonAlPanel.ae-fullscreen-ai.open{position:fixed!important;inset:0!important;left:0!important;right:0!important;top:0!important;bottom:0!important;width:100vw!important;height:100vh!important;height:100dvh!important;max-width:none!important;min-width:0!important;max-height:none!important;margin:0!important;transform:none!important;border-radius:0!important;z-index:2147483000!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}',
+      '#vizyonAlPanel.ae-fullscreen-ai .vizyon-al-header{flex:0 0 auto!important;padding:12px 16px!important;padding-top:max(12px,env(safe-area-inset-top))!important}',
+      '#vizyonAlPanel.ae-fullscreen-ai #vzMainArea{display:flex!important;flex:1 1 auto!important;min-height:0!important;overflow:hidden!important}',
+      '#vizyonAlPanel.ae-fullscreen-ai #vzChat{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain!important}',
+      '#vizyonAlPanel.ae-fullscreen-ai .vizyon-al-input-area{flex:0 0 auto!important;padding-bottom:max(12px,env(safe-area-inset-bottom))!important}',
+      '#vizyonAlPanel.ae-fullscreen-ai #vzInput{max-height:25vh!important}',
+      '#vizyonAlPanel.ae-fullscreen-ai #aaResponsibilityArea[hidden]{display:none!important}',
+      '@media(max-width:600px){#vizyonAlPanel.ae-fullscreen-ai .vizyon-al-header{padding-left:12px!important;padding-right:12px!important}#vizyonAlPanel.ae-fullscreen-ai .vizyon-al-input-area{gap:6px!important}}'
     ].join('');
     (d.head || d.documentElement).appendChild(style);
+  }
+  function getPanel() {
+    panel = node('vizyonAlPanel');
+    if (!panel) return null;
+    installStyles();
+    return panel;
+  }
+  function showChat(kind) {
+    var p = getPanel();
+    if (!p) {
+      notify('Eski AETHRION sohbet paneli bulunamadı. index.html içindeki #vizyonAlPanel bağlantısı eksik.', 'error');
+      return false;
+    }
+    priorOverflow = d.body.style.overflow || '';
+    p.classList.add('ae-fullscreen-ai', 'open');
+    p.style.setProperty('display', 'flex', 'important');
+    p.style.setProperty('visibility', 'visible', 'important');
+    p.style.setProperty('opacity', '1', 'important');
+    p.style.setProperty('pointer-events', 'auto', 'important');
+    d.body.style.overflow = 'hidden';
 
-    overlay = d.createElement('section');
-    overlay.id = 'aeWorkspaceOverlay';
-    overlay.setAttribute('role', 'dialog');
-    overlay.setAttribute('aria-modal', 'true');
-    overlay.setAttribute('aria-hidden', 'true');
-    overlay.setAttribute('aria-label', 'AETHRION çalışma alanı');
-    overlay.innerHTML = '<button id="aeWorkspaceClose" type="button" aria-label="Ana ekrana dön">✕ <span>Ana ekrana dön</span></button><div id="aeWorkspaceLoading">AETHRION AI YÜKLENİYOR</div><iframe id="aeWorkspaceFrame" title="AETHRION AI tam ekran çalışma alanı" allow="clipboard-read; clipboard-write; microphone; camera; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>';
-    d.body.appendChild(overlay);
-    frame = overlay.querySelector('#aeWorkspaceFrame');
-    overlay.querySelector('#aeWorkspaceClose').addEventListener('click', close);
-    overlay.addEventListener('click', function (event) { if (event.target === overlay) close(); });
-    frame.addEventListener('load', function () {
-      var loading = d.getElementById('aeWorkspaceLoading');
-      if (loading) loading.style.opacity = '0';
-      w.setTimeout(function () { if (loading && loading.isConnected) loading.style.display = 'none'; }, 280);
-    });
+    var title = p.querySelector('.vz-title');
+    if (title) title.textContent = kind === 'agents' ? 'AETHRION AGENTS' : 'AETHRION AI';
+    var responsibility = node('aaResponsibilityArea');
+    var main = node('vzMainArea');
+    if (kind === 'agents') {
+      if (responsibility) { responsibility.hidden = false; responsibility.style.removeProperty('display'); }
+      if (main) main.style.setProperty('display', 'none', 'important');
+    } else {
+      // Normal chat is available without enabling screen-reading or agent actions.
+      if (responsibility) { responsibility.hidden = true; responsibility.style.setProperty('display', 'none', 'important'); }
+      if (main) main.style.setProperty('display', 'flex', 'important');
+      var screenRead = node('vzScreenReadBtn');
+      if (screenRead) {
+        screenRead.setAttribute('aria-label', 'Ekran okuma Agents modunda kullanılabilir');
+        screenRead.title = 'Ekran okuma için AETHRION Agents modunu açın';
+      }
+    }
+    var input = node('vzInput');
+    if (input) w.setTimeout(function () { try { input.focus({ preventScroll: true }); } catch (_) {} }, 80);
+    return true;
+  }
+  function close() {
+    var p = getPanel();
+    if (p) {
+      p.classList.remove('open', 'ae-fullscreen-ai');
+      p.style.setProperty('display', 'none', 'important');
+      p.style.removeProperty('visibility');
+      p.style.removeProperty('opacity');
+      p.style.removeProperty('pointer-events');
+    }
+    d.body.style.overflow = priorOverflow;
+    return true;
+  }
 
-  // Intercept legacy same-site links (including hard-coded Vercel URLs) so AI workspaces
-  // open over the homepage instead of navigating away from it.
+  // Keep the legacy chat UI and its existing IDs; only change its presentation/routing.
+  w.openFullAIPanel = function () { return showChat('ai'); };
+  w.openAethrionAI = w.openFullAIPanel;
+  w.openAethrionAlPanel = function () { return showChat('agents'); };
+  w.openVizyonAlPanel = w.openAethrionAlPanel;
+  w.openKocPanel = function () {
+    var koc = node('kocPanelOverlay');
+    if (koc) { koc.classList.add('open'); koc.style.setProperty('display', 'flex', 'important'); return true; }
+    notify('AETHRION Coach paneli bulunamadı.', 'error');
+    return false;
+  };
+  w.closeAethrionWorkspace = close;
+  w.closeVizyonAlPanel = close;
+  w.closeAethrionAlPanel = close;
+  w.startVizyonAl = function () {
+    var check = node('aaResponsibilityCheckbox');
+    if (!check || !check.checked) {
+      notify('AETHRION Agents modunu başlatmak için sorumluluk onayını işaretleyin.', 'warning');
+      return false;
+    }
+    var responsibility = node('aaResponsibilityArea');
+    var main = node('vzMainArea');
+    if (responsibility) responsibility.style.setProperty('display', 'none', 'important');
+    if (main) main.style.setProperty('display', 'flex', 'important');
+    return true;
+  };
+  w.showDownloadOptions = w.showDownloadOptions || function () {
+    notify('Uygulama indirme bağlantısı bu sürümde tanımlı değil.', 'warning');
+    return false;
+  };
+
+  // Legacy links may still point to these pages; intercept them only when appropriate.
   d.addEventListener('click', function (event) {
     var link = event.target && event.target.closest ? event.target.closest('a[href]') : null;
     if (!link || event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     if (link.target && link.target.toLowerCase() === '_blank') return;
-    var raw = link.getAttribute('href') || '';
     var url;
-    try { url = new URL(raw, w.location.href); } catch (_) { return; }
+    try { url = new URL(link.getAttribute('href') || '', w.location.href); } catch (_) { return; }
     if (url.origin !== w.location.origin) return;
     var path = url.pathname.toLowerCase();
-    var kind = null;
-    if (path === '/aethrion-ai.html' || path === '/vizyon-al.html') kind = path === '/aethrion-ai.html' ? 'ai' : 'agents';
-    else if (path === '/aethrion-assistant.html') kind = 'coach';
-    if (!kind) return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    open(kind);
+    if (path === '/aethrion-ai.html') { event.preventDefault(); event.stopImmediatePropagation(); w.openFullAIPanel(); }
+    else if (path === '/aethrion-assistant.html' || path === '/vizyon-al.html') { event.preventDefault(); event.stopImmediatePropagation(); w.openAethrionAlPanel(); }
   }, true);
 
-    d.addEventListener('keydown', function (event) { if (event.key === 'Escape' && overlay.classList.contains('ae-open')) close(); });
-    return overlay;
-  }
-
-  function open(kind) {
-    var item = routes[kind] || routes.ai;
-    build();
-    previousFocus = d.activeElement;
-    var title = overlay.querySelector('#aeWorkspaceTitle');
-    var subtitle = overlay.querySelector('#aeWorkspaceSubtitle');
-    var loading = overlay.querySelector('#aeWorkspaceLoading');
-    if (title) title.textContent = item.title;
-    if (subtitle) subtitle.textContent = item.subtitle;
-    if (loading) { loading.style.display = 'grid'; loading.style.opacity = '1'; }
-    overlay.classList.add('ae-open');
-    overlay.setAttribute('aria-hidden', 'false');
-    d.body.style.overflow = 'hidden';
-    if (frame.getAttribute('src') !== item.url) frame.setAttribute('src', item.url);
-    overlay.querySelector('#aeWorkspaceClose').focus({ preventScroll: true });
-    return true;
-  }
-
-  function close() {
-    if (!overlay) return;
-    overlay.classList.remove('ae-open');
-    overlay.setAttribute('aria-hidden', 'true');
-    d.body.style.overflow = '';
-    if (frame) frame.setAttribute('src', 'about:blank');
-    if (previousFocus && typeof previousFocus.focus === 'function') {
-      try { previousFocus.focus({ preventScroll: true }); } catch (_) {}
-    }
-    return true;
-  }
-
-  // Register navigation interception before the first click.
-  // build() only creates a hidden shell; it does not open or navigate anywhere.
-  build();
-
-  w.openFullAIPanel = function () { return open('ai'); };
-  w.openAethrionAI = w.openFullAIPanel;
-  w.openKocPanel = function () { return open('coach'); };
-  w.openAethrionAlPanel = function () { return open('agents'); };
-  w.openVizyonAlPanel = w.openAethrionAlPanel;
-  w.closeAethrionWorkspace = close;
-  w.showDownloadOptions = w.showDownloadOptions || function () {
-    var url = 'https://vizyon2026.vercel.app/';
-    if (typeof w.showNotification === 'function') w.showNotification('Uygulama indirme bağlantısı bu sürümde tanımlı değil. Destek bölümünden güncel kurulum bağlantısını kontrol edin.', 'warning');
-    else w.alert('Uygulama indirme bağlantısı bu sürümde tanımlı değil.');
-    return false;
-  };
+  d.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && panel && panel.classList.contains('ae-fullscreen-ai')) close();
+  });
 })(window, document);
