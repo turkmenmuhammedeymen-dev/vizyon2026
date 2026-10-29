@@ -108,6 +108,10 @@
     return true;
   }
 
+  // Register navigation interception before the first click.
+  // build() only creates a hidden shell; it does not open or navigate anywhere.
+  build();
+
   w.openFullAIPanel = function () { return open('ai'); };
   w.openAethrionAI = w.openFullAIPanel;
   w.openKocPanel = function () { return open('coach'); };
