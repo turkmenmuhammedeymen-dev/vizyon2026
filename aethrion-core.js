@@ -196,6 +196,7 @@
   install('toggleJarvisListening', function () { go('/aethrion-jarvis.html'); });
   install('jarvisToggleMute', function () { if (w.speechSynthesis) w.speechSynthesis.cancel(); });
   install('jarvisClearTranscript', function () { var p = byId('aeJvMessages'); if (p) p.replaceChildren(); });
+  install('openModeratorVideoTool', function () { var m = byId('moderatorVideoToolModal'); if (m) { m.style.display = 'flex'; m.classList.add('open'); m.setAttribute('aria-hidden', 'false'); } else go('/aethrion-status.html'); });
   install('closeAethrionResponsibilityModal', function () { var m = byId('aethrionResponsibilityModal'); if (m) m.style.display = 'none'; });
   install('confirmAethrionResponsibilityAction', function () { var m = byId('aethrionResponsibilityModal'); if (m) { m.style.display = 'none'; m.setAttribute('aria-hidden', 'true'); } });
   // If a previous runtime left the drawer/backdrop open, remove that stale blocker on startup.
