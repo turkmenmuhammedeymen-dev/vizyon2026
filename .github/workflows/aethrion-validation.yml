@@ -58,6 +58,26 @@ jobs:
           }
           console.log('Homepage assets and workspace routes passed static checks (' + localRefs.size + ' local references).');
           NODE
+      - name: Check AI chat routing and daily quota wiring
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const home = fs.readFileSync('index.html', 'utf8');
+          const router = fs.readFileSync('aethrion-home-workspace.js', 'utf8');
+          const recovery = fs.readFileSync('aethrion-interaction-recovery.js', 'utf8');
+          const cloud = fs.readFileSync('back4app/main.js', 'utf8');
+          const checks = [
+            [home.includes('id="vizyonAlPanel"'), 'Legacy 28-model chat panel is missing'],
+            [router.includes("w.openFullAIPanel = function () { return showChat('ai'); }"), 'Primary AI button is not routed to the legacy chat'],
+            [recovery.includes("w.Parse.Cloud.run('aethrionChat'"), 'Chat UI does not call the quota-aware backend endpoint'],
+            [recovery.includes("w.openModal = function (id)"), 'Auth modal wrapper is missing'],
+            [cloud.includes('Parse.Cloud.define("aethrionChat"'), 'Daily-quota chat endpoint is missing'],
+            [cloud.includes('Parse.Cloud.define("getAethrionAIQuota"'), 'Daily-quota status endpoint is missing']
+          ];
+          const failures = checks.filter(x => !x[0]).map(x => x[1]);
+          if (failures.length) { console.error(failures.join('\n')); process.exit(1); }
+          console.log('AI chat routing, auth modal recovery, and daily quota wiring passed.');
+          NODE
       - name: Check Back4App Cloud Code
         run: node --check back4app/main.js
       - name: Check browser security guard
