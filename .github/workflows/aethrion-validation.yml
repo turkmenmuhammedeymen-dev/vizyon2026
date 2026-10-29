@@ -12,6 +12,42 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+      - name: Check homepage and auth runtime JavaScript
+        run: |
+          set -euo pipefail
+          for file in app.js aethrion-core.js aethrion-home-workspace.js aethrion-auth-hotfix.js aethrion-social-auth.js aethrion-ui-runtime.js aethrion-schema.js; do
+            test -s "$file" || { echo "Missing or empty runtime file: $file"; exit 1; }
+            node --check "$file"
+          done
+      - name: Check homepage workspace routes and local assets
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const html = fs.readFileSync('index.html', 'utf8');
+          const required = [
+            'aethrion-core.js',
+            'app.js',
+            'aethrion-home-workspace.js',
+            'aethrion-auth-hotfix.js',
+            'aethrion-social-auth.js',
+            'aethrion-ui-runtime.js',
+            'aethrion-ai.html',
+            'aethrion-assistant.html'
+          ];
+          const failures = [];
+          for (const file of required) {
+            if (!fs.existsSync(file)) failures.push('Missing required file: ' + file);
+          }
+          for (const file of required.filter(x => x.endsWith('.js'))) {
+            if (!html.includes('/' + file)) failures.push('index.html does not load /' + file);
+          }
+          if (!html.includes('aethrion-home-workspace.js?v=')) failures.push('Workspace launcher cache version missing');
+          if (failures.length) {
+            console.error(failures.join('\\n'));
+            process.exit(1);
+          }
+          console.log('Homepage assets and workspace routes passed static checks.');
+          NODE
       - name: Check Back4App Cloud Code
         run: node --check back4app/main.js
       - name: Check browser security guard
