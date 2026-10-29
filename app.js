@@ -519,6 +519,21 @@ function ensurePolicyLinks() {
   nav.style.setProperty('z-index', 'auto', 'important');
   nav.style.setProperty('width', '100%', 'important');
   nav.style.setProperty('pointer-events', 'auto', 'important');
+  nav.querySelectorAll('a').forEach(function (link) {
+    link.style.setProperty('position', 'static', 'important');
+    link.style.setProperty('inset', 'auto', 'important');
+    link.style.setProperty('transform', 'none', 'important');
+    link.style.setProperty('pointer-events', 'auto', 'important');
+  });
+  nav.style.setProperty('inset', 'auto', 'important');
+  nav.style.setProperty('top', 'auto', 'important');
+  nav.style.setProperty('right', 'auto', 'important');
+  nav.style.setProperty('bottom', 'auto', 'important');
+  nav.style.setProperty('left', 'auto', 'important');
+  nav.style.setProperty('transform', 'none', 'important');
+  nav.style.setProperty('z-index', 'auto', 'important');
+  nav.style.setProperty('width', '100%', 'important');
+  nav.style.setProperty('pointer-events', 'auto', 'important');
 }
 function enableScrollMotion() {
   if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -1342,6 +1357,8 @@ function observeSession() {
  }
 }
 function start() {
+ /* Clear a stale drawer/backdrop before binding the live click router. */
+ closeDrawer();
  applyOverrides();
  installClickRouter();
  initSplash();
