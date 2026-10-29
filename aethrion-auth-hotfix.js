@@ -128,7 +128,7 @@
   // hotfix file so legacy UI wrappers cannot leave auth buttons permanently busy.
   function field(id){return document.getElementById(id)}
   function value(id){var e=field(id);return e?String(e.value||'').trim():''}
-  function validEmail(v){return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(v)}
+  function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}
   function authTab(tab){
     try{if(typeof window.switchTab==='function')window.switchTab(tab)}catch(_){}
     [['login','formLogin'],['register','formRegister'],['verify','formVerify']].forEach(function(x){var e=field(x[1]);if(e)e.style.display=x[0]===tab?'block':'none'});
@@ -167,9 +167,30 @@
     if(!validEmail(email)||!pass){notify('Geçerli e-posta ve şifreni gir.','error');return false}
     if(!window.Parse||!window.Parse.User){notify('Hesap servisi hazır değil. Sayfayı yenileyip tekrar dene.','error');return false}
     try{
-      var user=await window.Parse.User.logIn(email,pass);
-      if(!user)throw new Error('Sunucu oturum oluşturmadı.');
-      if(user.get('isVerified')!==true){
+      var user=null,loginError=null;
+      // New accounts use email as username. Older AETHRION accounts may still
+      // have a separate username, so retry using the account's stored username.
+      try { user=await window.Parse.User.logIn(email,pass); }
+      catch(firstError) {
+        loginError=firstError;
+        try {
+          var byEmail=new window.Parse.Query(window.Parse.User);
+          byEmail.equalTo('email',email);
+          var legacy=await byEmail.first();
+          var legacyUsername=legacy&&legacy.get('username');
+          if(legacyUsername && legacyUsername.toLowerCase()!==email) {
+            user=await window.Parse.User.logIn(legacyUsername,pass);
+          } else {
+            throw firstError;
+          }
+        } catch(fallbackError) {
+          if(!user) throw loginError || fallbackError;
+        }
+      }
+      if(!user)throw loginError || new Error('Sunucu oturum oluşturmadı.');
+      // Only an explicit false means an account is awaiting email verification.
+      // Older accounts without this field must not be locked out by the new flow.
+      if(user.get('isVerified')===false && user.get('emailVerified')!==true){
         try{await window.Parse.User.logOut()}catch(_){}
         authTab('verify');if(field('verifyEmail'))field('verifyEmail').value=email;
         notify('Hesap henüz doğrulanmamış. E-postandaki kodu gir veya yeni kod iste.','warning');return false
@@ -187,7 +208,7 @@
   };
   window.verifyAccount=async function(){
     var email=value('verifyEmail').toLowerCase(),code=value('verifyCode');
-    if(!validEmail(email)||!/^\\d{6}$/.test(code)){notify('Geçerli e-posta ve 6 haneli doğrulama kodu gir.','error');return false}
+    if(!validEmail(email)||!/^\d{6}$/.test(code)){notify('Geçerli e-posta ve 6 haneli doğrulama kodu gir.','error');return false}
     try{
       var result=await window.Parse.Cloud.run('verifyUser',{email:email,code:code});
       if(!result||result.success!==true)throw new Error((result&&result.error)||'Kod doğrulanamadı.');
