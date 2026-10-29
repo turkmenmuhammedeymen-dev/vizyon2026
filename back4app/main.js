@@ -2291,7 +2291,7 @@ Parse.Cloud.define("aethrionChat", async function (request) {
     var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
     var role = user ? String(user.get('role') || 'user').toLowerCase() : 'visitor';
     var plan = user ? String(user.get('plan') || 'free').toLowerCase() : 'free';
-    var unlimited = ['admin', 'founder', 'beta', 'moderator'].indexOf(role) !== -1 || plan === 'team';
+    var unlimited = ['admin', 'founder', 'moderator'].indexOf(role) !== -1 || plan === 'team';
     var limit = unlimited ? -1 : (plan === 'pro' ? 2000 : 24);
     var identity = user ? String(user.get('email') || user.id) : String(request.ip || request.installationId || '');
     if (!identity) return { success: false, error: 'Ziyaretçi kimliği belirlenemedi. Sayfayı yenileyip tekrar deneyin.' };
@@ -2341,22 +2341,41 @@ Parse.Cloud.define("aethrionChat", async function (request) {
     var newUsed = used + 1;
     try {
         var reply = await Parse.Cloud.run('superAI', { prompt: prompt }, { useMasterKey: true });
+        var replyText = String(reply == null ? '' : reply);
+        if (!replyText || /tüm modeller şu anda cevap veremiyor|all models are currently unavailable/i.test(replyText)) {
+            usage.increment('count', -1);
+            await usage.save(null, { useMasterKey: true });
+            return {
+                success: false,
+                code: 'AI_UNAVAILABLE',
+                error: '28 modelin hiçbiri şu anda yanıt veremedi. Günlük hakkın düşülmedi; biraz sonra tekrar dene.',
+                limit: unlimited ? 'Sınırsız' : limit,
+                used: used,
+                remaining: unlimited ? 'Sınırsız' : Math.max(0, limit - used)
+            };
+        }
         return {
             success: true,
-            reply: String(reply == null ? '' : reply),
+            reply: replyText,
             limit: unlimited ? 'Sınırsız' : limit,
             used: newUsed,
             remaining: unlimited ? 'Sınırsız' : Math.max(0, limit - newUsed)
         };
     } catch (error) {
         console.error('[aethrionChat] superAI failed:', String(error && error.message || error));
+        try {
+            usage.increment('count', -1);
+            await usage.save(null, { useMasterKey: true });
+        } catch (rollbackError) {
+            console.error('[aethrionChat] quota rollback failed:', String(rollbackError && rollbackError.message || rollbackError));
+        }
         return {
             success: false,
             code: 'AI_UNAVAILABLE',
-            error: 'AETHRION AI şu anda yanıt üretemedi. Biraz sonra tekrar dene.',
+            error: 'AETHRION AI şu anda yanıt üretemedi. Günlük hakkın düşülmedi; biraz sonra tekrar dene.',
             limit: unlimited ? 'Sınırsız' : limit,
-            used: newUsed,
-            remaining: unlimited ? 'Sınırsız' : Math.max(0, limit - newUsed)
+            used: used,
+            remaining: unlimited ? 'Sınırsız' : Math.max(0, limit - used)
         };
     }
 });
