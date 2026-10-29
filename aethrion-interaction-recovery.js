@@ -5,7 +5,6 @@
   w.__aethrionInteractionRecovery = true;
 
   var originalOpenModal = typeof w.openModal === 'function' ? w.openModal : null;
-  var originalSwitchTab = typeof w.switchTab === 'function' ? w.switchTab : null;
   var sending = false;
   var currentMode = 'normal';
 
@@ -47,9 +46,8 @@
     return true;
   }
   function openAuth(tab) {
-    if (originalSwitchTab) {
-      try { originalSwitchTab(tab); } catch (error) { console.warn('[AETHRION] legacy tab switch failed', error); }
-    }
+    // Do not invoke the legacy switchTab implementation: it can change visibility
+    // independently and was the source of the disappearing auth panel.
     return revealAuth(tab);
   }
 
@@ -74,9 +72,6 @@
     return false;
   };
   w.switchTab = function (tab) {
-    if (originalSwitchTab) {
-      try { originalSwitchTab(tab); } catch (error) { console.warn('[AETHRION] switchTab failed', error); }
-    }
     return revealAuth(tab);
   };
   w.openAuthModal = openAuth;
