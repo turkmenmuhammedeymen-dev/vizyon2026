@@ -165,32 +165,39 @@
   window.handleLogin=async function(){
     var email=value('lEmail').toLowerCase(),pass=value('lPass');
     if(!validEmail(email)||!pass){notify('Geçerli e-posta ve şifreni gir.','error');return false}
-    if(!window.Parse||!window.Parse.User){notify('Hesap servisi hazır değil. Sayfayı yenileyip tekrar dene.','error');return false}
+    if(!window.Parse||!window.Parse.User||!window.Parse.Cloud){notify('Hesap servisi hazır değil. Sayfayı yenileyip tekrar dene.','error');return false}
     try{
-      var user=null,loginError=null;
-      // New accounts use email as username. Older AETHRION accounts may still
-      // have a separate username, so retry using the account's stored username.
-      try { user=await window.Parse.User.logIn(email,pass); }
-      catch(firstError) {
-        loginError=firstError;
-        try {
+      var user=null,cloudError=null;
+      // Preferred path: server-side email lookup supports old usernames and legacy accounts.
+      try{
+        var result=await window.Parse.Cloud.run('aethrionLoginWithEmail',{email:email,password:pass});
+        if(result&&result.success===true&&result.sessionToken){
+          user=await window.Parse.User.become(result.sessionToken);
+        }else if(result&&result.code==='EMAIL_NOT_VERIFIED'){
+          authTab('verify');if(field('verifyEmail'))field('verifyEmail').value=email;
+          notify(result.error||'Hesabını e-posta koduyla doğrulamalısın.','warning');return false;
+        }else if(result&&result.success===false){
+          throw new Error(result.error||'E-posta veya şifre hatalı.');
+        }else{
+          throw new Error('Giriş sunucusu geçerli oturum döndürmedi.');
+        }
+      }catch(e){
+        cloudError=e;
+        // Only fall back for a missing/unavailable Cloud Code function. Do not
+        // bypass a real server-side credential or verification rejection.
+        var em=String(e&&e.message||e);
+        if(!/function.*(?:not found|does not exist|unknown)|cloud code.*(?:not found|unavailable)|network|failed to fetch|timeout|timed out/i.test(em)) throw e;
+        try{user=await window.Parse.User.logIn(email,pass)}catch(firstError){
           var byEmail=new window.Parse.Query(window.Parse.User);
           byEmail.equalTo('email',email);
           var legacy=await byEmail.first();
           var legacyUsername=legacy&&legacy.get('username');
-          if(legacyUsername && legacyUsername.toLowerCase()!==email) {
-            user=await window.Parse.User.logIn(legacyUsername,pass);
-          } else {
-            throw firstError;
-          }
-        } catch(fallbackError) {
-          if(!user) throw loginError || fallbackError;
+          if(!legacyUsername||legacyUsername.toLowerCase()===email) throw firstError;
+          user=await window.Parse.User.logIn(legacyUsername,pass);
         }
       }
-      if(!user)throw loginError || new Error('Sunucu oturum oluşturmadı.');
-      // Only an explicit false means an account is awaiting email verification.
-      // Older accounts without this field must not be locked out by the new flow.
-      if(user.get('isVerified')===false && user.get('emailVerified')!==true){
+      if(!user)throw cloudError||new Error('Sunucu oturum oluşturmadı.');
+      if(user.get('isVerified')===false&&user.get('emailVerified')!==true){
         try{await window.Parse.User.logOut()}catch(_){}
         authTab('verify');if(field('verifyEmail'))field('verifyEmail').value=email;
         notify('Hesap henüz doğrulanmamış. E-postandaki kodu gir veya yeni kod iste.','warning');return false
