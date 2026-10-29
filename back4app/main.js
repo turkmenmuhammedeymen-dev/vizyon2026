@@ -2273,8 +2273,17 @@ Parse.Cloud.define("superAI", async function (request) {
 // ================================================================
 Parse.Cloud.define("aethrionChat", async function (request) {
     var message = String((request.params && (request.params.message || request.params.prompt)) || '').trim();
+    var mode = String((request.params && request.params.mode) || 'normal').toLowerCase();
     if (!message) return { success: false, error: 'Lütfen bir mesaj yazın.' };
     if (message.length > 8000) return { success: false, error: 'Mesaj en fazla 8000 karakter olabilir.' };
+    var modeInstruction = mode === 'deep'
+        ? 'Yanıtlamadan önce soruyu dikkatle analiz et; varsayımlarını kontrol et ve gerekçeli, yapılandırılmış bir yanıt ver.\\n\\n'
+        : mode === 'developer'
+            ? 'Yazılımcı modundasın: teknik doğruluk, çalışan kod, güvenlik ve test edilebilirlik önceliklidir.\\n\\n'
+            : mode === 'agent'
+                ? 'Ajan modundasın: uygulanabilir adımları planla; gerçekleştiremediğin harici işlemleri yaptığını iddia etme.\\n\\n'
+                : '';
+    var prompt = modeInstruction + message;
 
     var user = request.user || null;
     var today = new Date();
@@ -2331,7 +2340,7 @@ Parse.Cloud.define("aethrionChat", async function (request) {
     await usage.save(null, { useMasterKey: true });
     var newUsed = used + 1;
     try {
-        var reply = await Parse.Cloud.run('superAI', { prompt: message }, { useMasterKey: true });
+        var reply = await Parse.Cloud.run('superAI', { prompt: prompt }, { useMasterKey: true });
         return {
             success: true,
             reply: String(reply == null ? '' : reply),
