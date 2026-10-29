@@ -69,6 +69,7 @@
         screenRead.title = 'Ekran okuma için AETHRION Agents modunu açın';
       }
     }
+    if (kind === 'ai' && typeof w.refreshAethrionAIQuota === 'function') w.refreshAethrionAIQuota();
     var input = node('vzInput');
     if (input) w.setTimeout(function () { try { input.focus({ preventScroll: true }); } catch (_) {} }, 80);
     return true;
