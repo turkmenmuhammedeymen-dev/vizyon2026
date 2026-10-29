@@ -18,21 +18,15 @@
     var style = d.createElement('style');
     style.id = 'aeWorkspaceLauncherStyles';
     style.textContent = [
-      '#aeWorkspaceOverlay{position:fixed;inset:0;z-index:2147483000;display:grid;grid-template-rows:auto minmax(0,1fr);background:#060913;color:#f7f8fc;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(12px) scale(.995);transition:opacity .22s ease,transform .22s ease,visibility .22s ease;font-family:Inter,system-ui,sans-serif}',
-      '#aeWorkspaceOverlay.ae-open{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0) scale(1)}',
-      '#aeWorkspaceBar{display:flex;align-items:center;gap:14px;min-height:68px;padding:12px clamp(14px,3vw,34px);border-bottom:1px solid rgba(226,190,91,.24);background:linear-gradient(110deg,rgba(18,26,45,.98),rgba(7,11,22,.98));box-shadow:0 10px 35px rgba(0,0,0,.25)}',
-      '#aeWorkspaceBrand{display:flex;align-items:center;gap:12px;min-width:0;flex:1}',
-      '#aeWorkspaceMark{display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px;border:1px solid rgba(231,195,100,.62);border-radius:13px;color:#f1d58c;font-weight:900;letter-spacing:-.08em;background:linear-gradient(145deg,rgba(226,190,91,.18),rgba(255,255,255,.025));box-shadow:inset 0 0 22px rgba(226,190,91,.07),0 0 28px rgba(226,190,91,.08)}',
-      '#aeWorkspaceTitle{margin:0;font-size:clamp(14px,2vw,18px);font-weight:800;letter-spacing:.015em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-      '#aeWorkspaceSubtitle{margin:3px 0 0;color:#9aa7bf;font-size:11px;letter-spacing:.04em}',
-      '#aeWorkspaceClose{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 15px;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(255,255,255,.055);color:#f8fafc;font:700 13px inherit;cursor:pointer;touch-action:manipulation;transition:background .18s,border-color .18s,transform .18s}',
-      '#aeWorkspaceClose:hover{background:rgba(226,190,91,.14);border-color:rgba(226,190,91,.55);transform:translateY(-1px)}',
-      '#aeWorkspaceFrame{display:block;width:100%;height:100%;min-height:0;border:0;background:#080d18}',
-      '#aeWorkspaceLoading{position:absolute;inset:68px 0 0;display:grid;place-items:center;pointer-events:none;background:radial-gradient(ellipse at 50% 30%,rgba(226,190,91,.08),transparent 55%),#080d18;color:#c7d0df;font-size:13px;letter-spacing:.08em;transition:opacity .25s}',
-      '#aeWorkspaceLoading:before{content:"";width:27px;height:27px;margin-bottom:14px;border:2px solid rgba(226,190,91,.22);border-top-color:#e2be5b;border-radius:50%;animation:aeWorkspaceSpin .8s linear infinite}',
-      '#aeWorkspaceLoading{align-content:center;gap:0}',
+      '#aeWorkspaceOverlay{position:fixed;inset:0;z-index:2147483000;display:block;background:#060913;color:#f7f8fc;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,visibility .18s ease;font-family:Inter,system-ui,sans-serif}',
+      '#aeWorkspaceOverlay.ae-open{opacity:1;visibility:visible;pointer-events:auto}',
+      '#aeWorkspaceFrame{position:absolute;inset:0;display:block;width:100%;height:100%;min-height:100%;border:0;background:#080d18}',
+      '#aeWorkspaceClose{position:absolute;z-index:4;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 15px;border:1px solid rgba(226,190,91,.55);border-radius:13px;background:rgba(8,13,24,.88);backdrop-filter:blur(16px);color:#f8fafc;font:700 13px Inter,system-ui,sans-serif;cursor:pointer;touch-action:manipulation;box-shadow:0 8px 28px rgba(0,0,0,.28)}',
+      '#aeWorkspaceClose:hover{background:rgba(226,190,91,.16);border-color:#e2be5b}',
+      '#aeWorkspaceLoading{position:absolute;z-index:2;inset:0;display:grid;place-content:center;justify-items:center;gap:14px;pointer-events:none;background:radial-gradient(ellipse at 50% 30%,rgba(226,190,91,.08),transparent 55%),#080d18;color:#c7d0df;font-size:13px;letter-spacing:.08em;transition:opacity .25s}',
+      '#aeWorkspaceLoading:before{content:"";width:27px;height:27px;border:2px solid rgba(226,190,91,.22);border-top-color:#e2be5b;border-radius:50%;animation:aeWorkspaceSpin .8s linear infinite}',
       '@keyframes aeWorkspaceSpin{to{transform:rotate(360deg)}}',
-      '@media(max-width:600px){#aeWorkspaceBar{min-height:60px;padding:9px 12px;gap:8px}#aeWorkspaceMark{width:34px;height:34px;flex-basis:34px;border-radius:10px}#aeWorkspaceSubtitle{font-size:10px}#aeWorkspaceClose{min-height:40px;padding:0 11px;font-size:12px}#aeWorkspaceClose span{display:none}#aeWorkspaceLoading{inset:60px 0 0}}',
+      '@media(max-width:600px){#aeWorkspaceClose{min-height:40px;padding:0 12px;font-size:12px}}',
       '@media(prefers-reduced-motion:reduce){#aeWorkspaceOverlay,#aeWorkspaceClose{transition:none}#aeWorkspaceLoading:before{animation:none}}'
     ].join('');
     (d.head || d.documentElement).appendChild(style);
@@ -43,7 +37,7 @@
     overlay.setAttribute('aria-modal', 'true');
     overlay.setAttribute('aria-hidden', 'true');
     overlay.setAttribute('aria-label', 'AETHRION çalışma alanı');
-    overlay.innerHTML = '<header id="aeWorkspaceBar"><div id="aeWorkspaceBrand"><div id="aeWorkspaceMark" aria-hidden="true">A27</div><div style="min-width:0"><h2 id="aeWorkspaceTitle">AETHRION</h2><p id="aeWorkspaceSubtitle">Intelligence Without Limits.</p></div></div><button id="aeWorkspaceClose" type="button" aria-label="Çalışma alanını kapat">✕ <span>Kapat</span></button></header><div style="position:relative;min-height:0"><div id="aeWorkspaceLoading">ÇALIŞMA ALANI HAZIRLANIYOR</div><iframe id="aeWorkspaceFrame" title="AETHRION çalışma alanı" allow="clipboard-read; clipboard-write; microphone; camera; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>';
+    overlay.innerHTML = '<button id="aeWorkspaceClose" type="button" aria-label="Ana ekrana dön">✕ <span>Ana ekrana dön</span></button><div id="aeWorkspaceLoading">AETHRION AI YÜKLENİYOR</div><iframe id="aeWorkspaceFrame" title="AETHRION AI tam ekran çalışma alanı" allow="clipboard-read; clipboard-write; microphone; camera; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>';
     d.body.appendChild(overlay);
     frame = overlay.querySelector('#aeWorkspaceFrame');
     overlay.querySelector('#aeWorkspaceClose').addEventListener('click', close);
