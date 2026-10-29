@@ -3460,27 +3460,33 @@ def root():
       // Release any stale full-screen layer even when cached/older app code is running.
       function releaseBlockingLayers() {
         releaseAethrionSplash();
-        var progress = document.getElementById('aeAuthProgressOverlay');
-        if (progress && progress.classList.contains('is-visible')) {
-          progress.classList.remove('is-visible');
-          progress.style.setProperty('pointer-events', 'none', 'important');
-          progress.setAttribute('aria-hidden', 'true');
-        }
+        // Clear both legacy and current full-screen auth layers if a handler failed.
+        ['aeAuthProgressOverlay', 'aethrionAuthBusyOverlay'].forEach(function (id) {
+          var layer = document.getElementById(id);
+          if (!layer) return;
+          layer.classList.remove('is-visible');
+          layer.setAttribute('aria-hidden', 'true');
+          layer.style.setProperty('display', 'none', 'important');
+          layer.style.setProperty('visibility', 'hidden', 'important');
+          layer.style.setProperty('pointer-events', 'none', 'important');
+        });
       }
       window.setTimeout(releaseBlockingLayers, 3500);
       window.setTimeout(releaseBlockingLayers, 6000);
       window.setTimeout(releaseBlockingLayers, 12000);
       document.addEventListener('pointerdown', function (event) {
         var splash = document.getElementById('splashScreen');
-        if (splash && (event.target === splash || splash.contains(event.target))) {
-          releaseAethrionSplash();
-        }
-        var progress = document.getElementById('aeAuthProgressOverlay');
-        if (progress && progress.classList.contains('is-visible')) {
-          progress.classList.remove('is-visible');
-          progress.style.setProperty('pointer-events', 'none', 'important');
-          progress.setAttribute('aria-hidden', 'true');
-        }
+        if (splash && (event.target === splash || splash.contains(event.target))) releaseAethrionSplash();
+        // Remove stale busy overlays before the browser dispatches the click event.
+        ['aeAuthProgressOverlay', 'aethrionAuthBusyOverlay'].forEach(function (id) {
+          var layer = document.getElementById(id);
+          if (!layer) return;
+          layer.classList.remove('is-visible');
+          layer.setAttribute('aria-hidden', 'true');
+          layer.style.setProperty('display', 'none', 'important');
+          layer.style.setProperty('visibility', 'hidden', 'important');
+          layer.style.setProperty('pointer-events', 'none', 'important');
+        });
       }, true);
       window.addEventListener('error', function () {
         window.setTimeout(releaseBlockingLayers, 250);
