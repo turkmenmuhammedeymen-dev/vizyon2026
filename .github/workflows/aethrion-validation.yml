@@ -15,7 +15,7 @@ jobs:
       - name: Check homepage and auth runtime JavaScript
         run: |
           set -euo pipefail
-          for file in app.js aethrion-core.js aethrion-home-workspace.js aethrion-auth-hotfix.js aethrion-social-auth.js aethrion-ui-runtime.js aethrion-schema.js; do
+          for file in app.js aethrion-core.js aethrion-home-workspace.js aethrion-interaction-recovery.js aethrion-auth-hotfix.js aethrion-social-auth.js aethrion-ui-runtime.js aethrion-schema.js; do
             test -s "$file" || { echo "Missing or empty runtime file: $file"; exit 1; }
             node --check "$file"
           done
@@ -28,6 +28,7 @@ jobs:
             'aethrion-core.js',
             'app.js',
             'aethrion-home-workspace.js',
+            'aethrion-interaction-recovery.js',
             'aethrion-auth-hotfix.js',
             'aethrion-social-auth.js',
             'aethrion-ui-runtime.js',
@@ -50,6 +51,7 @@ jobs:
             if (!fs.existsSync(path)) failures.push('Broken local asset reference: /' + path);
           }
           if (!html.includes('aethrion-home-workspace.js?v=')) failures.push('Workspace launcher cache version missing');
+if (!html.includes('aethrion-interaction-recovery.js?v=')) failures.push('Interaction recovery cache version missing');
           if (failures.length) {
             console.error(failures.join('\n'));
             process.exit(1);
