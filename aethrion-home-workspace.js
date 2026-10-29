@@ -53,6 +53,27 @@
       if (loading) loading.style.opacity = '0';
       w.setTimeout(function () { if (loading && loading.isConnected) loading.style.display = 'none'; }, 280);
     });
+
+  // Intercept legacy same-site links (including hard-coded Vercel URLs) so AI workspaces
+  // open over the homepage instead of navigating away from it.
+  d.addEventListener('click', function (event) {
+    var link = event.target && event.target.closest ? event.target.closest('a[href]') : null;
+    if (!link || event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (link.target && link.target.toLowerCase() === '_blank') return;
+    var raw = link.getAttribute('href') || '';
+    var url;
+    try { url = new URL(raw, w.location.href); } catch (_) { return; }
+    if (url.origin !== w.location.origin) return;
+    var path = url.pathname.toLowerCase();
+    var kind = null;
+    if (path === '/aethrion-ai.html' || path === '/vizyon-al.html') kind = path === '/aethrion-ai.html' ? 'ai' : 'agents';
+    else if (path === '/aethrion-assistant.html') kind = 'coach';
+    if (!kind) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    open(kind);
+  }, true);
+
     d.addEventListener('keydown', function (event) { if (event.key === 'Escape' && overlay.classList.contains('ae-open')) close(); });
     return overlay;
   }
