@@ -425,16 +425,15 @@ function scan(root) {
   });
 }
 function loadLateTheme() {
-  if (!document.body || document.body.querySelector('link[data-aethrion-late-theme]')) return;
-  var links = Array.prototype.slice.call(document.querySelectorAll('link[rel="stylesheet"]'));
-  links.forEach(function (link) {
-    if ((link.getAttribute('href') || '').indexOf('aethrion-experience.css') !== -1 && link.parentNode) link.parentNode.removeChild(link);
-  });
-  var link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = '/aethrion-experience.css?v=20261022-corporate5';
-  link.setAttribute('data-aethrion-late-theme', 'true');
-  document.body.appendChild(link);
+  /* Keep the versioned stylesheet declared by index.html. Never replace it with a stale cache URL. */
+  var current = document.querySelector('link[rel="stylesheet"][href*="aethrion-experience.css"]');
+  if (!current) {
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = '/aethrion-experience.css?v=20261029-clickfix2';
+    link.setAttribute('data-aethrion-late-theme', 'true');
+    (document.head || document.documentElement).appendChild(link);
+  }
 }
 function updateBrandMetadata() {
   if (document.title) document.title = brand(document.title);
@@ -800,13 +799,8 @@ function installOpsFeatureCards() {
   }
 }
 function loadJarvisAssistant() {
-  if (!document.querySelector('#mainSite, #splashScreen, #dashboard, #mainDashboard')) return;
-  if (document.querySelector('script[data-aethrion-jarvis]')) return;
-  var script = document.createElement('script');
-  script.src = '/aethrion-jarvis.js?v=20261022-1';
-  script.defer = true;
-  script.setAttribute('data-aethrion-jarvis', 'true');
-  document.head.appendChild(script);
+  /* JARVIS implementation is bundled below in app.js; do not load a second controller. */
+  return;
 }
 function polish() {
   loadLateTheme();
@@ -1315,27 +1309,16 @@ window.addEventListener('load', function () {
 /* AETHRION Workspace shell loader — ensure the persistent sidebar is mounted. */
 function loadWorkspaceShell() {
  try {
+  /* The workspace controllers are bundled below; index.html owns the versioned CSS links. */
   function ensureCss(id, href) {
    if (document.getElementById(id) || document.querySelector('link[href*="' + href + '"]')) return;
-   var link = document.createElement('link'); link.id = id; link.rel = 'stylesheet'; link.href = '/' + href; document.head.appendChild(link);
+   var link = document.createElement('link');
+   link.id = id; link.rel = 'stylesheet'; link.href = '/' + href;
+   (document.head || document.documentElement).appendChild(link);
   }
   ensureCss('aethrionWorkspaceV5Css','aethrion-workspace-v5.css');
   ensureCss('aethrionWorkspaceV6Css','aethrion-workspace-v6.css');
-  function loadV6() {
-   if (document.querySelector('script[src*="aethrion-workspace-v6.js"]')) return;
-   var v6 = document.createElement('script'); v6.id = 'aethrionWorkspaceV6Script'; v6.src = '/aethrion-workspace-v6.js'; v6.async = true; document.head.appendChild(v6);
-  }
-  var core = document.querySelector('script[src*="aethrion-workspace-v5.js"]');
-  if (!core) {
-   core = document.createElement('script'); core.id = 'aethrionWorkspaceV5Script'; core.src = '/aethrion-workspace-v5.js'; core.async = false;
-   core.addEventListener('load', loadV6, {once:true}); document.head.appendChild(core);
-  } else if (window.__aewsClicks) {
-   loadV6();
-  } else {
-   core.addEventListener('load', loadV6, {once:true});
-   window.setTimeout(loadV6, 900);
-  }
- } catch (error) { console.error('[AETHRION] Çalışma alanı menüsü yüklenemedi:', error); }
+ } catch (error) { console.error('[AETHRION] Çalışma alanı stilleri yüklenemedi:', error); }
 }
 loadWorkspaceShell();
 })();
