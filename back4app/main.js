@@ -2352,6 +2352,33 @@ Parse.Cloud.define("aethrionChat", async function (request) {
     }
 });
 
+Parse.Cloud.define("getAethrionAIQuota", async function (request) {
+    var user = request.user || null;
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+    var role = user ? String(user.get('role') || 'user').toLowerCase() : 'visitor';
+    var plan = user ? String(user.get('plan') || 'free').toLowerCase() : 'free';
+    var unlimited = ['admin', 'founder', 'beta', 'moderator'].indexOf(role) !== -1 || plan === 'team';
+    var limit = unlimited ? 'Sınırsız' : (plan === 'pro' ? 2000 : 24);
+    var identity = user ? String(user.get('email') || user.id) : String(request.ip || request.installationId || '');
+    if (!identity) return { success: false, error: 'Kullanım hakkı kontrol edilemedi.' };
+
+    var Usage = Parse.Object.extend('AethrionAIUsage');
+    var query = new Parse.Query(Usage);
+    if (user) query.equalTo('user_email', identity);
+    else {
+        var cryptoModule = require('crypto');
+        var visitorHash = cryptoModule.createHash('sha256').update(identity).digest('hex').slice(0, 32);
+        query.equalTo('visitorKey', visitorHash);
+    }
+    query.greaterThanOrEqualTo('date', today);
+    query.lessThan('date', tomorrow);
+    var usage = await query.first({ useMasterKey: true });
+    var used = usage ? Number(usage.get('count') || 0) : 0;
+    return { success: true, limit: limit, used: used, remaining: unlimited ? 'Sınırsız' : Math.max(0, Number(limit) - used) };
+});
+
 // ================================================================
 // ========== webSearch ==========================================
 // ================================================================
