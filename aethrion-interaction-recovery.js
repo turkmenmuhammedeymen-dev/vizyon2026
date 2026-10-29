@@ -131,6 +131,7 @@
       console.warn('[AETHRION] quota check unavailable:', String(error && error.message || error));
     }
   }
+  w.refreshAethrionAIQuota = refreshQuota;
   w.sendVizyonAlMessage = async function () {
     var input = byId('vzInput');
     var button = byId('vzSendBtn');
