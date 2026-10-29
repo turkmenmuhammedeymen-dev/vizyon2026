@@ -1600,10 +1600,17 @@ loadWorkspaceShell();
     showProgress(action.message);
     var timeoutId;
     try {
-      await ensureParseReady();
+      // Parse initialization can itself hang before the previous action timeout starts.
+      // Bound BOTH initialization and the actual auth request so the button is always released.
+      var ready = Promise.resolve().then(ensureParseReady);
+      var readyTimeout = new Promise(function (_, reject) {
+        timeoutId = window.setTimeout(function () { reject(new Error('Back4App bağlantısı 12 saniye içinde hazır olmadı. Sayfayı yenileyin; bağlantı/Cloud Code durumunu kontrol edin.')); }, 12000);
+      });
+      await Promise.race([ready, readyTimeout]);
+      if (timeoutId) { window.clearTimeout(timeoutId); timeoutId = null; }
       var task = Promise.resolve().then(function () { return action.fn.call(button || window); });
       var timeout = new Promise(function (_, reject) {
-        timeoutId = window.setTimeout(function () { reject(new Error('Kimlik doğrulama 35 saniye içinde tamamlanmadı. Sunucu yanıt vermedi veya sağlayıcı ayarı eksik. Tekrar deneyin; sorun sürerse Back4App Cloud Code günlüklerini kontrol edin.')); }, 35000);
+        timeoutId = window.setTimeout(function () { reject(new Error('Giriş isteği 20 saniyede yanıt vermedi. Tekrar deneyin; sunucu günlükleri kontrol edilmeli.')); }, 20000);
       });
       var result = await Promise.race([task, timeout]);
       hideProgress(result === true);
