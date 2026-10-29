@@ -5,6 +5,19 @@
     try { if (typeof window.showNotification === 'function') window.showNotification(message, type || 'error'); else console.warn('[AETHRION Auth Recovery]', message); }
     catch (_) { console.warn('[AETHRION Auth Recovery]', message); }
   }
+  function authWithTimeout(promise, ms, label) {
+    var timer;
+    return Promise.race([
+      Promise.resolve(promise),
+      new Promise(function (_, reject) {
+        timer = window.setTimeout(function () {
+          var error = new Error(label + ' timed out after ' + ms + 'ms');
+          error.code = 'AETHRION_AUTH_TIMEOUT';
+          reject(error);
+        }, ms);
+      })
+    ]).finally(function () { if (timer) window.clearTimeout(timer); });
+  }
   function hideBusyLayers() {
     ['aeAuthProgressOverlay', 'aethrionAuthBusyOverlay'].forEach(function (id) {
       var node = document.getElementById(id);
@@ -172,7 +185,7 @@
       // Keep credential/verification rejections authoritative; only fall back for transport,
       // missing-function, or session-restoration failures.
       try{
-        cloudResult=await window.Parse.Cloud.run('aethrionLoginWithEmail',{email:email,password:pass});
+        cloudResult=await authWithTimeout(window.Parse.Cloud.run('aethrionLoginWithEmail',{email:email,password:pass}),15000,'AETHRION email login Cloud Code timeout');
       }catch(e){
         cloudError=e;
         var requestMessage=String(e&&e.message||e);
@@ -187,7 +200,7 @@
       }
       if(cloudResult&&cloudResult.success===true&&cloudResult.sessionToken){
         try{
-          user=await window.Parse.User.become(cloudResult.sessionToken);
+          user=await authWithTimeout(window.Parse.User.become(cloudResult.sessionToken),10000,'AETHRION session restore timeout');
         }catch(sessionError){
           cloudError=sessionError;
           allowClientFallback=true;
@@ -199,13 +212,13 @@
         throw new Error('Giriş sunucusu geçerli oturum döndürmedi.');
       }
       if(!user&&allowClientFallback){
-        try{user=await window.Parse.User.logIn(email,pass)}catch(firstError){
+        try{user=await authWithTimeout(window.Parse.User.logIn(email,pass),12000,'AETHRION client login timeout')}catch(firstError){
           var byEmail=new window.Parse.Query(window.Parse.User);
           byEmail.equalTo('email',email);
           var legacy=await byEmail.first();
           var legacyUsername=legacy&&legacy.get('username');
           if(!legacyUsername||String(legacyUsername).toLowerCase()===email) throw firstError;
-          user=await window.Parse.User.logIn(legacyUsername,pass);
+          user=await authWithTimeout(window.Parse.User.logIn(legacyUsername,pass),12000,'AETHRION legacy username login timeout');
         }
       }
       if(!user)throw cloudError||new Error('Sunucu oturum oluşturmadı.');
