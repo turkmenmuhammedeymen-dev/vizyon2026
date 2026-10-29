@@ -41,12 +41,20 @@ jobs:
           for (const file of required.filter(x => x.endsWith('.js'))) {
             if (!html.includes('/' + file)) failures.push('index.html does not load /' + file);
           }
+          const localRefs = new Set();
+          for (const match of html.matchAll(/(?:src|href)=["'](\/[^"'?#]+)(?:\?[^"']*)?["']/gi)) {
+            const path = match[1].slice(1);
+            if (/\.(?:js|css|html|svg|png|webp|ico|json|woff2?)$/i.test(path)) localRefs.add(path);
+          }
+          for (const path of localRefs) {
+            if (!fs.existsSync(path)) failures.push('Broken local asset reference: /' + path);
+          }
           if (!html.includes('aethrion-home-workspace.js?v=')) failures.push('Workspace launcher cache version missing');
           if (failures.length) {
-            console.error(failures.join('\\n'));
+            console.error(failures.join('\n'));
             process.exit(1);
           }
-          console.log('Homepage assets and workspace routes passed static checks.');
+          console.log('Homepage assets and workspace routes passed static checks (' + localRefs.size + ' local references).');
           NODE
       - name: Check Back4App Cloud Code
         run: node --check back4app/main.js
