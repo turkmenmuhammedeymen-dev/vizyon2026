@@ -167,48 +167,74 @@
     if(!validEmail(email)||!pass){notify('Geçerli e-posta ve şifreni gir.','error');return false}
     if(!window.Parse||!window.Parse.User||!window.Parse.Cloud){notify('Hesap servisi hazır değil. Sayfayı yenileyip tekrar dene.','error');return false}
     try{
-      var user=null,cloudError=null;
+      var user=null,cloudError=null,cloudResult=null,allowClientFallback=false;
       // Preferred path: server-side email lookup supports old usernames and legacy accounts.
+      // Keep credential/verification rejections authoritative; only fall back for transport,
+      // missing-function, or session-restoration failures.
       try{
-        var result=await window.Parse.Cloud.run('aethrionLoginWithEmail',{email:email,password:pass});
-        if(result&&result.success===true&&result.sessionToken){
-          user=await window.Parse.User.become(result.sessionToken);
-        }else if(result&&result.code==='EMAIL_NOT_VERIFIED'){
-          authTab('verify');if(field('verifyEmail'))field('verifyEmail').value=email;
-          notify(result.error||'Hesabını e-posta koduyla doğrulamalısın.','warning');return false;
-        }else if(result&&result.success===false){
-          throw new Error(result.error||'E-posta veya şifre hatalı.');
-        }else{
-          throw new Error('Giriş sunucusu geçerli oturum döndürmedi.');
-        }
+        cloudResult=await window.Parse.Cloud.run('aethrionLoginWithEmail',{email:email,password:pass});
       }catch(e){
         cloudError=e;
-        // Only fall back for a missing/unavailable Cloud Code function. Do not
-        // bypass a real server-side credential or verification rejection.
-        var em=String(e&&e.message||e);
-        if(!/function.*(?:not found|does not exist|unknown)|cloud code.*(?:not found|unavailable)|network|failed to fetch|timeout|timed out/i.test(em)) throw e;
+        var requestMessage=String(e&&e.message||e);
+        allowClientFallback=/function.*(?:not found|does not exist|unknown)|cloud code.*(?:not found|unavailable)|network|failed to fetch|timeout|timed out|connection/i.test(requestMessage);
+      }
+      if(cloudResult&&cloudResult.code==='EMAIL_NOT_VERIFIED'){
+        authTab('verify');if(field('verifyEmail'))field('verifyEmail').value=email;
+        notify(cloudResult.error||'Hesabını e-posta koduyla doğrulamalısın.','warning');return false;
+      }
+      if(cloudResult&&cloudResult.success===false){
+        throw new Error(cloudResult.error||'E-posta veya şifre hatalı.');
+      }
+      if(cloudResult&&cloudResult.success===true&&cloudResult.sessionToken){
+        try{
+          user=await window.Parse.User.become(cloudResult.sessionToken);
+        }catch(sessionError){
+          cloudError=sessionError;
+          allowClientFallback=true;
+          console.warn('[AETHRION Auth] Server login accepted credentials but session restoration failed; trying Parse client login.',String(sessionError&&sessionError.message||sessionError).slice(0,160));
+        }
+      }else if(!cloudResult){
+        if(!allowClientFallback)throw cloudError||new Error('Giriş sunucusundan yanıt alınamadı.');
+      }else{
+        throw new Error('Giriş sunucusu geçerli oturum döndürmedi.');
+      }
+      if(!user&&allowClientFallback){
         try{user=await window.Parse.User.logIn(email,pass)}catch(firstError){
           var byEmail=new window.Parse.Query(window.Parse.User);
           byEmail.equalTo('email',email);
           var legacy=await byEmail.first();
           var legacyUsername=legacy&&legacy.get('username');
-          if(!legacyUsername||legacyUsername.toLowerCase()===email) throw firstError;
+          if(!legacyUsername||String(legacyUsername).toLowerCase()===email) throw firstError;
           user=await window.Parse.User.logIn(legacyUsername,pass);
         }
       }
+      if(!user)throw cloudError||new Error('Sunucu oturum oluşturmadı.');
       if(!user)throw cloudError||new Error('Sunucu oturum oluşturmadı.');
       if(user.get('isVerified')===false&&user.get('emailVerified')!==true&&!!user.get('verificationCode')){
         try{await window.Parse.User.logOut()}catch(_){}
         authTab('verify');if(field('verifyEmail'))field('verifyEmail').value=email;
         notify('Hesap henüz doğrulanmamış. E-postandaki kodu gir veya yeni kod iste.','warning');return false
       }
-      var auth=field('authModal'),main=field('mainSite'),dash=field('dashboardArea');
-      if(auth){auth.style.setProperty('display','none','important');auth.setAttribute('aria-hidden','true')}
-      if(main)main.style.setProperty('display','none','important');
-      if(dash){dash.style.setProperty('display','block','important');dash.style.setProperty('visibility','visible','important');dash.style.setProperty('opacity','1','important');dash.style.setProperty('pointer-events','auto','important')}
-      document.body.classList.add('logged-in-user');
-      if(typeof window.showDashboard==='function'){try{await Promise.race([Promise.resolve(window.showDashboard()),new Promise(function(resolve){window.setTimeout(resolve,5000)})])}catch(_){}}
-      if(dash)dash.style.setProperty('display','block','important');
+      // Commit the authenticated state before running any optional dashboard initializer.
+      window.currentUser=user;
+      function revealDashboard(){
+        var auth=field('authModal'),main=field('mainSite'),dash=field('dashboardArea');
+        if(auth){auth.classList.remove('open');auth.style.setProperty('display','none','important');auth.setAttribute('aria-hidden','true')}
+        if(main)main.style.setProperty('display','none','important');
+        if(dash){dash.style.setProperty('display','block','important');dash.style.setProperty('visibility','visible','important');dash.style.setProperty('opacity','1','important');dash.style.setProperty('pointer-events','auto','important')}
+        document.body.classList.add('logged-in-user','aethrion-authenticated');
+        hideBusyLayers();
+        try{if(typeof window.onAethrionLoginSuccess==='function')window.onAethrionLoginSuccess(user)}catch(_){}
+        try{window.dispatchEvent(new CustomEvent('aethrion:authenticated',{detail:{user:user}}))}catch(_){}
+        return !!dash;
+      }
+      revealDashboard();
+      // Re-assert the dashboard after legacy observers/initializers settle.
+      [0,250,800,1600,3000].forEach(function(delay){window.setTimeout(revealDashboard,delay)});
+      if(typeof window.showDashboard==='function'){
+        try{await Promise.race([Promise.resolve(window.showDashboard()),new Promise(function(resolve){window.setTimeout(resolve,1800)})])}catch(_){}
+        revealDashboard();
+      }
       notify('Giriş başarılı. AETHRION çalışma alanın açıldı.','success');return true
     }catch(e){notify('Giriş tamamlanamadı: '+String(e&&e.message||e),'error');return false}
     finally{releaseAuth()}
