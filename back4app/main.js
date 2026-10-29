@@ -2267,6 +2267,92 @@ Parse.Cloud.define("superAI", async function (request) {
 });
 
 // ================================================================
+// ========== AETHRION AI CHAT + DAILY QUOTA =======================
+// Free: 24 messages/day. Pro: 2000/day. Team and elevated roles: unlimited.
+// This wrapper is the supported frontend entry point; model credentials stay server-side.
+// ================================================================
+Parse.Cloud.define("aethrionChat", async function (request) {
+    var message = String((request.params && (request.params.message || request.params.prompt)) || '').trim();
+    if (!message) return { success: false, error: 'Lütfen bir mesaj yazın.' };
+    if (message.length > 8000) return { success: false, error: 'Mesaj en fazla 8000 karakter olabilir.' };
+
+    var user = request.user || null;
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+    var role = user ? String(user.get('role') || 'user').toLowerCase() : 'visitor';
+    var plan = user ? String(user.get('plan') || 'free').toLowerCase() : 'free';
+    var unlimited = ['admin', 'founder', 'beta', 'moderator'].indexOf(role) !== -1 || plan === 'team';
+    var limit = unlimited ? -1 : (plan === 'pro' ? 2000 : 24);
+    var identity = user ? String(user.get('email') || user.id) : String(request.ip || request.installationId || '');
+    if (!identity) return { success: false, error: 'Ziyaretçi kimliği belirlenemedi. Sayfayı yenileyip tekrar deneyin.' };
+
+    try {
+        await checkRateLimit('aethrionChat:' + identity, 30, 60 * 1000);
+        await recordAttempt('aethrionChat:' + identity);
+    } catch (rateError) {
+        return { success: false, code: 'RATE_LIMIT', error: 'Çok hızlı mesaj gönderiyorsun. Biraz bekleyip tekrar dene.' };
+    }
+
+    var Usage = Parse.Object.extend('AethrionAIUsage');
+    var query = new Parse.Query(Usage);
+    if (user) query.equalTo('user_email', identity);
+    else {
+        var cryptoModule = require('crypto');
+        var visitorHash = cryptoModule.createHash('sha256').update(identity).digest('hex').slice(0, 32);
+        query.equalTo('visitorKey', visitorHash);
+    }
+    query.greaterThanOrEqualTo('date', today);
+    query.lessThan('date', tomorrow);
+    var usage = await query.first({ useMasterKey: true });
+    if (!usage) {
+        usage = new Usage();
+        if (user) usage.set('user_email', identity);
+        else usage.set('visitorKey', visitorHash);
+        usage.set('date', today);
+        usage.set('count', 0);
+    }
+
+    var used = Number(usage.get('count') || 0);
+    if (!unlimited && used >= limit) {
+        return {
+            success: false,
+            code: 'DAILY_LIMIT',
+            error: 'Günlük AETHRION AI hakkın doldu (' + used + '/' + limit + '). Hakların yarın yenilenir.',
+            limit: limit,
+            used: used,
+            remaining: 0
+        };
+    }
+
+    // Count before generation to prevent concurrent requests from bypassing the quota.
+    usage.increment('count');
+    usage.set('date', today);
+    await usage.save(null, { useMasterKey: true });
+    var newUsed = used + 1;
+    try {
+        var reply = await Parse.Cloud.run('superAI', { prompt: message }, { useMasterKey: true });
+        return {
+            success: true,
+            reply: String(reply == null ? '' : reply),
+            limit: unlimited ? 'Sınırsız' : limit,
+            used: newUsed,
+            remaining: unlimited ? 'Sınırsız' : Math.max(0, limit - newUsed)
+        };
+    } catch (error) {
+        console.error('[aethrionChat] superAI failed:', String(error && error.message || error));
+        return {
+            success: false,
+            code: 'AI_UNAVAILABLE',
+            error: 'AETHRION AI şu anda yanıt üretemedi. Biraz sonra tekrar dene.',
+            limit: unlimited ? 'Sınırsız' : limit,
+            used: newUsed,
+            remaining: unlimited ? 'Sınırsız' : Math.max(0, limit - newUsed)
+        };
+    }
+});
+
+// ================================================================
 // ========== webSearch ==========================================
 // ================================================================
 Parse.Cloud.define("webSearch", async function (request) {
