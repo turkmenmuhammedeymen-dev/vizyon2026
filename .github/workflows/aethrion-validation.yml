@@ -51,7 +51,7 @@ jobs:
             if (!fs.existsSync(path)) failures.push('Broken local asset reference: /' + path);
           }
           if (!html.includes('aethrion-home-workspace.js?v=')) failures.push('Workspace launcher cache version missing');
-if (!html.includes('aethrion-interaction-recovery.js?v=')) failures.push('Interaction recovery cache version missing');
+          if (!html.includes('aethrion-interaction-recovery.js?v=')) failures.push('Interaction recovery cache version missing');
           if (failures.length) {
             console.error(failures.join('\n'));
             process.exit(1);
