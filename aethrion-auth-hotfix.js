@@ -241,13 +241,16 @@
         try{window.dispatchEvent(new CustomEvent('aethrion:authenticated',{detail:{user:user}}))}catch(_){}
         return !!dash;
       }
-      revealDashboard();
-      // Re-assert the dashboard after legacy observers/initializers settle.
-      [0,250,800,1600,3000].forEach(function(delay){window.setTimeout(revealDashboard,delay)});
-      if(typeof window.showDashboard==='function'){
-        try{await Promise.race([Promise.resolve(window.showDashboard()),new Promise(function(resolve){window.setTimeout(resolve,1800)})])}catch(_){}
+      // Keep the successful email-login route self-contained. The legacy showDashboard
+      // chain can run older initializers after authentication and overwrite the active view.
+      // Reveal the dashboard directly, then use the current welcome renderer when available.
+      function finishDashboardRoute(){
+        revealDashboard();
+        try{if(typeof window.showWelcome==='function')window.showWelcome()}catch(_){}
         revealDashboard();
       }
+      finishDashboardRoute();
+      [0,250,800,1600,3000,5000].forEach(function(delay){window.setTimeout(finishDashboardRoute,delay)});
       notify('Giriş başarılı. AETHRION çalışma alanın açıldı.','success');return true
     }catch(e){notify('Giriş tamamlanamadı: '+String(e&&e.message||e),'error');return false}
     finally{releaseAuth()}
