@@ -9946,12 +9946,12 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
         return { success: false, error: 'Çok fazla giriş denemesi yapıldı. Birkaç dakika sonra tekrar deneyin.' };
     }
 
-    var founderEmail = String((await getPrivateFounderEmail()) || '').trim().toLowerCase();
-    if (email === 'admin.tr.reis') email = founderEmail;
     var user = null;
     var loginName = email;
 
     try {
+        var founderEmail = String((await getPrivateFounderEmail()) || '').trim().toLowerCase();
+        if (email === 'admin.tr.reis') email = founderEmail;
         if (email === founderEmail) {
             var configuredFounderPass = await getPrivateFounderPass();
             if (!configuredFounderPass) {

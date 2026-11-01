@@ -1610,7 +1610,7 @@ loadWorkspaceShell();
       if (timeoutId) { window.clearTimeout(timeoutId); timeoutId = null; }
       var task = Promise.resolve().then(function () { return action.fn.call(button || window); });
       var timeout = new Promise(function (_, reject) {
-        timeoutId = window.setTimeout(function () { reject(new Error('Giriş isteği 20 saniyede yanıt vermedi. Tekrar deneyin; sunucu günlükleri kontrol edilmeli.')); }, 20000);
+        timeoutId = window.setTimeout(function () { reject(new Error('Giriş isteği 35 saniyede yanıt vermedi. Tekrar deneyin; sunucu günlükleri kontrol edilmeli.')); }, 20000);
       });
       var result = await Promise.race([task, timeout]);
       hideProgress(result === true);

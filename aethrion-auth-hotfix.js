@@ -180,78 +180,75 @@
     if(!validEmail(email)||!pass){notify('Geçerli e-posta ve şifreni gir.','error');return false}
     if(!window.Parse||!window.Parse.User||!window.Parse.Cloud){notify('Hesap servisi hazır değil. Sayfayı yenileyip tekrar dene.','error');return false}
     try{
-      var user=null,cloudError=null,cloudResult=null,allowClientFallback=false;
-      // Preferred path: server-side email lookup supports old usernames and legacy accounts.
-      // Keep credential/verification rejections authoritative; only fall back for transport,
-      // missing-function, or session-restoration failures.
+      var user=null,directError=null,cloudResult=null;
+      // Primary path: Parse's supported browser login creates and persists the session locally.
+      // This avoids an unnecessary Cloud Code -> session-token round trip for normal accounts.
       try{
-        cloudResult=await authWithTimeout(window.Parse.Cloud.run('aethrionLoginWithEmail',{email:email,password:pass}),15000,'AETHRION email login Cloud Code timeout');
-      }catch(e){
-        cloudError=e;
-        var requestMessage=String(e&&e.message||e);
-        allowClientFallback=/function.*(?:not found|does not exist|unknown)|cloud code.*(?:not found|unavailable)|network|failed to fetch|timeout|timed out|connection/i.test(requestMessage);
-      }
-      if(cloudResult&&cloudResult.code==='EMAIL_NOT_VERIFIED'){
-        authTab('verify');if(field('verifyEmail'))field('verifyEmail').value=email;
-        notify(cloudResult.error||'Hesabını e-posta koduyla doğrulamalısın.','warning');return false;
-      }
-      if(cloudResult&&cloudResult.success===false){
-        throw new Error(cloudResult.error||'E-posta veya şifre hatalı.');
-      }
-      if(cloudResult&&cloudResult.success===true&&cloudResult.sessionToken){
+        user=await authWithTimeout(window.Parse.User.logIn(email,pass),9000,'AETHRION direct login timeout');
+      }catch(e){directError=e}
+      // Compatibility path: older accounts may use a username different from their email.
+      // The server resolves the email to the legacy username and returns a short-lived session.
+      if(!user){
         try{
-          user=await authWithTimeout(window.Parse.User.become(cloudResult.sessionToken),10000,'AETHRION session restore timeout');
+          cloudResult=await authWithTimeout(window.Parse.Cloud.run('aethrionLoginWithEmail',{email:email,password:pass}),9000,'AETHRION email login Cloud Code timeout');
+        }catch(cloudError){
+          var cloudMessage=String(cloudError&&cloudError.message||cloudError||'');
+          var directMessage=String(directError&&directError.message||directError||'');
+          throw new Error(cloudMessage||directMessage||'Giriş sunucusundan yanıt alınamadı.');
+        }
+        if(cloudResult&&cloudResult.code==='EMAIL_NOT_VERIFIED'){
+          authTab('verify');if(field('verifyEmail'))field('verifyEmail').value=email;
+          notify(cloudResult.error||'Hesabını e-posta koduyla doğrulamalısın.','warning');return false;
+        }
+        if(!cloudResult||cloudResult.success!==true||!cloudResult.sessionToken){
+          throw new Error((cloudResult&&cloudResult.error)||String(directError&&directError.message||'E-posta veya şifre hatalı.'));
+        }
+        try{
+          user=await authWithTimeout(window.Parse.User.become(cloudResult.sessionToken),7000,'AETHRION session restore timeout');
         }catch(sessionError){
-          cloudError=sessionError;
-          allowClientFallback=true;
-          console.warn('[AETHRION Auth] Server login accepted credentials but session restoration failed; trying Parse client login.',String(sessionError&&sessionError.message||sessionError).slice(0,160));
-        }
-      }else if(!cloudResult){
-        if(!allowClientFallback)throw cloudError||new Error('Giriş sunucusundan yanıt alınamadı.');
-      }else{
-        throw new Error('Giriş sunucusu geçerli oturum döndürmedi.');
-      }
-      if(!user&&allowClientFallback){
-        try{user=await authWithTimeout(window.Parse.User.logIn(email,pass),12000,'AETHRION client login timeout')}catch(firstError){
-          var byEmail=new window.Parse.Query(window.Parse.User);
-          byEmail.equalTo('email',email);
-          var legacy=await byEmail.first();
-          var legacyUsername=legacy&&legacy.get('username');
-          if(!legacyUsername||String(legacyUsername).toLowerCase()===email) throw firstError;
-          user=await authWithTimeout(window.Parse.User.logIn(legacyUsername,pass),12000,'AETHRION legacy username login timeout');
+          // If the SDK already persisted the session before a delayed response, reuse it.
+          try{user=window.Parse.User.current()}catch(_){}
+          if(!user)throw sessionError;
         }
       }
-      if(!user)throw cloudError||new Error('Sunucu oturum oluşturmadı.');
-      if(!user)throw cloudError||new Error('Sunucu oturum oluşturmadı.');
+      if(!user)throw new Error('Sunucu oturum oluşturmadı.');
+      if(user.get('isBanned')===true){
+        try{await window.Parse.User.logOut()}catch(_){}
+        throw new Error('Bu hesap devre dışı bırakılmış. Destek ekibiyle iletişime geçin.');
+      }
       if(user.get('isVerified')===false&&user.get('emailVerified')!==true&&!!user.get('verificationCode')){
         try{await window.Parse.User.logOut()}catch(_){}
         authTab('verify');if(field('verifyEmail'))field('verifyEmail').value=email;
-        notify('Hesap henüz doğrulanmamış. E-postandaki kodu gir veya yeni kod iste.','warning');return false
+        notify('Hesap henüz doğrulanmamış. E-postandaki kodu gir veya yeni kod iste.','warning');return false;
       }
-      // Commit the authenticated state before running any optional dashboard initializer.
+      // Confirm that Parse has persisted a current session before changing the visible route.
+      var current=null;
+      try{current=window.Parse.User.current()}catch(_){}
+      if(!current)throw new Error('Giriş yanıtı alındı ancak oturum telefona/tarayıcıya kaydedilemedi. Tekrar deneyin.');
+      user=current;
       window.currentUser=user;
       function revealDashboard(){
         var auth=field('authModal'),main=field('mainSite'),dash=field('dashboardArea');
+        if(!dash)return false;
         if(auth){auth.classList.remove('open');auth.style.setProperty('display','none','important');auth.setAttribute('aria-hidden','true')}
         if(main)main.style.setProperty('display','none','important');
-        if(dash){dash.style.setProperty('display','block','important');dash.style.setProperty('visibility','visible','important');dash.style.setProperty('opacity','1','important');dash.style.setProperty('pointer-events','auto','important')}
+        dash.style.setProperty('display','block','important');
+        dash.style.setProperty('visibility','visible','important');
+        dash.style.setProperty('opacity','1','important');
+        dash.style.setProperty('pointer-events','auto','important');
         document.body.classList.add('logged-in-user','aethrion-authenticated');
         hideBusyLayers();
         try{if(typeof window.onAethrionLoginSuccess==='function')window.onAethrionLoginSuccess(user)}catch(_){}
         try{window.dispatchEvent(new CustomEvent('aethrion:authenticated',{detail:{user:user}}))}catch(_){}
-        return !!dash;
+        return true;
       }
-      // Keep the successful email-login route self-contained. The legacy showDashboard
-      // chain can run older initializers after authentication and overwrite the active view.
-      // Reveal the dashboard directly, then use the current welcome renderer when available.
       function finishDashboardRoute(){
-        revealDashboard();
         try{if(typeof window.showWelcome==='function')window.showWelcome()}catch(_){}
-        revealDashboard();
+        if(!revealDashboard())throw new Error('Dashboard alanı sayfada bulunamadı. Arayüz dosyalarını kontrol edin.');
       }
       finishDashboardRoute();
-      [0,250,800,1600,3000,5000].forEach(function(delay){window.setTimeout(finishDashboardRoute,delay)});
-      notify('Giriş başarılı. AETHRION çalışma alanın açıldı.','success');return true
+      [250,800,1600,3000].forEach(function(delay){window.setTimeout(function(){try{revealDashboard()}catch(_){hideBusyLayers()}},delay)});
+      notify('Giriş başarılı. AETHRION çalışma alanın açıldı.','success');return true;
     }catch(e){notify('Giriş tamamlanamadı: '+String(e&&e.message||e),'error');return false}
     finally{releaseAuth()}
   };
