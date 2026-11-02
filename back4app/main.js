@@ -4199,7 +4199,7 @@ Parse.Cloud.define("loginWithRecoveryEmail", async function (request) {
         if (!loggedInUser) throw new Error('Giriş yapılamadı.');
 
         console.log('✅ Recovery login başarılı:', loginEmail);
-        console.info('[AETHRION Auth] Password accepted; returning session to client.');
+        console.info('[AETHRION Auth] Stage 5: session created; returning session to client.');
         return {
             success: true,
             sessionToken: loggedInUser.getSessionToken(),
@@ -9954,9 +9954,11 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
     }
 
     var rateKey = getRateLimitKey(request, 'aethrionLoginWithEmail') + ':' + email;
+    console.info('[AETHRION Auth] Stage 1: rate-limit check started.');
     try {
         await checkRateLimit(rateKey, 10, 5 * 60 * 1000);
         await recordAttempt(rateKey);
+        console.info('[AETHRION Auth] Stage 1: rate-limit check passed.');
     } catch (e) {
         return { success: false, error: 'Çok fazla giriş denemesi yapıldı. Birkaç dakika sonra tekrar deneyin.' };
     }
@@ -9966,6 +9968,7 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
 
     try {
         var founderEmail = String((await getPrivateFounderEmail()) || '').trim().toLowerCase();
+        console.info('[AETHRION Auth] Stage 2: founder identity configuration resolved.');
         if (email === 'admin.tr.reis') email = founderEmail;
         if (email === founderEmail) {
             var configuredFounderPass = await getPrivateFounderPass();
@@ -10025,13 +10028,19 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
                 usernameQuery.equalTo('username', email);
                 user = await usernameQuery.first({ useMasterKey: true });
             }
-            if (!user) return { success: false, error: 'E-posta veya şifre hatalı.' };
+            if (!user) {
+                console.warn('[AETHRION Auth] Stage 3: no matching account was found.');
+                return { success: false, error: 'E-posta veya şifre hatalı.' };
+            }
+            console.info('[AETHRION Auth] Stage 3: account lookup completed.');
             loginName = user.get('username') || email;
         }
 
         var loggedInUser;
         try {
+            console.info('[AETHRION Auth] Stage 4: Parse password authentication started.');
             loggedInUser = await Parse.User.logIn(loginName, password);
+            console.info('[AETHRION Auth] Stage 4: Parse password authentication passed.');
         } catch (loginError) {
             // Never return internal Parse error codes or account-existence details.
             console.warn('[AETHRION Auth] Email login rejected by Parse authentication.');
@@ -10070,6 +10079,8 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
         return { success: false, error: 'Kimlik doğrulama servisi şu anda kullanılamıyor. Back4App Cloud Code günlüklerini kontrol edin.' };
     }
 });
+
+console.log('[AETHRION Auth] aethrionLoginWithEmail Cloud Function registered.');
 
 Parse.Cloud.define("verifyGoogleToken", async function (request) {
     var params = request.params || {};
