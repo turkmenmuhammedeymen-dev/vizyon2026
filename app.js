@@ -1546,32 +1546,71 @@ loadWorkspaceShell();
     return overlay;
   }
 
+  var progressFailsafeTimer = null;
+
   function showProgress(message) {
     var el = ensureOverlay();
-    // Re-append before showing so no later-created modal can paint over progress.
+    if (progressFailsafeTimer) window.clearTimeout(progressFailsafeTimer);
     if (document.body && el.parentNode !== document.body) document.body.appendChild(el);
     el.style.zIndex = '2147483647';
     el.classList.add('is-visible');
+    el.setAttribute('aria-hidden', 'false');
     if (statusNode) statusNode.textContent = message;
     if (progressNode) { progressNode.style.width = '8%'; window.requestAnimationFrame(function () { if (progressNode) progressNode.style.width = '72%'; }); }
+    progressFailsafeTimer = window.setTimeout(function () {
+      if (overlay && overlay.classList.contains('is-visible')) {
+        overlay.classList.remove('is-visible');
+        overlay.setAttribute('aria-hidden', 'true');
+        notify('İşlem zaman aşımına uğradı. Sayfanın geri kalanı kullanılabilir; tekrar deneyin.', 'warning');
+      }
+      progressFailsafeTimer = null;
+    }, 12000);
   }
 
   function hideProgress(success) {
+    if (progressFailsafeTimer) {
+      window.clearTimeout(progressFailsafeTimer);
+      progressFailsafeTimer = null;
+    }
     if (!overlay) return;
     if (success && statusNode) statusNode.textContent = 'İşlem tamamlandı.';
     if (progressNode) progressNode.style.width = success ? '100%' : '8%';
     window.setTimeout(function () {
-      if (overlay) overlay.classList.remove('is-visible');
+      if (overlay) {
+        overlay.classList.remove('is-visible');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
       if (progressNode) progressNode.style.width = '8%';
     }, success ? 220 : 0);
   }
 
   async function ensureParseReady() {
-    if (!window.Parse || !window.Parse.User) throw new Error('Kimlik doğrulama bileşeni yüklenemedi. Sayfayı yenileyip tekrar deneyin.');
-    if (window.parseInitialized || window.Parse.applicationId) return true;
-    if (typeof window.initBack4app !== 'function') throw new Error('Sunucu bağlantısı henüz hazır değil.');
-    var result = await window.initBack4app();
-    if (result === false || (!window.parseInitialized && !window.Parse.applicationId)) throw new Error('Back4App bağlantısı başlatılamadı.');
+    var expectedAppId = 'Dr9SODgMburZ54QvC8RnIHc9dbjreozBbKLOpMjX';
+    var expectedServer = 'https://parseapi.back4app.com/';
+    if (!window.Parse || !window.Parse.User || !window.Parse.Cloud) {
+      throw new Error('Kimlik doğrulama bileşeni yüklenemedi. Sayfayı yenileyip tekrar deneyin.');
+    }
+
+    // A truthy applicationId alone is not proof that this app's Parse client is
+    // correctly configured. Never silently continue with another app or server.
+    if (window.Parse.applicationId && window.Parse.applicationId !== expectedAppId) {
+      throw new Error('Back4App App ID uyuşmuyor. AETHRION istemci yapılandırmasını kontrol edin.');
+    }
+
+    if (!window.parseInitialized && typeof window.initBack4app === 'function') {
+      var result = await window.initBack4app();
+      if (result === false) throw new Error('Back4App bağlantısı başlatılamadı.');
+    } else if (!window.Parse.applicationId) {
+      throw new Error('Back4App bağlantısı henüz başlatılmadı.');
+    }
+
+    if (window.Parse.applicationId !== expectedAppId) {
+      throw new Error('Back4App App ID doğrulanamadı. Sayfayı yenileyip tekrar deneyin.');
+    }
+    if (!window.Parse.serverURL || String(window.Parse.serverURL).replace(/\/$/, '') !== expectedServer.replace(/\/$/, '')) {
+      window.Parse.serverURL = expectedServer;
+    }
+    window.parseInitialized = true;
     return true;
   }
 
@@ -1600,17 +1639,17 @@ loadWorkspaceShell();
     showProgress(action.message);
     var timeoutId;
     try {
-      // Parse initialization can itself hang before the previous action timeout starts.
-      // Bound BOTH initialization and the actual auth request so the button is always released.
-      var ready = Promise.resolve().then(ensureParseReady);
-      var readyTimeout = new Promise(function (_, reject) {
-        timeoutId = window.setTimeout(function () { reject(new Error('Back4App bağlantısı 12 saniye içinde hazır olmadı. Sayfayı yenileyin; bağlantı/Cloud Code durumunu kontrol edin.')); }, 12000);
-      });
-      await Promise.race([ready, readyTimeout]);
-      if (timeoutId) { window.clearTimeout(timeoutId); timeoutId = null; }
-      var task = Promise.resolve().then(function () { return action.fn.call(button || window); });
+      // Bound the complete flow, including Parse initialization. Previously the timeout
+      // started only after initBack4app(), so a stalled initializer could leave the
+      // button disabled forever even after the progress overlay hid itself.
+      var task = (async function () {
+        await ensureParseReady();
+        return await action.fn.call(button || window);
+      })();
       var timeout = new Promise(function (_, reject) {
-        timeoutId = window.setTimeout(function () { reject(new Error('Giriş isteği 35 saniyede yanıt vermedi. Tekrar deneyin; sunucu günlükleri kontrol edilmeli.')); }, 35000);
+        timeoutId = window.setTimeout(function () {
+          reject(new Error('Kimlik doğrulama 45 saniye içinde tamamlanmadı. Sunucu yanıt vermedi veya sağlayıcı ayarı eksik. Tekrar deneyin; sorun sürerse Back4App Cloud Code günlüklerini kontrol edin.'));
+        }, 45000);
       });
       var result = await Promise.race([task, timeout]);
       hideProgress(result === true);
