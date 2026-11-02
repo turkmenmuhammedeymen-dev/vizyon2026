@@ -160,8 +160,8 @@
       })();
       var timeout = new Promise(function (_, reject) {
         timeoutId = window.setTimeout(function () {
-          reject(new Error('Kimlik doğrulama 35 saniye içinde tamamlanmadı. Sunucu yanıt vermedi veya sağlayıcı ayarı eksik. Tekrar deneyin; sorun sürerse Back4App Cloud Code günlüklerini kontrol edin.'));
-        }, 35000);
+          reject(new Error('Kimlik doğrulama 45 saniye içinde tamamlanmadı. Sunucu yanıt vermedi veya sağlayıcı ayarı eksik. Tekrar deneyin; sorun sürerse Back4App Cloud Code günlüklerini kontrol edin.'));
+        }, 45000);
       });
       var result = await Promise.race([task, timeout]);
       hideProgress(result === true);
