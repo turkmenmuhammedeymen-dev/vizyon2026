@@ -43,7 +43,7 @@ jobs:
             if (!html.includes(file)) failures.push('index.html does not load ' + file);
           }
           const localRefs = new Set();
-          for (const match of html.matchAll(/(?:src|href)=[\"']((?:\\.\\/|\\/)?[^\"'?#]+)(?:\\?[^\"']*)?[\"']/gi)) {
+          for (const match of html.matchAll(/(?:src|href)=[\"']([^\"']+)[\"']/gi)) {
             const raw = match[1];
             if (/^(?:https?:|\\/\\/|#|data:|mailto:)/i.test(raw)) continue;
             const path = raw.replace(/^\\.\\//, '').replace(/^\\//, '');
