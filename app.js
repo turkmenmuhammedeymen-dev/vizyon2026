@@ -430,7 +430,7 @@ function loadLateTheme() {
   if (!current) {
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = '/aethrion-experience.css?v=20261029-clickfix2';
+    link.href = './aethrion-experience.css?v=20261029-clickfix2';
     link.setAttribute('data-aethrion-late-theme', 'true');
     (document.head || document.documentElement).appendChild(link);
   }
@@ -447,7 +447,7 @@ function updateBrandMetadata() {
   });
   var canonical = document.querySelector('link[rel="canonical"]');
   if (canonical && /vizyon2026\.vercel\.app\/vizyon-(ai|al)\.html/i.test(canonical.href)) {
-    canonical.href = canonical.href.replace('/vizyon-ai.html', '/aethrion-ai.html').replace('/vizyon-al.html', '/aethrion-assistant.html');
+    canonical.href = canonical.href.replace('./vizyon-ai.html', './aethrion-ai.html').replace('./vizyon-al.html', './aethrion-assistant.html');
   }
 }
 function updateFriendlyRoutes() {
@@ -458,12 +458,12 @@ function updateFriendlyRoutes() {
       var u = new URL(raw, location.href);
       if (u.origin !== location.origin && u.hostname !== 'vizyon2026.vercel.app') return;
       var routeMap = {
-        '/vizyon-ai.html': '/aethrion-ai.html',
-        '/vizyon-al.html': '/aethrion-assistant.html',
-        '/vizyonekibi.html': '/aethrion-ekibi.html'
+        './vizyon-ai.html': './aethrion-ai.html',
+        './vizyon-al.html': './aethrion-assistant.html',
+        './vizyonekibi.html': './aethrion-ekibi.html'
       };
       if (routeMap[u.pathname]) a.setAttribute('href', routeMap[u.pathname] + u.search + u.hash);
-      else if (u.hostname === 'vizyon2026.vercel.app' && u.pathname !== '/') {
+      else if (u.hostname === 'vizyon2026.vercel.app' && u.pathname !== '.') {
         a.setAttribute('href', u.pathname + u.search + u.hash);
       }
     } catch (e) {}
@@ -488,23 +488,23 @@ function ensurePolicyLinks() {
     nav.innerHTML =
     '<div><strong>Yasal ve güvenlik belgeleri</strong><small>Gizlilik, hesap, API ve hizmet koşullarını inceleyin.</small></div>' +
     '<div class="ae-legal-links">' +
-    '<a href="/gizlilik.html">Gizlilik Politikası</a>' +
-    '<a href="/iade-ve-iptal-politikasi.html">İptal ve İade Politikası</a>' +
-    '<a href="/kullanici-sozlesmesi.html">Kullanıcı Sözleşmesi</a>' +
-    '<a href="/cerez-politikasi.html">Çerez Politikası</a>' +
-    '<a href="/kvkk-aydinlatma.html">KVKK Aydınlatma</a>' +
-    '<a href="/api-kullanim-kosullari.html">A27 API Koşulları</a>' +
-    '<a href="/api-belgelendirme.html">API Belgeleri</a>' +
-    '<a href="/ai-kullanim-politikasi.html">AI Kullanım Politikası</a>' +
-    '<a href="/guvenlik-politikasi.html">Güvenlik Politikası</a>' +
-    '<a href="/hesap-ve-oturum-guvenligi.html">Hesap ve Oturum Güvenliği</a>' +
-    '<a href="/veri-saklama-silme-politikasi.html">Veri Saklama ve Silme</a>' +
-    '<a href="/icerik-ve-fikri-mulkiyet.html">İçerik ve Fikri Mülkiyet</a>' +
-    '<a href="/kabul-edilebilir-kullanim.html">Kabul Edilebilir Kullanım</a>' +
-    '<a href="/ucuncu-taraf-hizmetler.html">Üçüncü Taraf Hizmetler</a>' +
-    '<a href="/erisilebilirlik.html">Erişilebilirlik</a>' +
-    '<a href="/sorumlu-aciklama.html">Sorumlu Açıklama</a>' +
-    '<a href="/iletisim-ve-basvuru.html">Destek ve Başvuru</a>' +
+    '<a href="./gizlilik.html">Gizlilik Politikası</a>' +
+    '<a href="./iade-ve-iptal-politikasi.html">İptal ve İade Politikası</a>' +
+    '<a href="./kullanici-sozlesmesi.html">Kullanıcı Sözleşmesi</a>' +
+    '<a href="./cerez-politikasi.html">Çerez Politikası</a>' +
+    '<a href="./kvkk-aydinlatma.html">KVKK Aydınlatma</a>' +
+    '<a href="./api-kullanim-kosullari.html">A27 API Koşulları</a>' +
+    '<a href="./api-belgelendirme.html">API Belgeleri</a>' +
+    '<a href="./ai-kullanim-politikasi.html">AI Kullanım Politikası</a>' +
+    '<a href="./guvenlik-politikasi.html">Güvenlik Politikası</a>' +
+    '<a href="./hesap-ve-oturum-guvenligi.html">Hesap ve Oturum Güvenliği</a>' +
+    '<a href="./veri-saklama-silme-politikasi.html">Veri Saklama ve Silme</a>' +
+    '<a href="./icerik-ve-fikri-mulkiyet.html">İçerik ve Fikri Mülkiyet</a>' +
+    '<a href="./kabul-edilebilir-kullanim.html">Kabul Edilebilir Kullanım</a>' +
+    '<a href="./ucuncu-taraf-hizmetler.html">Üçüncü Taraf Hizmetler</a>' +
+    '<a href="./erisilebilirlik.html">Erişilebilirlik</a>' +
+    '<a href="./sorumlu-aciklama.html">Sorumlu Açıklama</a>' +
+    '<a href="./iletisim-ve-basvuru.html">Destek ve Başvuru</a>' +
     '</div>';
     footer.appendChild(nav);
   }
@@ -739,7 +739,7 @@ function loadOpsStyles() {
   if (document.querySelector('link[data-aethrion-ops-css]')) return;
   var link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = '/aethrion-ops.css?v=20261023-2';
+  link.href = './aethrion-ops.css?v=20261023-2';
   link.setAttribute('data-aethrion-ops-css', 'true');
   document.head.appendChild(link);
 }
@@ -815,11 +815,11 @@ function installOpsFeatureCards() {
     var a = document.createElement('a'); a.href = href; a.textContent = 'Aç →'; a.setAttribute('aria-label', title + ' sayfasını aç');
     card.append(iconNode, h, p, a); return card;
   }
-  section.appendChild(makeCard('AETHRION Developer Platform', 'API belgeleri, anahtar izinleri ve kullanım istatistikleri.', '/aethrion-developer.html', '/aethrion-status-icon.svg'));
-  section.appendChild(makeCard('AETHRION Teams', 'Takımlar, üyeler, rol yönetimi ve denetlenebilir işlem geçmişi.', '/aethrion-teams.html', '/aethrion-audit-icon.svg'));
+  section.appendChild(makeCard('AETHRION Developer Platform', 'API belgeleri, anahtar izinleri ve kullanım istatistikleri.', './aethrion-developer.html', './aethrion-status-icon.svg'));
+  section.appendChild(makeCard('AETHRION Teams', 'Takımlar, üyeler, rol yönetimi ve denetlenebilir işlem geçmişi.', './aethrion-teams.html', './aethrion-audit-icon.svg'));
   if (privileged) {
-    section.appendChild(makeCard('Proje denetim kaydı', 'Takım projelerindeki kayıtlı olayları incele.', '/aethrion-project-audit.html', '/aethrion-audit-icon.svg'));
-    section.appendChild(makeCard('AETHRION Status & Diagnostics', 'Cloud Code, oturum, veri deposu, model ve dağıtım kontrolleri.', '/aethrion-status.html', '/aethrion-status-icon.svg'));
+    section.appendChild(makeCard('Proje denetim kaydı', 'Takım projelerindeki kayıtlı olayları incele.', './aethrion-project-audit.html', './aethrion-audit-icon.svg'));
+    section.appendChild(makeCard('AETHRION Status & Diagnostics', 'Cloud Code, oturum, veri deposu, model ve dağıtım kontrolleri.', './aethrion-status.html', './aethrion-status-icon.svg'));
   }
   var heading = document.createElement('h2'); heading.className = 'ae-tool-eyebrow'; heading.textContent = 'AETHRION PLATFORM ARAÇLARI';
   var wrapper = document.createElement('section'); wrapper.className = 'ae-ops-navigation'; wrapper.setAttribute('data-aethrion-ops-wrapper', 'true'); wrapper.append(heading, section);
@@ -874,26 +874,26 @@ var FALLBACK_FEATURES = [
  {group:'CORE',icon:'◈',name:'AETHRION Agents',desc:'Ajan, ekran okuma ve dosya araçları',action:'openAethrionAlPanel'},
  {group:'CORE',icon:'◎',name:'AETHRION Coach',desc:'Kişisel AI asistanı',action:'openKocPanel'},
  {group:'CORE',icon:'◉',name:'Model Kataloğu',desc:'Tanımlı model seçeneklerini incele',action:'openModelsShowcase'},
- {group:'CREATE',icon:'◇',name:'3D Studio',desc:'Üç boyutlu tasarım araçları',action:'open3DBuilder',href:'/3d-studio.html'},
+ {group:'CREATE',icon:'◇',name:'3D Studio',desc:'Üç boyutlu tasarım araçları',action:'open3DBuilder',href:'./3d-studio.html'},
  {group:'CREATE',icon:'▶',name:'Video Editör',desc:'Video düzenleme çalışma alanı',action:'openVideoEditor'},
  {group:'CREATE',icon:'▣',name:'Video Stüdyosu',desc:'Video fikirleri ve üretim araçları',action:'openVideoStudio'},
- {group:'PLATFORM',icon:'⌂',name:'Topluluk ve Takımlar',desc:'Takım ve ortak proje alanları',action:'toggleTeamPage',href:'/topluluk.html'},
+ {group:'PLATFORM',icon:'⌂',name:'Topluluk ve Takımlar',desc:'Takım ve ortak proje alanları',action:'toggleTeamPage',href:'./topluluk.html'},
  {group:'PLATFORM',icon:'▤',name:'Projelerim',desc:'Projelerine ve kayıtlarına eriş',action:'scrollToProjects'},
- {group:'ADVANCED',icon:'⌘',name:'A27 API Anahtarı',desc:'API erişim seçenekleri',action:'openA27ApiKeyGenerator',href:'/api.html#keys'},
- {group:'ADVANCED',icon:'↗',name:'A27 API Rehberi',desc:'API belgeleri ve örnekler',action:'openA27ApiGuide',href:'/api.html'},
- {group:'ADVANCED',icon:'▥',name:'Dokümantasyon',desc:'Teknik belgeler ve kullanım rehberi',action:'openDocumentation',href:'/dokumantasyon.html'},
+ {group:'ADVANCED',icon:'⌘',name:'A27 API Anahtarı',desc:'API erişim seçenekleri',action:'openA27ApiKeyGenerator',href:'./api.html#keys'},
+ {group:'ADVANCED',icon:'↗',name:'A27 API Rehberi',desc:'API belgeleri ve örnekler',action:'openA27ApiGuide',href:'./api.html'},
+ {group:'ADVANCED',icon:'▥',name:'Dokümantasyon',desc:'Teknik belgeler ve kullanım rehberi',action:'openDocumentation',href:'./dokumantasyon.html'},
  {group:'ACCOUNT',icon:'⚙',name:'Ayarlar',desc:'Hesap ve uygulama tercihleri',action:'openSettingsModal'},
  {group:'ACCOUNT',icon:'◌',name:'Hesap bilgilerim',desc:'Profil, üyelik ve cihaz bilgileri',action:'openAccountInfo'}
 ];
 var ROUTES = {
- openAethrionAlPanel:'/aethrion-assistant.html', openVizyonAlPanel:'/aethrion-assistant.html',
- openFullAIPanel:'/aethrion-ai.html', openAethrionAI:'/aethrion-ai.html', openKocPanel:'/aethrion-assistant.html',
- open3DBuilder:'/3d-studio.html', openA27ApiGuide:'/api.html', openV27ApiGuide:'/api.html',
- openA27ApiKeyGenerator:'/api.html#keys', createA27ApiKey:'/api.html#keys',
- openVideoEditor:'/index.html#features', openVideoStudio:'/index.html#features',
- openModelsShowcase:'/aethrion-ai.html#models', toggleTeamPage:'/topluluk.html',
- openContestPage:'/topluluk.html', scrollToAcademy:'/bana-ogret.html', openAcademy:'/bana-ogret.html',
- openDocumentation:'/dokumantasyon.html', openBlog:'/blog.html', openAbout:'/hakkimizda.html'
+ openAethrionAlPanel:'./aethrion-assistant.html', openVizyonAlPanel:'./aethrion-assistant.html',
+ openFullAIPanel:'./aethrion-ai.html', openAethrionAI:'./aethrion-ai.html', openKocPanel:'./aethrion-assistant.html',
+ open3DBuilder:'./3d-studio.html', openA27ApiGuide:'./api.html', openV27ApiGuide:'./api.html',
+ openA27ApiKeyGenerator:'./api.html#keys', createA27ApiKey:'./api.html#keys',
+ openVideoEditor:'./index.html#features', openVideoStudio:'./index.html#features',
+ openModelsShowcase:'./aethrion-ai.html#models', toggleTeamPage:'./topluluk.html',
+ openContestPage:'./topluluk.html', scrollToAcademy:'./bana-ogret.html', openAcademy:'./bana-ogret.html',
+ openDocumentation:'./dokumantasyon.html', openBlog:'./blog.html', openAbout:'./hakkimizda.html'
 };
 var splashDone = false;
 var menuReady = false;
@@ -1194,14 +1194,14 @@ function runAction(action, name, href) {
 function fallbackAction(action, name) {
  var route = ROUTES[action] || '';
  if (!route) {
-  if (/3d|üç boyut/i.test(name)) route = '/3d-studio.html';
-  else if (/api|anahtar/i.test(name)) route = '/api.html';
-  else if (/coach|koç|asistan/i.test(name)) route = '/aethrion-assistant.html';
-  else if (/ai|yapay zekâ|yapay zeka|model/i.test(name)) route = '/aethrion-ai.html';
-  else if (/topluluk|takım|community/i.test(name)) route = '/topluluk.html';
-  else if (/video/i.test(name)) route = '/index.html#features';
-  else if (/blog/i.test(name)) route = '/blog.html';
-  else if (/doküman|belge/i.test(name)) route = '/dokumantasyon.html';
+  if (/3d|üç boyut/i.test(name)) route = './3d-studio.html';
+  else if (/api|anahtar/i.test(name)) route = './api.html';
+  else if (/coach|koç|asistan/i.test(name)) route = './aethrion-assistant.html';
+  else if (/ai|yapay zekâ|yapay zeka|model/i.test(name)) route = './aethrion-ai.html';
+  else if (/topluluk|takım|community/i.test(name)) route = './topluluk.html';
+  else if (/video/i.test(name)) route = './index.html#features';
+  else if (/blog/i.test(name)) route = './blog.html';
+  else if (/doküman|belge/i.test(name)) route = './dokumantasyon.html';
  }
  if (route) { location.href = route; return; }
  if (typeof window.showNotification === 'function') window.showNotification('Bu özelliğin açılış noktası bulunamadı. Lütfen özelliğin bağlantısını kontrol edin.', 'warning');
@@ -1226,7 +1226,7 @@ function installClickRouter() {
    event.preventDefault(); event.stopImmediatePropagation();
    if (quick === 'menu') openDrawer();
    else if (quick === 'ai') runAction('openFullAIPanel', 'AETHRION AI');
-   else if (quick === 'api') { location.href = '/api.html'; }
+   else if (quick === 'api') { location.href = './api.html'; }
    else if (quick === 'account') {
     if (typeof window.openAccountInfo === 'function') window.openAccountInfo();
     else runAction('openAccountInfo', 'Hesap bilgilerim');
@@ -1389,7 +1389,7 @@ function loadWorkspaceShell() {
   function ensureCss(id, href) {
    if (document.getElementById(id) || document.querySelector('link[href*="' + href + '"]')) return;
    var link = document.createElement('link');
-   link.id = id; link.rel = 'stylesheet'; link.href = '/' + href;
+   link.id = id; link.rel = 'stylesheet'; link.href = '.' + href;
    (document.head || document.documentElement).appendChild(link);
   }
   ensureCss('aethrionWorkspaceV5Css','aethrion-workspace-v5.css');
@@ -1754,7 +1754,7 @@ function stopVoice(){if(recognition){try{recognition.stop();}catch(e){}}listenin
 function speak(text){if(!window.speechSynthesis||!window.SpeechSynthesisUtterance)return;window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text);u.lang=(navigator.language||'tr-TR').toLowerCase().indexOf('en')===0?'en-US':'tr-TR';window.speechSynthesis.speak(u);}
 function init(){
 if(!document.querySelector('#mainSite,#splashScreen,#dashboard,#mainDashboard')||document.getElementById('aeJvLauncher'))return;
-var css=document.createElement('link');css.rel='stylesheet';css.href='/aethrion-jarvis.css?v=20261022-1';document.head.appendChild(css);
+var css=document.createElement('link');css.rel='stylesheet';css.href='./aethrion-jarvis.css?v=20261022-1';document.head.appendChild(css);
 var launcher=node('button','ae-jv-launcher');launcher.type='button';launcher.setAttribute('aria-controls','aeJvPanel');launcher.setAttribute('aria-expanded','false');launcher.innerHTML='<span class="ae-jv-orb">A</span><span><b>AETHRION</b><small>AI · JARVIS</small></span>';
 var panel=node('section','ae-jv-panel');panel.id='aeJvPanel';panel.hidden=true;panel.setAttribute('role','dialog');panel.setAttribute('aria-labelledby','aeJvTitle');
 panel.innerHTML='<header class="ae-jv-head"><div><small>AETHRION INTELLIGENCE</small><h2 id="aeJvTitle">Sesli asistan</h2><p>Metin ve sesli sohbet</p></div><button id="aeJvClose" type="button" aria-label="Kapat">×</button></header><div class="ae-jv-modes"><button type="button" data-mode="normal" class="active" aria-pressed="true">AETHRION AI<small>Normal sohbet</small></button><button type="button" data-mode="agent" aria-pressed="false">AETHRION JARVIS<small>Görev asistanı</small></button></div><p id="aeJvNotice" class="ae-jv-notice">Mikrofon yalnızca ses düğmesine bastığında etkinleşir. Mesajın AI hizmetine gönderilebilir.</p><div id="aeJvStatus" class="ae-jv-status" role="status" aria-live="polite">Hazır. Mesajını yaz veya sesle konuş.</div><div id="aeJvMessages" class="ae-jv-messages"><div class="ae-jv-message ae-jv-assistant"><span class="ae-jv-label">AETHRION</span><p class="ae-jv-body">Merhaba! AETHRION AI ile sohbet edebilir veya JARVIS görev modunu seçebilirsin.</p></div></div><form id="aeJvForm" class="ae-jv-form"><textarea id="aeJvInput" maxlength="4000" rows="2" placeholder="Mesajını yaz…" aria-label="Mesajın"></textarea><div class="ae-jv-actions"><input id="aeJvFileInput" type="file" accept="image/*,application/pdf,audio/*,video/*,.docx,.xlsx,.xls,.txt,.md,.csv,.json,.js,.ts,.py,.html,.css,.xml,.yaml,.yml,.log" hidden><button id="aeJvAttach" type="button" aria-label="Dosya ekle" title="Dosya ekle">📎 Dosya</button><button id="aeJvMic" type="button" aria-label="Sesle konuş">🎙️</button><span id="aeJvFileLabel">Yanıtları önemli konularda doğrula.</span><button id="aeJvSend" type="submit">Gönder ↗</button></div></form><footer>AETHRION · Intelligence Without Limits</footer>';
@@ -1869,7 +1869,7 @@ checkDueReminders();window.setInterval(checkDueReminders,15000);window.addEventL
 /* ===== aethrion-workspace-v5.js ===== */
 (function(){'use strict';
 var CORE=[
-['YAPAY ZEKÂ','✦','AETHRION AI','Birleşik yapay zekâ çalışma alanı','openFullAIPanel','/aethrion-ai.html'],['YAPAY ZEKÂ','◈','AETHRION Agents','Ajanlar, ekran ve dosya araçları','openAethrionAlPanel','/aethrion-assistant.html'],['YAPAY ZEKÂ','◎','AETHRION Coach','Kişisel yapay zekâ koçu','openKocPanel','/aethrion-assistant.html'],['YAPAY ZEKÂ','◉','Model Kataloğu','Tanımlı modelleri incele','openModelsShowcase','/aethrion-ai.html#models'],['ÜRETİM','◇','3D Studio','Üç boyutlu tasarım alanı','open3DBuilder','/3d-studio.html'],['ÜRETİM','▶','Video Editör','Video düzenleme araçları','openVideoEditor','/index.html#features'],['ÜRETİM','▣','Video Stüdyosu','Video üretim çalışma alanı','openVideoStudio','/index.html#features'],['ÜRETİM','▧','Görsel Üretimi','Görsel üretim alanı','scrollToImageGen','/index.html#features'],['ÜRETİM','⌘','Kod Editörü','Kod geliştirme araçları','openCodeEditor','/kod-editoru.html'],['PLATFORM','◇','Topluluk','Topluluk ve takımlar','toggleTeamPage','/topluluk.html'],['PLATFORM','▤','Projelerim','Projeler ve kayıtlar','scrollToProjects',''],['PLATFORM','✎','Akademi','Öğrenme alanı','openAcademy','/bana-ogret.html'],['GELİŞTİRİCİ','⌘','A27 API','API anahtarları ve erişim','openA27ApiKeyGenerator','/api.html#keys'],['GELİŞTİRİCİ','↗','API Belgeleri','Geliştirici rehberi','openA27ApiGuide','/api.html'],['GELİŞTİRİCİ','▥','Dokümantasyon','Teknik rehberler','openDocumentation','/dokumantasyon.html'],['HESAP','⚙','Ayarlar','Uygulama tercihleri','openSettingsModal',''],['HESAP','◌','Hesap bilgilerim','Profil ve hesap ayrıntıları','openAccountInfo',''],['HESAP','↪','Oturumu kapat','Güvenli çıkış','doLogout','']];
+['YAPAY ZEKÂ','✦','AETHRION AI','Birleşik yapay zekâ çalışma alanı','openFullAIPanel','./aethrion-ai.html'],['YAPAY ZEKÂ','◈','AETHRION Agents','Ajanlar, ekran ve dosya araçları','openAethrionAlPanel','./aethrion-assistant.html'],['YAPAY ZEKÂ','◎','AETHRION Coach','Kişisel yapay zekâ koçu','openKocPanel','./aethrion-assistant.html'],['YAPAY ZEKÂ','◉','Model Kataloğu','Tanımlı modelleri incele','openModelsShowcase','./aethrion-ai.html#models'],['ÜRETİM','◇','3D Studio','Üç boyutlu tasarım alanı','open3DBuilder','./3d-studio.html'],['ÜRETİM','▶','Video Editör','Video düzenleme araçları','openVideoEditor','./index.html#features'],['ÜRETİM','▣','Video Stüdyosu','Video üretim çalışma alanı','openVideoStudio','./index.html#features'],['ÜRETİM','▧','Görsel Üretimi','Görsel üretim alanı','scrollToImageGen','./index.html#features'],['ÜRETİM','⌘','Kod Editörü','Kod geliştirme araçları','openCodeEditor','./kod-editoru.html'],['PLATFORM','◇','Topluluk','Topluluk ve takımlar','toggleTeamPage','./topluluk.html'],['PLATFORM','▤','Projelerim','Projeler ve kayıtlar','scrollToProjects',''],['PLATFORM','✎','Akademi','Öğrenme alanı','openAcademy','./bana-ogret.html'],['GELİŞTİRİCİ','⌘','A27 API','API anahtarları ve erişim','openA27ApiKeyGenerator','./api.html#keys'],['GELİŞTİRİCİ','↗','API Belgeleri','Geliştirici rehberi','openA27ApiGuide','./api.html'],['GELİŞTİRİCİ','▥','Dokümantasyon','Teknik rehberler','openDocumentation','./dokumantasyon.html'],['HESAP','⚙','Ayarlar','Uygulama tercihleri','openSettingsModal',''],['HESAP','◌','Hesap bilgilerim','Profil ve hesap ayrıntıları','openAccountInfo',''],['HESAP','↪','Oturumu kapat','Güvenli çıkış','doLogout','']];
 function q(s,r){return(r||document).querySelector(s)}function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function logged(){try{return!!((window.Parse&&Parse.User&&Parse.User.current())||window.currentUser||document.body.classList.contains('logged-in-user'))}catch(e){return document.body.classList.contains('logged-in-user')}}
 function uname(){try{var u=window.currentUser||(window.Parse&&Parse.User&&Parse.User.current());return(u&&(u.get('name')||u.get('username_display')||u.get('email')))||'AETHRION Üyesi'}catch(e){return'AETHRION Üyesi'}}
@@ -1908,7 +1908,7 @@ function welcome(){if(!logged())return;document.body.classList.add('ae-shell-on'
 function home(){document.body.classList.remove('aews-nav-open','aews-feature-view');document.body.classList.add('aews-home-view');if(typeof window.showWelcome==='function'&&!window.showWelcome.__aewsWrap)window.showWelcome();welcome();active('Ana ekran')}
 function findMatchingControl(label){var nodes=document.querySelectorAll('button,a,[role="button"],[data-action],[onclick]');var wanted=String(label||'').toLocaleLowerCase('tr-TR');for(var i=0;i<nodes.length;i++){var n=nodes[i];if(n.closest('#aeWorkspaceSidebar'))continue;var txt=(n.innerText||n.textContent||'').trim().toLocaleLowerCase('tr-TR');if(txt&&((txt===wanted)||(txt.indexOf(wanted)>=0&&txt.length<100))&&(n.hasAttribute('onclick')||n.hasAttribute('data-action')||n.getAttribute('role')==='button'||n.tagName==='BUTTON'))return n}return null}
 function callAction(action,label){var aliases={openKocPanel:['openKocPanel','openCoachPanel','openAethrionCoach','openKocOverlay'],openAethrionAlPanel:['openAethrionAlPanel','openAethrionAssistant','openAethrionAgents','openAssistantPanel'],openFullAIPanel:['openFullAIPanel','openAethrionAI','openAIAssistant'],openModelsShowcase:['openModelsShowcase','showModelsShowcase'],open3DBuilder:['open3DBuilder','open3DStudio'],openVideoEditor:['openVideoEditor','openVideoStudio'],openVideoStudio:['openVideoStudio','openVideoEditor'],scrollToImageGen:['scrollToImageGen','openImageGenerator'],openCodeEditor:['openCodeEditor','openKodEditor'],toggleTeamPage:['toggleTeamPage','openCommunityPage'],scrollToProjects:['scrollToProjects','openProjects'],openAcademy:['openAcademy','openAethrionAcademy'],openA27ApiKeyGenerator:['openA27ApiKeyGenerator','openApiKeyGenerator'],openA27ApiGuide:['openA27ApiGuide','openApiDocs'],openDocumentation:['openDocumentation','openDocs'],openSettingsModal:['openSettingsModal','openSettings'],openAccountInfo:['openAccountInfo','openProfile']};var list=aliases[action]||[action];for(var i=0;i<list.length;i++){var fn=window[list[i]];if(typeof fn==='function'){fn();return true}}if(typeof window.safeFeatureCall==='function'){try{var safeResult=window.safeFeatureCall(action,label,'');if(safeResult===true)return true;if(safeResult===false||safeResult===undefined)return false;return true}catch(e){}}var match=findMatchingControl(label);if(match){try{match.click();return true}catch(e){}}return false}
-function openFeature(label){var f=features().filter(function(a){return a[2]===label})[0];if(!f)return;document.body.classList.remove('aews-nav-open','aews-home-view');document.body.classList.add('aews-feature-view');active(label);var toggle=q('#aewsMobileToggle');if(toggle)toggle.setAttribute('aria-expanded','false');if(f[4]==='doLogout'){if(typeof window.logout==='function'){window.logout();return}if(window.Parse&&Parse.User){Parse.User.logOut().then(function(){location.reload()}).catch(function(){location.reload()});return}location.href='/';return}if(/^scrollTo/.test(f[4])){var main=q('#mainSite');if(main)main.style.removeProperty('display')}var ok=callAction(f[4],f[2]);if(!ok&&f[5]){location.href=f[5];return}if(!ok&&typeof window.showNotification==='function')window.showNotification('Bu özellik henüz bağlanmamış. Lütfen geliştirici bağlantısını kontrol edin.','warning')}
+function openFeature(label){var f=features().filter(function(a){return a[2]===label})[0];if(!f)return;document.body.classList.remove('aews-nav-open','aews-home-view');document.body.classList.add('aews-feature-view');active(label);var toggle=q('#aewsMobileToggle');if(toggle)toggle.setAttribute('aria-expanded','false');if(f[4]==='doLogout'){if(typeof window.logout==='function'){window.logout();return}if(window.Parse&&Parse.User){Parse.User.logOut().then(function(){location.reload()}).catch(function(){location.reload()});return}location.href='.';return}if(/^scrollTo/.test(f[4])){var main=q('#mainSite');if(main)main.style.removeProperty('display')}var ok=callAction(f[4],f[2]);if(!ok&&f[5]){location.href=f[5];return}if(!ok&&typeof window.showNotification==='function')window.showNotification('Bu özellik henüz bağlanmamış. Lütfen geliştirici bağlantısını kontrol edin.','warning')}
 function goBack(){document.body.classList.remove('aews-nav-open');var toggle=q('#aewsMobileToggle');if(toggle)toggle.setAttribute('aria-expanded','false');var dialogs=document.querySelectorAll('[aria-modal="true"],[role="dialog"],.modal-overlay,.modal.show,#kocPanelOverlay,#vizyonAlPanel,#aethrionAiPanel');for(var i=dialogs.length-1;i>=0;i--){var d=dialogs[i];if(d.closest('#aeWorkspaceSidebar'))continue;var st=window.getComputedStyle(d);if(st.display==='none'||st.visibility==='hidden'||st.opacity==='0')continue;var close=d.querySelector('[data-dismiss],[data-bs-dismiss],.modal-close,.close-modal,.close-btn,[aria-label*="kapat" i],[aria-label*="close" i],button[title*="kapat" i],button[title*="close" i]');if(close){close.click();return}d.classList.remove('show','active','open');d.style.setProperty('display','none','important');d.setAttribute('aria-hidden','true');return}if(document.body.classList.contains('aews-feature-view')){home();return}if(window.history&&window.history.length>1){window.history.back()}else{home()}}
 function wire(){sidebar();if(!window.__aewsClicks){window.__aewsClicks=true;document.addEventListener('click',function(e){var h=e.target.closest&&e.target.closest('[data-aews-home]');if(h){e.preventDefault();home();return}var back=e.target.closest&&e.target.closest('[data-aews-back]');if(back){e.preventDefault();goBack();return}var f=e.target.closest&&e.target.closest('[data-aews-feature]');if(f){e.preventDefault();openFeature(f.getAttribute('data-aews-feature'))}});document.addEventListener('click',function(e){var n=e.target.closest&&e.target.closest('[data-aews-back],.aethrion-back-button,.btn-back,[data-action="back"],[onclick*="history.back"],[onclick*="goBack"]');if(n&&!n.closest('#aeWorkspaceSidebar')){e.preventDefault();e.stopImmediatePropagation();goBack()}},true);document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.body.classList.contains('aews-nav-open')){document.body.classList.remove('aews-nav-open');var t=q('#aewsMobileToggle');if(t)t.setAttribute('aria-expanded','false')}})}var old=window.showWelcome;if(typeof old==='function'&&!old.__aewsWrap){var wrapped=function(){if(document.body.classList.contains('aews-feature-view'))return false;var result=old.apply(this,arguments);setTimeout(function(){if(!document.body.classList.contains('aews-feature-view'))welcome()},0);return result};wrapped.__aewsWrap=true;window.showWelcome=wrapped;window.showWelcomeScreen=wrapped;window.renderWelcome=wrapped;window.goHome=wrapped}if(logged()&&!document.body.classList.contains('aews-feature-view'))welcome()}
 })();
@@ -1918,21 +1918,21 @@ function wire(){sidebar();if(!window.__aewsClicks){window.__aewsClicks=true;docu
 (function(){
 'use strict';
 var fallback={
-'AETHRION AI':['openFullAIPanel','/aethrion-ai.html'],
-'AETHRION Agents':['openAethrionAlPanel','/aethrion-assistant.html'],
-'AETHRION Coach':['openKocPanel','/aethrion-assistant.html'],
-'Model Kataloğu':['openModelsShowcase','/aethrion-ai.html#models'],
-'3D Studio':['open3DBuilder','/3d-studio.html'],
+'AETHRION AI':['openFullAIPanel','./aethrion-ai.html'],
+'AETHRION Agents':['openAethrionAlPanel','./aethrion-assistant.html'],
+'AETHRION Coach':['openKocPanel','./aethrion-assistant.html'],
+'Model Kataloğu':['openModelsShowcase','./aethrion-ai.html#models'],
+'3D Studio':['open3DBuilder','./3d-studio.html'],
 'Video Editör':['openVideoEditor',''],
 'Video Stüdyosu':['openVideoStudio',''],
 'Görsel Üretimi':['scrollToImageGen',''],
-'Kod Editörü':['openCodeEditor','/kod-editoru.html'],
-'Topluluk':['toggleTeamPage','/topluluk.html'],
+'Kod Editörü':['openCodeEditor','./kod-editoru.html'],
+'Topluluk':['toggleTeamPage','./topluluk.html'],
 'Projelerim':['scrollToProjects',''],
-'Akademi':['openAcademy','/bana-ogret.html'],
-'A27 API':['openA27ApiKeyGenerator','/api.html#keys'],
-'API Belgeleri':['openA27ApiGuide','/api.html'],
-'Dokümantasyon':['openDocumentation','/dokumantasyon.html'],
+'Akademi':['openAcademy','./bana-ogret.html'],
+'A27 API':['openA27ApiKeyGenerator','./api.html#keys'],
+'API Belgeleri':['openA27ApiGuide','./api.html'],
+'Dokümantasyon':['openDocumentation','./dokumantasyon.html'],
 'Ayarlar':['openSettingsModal',''],
 'Hesap bilgilerim':['openAccountInfo',''],
 'Oturumu kapat':['doLogout','']
@@ -1962,7 +1962,7 @@ function customWelcome(){
  var main=q('#mainSite');if(main)main.style.setProperty('display','none','important');
  var n=q('#aewsUserName');if(n)n.textContent=userName();
  var av=q('#aewsAvatar');if(av)av.textContent=userName().slice(0,1).toUpperCase();
- hideTrigger();var logo=q('.aews-logo');if(logo&&!q('img',logo))logo.innerHTML='<img src="/aethrion-mark.svg" alt="AETHRION" draggable="false">';
+ hideTrigger();var logo=q('.aews-logo');if(logo&&!q('img',logo))logo.innerHTML='<img src="./aethrion-mark.svg" alt="AETHRION" draggable="false">';
 }
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function stageHost(){
@@ -1985,7 +1985,7 @@ function isolateStage(){
 function showStage(label,desc,href){
  var h=stageHost();if(!h)return;
  var safeHref=String(href||'');
- var isFrame=!!safeHref&&safeHref.charAt(0)==='/'&&safeHref!=='/index.html#features'&&safeHref!=='#features';
+ var isFrame=!!safeHref&&safeHref.charAt(0)==='.'&&safeHref!=='./index.html#features'&&safeHref!=='#features';
  var detail=desc||'Bu çalışma alanı seçiminiz için hazırlandı.';
  h.stage.innerHTML='<div class="ae-ws-stage-head"><div><div class="ae-ws-stage-kicker">AETHRION WORKSPACE</div><h2>'+esc(label)+'</h2><p>'+esc(detail)+'</p></div>'+(isFrame?'<a class="ae-ws-open-tab" href="'+esc(safeHref)+'" target="_blank" rel="noopener noreferrer">Yeni sekmede aç ↗</a>':'<span class="ae-ws-stage-state"><i></i> Çalışma alanı</span>')+'</div>'+(isFrame?'<iframe class="ae-ws-stage-frame" title="'+esc(label)+'" src="'+esc(safeHref)+'" loading="eager" allow="microphone; camera; clipboard-read; clipboard-write; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>':'<div class="ae-ws-stage-empty"><div class="ae-ws-stage-emblem">A</div><h3>'+esc(label)+'</h3><p>Bu özellik uygulama paneli üzerinden açılır. Açılan paneli kapattığınızda sol menüden başka bir çalışma alanına geçebilir veya Ana ekran’a dönebilirsiniz.</p></div>');
  h.stage.style.setProperty('display','flex','important');
@@ -2000,7 +2000,7 @@ function openFeature(label){
  if(label==='Oturumu kapat'){if(typeof window.logout==='function')return window.logout();if(window.Parse&&Parse.User)return Parse.User.logOut().then(function(){location.reload()});location.reload();return}
  var desc=(Array.isArray(window.FEATURE_LIST)?window.FEATURE_LIST:[]).filter(function(x){return x&&String(x.name||x.title||'')===label})[0];
  desc=desc&&String(desc.desc||desc.description||'')||'Bu özellik AETHRION çalışma alanı üzerinden kullanılabilir.';
- if(f.href&&f.href!=='/index.html#features'&&f.href!=='#features'){document.body.classList.add('aews-feature-view');showStage(label,'Özelliğin çalışma alanı açılıyor.',f.href);return}
+ if(f.href&&f.href!=='./index.html#features'&&f.href!=='#features'){document.body.classList.add('aews-feature-view');showStage(label,'Özelliğin çalışma alanı açılıyor.',f.href);return}
  if(/^scrollTo/.test(f.action||'')){
   document.body.classList.remove('aews-feature-view');var stage=q('#aethrionWorkspaceStage');if(stage)stage.style.setProperty('display','none','important');
   var main=q('#mainSite');if(main)main.style.removeProperty('display');
@@ -2088,7 +2088,7 @@ function repairWorkspaceSurface(){
  qa('#aethrionFeaturesTrigger,#aethrionFeaturesButton,#aethrionFeaturesPanel,#aethrionExperienceDrawer,#aethrionExperienceBackdrop').forEach(function(node){if(node&&node.parentNode)node.parentNode.removeChild(node)});
  sidebar.setAttribute('aria-label','AETHRION özellik menüsü');
 }
-function boot(){installRouter();patchWelcome();installCloseRecovery();if(logged()){document.body.classList.add('ae-shell-on');hideTrigger();customWelcome();var logo=q('.aews-logo');if(logo&&!q('img',logo))logo.innerHTML='<img src="/aethrion-mark.svg" alt="AETHRION" draggable="false">'}repairWorkspaceSurface();syncOverlayState()}
+function boot(){installRouter();patchWelcome();installCloseRecovery();if(logged()){document.body.classList.add('ae-shell-on');hideTrigger();customWelcome();var logo=q('.aews-logo');if(logo&&!q('img',logo))logo.innerHTML='<img src="./aethrion-mark.svg" alt="AETHRION" draggable="false">'}repairWorkspaceSurface();syncOverlayState()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 [150,500,1000,1800,3000,5000].forEach(function(t){setTimeout(boot,t)});
 if(window.MutationObserver&&document.body)new MutationObserver(function(){syncOverlayState();if(logged()){patchWelcome();installCloseRecovery();if(!document.body.classList.contains('aews-feature-view'))customWelcome();hideTrigger();repairWorkspaceSurface()}}).observe(document.body,{attributes:true,attributeFilter:['class'],childList:true,subtree:true});
