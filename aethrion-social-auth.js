@@ -59,8 +59,8 @@
       '<p style="color:#d4af37;letter-spacing:.16em;font-size:11px;font-weight:800">AETHRION ACCOUNT</p>' +
       '<h2 style="margin:8px 0 10px;font-size:23px">Güvenli sosyal giriş</h2>' +
       '<p style="color:#b9c4d5;font-size:13px;line-height:1.6">Devam etmeden önce kullanıcı sözleşmesini ve gizlilik politikasını kabul et. Kimlik doğrulaması sunucuda kontrol edilir.</p>' +
-      '<label style="display:flex;gap:10px;align-items:flex-start;margin:15px 0;font-size:13px"><input id="aeSocialTerms" type="checkbox" style="margin-top:3px"><span><a href="/kullanici-sozlesmesi.html" target="_blank" style="color:#e4ca83">Kullanıcı Sözleşmesi</a>ni kabul ediyorum.</span></label>' +
-      '<label style="display:flex;gap:10px;align-items:flex-start;margin:15px 0;font-size:13px"><input id="aeSocialPrivacy" type="checkbox" style="margin-top:3px"><span><a href="/gizlilik.html" target="_blank" style="color:#e4ca83">Gizlilik Politikası</a>nı kabul ediyorum.</span></label>' +
+      '<label style="display:flex;gap:10px;align-items:flex-start;margin:15px 0;font-size:13px"><input id="aeSocialTerms" type="checkbox" style="margin-top:3px"><span><a href="./kullanici-sozlesmesi.html" target="_blank" style="color:#e4ca83">Kullanıcı Sözleşmesi</a>ni kabul ediyorum.</span></label>' +
+      '<label style="display:flex;gap:10px;align-items:flex-start;margin:15px 0;font-size:13px"><input id="aeSocialPrivacy" type="checkbox" style="margin-top:3px"><span><a href="./gizlilik.html" target="_blank" style="color:#e4ca83">Gizlilik Politikası</a>nı kabul ediyorum.</span></label>' +
       '<p id="aeSocialError" role="status" style="display:none;color:#fca5a5;font-size:12px;line-height:1.5"></p>' +
       '<button type="button" data-continue style="width:100%;border:0;border-radius:12px;padding:13px;background:linear-gradient(110deg,#d4af37,#f3df9a);color:#101827;font-weight:800">Devam Et</button>' +
       '<button type="button" data-cancel style="width:100%;margin-top:9px;border:1px solid #334155;border-radius:12px;padding:11px;background:transparent;color:#cbd5e1">İptal</button>' +
