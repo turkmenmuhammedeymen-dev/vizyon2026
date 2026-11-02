@@ -113,7 +113,7 @@
 
   install('openAethrionAlPanel', function () {
     if (typeof window.openFullAIPanel === 'function') return window.openFullAIPanel();
-    window.location.href = '/aethrion-assistant.html';
+    window.location.href = './aethrion-assistant.html';
   });
   install('startJarvisMode', function () {
     if (typeof window.openFullAIPanel === 'function') window.openFullAIPanel();
@@ -127,23 +127,23 @@
     if (voiceButton) voiceButton.click();
     else window.showNotification('AI paneli açıldı. Sesli sohbet düğmesi bulunamadı.', 'warning');
   });
-  install('createProjectWizard', function () { window.location.href = '/3d-studio.html'; });
+  install('createProjectWizard', function () { window.location.href = './3d-studio.html'; });
   install('openMarket', function () {
     var panel = document.getElementById('marketOverlay') || document.getElementById('marketModal') || document.querySelector('.market-overlay');
     if (panel) { panel.style.display = 'flex'; panel.classList.add('open'); return; }
     var target = document.getElementById('store') || document.getElementById('pricingSection') || document.getElementById('pricing');
     if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
-    else window.location.href = '/topluluk.html';
+    else window.location.href = './topluluk.html';
   });
-  install('toggleTeamPage', function () { window.location.href = '/topluluk.html'; });
+  install('toggleTeamPage', function () { window.location.href = './topluluk.html'; });
   install('openPersonalAssistant', function () {
     if (typeof window.openFullAIPanel === 'function') return window.openFullAIPanel();
-    window.location.href = '/aethrion-assistant.html';
+    window.location.href = './aethrion-assistant.html';
   });
   install('openContestPage', function () {
     var target = document.getElementById('contestSection') || document.getElementById('contestContainer') || document.querySelector('[id*="contest"]');
     if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
-    else window.location.href = '/topluluk.html#contest';
+    else window.location.href = './topluluk.html#contest';
   });
   install('openAdminAssign', function () {
     if (focusField('roleAssignEmail')) return;
