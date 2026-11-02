@@ -45,9 +45,9 @@ jobs:
           const localRefs = new Set();
           for (const match of html.matchAll(/(?:src|href)=[\"']([^\"']+)[\"']/gi)) {
             const raw = match[1];
-            if (/^(?:https?:|\\/\\/|#|data:|mailto:)/i.test(raw)) continue;
-            const path = raw.replace(/^\\.\\//, '').replace(/^\\//, '');
-            if (/\\.(?:js|css|html|svg|png|webp|ico|json|woff2?)$/i.test(path)) localRefs.add(path);
+            if (raw.startsWith('http:') || raw.startsWith('https:') || raw.startsWith('//') || raw.startsWith('#') || raw.startsWith('data:') || raw.startsWith('mailto:')) continue;
+            const path = raw.startsWith('./') ? raw.slice(2) : (raw.startsWith('/') ? raw.slice(1) : raw);
+            if (['.js','.css','.html','.svg','.png','.webp','.ico','.json','.woff','.woff2'].some(ext => path.toLowerCase().split('?')[0].endsWith(ext))) localRefs.add(path.split('?')[0]);
           }
           if (!html.includes('aethrion-home-workspace.js?v=')) failures.push('Workspace launcher cache version missing');
           if (!html.includes('aethrion-interaction-recovery.js?v=')) failures.push('Interaction recovery cache version missing');
