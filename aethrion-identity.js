@@ -49,7 +49,7 @@ function loadLateTheme() {
   });
   var link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = '/aethrion-experience.css?v=20261022-corporate5';
+  link.href = './aethrion-experience.css?v=20261022-corporate5';
   link.setAttribute('data-aethrion-late-theme', 'true');
   document.body.appendChild(link);
 }
@@ -65,7 +65,7 @@ function updateBrandMetadata() {
   });
   var canonical = document.querySelector('link[rel="canonical"]');
   if (canonical && /vizyon2026\.vercel\.app\/vizyon-(ai|al)\.html/i.test(canonical.href)) {
-    canonical.href = canonical.href.replace('/vizyon-ai.html', '/aethrion-ai.html').replace('/vizyon-al.html', '/aethrion-assistant.html');
+    canonical.href = canonical.href.replace('./vizyon-ai.html', './aethrion-ai.html').replace('./vizyon-al.html', './aethrion-assistant.html');
   }
 }
 function updateFriendlyRoutes() {
@@ -76,9 +76,9 @@ function updateFriendlyRoutes() {
       var u = new URL(raw, location.href);
       if (u.origin !== location.origin && u.hostname !== 'vizyon2026.vercel.app') return;
       var routeMap = {
-        '/vizyon-ai.html': '/aethrion-ai.html',
-        '/vizyon-al.html': '/aethrion-assistant.html',
-        '/vizyonekibi.html': '/aethrion-ekibi.html'
+        './vizyon-ai.html': './aethrion-ai.html',
+        './vizyon-al.html': './aethrion-assistant.html',
+        './vizyonekibi.html': './aethrion-ekibi.html'
       };
       if (routeMap[u.pathname]) a.setAttribute('href', routeMap[u.pathname] + u.search + u.hash);
       else if (u.hostname === 'vizyon2026.vercel.app' && u.pathname !== '/') {
@@ -99,23 +99,23 @@ function ensurePolicyLinks() {
   nav.innerHTML =
     '<div><strong>Yasal ve güvenlik belgeleri</strong><small>Gizlilik, hesap, API ve hizmet koşullarını inceleyin.</small></div>' +
     '<div class="ae-legal-links">' +
-    '<a href="/gizlilik.html">Gizlilik Politikası</a>' +
-    '<a href="/iade-ve-iptal-politikasi.html">İptal ve İade Politikası</a>' +
-    '<a href="/kullanici-sozlesmesi.html">Kullanıcı Sözleşmesi</a>' +
-    '<a href="/cerez-politikasi.html">Çerez Politikası</a>' +
-    '<a href="/kvkk-aydinlatma.html">KVKK Aydınlatma</a>' +
-    '<a href="/api-kullanim-kosullari.html">A27 API Koşulları</a>' +
-    '<a href="/api-belgelendirme.html">API Belgeleri</a>' +
-    '<a href="/ai-kullanim-politikasi.html">AI Kullanım Politikası</a>' +
-    '<a href="/guvenlik-politikasi.html">Güvenlik Politikası</a>' +
-    '<a href="/hesap-ve-oturum-guvenligi.html">Hesap ve Oturum Güvenliği</a>' +
-    '<a href="/veri-saklama-silme-politikasi.html">Veri Saklama ve Silme</a>' +
-    '<a href="/icerik-ve-fikri-mulkiyet.html">İçerik ve Fikri Mülkiyet</a>' +
-    '<a href="/kabul-edilebilir-kullanim.html">Kabul Edilebilir Kullanım</a>' +
-    '<a href="/ucuncu-taraf-hizmetler.html">Üçüncü Taraf Hizmetler</a>' +
-    '<a href="/erisilebilirlik.html">Erişilebilirlik</a>' +
-    '<a href="/sorumlu-aciklama.html">Sorumlu Açıklama</a>' +
-    '<a href="/iletisim-ve-basvuru.html">Destek ve Başvuru</a>' +
+    '<a href="./gizlilik.html">Gizlilik Politikası</a>' +
+    '<a href="./iade-ve-iptal-politikasi.html">İptal ve İade Politikası</a>' +
+    '<a href="./kullanici-sozlesmesi.html">Kullanıcı Sözleşmesi</a>' +
+    '<a href="./cerez-politikasi.html">Çerez Politikası</a>' +
+    '<a href="./kvkk-aydinlatma.html">KVKK Aydınlatma</a>' +
+    '<a href="./api-kullanim-kosullari.html">A27 API Koşulları</a>' +
+    '<a href="./api-belgelendirme.html">API Belgeleri</a>' +
+    '<a href="./ai-kullanim-politikasi.html">AI Kullanım Politikası</a>' +
+    '<a href="./guvenlik-politikasi.html">Güvenlik Politikası</a>' +
+    '<a href="./hesap-ve-oturum-guvenligi.html">Hesap ve Oturum Güvenliği</a>' +
+    '<a href="./veri-saklama-silme-politikasi.html">Veri Saklama ve Silme</a>' +
+    '<a href="./icerik-ve-fikri-mulkiyet.html">İçerik ve Fikri Mülkiyet</a>' +
+    '<a href="./kabul-edilebilir-kullanim.html">Kabul Edilebilir Kullanım</a>' +
+    '<a href="./ucuncu-taraf-hizmetler.html">Üçüncü Taraf Hizmetler</a>' +
+    '<a href="./erisilebilirlik.html">Erişilebilirlik</a>' +
+    '<a href="./sorumlu-aciklama.html">Sorumlu Açıklama</a>' +
+    '<a href="./iletisim-ve-basvuru.html">Destek ve Başvuru</a>' +
     '</div>';
   footer.appendChild(nav);
 }
@@ -323,7 +323,7 @@ function loadOpsStyles() {
   if (document.querySelector('link[data-aethrion-ops-css]')) return;
   var link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = '/aethrion-ops.css?v=20261023-2';
+  link.href = './aethrion-ops.css?v=20261023-2';
   link.setAttribute('data-aethrion-ops-css', 'true');
   document.head.appendChild(link);
 }
@@ -399,11 +399,11 @@ function installOpsFeatureCards() {
     var a = document.createElement('a'); a.href = href; a.textContent = 'Aç →'; a.setAttribute('aria-label', title + ' sayfasını aç');
     card.append(iconNode, h, p, a); return card;
   }
-  section.appendChild(makeCard('AETHRION Developer Platform', 'API belgeleri, anahtar izinleri ve kullanım istatistikleri.', '/aethrion-developer.html', '/aethrion-status-icon.svg'));
-  section.appendChild(makeCard('AETHRION Teams', 'Takımlar, üyeler, rol yönetimi ve denetlenebilir işlem geçmişi.', '/aethrion-teams.html', '/aethrion-audit-icon.svg'));
+  section.appendChild(makeCard('AETHRION Developer Platform', 'API belgeleri, anahtar izinleri ve kullanım istatistikleri.', './aethrion-developer.html', './aethrion-status-icon.svg'));
+  section.appendChild(makeCard('AETHRION Teams', 'Takımlar, üyeler, rol yönetimi ve denetlenebilir işlem geçmişi.', './aethrion-teams.html', './aethrion-audit-icon.svg'));
   if (privileged) {
-    section.appendChild(makeCard('Proje denetim kaydı', 'Takım projelerindeki kayıtlı olayları incele.', '/aethrion-project-audit.html', '/aethrion-audit-icon.svg'));
-    section.appendChild(makeCard('AETHRION Status & Diagnostics', 'Cloud Code, oturum, veri deposu, model ve dağıtım kontrolleri.', '/aethrion-status.html', '/aethrion-status-icon.svg'));
+    section.appendChild(makeCard('Proje denetim kaydı', 'Takım projelerindeki kayıtlı olayları incele.', './aethrion-project-audit.html', './aethrion-audit-icon.svg'));
+    section.appendChild(makeCard('AETHRION Status & Diagnostics', 'Cloud Code, oturum, veri deposu, model ve dağıtım kontrolleri.', './aethrion-status.html', './aethrion-status-icon.svg'));
   }
   var heading = document.createElement('h2'); heading.className = 'ae-tool-eyebrow'; heading.textContent = 'AETHRION PLATFORM ARAÇLARI';
   var wrapper = document.createElement('section'); wrapper.className = 'ae-ops-navigation'; wrapper.setAttribute('data-aethrion-ops-wrapper', 'true'); wrapper.append(heading, section);
@@ -420,7 +420,7 @@ function loadJarvisAssistant() {
   if (!document.querySelector('#mainSite, #splashScreen, #dashboard, #mainDashboard')) return;
   if (document.querySelector('script[data-aethrion-jarvis]')) return;
   var script = document.createElement('script');
-  script.src = '/aethrion-jarvis.js?v=20261022-1';
+  script.src = './aethrion-jarvis.js?v=20261022-1';
   script.defer = true;
   script.setAttribute('data-aethrion-jarvis', 'true');
   document.head.appendChild(script);
