@@ -379,7 +379,17 @@ var _aethrionParseConfigPromise = null;
 async function _aethrionGetParseConfig() {
     if (_aethrionParseConfigCache) return _aethrionParseConfigCache;
     if (!_aethrionParseConfigPromise) {
-        _aethrionParseConfigPromise = Parse.Config.get({ useMasterKey: true }).then(function (config) {
+        var configRequest = Promise.resolve().then(function () {
+            return Parse.Config.get({ useMasterKey: true });
+        });
+        var configTimeout = new Promise(function (_, reject) {
+            setTimeout(function () {
+                var error = new Error('Parse.Config request timed out');
+                error.code = 'AETHRION_CONFIG_TIMEOUT';
+                reject(error);
+            }, 5000);
+        });
+        _aethrionParseConfigPromise = Promise.race([configRequest, configTimeout]).then(function (config) {
             _aethrionParseConfigCache = config;
             return config;
         }).catch(function (error) {
@@ -3587,7 +3597,7 @@ console.log('   → [YENİ] trackFeatureUsage');
 console.log('   → [YENİ] getUserProjectCount');
 console.log('   → [YENİ] toggleVizyonPatrol + toggleVizyonSupport');
 console.log('');
-console.log('⏸️  BÖLÜM 2 İÇİN "devam" YAZ → 160+ cloud function, 13 job, final log');
+console.log('ℹ️ BÖLÜM 2 aynı main.js dosyasında tanımlı; Cloud Code yüklemesi devam ediyor.');
 console.log('');
 console.log('🇹🇷 AETHRION v7.10.0 — BÖLÜM 1 AKTİF (Back4App)');
 
@@ -4186,6 +4196,7 @@ Parse.Cloud.define("loginWithRecoveryEmail", async function (request) {
         if (!loggedInUser) throw new Error('Giriş yapılamadı.');
 
         console.log('✅ Recovery login başarılı:', loginEmail);
+        console.info('[AETHRION Auth] Password accepted; returning session to client.');
         return {
             success: true,
             sessionToken: loggedInUser.getSessionToken(),
@@ -9931,6 +9942,7 @@ Parse.Cloud.define("fixDateColumnsMigration", async function (request) {
 // AETHRION EMAIL LOGIN — email lookup + configured founder credentials
 // ================================================================
 Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
+    console.info('[AETHRION Auth] Email login request received.');
     var params = request.params || {};
     var email = typeof params.email === 'string' ? params.email.trim().toLowerCase() : '';
     var password = typeof params.password === 'string' ? params.password : '';
@@ -10018,6 +10030,10 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
         try {
             loggedInUser = await Parse.User.logIn(loginName, password);
         } catch (loginError) {
+            if (loginError && loginError.code === 'AETHRION_CONFIG_TIMEOUT') {
+                console.error('[AETHRION Auth] Parse.Config lookup timed out before password login.');
+                return { success: false, error: 'Hesap yapılandırması zamanında okunamadı. Lütfen tekrar deneyin; sorun sürerse Back4App Config ayarlarını kontrol edin.' };
+            }
             // Never return internal Parse error codes or account-existence details.
             console.warn('[AETHRION Auth] Email login rejected by Parse authentication.');
             return { success: false, error: 'E-posta veya şifre hatalı.' };
