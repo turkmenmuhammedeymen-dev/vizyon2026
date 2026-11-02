@@ -382,8 +382,9 @@ async function _aethrionGetParseConfig() {
         var configRequest = Promise.resolve().then(function () {
             return Parse.Config.get({ useMasterKey: true });
         });
+        var configTimer;
         var configTimeout = new Promise(function (_, reject) {
-            setTimeout(function () {
+            configTimer = setTimeout(function () {
                 var error = new Error('Parse.Config request timed out');
                 error.code = 'AETHRION_CONFIG_TIMEOUT';
                 reject(error);
@@ -395,6 +396,8 @@ async function _aethrionGetParseConfig() {
         }).catch(function (error) {
             _aethrionParseConfigPromise = null;
             throw error;
+        }).finally(function () {
+            if (configTimer) clearTimeout(configTimer);
         });
     }
     return _aethrionParseConfigPromise;
@@ -10030,10 +10033,6 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
         try {
             loggedInUser = await Parse.User.logIn(loginName, password);
         } catch (loginError) {
-            if (loginError && loginError.code === 'AETHRION_CONFIG_TIMEOUT') {
-                console.error('[AETHRION Auth] Parse.Config lookup timed out before password login.');
-                return { success: false, error: 'Hesap yapılandırması zamanında okunamadı. Lütfen tekrar deneyin; sorun sürerse Back4App Config ayarlarını kontrol edin.' };
-            }
             // Never return internal Parse error codes or account-existence details.
             console.warn('[AETHRION Auth] Email login rejected by Parse authentication.');
             return { success: false, error: 'E-posta veya şifre hatalı.' };
