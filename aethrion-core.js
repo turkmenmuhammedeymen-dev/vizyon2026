@@ -82,8 +82,8 @@
   install('openDocumentation', function () { go('/dokumantasyon.html'); });
   install('openA27ApiGuide', function () { go('/api.html'); });
   install('openV27ApiGuide', function () { go('/api.html'); });
-  install('openV27ApiKeyGenerator', function () { go('/api.html#keys'); });
-  install('openA27ApiKeyGenerator', function () { go('/api.html#keys'); });
+  install('openV27ApiKeyGenerator', function () { go('/aethrion-developer.html'); });
+  install('openA27ApiKeyGenerator', function () { go('/aethrion-developer.html'); });
   install('openJobMarket', function () { var p = byId('jobMarketOverlay'); if (!p) { go('/index.html#features'); return false; } p.classList.add('open', 'active'); p.style.setProperty('display', 'flex', 'important'); p.style.setProperty('visibility', 'visible', 'important'); p.style.setProperty('pointer-events', 'auto', 'important'); p.style.setProperty('position', 'fixed', 'important'); p.style.setProperty('inset', '0', 'important'); p.style.setProperty('z-index', '2147482000', 'important'); p.style.setProperty('overflow', 'auto', 'important'); d.body.style.overflow = 'hidden'; return true; });
   install('toggleTeamPage', function () { go('/topluluk.html'); });
   install('openPersonalAssistant', function () { go('/aethrion-assistant.html'); });
@@ -478,7 +478,7 @@
   install('openMarket', function () { go('/topluluk.html'); });
   install('openPersonalAssistant', function () { go('/aethrion-assistant.html'); });
   install('openContestPage', function () { go('/topluluk.html'); });
-  install('openV27ApiKeyGenerator', function () { go('/api.html#keys'); });
+  install('openV27ApiKeyGenerator', function () { go('/aethrion-developer.html'); });
   install('openLogsPanel', function () { go('/aethrion-status.html'); });
   install('openParentSettings', function () { go('/hesap-ve-oturum-guvenligi.html'); });
   install('startJarvisMode', function () { go('/aethrion-jarvis.html'); });
@@ -602,7 +602,7 @@
     catch (e) { w.showNotification && w.showNotification(e.message || 'Sohbet adı güncellenemedi.', 'error'); return false; }
   });
   install('switchToSiteAI', function () { go('/aethrion-ai.html'); });
-  install('openApiKeySelectionModal', function () { go('/api.html#keys'); });
+  install('openApiKeySelectionModal', function () { go('/aethrion-developer.html'); });
   install('sendDashboardAI', function () { go('/aethrion-ai.html'); });
   install('speakLastAIResponse', function () { w.showNotification && w.showNotification('Önce AI yanıtı oluşturun.', 'warning'); });
   install('stopAIResponse', function () { if (w.speechSynthesis) w.speechSynthesis.cancel(); });
