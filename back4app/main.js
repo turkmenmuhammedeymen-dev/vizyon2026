@@ -5008,8 +5008,19 @@ Parse.Cloud.define("inviteToTeam", async function (request) {
     if (!user) throw new Error('Giriş yapmalısınız!');
     var teamId = user.get('teamId');
     if (!teamId) throw new Error('Önce takım oluşturun!');
-    var email = request.params.email;
-    if (!email) throw new Error('E-posta adresi gerekli!');
+    var email = String((request.params && request.params.email) || '').trim().toLowerCase();
+    if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) throw new Error('Geçerli bir e-posta adresi gerekli!');
+    if (email === String(user.get('email') || '').trim().toLowerCase()) throw new Error('Kendinize takım daveti gönderemezsiniz.');
+
+    var recipientQuery = new Parse.Query(Parse.User);
+    recipientQuery.equalTo('email', email);
+    var recipient = await recipientQuery.first({ useMasterKey: true });
+    if (!recipient) {
+        var usernameQuery = new Parse.Query(Parse.User);
+        usernameQuery.equalTo('username', email);
+        recipient = await usernameQuery.first({ useMasterKey: true });
+    }
+    if (!recipient) throw new Error('Bu e-posta ile eşleşen AETHRION hesabı bulunamadı.');
 
     var teamQuery = new Parse.Query(Team);
     var team = await teamQuery.get(teamId, { useMasterKey: true });
@@ -5022,8 +5033,16 @@ Parse.Cloud.define("inviteToTeam", async function (request) {
     var invitePrivileged = user.get('role') === 'founder' || user.get('role') === 'admin' || team.get('owner_email') === user.get('email') || team.get('manager_email') === user.get('email') || inviteRole === 'admin';
     if (!invitePrivileged) throw new Error('Yalnızca takım admini, sahibi veya yöneticisi davet gönderebilir.');
 
+    var duplicateInviteQuery = new Parse.Query(Inbox);
+    duplicateInviteQuery.equalTo('receiver_email', email);
+    duplicateInviteQuery.equalTo('team_id', teamId);
+    duplicateInviteQuery.equalTo('type', 'team_invite');
+    duplicateInviteQuery.equalTo('status', 'pending');
+    var duplicateInvite = await duplicateInviteQuery.first({ useMasterKey: true });
+    if (duplicateInvite) throw new Error('Bu kullanıcıya zaten bekleyen bir takım daveti gönderilmiş.');
+
     var inbox = new Inbox();
-    inbox.set("sender_email", user.get('email'));
+    inbox.set("sender_email", String(user.get('email') || '').trim().toLowerCase());
     inbox.set("receiver_email", email);
     inbox.set("type", "team_invite");
     inbox.set("team_id", teamId);
