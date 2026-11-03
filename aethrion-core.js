@@ -292,6 +292,7 @@
     if (!result || result.success !== true || !result.conversationId) throw new Error(result && result.error || 'Yeni sohbet oluşturulamadı.');
     w.fullAIConversationId = result.conversationId;
     w.currentConversationId = result.conversationId;
+    try { await aiCloud('renameConversation', { conversationId: result.conversationId, name: 'AETHRION AI | Yeni Sohbet' }); } catch (e) { console.warn('[AETHRION] Sohbet tür etiketi kaydedilemedi:', e); }
     return result.conversationId;
   }
   async function aiOpenConversation(id) {
@@ -310,7 +311,7 @@
     list.textContent = 'Sohbetler yükleniyor…';
     try {
       var conversations = await aiCloud('getConversations', {});
-      conversations = Array.isArray(conversations) ? conversations : [];
+      conversations = (Array.isArray(conversations) ? conversations : []).filter(function (c) { return String(c.customName || '').indexOf('AETHRION AI | ') === 0; });
       list.innerHTML = '';
       if (!conversations.length) {
         var empty = d.createElement('p'); empty.textContent = 'Henüz kayıtlı sohbetin yok. Yeni Sohbet düğmesiyle bir tane oluşturabilirsin.'; empty.style.cssText = 'padding:12px;color:var(--text3,#9ca3af)';
@@ -328,7 +329,7 @@
         [rename,share,remove].forEach(function (button) { button.style.cssText = 'padding:8px 10px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:9px;background:transparent;color:var(--text,#fff);cursor:pointer'; });
         rename.addEventListener('click', async function () {
           var newName = w.prompt('Yeni sohbet adı:', item.customName || ''); if (!newName || !newName.trim()) return;
-          try { await aiCloud('renameConversation', { conversationId: item.id, name: newName.trim().slice(0,100) }); await aiRenderHistoryList(); w.showNotification && w.showNotification('Sohbet adı güncellendi.', 'success'); }
+          try { await aiCloud('renameConversation', { conversationId: item.id, name: 'AETHRION AI | ' + newName.trim().slice(0,86) }); await aiRenderHistoryList(); w.showNotification && w.showNotification('Sohbet adı güncellendi.', 'success'); }
           catch (e) { w.showNotification && w.showNotification(e.message || 'Sohbet adı değiştirilemedi.', 'error'); }
         });
         share.addEventListener('click', async function () {
@@ -351,7 +352,8 @@
   async function aiLoadHistory() {
     try {
       var conversations = await aiCloud('getConversations', {});
-      if (Array.isArray(conversations) && conversations.length) {
+      conversations = (Array.isArray(conversations) ? conversations : []).filter(function (c) { return String(c.customName || '').indexOf('AETHRION AI | ') === 0; });
+      if (conversations.length) {
         var selected = conversations.find(function (c) { return c.id === w.fullAIConversationId; }) || conversations[0];
         return await aiOpenConversation(selected.id);
       }
@@ -596,7 +598,7 @@
     var id = w.fullAIConversationId || w.currentConversationId;
     if (!id) { w.showNotification && w.showNotification('Önce yeniden adlandırılacak bir sohbet açın.', 'warning'); return false; }
     var name = w.prompt('Yeni sohbet adı:'); if (!name || !name.trim()) return false;
-    try { await aiCloud('renameConversation', { conversationId: id, name: name.trim().slice(0,100) }); if (typeof aiRenderHistoryList === 'function') await aiRenderHistoryList(); w.showNotification && w.showNotification('Sohbet adı güncellendi.', 'success'); return true; }
+    try { await aiCloud('renameConversation', { conversationId: id, name: 'AETHRION AI | ' + name.trim().slice(0,86) }); if (typeof aiRenderHistoryList === 'function') await aiRenderHistoryList(); w.showNotification && w.showNotification('Sohbet adı güncellendi.', 'success'); return true; }
     catch (e) { w.showNotification && w.showNotification(e.message || 'Sohbet adı güncellenemedi.', 'error'); return false; }
   });
   install('switchToSiteAI', function () { go('/aethrion-ai.html'); });
