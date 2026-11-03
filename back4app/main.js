@@ -943,10 +943,13 @@ Parse.Cloud.define("initSchemas", async function (request) {
 // ================================================================
 // ========== TEMEL FONKSİYONLAR ==================================
 // ================================================================
+var AETHRION_CLOUD_BUILD_ID = '2026-11-03-community-reliability-1';
 Parse.Cloud.define("test", async function (request) {
     return {
         success: true,
-        message: 'Cloud Code çalışıyor! (Back4App v7.10.0)',
+        app: 'AETHRION',
+        buildId: AETHRION_CLOUD_BUILD_ID,
+        message: 'AETHRION Cloud Code sağlık kontrolü başarılı.',
         user: request.user ? request.user.get('email') : 'Oturum yok',
         timestamp: new Date().toISOString()
     };
