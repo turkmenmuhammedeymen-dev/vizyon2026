@@ -2012,7 +2012,6 @@ var CORE=[
 ['KATEGORİLER','💰','Para Kazandıran Araçlar','Freelance, mağaza ve kazanç modülleri','openCategoryPanel','','earn'],
 ['ÜRETİM','◇','3D Studio','Üç boyutlu tasarım ve üretim','open3DBuilder','./3d-studio.html'],
 ['ÜRETİM','▶','Video Editör','Video düzenleme çalışma alanı','openVideoEditor',''],
-['ÜRETİM','▣','Video Stüdyosu','Video üretim çalışma alanı','openVideoStudio',''],
 ['ÜRETİM','▧','Görsel Üretimi','Görsel oluşturma araçları','scrollToImageGen',''],
 ['ÜRETİM','⌘','Kod Editörü','Kod geliştirme araçları','openCodeEditor','./kod-editoru.html'],
 ['PLATFORM','◇','Topluluk ve Takımlar','Topluluk ve ortak çalışma alanı','toggleTeamPage','./topluluk.html'],
