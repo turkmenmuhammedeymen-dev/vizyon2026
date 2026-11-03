@@ -687,8 +687,41 @@
   install('acceptJobListing', function () { go('/topluluk.html'); });
   install('closeModelsShowcase', function () { var p = byId('modelsShowcaseModal'); if (p) p.style.display = 'none'; });
   install('closeCategoryPanel', function () { var p = byId('categoryPanelModal'); if (p) { p.style.setProperty('display', 'none', 'important'); p.style.setProperty('visibility', 'hidden', 'important'); p.style.setProperty('pointer-events', 'none', 'important'); p.classList.remove('open'); } });
-  var jarvisRecognition = null, jarvisMuted = false;
+  var jarvisRecognition = null, jarvisMuted = false, jarvisMicStream = null, jarvisMicContext = null, jarvisMicTimer = null, jarvisMicLevel = 0;
   function jarvisStatus(value) { var s = byId('jarvisStatus'); if (s) s.textContent = value; }
+  function jarvisStopMicCapture() {
+    if (jarvisMicTimer) { w.clearInterval(jarvisMicTimer); jarvisMicTimer = null; }
+    if (jarvisMicStream) { try { jarvisMicStream.getTracks().forEach(function (track) { track.stop(); }); } catch (_) {} jarvisMicStream = null; }
+    if (jarvisMicContext) { try { var closing = jarvisMicContext.close(); if (closing && closing.catch) closing.catch(function () {}); } catch (_) {} jarvisMicContext = null; }
+  }
+  async function jarvisStartMicCapture() {
+    if (!w.navigator.mediaDevices || typeof w.navigator.mediaDevices.getUserMedia !== 'function') {
+      throw new Error('Bu tarayıcı mikrofon erişimini desteklemiyor. Güncel Chrome/Edge ve HTTPS bağlantısı kullanın.');
+    }
+    jarvisStopMicCapture();
+    jarvisMicLevel = 0;
+    jarvisMicStream = await w.navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+    var track = jarvisMicStream.getAudioTracks()[0];
+    if (!track || track.readyState !== 'live') throw new Error('Mikrofon akışı başlatılamadı. Windows mikrofon girişini kontrol edin.');
+    try {
+      var AudioContextCtor = w.AudioContext || w.webkitAudioContext;
+      if (AudioContextCtor) {
+        jarvisMicContext = new AudioContextCtor();
+        var source = jarvisMicContext.createMediaStreamSource(jarvisMicStream);
+        var analyser = jarvisMicContext.createAnalyser();
+        analyser.fftSize = 512;
+        source.connect(analyser);
+        var samples = new Uint8Array(analyser.fftSize);
+        jarvisMicTimer = w.setInterval(function () {
+          analyser.getByteTimeDomainData(samples);
+          var sum = 0;
+          for (var i = 0; i < samples.length; i++) { var v = (samples[i] - 128) / 128; sum += v * v; }
+          jarvisMicLevel = Math.max(jarvisMicLevel, Math.sqrt(sum / samples.length));
+        }, 120);
+      }
+    } catch (meterError) { console.warn('[JARVIS] Mikrofon seviye ölçümü kullanılamıyor:', meterError && meterError.message); }
+    return track;
+  }
   function jarvisWrite(text, who) {
     var p = byId('jarvisTranscript'); if (!p) return;
     var line = d.createElement('div');
@@ -712,6 +745,7 @@
   install('openJarvisMode', function () { return w.startJarvisMode(); });
   install('closeJarvisMode', function () {
     if (jarvisRecognition) { try { jarvisRecognition.stop(); } catch (_) {} jarvisRecognition = null; }
+    jarvisStopMicCapture();
     if (w.speechSynthesis) w.speechSynthesis.cancel();
     var p = byId('aethrionJarvisOverlay');
     if (p) { p.style.setProperty('display', 'none', 'important'); p.classList.remove('open', 'active'); p.setAttribute('aria-hidden', 'true'); }
@@ -753,17 +787,19 @@
     };
     return messages[code] || ('Ses tanıma hatası: ' + (code || 'bilinmeyen hata') + '.');
   }
-  install('toggleJarvisListening', function () {
+  install('toggleJarvisListening', async function () {
     var Speech = w.SpeechRecognition || w.webkitSpeechRecognition;
     var mic = byId('jarvisMicBtn');
-    if (jarvisRecognition) { try { jarvisRecognition.stop(); } catch (_) {} jarvisStatus('HAZIR'); return true; }
+    if (jarvisRecognition) { try { jarvisRecognition.stop(); } catch (_) {} jarvisRecognition = null; jarvisStopMicCapture(); jarvisStatus('HAZIR'); return true; }
     if (!Speech) {
       jarvisStatus('DESTEKLENMİYOR');
-      w.showNotification && w.showNotification('Bu tarayıcı Web Speech ses tanımayı desteklemiyor. Chrome veya Edge’in güncel sürümünü deneyin.', 'warning');
+      w.showNotification && w.showNotification('Bu tarayıcı Web Speech ses tanımayı desteklemiyor. Güncel Chrome veya Edge kullanın.', 'warning');
       return false;
     }
     jarvisSpeechError = '';
     try {
+      jarvisStatus('MİKROFON KONTROL EDİLİYOR');
+      var audioTrack = await jarvisStartMicCapture();
       var recognition = new Speech();
       jarvisRecognition = recognition;
       recognition.lang = 'tr-TR';
@@ -792,23 +828,38 @@
         jarvisSpeechError = code;
         jarvisStatus('SES HATASI');
         var message = jarvisSpeechErrorMessage(code);
+        if (code === 'no-speech') {
+          message = jarvisMicLevel > 0.012
+            ? 'Mikrofon ses alıyor ancak tarayıcının Türkçe konuşma tanıma servisi sesi çözemedi. VPN/ağ filtresini kapatıp tekrar deneyin veya Chrome ses tanıma hizmetini kontrol edin.'
+            : 'Mikrofon açıldı fakat giriş seviyesinde konuşma algılanmadı. Windows > Ayarlar > Sistem > Ses > Giriş bölümünde doğru mikrofonu seçip giriş seviyesini kontrol edin.';
+        }
         jarvisWrite(message, 'assistant');
         w.showNotification && w.showNotification(message, code === 'aborted' ? 'info' : 'warning');
       };
       recognition.onend = function () {
         if (recognition === jarvisRecognition) jarvisRecognition = null;
+        jarvisStopMicCapture();
         if (mic) { mic.setAttribute('aria-pressed', 'false'); mic.title = 'Dinlemeyi başlat'; }
         if (byId('aethrionJarvisOverlay') && !jarvisSpeechError) jarvisStatus('HAZIR');
       };
-      recognition.start();
+      try { recognition.start(audioTrack); }
+      catch (trackError) {
+        // Older Chromium builds do not support passing an audio track to start().
+        recognition.start();
+      }
       return true;
     } catch (e) {
       jarvisRecognition = null;
+      jarvisStopMicCapture();
       if (mic) mic.setAttribute('aria-pressed', 'false');
       jarvisStatus('SES HATASI');
       var detail = e && e.name === 'NotAllowedError'
-        ? 'Mikrofon izni verilmedi. Site izinlerinden mikrofonu açın.'
-        : (e && e.message || 'Mikrofon başlatılamadı.');
+        ? 'Mikrofon izni reddedildi. Adres çubuğundaki site ayarlarından Mikrofonu İzin ver yapın.'
+        : e && e.name === 'NotFoundError'
+          ? 'Bilgisayarda kullanılabilir mikrofon bulunamadı. Windows ses giriş cihazını kontrol edin.'
+          : e && e.name === 'NotReadableError'
+            ? 'Mikrofon başka bir uygulama tarafından kullanılıyor. Mikrofonu kullanan uygulamayı kapatıp deneyin.'
+            : (e && e.message || 'Mikrofon başlatılamadı.');
       w.showNotification && w.showNotification(detail, 'warning');
       return false;
     }
