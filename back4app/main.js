@@ -1911,7 +1911,7 @@ Parse.Cloud.define("callLocalLlama", async function (request) {
                 presence_penalty: 0.1,
                 frequency_penalty: 0.1
             }),
-            timeout: 120000
+            timeout: 10000
         });
 
         var rawText = '';
@@ -2197,8 +2197,28 @@ async function callCustomAIWithSingleKey(keyName, rawValue, prompt) {
 }
 
 // ================================================================
-// ========== superAI — 13 Ollama + NVIDIA NIM + 8 API ============
+// ========== superAI — bounded provider fallback =================
 // ================================================================
+// A slow or unreachable provider must never hold a chat request indefinitely.
+async function _aeCloudRunWithTimeout(functionName, params, timeoutMs) {
+    var timer;
+    var timeout = new Promise(function (_, reject) {
+        timer = setTimeout(function () {
+            var error = new Error("AI sağlayıcısı zaman aşımına uğradı: " + functionName);
+            error.code = "AETHRION_PROVIDER_TIMEOUT";
+            reject(error);
+        }, Math.max(1000, Math.min(12000, Number(timeoutMs) || 7500)));
+    });
+    try {
+        return await Promise.race([
+            Parse.Cloud.run(functionName, params || {}, { useMasterKey: true }),
+            timeout
+        ]);
+    } finally {
+        if (timer) clearTimeout(timer);
+    }
+}
+
 Parse.Cloud.define("superAI", async function (request) {
     var prompt = request.params.prompt;
     if (!prompt) return 'Lütfen bir soru girin.';
@@ -2229,8 +2249,12 @@ Parse.Cloud.define("superAI", async function (request) {
     }
 
     var apiPrompt = turkishInstruction ? (turkishInstruction + prompt) : prompt;
+    var aiStartedAt = Date.now();
+    var aiDeadlineMs = 50000;
+    function aiTimeLeft() { return Math.max(0, aiDeadlineMs - (Date.now() - aiStartedAt)); }
+    function aiCanContinue() { return aiTimeLeft() > 1000; }
 
-    // KATMAN 1: 13 OLLAMA
+    // KATMAN 1: 13 OLLAMA (her istekte en fazla iki aday; süre bütçesi korunur)
     var ollamaModels = [
         'qwen2.5:latest','qwen3:8b','llama3.2:latest','gemma3:4b','mistral:latest',
         'qwen3:4b','gemma2:latest','phi3.5:latest','deepseek-r1:latest','qwen2.5-coder:latest',
@@ -2239,10 +2263,10 @@ Parse.Cloud.define("superAI", async function (request) {
 
     var localUrl = await getAPIKey('COLAB_LLAMA_URL');
     if (localUrl) {
-        console.log('🔄 KATMAN 1 - Ollama: 13 model sırayla...');
-        for (var om = 0; om < ollamaModels.length; om++) {
+        console.log('🔄 KATMAN 1 - Ollama: süre sınırı içinde en fazla 2 model deneniyor...');
+        for (var om = 0; om < Math.min(ollamaModels.length, 2) && aiCanContinue(); om++) {
             try {
-                var localReply = await Parse.Cloud.run('callLocalLlama', { prompt: prompt, model: ollamaModels[om] }, { useMasterKey: true });
+                var localReply = await _aeCloudRunWithTimeout('callLocalLlama', { prompt: prompt, model: ollamaModels[om] }, Math.min(7500, aiTimeLeft()));
                 if (localReply && localReply.length > 10) { console.log('✅ OLLAMA: ' + ollamaModels[om]); return cleanResponse(localReply); }
             } catch (e) { console.warn('⚠️ Ollama ' + ollamaModels[om] + ' başarısız'); }
         }
@@ -2257,10 +2281,10 @@ Parse.Cloud.define("superAI", async function (request) {
 
     var nvidiaKey = await getAPIKey('NVIDIA_API_KEY');
     if (nvidiaKey) {
-        console.log('🔄 KATMAN 2 - NVIDIA NIM: ' + nvidiaModels.length + ' model...');
-        for (var nm = 0; nm < nvidiaModels.length; nm++) {
+        console.log('🔄 KATMAN 2 - NVIDIA NIM: süre sınırı içinde en fazla 2 model deneniyor...');
+        for (var nm = 0; nm < Math.min(nvidiaModels.length, 2) && aiCanContinue(); nm++) {
             try {
-                var nvidiaReply = await Parse.Cloud.run('callNvidiaNIM', { prompt: apiPrompt, model: nvidiaModels[nm] }, { useMasterKey: true });
+                var nvidiaReply = await _aeCloudRunWithTimeout('callNvidiaNIM', { prompt: apiPrompt, model: nvidiaModels[nm] }, Math.min(7500, aiTimeLeft()));
                 if (nvidiaReply && nvidiaReply.length > 10) { console.log('✅ NIM: ' + nvidiaModels[nm]); return cleanResponse(nvidiaReply); }
             } catch (e) {}
         }
@@ -2268,10 +2292,10 @@ Parse.Cloud.define("superAI", async function (request) {
 
     // KATMAN 3: 8 Bulut API
     var apiModels = ['callGroq','callGemini','callDeepSeek','callDeepInfra','callOpenAI','callCerebras','callOpenRouter','callCohere'];
-    for (var mi = 0; mi < apiModels.length; mi++) {
+    for (var mi = 0; mi < apiModels.length && aiCanContinue(); mi++) {
         var model = apiModels[mi];
         try {
-            var result2 = await Parse.Cloud.run(model, { prompt: apiPrompt }, { useMasterKey: true });
+            var result2 = await _aeCloudRunWithTimeout(model, { prompt: apiPrompt }, Math.min(7500, aiTimeLeft()));
             if (result2 && result2.length > 10) { console.log('✅ ' + model); return cleanResponse(result2); }
         } catch (e) { console.error('❌ ' + model + ' başarısız'); }
     }
@@ -4517,8 +4541,44 @@ Parse.Cloud.define("getInboxItems", async function (request) {
     var user = request.user;
     if (!user) throw new Error('Giriş yapmalısınız!');
 
+    var receiverEmail = String(user.get('email') || '').trim();
+    if (!receiverEmail) throw new Error('Hesap e-posta adresi bulunamadı.');
     var query = new Parse.Query(Inbox);
-    query.equalTo('receiver_email', user.get('email'));
+    // Legacy accounts may contain mixed-case email values; keep the query scoped to this user.
+    var escapedEmail = receiverEmail.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\    var query = new Parse.Query(Inbox);
+    query.equalTo('receiver_email', user.get('email'));');
+    query.matches('receiver_email', '^' + escapedEmail + '
+    query.descending('createdAt');
+    query.limit(100);
+
+    try {
+        var results = await query.find({ useMasterKey: true });
+        return results.map(function (obj) {
+            return {
+                id: obj.id,
+                sender_email: obj.get('sender_email') || 'Sistem',
+                type: obj.get('type') || 'notification',
+                message: obj.get('message') || '',
+                status: obj.get('status') || '',
+                request_id: obj.get('request_id') || '',
+                project_title: obj.get('project_title') || '',
+                project_type: obj.get('project_type') || '',
+                project_description: obj.get('project_description') || '',
+                role: obj.get('role') || '',
+                package_type: obj.get('package_type') || '',
+                team_id: obj.get('team_id') || '',
+                team_name: obj.get('team_name') || '',
+                project_id: obj.get('project_id') || '',
+                created_at: obj.createdAt ? obj.createdAt.toISOString() : new Date().toISOString()
+            };
+        });
+    } catch (e) {
+        console.error('getInboxItems hatası:', String(e && e.message || e).slice(0, 240));
+        throw new Error('Gelen kutusu şu anda yüklenemedi. Sunucu bağlantısını ve Inbox şemasını kontrol edip tekrar deneyin.');
+    }
+});
+
+, 'i');
     query.descending('createdAt');
     query.limit(100);
 
