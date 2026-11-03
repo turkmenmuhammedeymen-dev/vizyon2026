@@ -1229,16 +1229,8 @@ function showWelcome() {
  dashboard.style.setProperty('opacity', '1', 'important');
  var main = qs('#mainSite');
  if (main) main.style.setProperty('display', 'none', 'important');
- Array.prototype.forEach.call(wrapper.children, function (el) {
-  if (el === welcome) return;
-  if (!el.hasAttribute('data-ae-display-saved')) {
-   el.setAttribute('data-ae-display-saved', JSON.stringify({
-    value:el.style.getPropertyValue('display'),
-    priority:el.style.getPropertyPriority('display')
-   }));
-  }
-  el.style.setProperty('display', 'none', 'important');
- });
+ /* Keep the original full dashboard visible after login.
+    The welcome banner is additive; it must not hide the dashboard's feature panels. */
  var nameEl = qs('#navbarAvatarName');
  if (nameEl) nameEl.textContent = name;
  var roleEl = qs('#dashboardUserName');
@@ -2035,7 +2027,7 @@ Array.prototype.forEach.call(nav.querySelectorAll('[data-aews-group-toggle]'),fu
 });
 }function sidebar(){var existing=q('#aeWorkspaceSidebar');if(existing&&q('#aewsNav',existing))return;if(existing)existing.remove();var oldToggle=q('#aewsMobileToggle');if(oldToggle)oldToggle.remove();var oldShade=q('#aewsMobileShade');if(oldShade)oldShade.remove();var shade=document.createElement('div');shade.id='aewsMobileShade';shade.setAttribute('aria-hidden','true');shade.onclick=function(){document.body.classList.remove('aews-nav-open')};document.body.appendChild(shade);var toggle=document.createElement('button');toggle.id='aewsMobileToggle';toggle.type='button';toggle.setAttribute('aria-label','Yan menüyü aç');toggle.setAttribute('aria-expanded','false');toggle.textContent='☰';toggle.onclick=function(){var open=document.body.classList.toggle('aews-nav-open');toggle.setAttribute('aria-expanded',String(open))};document.body.appendChild(toggle);var s=document.createElement('aside');s.id='aeWorkspaceSidebar';s.setAttribute('aria-label','AETHRION çalışma alanı menüsü');s.innerHTML='<div class="aews-brand"><div class="aews-logo">A</div><div><strong>AETHRION</strong><small>INTELLIGENCE WITHOUT LIMITS</small></div><button class="aews-close" type="button" aria-label="Menüyü kapat">×</button></div><nav class="aews-nav" id="aewsNav"></nav><div class="aews-footer"><div class="aews-avatar" id="aewsAvatar">A</div><div class="aews-user"><strong id="aewsUserName">AETHRION Üyesi</strong><small>Güvenli çalışma alanı</small></div></div>';document.body.appendChild(s);var close=q('.aews-close',s);if(close)close.onclick=function(){document.body.classList.remove('aews-nav-open');toggle.setAttribute('aria-expanded','false')};navRender('')}
 function active(label){Array.prototype.forEach.call(document.querySelectorAll('.aews-link'),function(b){b.classList.toggle('is-active',b.hasAttribute('data-aews-home')?label==='Ana ekran':b.getAttribute('data-aews-feature')===label)})}
-function welcome(){if(!logged())return;document.body.classList.add('ae-shell-on','aews-home-view');document.body.classList.remove('aews-feature-view','aews-nav-open');sidebar();var w=q('#aethrionExperienceWelcome');if(w){var grid=q('.aew-grid',w),actions=q('.aew-actions',w);if(grid)grid.remove();if(actions)actions.remove();var g=q('.aew-greeting',w),c=q('.aew-copy',w),t=q('.aew-name',w);if(g)g.textContent='Kişisel çalışma alanınız hazır.';if(c)c.textContent='Yapay zekâ, üretim ve geliştirici araçlarına sol menüden ulaşın. Her özellik kendi çalışma alanında açılır.';if(t)t.innerHTML='Hoş geldiniz,<br><em>'+esc(uname())+'</em>';if(!q('.aews-home-cta',w)){var note=document.createElement('div');note.className='aews-home-cta';note.textContent='Çalışma alanınızı sol menüden seçin  →';w.appendChild(note)}}var un=q('#aewsUserName'),av=q('#aewsAvatar');if(un)un.textContent=uname();if(av)av.textContent=uname().slice(0,1).toUpperCase();var main=q('#mainSite');if(main)main.style.setProperty('display','none','important')}
+function welcome(){if(!logged())return;document.body.classList.add('ae-shell-on','aews-home-view');document.body.classList.remove('aews-feature-view','aews-nav-open');sidebar();var w=q('#aethrionExperienceWelcome');if(w){var grid=q('.aew-grid',w),actions=q('.aew-actions',w);var g=q('.aew-greeting',w),c=q('.aew-copy',w),t=q('.aew-name',w);if(g)g.textContent='Kişisel çalışma alanınız hazır.';if(c)c.textContent='Yapay zekâ, üretim ve geliştirici araçlarına sol menüden ulaşın. Her özellik kendi çalışma alanında açılır.';if(t)t.innerHTML='Hoş geldiniz,<br><em>'+esc(uname())+'</em>';if(!q('.aews-home-cta',w)){var note=document.createElement('div');note.className='aews-home-cta';note.textContent='Çalışma alanınızı sol menüden seçin  →';w.appendChild(note)}}var un=q('#aewsUserName'),av=q('#aewsAvatar');if(un)un.textContent=uname();if(av)av.textContent=uname().slice(0,1).toUpperCase();var main=q('#mainSite');if(main)main.style.setProperty('display','none','important')}
 function home(){document.body.classList.remove('aews-nav-open','aews-feature-view');document.body.classList.add('aews-home-view');if(typeof window.showWelcome==='function'&&!window.showWelcome.__aewsWrap)window.showWelcome();welcome();active('Ana ekran')}
 function findMatchingControl(label){var nodes=document.querySelectorAll('button,a,[role="button"],[data-action],[onclick]');var wanted=String(label||'').toLocaleLowerCase('tr-TR');for(var i=0;i<nodes.length;i++){var n=nodes[i];if(n.closest('#aeWorkspaceSidebar'))continue;var txt=(n.innerText||n.textContent||'').trim().toLocaleLowerCase('tr-TR');if(txt&&((txt===wanted)||(txt.indexOf(wanted)>=0&&txt.length<100))&&(n.hasAttribute('onclick')||n.hasAttribute('data-action')||n.getAttribute('role')==='button'||n.tagName==='BUTTON'))return n}return null}
 function callAction(action,label){var aliases={openKocPanel:['openKocPanel','openCoachPanel','openAethrionCoach','openKocOverlay'],openAethrionAlPanel:['openAethrionAlPanel','openAethrionAssistant','openAethrionAgents','openAssistantPanel'],openFullAIPanel:['openFullAIPanel','openAethrionAI','openAIAssistant'],openModelsShowcase:['openModelsShowcase','showModelsShowcase'],open3DBuilder:['open3DBuilder','open3DStudio'],openVideoEditor:['openVideoEditor','openVideoStudio'],openVideoStudio:['openVideoStudio','openVideoEditor'],scrollToImageGen:['scrollToImageGen','openImageGenerator'],openCodeEditor:['openCodeEditor','openKodEditor'],toggleTeamPage:['toggleTeamPage','openCommunityPage'],scrollToProjects:['scrollToProjects','openProjects'],openAcademy:['openAcademy','openAethrionAcademy'],openA27ApiKeyGenerator:['openA27ApiKeyGenerator','openApiKeyGenerator'],openA27ApiGuide:['openA27ApiGuide','openApiDocs'],openDocumentation:['openDocumentation','openDocs'],openSettingsModal:['openSettingsModal','openSettings'],openAccountInfo:['openAccountInfo','openProfile']};var list=aliases[action]||[action];for(var i=0;i<list.length;i++){var fn=window[list[i]];if(typeof fn==='function'){fn();return true}}if(typeof window.safeFeatureCall==='function'){try{var safeResult=window.safeFeatureCall(action,label,'');if(safeResult===true)return true;if(safeResult===false||safeResult===undefined)return false;return true}catch(e){}}var match=findMatchingControl(label);if(match){try{match.click();return true}catch(e){}}return false}
@@ -2080,16 +2072,20 @@ function customWelcome(){
  document.body.classList.add('ae-shell-on','logged-in-user');
  var w=q('#aethrionExperienceWelcome'),dash=q('#dashboardArea');
  if(!w||!dash)return;
- var name=String(userName()).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]});
- var title=q('.aew-name',w);
- if(!w.dataset.aeV6Built){
-  w.innerHTML='<div class="aew-eyebrow"><span class="aew-dot"></span>AETHRION · PERSONAL WORKSPACE</div><p class="aew-greeting">Çalışma alanınıza hoş geldiniz.</p><h1 class="aew-name" id="aewName">Hoş geldiniz,<br><em>'+name+'</em></h1><div class="aew-role">◈ Kişisel çalışma alanı</div><p class="aew-copy">Yapay zekâ, üretim araçları ve geliştirici kaynaklarınız tek bir düzenli çalışma alanında. Başlamak için soldaki menüden bir özellik seçin.</p><div class="aew-v6-hint"><b>⌘</b><span><strong>Çalışma alanları</strong><br>İhtiyacınız olan aracı sol menüden açın. Ana ekranınız sade kalır.</span></div>';
-  w.dataset.aeV6Built='1';
- }else if(title){title.innerHTML='Hoş geldiniz,<br><em>'+name+'</em>'}
- qa('.aew-grid,.aew-actions,.aews-home-cta',w).forEach(function(el){el.remove()});
  var wrap=q('.dashboard-content-wrapper',dash)||q('.dashboard-content',dash)||dash;
- Array.prototype.forEach.call(wrap.children,function(el){if(el===w)return;if(el.id==='aethrionWorkspaceStage'){el.style.setProperty('display','none','important');return}if(!el.hasAttribute('data-ae-display-saved'))el.setAttribute('data-ae-display-saved',JSON.stringify({value:el.style.getPropertyValue('display'),priority:el.style.getPropertyPriority('display')}));el.style.setProperty('display','none','important')});
- w.style.setProperty('display','flex','important');
+ /* Return every dashboard section hidden by a previous welcome/stage transition. */
+ Array.prototype.forEach.call(wrap.children,function(el){
+  if(el===w)return;
+  if(el.id==='aethrionWorkspaceStage'){el.style.setProperty('display','none','important');return}
+  if(el.hasAttribute('data-ae-display-saved')){
+   var previous={};
+   try{previous=JSON.parse(el.getAttribute('data-ae-display-saved')||'{}')}catch(_){}
+   if(previous.value)el.style.setProperty('display',previous.value,previous.priority||'');
+   else el.style.removeProperty('display');
+   el.removeAttribute('data-ae-display-saved');
+  }
+ });
+ w.style.removeProperty('display');
  var main=q('#mainSite');if(main)main.style.setProperty('display','none','important');
  var n=q('#aewsUserName');if(n)n.textContent=userName();
  var av=q('#aewsAvatar');if(av)av.textContent=userName().slice(0,1).toUpperCase();
