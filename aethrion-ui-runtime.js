@@ -390,8 +390,63 @@
   } else {
     bootCommunityServices();
   }
+  function installAethrionInboxUI() {
+    if (document.getElementById('aethrionInboxLauncher')) return;
+    var style = document.createElement('style');
+    style.textContent = '#aethrionInboxLauncher{position:fixed;right:22px;bottom:22px;z-index:99990;border:1px solid rgba(180,150,90,.55);border-radius:999px;padding:12px 18px;background:#111827;color:#f8fafc;font:600 13px system-ui;box-shadow:0 10px 35px #0005;cursor:pointer}#aethrionInboxPanel{position:fixed;right:22px;bottom:78px;width:min(390px,calc(100vw - 28px));max-height:min(70vh,620px);overflow:auto;z-index:99991;background:#101827;color:#eef2f7;border:1px solid #8b7448;border-radius:16px;padding:16px;box-shadow:0 20px 60px #0008;display:none}#aethrionInboxPanel.open{display:block}#aethrionInboxPanel .ae-inbox-item{padding:12px 0;border-bottom:1px solid #ffffff20}#aethrionInboxPanel button{margin:8px 6px 0 0;border:1px solid #9b8356;border-radius:8px;padding:7px 10px;background:#1d293b;color:#fff;cursor:pointer}#aethrionInboxPanel .ae-inbox-close{float:right}';
+    document.head.appendChild(style);
+    var launcher = document.createElement('button');
+    launcher.id = 'aethrionInboxLauncher'; launcher.type = 'button'; launcher.textContent = 'Gelen Kutusu';
+    var panel = document.createElement('section');
+    panel.id = 'aethrionInboxPanel'; panel.setAttribute('aria-label','AETHRION gelen kutusu');
+    panel.innerHTML = '<button type="button" class="ae-inbox-close" aria-label="Kapat">Kapat ×</button><h3>Gelen Kutusu ve Davetler</h3><div class="ae-inbox-content" aria-live="polite">Henüz yüklenmedi.</div>';
+    document.body.appendChild(launcher); document.body.appendChild(panel);
+    launcher.addEventListener('click', async function () {
+      panel.classList.toggle('open');
+      if (panel.classList.contains('open')) await renderAethrionInbox();
+    });
+    panel.querySelector('.ae-inbox-close').addEventListener('click', function () { panel.classList.remove('open'); });
+  }
+  async function renderAethrionInbox() {
+    var panel = document.getElementById('aethrionInboxPanel');
+    if (!panel) return;
+    var host = panel.querySelector('.ae-inbox-content');
+    host.textContent = 'Gelen kutusu yükleniyor…';
+    var result = await window.loadAethrionInboxItems();
+    host.replaceChildren();
+    if (!result.success) { host.textContent = 'Gelen kutusu yüklenemedi: ' + result.error; return; }
+    if (!result.items.length) { host.textContent = 'Yeni davet veya bildiriminiz bulunmuyor.'; return; }
+    result.items.forEach(function (item) {
+      var card = document.createElement('article'); card.className = 'ae-inbox-item';
+      var message = document.createElement('p'); message.textContent = String(item.message || 'Yeni bildirim'); card.appendChild(message);
+      var pending = String(item.status || 'pending').toLowerCase() === 'pending';
+      if (pending && item.type === 'team_invite') {
+        [['Kabul et','acceptTeamInvite'],['Reddet','rejectTeamInvite']].forEach(function (action) {
+          var button = document.createElement('button'); button.type='button'; button.textContent=action[0];
+          button.addEventListener('click', async function () {
+            button.disabled = true;
+            try { await window.Parse.Cloud.run(action[1], { teamId: item.team_id, inboxId: item.id }); await renderAethrionInbox(); }
+            catch (error) { button.disabled=false; window.showNotification(String(error && error.message || error),'error'); }
+          }); card.appendChild(button);
+        });
+      } else if (pending && (item.type === 'gift_request' || item.type === 'role_request')) {
+        [['Kabul et','accept'],['Reddet','reject']].forEach(function (action) {
+          var button = document.createElement('button'); button.type='button'; button.textContent=action[0];
+          button.addEventListener('click', async function () {
+            button.disabled=true;
+            try { await window.Parse.Cloud.run('handleRequest', { requestId:item.request_id, action:action[1] }); await renderAethrionInbox(); }
+            catch (error) { button.disabled=false; window.showNotification(String(error && error.message || error),'error'); }
+          }); card.appendChild(button);
+        });
+      }
+      host.appendChild(card);
+    });
+  }
+  function bootInboxUI() { if (document.body) installAethrionInboxUI(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootInboxUI, { once:true }); else bootInboxUI();
   window.addEventListener('aethrion:authenticated', function () {
     window.loadAethrionInboxItems();
+    if (document.getElementById('aethrionInboxPanel') && document.getElementById('aethrionInboxPanel').classList.contains('open')) renderAethrionInbox();
   });
 
 })();
