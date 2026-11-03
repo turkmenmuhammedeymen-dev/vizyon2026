@@ -398,7 +398,49 @@
   install('openLogsPanel', function () { go('/aethrion-status.html'); });
   install('openParentSettings', function () { go('/hesap-ve-oturum-guvenligi.html'); });
   install('startJarvisMode', function () { go('/aethrion-jarvis.html'); });
-  install('toggleNotificationPanel', function () { var p = byId('notificationPanel'); if (p) p.hidden = !p.hidden; else w.showNotification && w.showNotification('Bildirim paneli bu sayfada bulunmuyor.', 'warning'); });
+  function loadAethrionNotifications() {
+    var panel = byId('aethrionNotificationPanel'); if (!panel) return Promise.resolve([]);
+    var list = byId('aethrionNotificationList'); if (list) list.textContent = 'Bildirimler yükleniyor…';
+    return aiCloud('getNotifications', {}).then(function (items) {
+      items = Array.isArray(items) ? items : [];
+      var unread = items.filter(function (n) { return !n.is_read; }).length;
+      var badge = byId('notificationBadge'); if (badge) { badge.textContent = String(unread); badge.style.display = unread ? '' : 'none'; }
+      if (list) {
+        list.innerHTML = '';
+        if (!items.length) { list.textContent = 'Henüz bildirimin yok.'; return items; }
+        items.forEach(function (item) {
+          var button = d.createElement('button'); button.type = 'button';
+          button.style.cssText = 'display:block;width:100%;text-align:left;padding:13px;margin:7px 0;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:12px;background:' + (item.is_read ? 'transparent' : 'rgba(212,175,55,.08)') + ';color:var(--text,#f4f6fb);cursor:pointer';
+          var title = d.createElement('strong'); title.textContent = item.type || 'Bildirim'; title.style.display = 'block';
+          var message = d.createElement('span'); message.textContent = item.message || ''; message.style.cssText = 'display:block;margin-top:5px;white-space:pre-wrap';
+          var date = d.createElement('small'); date.textContent = item.createdAt ? new Date(item.createdAt).toLocaleString('tr-TR') : ''; date.style.cssText = 'display:block;margin-top:7px;color:var(--text3,#9ca3af)';
+          button.appendChild(title); button.appendChild(message); button.appendChild(date);
+          button.addEventListener('click', function () {
+            if (!item.is_read) aiCloud('markNotificationRead', { notificationId: item.id }).then(loadAethrionNotifications).catch(function (e) { w.showNotification && w.showNotification(e.message || 'Bildirim güncellenemedi.', 'error'); });
+          });
+          list.appendChild(button);
+        });
+      }
+      return items;
+    }).catch(function (e) {
+      if (list) list.textContent = 'Bildirimler yüklenemedi: ' + (e && e.message || 'Bağlantı hatası');
+      return [];
+    });
+  }
+  install('toggleNotificationPanel', function () {
+    var panel = byId('aethrionNotificationPanel');
+    if (!panel) {
+      panel = d.createElement('section'); panel.id = 'aethrionNotificationPanel'; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-modal', 'true');
+      panel.style.cssText = 'position:fixed;inset:0;z-index:2147483100;display:none;align-items:flex-start;justify-content:flex-end;padding:16px;background:rgba(2,6,16,.55);backdrop-filter:blur(7px)';
+      panel.innerHTML = '<div style="width:min(440px,96vw);max-height:88vh;overflow:auto;padding:18px;border:1px solid var(--border,rgba(255,255,255,.14));border-radius:18px;background:var(--card,#111827);color:var(--text,#f4f6fb)"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><h3 style="margin:0">Bildirimler</h3><div><button type="button" id="aethrionNotificationRefresh">↻</button> <button type="button" id="aethrionNotificationClose" aria-label="Kapat">✕</button></div></div><div id="aethrionNotificationList" style="margin-top:12px"></div></div>';
+      panel.addEventListener('click', function (e) { if (e.target === panel || e.target.closest('#aethrionNotificationClose')) panel.style.display = 'none'; if (e.target.closest('#aethrionNotificationRefresh')) loadAethrionNotifications(); });
+      d.body.appendChild(panel);
+    }
+    var opening = panel.style.display === 'none' || !panel.style.display;
+    panel.style.display = opening ? 'flex' : 'none';
+    if (opening) loadAethrionNotifications();
+    return true;
+  });
   install('toggleChatHistory', function () { var p = byId('conversationHistoryList') || byId('conversationHistoryItems'); if (p) p.hidden = !p.hidden; else w.showNotification && w.showNotification('Sohbet geçmişi bu sayfada bulunmuyor.', 'warning'); });
   var aethrionVoiceRecognition = null;
   function voiceStatus(text) { var status = d.querySelector('#aaVoiceFullscreen .aa-voice-status'); if (status) status.textContent = text; }
