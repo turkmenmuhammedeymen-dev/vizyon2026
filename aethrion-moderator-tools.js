@@ -40,7 +40,7 @@
     var title = node('h2', '', '🎬 Moderatör · Video Kesit Aracı');
     title.id = 'moderatorVideoToolTitle';
     title.style.cssText = 'margin:0;font-size:20px;font-weight:800';
-    var close = node('button', 'btn-secondary btn-sm', '✕ Kapat');
+    var close = node('button', 'btn-secondary btn-sm modal-close', '✕ Kapat');
     close.type = 'button';
     close.addEventListener('click', w.closeModeratorVideoTool);
     header.append(title, close);
