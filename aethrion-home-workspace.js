@@ -101,6 +101,13 @@
   w.openVoiceChatFullscreen = function () {
     var p=node('aaVoiceFullscreen');
     if(!p){notify('Tam ekran sesli sohbet paneli index.html içinde bulunamadı.','error');return false;}
+    if(!node('aaVoiceMicBtn')){
+      var mic=d.createElement('button');mic.type='button';mic.id='aaVoiceMicBtn';mic.setAttribute('aria-pressed','false');
+      mic.textContent='🎤 Konuşmaya başla';
+      mic.style.cssText='display:block;margin:22px auto 28px;padding:14px 24px;border:1px solid rgba(212,175,55,.45);border-radius:999px;background:linear-gradient(135deg,rgba(212,175,55,.18),rgba(124,92,255,.16));color:inherit;font-weight:700;cursor:pointer';
+      mic.addEventListener('click',function(){if(typeof w.toggleAethrionVoiceInput==='function')w.toggleAethrionVoiceInput();});
+      p.appendChild(mic);
+    }
     p.style.setProperty('display','flex','important');p.classList.add('open','active');
     p.setAttribute('aria-hidden','false');d.body.style.overflow='hidden';
     return true;
