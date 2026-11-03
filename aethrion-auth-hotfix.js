@@ -252,6 +252,8 @@
         return true;
       }
       if(!revealDashboard())throw new Error('Dashboard alanı sayfada bulunamadı. Arayüz dosyalarını kontrol edin.');
+      // Show the dedicated welcome workspace after login; do not expose the legacy dashboard cards.
+      window.setTimeout(function(){try{if(!document.body.classList.contains('aews-feature-view')&&typeof window.showWelcome==='function')window.showWelcome()}catch(error){console.warn('[AETHRION] Welcome workspace could not be restored:',error)}},80);
       [250,800,1600,3000].forEach(function(delay){window.setTimeout(function(){try{revealDashboard()}catch(_){hideBusyLayers()}},delay)});
       notify('Giriş başarılı. AETHRION çalışma alanın açıldı.','success');
       return true;
