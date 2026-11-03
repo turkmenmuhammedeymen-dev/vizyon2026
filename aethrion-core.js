@@ -364,7 +364,48 @@
   install('startJarvisMode', function () { go('/aethrion-jarvis.html'); });
   install('toggleNotificationPanel', function () { var p = byId('notificationPanel'); if (p) p.hidden = !p.hidden; else w.showNotification && w.showNotification('Bildirim paneli bu sayfada bulunmuyor.', 'warning'); });
   install('toggleChatHistory', function () { var p = byId('conversationHistoryList') || byId('conversationHistoryItems'); if (p) p.hidden = !p.hidden; else w.showNotification && w.showNotification('Sohbet geçmişi bu sayfada bulunmuyor.', 'warning'); });
-  install('startVoiceInput', function () { go('/aethrion-assistant.html'); });
+  var aethrionVoiceRecognition = null;
+  function voiceStatus(text) { var status = d.querySelector('#aaVoiceFullscreen .aa-voice-status'); if (status) status.textContent = text; }
+  function voiceLine(text, role) {
+    var transcript = byId('aaVoiceTranscript'); if (!transcript) return;
+    var line = d.createElement('div'); line.style.cssText = 'margin:9px 0;padding:9px 12px;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:' + (role === 'user' ? 'rgba(124,92,255,.15)' : 'rgba(255,255,255,.06)');
+    var tag = d.createElement('strong'); tag.textContent = role === 'user' ? 'SİZ' : 'AETHRION AI'; tag.style.display = 'block'; tag.style.fontSize = '10px'; tag.style.opacity = '.7';
+    var body = d.createElement('span'); body.textContent = String(text || '');
+    line.appendChild(tag); line.appendChild(body); transcript.appendChild(line); transcript.scrollTop = transcript.scrollHeight;
+  }
+  install('toggleAethrionVoiceInput', function () {
+    var mic = byId('aaVoiceMicBtn');
+    if (aethrionVoiceRecognition) {
+      try { aethrionVoiceRecognition.stop(); } catch (_) {}
+      aethrionVoiceRecognition = null;
+      if (mic) { mic.setAttribute('aria-pressed', 'false'); mic.textContent = '🎤 Konuşmaya başla'; }
+      voiceStatus('🎤 SESLİ SOHBET HAZIR');
+      return true;
+    }
+    var Speech = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (!Speech) { w.showNotification && w.showNotification('Bu tarayıcı ses tanımayı desteklemiyor.', 'warning'); return false; }
+    aethrionVoiceRecognition = new Speech(); aethrionVoiceRecognition.lang = 'tr-TR'; aethrionVoiceRecognition.interimResults = false; aethrionVoiceRecognition.maxAlternatives = 1;
+    aethrionVoiceRecognition.onstart = function () { if (mic) { mic.setAttribute('aria-pressed', 'true'); mic.textContent = '⏹ Dinlemeyi durdur'; } voiceStatus('🎤 SİZİ DİNLİYORUM'); };
+    aethrionVoiceRecognition.onresult = async function (event) {
+      var said = event.results && event.results[0] && event.results[0][0] && event.results[0][0].transcript;
+      if (!said) return;
+      voiceLine(said, 'user'); voiceStatus('🧠 YANIT HAZIRLANIYOR');
+      try {
+        var result = await aiCloud('aethrionChat', { message: said, mode: 'normal' });
+        if (!result || result.success !== true) throw new Error(result && result.error || 'Yanıt alınamadı.');
+        var reply = String(result.reply || 'Yanıt boş döndü.'); voiceLine(reply, 'assistant');
+        if (w.speechSynthesis && w.SpeechSynthesisUtterance) { w.speechSynthesis.cancel(); var utterance = new w.SpeechSynthesisUtterance(reply); utterance.lang = 'tr-TR'; w.speechSynthesis.speak(utterance); }
+        voiceStatus('🎤 SESLİ SOHBET HAZIR');
+      } catch (e) { voiceLine('Yanıt alınamadı: ' + (e && e.message || 'Hata'), 'assistant'); voiceStatus('BAĞLANTI HATASI'); }
+    };
+    aethrionVoiceRecognition.onerror = function (event) { voiceStatus('SES HATASI'); w.showNotification && w.showNotification('Ses tanıma: ' + (event.error || 'hata'), 'warning'); };
+    aethrionVoiceRecognition.onend = function () { aethrionVoiceRecognition = null; if (mic) { mic.setAttribute('aria-pressed', 'false'); mic.textContent = '🎤 Konuşmaya başla'; } };
+    try { aethrionVoiceRecognition.start(); return true; } catch (e) { aethrionVoiceRecognition = null; if (mic) mic.setAttribute('aria-pressed', 'false'); w.showNotification && w.showNotification(e.message || 'Mikrofon başlatılamadı.', 'error'); return false; }
+  });
+  install('startVoiceInput', function () {
+    if (typeof w.openVoiceChatFullscreen === 'function') w.openVoiceChatFullscreen();
+    return w.toggleAethrionVoiceInput();
+  });
   install('scrollToProjectRequests', function () { if (!scrollTo('projectRequests')) go('/topluluk.html'); });
   install('newConversation', function () { go('/aethrion-ai.html'); });
   install('toggleConversationHistory', function () { var p = byId('conversationHistoryList') || byId('conversationHistoryItems'); if (p) p.hidden = !p.hidden; else go('/aethrion-ai.html'); });
