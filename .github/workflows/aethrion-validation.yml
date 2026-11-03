@@ -67,7 +67,10 @@ jobs:
           const cloud = fs.readFileSync('back4app/main.js', 'utf8');
           const checks = [
             [home.includes('id="vizyonAlPanel"'), 'Legacy 28-model chat panel is missing'],
-            [router.includes("w.openFullAIPanel = function () { return showChat('ai'); }"), 'Primary AI button is not routed to the legacy chat'],
+            [router.includes("w.openFullAIPanel = function () {") && router.includes("showChat('ai')"), 'Primary AI button is not routed to the legacy chat'],
+            [fs.readFileSync('app.js', 'utf8').includes('function renderHomeCatalog(w)') && fs.readFileSync('app.js', 'utf8').includes('aewHomeCatalog'), 'Full feature catalogue is missing from the workspace home'],
+            [fs.readFileSync('app.js', 'utf8').includes('Pexels GIF Ara') && fs.readFileSync('aethrion-core.js', 'utf8').includes('w.openGifPicker=function()'), 'Legacy GIF picker is not wired into the workspace'],
+            [cloud.includes('Parse.Cloud.define("searchGif"'), 'GIF search Cloud Function is missing'],
             [recovery.includes("w.Parse.Cloud.run('aethrionChat'"), 'Chat UI does not call the quota-aware backend endpoint'],
             [recovery.includes("w.openModal = function (id)"), 'Auth modal wrapper is missing'],
             [cloud.includes('Parse.Cloud.define("aethrionChat"'), 'Daily-quota chat endpoint is missing'],
