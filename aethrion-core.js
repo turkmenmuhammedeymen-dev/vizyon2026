@@ -569,9 +569,36 @@
   install('scrollToProjectRequests', function () { if (!scrollTo('projectRequests')) go('/topluluk.html'); });
   install('newConversation', function () { go('/aethrion-ai.html'); });
   install('toggleConversationHistory', function () { var p = byId('conversationHistoryList') || byId('conversationHistoryItems'); if (p) p.hidden = !p.hidden; else go('/aethrion-ai.html'); });
-  install('shareCurrentConversation', function () { w.showNotification && w.showNotification('Paylaşmak için önce bir sohbet açın.', 'warning'); });
-  install('deleteCurrentConversation', function () { w.showNotification && w.showNotification('Silmek için önce bir sohbet seçin.', 'warning'); });
-  install('renameCurrentConversation', function () { w.showNotification && w.showNotification('Yeniden adlandırmak için önce bir sohbet seçin.', 'warning'); });
+  install('shareCurrentConversation', async function () {
+    var id = w.fullAIConversationId || w.currentConversationId;
+    if (!id) { w.showNotification && w.showNotification('Önce paylaşılacak bir sohbet açın.', 'warning'); return false; }
+    try {
+      var result = await aiCloud('shareConversation', { conversationId: id });
+      if (!result || !result.shareUrl) throw new Error('Paylaşım bağlantısı oluşturulamadı.');
+      try { await w.navigator.clipboard.writeText(result.shareUrl); w.showNotification && w.showNotification('Sohbet bağlantısı kopyalandı.', 'success'); }
+      catch (_) { w.prompt('Sohbet bağlantısı:', result.shareUrl); }
+      return true;
+    } catch (e) { w.showNotification && w.showNotification(e.message || 'Sohbet paylaşılamadı.', 'error'); return false; }
+  });
+  install('deleteCurrentConversation', async function () {
+    var id = w.fullAIConversationId || w.currentConversationId;
+    if (!id) { w.showNotification && w.showNotification('Önce silinecek bir sohbet açın.', 'warning'); return false; }
+    if (!w.confirm('Bu sohbet ve ilişkili mesajları kalıcı olarak silinsin mi?')) return false;
+    try {
+      await aiCloud('deleteConversation', { conversationId: id });
+      w.fullAIConversationId = null; w.currentConversationId = null; w.__aethrionAIChatMessages = [];
+      aiRender([]);
+      if (typeof aiRenderHistoryList === 'function') await aiRenderHistoryList();
+      w.showNotification && w.showNotification('Sohbet silindi.', 'success'); return true;
+    } catch (e) { w.showNotification && w.showNotification(e.message || 'Sohbet silinemedi.', 'error'); return false; }
+  });
+  install('renameCurrentConversation', async function () {
+    var id = w.fullAIConversationId || w.currentConversationId;
+    if (!id) { w.showNotification && w.showNotification('Önce yeniden adlandırılacak bir sohbet açın.', 'warning'); return false; }
+    var name = w.prompt('Yeni sohbet adı:'); if (!name || !name.trim()) return false;
+    try { await aiCloud('renameConversation', { conversationId: id, name: name.trim().slice(0,100) }); if (typeof aiRenderHistoryList === 'function') await aiRenderHistoryList(); w.showNotification && w.showNotification('Sohbet adı güncellendi.', 'success'); return true; }
+    catch (e) { w.showNotification && w.showNotification(e.message || 'Sohbet adı güncellenemedi.', 'error'); return false; }
+  });
   install('switchToSiteAI', function () { go('/aethrion-ai.html'); });
   install('openApiKeySelectionModal', function () { go('/api.html#keys'); });
   install('sendDashboardAI', function () { go('/aethrion-ai.html'); });
