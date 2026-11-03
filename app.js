@@ -1992,10 +1992,10 @@ checkDueReminders();window.setInterval(checkDueReminders,15000);window.addEventL
 /* ===== aethrion-workspace-v5.js ===== */
 (function(){'use strict';
 var CORE=[
-['YAPAY ZEKÂ','✦','AETHRION AI','28 model destekli ana sohbet alanı','openFullAIPanel','./aethrion-ai.html'],
-['YAPAY ZEKÂ','◈','AETHRION Agents','Ajanlar, ekran okuma ve dosya araçları','openAethrionAlPanel','./aethrion-assistant.html'],
-['YAPAY ZEKÂ','◎','AETHRION Coach','Kişisel yapay zekâ koçu','openKocPanel','./aethrion-assistant.html'],
-['YAPAY ZEKÂ','◉','Model Kataloğu','Tanımlı AI modellerini incele','openModelsShowcase','./aethrion-ai.html#models'],
+['YAPAY ZEKÂ','✦','AETHRION AI','28 model destekli ana sohbet alanı','openFullAIPanel',''],
+['YAPAY ZEKÂ','◈','AETHRION Agents','Ajanlar, ekran okuma ve dosya araçları','openAethrionAlPanel',''],
+['YAPAY ZEKÂ','◎','AETHRION Coach','Kişisel yapay zekâ koçu','openKocPanel',''],
+['YAPAY ZEKÂ','◉','Model Kataloğu','Tanımlı AI modellerini incele','openModelsShowcase',''],
 ['YAPAY ZEKÂ','🎙️','Sesli Sohbet','Tam ekran sesli AI sohbeti','openVoiceChatFullscreen','./aethrion-assistant.html'],
 ['YAPAY ZEKÂ','🤖','AI Kişisel Asistan','Günlük özet, hatırlatıcı ve kişisel yardımcı','openPersonalAssistant','./aethrion-assistant.html'],
 ['YAPAY ZEKÂ','🧠','JARVIS','Ayrı sesli asistan çalışma alanı','startJarvisMode','./aethrion-jarvis.html'],
@@ -2036,7 +2036,7 @@ var CORE=[
 ['ADMIN','📋','Admin Logs Paneli','Sistem olayları ve kayıtlar','openLogsPanel','','','admin'],
 ['MODERATÖR','🎬','Video Kesit Aracı','Moderatör video kesit ve analiz aracı','openModeratorVideoTool','','','moderator'],
 ['MODERATÖR','📨','Proje Talepleri','Moderatöre yönlendirilen proje talepleri','scrollToProjectRequests','','','moderator'],
-['BETA','⚡','Beta Model Erişimi','Beta üyelerine tanımlı gelişmiş model erişimi','openModelsShowcase','./aethrion-ai.html#models','','beta'],
+['BETA','⚡','Beta Model Erişimi','Beta üyelerine tanımlı gelişmiş model erişimi','openModelsShowcase','','','beta'],
 ['BETA','🔑','Beta API Yönetimi','Beta üyelerine tanımlı API erişimi','openA27ApiKeyGenerator','./api.html#keys','','beta'],
 ['TEAM PAKETİ','👥','Team Ortak Çalışma','Takım çalışma ve ortak proje alanı','toggleTeamPage','./topluluk.html','','team'],
 ['TEAM PAKETİ','💼','Team İş İlanları','Takım paketine ait ilan limitleriyle mağaza','openJobMarket','','team'],
@@ -2077,8 +2077,8 @@ Array.prototype.forEach.call(nav.querySelectorAll('[data-aews-group-toggle]'),fu
 });
 }function sidebar(){var existing=q('#aeWorkspaceSidebar');if(existing&&q('#aewsNav',existing))return;if(existing)existing.remove();var oldToggle=q('#aewsMobileToggle');if(oldToggle)oldToggle.remove();var oldShade=q('#aewsMobileShade');if(oldShade)oldShade.remove();var shade=document.createElement('div');shade.id='aewsMobileShade';shade.setAttribute('aria-hidden','true');shade.onclick=function(){document.body.classList.remove('aews-nav-open')};document.body.appendChild(shade);var toggle=document.createElement('button');toggle.id='aewsMobileToggle';toggle.type='button';toggle.setAttribute('aria-label','Yan menüyü aç');toggle.setAttribute('aria-expanded','false');toggle.textContent='☰';toggle.onclick=function(){var open=document.body.classList.toggle('aews-nav-open');toggle.setAttribute('aria-expanded',String(open))};document.body.appendChild(toggle);var s=document.createElement('aside');s.id='aeWorkspaceSidebar';s.setAttribute('aria-label','AETHRION çalışma alanı menüsü');s.innerHTML='<div class="aews-brand"><div class="aews-logo">A</div><div><strong>AETHRION</strong><small>INTELLIGENCE WITHOUT LIMITS</small></div><button class="aews-close" type="button" aria-label="Menüyü kapat">×</button></div><nav class="aews-nav" id="aewsNav"></nav><div class="aews-footer"><div class="aews-avatar" id="aewsAvatar">A</div><div class="aews-user"><strong id="aewsUserName">AETHRION Üyesi</strong><small>Güvenli çalışma alanı</small></div></div>';document.body.appendChild(s);var close=q('.aews-close',s);if(close)close.onclick=function(){document.body.classList.remove('aews-nav-open');toggle.setAttribute('aria-expanded','false')};navRender('')}
 function active(label){Array.prototype.forEach.call(document.querySelectorAll('.aews-link'),function(b){b.classList.toggle('is-active',b.hasAttribute('data-aews-home')?label==='Ana ekran':b.getAttribute('data-aews-feature')===label)})}
-function welcome(){if(!logged())return;document.body.classList.add('ae-shell-on','aews-home-view');document.body.classList.remove('aews-feature-view','aews-nav-open');sidebar();var w=q('#aethrionExperienceWelcome');if(w){var grid=q('.aew-grid',w),actions=q('.aew-actions',w);var g=q('.aew-greeting',w),c=q('.aew-copy',w),t=q('.aew-name',w);if(g)g.textContent='Kişisel çalışma alanınız hazır.';if(c)c.textContent='Yapay zekâ, üretim ve geliştirici araçlarına sol menüden ulaşın. Her özellik kendi çalışma alanında açılır.';if(t)t.innerHTML='Hoş geldiniz,<br><em>'+esc(uname())+'</em>';if(!q('.aews-home-cta',w)){var note=document.createElement('div');note.className='aews-home-cta';note.textContent='Çalışma alanınızı sol menüden seçin  →';w.appendChild(note)}}var un=q('#aewsUserName'),av=q('#aewsAvatar');if(un)un.textContent=uname();if(av)av.textContent=uname().slice(0,1).toUpperCase();var main=q('#mainSite');if(main)main.style.setProperty('display','none','important')}
-function home(){document.body.classList.remove('aews-nav-open','aews-feature-view');document.body.classList.add('aews-home-view');if(typeof window.showWelcome==='function'&&!window.showWelcome.__aewsWrap)window.showWelcome();welcome();active('Ana ekran')}
+function welcome(){if(!logged())return;document.body.classList.add('ae-shell-on');document.body.classList.remove('aews-home-view');document.body.classList.remove('aews-feature-view','aews-nav-open');sidebar();var w=q('#aethrionExperienceWelcome');if(w){var grid=q('.aew-grid',w),actions=q('.aew-actions',w);var g=q('.aew-greeting',w),c=q('.aew-copy',w),t=q('.aew-name',w);if(g)g.textContent='Kişisel çalışma alanınız hazır.';if(c)c.textContent='Yapay zekâ, üretim ve geliştirici araçlarına sol menüden ulaşın. Her özellik kendi çalışma alanında açılır.';if(t)t.innerHTML='Hoş geldiniz,<br><em>'+esc(uname())+'</em>';if(!q('.aews-home-cta',w)){var note=document.createElement('div');note.className='aews-home-cta';note.textContent='Çalışma alanınızı sol menüden seçin  →';w.appendChild(note)}}var un=q('#aewsUserName'),av=q('#aewsAvatar');if(un)un.textContent=uname();if(av)av.textContent=uname().slice(0,1).toUpperCase();var main=q('#mainSite');if(main)main.style.setProperty('display','none','important')}
+function home(){document.body.classList.remove('aews-nav-open','aews-feature-view');document.body.classList.remove('aews-home-view');if(typeof window.showWelcome==='function'&&!window.showWelcome.__aewsWrap)window.showWelcome();welcome();active('Ana ekran')}
 function findMatchingControl(label){var nodes=document.querySelectorAll('button,a,[role="button"],[data-action],[onclick]');var wanted=String(label||'').toLocaleLowerCase('tr-TR');for(var i=0;i<nodes.length;i++){var n=nodes[i];if(n.closest('#aeWorkspaceSidebar'))continue;var txt=(n.innerText||n.textContent||'').trim().toLocaleLowerCase('tr-TR');if(txt&&((txt===wanted)||(txt.indexOf(wanted)>=0&&txt.length<100))&&(n.hasAttribute('onclick')||n.hasAttribute('data-action')||n.getAttribute('role')==='button'||n.tagName==='BUTTON'))return n}return null}
 function callAction(action,label,arg){var aliases={openKocPanel:['openKocPanel','openCoachPanel','openAethrionCoach','openKocOverlay'],openAethrionAlPanel:['openAethrionAlPanel','openAethrionAssistant','openAethrionAgents','openAssistantPanel'],openFullAIPanel:['openFullAIPanel','openAethrionAI','openAIAssistant'],openModelsShowcase:['openModelsShowcase','showModelsShowcase'],open3DBuilder:['open3DBuilder','open3DStudio'],openVideoEditor:['openVideoEditor','openVideoStudio'],openVideoStudio:['openVideoStudio','openVideoEditor'],scrollToImageGen:['scrollToImageGen','openImageGenerator'],openCodeEditor:['openCodeEditor','openKodEditor'],toggleTeamPage:['toggleTeamPage','openCommunityPage'],scrollToProjects:['scrollToProjects','openProjects'],openAcademy:['openAcademy','openAethrionAcademy'],openA27ApiKeyGenerator:['openA27ApiKeyGenerator','openApiKeyGenerator'],openA27ApiGuide:['openA27ApiGuide','openApiDocs'],openDocumentation:['openDocumentation','openDocs'],openSettingsModal:['openSettingsModal','openSettings'],openAccountInfo:['openAccountInfo','openProfile'],openCategoryPanel:['openCategoryPanel'],openJobMarket:['openJobMarket'],openMarket:['openMarket'],openModeratorVideoTool:['openModeratorVideoTool'],scrollToProjectRequests:['scrollToProjectRequests'],openLogsPanel:['openLogsPanel']};var list=aliases[action]||[action];for(var i=0;i<list.length;i++){var fn=window[list[i]];if(typeof fn==='function'){fn(arg);return true}}if(typeof window.safeFeatureCall==='function'){try{var safeResult=window.safeFeatureCall(action,label,'');if(safeResult===true)return true;if(safeResult===false||safeResult===undefined)return false;return true}catch(e){}}var match=findMatchingControl(label);if(match){try{match.click();return true}catch(e){}}return false}
 function openFeature(label){var f=features().filter(function(a){return a[2]===label})[0];if(!f)return;document.body.classList.remove('aews-nav-open','aews-home-view');document.body.classList.add('aews-feature-view');active(label);var toggle=q('#aewsMobileToggle');if(toggle)toggle.setAttribute('aria-expanded','false');if(f[4]==='doLogout'){if(typeof window.logout==='function'){window.logout();return}if(window.Parse&&Parse.User){Parse.User.logOut().then(function(){location.reload()}).catch(function(){location.reload()});return}location.href='.';return}if(/^scrollTo/.test(f[4])){var main=q('#mainSite');if(main)main.style.removeProperty('display')}var ok=callAction(f[4],f[2],f[6]);if(!ok&&f[5]){location.href=f[5];return}if(!ok&&typeof window.showNotification==='function')window.showNotification('Bu özellik henüz bağlanmamış. Lütfen geliştirici bağlantısını kontrol edin.','warning')}
@@ -2123,9 +2123,8 @@ function customWelcome(){
  var w=q('#aethrionExperienceWelcome'),dash=q('#dashboardArea');
  if(!w||!dash)return;
  var wrap=q('.dashboard-content-wrapper',dash)||q('.dashboard-content',dash)||dash;
- /* Return every dashboard section hidden by a previous welcome/stage transition. */
  Array.prototype.forEach.call(wrap.children,function(el){
-  if(el===w)return;
+  if(el===w){el.style.setProperty('display','none','important');return}
   if(el.id==='aethrionWorkspaceStage'){el.style.setProperty('display','none','important');return}
   if(el.hasAttribute('data-ae-display-saved')){
    var previous={};
@@ -2135,7 +2134,7 @@ function customWelcome(){
    el.removeAttribute('data-ae-display-saved');
   }
  });
- w.style.removeProperty('display');
+ w.style.setProperty('display','none','important');
  var main=q('#mainSite');if(main)main.style.setProperty('display','none','important');
  var n=q('#aewsUserName');if(n)n.textContent=userName();
  var av=q('#aewsAvatar');if(av)av.textContent=userName().slice(0,1).toUpperCase();
@@ -2228,7 +2227,7 @@ function syncOverlayState(){
 function restoreWorkspaceAfterClose(){
  if(!logged()||overlayStillOpen())return;
  document.body.classList.remove('aews-feature-view','aews-nav-open');
- document.body.classList.add('ae-shell-on','logged-in-user','aews-home-view');
+ document.body.classList.add('ae-shell-on','logged-in-user');document.body.classList.remove('aews-home-view');
  var dash=q('#dashboardArea'),main=q('#mainSite'),stage=q('#aethrionWorkspaceStage');
  if(dash){dash.style.setProperty('display','block','important');dash.style.setProperty('visibility','visible','important')}
  if(main)main.style.setProperty('display','none','important');
