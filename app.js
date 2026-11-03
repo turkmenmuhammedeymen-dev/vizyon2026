@@ -2144,9 +2144,40 @@ function ensureWorkspaceWelcome(dash){
  w.id='aethrionExperienceWelcome';
  w.className='aethrion-workspace-welcome';
  w.setAttribute('aria-label','AETHRION karşılama ekranı');
- w.innerHTML='<div style="max-width:920px;margin:0 auto;padding:clamp(28px,6vw,72px) clamp(18px,4vw,48px);text-align:left"><div style="display:inline-flex;align-items:center;gap:9px;padding:8px 13px;border:1px solid rgba(212,175,55,.28);border-radius:999px;background:rgba(212,175,55,.07);color:#d9bd69;font-size:11px;letter-spacing:.16em;font-weight:700">AETHRION WORKSPACE</div><div style="font-size:clamp(34px,5vw,58px);line-height:1.08;font-weight:800;letter-spacing:-.04em;margin-top:26px;color:var(--text,#f4f6fb)">Intelligence <span style="color:#d7b957">Without Limits.</span></div><h1 class="aew-name" style="font-size:clamp(23px,3vw,32px);margin:24px 0 10px;color:var(--text,#f4f6fb)">Hoş geldiniz</h1><p class="aew-copy" style="max-width:660px;font-size:15px;line-height:1.85;color:var(--text3,#aab3c4)">AETHRION çalışma alanınız hazır. Başlamak için sol menüden bir özellik seçin. Seçtiğiniz özellik kendi panelinde açılır; bu karşılama ekranı Ana Ekran bölümüne dönene kadar yerini korur.</p><div class="aew-actions" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px"><div style="padding:14px 17px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:14px;background:rgba(255,255,255,.025);color:var(--text2,#c7cfdd)">✦ Yapay zekâ ve asistanlar</div><div style="padding:14px 17px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:14px;background:rgba(255,255,255,.025);color:var(--text2,#c7cfdd)">◇ Üretim ve geliştirme</div><div style="padding:14px 17px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:14px;background:rgba(255,255,255,.025);color:var(--text2,#c7cfdd)">◈ Hesap ve platform</div></div><div class="aews-home-cta" style="margin-top:34px;color:#d9bd69;font-size:13px;letter-spacing:.04em">← Sol menüden istediğiniz özelliği seçerek başlayın</div></div>';
+ w.innerHTML='<div style="max-width:920px;margin:0 auto;padding:clamp(28px,6vw,72px) clamp(18px,4vw,48px);text-align:left"><div style="display:inline-flex;align-items:center;gap:9px;padding:8px 13px;border:1px solid rgba(212,175,55,.28);border-radius:999px;background:rgba(212,175,55,.07);color:#d9bd69;font-size:11px;letter-spacing:.16em;font-weight:700">AETHRION WORKSPACE</div><div style="font-size:clamp(34px,5vw,58px);line-height:1.08;font-weight:800;letter-spacing:-.04em;margin-top:26px;color:var(--text,#f4f6fb)">Intelligence <span style="color:#d7b957">Without Limits.</span></div><h1 class="aew-name" style="font-size:clamp(23px,3vw,32px);margin:24px 0 10px;color:var(--text,#f4f6fb)">Hoş geldiniz</h1><p class="aew-copy" style="max-width:660px;font-size:15px;line-height:1.85;color:var(--text3,#aab3c4)">AETHRION çalışma alanınız hazır. Özellikleri aşağıdaki listede inceleyin; yalnızca yanındaki Bak düğmesine bastığınızda ilgili çalışma alanı açılır.</p><div class="aew-actions" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px"><div style="padding:14px 17px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:14px;background:rgba(255,255,255,.025);color:var(--text2,#c7cfdd)">✦ Yapay zekâ ve asistanlar</div><div style="padding:14px 17px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:14px;background:rgba(255,255,255,.025);color:var(--text2,#c7cfdd)">◇ Üretim ve geliştirme</div><div style="padding:14px 17px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:14px;background:rgba(255,255,255,.025);color:var(--text2,#c7cfdd)">◈ Hesap ve platform</div></div><div class="aews-home-cta" style="margin-top:24px;color:#d9bd69;font-size:13px;letter-spacing:.04em">Aşağıdaki listeden bir özellik seçin. Açmak için yalnızca Bak düğmesini kullanın.</div><section id="aewHomeCatalog" class="aew-home-catalog" aria-label="AETHRION tüm özellikler"></section></div>';
  wrap.insertBefore(w,wrap.firstChild);
  return w;
+}
+function renderHomeCatalog(w){
+ var host=q('#aewHomeCatalog',w);if(!host)return;
+ var source=Array.isArray(window.__aethrionWorkspaceMenuFeatures)?window.__aethrionWorkspaceMenuFeatures:[];
+ var groups=Object.create(null),labels={CORE:'YAPAY ZEKÂ',CREATE:'ÜRETİM ARAÇLARI',PLATFORM:'PLATFORM',ADVANCED:'GELİŞTİRİCİ ARAÇLARI',ACCOUNT:'HESAP',KURUCU:'KURUCU ARAÇLARI',ADMIN:'YÖNETİM ARAÇLARI',MODERATOR:'MODERATÖR ARAÇLARI',OTHER:'DİĞER ÖZELLİKLER',AI:'YAPAY ZEKÂ',TOOLS:'ÜRETİM ARAÇLARI',DEVELOPER:'GELİŞTİRİCİ ARAÇLARI'};
+ source.forEach(function(item){
+  if(!Array.isArray(item))return;
+  var group=String(item[0]||'OTHER'),icon=String(item[1]||'✦'),name=String(item[2]||'').trim(),desc=String(item[3]||'AETHRION çalışma alanı'),action=String(item[4]||''),href=String(item[5]||'');
+  if(!name||!action||group==='KATEGORİLER'||action==='openCategoryPanel')return;
+  /* Only expose entries with a real handler or an explicit destination. */
+  if(!href&&typeof window[action]!=='function')return;
+  (groups[group]||(groups[group]=[])).push({icon:icon,name:name,desc:desc,action:action});
+ });
+ var keys=Object.keys(groups);
+ var rank=['CORE','YAPAY ZEKÂ','AI','CREATE','ÜRETİM','PLATFORM','ADVANCED','GELİŞTİRİCİ','DEVELOPER','ACCOUNT','KURUCU','ADMIN','MODERATOR','OTHER'];
+ keys.sort(function(a,b){var x=rank.indexOf(a.toUpperCase()),y=rank.indexOf(b.toUpperCase());if(x<0)x=999;if(y<0)y=999;return x-y||a.localeCompare(b,'tr')});
+ if(!keys.length){host.innerHTML='<p class="aew-home-empty">Şu anda açılış bağlantısı doğrulanmış özellik bulunamadı.</p>';return}
+ var html='';
+ keys.forEach(function(group){
+  html+='<section class="aew-home-group"><h2>'+esc(labels[group]||group)+'</h2><div class="aew-home-grid">';
+  groups[group].forEach(function(item){
+   html+='<article class="aew-home-card"><span class="aew-home-icon" aria-hidden="true">'+esc(item.icon)+'</span><div class="aew-home-copy"><h3>'+esc(item.name)+'</h3><p>'+esc(item.desc)+'</p></div><button type="button" class="aew-home-open" data-aews-feature="'+esc(item.name)+'">Bak <span aria-hidden="true">↗</span></button></article>';
+  });
+  html+='</div></section>';
+ });
+ host.innerHTML=html;
+ if(!document.getElementById('aewHomeCatalogStyles')){
+  var style=document.createElement('style');style.id='aewHomeCatalogStyles';style.textContent=
+   '.aew-home-catalog{width:100%;max-width:1180px;margin:26px auto 40px;text-align:left}.aew-home-group{margin-top:28px}.aew-home-group>h2{margin:0 0 13px;color:var(--text2,#d7dce7);font:700 12px/1.4 var(--font-body,Inter,sans-serif);letter-spacing:.15em;text-transform:uppercase}.aew-home-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:12px}.aew-home-card{min-width:0;display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:13px;padding:16px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:16px;background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.015));transition:border-color .2s,transform .2s,background .2s}.aew-home-card:hover{border-color:rgba(217,189,105,.48);transform:translateY(-2px);background:rgba(217,189,105,.045)}.aew-home-icon{width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(217,189,105,.2);border-radius:12px;background:rgba(217,189,105,.07);font-size:19px}.aew-home-copy{min-width:0}.aew-home-copy h3{margin:0;color:var(--text,#f4f6fb);font-size:14px;font-weight:700;line-height:1.4}.aew-home-copy p{margin:5px 0 0;color:var(--text3,#9ca3af);font-size:12px;line-height:1.5}.aew-home-open{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid rgba(217,189,105,.38);border-radius:10px;background:rgba(217,189,105,.09);color:var(--accent,#d9bd69);font:700 12px var(--font-body,Inter,sans-serif);cursor:pointer;white-space:nowrap}.aew-home-open:hover{background:rgba(217,189,105,.17);border-color:rgba(217,189,105,.7)}.aew-home-empty{padding:22px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:14px;color:var(--text3,#9ca3af);text-align:center}@media(max-width:560px){.aew-home-card{grid-template-columns:34px minmax(0,1fr);gap:10px;padding:13px}.aew-home-icon{width:34px;height:34px}.aew-home-open{grid-column:2;justify-self:start;padding:8px 12px}.aew-home-copy h3{font-size:13px}}';
+  document.head.appendChild(style);
+ }
 }
 function customWelcome(){
  if(!logged()||document.body.classList.contains('aews-feature-view'))return;
@@ -2168,6 +2199,7 @@ function customWelcome(){
   }
  });
  w.style.setProperty('display','block','important');
+ renderHomeCatalog(w);
  var main=q('#mainSite');if(main)main.style.setProperty('display','none','important');
  var n=q('#aewsUserName');if(n)n.textContent=userName();
  var av=q('#aewsAvatar');if(av)av.textContent=userName().slice(0,1).toUpperCase();
