@@ -697,6 +697,19 @@
     var body = d.createElement('span'); body.textContent = String(text || '');
     line.appendChild(label); line.appendChild(body); p.appendChild(line); p.scrollTop = p.scrollHeight;
   }
+  install('startJarvisMode', function () {
+    var panel = byId('aethrionJarvisOverlay');
+    if (!panel) { w.showNotification && w.showNotification('JARVIS paneli bulunamadı. Eski arayüz bileşenlerini kontrol edin.', 'error'); return false; }
+    panel.style.setProperty('display', 'flex', 'important');
+    panel.style.setProperty('visibility', 'visible', 'important');
+    panel.style.setProperty('pointer-events', 'auto', 'important');
+    panel.classList.add('open', 'active');
+    panel.setAttribute('aria-hidden', 'false');
+    d.body.style.overflow = 'hidden';
+    jarvisStatus('HAZIR');
+    return true;
+  });
+  install('openJarvisMode', function () { return w.startJarvisMode(); });
   install('closeJarvisMode', function () {
     if (jarvisRecognition) { try { jarvisRecognition.stop(); } catch (_) {} jarvisRecognition = null; }
     if (w.speechSynthesis) w.speechSynthesis.cancel();
