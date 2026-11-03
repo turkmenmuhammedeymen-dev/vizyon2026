@@ -43,7 +43,7 @@
   install('openAethrionAlPanel', function () { go('/aethrion-assistant.html'); });
   install('openVizyonAlPanel', function () { go('/aethrion-assistant.html'); });
   install('openKocPanel', function () { go('/aethrion-assistant.html'); });
-  install('openModelsShowcase', function () { go('/aethrion-ai.html#models'); });
+  install('openModelsShowcase', function () { var p = byId('modelsShowcaseOverlay'); if (!p) { go('/aethrion-ai.html#models'); return false; } p.classList.add('open', 'active'); p.style.setProperty('display', 'flex', 'important'); p.style.setProperty('visibility', 'visible', 'important'); p.style.setProperty('pointer-events', 'auto', 'important'); p.style.setProperty('position', 'fixed', 'important'); p.style.setProperty('inset', '0', 'important'); p.style.setProperty('z-index', '2147482000', 'important'); d.body.style.overflow = 'hidden'; return true; });
   install('open3DBuilder', function () { go('/3d-studio.html'); });
   install('open3DStudio', function () { go('/3d-studio.html'); });
   install('openVideoEditor', function () { var p = byId('videoEditorOverlay'); if (!p) { go('/index.html#features'); return false; } p.classList.add('open', 'active'); p.style.setProperty('display', 'flex', 'important'); p.style.setProperty('visibility', 'visible', 'important'); p.style.setProperty('pointer-events', 'auto', 'important'); p.style.setProperty('position', 'fixed', 'important'); p.style.setProperty('inset', '0', 'important'); p.style.setProperty('z-index', '2147482000', 'important'); p.style.setProperty('overflow', 'auto', 'important'); d.body.style.overflow = 'hidden'; return true; });
