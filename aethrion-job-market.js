@@ -22,7 +22,7 @@
       return u && (u.get('email') || u.get('username')) || '';
     } catch (e) { return ''; }
   }
-  function anyJobOverlayOpen() { return ['jobMarketOverlay', 'jobDetailOverlay', 'jobCreateOverlay'].some(function (id) { var n = byId(id); return n && n.style.display !== 'none' && n.style.visibility !== 'hidden'; }); }
+  function anyJobOverlayOpen() { return ['jobMarketOverlay', 'jobDetailOverlay', 'jobCreateOverlay'].some(function (id) { var n = byId(id); if (!n) return false; var cs = w.getComputedStyle ? w.getComputedStyle(n) : null; return cs ? cs.display !== 'none' && cs.visibility !== 'hidden' : n.style.display !== 'none' && n.style.visibility !== 'hidden'; }); }
   function setOverlay(id, visible, zIndex) {
     var node = byId(id);
     if (!node) return null;
