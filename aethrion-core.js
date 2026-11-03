@@ -760,4 +760,71 @@
   }
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', clearStaleDrawer, { once: true });
   else clearStaleDrawer();
+
+/* Legacy GIF picker recovery: keeps the old searchGif Cloud Function contract. */
+(function installGifPicker(w,d){
+ 'use strict';
+ function byId(id){return d.getElementById(id)}
+ function notify(message,type){if(typeof w.showNotification==='function')w.showNotification(message,type||'warning');else console.warn('[AETHRION GIF]',message)}
+ function close(){
+  var modal=byId('gifPickerModal');if(modal){modal.classList.remove('open');modal.style.setProperty('display','none','important');modal.setAttribute('aria-hidden','true')}
+ }
+ function renderMessage(container,message){container.textContent=message;container.style.cssText='grid-column:1/-1;text-align:center;padding:22px;color:var(--text3,#aab3c4)'}
+ w.openGifPicker=function(){
+  var modal=byId('gifPickerModal');
+  if(!modal){
+   modal=d.createElement('div');modal.id='gifPickerModal';modal.className='modal-overlay';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-label','AETHRION GIF seçici');
+   var panel=d.createElement('div');panel.className='modal';panel.style.cssText='max-width:700px;max-height:80vh;overflow-y:auto;width:min(94vw,700px)';
+   var header=d.createElement('div');header.className='modal-header';
+   var title=d.createElement('h3');title.textContent='🎞️ AETHRION GIF Seçici';
+   var closeBtn=d.createElement('button');closeBtn.type='button';closeBtn.className='modal-close';closeBtn.textContent='×';closeBtn.setAttribute('aria-label','GIF seçiciyi kapat');closeBtn.addEventListener('click',close);
+   header.appendChild(title);header.appendChild(closeBtn);
+   var searchRow=d.createElement('div');searchRow.style.cssText='display:flex;gap:8px;margin:12px 0';
+   var input=d.createElement('input');input.type='search';input.id='gifSearchInput';input.className='glow-input';input.placeholder='GIF ara…';input.style.flex='1';
+   var searchBtn=d.createElement('button');searchBtn.type='button';searchBtn.className='btn-primary btn-sm';searchBtn.textContent='Ara';searchBtn.addEventListener('click',function(){w.searchGifAndShow()});
+   input.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();w.searchGifAndShow()}});
+   searchRow.appendChild(input);searchRow.appendChild(searchBtn);
+   var results=d.createElement('div');results.id='gifResults';results.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px;max-height:52vh;overflow:auto';
+   var footer=d.createElement('div');footer.style.cssText='margin-top:12px;text-align:center';
+   var closeBottom=d.createElement('button');closeBottom.type='button';closeBottom.className='btn-secondary';closeBottom.textContent='Kapat';closeBottom.addEventListener('click',close);footer.appendChild(closeBottom);
+   panel.appendChild(header);panel.appendChild(searchRow);panel.appendChild(results);panel.appendChild(footer);modal.appendChild(panel);modal.addEventListener('click',function(e){if(e.target===modal)close()});d.body.appendChild(modal);
+  }
+  modal.classList.add('open');modal.style.setProperty('display','flex','important');modal.setAttribute('aria-hidden','false');
+  var input=byId('gifSearchInput'),results=byId('gifResults');if(input)input.value='';if(results)renderMessage(results,'Popüler GIF’ler yükleniyor…');
+  w.searchGifAndShow('popüler');return true;
+ };
+ w.searchGifAndShow=async function(query){
+  var input=byId('gifSearchInput'),results=byId('gifResults');if(!results)return false;
+  var searchQuery=String(query||(input&&input.value)||'popüler').trim()||'popüler';
+  renderMessage(results,'GIF’ler yükleniyor…');
+  try{
+   if(!w.Parse||!w.Parse.Cloud||typeof w.Parse.Cloud.run!=='function')throw new Error('AETHRION bulut bağlantısı kullanılamıyor.');
+   var data=await w.Parse.Cloud.run('searchGif',{query:searchQuery});
+   var items=Array.isArray(data)?data:(data&&Array.isArray(data.results)?data.results:[]);
+   results.textContent='';
+   if(!items.length){renderMessage(results,'GIF bulunamadı. Başka bir arama deneyin.');return false}
+   items.forEach(function(gif){
+    var url=gif&&gif.images&&gif.images.fixed_height&&gif.images.fixed_height.url;
+    if(typeof url!=='string'||!/^https?:\/\//i.test(url))return;
+    var card=d.createElement('button');card.type='button';card.style.cssText='padding:0;overflow:hidden;border:1px solid var(--border2,rgba(255,255,255,.15));border-radius:10px;background:transparent;cursor:pointer';
+    var img=d.createElement('img');img.src=url;img.alt=String(gif.title||'GIF');img.loading='lazy';img.style.cssText='display:block;width:100%;height:145px;object-fit:cover';
+    card.appendChild(img);card.addEventListener('click',function(){w.selectGif(url)});results.appendChild(card);
+   });
+   if(!results.children.length)renderMessage(results,'Gösterilebilir GIF sonucu bulunamadı.');
+   return true;
+  }catch(error){console.error('[AETHRION] GIF arama hatası:',error);renderMessage(results,'GIF araması tamamlanamadı: '+String(error&&error.message||'Bilinmeyen hata'));return false}
+ };
+ w.selectGif=function(url){
+  if(typeof url!=='string'||!/^https?:\/\//i.test(url))return false;
+  var input=byId('teamPageInput');
+  if(input&&typeof w.sendTeamPageMessage==='function'){
+   input.value='![GIF]('+url+')';w.sendTeamPageMessage();close();notify('GIF topluluk sohbetine gönderildi.','success');return true;
+  }
+  if(w.navigator&&w.navigator.clipboard&&typeof w.navigator.clipboard.writeText==='function'){
+   w.navigator.clipboard.writeText(url).then(function(){notify('GIF bağlantısı kopyalandı. Topluluk sohbetinde paylaşabilirsiniz.','success')}).catch(function(){notify('GIF bağlantısı kopyalanamadı. Topluluk sohbetini açıp yeniden deneyin.','warning')});
+  }else notify('Önce Topluluk sohbetini açın; GIF orada paylaşılabilir.','warning');
+  return false;
+ };
+})(window,document);
+
 })(window, document);
