@@ -2259,7 +2259,7 @@ function openFeature(label){
  if(action&&typeof window[action]==='function'){
   try{var result=window[action](f.arg);opened=result!==false}catch(error){console.error('[AETHRION] Özellik açılamadı:',label,error);opened=false}
  }else if(action&&typeof window.safeFeatureCall==='function'){
-  try{var safeResult=window.safeFeatureCall(action,label,f.arg||'');opened=safeResult!==false}catch(error){console.error('[AETHRION] Özellik yönlendirmesi başarısız:',label,error);opened=false}
+  try{var safeResult=window.safeFeatureCall(action,label,'');opened=safeResult!==false}catch(error){console.error('[AETHRION] Özellik yönlendirmesi başarısız:',label,error);opened=false}
  }
  if(opened){document.body.classList.remove('aews-feature-view');var openedStage=q('#aethrionWorkspaceStage');if(openedStage)openedStage.style.setProperty('display','none','important');return}
  if(f.href&&f.href!=='./index.html#features'&&f.href!=='#features'){document.body.classList.add('aews-feature-view');showStage(label,desc,f.href);return}
