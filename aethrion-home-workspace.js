@@ -117,7 +117,14 @@
     if(launcher){launcher.click();return true;}
     notify('JARVIS tam ekran paneli bulunamadı.','error');return false;
   };
-  w.openFullAIPanel = function () { return showChat('ai'); };
+  w.openFullAIPanel = function () {
+    var opened = showChat('ai');
+    if (opened && !w.__aethrionAIHistoryLoaded && typeof w.loadConversationHistory === 'function') {
+      w.__aethrionAIHistoryLoaded = true;
+      w.loadConversationHistory();
+    }
+    return opened;
+  };
   w.openAethrionAI = w.openFullAIPanel;
   w.openAethrionAlPanel = function () { return showChat('agents'); };
   w.openVizyonAlPanel = w.openAethrionAlPanel;
