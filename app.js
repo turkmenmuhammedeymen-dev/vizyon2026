@@ -2157,7 +2157,7 @@ function customWelcome(){
  if(!w)return;
  var wrap=q('.dashboard-content-wrapper',dash)||q('.dashboard-content',dash)||dash;
  Array.prototype.forEach.call(wrap.children,function(el){
-  if(el===w){el.style.setProperty('display','none','important');return}
+  if(el===w){el.style.setProperty('display','block','important');return}
   if(el.id==='aethrionWorkspaceStage'){el.style.setProperty('display','none','important');return}
   if(el.hasAttribute('data-ae-display-saved')){
    var previous={};
@@ -2167,7 +2167,7 @@ function customWelcome(){
    el.removeAttribute('data-ae-display-saved');
   }
  });
- w.style.setProperty('display','none','important');
+ w.style.setProperty('display','block','important');
  var main=q('#mainSite');if(main)main.style.setProperty('display','none','important');
  var n=q('#aewsUserName');if(n)n.textContent=userName();
  var av=q('#aewsAvatar');if(av)av.textContent=userName().slice(0,1).toUpperCase();
