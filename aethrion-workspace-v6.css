@@ -225,3 +225,22 @@ body.ae-shell-on .aews-search input{font-size:12px!important}
  body.ae-shell-on #aeWorkspaceSidebar{width:min(300px,86vw)!important}
  body.ae-shell-on #aewsMobileToggle{display:grid!important}
 }
+
+
+/* Workspace v7 — authenticated experience is a true app viewport, not the legacy dashboard page. */
+html:has(body.ae-shell-on),body.ae-shell-on{width:100%!important;height:100%!important;min-height:100%!important;overflow:hidden!important}
+body.ae-shell-on #dashboardArea{position:fixed!important;inset:0 0 0 var(--a6-sidebar,286px)!important;width:auto!important;height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;margin:0!important;padding:24px clamp(16px,3vw,42px)!important;overflow:auto!important;overscroll-behavior:contain!important;box-sizing:border-box!important}
+body.ae-shell-on #dashboardArea>.dashboard-content-wrapper,body.ae-shell-on #dashboardArea .dashboard-content-wrapper{width:100%!important;max-width:none!important;min-height:100%!important;margin:0!important;padding:0!important;box-sizing:border-box!important}
+body.ae-shell-on #aethrionExperienceWelcome{min-height:calc(100dvh - 48px)!important}
+body.ae-shell-on #aethrionWorkspaceStage{width:100%!important;min-height:calc(100dvh - 48px)!important;max-width:none!important;margin:0!important}
+body.ae-shell-on .aews-search{display:block!important;position:relative!important;flex:0 0 auto!important;width:100%!important;padding:0 1px 13px!important;box-sizing:border-box!important}
+body.ae-shell-on .aews-search span{position:absolute!important;left:12px!important;top:50%!important;transform:translateY(-50%)!important;color:#91a5b9!important;font-size:18px!important;pointer-events:none!important}
+body.ae-shell-on .aews-search input{display:block!important;width:100%!important;height:42px!important;padding:0 12px 0 36px!important;border:1px solid rgba(183,207,229,.18)!important;border-radius:10px!important;background:#142b43!important;color:#f4f8fc!important;box-sizing:border-box!important;font:500 12px/1.4 "DM Sans","Segoe UI",sans-serif!important}
+body.ae-shell-on .aews-search input::placeholder{color:#91a5b9!important}
+body.ae-shell-on .aews-search input:focus{outline:none!important;border-color:#6597c4!important;box-shadow:0 0 0 3px rgba(89,151,202,.16)!important}
+@media(max-width:1000px){
+ body.ae-shell-on #dashboardArea{inset:0!important;width:100%!important;height:100dvh!important;min-height:100dvh!important;margin:0!important;padding:70px 14px 18px!important}
+ body.ae-shell-on #aethrionExperienceWelcome{min-height:calc(100dvh - 88px)!important}
+ body.ae-shell-on #aethrionWorkspaceStage{min-height:calc(100dvh - 90px)!important}
+}
+@media(max-width:480px){body.ae-shell-on #dashboardArea{padding:68px 10px 12px!important}}
