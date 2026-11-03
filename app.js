@@ -2039,9 +2039,9 @@ var CORE=[
 ['BETA','⚡','Beta Model Erişimi','Beta üyelerine tanımlı gelişmiş model erişimi','openModelsShowcase','','','beta'],
 ['BETA','🔑','Beta API Yönetimi','Beta üyelerine tanımlı API erişimi','openA27ApiKeyGenerator','./api.html#keys','','beta'],
 ['TEAM PAKETİ','👥','Team Ortak Çalışma','Takım çalışma ve ortak proje alanı','toggleTeamPage','./topluluk.html','','team'],
-['TEAM PAKETİ','💼','Team İş İlanları','Takım paketine ait ilan limitleriyle mağaza','openJobMarket','','team'],
-['PRO PAKETİ','🌟','Pro Video Stüdyosu','Pro paket video üretim hakları','openVideoStudio','','pro'],
-['PRO PAKETİ','💼','Pro İş İlanları','Pro paket ilan limitleriyle mağaza','openJobMarket','','pro']
+['TEAM PAKETİ','💼','Team İş İlanları','Takım paketine ait ilan limitleriyle mağaza','openJobMarket','','','team'],
+['PRO PAKETİ','🌟','Pro Video Stüdyosu','Pro paket video üretim hakları','openVideoStudio','','','pro'],
+['PRO PAKETİ','💼','Pro İş İlanları','Pro paket ilan limitleriyle mağaza','openJobMarket','','','pro']
 ];
 function q(s,r){return(r||document).querySelector(s)}function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function logged(){try{return!!((window.Parse&&Parse.User&&Parse.User.current())||window.currentUser||document.body.classList.contains('logged-in-user'))}catch(e){return document.body.classList.contains('logged-in-user')}}
