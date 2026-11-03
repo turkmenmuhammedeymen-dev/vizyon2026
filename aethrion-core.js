@@ -272,48 +272,105 @@
   }
   function aiSaveHistory() {
     var messages = aiMessages().map(function (m) { return { role: m.role, text: m.text, at: m.at }; });
-    return aiCloud('saveChatHistory', { messages: messages }).catch(function (e) {
-      console.warn('[AETHRION] Sohbet geçmişi kaydedilemedi:', e);
-    });
+    return aiCloud('saveChatHistory', { messages: messages }).catch(function (e) { console.warn('[AETHRION] Eski sohbet geçmişi kaydedilemedi:', e); });
   }
   function aiHistoryPanel() {
     var panel = aiPanel(); if (!panel) return null;
     var history = byId('aeVizyonAIHistory');
     if (!history) {
       history = d.createElement('section'); history.id = 'aeVizyonAIHistory';
-      history.style.cssText = 'display:none;flex:0 0 auto;max-height:38vh;overflow:auto;padding:12px 16px;border-bottom:1px solid var(--border,rgba(255,255,255,.12));background:var(--card,#111827)';
+      history.style.cssText = 'display:none;flex:0 0 auto;max-height:42vh;overflow:auto;padding:12px 16px;border-bottom:1px solid var(--border,rgba(255,255,255,.12));background:var(--card,#111827)';
       history.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px"><strong style="color:var(--text,#fff)">Sohbet geçmişi</strong><button type="button" id="aeVizyonAIHistoryClose" aria-label="Geçmişi kapat">✕</button></div><div id="aeVizyonAIHistoryItems"></div>';
-      var main = byId('vzMainArea') || panel;
-      main.insertBefore(history, main.firstChild);
+      var main = byId('vzMainArea') || panel; main.insertBefore(history, main.firstChild);
       byId('aeVizyonAIHistoryClose').addEventListener('click', function () { history.style.display = 'none'; });
     }
     return history;
   }
-  function aiLoadHistory() {
-    return aiCloud('getChatHistory', {}).then(function (result) {
-      var messages = result && Array.isArray(result.messages) ? result.messages : [];
+  async function aiCreateConversation() {
+    if (w.fullAIConversationId) return w.fullAIConversationId;
+    var result = await aiCloud('startConversation', {});
+    if (!result || result.success !== true || !result.conversationId) throw new Error(result && result.error || 'Yeni sohbet oluşturulamadı.');
+    w.fullAIConversationId = result.conversationId;
+    w.currentConversationId = result.conversationId;
+    return result.conversationId;
+  }
+  async function aiOpenConversation(id) {
+    if (!id) return false;
+    var result = await aiCloud('getConversationMessages', { conversationId: id });
+    if (!result || !Array.isArray(result.messages)) throw new Error('Sohbet mesajları alınamadı.');
+    w.fullAIConversationId = id; w.currentConversationId = id;
+    aiRender(result.messages);
+    var history = byId('aeVizyonAIHistory'); if (history) history.style.display = 'none';
+    if (typeof w.openFullAIPanel === 'function') w.openFullAIPanel();
+    return true;
+  }
+  async function aiRenderHistoryList() {
+    var panel = aiHistoryPanel(), list = byId('aeVizyonAIHistoryItems');
+    if (!panel || !list) return false;
+    list.textContent = 'Sohbetler yükleniyor…';
+    try {
+      var conversations = await aiCloud('getConversations', {});
+      conversations = Array.isArray(conversations) ? conversations : [];
+      list.innerHTML = '';
+      if (!conversations.length) {
+        var empty = d.createElement('p'); empty.textContent = 'Henüz kayıtlı sohbetin yok. Yeni Sohbet düğmesiyle bir tane oluşturabilirsin.'; empty.style.cssText = 'padding:12px;color:var(--text3,#9ca3af)';
+        list.appendChild(empty); return true;
+      }
+      conversations.forEach(function (item) {
+        var row = d.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 0;border-bottom:1px solid var(--border,rgba(255,255,255,.08))';
+        var open = d.createElement('button'); open.type = 'button'; open.style.cssText = 'flex:1 1 180px;min-width:0;text-align:left;padding:10px 12px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:10px;background:transparent;color:var(--text,#fff);cursor:pointer';
+        var name = d.createElement('strong'); name.textContent = item.customName || (item.lastMessage ? String(item.lastMessage).slice(0,52) : 'Yeni sohbet'); name.style.display = 'block';
+        var date = d.createElement('small'); date.textContent = item.lastMessageTime ? new Date(item.lastMessageTime).toLocaleString('tr-TR') : 'Henüz mesaj yok'; date.style.cssText = 'display:block;margin-top:4px;color:var(--text3,#9ca3af)';
+        open.appendChild(name); open.appendChild(date); open.addEventListener('click', function () { aiOpenConversation(item.id).catch(function (e) { w.showNotification && w.showNotification(e.message || 'Sohbet açılamadı.', 'error'); }); });
+        var rename = d.createElement('button'); rename.type = 'button'; rename.textContent = 'Adlandır'; rename.title = 'Sohbeti yeniden adlandır';
+        var share = d.createElement('button'); share.type = 'button'; share.textContent = 'Paylaş'; share.title = 'Paylaşım bağlantısını kopyala';
+        var remove = d.createElement('button'); remove.type = 'button'; remove.textContent = 'Sil'; remove.title = 'Sohbeti sil';
+        [rename,share,remove].forEach(function (button) { button.style.cssText = 'padding:8px 10px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:9px;background:transparent;color:var(--text,#fff);cursor:pointer'; });
+        rename.addEventListener('click', async function () {
+          var newName = w.prompt('Yeni sohbet adı:', item.customName || ''); if (!newName || !newName.trim()) return;
+          try { await aiCloud('renameConversation', { conversationId: item.id, name: newName.trim().slice(0,100) }); await aiRenderHistoryList(); w.showNotification && w.showNotification('Sohbet adı güncellendi.', 'success'); }
+          catch (e) { w.showNotification && w.showNotification(e.message || 'Sohbet adı değiştirilemedi.', 'error'); }
+        });
+        share.addEventListener('click', async function () {
+          try { var result = await aiCloud('shareConversation', { conversationId: item.id }); if (!result || !result.shareUrl) throw new Error('Paylaşım bağlantısı oluşturulamadı.'); try { await w.navigator.clipboard.writeText(result.shareUrl); w.showNotification && w.showNotification('Paylaşım bağlantısı kopyalandı.', 'success'); } catch (_) { w.prompt('Sohbet bağlantısı:', result.shareUrl); } }
+          catch (e) { w.showNotification && w.showNotification(e.message || 'Sohbet paylaşılamadı.', 'error'); }
+        });
+        remove.addEventListener('click', async function () {
+          if (!w.confirm('Bu sohbet ve mesajları kalıcı olarak silinsin mi?')) return;
+          try { await aiCloud('deleteConversation', { conversationId: item.id }); if (w.fullAIConversationId === item.id) { w.fullAIConversationId = null; w.currentConversationId = null; aiRender([]); } await aiRenderHistoryList(); w.showNotification && w.showNotification('Sohbet silindi.', 'success'); }
+          catch (e) { w.showNotification && w.showNotification(e.message || 'Sohbet silinemedi.', 'error'); }
+        });
+        row.appendChild(open); row.appendChild(rename); row.appendChild(share); row.appendChild(remove); list.appendChild(row);
+      });
+      return true;
+    } catch (e) {
+      list.textContent = 'Sohbet geçmişi yüklenemedi: ' + (e && e.message || 'Bağlantı hatası');
+      return false;
+    }
+  }
+  async function aiLoadHistory() {
+    try {
+      var conversations = await aiCloud('getConversations', {});
+      if (Array.isArray(conversations) && conversations.length) {
+        var selected = conversations.find(function (c) { return c.id === w.fullAIConversationId; }) || conversations[0];
+        return await aiOpenConversation(selected.id);
+      }
+    } catch (e) { console.warn('[AETHRION] Kayıtlı sohbet listesi yüklenemedi:', e); }
+    try {
+      var legacy = await aiCloud('getChatHistory', {});
+      var messages = legacy && Array.isArray(legacy.messages) ? legacy.messages : [];
       if (messages.length) aiRender(messages);
       return messages;
-    }).catch(function (e) {
-      console.warn('[AETHRION] Sohbet geçmişi yüklenemedi:', e);
-      return [];
-    });
+    } catch (e) { console.warn('[AETHRION] Eski sohbet geçmişi yüklenemedi:', e); return []; }
   }
   install('loadConversationHistory', aiLoadHistory);
   install('startConversation', function () { return w.newConversation(); });
   install('newConversation', async function () {
-    if (w.__aethrionAIHistoryPromise) { try { await w.__aethrionAIHistoryPromise; } catch (_) {} }
-    var current = aiMessages().slice();
-    if (current.length) {
-      var archives = [];
-      try { archives = JSON.parse(w.localStorage.getItem('aethrion_ai_archives_v1') || '[]') || []; } catch (_) {}
-      archives.unshift({ id: 'local-' + Date.now(), title: current.find(function (m) { return m.role === 'user'; })?.text?.slice(0, 54) || 'Önceki sohbet', createdAt: new Date().toISOString(), messages: current });
-      try { w.localStorage.setItem('aethrion_ai_archives_v1', JSON.stringify(archives.slice(0, 30))); } catch (_) {}
-    }
-    w.__aethrionAIChatMessages = [];
-    aiRender([]);
+    w.fullAIConversationId = null; w.currentConversationId = null;
+    w.__aethrionAIChatMessages = []; aiRender([]);
     w.__aethrionAIHistoryLoaded = true;
-    try { await aiCloud('saveChatHistory', { messages: [] }); } catch (e) { console.warn('[AETHRION] Yeni sohbet başlatıldı ancak bulut geçmişi sıfırlanamadı:', e); }
+    try { await aiCreateConversation(); }
+    catch (e) { w.showNotification && w.showNotification(e.message || 'Yeni sohbet oluşturulamadı.', 'error'); return false; }
     if (typeof w.openFullAIPanel === 'function') w.openFullAIPanel();
     var input = byId('vzInput'); if (input) input.focus();
     return true;
@@ -322,24 +379,7 @@
     var panel = aiHistoryPanel(); if (!panel) { w.showNotification && w.showNotification('AETHRION sohbet paneli bulunamadı.', 'error'); return false; }
     var opening = panel.style.display === 'none';
     panel.style.display = opening ? 'block' : 'none';
-    if (!opening) return true;
-    var list = byId('aeVizyonAIHistoryItems'); if (!list) return true;
-    list.innerHTML = '';
-    var archives = [];
-    try { archives = JSON.parse(w.localStorage.getItem('aethrion_ai_archives_v1') || '[]') || []; } catch (_) {}
-    if (!archives.length) { list.textContent = 'Bu cihazda arşivlenmiş sohbet bulunmuyor.'; return true; }
-    archives.forEach(function (entry) {
-      var button = d.createElement('button'); button.type = 'button';
-      button.style.cssText = 'display:block;width:100%;text-align:left;padding:10px 12px;margin:5px 0;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:10px;background:transparent;color:var(--text,#fff);cursor:pointer';
-      button.textContent = (entry.title || 'Önceki sohbet') + ' · ' + new Date(entry.createdAt).toLocaleString('tr-TR');
-      button.addEventListener('click', function () {
-        w.__aethrionAIChatMessages = [];
-        aiRender(entry.messages || []);
-        panel.style.display = 'none';
-        if (typeof w.openFullAIPanel === 'function') w.openFullAIPanel();
-      });
-      list.appendChild(button);
-    });
+    if (opening) aiRenderHistoryList();
     return true;
   });
   install('toggleChatHistory', function () { return w.toggleConversationHistory(); });
@@ -348,22 +388,22 @@
     var message = input ? input.value.trim() : '';
     if (!message) { if (input) input.focus(); return false; }
     if (message.length > 4000) { w.showNotification && w.showNotification('Mesaj en fazla 4000 karakter olabilir.', 'warning'); return false; }
-    var activeMode = 'normal';
-    var selected = d.querySelector('#vizyonAlPanel [data-mode].active');
+    var activeMode = 'normal', selected = d.querySelector('#vizyonAlPanel [data-mode].active');
     try { activeMode = (selected && selected.getAttribute('data-mode')) || w.sessionStorage.getItem('aethrion_ai_mode') || 'normal'; } catch (_) {}
     if (input) input.value = '';
     if (button) { button.disabled = true; button.textContent = 'Yanıt hazırlanıyor…'; }
     aiAppend('user', message);
-    aiSaveHistory();
     try {
+      var conversationId = await aiCreateConversation();
+      await aiCloud('sendMessage', { conversationId: conversationId, text: message });
       var result = await aiCloud('vizyonAlChat', { message: message, mode: activeMode });
       if (!result || result.success !== true) throw new Error(result && result.error || 'AETHRION AI yanıt üretemedi.');
-      aiAppend('assistant', result.reply || 'Yanıt alınamadı.');
-      await aiSaveHistory();
+      var reply = String(result.reply || 'Yanıt alınamadı.');
+      aiAppend('assistant', reply);
+      await aiCloud('sendAIMessage', { conversationId: conversationId, text: reply, fromName: 'AETHRION AI · 28 MODEL' });
       if (typeof w.refreshAethrionAIQuota === 'function') w.refreshAethrionAIQuota();
     } catch (e) {
       aiAppend('assistant', 'Mesaj gönderilemedi: ' + (e && e.message || 'Bilinmeyen hata'));
-      await aiSaveHistory();
       w.showNotification && w.showNotification(e && e.message || 'AETHRION AI şu anda yanıt veremiyor.', 'error');
     } finally {
       if (button) { button.disabled = false; button.textContent = '⚡ Gönder'; }
