@@ -121,7 +121,7 @@
     var opened = showChat('ai');
     if (opened && !w.__aethrionAIHistoryLoaded && typeof w.loadConversationHistory === 'function') {
       w.__aethrionAIHistoryLoaded = true;
-      w.loadConversationHistory();
+      w.__aethrionAIHistoryPromise = w.loadConversationHistory();
     }
     return opened;
   };
