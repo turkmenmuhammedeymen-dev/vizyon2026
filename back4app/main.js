@@ -943,7 +943,7 @@ Parse.Cloud.define("initSchemas", async function (request) {
 // ================================================================
 // ========== TEMEL FONKSİYONLAR ==================================
 // ================================================================
-var AETHRION_CLOUD_BUILD_ID = '2026-11-03-community-reliability-1';
+var AETHRION_CLOUD_BUILD_ID = '2026-11-03-community-reliability-2';
 Parse.Cloud.define("test", async function (request) {
     return {
         success: true,
