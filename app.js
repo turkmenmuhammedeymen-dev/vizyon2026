@@ -2149,15 +2149,20 @@ function ensureWorkspaceWelcome(dash){
  return w;
 }
 function renderHomeCatalog(w){
- var host=q('#aewHomeCatalog',w);if(!host)return;
- var source=Array.isArray(window.__aethrionWorkspaceMenuFeatures)?window.__aethrionWorkspaceMenuFeatures:[];
+ var host=q('#aewHomeCatalog',w);
+ if(!host){
+  host=document.createElement('section');host.id='aewHomeCatalog';host.className='aew-home-catalog';host.setAttribute('aria-label','AETHRION tüm özellikler');
+  var note=q('.aews-home-cta',w);
+  if(note&&note.parentNode)note.parentNode.insertBefore(host,note.nextSibling);else w.appendChild(host);
+ }
+ var source=typeof features==='function'?features():(Array.isArray(window.__aethrionWorkspaceMenuFeatures)?window.__aethrionWorkspaceMenuFeatures:[]);
  var groups=Object.create(null),labels={CORE:'YAPAY ZEKÂ',CREATE:'ÜRETİM ARAÇLARI',PLATFORM:'PLATFORM',ADVANCED:'GELİŞTİRİCİ ARAÇLARI',ACCOUNT:'HESAP',KURUCU:'KURUCU ARAÇLARI',ADMIN:'YÖNETİM ARAÇLARI',MODERATOR:'MODERATÖR ARAÇLARI',OTHER:'DİĞER ÖZELLİKLER',AI:'YAPAY ZEKÂ',TOOLS:'ÜRETİM ARAÇLARI',DEVELOPER:'GELİŞTİRİCİ ARAÇLARI'};
  source.forEach(function(item){
   if(!Array.isArray(item))return;
   var group=String(item[0]||'OTHER'),icon=String(item[1]||'✦'),name=String(item[2]||'').trim(),desc=String(item[3]||'AETHRION çalışma alanı'),action=String(item[4]||''),href=String(item[5]||'');
   if(!name||!action||group==='KATEGORİLER'||action==='openCategoryPanel')return;
-  /* Only expose entries with a real handler or an explicit destination. */
-  if(!href&&typeof window[action]!=='function')return;
+  /* The shared action router can resolve aliases and safe fallback routes. */
+  if(!href&&typeof window[action]!=='function'&&typeof window.safeFeatureCall!=='function')return;
   (groups[group]||(groups[group]=[])).push({icon:icon,name:name,desc:desc,action:action});
  });
  var keys=Object.keys(groups);
@@ -2186,6 +2191,8 @@ function customWelcome(){
  if(!dash)return;
  var w=ensureWorkspaceWelcome(dash);
  if(!w)return;
+ var copy=q('.aew-copy',w);if(copy)copy.textContent='AETHRION özelliklerini aşağıdaki listede inceleyin. Yalnızca ilgili Bak düğmesine bastığınızda seçtiğiniz çalışma alanı açılır.';
+ var note=q('.aews-home-cta',w);if(note)note.textContent='Tüm çalışma alanları aşağıda. Açmak için Bak düğmesini kullanın.';
  var wrap=q('.dashboard-content-wrapper',dash)||q('.dashboard-content',dash)||dash;
  Array.prototype.forEach.call(wrap.children,function(el){
   if(el===w){el.style.setProperty('display','block','important');return}
