@@ -28,6 +28,7 @@ jobs:
             'aethrion-core.js',
             'app.js',
             'aethrion-home-workspace.js',
+            'aethrion-coach.js',
             'aethrion-interaction-recovery.js',
             'aethrion-auth-hotfix.js',
             'aethrion-social-auth.js',
@@ -68,6 +69,7 @@ jobs:
           const checks = [
             [home.includes('id="vizyonAlPanel"'), 'Legacy 28-model chat panel is missing'],
             [router.includes("w.openFullAIPanel = function () {") && router.includes("showChat('ai')"), 'Primary AI button is not routed to the legacy chat'],
+            [fs.readFileSync('aethrion-coach.js', 'utf8').includes("cloud('kocChat'") && fs.readFileSync('aethrion-coach.js', 'utf8').includes("cloud('getKocHistory'") && fs.readFileSync('aethrion-coach.js', 'utf8').includes("cloud('shareKocConversation'"), 'AETHRION Coach chat, history, or share integration is missing'],
             [fs.readFileSync('app.js', 'utf8').includes('function renderHomeCatalog(w)') && fs.readFileSync('app.js', 'utf8').includes('aewHomeCatalog'), 'Full feature catalogue is missing from the workspace home'],
             [fs.readFileSync('app.js', 'utf8').includes('Pexels GIF Ara') && fs.readFileSync('aethrion-core.js', 'utf8').includes('w.openGifPicker=function()'), 'Legacy GIF picker is not wired into the workspace'],
             [cloud.includes('Parse.Cloud.define("searchGif"'), 'GIF search Cloud Function is missing'],
