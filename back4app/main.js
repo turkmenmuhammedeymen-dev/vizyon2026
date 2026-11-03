@@ -11052,7 +11052,7 @@ Parse.Cloud.define("aethrionGetDiagnostics", async function (request) {
             var controller = typeof AbortController !== "undefined" ? new AbortController() : null;
             var timeoutId = controller ? setTimeout(function () { controller.abort(); }, 7000) : null;
             var headers = {};
-            headers[headerName || "Authorization"] = headerName ? key : "Bearer " + key;
+            if (key) headers[headerName || "Authorization"] = headerName ? key : "Bearer " + key;
             var response = await fetch(url, { method: "GET", headers: headers, signal: controller ? controller.signal : undefined });
             if (timeoutId) clearTimeout(timeoutId);
             if (response.ok) return { ok: true, detail: "Sağlayıcı uç noktası HTTP " + response.status + " yanıtı verdi." };
@@ -11062,8 +11062,7 @@ Parse.Cloud.define("aethrionGetDiagnostics", async function (request) {
         }
     }
     async function secret(name) {
-        try { if (typeof process !== "undefined" && process.env && process.env[name]) return process.env[name]; } catch (e) {}
-        try { return config && config.get ? config.get(name) : null; } catch (e) { return null; }
+        try { return await getAPIKey(name); } catch (e) { return null; }
     }
     var providers = [
         { key: "OPENAI_KEY", label: "OpenAI model erişimi", url: "https://api.openai.com/v1/models" },
@@ -11073,7 +11072,9 @@ Parse.Cloud.define("aethrionGetDiagnostics", async function (request) {
         { key: "OPENROUTER_KEY", label: "OpenRouter model erişimi", url: "https://openrouter.ai/api/v1/models" },
         { key: "DEEPINFRA_KEY", label: "DeepInfra model erişimi", url: "https://api.deepinfra.com/v1/openai/models" },
         { key: "CEREBRAS_KEY", label: "Cerebras model erişimi", url: "https://api.cerebras.ai/v1/models" },
-        { key: "GEMINI_KEY", label: "Gemini model erişimi", url: "https://generativelanguage.googleapis.com/v1beta/models", header: "x-goog-api-key" }
+        { key: "GEMINI_KEY", label: "Gemini model erişimi", url: "https://generativelanguage.googleapis.com/v1beta/models", header: "x-goog-api-key" },
+        { key: "COHERE_KEY", label: "Cohere model erişimi", url: null },
+        { key: "COLAB_LLAMA_URL", label: "Ollama endpoint", url: null, kind: "ollama" }
     ];
     for (var pi = 0; pi < providers.length; pi++) {
         var provider = providers[pi];
@@ -11082,18 +11083,20 @@ Parse.Cloud.define("aethrionGetDiagnostics", async function (request) {
             add(provider.label, "warn", "Yapılandırma anahtarı bulunamadı veya bu ortamda görünür değil.");
             continue;
         }
-        if (provider.url) {
+        if (provider.kind === "ollama") {
+            var ollamaBase = String(keyValue).replace(/\/+$/, '').replace(/\/v1$/i, '');
+            var ollamaResult = await probe(ollamaBase + "/v1/models", null);
+            add(provider.label, ollamaResult.ok ? "ok" : "bad", ollamaResult.detail);
+        } else if (provider.url) {
             var result = await probe(provider.url, keyValue, provider.header);
             add(provider.label, result.ok ? "ok" : "bad", result.detail);
         } else if (provider.key === "NVIDIA_API_KEY") {
             var base = await secret("NVIDIA_BASE_URL");
-            if (base) {
-                var nvidiaBase = String(base); while (nvidiaBase.endsWith("/")) nvidiaBase = nvidiaBase.slice(0, -1);
-                var nvidiaResult = await probe(nvidiaBase + "/models", keyValue);
-                add(provider.label, nvidiaResult.ok ? "ok" : "bad", nvidiaResult.detail);
-            } else {
-                add(provider.label, "warn", "API anahtarı mevcut ancak NVIDIA_BASE_URL eksik; uç nokta probe edilemedi.");
-            }
+            if (!base) base = "https://integrate.api.nvidia.com/v1";
+            var nvidiaBase = String(base).replace(/\/+$/, '');
+            if (!/\/v1$/i.test(nvidiaBase)) nvidiaBase += "/v1";
+            var nvidiaResult = await probe(nvidiaBase + "/models", keyValue);
+            add(provider.label, nvidiaResult.ok ? "ok" : "bad", nvidiaResult.detail);
         } else {
             add(provider.label, "ok", "Güvenlik yapılandırması mevcut; bu kontrol sağlayıcıya test isteği göndermiyor.");
         }
