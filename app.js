@@ -79,7 +79,7 @@
         if (!result || result.success !== true) {
           throw new Error('Back4App Cloud Code sağlık kontrolü beklenen yanıtı vermedi.');
         }
-        var expectedBuild = '2026-11-03-community-reliability-3';
+        var expectedBuild = '2026-11-03-community-reliability-4';
         if (result.buildId !== expectedBuild) {
           throw new Error('Back4App eski Cloud Code sürümünde. Beklenen: ' + expectedBuild + ' · Çalışan: ' + String(result.buildId || 'sürüm bilgisi yok') + '. back4app/main.js dosyasını Back4App Cloud Code bölümüne yeniden yükleyip deploy edin.');
         }
