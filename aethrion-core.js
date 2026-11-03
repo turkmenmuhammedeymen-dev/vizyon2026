@@ -224,6 +224,7 @@
   install('loadConversationHistory', aiLoadHistory);
   install('startConversation', function () { return w.newConversation(); });
   install('newConversation', async function () {
+    if (w.__aethrionAIHistoryPromise) { try { await w.__aethrionAIHistoryPromise; } catch (_) {} }
     var current = aiMessages().slice();
     if (current.length) {
       var archives = [];
