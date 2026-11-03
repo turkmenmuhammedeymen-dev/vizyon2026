@@ -231,7 +231,9 @@
       grid.appendChild(button);
     });
     body.appendChild(grid);
-    modal.style.display = 'flex';
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
     return true;
@@ -247,7 +249,7 @@
   install('closeJobDetail', function () { var p = byId('jobDetailModal'); if (p) p.style.display = 'none'; });
   install('acceptJobListing', function () { go('/topluluk.html'); });
   install('closeModelsShowcase', function () { var p = byId('modelsShowcaseModal'); if (p) p.style.display = 'none'; });
-  install('closeCategoryPanel', function () { var p = byId('categoryPanelModal'); if (p) p.style.display = 'none'; });
+  install('closeCategoryPanel', function () { var p = byId('categoryPanelModal'); if (p) { p.style.setProperty('display', 'none', 'important'); p.style.setProperty('visibility', 'hidden', 'important'); p.style.setProperty('pointer-events', 'none', 'important'); p.classList.remove('open'); } });
   install('closeJarvisMode', function () { go('/aethrion-jarvis.html'); });
   install('jarvisQuickCommand', function () { go('/aethrion-jarvis.html'); });
   install('toggleJarvisListening', function () { go('/aethrion-jarvis.html'); });
