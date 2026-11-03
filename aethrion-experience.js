@@ -2,30 +2,41 @@
 'use strict';
 var GROUP_LABELS = { CORE: 'YAPAY ZEKÂ', CREATE: 'ÜRETİM ARAÇLARI', PLATFORM: 'PLATFORM', ADVANCED: 'GELİŞTİRİCİ ARAÇLARI', ACCOUNT: 'HESAP', OTHER: 'DİĞER ÖZELLİKLER' };
 var FALLBACK_FEATURES = [
- {group:'CORE',icon:'✦',name:'AETHRION AI',desc:'Yapay zekâ çalışma alanı',action:'openFullAIPanel'},
- {group:'CORE',icon:'◈',name:'AETHRION Agents',desc:'Ajan, ekran okuma ve dosya araçları',action:'openAethrionAlPanel'},
- {group:'CORE',icon:'◎',name:'AETHRION Coach',desc:'Kişisel AI asistanı',action:'openKocPanel'},
- {group:'CORE',icon:'◉',name:'Model Kataloğu',desc:'Tanımlı model seçeneklerini incele',action:'openModelsShowcase'},
- {group:'CREATE',icon:'◇',name:'3D Studio',desc:'Üç boyutlu tasarım araçları',action:'open3DBuilder',href:'/3d-studio.html'},
- {group:'CREATE',icon:'▶',name:'Video Editör',desc:'Video düzenleme çalışma alanı',action:'openVideoEditor'},
- {group:'CREATE',icon:'▣',name:'Video Stüdyosu',desc:'Video fikirleri ve üretim araçları',action:'openVideoStudio'},
- {group:'PLATFORM',icon:'⌂',name:'Topluluk ve Takımlar',desc:'Takım ve ortak proje alanları',action:'toggleTeamPage',href:'/topluluk.html'},
- {group:'PLATFORM',icon:'▤',name:'Projelerim',desc:'Projelerine ve kayıtlarına eriş',action:'scrollToProjects'},
- {group:'ADVANCED',icon:'⌘',name:'A27 API Anahtarı',desc:'API erişim seçenekleri',action:'openA27ApiKeyGenerator',href:'/api.html#keys'},
- {group:'ADVANCED',icon:'↗',name:'A27 API Rehberi',desc:'API belgeleri ve örnekler',action:'openA27ApiGuide',href:'/api.html'},
- {group:'ADVANCED',icon:'▥',name:'Dokümantasyon',desc:'Teknik belgeler ve kullanım rehberi',action:'openDocumentation',href:'/dokumantasyon.html'},
- {group:'ACCOUNT',icon:'⚙',name:'Ayarlar',desc:'Hesap ve uygulama tercihleri',action:'openSettingsModal'},
- {group:'ACCOUNT',icon:'◌',name:'Hesap bilgilerim',desc:'Profil, üyelik ve cihaz bilgileri',action:'openAccountInfo'}
+ {group:'CORE',icon:'⚡',name:'AETHRION AI',desc:'28 model birleşik gücü · tam ekran sohbet',action:'openFullAIPanel'},
+ {group:'CORE',icon:'✨',name:'AETHRION Agents',desc:'4 mod · ekran okuma · dosya araçları',action:'openAethrionAlPanel'},
+ {group:'CORE',icon:'🧭',name:'AETHRION Coach',desc:'Kişisel AI koçu ve sohbet geçmişi',action:'openKocPanel'},
+ {group:'CORE',icon:'◉',name:'Model Kataloğu',desc:'13 Ollama + 7 NVIDIA NIM + 8 bulut API',action:'openModelsShowcase'},
+ {group:'CORE',icon:'🤖',name:'AI Kişisel Asistan',desc:'JARVIS sesli asistan ve hatırlatıcılar',action:'startJarvisMode'},
+ {group:'CREATE',icon:'🧊',name:'3D Studio',desc:'Üç boyutlu tasarım ve dışa aktarma',action:'open3DBuilder',href:'./3d-studio.html'},
+ {group:'CREATE',icon:'🎬',name:'Video Editör',desc:'Timeline, kesme ve dışa aktarma',action:'openVideoEditor'},
+ {group:'CREATE',icon:'🎥',name:'Video Stüdyosu',desc:'Senaryo, Reels ve video analizi',action:'openVideoStudio'},
+ {group:'CREATE',icon:'🎨',name:'Görsel Üretimi',desc:'Görsel üretim çalışma alanı',action:'scrollToImageGen'},
+ {group:'CREATE',icon:'🖼️',name:'GIF Ara',desc:'GIF arama ve sohbete ekleme',action:'openGifPicker'},
+ {group:'PLATFORM',icon:'💼',name:'İş İlanları Mağazası',desc:'İlanları görüntüle ve başvur',action:'openJobMarket'},
+ {group:'PLATFORM',icon:'🛒',name:'A27 Puan Mağazası',desc:'Puan ve proje mağazası',action:'openMarket'},
+ {group:'PLATFORM',icon:'👥',name:'Topluluk ve Takımlar',desc:'Takım, mesajlaşma ve ortak projeler',action:'toggleTeamPage',href:'./topluluk.html'},
+ {group:'PLATFORM',icon:'📁',name:'Projelerim',desc:'Projelerini yönet ve arşivle',action:'scrollToProjects'},
+ {group:'PLATFORM',icon:'🏆',name:'Aylık Yarışma',desc:'Projeni gönder ve değerlendir',action:'openContestPage'},
+ {group:'ADVANCED',icon:'🔑',name:'A27 API Anahtarı',desc:'API anahtarı oluştur ve yönet',action:'openA27ApiKeyGenerator',href:'./aethrion-developer.html'},
+ {group:'ADVANCED',icon:'📖',name:'A27 API Rehberi',desc:'API belgeleri ve örnekler',action:'openA27ApiGuide',href:'./api.html'},
+ {group:'ADVANCED',icon:'📋',name:'Sistem Kayıtları',desc:'İstemci ve sunucu kayıtları',action:'openLogsPanel'},
+ {group:'ADVANCED',icon:'📚',name:'AETHRION Academy',desc:'Dersler, quizler ve öğrenme alanı',action:'scrollToAcademy',href:'./bana-ogret.html'},
+ {group:'ADVANCED',icon:'🛡️',name:'Ebeveyn Ayarları',desc:'Güvenli mod ve kullanım sınırları',action:'openParentSettings'},
+ {group:'ACCOUNT',icon:'👤',name:'Profilim',desc:'Hesap bilgileri ve üyelik',action:'openProfileModal'},
+ {group:'ACCOUNT',icon:'📋',name:'Hesap Bilgilerim',desc:'Oturum ve cihaz bilgileri',action:'openAccountInfo'},
+ {group:'ACCOUNT',icon:'⚙️',name:'Ayarlar',desc:'Dil, tema ve uygulama tercihleri',action:'openSettingsModal'},
+ {group:'ADVANCED',icon:'⌘',name:'Kod Editörü',desc:'Kod yazma ve geliştirme alanı',action:'openCodeEditor',href:'./kod-editoru.html'},
+ {group:'ADVANCED',icon:'▤',name:'Dokümantasyon',desc:'Teknik belgeler ve kullanım rehberi',action:'openDocumentation',href:'./dokumantasyon.html'}
 ];
 var ROUTES = {
- openAethrionAlPanel:'/aethrion-assistant.html', openVizyonAlPanel:'/aethrion-assistant.html',
- openFullAIPanel:'/aethrion-ai.html', openAethrionAI:'/aethrion-ai.html', openKocPanel:'/aethrion-assistant.html',
- open3DBuilder:'/3d-studio.html', openA27ApiGuide:'/api.html', openV27ApiGuide:'/api.html',
+ openAethrionAlPanel :'./aethrion-assistant.html', openVizyonAlPanel :'./aethrion-assistant.html',
+ openKocPanel:'./aethrion-assistant.html',
+ open3DBuilder :'./3d-studio.html', openA27ApiGuide :'./api.html', openV27ApiGuide :'./api.html',
  openA27ApiKeyGenerator:'/api.html#keys', createA27ApiKey:'/api.html#keys',
  openVideoEditor:'/index.html#features', openVideoStudio:'/index.html#features',
- openModelsShowcase:'/aethrion-ai.html#models', toggleTeamPage:'/topluluk.html',
- openContestPage:'/topluluk.html', scrollToAcademy:'/bana-ogret.html', openAcademy:'/bana-ogret.html',
- openDocumentation:'/dokumantasyon.html', openBlog:'/blog.html', openAbout:'/hakkimizda.html'
+ openModelsShowcase:'/aethrion-ai.html#models', toggleTeamPage :'./topluluk.html',
+ openContestPage :'./topluluk.html', scrollToAcademy :'./bana-ogret.html', openAcademy :'./bana-ogret.html',
+ openDocumentation :'./dokumantasyon.html', openBlog :'./blog.html', openAbout :'./hakkimizda.html'
 };
 var splashDone = false;
 var menuReady = false;
