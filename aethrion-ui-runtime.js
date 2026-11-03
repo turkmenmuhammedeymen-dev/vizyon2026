@@ -287,4 +287,111 @@
       console.warn('[AETHRION Stats] Public counters could not be refreshed.');
     }
   };
+  
+  // Community comments: the homepage previously kept the static
+  // "Yorumlar yükleniyor..." placeholder because no client renderer was bound.
+  window.loadAethrionComments = async function () {
+    var host = document.getElementById('mainCommentsList');
+    if (!host) return false;
+    if (!window.Parse || !window.Parse.Cloud || typeof window.Parse.Cloud.run !== 'function') {
+      host.textContent = 'Yorumlar şu anda yüklenemiyor. Sunucu bağlantısı hazır değil.';
+      return false;
+    }
+    host.setAttribute('aria-busy', 'true');
+    host.textContent = 'Yorumlar getiriliyor…';
+    var timer;
+    try {
+      var timeout = new Promise(function (_, reject) {
+        timer = window.setTimeout(function () {
+          reject(new Error('Yorum servisi 10 saniyede yanıt vermedi.'));
+        }, 10000);
+      });
+      var response = await Promise.race([
+        window.Parse.Cloud.run('getComments', {}),
+        timeout
+      ]);
+      if (!response || response.success !== true || !Array.isArray(response.comments)) {
+        throw new Error(response && response.error ? response.error : 'Yorum servisi beklenen veriyi döndürmedi.');
+      }
+      host.replaceChildren();
+      if (!response.comments.length) {
+        var empty = document.createElement('div');
+        empty.className = 'comment-item';
+        empty.textContent = 'Henüz topluluk yorumu bulunmuyor.';
+        host.appendChild(empty);
+      } else {
+        response.comments.forEach(function (item) {
+          var card = document.createElement('article');
+          card.className = 'comment-item';
+          var name = document.createElement('strong');
+          name.textContent = String(item.user_name || 'AETHRION kullanıcısı');
+          var rating = document.createElement('span');
+          rating.className = 'aethrion-comment-rating';
+          rating.textContent = ' ★'.repeat(Math.max(0, Math.min(5, Number(item.rating) || 0)));
+          var body = document.createElement('p');
+          body.textContent = String(item.comment || '');
+          card.appendChild(name);
+          card.appendChild(rating);
+          card.appendChild(body);
+          host.appendChild(card);
+        });
+      }
+      host.removeAttribute('aria-busy');
+      return true;
+    } catch (error) {
+      host.replaceChildren();
+      var failure = document.createElement('div');
+      failure.className = 'comment-item';
+      failure.setAttribute('role', 'status');
+      failure.textContent = 'Yorumlar yüklenemedi: ' + String(error && error.message || error);
+      host.appendChild(failure);
+      host.removeAttribute('aria-busy');
+      console.error('[AETHRION Comments] Load failed:', error);
+      return false;
+    } finally {
+      if (timer) window.clearTimeout(timer);
+    }
+  };
+
+  window.loadAethrionInboxItems = async function () {
+    if (!window.Parse || !window.Parse.Cloud || !window.Parse.User || !window.Parse.User.current()) {
+      return { success: false, error: 'Gelen kutusu için oturum açılmalı.' };
+    }
+    var timer;
+    try {
+      var timeout = new Promise(function (_, reject) {
+        timer = window.setTimeout(function () {
+          reject(new Error('Gelen kutusu 12 saniyede yanıt vermedi.'));
+        }, 12000);
+      });
+      var items = await Promise.race([
+        window.Parse.Cloud.run('getInboxItems', {}),
+        timeout
+      ]);
+      if (!Array.isArray(items)) throw new Error('Gelen kutusu beklenen listeyi döndürmedi.');
+      window.aethrionInboxItems = items;
+      window.dispatchEvent(new CustomEvent('aethrion:inbox-loaded', { detail: { count: items.length, items: items } }));
+      return { success: true, items: items };
+    } catch (error) {
+      console.error('[AETHRION Inbox] Load failed:', error);
+      window.dispatchEvent(new CustomEvent('aethrion:inbox-error', { detail: { error: String(error && error.message || error) } }));
+      return { success: false, error: String(error && error.message || error) };
+    } finally {
+      if (timer) window.clearTimeout(timer);
+    }
+  };
+
+  function bootCommunityServices() {
+    if (document.getElementById('mainCommentsList')) window.loadAethrionComments();
+    if (typeof window.updateStats === 'function') window.updateStats();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootCommunityServices, { once: true });
+  } else {
+    bootCommunityServices();
+  }
+  window.addEventListener('aethrion:authenticated', function () {
+    window.loadAethrionInboxItems();
+  });
+
 })();
