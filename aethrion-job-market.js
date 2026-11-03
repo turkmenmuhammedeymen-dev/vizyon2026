@@ -159,7 +159,7 @@
       w.location.href = './index.html#features';
       return false;
     }
-    loadListings();
+    loadListings().catch(function () {});
     return true;
   };
   w.loadJobMarket = loadListings;
@@ -233,7 +233,7 @@
     return request.then(function (result) {
       notify(result && result.message || (state.editingId ? 'İlan güncellendi.' : 'İlan yayınlandı.'), 'success');
       w.closeJobCreateForm();
-      return loadListings();
+      return loadListings().catch(function () { return false; });
     }).catch(function (error) {
       showCreateError(error.message || 'İlan kaydedilemedi.');
       return false;
