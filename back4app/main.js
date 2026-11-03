@@ -5038,32 +5038,39 @@ Parse.Cloud.define("inviteToTeam", async function (request) {
 Parse.Cloud.define("acceptTeamInvite", async function (request) {
     var user = request.user;
     if (!user) throw new Error('Giriş yapmalısınız!');
-    var teamId = request.params.teamId;
-    var inboxId = request.params.inboxId;
-    if (!teamId || !inboxId) throw new Error('Takım ID ve Inbox ID gerekli!');
+    var params = request.params || {};
+    var teamId = String(params.teamId || '');
+    var inboxId = String(params.inboxId || '');
+    var userEmail = String(user.get('email') || '').trim().toLowerCase();
+    if (!teamId || !inboxId || !userEmail) throw new Error('Takım daveti bilgileri eksik.');
 
-    var teamQuery = new Parse.Query(Team);
-    var team = await teamQuery.get(teamId, { useMasterKey: true });
+    // Validate ownership and invitation state before changing membership.
+    var inbox = await new Parse.Query(Inbox).get(inboxId, { useMasterKey: true });
+    if (!inbox ||
+        String(inbox.get('receiver_email') || '').trim().toLowerCase() !== userEmail ||
+        inbox.get('type') !== 'team_invite' ||
+        String(inbox.get('team_id') || '') !== teamId ||
+        String(inbox.get('status') || 'pending').toLowerCase() !== 'pending') {
+        throw new Error('Bu davet hesabınıza ait değil, geçersiz veya daha önce yanıtlanmış.');
+    }
+
+    var team = await new Parse.Query(Team).get(teamId, { useMasterKey: true });
     if (!team) throw new Error('Takım bulunamadı!');
-
     var memberQuery = new Parse.Query(TeamMember);
     memberQuery.equalTo("team_id", teamId);
-    memberQuery.equalTo("user_email", user.get('email'));
+    memberQuery.equalTo("user_email", userEmail);
     var existing = await memberQuery.first({ useMasterKey: true });
     if (existing) throw new Error('Zaten bu takımın üyesisiniz!');
 
     var member = new TeamMember();
     member.set("team_id", teamId);
-    member.set("user_email", user.get('email'));
+    member.set("user_email", userEmail);
     member.set("user_name", user.get('name') || 'Kullanıcı');
     member.set("role", "viewer");
     await member.save(null, { useMasterKey: true });
 
     user.set("teamId", teamId);
     await user.save(null, { useMasterKey: true });
-
-    var inboxQuery = new Parse.Query(Inbox);
-    var inbox = await inboxQuery.get(inboxId, { useMasterKey: true });
     inbox.set("status", "accepted");
     await inbox.save(null, { useMasterKey: true });
     return { success: true, message: 'Takıma katıldınız!' };
@@ -5072,9 +5079,17 @@ Parse.Cloud.define("acceptTeamInvite", async function (request) {
 Parse.Cloud.define("rejectTeamInvite", async function (request) {
     var user = request.user;
     if (!user) throw new Error('Giriş yapmalısınız!');
-    var inboxId = request.params.inboxId;
-    var inboxQuery = new Parse.Query(Inbox);
-    var inbox = await inboxQuery.get(inboxId, { useMasterKey: true });
+    var params = request.params || {};
+    var inboxId = String(params.inboxId || '');
+    var userEmail = String(user.get('email') || '').trim().toLowerCase();
+    if (!inboxId || !userEmail) throw new Error('Davet bilgileri eksik.');
+    var inbox = await new Parse.Query(Inbox).get(inboxId, { useMasterKey: true });
+    if (!inbox ||
+        String(inbox.get('receiver_email') || '').trim().toLowerCase() !== userEmail ||
+        inbox.get('type') !== 'team_invite' ||
+        String(inbox.get('status') || 'pending').toLowerCase() !== 'pending') {
+        throw new Error('Bu davet hesabınıza ait değil, geçersiz veya daha önce yanıtlanmış.');
+    }
     inbox.set("status", "rejected");
     await inbox.save(null, { useMasterKey: true });
     return { success: true };
