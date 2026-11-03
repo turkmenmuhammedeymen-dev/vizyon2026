@@ -223,7 +223,7 @@
   }
   install('loadConversationHistory', aiLoadHistory);
   install('startConversation', function () { return w.newConversation(); });
-  install('newConversation', function () {
+  install('newConversation', async function () {
     var current = aiMessages().slice();
     if (current.length) {
       var archives = [];
@@ -233,8 +233,9 @@
     }
     w.__aethrionAIChatMessages = [];
     aiRender([]);
+    w.__aethrionAIHistoryLoaded = true;
+    try { await aiCloud('saveChatHistory', { messages: [] }); } catch (e) { console.warn('[AETHRION] Yeni sohbet başlatıldı ancak bulut geçmişi sıfırlanamadı:', e); }
     if (typeof w.openFullAIPanel === 'function') w.openFullAIPanel();
-    aiCloud('saveChatHistory', { messages: [] }).catch(function (e) { console.warn('[AETHRION] Yeni sohbet başlatıldı ancak bulut geçmişi sıfırlanamadı:', e); });
     var input = byId('vzInput'); if (input) input.focus();
     return true;
   });
