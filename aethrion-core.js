@@ -820,7 +820,7 @@
     return jarvisMuted;
   });
   install('jarvisClearTranscript', function () {
-    var p = byId('jarvisTranscript'); if (p) p.innerHTML = '<span class="jarvis-thinking">Sizi dinliyorum, "Hey Jarvis" diyerek başlayabilirsiniz...</span>';
+    var p = byId('jarvisTranscript'); if (p) p.innerHTML = '<span class="jarvis-thinking">Mikrofon düğmesine basıp konuşun. JARVIS arka planda sürekli dinlemez.</span>';
     return true;
   });
   install('openModeratorVideoTool', function () { var m = byId('moderatorVideoToolModal'); if (m) { m.style.display = 'flex'; m.classList.add('open'); m.setAttribute('aria-hidden', 'false'); } else go('/aethrion-status.html'); });
