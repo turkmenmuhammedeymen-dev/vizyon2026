@@ -179,7 +179,64 @@
   install('videoEditorPause', function () { var v = byId('videoPreview'); if (v && v.pause) v.pause(); });
   install('videoEditorReset', function () { var v = byId('videoPreview'); if (v) { v.pause(); v.currentTime = 0; } });
   install('videoEditorTrim', function () { w.showNotification && w.showNotification('Önce video çalışma alanını açın.', 'warning'); });
-  install('openCategoryPanel', function (name) { w.openCategory(name); });
+  install('openCategory', function (category) {
+    var data = {
+      assistant: { title: 'AI Kişisel Asistan', icon: '🤖', description: 'Günlük planlama ve kişisel yardımcı araçları.', items: ['Günlük Özet', 'Hatırlatıcı', 'AI Avatar', 'Sesli Asistan'] },
+      education: { title: 'Eğitim & Öğrenme', icon: '📚', description: 'Öğrenme, sınav ve üretkenlik destek araçları.', items: ['AI Dil', 'Öğrenme Planı', 'Ödev Yardımı', 'Sesli Kitap', 'Hikâye', 'Şiir'] },
+      gamification: { title: 'Oyunlaştırma & Sosyal', icon: '🎮', description: 'Etkileşim, meydan okuma ve takım etkinlikleri.', items: ['Canlı Savaşlar', 'Meydan Okuma', 'Takım Savaşı', 'Sesli Düello', 'Sanal Oda'] },
+      creative: { title: 'Yaratıcı Araçlar', icon: '🎨', description: 'Dijital içerik ve yaratıcı üretim fikirleri.', items: ['Video Editör', 'Ses Klonlama', 'Müzik', 'Anime Selfie', 'Logo Tasarımı', 'Instagram Bio'] },
+      professional: { title: 'Profesyonel Araçlar', icon: '💼', description: 'İş ve belge üretimi için yardımcı araçlar.', items: ['CV Hazırlama', 'İş Mektubu', 'Sözleşme Analizi', 'Sunum Oluşturma', 'E-posta', 'Fatura'] },
+      health: { title: 'Sağlık & Yaşam', icon: '🌿', description: 'Genel yaşam düzeni ve iyi oluş desteği.', items: ['Beslenme Bilgisi', 'Hareket Planı', 'Uyku Günlüğü', 'Meditasyon', 'Tarif Önerileri', 'Su Hatırlatıcısı'] },
+      social: { title: 'Sosyal Sorumluluk', icon: '🌍', description: 'Toplumsal katkı ve öğrenme fikirleri.', items: ['Çevre', 'Bağış Bilgisi', 'Gönüllülük', 'Kodlama', 'Blog'] },
+      surprise: { title: '“Vay Be!” Özellikler', icon: '🎁', description: 'Yaratıcı keşif ve kişisel düşünme araçları.', items: ['Rüya Üzerine Düşünme', 'Astroloji Hakkında Bilgi', 'Karakter Analizi', 'İlişki İletişimi', 'Vizyon Haritası', 'Anı Defteri'] },
+      earn: { title: 'Para Kazandıran Araçlar', icon: '💰', description: 'İş, girişim ve dijital ürün fikirleri.', items: ['Freelance', 'Reklam Fikirleri', 'Kurs Pazarı', 'Şablonlar', 'API Bayilik', 'Sponsorluk'] }
+    };
+    var selected = data[String(category || '').toLowerCase()];
+    var modal = byId('categoryPanelModal'), title = byId('categoryPanelTitle'), body = byId('categoryPanelBody');
+    if (!selected || !modal || !body) {
+      if (w.showNotification) w.showNotification('Bu kategori paneli şu anda kullanılamıyor.', 'warning');
+      return false;
+    }
+    if (title) title.textContent = selected.icon + ' ' + selected.title;
+    body.replaceChildren();
+    var intro = d.createElement('p');
+    intro.textContent = selected.description + ' Bir aracı seçtiğinde AETHRION AI ilgili çalışma isteğini hazırlar.';
+    intro.style.cssText = 'margin:0 0 20px;color:var(--text2);line-height:1.75';
+    body.appendChild(intro);
+    var grid = d.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px';
+    selected.items.forEach(function (item) {
+      var button = d.createElement('button');
+      button.type = 'button';
+      button.className = 'category-feature-launch';
+      button.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:58px;padding:14px 16px;border:1px solid var(--border2);border-radius:13px;background:var(--card-bg,rgba(120,140,170,.08));color:var(--text);text-align:left;cursor:pointer';
+      var label = d.createElement('span');
+      label.textContent = item;
+      label.style.cssText = 'font-weight:700';
+      var action = d.createElement('span');
+      action.textContent = 'AI ile başlat →';
+      action.style.cssText = 'flex:0 0 auto;color:var(--accent);font-size:11px;font-weight:700';
+      button.append(label, action);
+      button.addEventListener('click', function () {
+        var prompt = selected.title + ' / ' + item + ': Bu konuda bana yardımcı ol. Önce ihtiyacımı netleştir, ardından uygulanabilir bir çalışma başlat.';
+        if (typeof w.closeCategoryPanel === 'function') w.closeCategoryPanel();
+        if (typeof w.openFullAIPanel === 'function') w.openFullAIPanel();
+        else { go('/aethrion-ai.html'); return; }
+        w.setTimeout(function () {
+          var input = byId('vzInput');
+          if (input) { input.value = prompt; input.dispatchEvent(new Event('input', { bubbles: true })); input.focus(); }
+          else go('/aethrion-ai.html');
+        }, 100);
+      });
+      grid.appendChild(button);
+    });
+    body.appendChild(grid);
+    modal.style.display = 'flex';
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    return true;
+  });
+  install('openCategoryPanel', function (name) { return w.openCategory(name); });
   install('openJobCreateForm', function () { go('/topluluk.html'); });
   install('closeJobMarket', function () { var p = byId('jobMarketModal'); if (p) p.style.display = 'none'; else go('/topluluk.html'); });
   install('loadJobMarket', function () { go('/topluluk.html'); });
