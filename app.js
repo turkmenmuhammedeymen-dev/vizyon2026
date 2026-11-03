@@ -39,7 +39,8 @@
   global.aethrionBackendHealth = global.aethrionBackendHealth || {
     state: 'pending',
     checkedAt: null,
-    error: null
+    error: null,
+    services: null
   };
 
   global.checkAethrionBackend = async function (options) {
@@ -77,6 +78,55 @@
 
         if (!result || result.success !== true) {
           throw new Error('Back4App Cloud Code sağlık kontrolü beklenen yanıtı vermedi.');
+        }
+        var expectedBuild = '2026-11-03-community-reliability-1';
+        if (result.buildId !== expectedBuild) {
+          throw new Error('Back4App eski Cloud Code sürümünde. Beklenen: ' + expectedBuild + ' · Çalışan: ' + String(result.buildId || 'sürüm bilgisi yok') + '. back4app/main.js dosyasını Back4App Cloud Code bölümüne yeniden yükleyip deploy edin.');
+        }
+
+        // A basic ping is not enough: verify public read services used by the UI.
+        var serviceTimeoutId;
+        var serviceTimeout = new Promise(function (_, reject) {
+          serviceTimeoutId = global.setTimeout(function () {
+            reject(new Error('Yorum/istatistik servisleri 8 saniyede yanıt vermedi.'));
+          }, 8000);
+        });
+        try {
+          var serviceChecks = await Promise.race([
+            Promise.all([
+              global.Parse.Cloud.run('getComments', {}),
+              global.Parse.Cloud.run('getPublicStats', {})
+            ]),
+            serviceTimeout
+          ]);
+          if (!serviceChecks[0] || serviceChecks[0].success !== true) {
+            throw new Error('getComments servisi başarısız: ' + String(serviceChecks[0] && serviceChecks[0].error || 'beklenmeyen yanıt'));
+          }
+          if (!serviceChecks[1] || serviceChecks[1].success !== true) {
+            throw new Error('getPublicStats servisi başarısız: ' + String(serviceChecks[1] && serviceChecks[1].error || 'beklenmeyen yanıt'));
+          }
+          if (global.Parse.User && global.Parse.User.current && global.Parse.User.current()) {
+            var inboxTimeoutId;
+            var inboxTimeout = new Promise(function (_, reject) {
+              inboxTimeoutId = global.setTimeout(function () {
+                reject(new Error('Gelen kutusu/davet servisi 8 saniyede yanıt vermedi.'));
+              }, 8000);
+            });
+            try {
+              var inboxItems = await Promise.race([
+                global.Parse.Cloud.run('getInboxItems', {}),
+                inboxTimeout
+              ]);
+              if (!Array.isArray(inboxItems)) {
+                throw new Error('getInboxItems beklenen listeyi döndürmedi.');
+              }
+            } finally {
+              global.clearTimeout(inboxTimeoutId);
+            }
+          }
+          state.services = { comments: 'ok', publicStats: 'ok', inbox: (global.Parse.User && global.Parse.User.current && global.Parse.User.current()) ? 'ok' : 'not_checked' };
+        } finally {
+          global.clearTimeout(serviceTimeoutId);
         }
         state.state = 'connected';
         state.checkedAt = new Date().toISOString();
