@@ -740,16 +740,78 @@
       return false;
     }
   });
+  var jarvisSpeechError = '';
+  function jarvisSpeechErrorMessage(code) {
+    var messages = {
+      'not-allowed': 'Mikrofon izni engellendi. Adres çubuğundaki site izinlerinden Mikrofonu İzin ver yapıp sayfayı yenileyin.',
+      'service-not-allowed': 'Tarayıcının ses tanıma hizmetine erişimi engellendi. Mikrofon iznini ve tarayıcı ayarlarını kontrol edin.',
+      'audio-capture': 'Mikrofon bulunamadı veya başka bir uygulama tarafından kullanılıyor.',
+      'network': 'Ses tanıma servisine ağ bağlantısı kurulamadı. İnternet/VPN bağlantısını kontrol edip yeniden deneyin.',
+      'no-speech': 'Ses algılanmadı. Mikrofonu yakın tutup tekrar konuşun.',
+      'language-not-supported': 'Türkçe ses tanıma bu tarayıcıda desteklenmiyor.',
+      'aborted': 'Ses dinleme durduruldu.'
+    };
+    return messages[code] || ('Ses tanıma hatası: ' + (code || 'bilinmeyen hata') + '.');
+  }
   install('toggleJarvisListening', function () {
     var Speech = w.SpeechRecognition || w.webkitSpeechRecognition;
-    if (jarvisRecognition) { try { jarvisRecognition.stop(); } catch (_) {} jarvisRecognition = null; jarvisStatus('HAZIR'); return true; }
-    if (!Speech) { w.showNotification && w.showNotification('Bu tarayıcı ses tanımayı desteklemiyor. Hızlı komut düğmelerini kullanabilirsiniz.', 'warning'); return false; }
-    jarvisRecognition = new Speech(); jarvisRecognition.lang = 'tr-TR'; jarvisRecognition.interimResults = false; jarvisRecognition.maxAlternatives = 1;
-    jarvisRecognition.onstart = function () { jarvisStatus('DİNLİYOR'); };
-    jarvisRecognition.onresult = function (event) { var said = event.results && event.results[0] && event.results[0][0] && event.results[0][0].transcript; if (said) w.jarvisQuickCommand(said); };
-    jarvisRecognition.onerror = function (event) { jarvisStatus('SES HATASI'); w.showNotification && w.showNotification('Ses tanıma: ' + (event.error || 'hata'), 'warning'); };
-    jarvisRecognition.onend = function () { jarvisRecognition = null; if (byId('aethrionJarvisOverlay')) jarvisStatus('HAZIR'); };
-    try { jarvisRecognition.start(); return true; } catch (e) { jarvisRecognition = null; jarvisStatus('HAZIR'); w.showNotification && w.showNotification(e.message || 'Mikrofon başlatılamadı.', 'error'); return false; }
+    var mic = byId('jarvisMicBtn');
+    if (jarvisRecognition) { try { jarvisRecognition.stop(); } catch (_) {} jarvisStatus('HAZIR'); return true; }
+    if (!Speech) {
+      jarvisStatus('DESTEKLENMİYOR');
+      w.showNotification && w.showNotification('Bu tarayıcı Web Speech ses tanımayı desteklemiyor. Chrome veya Edge’in güncel sürümünü deneyin.', 'warning');
+      return false;
+    }
+    jarvisSpeechError = '';
+    try {
+      var recognition = new Speech();
+      jarvisRecognition = recognition;
+      recognition.lang = 'tr-TR';
+      recognition.interimResults = true;
+      recognition.continuous = false;
+      recognition.maxAlternatives = 1;
+      recognition.onstart = function () {
+        jarvisSpeechError = '';
+        jarvisStatus('DİNLİYOR');
+        if (mic) { mic.setAttribute('aria-pressed', 'true'); mic.title = 'Dinlemeyi durdur'; }
+      };
+      recognition.onresult = function (event) {
+        var result = event.results && event.results[event.results.length - 1];
+        var said = result && result[0] && result[0].transcript ? String(result[0].transcript).trim() : '';
+        if (said && result.isFinal) {
+          jarvisStatus('KOMUT ALINDI');
+          if (recognition === jarvisRecognition) {
+            try { recognition.stop(); } catch (_) {}
+            jarvisRecognition = null;
+          }
+          w.jarvisQuickCommand(said);
+        }
+      };
+      recognition.onerror = function (event) {
+        var code = event && event.error || 'unknown';
+        jarvisSpeechError = code;
+        jarvisStatus('SES HATASI');
+        var message = jarvisSpeechErrorMessage(code);
+        jarvisWrite(message, 'assistant');
+        w.showNotification && w.showNotification(message, code === 'aborted' ? 'info' : 'warning');
+      };
+      recognition.onend = function () {
+        if (recognition === jarvisRecognition) jarvisRecognition = null;
+        if (mic) { mic.setAttribute('aria-pressed', 'false'); mic.title = 'Dinlemeyi başlat'; }
+        if (byId('aethrionJarvisOverlay') && !jarvisSpeechError) jarvisStatus('HAZIR');
+      };
+      recognition.start();
+      return true;
+    } catch (e) {
+      jarvisRecognition = null;
+      if (mic) mic.setAttribute('aria-pressed', 'false');
+      jarvisStatus('SES HATASI');
+      var detail = e && e.name === 'NotAllowedError'
+        ? 'Mikrofon izni verilmedi. Site izinlerinden mikrofonu açın.'
+        : (e && e.message || 'Mikrofon başlatılamadı.');
+      w.showNotification && w.showNotification(detail, 'warning');
+      return false;
+    }
   });
   install('jarvisToggleMute', function () {
     jarvisMuted = !jarvisMuted;
