@@ -4550,16 +4550,14 @@ Parse.Cloud.define("getInboxItems", async function (request) {
     var receiverEmail = String(user.get('email') || '').trim().toLowerCase();
     if (!receiverEmail) throw new Error('Hesap e-posta adresi bulunamadı.');
     var query = new Parse.Query(Inbox);
-    // Legacy invitations may contain mixed-case addresses. Match the full email
-    // case-insensitively so older records remain visible after normalization.
+    // Keep legacy records visible even when their stored email casing differs.
     var escapedReceiverEmail = receiverEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     query.matches('receiver_email', '^' + escapedReceiverEmail + '$', 'i');
     query.descending('createdAt');
     query.limit(100);
 
     try {
-        var results = await query.find({ useMasterKey: true });');
-    query.matches('receiver_email', '^' + escapedReceiverEmail + '
+        var results = await query.find({ useMasterKey: true });
         return results.map(function (obj) {
             return {
                 id: obj.id,
@@ -4581,10 +4579,9 @@ Parse.Cloud.define("getInboxItems", async function (request) {
         });
     } catch (e) {
         console.error('getInboxItems hatası:', String(e && e.message || e).slice(0, 240));
-        throw new Error('Gelen kutusu şu anda yüklenemedi. Sunucu bağlantısını ve Inbox şemasını kontrol edip tekrar deneyin.');
+        throw new Error('Gelen kutusu şu anda yüklenemedi: ' + String(e && e.message || 'veritabanı sorgusu başarısız').slice(0, 180));
     }
 });
-
 
 // ================================================================
 // ========== TAKIM SİSTEMİ (FULL) ================================
