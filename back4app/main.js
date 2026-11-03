@@ -3823,8 +3823,8 @@ Parse.Cloud.define("adminLogin", async function (request) {
             newUser.set('isBanned', false);
             newUser.set('profile_completed', true);
             await newUser.save(null, { useMasterKey: true });
-            await Parse.User.logIn(admin.email, password);
-            return { success: true, name: admin.name, email: admin.email, role: 'admin' };
+            var authenticatedUser = await Parse.User.logIn(admin.email, password);
+            return { success: true, sessionToken: authenticatedUser.getSessionToken(), userId: authenticatedUser.id, name: admin.name, email: admin.email, role: 'admin' };
         } else throw e;
     }
 });
@@ -3869,8 +3869,8 @@ Parse.Cloud.define("betaLogin", async function (request) {
             newUser.set('isBanned', false);
             newUser.set('profile_completed', true);
             await newUser.save(null, { useMasterKey: true });
-            await Parse.User.logIn(beta.email, password);
-            return { success: true, name: beta.name, email: beta.email, role: 'beta' };
+            var authenticatedUser = await Parse.User.logIn(beta.email, password);
+            return { success: true, sessionToken: authenticatedUser.getSessionToken(), userId: authenticatedUser.id, name: beta.name, email: beta.email, role: 'beta' };
         } else throw e;
     }
 });
@@ -3909,8 +3909,8 @@ Parse.Cloud.define("founderLogin", async function (request) {
             newUser.set('isBanned', false);
             newUser.set('profile_completed', true);
             await newUser.save(null, { useMasterKey: true });
-            await Parse.User.logIn(founderEmail, password);
-            return { success: true, name: 'Eymen', email: founderEmail, role: 'founder' };
+            var authenticatedUser = await Parse.User.logIn(founderEmail, password);
+            return { success: true, sessionToken: authenticatedUser.getSessionToken(), userId: authenticatedUser.id, name: 'Eymen', email: founderEmail, role: 'founder' };
         } else throw e;
     }
 });
