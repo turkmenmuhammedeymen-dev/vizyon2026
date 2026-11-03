@@ -98,6 +98,25 @@
   }
 
   // Keep the legacy chat UI and its existing IDs; only change its presentation/routing.
+  w.openVoiceChatFullscreen = function () {
+    var p=node('aaVoiceFullscreen');
+    if(!p){notify('Tam ekran sesli sohbet paneli index.html içinde bulunamadı.','error');return false;}
+    p.style.setProperty('display','flex','important');p.classList.add('open','active');
+    p.setAttribute('aria-hidden','false');d.body.style.overflow='hidden';
+    return true;
+  };
+  w.closeVoiceChatFullscreen = function () {
+    var p=node('aaVoiceFullscreen');if(p){p.style.setProperty('display','none','important');p.classList.remove('open','active');p.setAttribute('aria-hidden','true');}
+    try{if(w.speechSynthesis)w.speechSynthesis.cancel();var mic=node('aaVoiceMicBtn');if(mic&&typeof mic.click==='function'&&mic.getAttribute('aria-pressed')==='true')mic.click();}catch(_){}
+    d.body.style.overflow='';return true;
+  };
+  w.startJarvisMode = function () {
+    var p=node('aethrionJarvisOverlay');
+    if(p){p.style.setProperty('display','flex','important');p.classList.add('open','active');p.setAttribute('aria-hidden','false');d.body.style.overflow='hidden';return true;}
+    var launcher=d.querySelector('.ae-jv-launcher');
+    if(launcher){launcher.click();return true;}
+    notify('JARVIS tam ekran paneli bulunamadı.','error');return false;
+  };
   w.openFullAIPanel = function () { return showChat('ai'); };
   w.openAethrionAI = w.openFullAIPanel;
   w.openAethrionAlPanel = function () { return showChat('agents'); };
