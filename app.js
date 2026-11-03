@@ -2058,7 +2058,7 @@ var CORE=[
 ['PLATFORM','🔔','Bildirimler','Hesap bildirimlerini görüntüle','toggleNotificationPanel',''],
 ['PLATFORM','📩','Destek Merkezi','AETHRION destek kanalı','openVizyonSupport',''],
 ['PLATFORM','📥','Uygulamayı İndir','Desteklenen uygulama indirme seçenekleri','showDownloadOptions',''],
-['GELİŞTİRİCİ','📊','Kullanım ve Sistem Kayıtları','Yetkiniz kapsamındaki sistem kayıtları','openLogsPanel','','','admin'],
+['GELİŞTİRİCİ','📊','Logs Sistemi','Yetkiniz kapsamındaki sistem kayıtları ve olay günlüğü','openLogsPanel','','','admin'],
 ['HESAP','📜','Sohbet ve İşlem Geçmişi','Hesap etkinlik ve geçmiş alanı','toggleChatHistory',''],
 ['HESAP','🔐','Güvenlik Ayarları','Oturum ve güvenlik tercihleri','openParentSettings','./hesap-ve-oturum-guvenligi.html']
 ];
