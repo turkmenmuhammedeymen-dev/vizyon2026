@@ -182,7 +182,7 @@
     w.__aethrionAIChatMessages = [];
     (Array.isArray(messages) ? messages : []).forEach(function (m) {
       if (!m) return;
-      var role = m.role || (m.is_ai ? 'assistant' : (m.from === 'user' ? 'user' : 'assistant'));
+      var role = m.role || (m.is_ai === true ? 'assistant' : (m.is_ai === false || m.from === 'user' || m.sender === 'user' ? 'user' : 'assistant'));
       var text = m.text || m.content || m.message || '';
       if (text) aiAppend(role === 'user' || role === 'human' ? 'user' : 'assistant', text);
     });
@@ -293,19 +293,20 @@
     return true;
   });
   install('startScreenReading', async function () {
+    var screenStream = null;
     if (!w.navigator.mediaDevices || typeof w.navigator.mediaDevices.getDisplayMedia !== 'function') {
       w.showNotification && w.showNotification('Bu tarayıcı ekran paylaşımı desteklemiyor.', 'error'); return false;
     }
     try {
-      var stream = await w.navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 1 }, audio: false });
-      var track = stream.getVideoTracks()[0], settings = track && track.getSettings ? track.getSettings() : {};
-      var video = d.createElement('video'); video.muted = true; video.srcObject = stream; video.playsInline = true;
+      screenStream = await w.navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 1 }, audio: false });
+      var track = screenStream.getVideoTracks()[0], settings = track && track.getSettings ? track.getSettings() : {};
+      var video = d.createElement('video'); video.muted = true; video.srcObject = screenStream; video.playsInline = true;
       await video.play();
       await new Promise(function (resolve) { if (video.videoWidth) resolve(); else video.onloadedmetadata = resolve; });
       var scale = Math.min(1, 1600 / (video.videoWidth || 1600), 900 / (video.videoHeight || 900));
       var canvas = d.createElement('canvas'); canvas.width = Math.max(1, Math.round((video.videoWidth || 1280) * scale)); canvas.height = Math.max(1, Math.round((video.videoHeight || 720) * scale));
       canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-      stream.getTracks().forEach(function (t) { t.stop(); });
+      screenStream.getTracks().forEach(function (t) { t.stop(); }); screenStream = null;
       var data = canvas.toDataURL('image/jpeg', 0.72).split(',')[1];
       aiAppend('user', 'Ekran görüntüsünü analiz et.');
       var result = await aiCloud('vizyonAlScreenRead', { imageBase64: data, question: 'Ekrandaki içeriği açıkla; görünen metinleri, arayüz bölümlerini ve önemli bilgileri özetle.' });
@@ -314,6 +315,7 @@
       await aiSaveHistory();
       return true;
     } catch (e) {
+      if (screenStream) screenStream.getTracks().forEach(function (t) { try { t.stop(); } catch (_) {} });
       w.showNotification && w.showNotification(e && e.message || 'Ekran okunamadı.', 'error');
       return false;
     }
