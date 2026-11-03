@@ -943,7 +943,7 @@ Parse.Cloud.define("initSchemas", async function (request) {
 // ================================================================
 // ========== TEMEL FONKSİYONLAR ==================================
 // ================================================================
-var AETHRION_CLOUD_BUILD_ID = '2026-11-03-community-reliability-2';
+var AETHRION_CLOUD_BUILD_ID = '2026-11-03-community-reliability-3';
 Parse.Cloud.define("test", async function (request) {
     return {
         success: true,
@@ -10035,10 +10035,19 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
     var loginName = email;
 
     try {
-        var founderEmail = String((await getPrivateFounderEmail()) || '').trim().toLowerCase();
+        var founderEmail = '';
+        try {
+            founderEmail = String((await getPrivateFounderEmail()) || '').trim().toLowerCase();
+        } catch (founderConfigError) {
+            // A missing founder-only secret must never block ordinary member/admin/beta sign-in.
+            console.warn('[AETHRION Auth] Founder identity config unavailable; continuing standard account lookup.');
+        }
         console.info('[AETHRION Auth] Stage 2: founder identity configuration resolved.');
-        if (email === 'admin.tr.reis') email = founderEmail;
-        if (email === founderEmail) {
+        if (email === 'admin.tr.reis') {
+            if (!founderEmail) return { success: false, error: 'Kurucu hesabı yapılandırılmamış. Back4App özel ayarlarını kontrol edin.' };
+            email = founderEmail;
+        }
+        if (founderEmail && email === founderEmail) {
             var configuredFounderPass = await getPrivateFounderPass();
             if (!configuredFounderPass) {
                 console.error('[AETHRION Auth] FOUNDER_PASS is not configured in private Back4App runtime settings.');
@@ -16807,10 +16816,19 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
     var loginName = email;
 
     try {
-        var founderEmail = String((await getPrivateFounderEmail()) || '').trim().toLowerCase();
+        var founderEmail = '';
+        try {
+            founderEmail = String((await getPrivateFounderEmail()) || '').trim().toLowerCase();
+        } catch (founderConfigError) {
+            // A missing founder-only secret must never block ordinary member/admin/beta sign-in.
+            console.warn('[AETHRION Auth] Founder identity config unavailable; continuing standard account lookup.');
+        }
         console.info('[AETHRION Auth] Stage 2: founder identity configuration resolved.');
-        if (email === 'admin.tr.reis') email = founderEmail;
-        if (email === founderEmail) {
+        if (email === 'admin.tr.reis') {
+            if (!founderEmail) return { success: false, error: 'Kurucu hesabı yapılandırılmamış. Back4App özel ayarlarını kontrol edin.' };
+            email = founderEmail;
+        }
+        if (founderEmail && email === founderEmail) {
             var configuredFounderPass = await getPrivateFounderPass();
             if (!configuredFounderPass) {
                 console.error('[AETHRION Auth] FOUNDER_PASS is not configured in private Back4App runtime settings.');
