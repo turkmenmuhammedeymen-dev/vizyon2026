@@ -1994,6 +1994,8 @@ checkDueReminders();window.setInterval(checkDueReminders,15000);window.addEventL
 var CORE=[
 ['YAPAY ZEKÂ','✦','AETHRION AI','28 model destekli ana sohbet alanı','openFullAIPanel',''],
 ['YAPAY ZEKÂ','◈','AETHRION Agents','Ajanlar, ekran okuma ve dosya araçları','openAethrionAlPanel',''],
+['YAPAY ZEKÂ','📎','Dosya Analiz + Sunum','PDF, Word, Excel, görsel ve diğer dosyaları analiz et','openAethrionAlPanel',''],
+['YAPAY ZEKÂ','🌐','Canlı Web Arama','Güncel web araştırması ve kaynaklı yanıtlar','openFullAIPanel',''],
 ['YAPAY ZEKÂ','◎','AETHRION Coach','Kişisel yapay zekâ koçu','openKocPanel',''],
 ['YAPAY ZEKÂ','◉','Model Kataloğu','Tanımlı AI modellerini incele','openModelsShowcase',''],
 ['YAPAY ZEKÂ','🎙️','Sesli Sohbet','Tam ekran sesli AI sohbeti','openVoiceChatFullscreen','./aethrion-assistant.html'],
@@ -2017,7 +2019,8 @@ var CORE=[
 ['PLATFORM','▤','Projelerim','Projeler ve kayıtlı çalışmalar','scrollToProjects',''],
 ['PLATFORM','🏆','Aylık Yarışma','Aylık proje yarışmaları','openContestPage','./topluluk.html'],
 ['PLATFORM','💼','A27 İş İlanları Mağazası','İş ilanlarını görüntüle ve yönet','openJobMarket',''],
-['PLATFORM','🪙','A27 Puan Mağazası','Puan ve dijital mağaza alanı','openMarket',''],
+['PLATFORM','🪙','Puan Mağazası + Cüzdan','Puan, dijital mağaza ve cüzdan alanı','openMarket',''],
+['PLATFORM','💬','GIF + DM Sistemi','Topluluk mesajları ve GIF destekli iletişim','toggleTeamPage','./topluluk.html'],
 ['PLATFORM','✎','AETHRION Akademi','Eğitim ve öğrenme alanı','openAcademy','./bana-ogret.html'],
 ['GELİŞTİRİCİ','⌘','A27 API Anahtarı','API anahtarı oluşturma ve yönetim','openA27ApiKeyGenerator','./api.html#keys'],
 ['GELİŞTİRİCİ','↗','API Belgeleri','Geliştirici rehberi ve örnekler','openA27ApiGuide','./api.html'],
