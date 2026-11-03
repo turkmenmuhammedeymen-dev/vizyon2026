@@ -4541,13 +4541,10 @@ Parse.Cloud.define("getInboxItems", async function (request) {
     var user = request.user;
     if (!user) throw new Error('Giriş yapmalısınız!');
 
-    var receiverEmail = String(user.get('email') || '').trim();
+    var receiverEmail = String(user.get('email') || '').trim().toLowerCase();
     if (!receiverEmail) throw new Error('Hesap e-posta adresi bulunamadı.');
     var query = new Parse.Query(Inbox);
-    // Legacy accounts may contain mixed-case email values; keep the query scoped to this user.
-    var escapedEmail = receiverEmail.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\    var query = new Parse.Query(Inbox);
-    query.equalTo('receiver_email', user.get('email'));');
-    query.matches('receiver_email', '^' + escapedEmail + '
+    query.equalTo('receiver_email', receiverEmail);
     query.descending('createdAt');
     query.limit(100);
 
