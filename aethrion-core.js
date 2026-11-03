@@ -145,13 +145,55 @@
   install('scrollToImageGen', function () { if (!scrollTo('imageGen') && !scrollTo('features')) go('/aethrion-ai.html'); });
   install('scrollToProjects', function () { if (!scrollTo('projects')) go('/topluluk.html'); });
   install('openCategory', function (category) {
-    var modal = byId('categoryPanelModal');
-    var title = byId('categoryPanelTitle');
-    var body = byId('categoryPanelBody');
-    if (title) title.textContent = String(category || 'AETHRION').replace(/(^|[-_ ])\w/g, function (x) { return x.toUpperCase(); });
-    if (body) body.textContent = 'Bu kategori için çalışma alanını açmak üzere aşağıdaki bağlantılardan devam edin.';
-    if (modal) { modal.style.display = 'flex'; modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); }
-    else go('/aethrion-ai.html');
+    var modal = byId('categoryPanelModal'), title = byId('categoryPanelTitle'), body = byId('categoryPanelBody');
+    var key = String(category || '').toLowerCase();
+    var labels = { assistant: 'AI Asistan', education: 'Eğitim ve Öğrenme', gamification: 'Oyunlaştırma', creative: 'Yaratıcı Araçlar', professional: 'Profesyonel Araçlar', health: 'Sağlık ve Yaşam', social: 'Sosyal Özellikler', surprise: 'Vay Be! Özellikler', earn: 'Kazanç Araçları' };
+    if (title) title.textContent = labels[key] || 'AETHRION Özellikleri';
+    if (!body) return false;
+    body.innerHTML = '';
+    var catalog = Array.isArray(w.__aethrionWorkspaceMenuFeatures) ? w.__aethrionWorkspaceMenuFeatures : [];
+    var rules = {
+      assistant: /ai|agent|coach|asistan|model|sohbet|sesli|ekran|dosya analiz/i,
+      education: /academy|akademi|eğitim|öğren|ders|kütüphane/i,
+      gamification: /oyun|yarışma|battle|savaş|streak|seri|puan/i,
+      creative: /create|video|3d|görsel|kod|dosya|üretim/i,
+      professional: /profesyonel|iş|api|dokümantasyon|belge|market/i,
+      health: /sağlık|güvenlik|ebeveyn|yaşam/i,
+      social: /topluluk|takım|dm|yorum|sosyal/i,
+      surprise: /vay|keşif|sürpriz/i,
+      earn: /kazanç|iş ilanı|mağaza|cüzdan|market/i
+    };
+    var matcher = rules[key] || /./;
+    var items = catalog.filter(function (item) {
+      var name = String(item[2] || ''), group = String(item[0] || ''), action = String(item[4] || '');
+      return action && action !== 'openCategoryPanel' && group !== 'KATEGORİLER' && matcher.test(name + ' ' + group);
+    });
+    if (!items.length) {
+      var empty = d.createElement('p'); empty.textContent = 'Bu kategori için şu anda etkin bir çalışma alanı tanımlı değil.'; empty.style.cssText = 'padding:20px;color:var(--text3,#9ca3af);text-align:center';
+      body.appendChild(empty);
+    } else {
+      var grid = d.createElement('div'); grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px';
+      items.forEach(function (item) {
+        var button = d.createElement('button'); button.type = 'button';
+        button.style.cssText = 'display:flex;align-items:flex-start;gap:12px;text-align:left;padding:15px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:14px;background:rgba(255,255,255,.025);color:var(--text,#f4f6fb);cursor:pointer';
+        var icon = d.createElement('span'); icon.textContent = item[1] || '✦'; icon.style.fontSize = '22px';
+        var copy = d.createElement('span'); var name = d.createElement('strong'); name.textContent = item[2];
+        var desc = d.createElement('small'); desc.textContent = item[3] || ''; desc.style.cssText = 'display:block;margin-top:5px;color:var(--text3,#9ca3af);line-height:1.5';
+        copy.appendChild(name); copy.appendChild(desc); button.appendChild(icon); button.appendChild(copy);
+        button.addEventListener('click', function () {
+          if (modal) { modal.style.display = 'none'; modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); }
+          var navButton = d.querySelector('#aeWorkspaceSidebar [data-aews-feature]');
+          var buttons = d.querySelectorAll('#aeWorkspaceSidebar [data-aews-feature]');
+          for (var i = 0; i < buttons.length; i++) if (buttons[i].getAttribute('data-aews-feature') === item[2]) { buttons[i].click(); return; }
+          if (typeof w.safeFeatureCall === 'function') w.safeFeatureCall(item[4], item[2], item[6] || '');
+          else if (typeof w[item[4]] === 'function') w[item[4]](item[6] || '');
+        });
+        grid.appendChild(button);
+      });
+      body.appendChild(grid);
+    }
+    if (modal) { modal.style.display = 'flex'; modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); return true; }
+    return false;
   });
   install('logout', function () {
     var P = w.Parse;
