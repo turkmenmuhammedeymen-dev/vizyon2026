@@ -2020,6 +2020,7 @@ var CORE=[
 ['PLATFORM','💼','A27 İş İlanları Mağazası','İş ilanlarını görüntüle ve yönet','openJobMarket',''],
 ['PLATFORM','🪙','Puan Mağazası + Cüzdan','Puan, dijital mağaza ve cüzdan alanı','openMarket',''],
 ['PLATFORM','💬','GIF + DM Sistemi','Topluluk mesajları ve GIF destekli iletişim','toggleTeamPage','./topluluk.html'],
+['PLATFORM','🎞️','Pexels GIF Ara','Topluluk sohbetinde paylaşmak için GIF ara','openGifPicker',''],
 ['PLATFORM','✎','AETHRION Akademi','Eğitim ve öğrenme alanı','openAcademy','./bana-ogret.html'],
 ['GELİŞTİRİCİ','⌘','A27 API Anahtarı','API anahtarı oluşturma ve yönetim','openA27ApiKeyGenerator','./api.html#keys'],
 ['GELİŞTİRİCİ','↗','API Belgeleri','Geliştirici rehberi ve örnekler','openA27ApiGuide','./api.html'],
