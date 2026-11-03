@@ -2164,7 +2164,7 @@ function renderHomeCatalog(w){
   var group=String(item[0]||'OTHER'),icon=String(item[1]||'✦'),name=String(item[2]||'').trim(),desc=String(item[3]||'AETHRION çalışma alanı'),action=String(item[4]||''),href=String(item[5]||'');
   if(!name||(!action&&!href))return;
   /* The shared action router can resolve aliases and safe fallback routes. */
-  if(!href&&typeof window[action]!=='function'&&typeof window.safeFeatureCall!=='function')return;
+  /* Keep every legacy feature visible; unresolved actions are reported only when selected. */
   (groups[group]||(groups[group]=[])).push({icon:icon,name:name,desc:desc,action:action});
  });
  var keys=Object.keys(groups);
@@ -2248,27 +2248,23 @@ function home(){document.body.classList.remove('aews-nav-open','aews-feature-vie
 function openFeature(label){
  var f=feature(label);document.body.classList.remove('aews-nav-open');setActive(label);
  if(label==='Oturumu kapat'){if(typeof window.logout==='function')return window.logout();if(window.Parse&&Parse.User)return Parse.User.logOut().then(function(){location.reload()});location.reload();return}
- var desc=(Array.isArray(window.FEATURE_LIST)?window.FEATURE_LIST:[]).filter(function(x){return x&&String(x.name||x.title||'')===label})[0];
- desc=desc&&String(desc.desc||desc.description||'')||'Bu özellik AETHRION çalışma alanı üzerinden kullanılabilir.';
- if(f.href&&f.href!=='./index.html#features'&&f.href!=='#features'){document.body.classList.add('aews-feature-view');showStage(label,'Özelliğin çalışma alanı açılıyor.',f.href);return}
- if(/^scrollTo/.test(f.action||'')){
+ var meta=(Array.isArray(window.FEATURE_LIST)?window.FEATURE_LIST:[]).filter(function(x){return x&&String(x.name||x.title||'')===label})[0];
+ var desc=meta&&String(meta.desc||meta.description||'')||'Bu özellik AETHRION çalışma alanı üzerinden kullanılabilir.';
+ var action=String(f.action||''),opened=false;
+ if(/^scrollTo/.test(action)){
   document.body.classList.remove('aews-feature-view');var stage=q('#aethrionWorkspaceStage');if(stage)stage.style.setProperty('display','none','important');
   var main=q('#mainSite');if(main)main.style.removeProperty('display');
   var dash=q('#dashboardArea');if(dash)dash.style.removeProperty('display');
-  if(typeof window.safeFeatureCall==='function')window.safeFeatureCall(f.action,label,'');else if(typeof window[f.action]==='function')window[f.action]();
-  return;
  }
- if(f.action&&typeof window[f.action]==='function'){
-  document.body.classList.remove('aews-feature-view');var stage3=q('#aethrionWorkspaceStage');if(stage3)stage3.style.setProperty('display','none','important');
-  window[f.action](f.arg);return;
+ if(action&&typeof window[action]==='function'){
+  try{var result=window[action](f.arg);opened=result!==false}catch(error){console.error('[AETHRION] Özellik açılamadı:',label,error);opened=false}
+ }else if(action&&typeof window.safeFeatureCall==='function'){
+  try{var safeResult=window.safeFeatureCall(action,label,f.arg||'');opened=safeResult!==false}catch(error){console.error('[AETHRION] Özellik yönlendirmesi başarısız:',label,error);opened=false}
  }
- if(f.action&&typeof window.safeFeatureCall==='function'){
-  document.body.classList.remove('aews-feature-view');var stage2=q('#aethrionWorkspaceStage');if(stage2)stage2.style.setProperty('display','none','important');
-  window.safeFeatureCall(f.action,label,'');
-  return;
- }
+ if(opened){document.body.classList.remove('aews-feature-view');var openedStage=q('#aethrionWorkspaceStage');if(openedStage)openedStage.style.setProperty('display','none','important');return}
+ if(f.href&&f.href!=='./index.html#features'&&f.href!=='#features'){document.body.classList.add('aews-feature-view');showStage(label,desc,f.href);return}
  document.body.classList.add('aews-feature-view');showStage(label,desc,'');
- if(typeof window.showNotification==='function')window.showNotification('Bu özellik için doğrudan açılış bağlantısı tanımlanmamış.','warning');
+ if(typeof window.showNotification==='function')window.showNotification('Bu özelliğin paneli veya açılış bağlantısı bulunamadı.','warning');
 }
 function installRouter(){
  if(document.body.dataset.aeV6Router==='1')return;document.body.dataset.aeV6Router='1';
