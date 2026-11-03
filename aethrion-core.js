@@ -457,11 +457,67 @@
   install('acceptJobListing', function () { go('/topluluk.html'); });
   install('closeModelsShowcase', function () { var p = byId('modelsShowcaseModal'); if (p) p.style.display = 'none'; });
   install('closeCategoryPanel', function () { var p = byId('categoryPanelModal'); if (p) { p.style.setProperty('display', 'none', 'important'); p.style.setProperty('visibility', 'hidden', 'important'); p.style.setProperty('pointer-events', 'none', 'important'); p.classList.remove('open'); } });
-  install('closeJarvisMode', function () { go('/aethrion-jarvis.html'); });
-  install('jarvisQuickCommand', function () { go('/aethrion-jarvis.html'); });
-  install('toggleJarvisListening', function () { go('/aethrion-jarvis.html'); });
-  install('jarvisToggleMute', function () { if (w.speechSynthesis) w.speechSynthesis.cancel(); });
-  install('jarvisClearTranscript', function () { var p = byId('aeJvMessages'); if (p) p.replaceChildren(); });
+  var jarvisRecognition = null, jarvisMuted = false;
+  function jarvisStatus(value) { var s = byId('jarvisStatus'); if (s) s.textContent = value; }
+  function jarvisWrite(text, who) {
+    var p = byId('jarvisTranscript'); if (!p) return;
+    var line = d.createElement('div');
+    line.style.cssText = 'padding:9px 12px;margin:7px 0;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:' + (who === 'user' ? 'rgba(124,92,255,.14)' : 'rgba(255,255,255,.055)') + ';color:var(--text,#f4f6fb)';
+    var label = d.createElement('strong'); label.textContent = who === 'user' ? 'SİZ' : 'JARVIS'; label.style.display = 'block'; label.style.fontSize = '10px'; label.style.letterSpacing = '.12em'; label.style.opacity = '.7';
+    var body = d.createElement('span'); body.textContent = String(text || '');
+    line.appendChild(label); line.appendChild(body); p.appendChild(line); p.scrollTop = p.scrollHeight;
+  }
+  install('closeJarvisMode', function () {
+    if (jarvisRecognition) { try { jarvisRecognition.stop(); } catch (_) {} jarvisRecognition = null; }
+    if (w.speechSynthesis) w.speechSynthesis.cancel();
+    var p = byId('aethrionJarvisOverlay');
+    if (p) { p.style.setProperty('display', 'none', 'important'); p.classList.remove('open', 'active'); p.setAttribute('aria-hidden', 'true'); }
+    d.body.style.overflow = '';
+    jarvisStatus('HAZIR');
+    return true;
+  });
+  install('jarvisQuickCommand', async function (command) {
+    var text = String(command || '').trim(); if (!text) return false;
+    jarvisWrite(text, 'user'); jarvisStatus('DÜŞÜNÜYOR');
+    try {
+      var result = await aiCloud('aethrionChat', { message: text, mode: 'agent' });
+      if (!result || result.success !== true) throw new Error(result && result.error || 'JARVIS yanıt üretemedi.');
+      var reply = String(result.reply || 'Yanıt alınamadı.');
+      jarvisWrite(reply, 'assistant'); jarvisStatus('HAZIR');
+      if (!jarvisMuted && w.speechSynthesis && w.SpeechSynthesisUtterance) {
+        w.speechSynthesis.cancel();
+        var utterance = new w.SpeechSynthesisUtterance(reply);
+        utterance.lang = 'tr-TR'; w.speechSynthesis.speak(utterance);
+      }
+      return true;
+    } catch (e) {
+      jarvisWrite('İşlem tamamlanamadı: ' + (e && e.message || 'Bilinmeyen hata'), 'assistant');
+      jarvisStatus('BAĞLANTI HATASI');
+      w.showNotification && w.showNotification(e && e.message || 'JARVIS yanıt veremiyor.', 'error');
+      return false;
+    }
+  });
+  install('toggleJarvisListening', function () {
+    var Speech = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (jarvisRecognition) { try { jarvisRecognition.stop(); } catch (_) {} jarvisRecognition = null; jarvisStatus('HAZIR'); return true; }
+    if (!Speech) { w.showNotification && w.showNotification('Bu tarayıcı ses tanımayı desteklemiyor. Hızlı komut düğmelerini kullanabilirsiniz.', 'warning'); return false; }
+    jarvisRecognition = new Speech(); jarvisRecognition.lang = 'tr-TR'; jarvisRecognition.interimResults = false; jarvisRecognition.maxAlternatives = 1;
+    jarvisRecognition.onstart = function () { jarvisStatus('DİNLİYOR'); };
+    jarvisRecognition.onresult = function (event) { var said = event.results && event.results[0] && event.results[0][0] && event.results[0][0].transcript; if (said) w.jarvisQuickCommand(said); };
+    jarvisRecognition.onerror = function (event) { jarvisStatus('SES HATASI'); w.showNotification && w.showNotification('Ses tanıma: ' + (event.error || 'hata'), 'warning'); };
+    jarvisRecognition.onend = function () { jarvisRecognition = null; if (byId('aethrionJarvisOverlay')) jarvisStatus('HAZIR'); };
+    try { jarvisRecognition.start(); return true; } catch (e) { jarvisRecognition = null; jarvisStatus('HAZIR'); w.showNotification && w.showNotification(e.message || 'Mikrofon başlatılamadı.', 'error'); return false; }
+  });
+  install('jarvisToggleMute', function () {
+    jarvisMuted = !jarvisMuted;
+    if (jarvisMuted && w.speechSynthesis) w.speechSynthesis.cancel();
+    w.showNotification && w.showNotification(jarvisMuted ? 'JARVIS sesli yanıtı kapatıldı.' : 'JARVIS sesli yanıtı açıldı.', 'success');
+    return jarvisMuted;
+  });
+  install('jarvisClearTranscript', function () {
+    var p = byId('jarvisTranscript'); if (p) p.innerHTML = '<span class="jarvis-thinking">Sizi dinliyorum, "Hey Jarvis" diyerek başlayabilirsiniz...</span>';
+    return true;
+  });
   install('openModeratorVideoTool', function () { var m = byId('moderatorVideoToolModal'); if (m) { m.style.display = 'flex'; m.classList.add('open'); m.setAttribute('aria-hidden', 'false'); } else go('/aethrion-status.html'); });
   install('closeAethrionResponsibilityModal', function () { var m = byId('aethrionResponsibilityModal'); if (m) m.style.display = 'none'; });
   install('confirmAethrionResponsibilityAction', function () { var m = byId('aethrionResponsibilityModal'); if (m) { m.style.display = 'none'; m.setAttribute('aria-hidden', 'true'); } });
