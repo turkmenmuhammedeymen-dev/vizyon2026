@@ -217,7 +217,9 @@
   };
   function ensureRestoreButton(show) {
     var actions = d.querySelector('#videoEditorOverlay .video-editor-actions');
-    if (!actions || byId('videoEditorRestoreDraftBtn')) return;
+    var existing = byId('videoEditorRestoreDraftBtn');
+    if (existing) { if (show) existing.style.display = 'inline-flex'; return; }
+    if (!actions) return;
     var button = d.createElement('button');
     button.id = 'videoEditorRestoreDraftBtn';
     button.type = 'button';
