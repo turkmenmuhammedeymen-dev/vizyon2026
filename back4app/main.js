@@ -943,7 +943,7 @@ Parse.Cloud.define("initSchemas", async function (request) {
 // ================================================================
 // ========== TEMEL FONKSİYONLAR ==================================
 // ================================================================
-var AETHRION_CLOUD_BUILD_ID = '2026-11-03-community-reliability-3';
+var AETHRION_CLOUD_BUILD_ID = '2026-11-03-community-reliability-4';
 Parse.Cloud.define("test", async function (request) {
     return {
         success: true,
@@ -10033,6 +10033,11 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
 
     var user = null;
     var loginName = email;
+    var privilegedAccounts = {
+        'iy5971828@gmail.com': { key: 'ADMIN_IBRAHIM_PASS', name: 'İbrahim Admin', role: 'admin', plan: 'team' },
+        'itaner686@gmail.com': { key: 'ADMIN_BOZKURT_PASS', name: 'Bozkurt Admin', role: 'admin', plan: 'team' },
+        'o2059497@gmail.com': { key: 'BETA_OMER_PASS', name: 'Eymen Beta', role: 'beta', plan: 'free' }
+    };
 
     try {
         var founderEmail = '';
@@ -10096,6 +10101,45 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
             user.set('profile_completed', true);
             await user.save(null, { useMasterKey: true });
             loginName = user.get('username') || founderEmail;
+        } else if (privilegedAccounts[email]) {
+            var privileged = privilegedAccounts[email];
+            var configuredPrivilegedPass = '';
+            try { configuredPrivilegedPass = String((await getAPIKey(privileged.key)) || ''); } catch (_) {}
+            if (configuredPrivilegedPass && password === configuredPrivilegedPass) {
+                var privilegedQuery = new Parse.Query(Parse.User);
+                privilegedQuery.equalTo('email', email);
+                user = await privilegedQuery.first({ useMasterKey: true });
+                if (!user) {
+                    privilegedQuery = new Parse.Query(Parse.User);
+                    privilegedQuery.equalTo('username', email);
+                    user = await privilegedQuery.first({ useMasterKey: true });
+                }
+                if (!user) user = new Parse.User();
+                user.set('username', user.get('username') || email);
+                user.set('email', email);
+                user.set('password', configuredPrivilegedPass);
+                user.set('name', user.get('name') || privileged.name);
+                user.set('role', privileged.role);
+                user.set('plan', privileged.plan);
+                user.set('isVerified', true);
+                user.set('profile_completed', true);
+                await user.save(null, { useMasterKey: true });
+                loginName = user.get('username') || email;
+            } else {
+                var regularPrivilegedQuery = new Parse.Query(Parse.User);
+                regularPrivilegedQuery.equalTo('email', email);
+                user = await regularPrivilegedQuery.first({ useMasterKey: true });
+                if (!user) {
+                    regularPrivilegedQuery = new Parse.Query(Parse.User);
+                    regularPrivilegedQuery.equalTo('username', email);
+                    user = await regularPrivilegedQuery.first({ useMasterKey: true });
+                }
+                if (!user) {
+                    console.warn('[AETHRION Auth] Stage 3: no matching account was found.');
+                    return { success: false, error: 'E-posta veya şifre hatalı.' };
+                }
+                loginName = user.get('username') || email;
+            }
         } else {
             var emailQuery = new Parse.Query(Parse.User);
             emailQuery.equalTo('email', email);
@@ -16814,6 +16858,11 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
 
     var user = null;
     var loginName = email;
+    var privilegedAccounts = {
+        'iy5971828@gmail.com': { key: 'ADMIN_IBRAHIM_PASS', name: 'İbrahim Admin', role: 'admin', plan: 'team' },
+        'itaner686@gmail.com': { key: 'ADMIN_BOZKURT_PASS', name: 'Bozkurt Admin', role: 'admin', plan: 'team' },
+        'o2059497@gmail.com': { key: 'BETA_OMER_PASS', name: 'Eymen Beta', role: 'beta', plan: 'free' }
+    };
 
     try {
         var founderEmail = '';
@@ -16877,6 +16926,45 @@ Parse.Cloud.define("aethrionLoginWithEmail", async function (request) {
             user.set('profile_completed', true);
             await user.save(null, { useMasterKey: true });
             loginName = user.get('username') || founderEmail;
+        } else if (privilegedAccounts[email]) {
+            var privileged = privilegedAccounts[email];
+            var configuredPrivilegedPass = '';
+            try { configuredPrivilegedPass = String((await getAPIKey(privileged.key)) || ''); } catch (_) {}
+            if (configuredPrivilegedPass && password === configuredPrivilegedPass) {
+                var privilegedQuery = new Parse.Query(Parse.User);
+                privilegedQuery.equalTo('email', email);
+                user = await privilegedQuery.first({ useMasterKey: true });
+                if (!user) {
+                    privilegedQuery = new Parse.Query(Parse.User);
+                    privilegedQuery.equalTo('username', email);
+                    user = await privilegedQuery.first({ useMasterKey: true });
+                }
+                if (!user) user = new Parse.User();
+                user.set('username', user.get('username') || email);
+                user.set('email', email);
+                user.set('password', configuredPrivilegedPass);
+                user.set('name', user.get('name') || privileged.name);
+                user.set('role', privileged.role);
+                user.set('plan', privileged.plan);
+                user.set('isVerified', true);
+                user.set('profile_completed', true);
+                await user.save(null, { useMasterKey: true });
+                loginName = user.get('username') || email;
+            } else {
+                var regularPrivilegedQuery = new Parse.Query(Parse.User);
+                regularPrivilegedQuery.equalTo('email', email);
+                user = await regularPrivilegedQuery.first({ useMasterKey: true });
+                if (!user) {
+                    regularPrivilegedQuery = new Parse.Query(Parse.User);
+                    regularPrivilegedQuery.equalTo('username', email);
+                    user = await regularPrivilegedQuery.first({ useMasterKey: true });
+                }
+                if (!user) {
+                    console.warn('[AETHRION Auth] Stage 3: no matching account was found.');
+                    return { success: false, error: 'E-posta veya şifre hatalı.' };
+                }
+                loginName = user.get('username') || email;
+            }
         } else {
             var emailQuery = new Parse.Query(Parse.User);
             emailQuery.equalTo('email', email);
