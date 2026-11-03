@@ -89,8 +89,44 @@
   install('openPersonalAssistant', function () { go('/aethrion-assistant.html'); });
   install('openContestPage', function () { go('/topluluk.html#contest'); });
   install('openSettingsModal', openSettingsPanel);
-  install('openAccountInfo', function () { if (!scrollTo('accountInfoModal')) go('/hesap.html'); });
-  install('openProfileModal', function () { if (!scrollTo('profileModal')) go('/hesap.html'); });
+  function openAccountProfilePanel() {
+    var modal = byId('aethrionAccountProfileModal');
+    if (!modal) {
+      modal = d.createElement('section'); modal.id = 'aethrionAccountProfileModal'; modal.className = 'modal-overlay';
+      modal.setAttribute('role', 'dialog'); modal.setAttribute('aria-modal', 'true'); modal.setAttribute('aria-labelledby', 'aeAccountProfileTitle');
+      modal.style.cssText = 'position:fixed;inset:0;z-index:2147483200;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(2,6,16,.78);backdrop-filter:blur(12px)';
+      modal.innerHTML = '<div style="width:min(680px,96vw);max-height:88vh;overflow:auto;padding:24px;border:1px solid var(--border,rgba(255,255,255,.14));border-radius:22px;background:var(--card,#111827);color:var(--text,#f4f6fb);box-shadow:0 24px 90px rgba(0,0,0,.45)"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><small style="letter-spacing:.15em;color:var(--accent2,#d8bd6a)">AETHRION ACCOUNT</small><h2 id="aeAccountProfileTitle" style="margin:7px 0">Hesap bilgilerim</h2></div><button type="button" data-ae-account-close aria-label="Kapat">✕</button></div><div id="aeAccountProfileDetails" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:20px 0"></div><div style="display:flex;flex-wrap:wrap;gap:10px"><button type="button" class="btn-secondary" data-ae-account-settings>Ayarlar</button><button type="button" class="btn-secondary" data-ae-account-security>Güvenlik</button><button type="button" class="btn-primary" data-ae-account-close>Paneli kapat</button></div></div>';
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal || e.target.closest('[data-ae-account-close]')) { modal.style.display = 'none'; modal.setAttribute('aria-hidden', 'true'); }
+        if (e.target.closest('[data-ae-account-settings]')) w.openSettingsModal();
+        if (e.target.closest('[data-ae-account-security]')) w.openParentSettings();
+      });
+      d.body.appendChild(modal);
+    }
+    var user = w.Parse && w.Parse.User && w.Parse.User.current ? w.Parse.User.current() : w.currentUser;
+    function val(key) { try { return user && typeof user.get === 'function' ? user.get(key) : user && user[key]; } catch (_) { return ''; } }
+    var saved = {}; try { saved = JSON.parse(w.localStorage.getItem('aethrion_user') || '{}') || {}; } catch (_) {}
+    var fields = [
+      ['Ad', val('name') || val('username_display') || saved.name || val('username') || '—'],
+      ['E-posta', val('email') || saved.email || '—'],
+      ['Kullanıcı adı', val('username') || saved.username || '—'],
+      ['Rol', val('role') || saved.role || 'Üye'],
+      ['Paket', val('plan') || val('subscriptionPlan') || saved.plan || 'Free'],
+      ['Üyelik', val('createdAt') ? new Date(val('createdAt')).toLocaleDateString('tr-TR') : 'Aktif']
+    ];
+    var details = byId('aeAccountProfileDetails'); if (details) {
+      details.innerHTML = '';
+      fields.forEach(function (field) {
+        var card = d.createElement('div'); card.style.cssText = 'padding:14px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:13px;background:rgba(255,255,255,.025)';
+        var label = d.createElement('small'); label.textContent = field[0]; label.style.cssText = 'display:block;color:var(--text3,#9ca3af);margin-bottom:7px';
+        var value = d.createElement('strong'); value.textContent = String(field[1]); value.style.cssText = 'overflow-wrap:anywhere';
+        card.appendChild(label); card.appendChild(value); details.appendChild(card);
+      });
+    }
+    modal.style.display = 'flex'; modal.setAttribute('aria-hidden', 'false'); return true;
+  }
+  install('openAccountInfo', openAccountProfilePanel);
+  install('openProfileModal', openAccountProfilePanel);
   install('toggleTheme', function () {
     var dark = d.documentElement.getAttribute('data-theme') !== 'dark';
     d.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
