@@ -2222,5 +2222,31 @@ function repairWorkspaceSurface(){
 function boot(){installRouter();patchWelcome();installCloseRecovery();if(logged()){document.body.classList.add('ae-shell-on');hideTrigger();customWelcome();var logo=q('.aews-logo');if(logo&&!q('img',logo))logo.innerHTML='<img src="./aethrion-mark.svg" alt="AETHRION" draggable="false">'}repairWorkspaceSurface();syncOverlayState()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 [150,500,1000,1800,3000,5000].forEach(function(t){setTimeout(boot,t)});
-if(window.MutationObserver&&document.body)new MutationObserver(function(){syncOverlayState();if(logged()){patchWelcome();installCloseRecovery();if(!document.body.classList.contains('aews-feature-view'))customWelcome();hideTrigger();repairWorkspaceSurface()}}).observe(document.body,{attributes:true,attributeFilter:['class'],childList:true,subtree:true});
+if(window.MutationObserver&&document.body){
+ var lastWorkspaceAuthState=logged();
+ var workspaceMutationQueued=false;
+ var workspaceObserver=new MutationObserver(function(records){
+  var relevant=records.some(function(record){
+   return record.type==='attributes'&&record.attributeName==='class';
+  });
+  if(!relevant||workspaceMutationQueued)return;
+  workspaceMutationQueued=true;
+  window.requestAnimationFrame(function(){
+   workspaceMutationQueued=false;
+   syncOverlayState();
+   var isLogged=logged();
+   if(isLogged&&!lastWorkspaceAuthState){
+    patchWelcome();
+    installCloseRecovery();
+    if(!document.body.classList.contains('aews-feature-view'))customWelcome();
+    hideTrigger();
+    repairWorkspaceSurface();
+   }
+   lastWorkspaceAuthState=isLogged;
+  });
+ });
+ /* Observe class-state changes only. Watching every descendant insertion caused
+    the entire workspace repair pipeline to rerun for unrelated UI updates. */
+ workspaceObserver.observe(document.body,{attributes:true,attributeFilter:['class'],subtree:true});
+}
 })();
