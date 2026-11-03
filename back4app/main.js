@@ -2287,7 +2287,7 @@ Parse.Cloud.define("superAI", async function (request) {
 
     var nvidiaKey = await getAPIKey('NVIDIA_API_KEY');
     if (nvidiaKey) {
-        console.log('🔄 KATMAN 2 - NVIDIA NIM: süre sınırı içinde en fazla 2 model deneniyor...');
+        console.log('🔄 KATMAN 2 - NVIDIA NIM: süre sınırı içinde 7 model adayı sırayla deneniyor...');
         for (var nm = 0; nm < nvidiaModels.length && aiCanContinue(); nm++) {
             try {
                 var nvidiaReply = await _aeCloudRunWithTimeout('callNvidiaNIM', { prompt: apiPrompt, model: nvidiaModels[nm] }, Math.min(4500, aiTimeLeft()));
