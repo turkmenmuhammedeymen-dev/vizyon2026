@@ -2135,11 +2135,26 @@ function userName(){try{var u=window.currentUser||(window.Parse&&Parse.User&&Par
 function feature(label){var menu=Array.isArray(window.__aethrionWorkspaceMenuFeatures)?window.__aethrionWorkspaceMenuFeatures:[];for(var m=0;m<menu.length;m++){var item=menu[m];if(item&&String(item[2]||'')===label)return{action:String(item[4]||''),href:String(item[5]||''),arg:item[6]};}var list=Array.isArray(window.FEATURE_LIST)?window.FEATURE_LIST:[];for(var i=0;i<list.length;i++){var f=list[i];if(f&&String(f.name||f.title||'')===label)return{action:String(f.action||f.onclick||''),href:String(f.href||f.url||''),arg:f.arg};}var v=fallback[label]||['',''];return{action:v[0],href:v[1],arg:''}}
 function setActive(label){qa('.aews-link').forEach(function(b){var home=b.hasAttribute('data-aews-home');b.classList.toggle('is-active',home?label==='Ana ekran':b.getAttribute('data-aews-feature')===label)})}
 function hideTrigger(){['#aethrionFeaturesTrigger','#aethrionFeaturesButton','#aethrionExperienceDrawer','#aethrionExperienceBackdrop','#aethrionFeaturesPanel','#aethrionFeaturesBackdrop','#aethrionWelcomeScreen','.aethrion-sidebar','.aethrion-sidebar-toggle','.aethrion-sidebar-backdrop'].forEach(function(s){qa(s).forEach(function(el){if(el.id==='aeWorkspaceSidebar'||el.id==='aewsMobileToggle'||el.id==='aewsMobileShade')return;if(el.parentNode)el.parentNode.removeChild(el)})})}
+function ensureWorkspaceWelcome(dash){
+ var w=q('#aethrionExperienceWelcome');
+ if(w)return w;
+ var wrap=q('.dashboard-content-wrapper',dash)||dash;
+ if(!wrap)return null;
+ w=document.createElement('section');
+ w.id='aethrionExperienceWelcome';
+ w.className='aethrion-workspace-welcome';
+ w.setAttribute('aria-label','AETHRION karşılama ekranı');
+ w.innerHTML='<div style="max-width:920px;margin:0 auto;padding:clamp(28px,6vw,72px) clamp(18px,4vw,48px);text-align:left"><div style="display:inline-flex;align-items:center;gap:9px;padding:8px 13px;border:1px solid rgba(212,175,55,.28);border-radius:999px;background:rgba(212,175,55,.07);color:#d9bd69;font-size:11px;letter-spacing:.16em;font-weight:700">AETHRION WORKSPACE</div><div style="font-size:clamp(34px,5vw,58px);line-height:1.08;font-weight:800;letter-spacing:-.04em;margin-top:26px;color:var(--text,#f4f6fb)">Intelligence <span style="color:#d7b957">Without Limits.</span></div><h1 class="aew-name" style="font-size:clamp(23px,3vw,32px);margin:24px 0 10px;color:var(--text,#f4f6fb)">Hoş geldiniz</h1><p class="aew-copy" style="max-width:660px;font-size:15px;line-height:1.85;color:var(--text3,#aab3c4)">AETHRION çalışma alanınız hazır. Başlamak için sol menüden bir özellik seçin. Seçtiğiniz özellik kendi panelinde açılır; bu karşılama ekranı Ana Ekran bölümüne dönene kadar yerini korur.</p><div class="aew-actions" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px"><div style="padding:14px 17px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:14px;background:rgba(255,255,255,.025);color:var(--text2,#c7cfdd)">✦ Yapay zekâ ve asistanlar</div><div style="padding:14px 17px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:14px;background:rgba(255,255,255,.025);color:var(--text2,#c7cfdd)">◇ Üretim ve geliştirme</div><div style="padding:14px 17px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:14px;background:rgba(255,255,255,.025);color:var(--text2,#c7cfdd)">◈ Hesap ve platform</div></div><div class="aews-home-cta" style="margin-top:34px;color:#d9bd69;font-size:13px;letter-spacing:.04em">← Sol menüden istediğiniz özelliği seçerek başlayın</div></div>';
+ wrap.insertBefore(w,wrap.firstChild);
+ return w;
+}
 function customWelcome(){
  if(!logged()||document.body.classList.contains('aews-feature-view'))return;
  document.body.classList.add('ae-shell-on','logged-in-user');
- var w=q('#aethrionExperienceWelcome'),dash=q('#dashboardArea');
- if(!w||!dash)return;
+ var dash=q('#dashboardArea');
+ if(!dash)return;
+ var w=ensureWorkspaceWelcome(dash);
+ if(!w)return;
  var wrap=q('.dashboard-content-wrapper',dash)||q('.dashboard-content',dash)||dash;
  Array.prototype.forEach.call(wrap.children,function(el){
   if(el===w){el.style.setProperty('display','none','important');return}
