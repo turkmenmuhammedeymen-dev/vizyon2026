@@ -79,7 +79,7 @@
         if (!result || result.success !== true) {
           throw new Error('Back4App Cloud Code sağlık kontrolü beklenen yanıtı vermedi.');
         }
-        var expectedBuild = '2026-11-03-community-reliability-4';
+        var expectedBuild = '2026-11-03-ai-reliability-5';
         if (result.buildId !== expectedBuild) {
           throw new Error('Back4App eski Cloud Code sürümünde. Beklenen: ' + expectedBuild + ' · Çalışan: ' + String(result.buildId || 'sürüm bilgisi yok') + '. back4app/main.js dosyasını Back4App Cloud Code bölümüne yeniden yükleyip deploy edin.');
         }
@@ -1001,24 +1001,35 @@ if (document.body && window.MutationObserver) {
 'use strict';
 var GROUP_LABELS = { CORE: 'YAPAY ZEKÂ', CREATE: 'ÜRETİM ARAÇLARI', PLATFORM: 'PLATFORM', ADVANCED: 'GELİŞTİRİCİ ARAÇLARI', ACCOUNT: 'HESAP', OTHER: 'DİĞER ÖZELLİKLER' };
 var FALLBACK_FEATURES = [
- {group:'CORE',icon:'✦',name:'AETHRION AI',desc:'Yapay zekâ çalışma alanı',action:'openFullAIPanel'},
- {group:'CORE',icon:'◈',name:'AETHRION Agents',desc:'Ajan, ekran okuma ve dosya araçları',action:'openAethrionAlPanel'},
- {group:'CORE',icon:'◎',name:'AETHRION Coach',desc:'Kişisel AI asistanı',action:'openKocPanel'},
- {group:'CORE',icon:'◉',name:'Model Kataloğu',desc:'Tanımlı model seçeneklerini incele',action:'openModelsShowcase'},
- {group:'CREATE',icon:'◇',name:'3D Studio',desc:'Üç boyutlu tasarım araçları',action:'open3DBuilder',href:'./3d-studio.html'},
- {group:'CREATE',icon:'▶',name:'Video Editör',desc:'Video düzenleme çalışma alanı',action:'openVideoEditor'},
- {group:'CREATE',icon:'▣',name:'Video Stüdyosu',desc:'Video fikirleri ve üretim araçları',action:'openVideoStudio'},
- {group:'PLATFORM',icon:'⌂',name:'Topluluk ve Takımlar',desc:'Takım ve ortak proje alanları',action:'toggleTeamPage',href:'./topluluk.html'},
- {group:'PLATFORM',icon:'▤',name:'Projelerim',desc:'Projelerine ve kayıtlarına eriş',action:'scrollToProjects'},
- {group:'ADVANCED',icon:'⌘',name:'A27 API Anahtarı',desc:'API erişim seçenekleri',action:'openA27ApiKeyGenerator',href:'./aethrion-developer.html'},
- {group:'ADVANCED',icon:'↗',name:'A27 API Rehberi',desc:'API belgeleri ve örnekler',action:'openA27ApiGuide',href:'./api.html'},
- {group:'ADVANCED',icon:'▥',name:'Dokümantasyon',desc:'Teknik belgeler ve kullanım rehberi',action:'openDocumentation',href:'./dokumantasyon.html'},
- {group:'ACCOUNT',icon:'⚙',name:'Ayarlar',desc:'Hesap ve uygulama tercihleri',action:'openSettingsModal'},
- {group:'ACCOUNT',icon:'◌',name:'Hesap bilgilerim',desc:'Profil, üyelik ve cihaz bilgileri',action:'openAccountInfo'}
+ {group:'CORE',icon:'⚡',name:'AETHRION AI',desc:'28 model birleşik gücü · tam ekran sohbet',action:'openFullAIPanel'},
+ {group:'CORE',icon:'✨',name:'AETHRION Agents',desc:'4 mod · ekran okuma · dosya araçları',action:'openAethrionAlPanel'},
+ {group:'CORE',icon:'🧭',name:'AETHRION Coach',desc:'Kişisel AI koçu ve sohbet geçmişi',action:'openKocPanel'},
+ {group:'CORE',icon:'◉',name:'Model Kataloğu',desc:'13 Ollama + 7 NVIDIA NIM + 8 bulut API',action:'openModelsShowcase'},
+ {group:'CORE',icon:'🤖',name:'AI Kişisel Asistan',desc:'JARVIS sesli asistan ve hatırlatıcılar',action:'startJarvisMode'},
+ {group:'CREATE',icon:'🧊',name:'3D Studio',desc:'Üç boyutlu tasarım ve dışa aktarma',action:'open3DBuilder',href:'./3d-studio.html'},
+ {group:'CREATE',icon:'🎬',name:'Video Editör',desc:'Timeline, kesme ve dışa aktarma',action:'openVideoEditor'},
+ {group:'CREATE',icon:'🎥',name:'Video Stüdyosu',desc:'Senaryo, Reels ve video analizi',action:'openVideoStudio'},
+ {group:'CREATE',icon:'🎨',name:'Görsel Üretimi',desc:'Görsel üretim çalışma alanı',action:'scrollToImageGen'},
+ {group:'CREATE',icon:'🖼️',name:'GIF Ara',desc:'GIF arama ve sohbete ekleme',action:'openGifPicker'},
+ {group:'PLATFORM',icon:'💼',name:'İş İlanları Mağazası',desc:'İlanları görüntüle ve başvur',action:'openJobMarket'},
+ {group:'PLATFORM',icon:'🛒',name:'A27 Puan Mağazası',desc:'Puan ve proje mağazası',action:'openMarket'},
+ {group:'PLATFORM',icon:'👥',name:'Topluluk ve Takımlar',desc:'Takım, mesajlaşma ve ortak projeler',action:'toggleTeamPage',href:'./topluluk.html'},
+ {group:'PLATFORM',icon:'📁',name:'Projelerim',desc:'Projelerini yönet ve arşivle',action:'scrollToProjects'},
+ {group:'PLATFORM',icon:'🏆',name:'Aylık Yarışma',desc:'Projeni gönder ve değerlendir',action:'openContestPage'},
+ {group:'ADVANCED',icon:'🔑',name:'A27 API Anahtarı',desc:'API anahtarı oluştur ve yönet',action:'openA27ApiKeyGenerator',href:'./aethrion-developer.html'},
+ {group:'ADVANCED',icon:'📖',name:'A27 API Rehberi',desc:'API belgeleri ve örnekler',action:'openA27ApiGuide',href:'./api.html'},
+ {group:'ADVANCED',icon:'📋',name:'Sistem Kayıtları',desc:'İstemci ve sunucu kayıtları',action:'openLogsPanel'},
+ {group:'ADVANCED',icon:'📚',name:'AETHRION Academy',desc:'Dersler, quizler ve öğrenme alanı',action:'scrollToAcademy',href:'./bana-ogret.html'},
+ {group:'ADVANCED',icon:'🛡️',name:'Ebeveyn Ayarları',desc:'Güvenli mod ve kullanım sınırları',action:'openParentSettings'},
+ {group:'ACCOUNT',icon:'👤',name:'Profilim',desc:'Hesap bilgileri ve üyelik',action:'openProfileModal'},
+ {group:'ACCOUNT',icon:'📋',name:'Hesap Bilgilerim',desc:'Oturum ve cihaz bilgileri',action:'openAccountInfo'},
+ {group:'ACCOUNT',icon:'⚙️',name:'Ayarlar',desc:'Dil, tema ve uygulama tercihleri',action:'openSettingsModal'},
+ {group:'ADVANCED',icon:'⌘',name:'Kod Editörü',desc:'Kod yazma ve geliştirme alanı',action:'openCodeEditor',href:'./kod-editoru.html'},
+ {group:'ADVANCED',icon:'▤',name:'Dokümantasyon',desc:'Teknik belgeler ve kullanım rehberi',action:'openDocumentation',href:'./dokumantasyon.html'}
 ];
 var ROUTES = {
  openAethrionAlPanel:'./aethrion-assistant.html', openVizyonAlPanel:'./aethrion-assistant.html',
- openFullAIPanel:'./aethrion-ai.html', openAethrionAI:'./aethrion-ai.html', openKocPanel:'./aethrion-assistant.html',
+ openKocPanel:'./aethrion-assistant.html',
  open3DBuilder:'./3d-studio.html', openA27ApiGuide:'./api.html', openV27ApiGuide:'./api.html',
  openA27ApiKeyGenerator:'./aethrion-developer.html', createA27ApiKey:'./aethrion-developer.html',
  openVideoEditor:'./index.html#features', openVideoStudio:'./index.html#features',
@@ -2111,23 +2122,31 @@ wire();
 (function(){
 'use strict';
 var fallback={
-'AETHRION AI':['openFullAIPanel','./aethrion-ai.html'],
-'AETHRION Agents':['openAethrionAlPanel','./aethrion-assistant.html'],
-'AETHRION Coach':['openKocPanel','./aethrion-assistant.html'],
+'AETHRION AI':['openFullAIPanel',''],
+'AETHRION Agents':['openAethrionAlPanel',''],
+'AETHRION Coach':['openKocPanel',''],
 'Model Kataloğu':['openModelsShowcase','./aethrion-ai.html#models'],
+'AI Kişisel Asistan':['startJarvisMode',''],
 '3D Studio':['open3DBuilder','./3d-studio.html'],
 'Video Editör':['openVideoEditor',''],
 'Video Stüdyosu':['openVideoStudio',''],
 'Görsel Üretimi':['scrollToImageGen',''],
-'Kod Editörü':['openCodeEditor','./kod-editoru.html'],
-'Topluluk':['toggleTeamPage','./topluluk.html'],
+'GIF Ara':['openGifPicker',''],
+'İş İlanları Mağazası':['openJobMarket',''],
+'A27 Puan Mağazası':['openMarket',''],
+'Topluluk ve Takımlar':['toggleTeamPage','./topluluk.html'],
 'Projelerim':['scrollToProjects',''],
-'Akademi':['openAcademy','./bana-ogret.html'],
-'A27 API':['openA27ApiKeyGenerator','./aethrion-developer.html'],
-'API Belgeleri':['openA27ApiGuide','./api.html'],
-'Dokümantasyon':['openDocumentation','./dokumantasyon.html'],
+'Aylık Yarışma':['openContestPage','./topluluk.html'],
+'A27 API Anahtarı':['openA27ApiKeyGenerator','./aethrion-developer.html'],
+'A27 API Rehberi':['openA27ApiGuide','./api.html'],
+'Sistem Kayıtları':['openLogsPanel',''],
+'AETHRION Academy':['scrollToAcademy','./bana-ogret.html'],
+'Ebeveyn Ayarları':['openParentSettings',''],
+'Profilim':['openProfileModal',''],
+'Hesap Bilgilerim':['openAccountInfo',''],
 'Ayarlar':['openSettingsModal',''],
-'Hesap bilgilerim':['openAccountInfo',''],
+'Kod Editörü':['openCodeEditor','./kod-editoru.html'],
+'Dokümantasyon':['openDocumentation','./dokumantasyon.html'],
 'Oturumu kapat':['doLogout','']
 };
 function q(s,r){return(r||document).querySelector(s)}
