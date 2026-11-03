@@ -4550,10 +4550,10 @@ Parse.Cloud.define("getInboxItems", async function (request) {
     var receiverEmail = String(user.get('email') || '').trim().toLowerCase();
     if (!receiverEmail) throw new Error('Hesap e-posta adresi bulunamadı.');
     var query = new Parse.Query(Inbox);
-    // Legacy invitations may contain mixed-case addresses. Match the complete
-    // email case-insensitively so older records remain visible after normalization.
-    var escapedReceiverEmail = receiverEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\    var query = new Parse.Query(Inbox);
-    query.equalTo('receiver_email', receiverEmail);
+    // Legacy invitations may contain mixed-case addresses. Match the full email
+    // case-insensitively so older records remain visible after normalization.
+    var escapedReceiverEmail = receiverEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    query.matches('receiver_email', '^' + escapedReceiverEmail + '$', 'i');
     query.descending('createdAt');
     query.limit(100);
 
