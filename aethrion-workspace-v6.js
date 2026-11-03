@@ -14,7 +14,7 @@ var fallback={
 'Topluluk':['toggleTeamPage','/topluluk.html'],
 'Projelerim':['scrollToProjects',''],
 'Akademi':['openAcademy','/bana-ogret.html'],
-'A27 API':['openA27ApiKeyGenerator','/api.html#keys'],
+'A27 API':['openA27ApiKeyGenerator','/aethrion-developer.html'],
 'API Belgeleri':['openA27ApiGuide','/api.html'],
 'Dokümantasyon':['openDocumentation','/dokumantasyon.html'],
 'Ayarlar':['openSettingsModal',''],
