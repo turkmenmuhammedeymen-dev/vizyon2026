@@ -46,8 +46,8 @@
   install('openModelsShowcase', function () { go('/aethrion-ai.html#models'); });
   install('open3DBuilder', function () { go('/3d-studio.html'); });
   install('open3DStudio', function () { go('/3d-studio.html'); });
-  install('openVideoEditor', function () { go('/video-editor.html'); });
-  install('openVideoStudio', function () { go('/video-studio.html'); });
+  install('openVideoEditor', function () { var p = byId('videoEditorOverlay'); if (!p) { go('/index.html#features'); return false; } p.classList.add('open', 'active'); p.style.setProperty('display', 'flex', 'important'); p.style.setProperty('visibility', 'visible', 'important'); p.style.setProperty('pointer-events', 'auto', 'important'); p.style.setProperty('position', 'fixed', 'important'); p.style.setProperty('inset', '0', 'important'); p.style.setProperty('z-index', '2147482000', 'important'); p.style.setProperty('overflow', 'auto', 'important'); d.body.style.overflow = 'hidden'; return true; });
+  install('openVideoStudio', function () { var opened = w.openVideoEditor(); var title = d.querySelector('#videoEditorOverlay .video-editor-title span'); if (title) title.textContent = 'VİDEO STÜDYOSU'; return opened; });
   install('openCodeEditor', function () { go('/kod-editoru.html'); });
   install('openAcademy', function () { go('/bana-ogret.html'); });
   install('openDocumentation', function () { go('/dokumantasyon.html'); });
@@ -55,7 +55,7 @@
   install('openV27ApiGuide', function () { go('/api.html'); });
   install('openV27ApiKeyGenerator', function () { go('/api.html#keys'); });
   install('openA27ApiKeyGenerator', function () { go('/api.html#keys'); });
-  install('openJobMarket', function () { go('/is-ilanlari.html'); });
+  install('openJobMarket', function () { var p = byId('jobMarketOverlay'); if (!p) { go('/index.html#features'); return false; } p.classList.add('open', 'active'); p.style.setProperty('display', 'flex', 'important'); p.style.setProperty('visibility', 'visible', 'important'); p.style.setProperty('pointer-events', 'auto', 'important'); p.style.setProperty('position', 'fixed', 'important'); p.style.setProperty('inset', '0', 'important'); p.style.setProperty('z-index', '2147482000', 'important'); p.style.setProperty('overflow', 'auto', 'important'); d.body.style.overflow = 'hidden'; return true; });
   install('toggleTeamPage', function () { go('/topluluk.html'); });
   install('openPersonalAssistant', function () { go('/aethrion-assistant.html'); });
   install('openContestPage', function () { go('/topluluk.html#contest'); });
@@ -174,7 +174,7 @@
   install('refreshAssistantSummary', function () { w.location.reload(); });
   install('exportVideo', function () { w.showNotification && w.showNotification('Önce video çalışma alanını açın.', 'warning'); });
   install('saveVideoDraft', function () { w.showNotification && w.showNotification('Önce video çalışma alanını açın.', 'warning'); });
-  install('closeVideoEditor', function () { var p = byId('videoEditorModal'); if (p) p.style.display = 'none'; else go('/index.html#features'); });
+  install('closeVideoEditor', function () { var p = byId('videoEditorOverlay'); if (p) { p.style.setProperty('display', 'none', 'important'); p.style.setProperty('visibility', 'hidden', 'important'); p.style.setProperty('pointer-events', 'none', 'important'); p.classList.remove('open', 'active'); } d.body.style.overflow = ''; });
   install('videoEditorPlay', function () { var v = byId('videoPreview'); if (v && v.play) v.play(); });
   install('videoEditorPause', function () { var v = byId('videoPreview'); if (v && v.pause) v.pause(); });
   install('videoEditorReset', function () { var v = byId('videoPreview'); if (v) { v.pause(); v.currentTime = 0; } });
@@ -237,10 +237,10 @@
     return true;
   });
   install('openCategoryPanel', function (name) { return w.openCategory(name); });
-  install('openJobCreateForm', function () { go('/topluluk.html'); });
-  install('closeJobMarket', function () { var p = byId('jobMarketModal'); if (p) p.style.display = 'none'; else go('/topluluk.html'); });
+  install('openJobCreateForm', function () { var p = byId('jobCreateOverlay'); if (!p) return w.openJobMarket(); p.classList.add('open', 'active'); p.style.setProperty('display', 'flex', 'important'); p.style.setProperty('visibility', 'visible', 'important'); p.style.setProperty('pointer-events', 'auto', 'important'); p.style.setProperty('position', 'fixed', 'important'); p.style.setProperty('inset', '0', 'important'); p.style.setProperty('z-index', '2147482001', 'important'); p.style.setProperty('overflow', 'auto', 'important'); d.body.style.overflow = 'hidden'; return true; });
+  install('closeJobMarket', function () { var p = byId('jobMarketOverlay'); if (p) { p.style.setProperty('display', 'none', 'important'); p.style.setProperty('visibility', 'hidden', 'important'); p.style.setProperty('pointer-events', 'none', 'important'); p.classList.remove('open', 'active'); } d.body.style.overflow = ''; });
   install('loadJobMarket', function () { go('/topluluk.html'); });
-  install('closeJobCreateForm', function () { var p = byId('jobCreateModal'); if (p) p.style.display = 'none'; else go('/topluluk.html'); });
+  install('closeJobCreateForm', function () { var p = byId('jobCreateOverlay'); if (p) { p.style.setProperty('display', 'none', 'important'); p.style.setProperty('visibility', 'hidden', 'important'); p.style.setProperty('pointer-events', 'none', 'important'); p.classList.remove('open', 'active'); } d.body.style.overflow = ''; });
   install('submitJobCreate', function () { w.showNotification && w.showNotification('İlan oluşturmak için Topluluk bölümünü açın.', 'warning'); go('/topluluk.html'); });
   install('openJobEdit', function () { go('/topluluk.html'); });
   install('deleteJobListing', function () { go('/topluluk.html'); });
