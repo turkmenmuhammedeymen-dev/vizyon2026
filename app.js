@@ -2033,7 +2033,7 @@ var CORE=[
 ['ADMIN','🛡️','Admin Sistem Durumu','Platform ve servis tanıları','','./aethrion-status.html','','admin'],
 ['ADMIN','🧾','Admin Proje Denetimi','Yetkili proje denetim kayıtları','','./aethrion-project-audit.html','','admin'],
 ['ADMIN','👥','Admin Takım Yönetimi','Takım ve üye yönetimi','','./aethrion-teams.html','','admin'],
-['ADMIN','📋','Admin Logs Paneli','Sistem olayları ve kayıtlar','openLogsPanel','','','admin'],
+['ADMIN','📋','Admin Logs Paneli','Sistem olayları ve kayıtlar','','./aethrion-status.html','','admin'],
 ['MODERATÖR','🎬','Video Kesit Aracı','Moderatör video kesit ve analiz aracı','openModeratorVideoTool','','','moderator'],
 ['MODERATÖR','📨','Proje Talepleri','Moderatöre yönlendirilen proje talepleri','scrollToProjectRequests','','','moderator'],
 ['BETA','⚡','Beta Model Erişimi','Beta üyelerine tanımlı gelişmiş model erişimi','openModelsShowcase','','','beta'],
