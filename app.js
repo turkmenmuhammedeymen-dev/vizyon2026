@@ -2162,7 +2162,7 @@ function renderHomeCatalog(w){
  source.forEach(function(item){
   if(!Array.isArray(item))return;
   var group=String(item[0]||'OTHER'),icon=String(item[1]||'✦'),name=String(item[2]||'').trim(),desc=String(item[3]||'AETHRION çalışma alanı'),action=String(item[4]||''),href=String(item[5]||'');
-  if(!name||!action||group==='KATEGORİLER'||action==='openCategoryPanel')return;
+  if(!name||(!action&&!href)||group==='KATEGORİLER'||action==='openCategoryPanel')return;
   /* The shared action router can resolve aliases and safe fallback routes. */
   if(!href&&typeof window[action]!=='function'&&typeof window.safeFeatureCall!=='function')return;
   (groups[group]||(groups[group]=[])).push({icon:icon,name:name,desc:desc,action:action});
