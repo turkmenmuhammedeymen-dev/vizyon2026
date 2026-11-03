@@ -2188,7 +2188,7 @@ function showStage(label,desc,href){
  if(frame)frame.addEventListener('load',function(){try{var d=frame.contentDocument;if(!d)return;var st=d.createElement('style');st.textContent='html,body{min-height:100%!important;background:#f5f8fc!important;color:#172b43!important}body{padding:0 0 20px!important;overflow-x:hidden!important}#aeWorkspaceSidebar,#aewsMobileToggle,#aewsMobileShade,#aethrionWorkspaceSidebar,#aethrionWorkspaceMobileToggle,#aethrionWorkspaceScrim{display:none!important}body.ae-shell-on #mainSite{display:block!important}body.ae-shell-on #dashboardArea{width:100%!important;max-width:none!important;margin:0!important;padding:12px!important}body.ae-shell-on #dashboardArea .dashboard-content-wrapper{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}.navbar,.top-nav,.main-nav,header.site-header,.site-header,footer,.site-footer{box-shadow:none!important}';d.head.appendChild(st)}catch(e){}},{once:true});
  isolateStage();
 }
-function goBack(){var selectors='[aria-modal="true"],[role="dialog"],.modal-overlay,.modal.show,#kocPanelOverlay,#vizyonAlPanel,#aethrionAiPanel';var list=qa(selectors);for(var i=list.length-1;i>=0;i--){var el=list[i];var st=window.getComputedStyle(el);if(st.display==='none'||st.visibility==='hidden'||st.opacity==='0')continue;var close=q('[data-dismiss],[data-bs-dismiss],.modal-close,.close-modal,.close-btn,[aria-label*="kapat" i],[aria-label*="close" i]',el);if(close){close.click();return}el.style.setProperty('display','none','important');el.setAttribute('aria-hidden','true');return}home()}
+function goBack(){var selectors='[aria-modal="true"],[role="dialog"],.modal-overlay,.modal.show,#kocPanelOverlay,#vizyonAlPanel,#aethrionAiPanel,#videoEditorOverlay,#jobMarketOverlay,#jobCreateOverlay,#jobDetailOverlay,#modelsShowcaseOverlay,#categoryPanelModal';var list=qa(selectors);for(var i=list.length-1;i>=0;i--){var el=list[i];var st=window.getComputedStyle(el);if(st.display==='none'||st.visibility==='hidden'||st.opacity==='0')continue;var close=q('[data-dismiss],[data-bs-dismiss],.modal-close,.close-modal,.close-btn,[aria-label*="kapat" i],[aria-label*="close" i],[onclick*="closeVideoEditor"],[onclick*="closeJobMarket"],[onclick*="closeJobCreateForm"],[onclick*="closeJobDetail"],[onclick*="closeCategoryPanel"],[onclick*="closeModelsShowcase"]',el);if(close){close.click();return}el.style.setProperty('display','none','important');el.setAttribute('aria-hidden','true');return}home()}
 function home(){document.body.classList.remove('aews-nav-open','aews-feature-view');var stage=q('#aethrionWorkspaceStage');if(stage)stage.style.setProperty('display','none','important');if(typeof window.showWelcome==='function')window.showWelcome();setTimeout(customWelcome,35);setActive('Ana ekran')}
 function openFeature(label){
  var f=feature(label);document.body.classList.remove('aews-nav-open');setActive(label);
@@ -2239,7 +2239,7 @@ function overlayIsVisible(el){
  return s.display!=='none'&&s.visibility!=='hidden'&&s.opacity!=='0'&&el.getAttribute('aria-hidden')!=='true';
 }
 function syncOverlayState(){
- var selectors=['#fullAIPanel','#kocPanelOverlay','#vizyonAlPanel','#aethrionAlPanel','#full3DBuilder','#videoEditorOverlay','#voiceChatFullscreen','#vzVoiceFullscreen','.modal-overlay.open'];
+ var selectors=['#fullAIPanel','#kocPanelOverlay','#vizyonAlPanel','#aethrionAlPanel','#full3DBuilder','#videoEditorOverlay','#jobMarketOverlay','#jobCreateOverlay','#jobDetailOverlay','#modelsShowcaseOverlay','#categoryPanelModal','#voiceChatFullscreen','#vzVoiceFullscreen','.modal-overlay.open'];
  var active=selectors.some(function(sel){return qa(sel).some(overlayIsVisible)});
  document.body.classList.toggle('ae-overlay-active',active);
 }
@@ -2254,11 +2254,11 @@ function restoreWorkspaceAfterClose(){
  customWelcome();syncOverlayState();
 }
 function overlayStillOpen(){
- var selectors=['#fullAIPanel','#kocPanelOverlay','#vizyonAlPanel','#aethrionAlPanel','#full3DBuilder','#videoEditorOverlay','#voiceChatFullscreen','#vzVoiceFullscreen','.modal-overlay.open'];
+ var selectors=['#fullAIPanel','#kocPanelOverlay','#vizyonAlPanel','#aethrionAlPanel','#full3DBuilder','#videoEditorOverlay','#jobMarketOverlay','#jobCreateOverlay','#jobDetailOverlay','#modelsShowcaseOverlay','#categoryPanelModal','#voiceChatFullscreen','#vzVoiceFullscreen','.modal-overlay.open'];
  return selectors.some(function(sel){return qa(sel).some(overlayIsVisible)});
 }
 function installCloseRecovery(){
- ['closeFullAIPanel','closeAethrionAlPanel','closeVizyonAlPanel','closeKocPanel','close3DBuilder','closeVideoEditor','closeVideoStudio','closeVoiceChatFullscreen','closeVizyonAlScreenRead','closeAethrionAiPanel'].forEach(function(name){
+ ['closeFullAIPanel','closeAethrionAlPanel','closeVizyonAlPanel','closeKocPanel','close3DBuilder','closeVideoEditor','closeVideoStudio','closeVoiceChatFullscreen','closeVizyonAlScreenRead','closeAethrionAiPanel','closeCategoryPanel','closeModelsShowcase','closeJobMarket','closeJobDetail','closeJobCreateForm'].forEach(function(name){
   var original=window[name];if(typeof original!=='function'||original.__aeV6CloseWrapped)return;
   var wrapped=function(){var result=original.apply(this,arguments);setTimeout(restoreWorkspaceAfterClose,90);return result};
   wrapped.__aeV6CloseWrapped=true;wrapped.__aeV6Original=original;window[name]=wrapped;
