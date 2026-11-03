@@ -22,11 +22,12 @@
       return u && (u.get('email') || u.get('username')) || '';
     } catch (e) { return ''; }
   }
+  function anyJobOverlayOpen() { return ['jobMarketOverlay', 'jobDetailOverlay', 'jobCreateOverlay'].some(function (id) { var n = byId(id); return n && n.style.display !== 'none' && n.style.visibility !== 'hidden'; }); }
   function setOverlay(id, visible, zIndex) {
     var node = byId(id);
     if (!node) return null;
     if (visible) {
-      state.priorOverflow = d.body.style.overflow || '';
+      if (!anyJobOverlayOpen()) state.priorOverflow = d.body.style.overflow || '';
       node.classList.add('open', 'active');
       node.style.setProperty('display', 'flex', 'important');
       node.style.setProperty('visibility', 'visible', 'important');
@@ -41,7 +42,7 @@
       node.style.setProperty('display', 'none', 'important');
       node.style.setProperty('visibility', 'hidden', 'important');
       node.style.setProperty('pointer-events', 'none', 'important');
-      d.body.style.overflow = state.priorOverflow;
+      if (!anyJobOverlayOpen()) d.body.style.overflow = state.priorOverflow;
     }
     return node;
   }
