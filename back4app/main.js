@@ -11353,36 +11353,6 @@ async function _aeWriteTeamAudit(user, teamId, action, targetId, targetLabel) {
         return false;
     }
 }
-, 'i');
-    query.descending('createdAt');
-    query.limit(100);
-
-    try {
-        var results = await query.find({ useMasterKey: true });
-        return results.map(function (obj) {
-            return {
-                id: obj.id,
-                sender_email: obj.get('sender_email') || 'Sistem',
-                type: obj.get('type') || 'notification',
-                message: obj.get('message') || '',
-                status: obj.get('status') || '',
-                request_id: obj.get('request_id') || '',
-                project_title: obj.get('project_title') || '',
-                project_type: obj.get('project_type') || '',
-                project_description: obj.get('project_description') || '',
-                role: obj.get('role') || '',
-                package_type: obj.get('package_type') || '',
-                team_id: obj.get('team_id') || '',
-                team_name: obj.get('team_name') || '',
-                project_id: obj.get('project_id') || '',
-                created_at: obj.createdAt ? obj.createdAt.toISOString() : new Date().toISOString()
-            };
-        });
-    } catch (e) {
-        console.error('getInboxItems hatası:', String(e && e.message || e).slice(0, 240));
-        throw new Error('Gelen kutusu şu anda yüklenemedi. Sunucu bağlantısını ve Inbox şemasını kontrol edip tekrar deneyin.');
-    }
-});
 
 
 // ================================================================
