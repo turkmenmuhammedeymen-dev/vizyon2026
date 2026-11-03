@@ -2288,11 +2288,11 @@ Parse.Cloud.define("superAI", async function (request) {
     var nvidiaKey = await getAPIKey('NVIDIA_API_KEY');
     if (nvidiaKey) {
         console.log('🔄 KATMAN 2 - NVIDIA NIM: süre sınırı içinde en fazla 2 model deneniyor...');
-        for (var nm = 0; nm < Math.min(nvidiaModels.length, 2) && aiCanContinue(); nm++) {
+        for (var nm = 0; nm < nvidiaModels.length && aiCanContinue(); nm++) {
             try {
-                var nvidiaReply = await _aeCloudRunWithTimeout('callNvidiaNIM', { prompt: apiPrompt, model: nvidiaModels[nm] }, Math.min(7500, aiTimeLeft()));
+                var nvidiaReply = await _aeCloudRunWithTimeout('callNvidiaNIM', { prompt: apiPrompt, model: nvidiaModels[nm] }, Math.min(4500, aiTimeLeft()));
                 if (nvidiaReply && nvidiaReply.length > 10) { console.log('✅ NIM: ' + nvidiaModels[nm]); return cleanResponse(nvidiaReply); }
-            } catch (e) {}
+            } catch (e) { console.error('❌ NIM ' + nvidiaModels[nm] + ' başarısız:', String(e && e.message || e)); }
         }
     }
 
@@ -2303,7 +2303,7 @@ Parse.Cloud.define("superAI", async function (request) {
         try {
             var result2 = await _aeCloudRunWithTimeout(model, { prompt: apiPrompt }, Math.min(7500, aiTimeLeft()));
             if (result2 && result2.length > 10) { console.log('✅ ' + model); return cleanResponse(result2); }
-        } catch (e) { console.error('❌ ' + model + ' başarısız'); }
+        } catch (e) { console.error('❌ ' + model + ' başarısız:', String(e && e.message || e)); }
     }
 
     return '🧠 AETHRION AI: Üzgünüm, tüm modeller şu anda cevap veremiyor.';
