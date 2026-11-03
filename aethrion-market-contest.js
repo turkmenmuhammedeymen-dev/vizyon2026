@@ -27,8 +27,8 @@
   overlay.addEventListener('click',function(e){if(e.target===overlay){if(id==='marketModal')w.closeMarket();else w.closeContestPage()}});
   d.body.appendChild(overlay);return overlay;
  }
- function openOverlay(overlay){state.previousOverflow=d.body.style.overflow||'';overlay.classList.add('open');overlay.style.setProperty('display','flex','important');overlay.setAttribute('aria-hidden','false');d.body.style.overflow='hidden'}
- function closeOverlay(overlay){if(!overlay)return;overlay.classList.remove('open');overlay.style.setProperty('display','none','important');overlay.setAttribute('aria-hidden','true');d.body.style.overflow=state.previousOverflow||''}
+ function openOverlay(overlay){var active=(byId('marketModal')&&byId('marketModal').classList.contains('open'))||(byId('contestPage')&&byId('contestPage').classList.contains('open'));if(!active)state.previousOverflow=d.body.style.overflow||'';var other=overlay.id==='marketModal'?byId('contestPage'):byId('marketModal');if(other){other.classList.remove('open');other.style.setProperty('display','none','important');other.setAttribute('aria-hidden','true')}overlay.classList.add('open');overlay.style.setProperty('display','flex','important');overlay.setAttribute('aria-hidden','false');d.body.style.overflow='hidden'}
+ function closeOverlay(overlay){if(!overlay)return;overlay.classList.remove('open');overlay.style.setProperty('display','none','important');overlay.setAttribute('aria-hidden','true');var another=(byId('marketModal')&&byId('marketModal')!==overlay&&byId('marketModal').classList.contains('open'))||(byId('contestPage')&&byId('contestPage')!==overlay&&byId('contestPage').classList.contains('open'))||(byId('kocPanelOverlay')&&byId('kocPanelOverlay').classList.contains('open'))||(byId('vizyonAlPanel')&&byId('vizyonAlPanel').classList.contains('open'));d.body.style.overflow=another?'hidden':(state.previousOverflow||'')}
  function ensureMarket(){
   var overlay=makeOverlay('marketModal','🛒 A27 Puan Pazarı'),shell=overlay.querySelector('.ae-mc-shell');
   if(byId('marketItems'))return overlay;
@@ -120,7 +120,7 @@
   var host=byId('contestProjectsFounderList');if(!host||role()!=='founder')return;host.textContent='Projeler yükleniyor…';
   try{var result=await cloud('getContestProjectsForFounder',{});state.projects=result&&Array.isArray(result.projects)?result.projects:[];w.contestProjectsFounderCache=state.projects;host.textContent='';
    if(!state.projects.length){host.appendChild(el('div','ae-mc-empty','Henüz değerlendirme bekleyen proje yok.'));return}
-   state.projects.forEach(function(p){var card=el('article','ae-mc-project');card.appendChild(el('h4','',String(p.project_name||'İsimsiz proje')));card.appendChild(el('p','ae-mc-muted','Katılımcı: '+String(p.user_name||'Üye')+' · '+(p.reviewed?'Değerlendirildi':'Değerlendirme bekliyor')));
+   state.projects.forEach(function(p){var card=el('article','ae-mc-project');card.setAttribute('data-project-id',p.id);card.appendChild(el('h4','',String(p.project_name||'İsimsiz proje')));card.appendChild(el('p','ae-mc-muted','Katılımcı: '+String(p.user_name||'Üye')+' · '+(p.reviewed?'Değerlendirildi':'Değerlendirme bekliyor')));
     var pre=el('pre','',String(p.code||''));card.appendChild(pre);
     var actions=el('div','ae-mc-actions'),score=el('input','ae-mc-score');score.type='number';score.min='1';score.max='10000';score.value=String(p.points||100);score.setAttribute('aria-label','Proje puanı');
     var save=el('button','ae-mc-btn','Puanı kaydet');save.type='button';save.addEventListener('click',function(){w.saveContestScore(p.id,score.value)});actions.appendChild(score);actions.appendChild(save);card.appendChild(actions);host.appendChild(card);
@@ -163,7 +163,7 @@
   catch(e){notify(String(e.message||e),'error');return false}
  }
  function reviewContestProject(id){var p=state.projects.find(function(x){return x.id===id});if(!p)return false;notify('Proje kodu değerlendirme kartında görüntüleniyor.','info');return true}
- function openContestScore(id){var card=Array.from((byId('contestProjectsFounderList')||d).querySelectorAll('.ae-mc-project')).find(function(x){return x.querySelector('button')&&x.textContent.includes(id)});if(card){var input=card.querySelector('input');if(input)input.focus()}}
+ function openContestScore(id){var cards=(byId('contestProjectsFounderList')||d).querySelectorAll('.ae-mc-project');for(var i=0;i<cards.length;i++){if(cards[i].getAttribute('data-project-id')===id){var input=cards[i].querySelector('input');if(input)input.focus();return true}}return false}
  w.openMarket=openMarket;w.closeMarket=closeMarket;w.loadMarket=loadMarket;w.renderMarketItems=renderMarketItems;w.filterMarket=filterMarket;w.buyMarketProject=buyMarketProject;w.removeFromMarket=removeFromMarket;w.viewMarketProject=function(id){var p=state.market.find(function(x){return x.id===id});if(p)notify(String(p.title||'Proje')+' · '+String(p.description||''),'info')};
  w.openContestPage=openContestPage;w.closeContestPage=closeContestPage;w.loadContestPageData=loadContestPageData;w.loadContestRankingV2=loadContestRankingV2;
  w.openContestJoinWarning=openContestJoinWarning;w.confirmContestJoin=confirmContestJoin;w.openContestProjectForm=openContestProjectForm;w.closeContestProjectForm=closeContestProjectForm;w.submitContestProject=submitContestProject;
