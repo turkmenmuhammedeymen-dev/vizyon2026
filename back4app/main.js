@@ -3804,8 +3804,8 @@ Parse.Cloud.define("adminLogin", async function (request) {
     if (!correctPass) throw new Error('Admin şifresi tanımlı değil!');
 
     try {
-        await Parse.User.logIn(admin.email, password);
-        return { success: true, name: admin.name, email: admin.email, role: 'admin' };
+        var authenticatedUser = await Parse.User.logIn(admin.email, password);
+        return { success: true, sessionToken: authenticatedUser.getSessionToken(), userId: authenticatedUser.id, name: admin.name, email: admin.email, role: 'admin' };
     } catch (e) {
         if (e.code === 101 && request.master) {
             var query = new Parse.Query(Parse.User);
@@ -3850,8 +3850,8 @@ Parse.Cloud.define("betaLogin", async function (request) {
     if (!correctPass) throw new Error('Beta şifresi tanımlı değil!');
 
     try {
-        await Parse.User.logIn(beta.email, password);
-        return { success: true, name: beta.name, email: beta.email, role: 'beta' };
+        var authenticatedUser = await Parse.User.logIn(beta.email, password);
+        return { success: true, sessionToken: authenticatedUser.getSessionToken(), userId: authenticatedUser.id, name: beta.name, email: beta.email, role: 'beta' };
     } catch (e) {
         if (e.code === 101 && request.master) {
             var query = new Parse.Query(Parse.User);
@@ -3890,8 +3890,8 @@ Parse.Cloud.define("founderLogin", async function (request) {
     if (!correctPass) throw new Error('Founder şifresi tanımlı değil!');
 
     try {
-        await Parse.User.logIn(founderEmail, password);
-        return { success: true, name: 'Eymen', email: founderEmail, role: 'founder' };
+        var authenticatedUser = await Parse.User.logIn(founderEmail, password);
+        return { success: true, sessionToken: authenticatedUser.getSessionToken(), userId: authenticatedUser.id, name: 'Eymen', email: founderEmail, role: 'founder' };
     } catch (e) {
         if (e.code === 101 && request.master) {
             var query = new Parse.Query(Parse.User);
