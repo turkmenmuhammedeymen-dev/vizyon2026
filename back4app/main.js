@@ -439,8 +439,32 @@ async function getAethrionConfigValue(keyName, options) {
     }
 }
 
+var AETHRION_CONFIG_KEY_ALIASES = {
+    COLAB_LLAMA_URL: ['OLLAMA_URL', 'OLLAMA_BASE_URL', 'COLAB_OLLAMA_URL', 'LLAMA_API_URL'],
+    NVIDIA_API_KEY: ['NVIDIA_NIM_API_KEY', 'NVIDIA_KEY', 'NIM_API_KEY'],
+    NVIDIA_BASE_URL: ['NVIDIA_NIM_BASE_URL', 'NIM_BASE_URL'],
+    NVIDIA_NIM_BASE_URL: ['NVIDIA_BASE_URL', 'NIM_BASE_URL'],
+    GROQ_KEY: ['GROQ_API_KEY'],
+    GEMINI_KEY: ['GEMINI_API_KEY', 'GOOGLE_AI_API_KEY', 'GOOGLE_API_KEY'],
+    DEEPSEEK_KEY: ['DEEPSEEK_API_KEY'],
+    DEEPINFRA_KEY: ['DEEPINFRA_API_KEY'],
+    OPENAI_KEY: ['OPENAI_API_KEY'],
+    CEREBRAS_KEY: ['CEREBRAS_API_KEY'],
+    OPENROUTER_KEY: ['OPENROUTER_API_KEY'],
+    COHERE_KEY: ['COHERE_API_KEY']
+};
 async function getAPIKey(keyName) {
-    return getAethrionConfigValue(keyName);
+    var value = await getAethrionConfigValue(keyName);
+    if (value !== null && value !== undefined && String(value).trim()) return value;
+    var aliases = AETHRION_CONFIG_KEY_ALIASES[keyName] || [];
+    for (var ai = 0; ai < aliases.length; ai++) {
+        value = await getAethrionConfigValue(aliases[ai]);
+        if (value !== null && value !== undefined && String(value).trim()) {
+            console.warn('[AETHRION Config] ' + keyName + ' anahtarı ' + aliases[ai] + ' adıyla bulundu.');
+            return value;
+        }
+    }
+    return null;
 }
 
 async function getPrivateFounderPass() {
@@ -943,7 +967,7 @@ Parse.Cloud.define("initSchemas", async function (request) {
 // ================================================================
 // ========== TEMEL FONKSİYONLAR ==================================
 // ================================================================
-var AETHRION_CLOUD_BUILD_ID = '2026-11-03-community-reliability-4';
+var AETHRION_CLOUD_BUILD_ID = '2026-11-03-ai-reliability-5';
 Parse.Cloud.define("test", async function (request) {
     return {
         success: true,
@@ -1701,7 +1725,7 @@ Parse.Cloud.define("callGroq", async function (request) {
             method: "POST",
             headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: "llama-3.3-70b-instruct",
+                model: "openai/gpt-oss-120b",
                 messages: [{ role: 'user', content: prompt }],
                 temperature: 0.7, max_tokens: 1000
             })
@@ -1718,11 +1742,11 @@ Parse.Cloud.define("callDeepSeek", async function (request) {
     var key = await getAPIKey('DEEPSEEK_KEY');
     if (!key) return null;
     try {
-        var res = await fetch("https://api.deepseek.com/v1/chat/completions", {
+        var res = await fetch("https://api.deepseek.com/chat/completions", {
             method: "POST",
             headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: "deepseek-chat",
+                model: "deepseek-v4-flash",
                 messages: [{ role: 'user', content: prompt }],
                 temperature: 0.7, max_tokens: 1000
             })
@@ -1743,7 +1767,7 @@ Parse.Cloud.define("callDeepInfra", async function (request) {
             method: "POST",
             headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: "meta-llama/Meta-Llama-3.1-70B-Instruct",
+                model: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
                 messages: [{ role: 'user', content: prompt }],
                 temperature: 0.7, max_tokens: 1000
             })
@@ -1786,11 +1810,11 @@ Parse.Cloud.define("callOpenRouter", async function (request) {
             headers: {
                 'Authorization': 'Bearer ' + key,
                 'Content-Type': 'application/json',
-                'HTTP-Referer': 'https://vizyon2026.vercel.app',
+                'HTTP-Referer': 'https://turkmenmuhammedeymen-dev.github.io/vizyon2026/',
                 'X-Title': 'AETHRION'
             },
             body: JSON.stringify({
-                model: "meta-llama/llama-3.1-8b-instruct:free",
+                model: "openrouter/free",
                 messages: [{ role: 'user', content: prompt }],
                 temperature: 0.7, max_tokens: 1000
             })
@@ -1807,11 +1831,11 @@ Parse.Cloud.define("callCohere", async function (request) {
     var key = await getAPIKey('COHERE_KEY');
     if (!key) return null;
     try {
-        var res = await fetch("https://api.cohere.ai/v2/chat", {
+        var res = await fetch("https://api.cohere.com/v2/chat", {
             method: "POST",
             headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: "command-r-plus-08-2024",
+                model: "command-a-plus-05-2026",
                 messages: [{ role: 'user', content: prompt }],
                 temperature: 0.7, max_tokens: 1000
             })
@@ -1833,7 +1857,7 @@ Parse.Cloud.define("callCerebras", async function (request) {
             method: "POST",
             headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: "llama-3.3-70b-instruct",
+                model: "openai/gpt-oss-120b",
                 messages: [{ role: 'user', content: prompt }],
                 temperature: 0.7, max_tokens: 1000
             })
@@ -1852,7 +1876,7 @@ Parse.Cloud.define("callGemini", async function (request) {
     var key = await getAPIKey('GEMINI_KEY');
     if (!key) return null;
     try {
-        var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=' + key;
+        var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + key;
         var res = await fetch(url, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
@@ -1878,7 +1902,7 @@ Parse.Cloud.define("callLocalLlama", async function (request) {
     var modelName = request.params.model || 'qwen2.5:latest';
     var localUrl = await getAPIKey('COLAB_LLAMA_URL');
     if (!localUrl) { console.log('⚠️ COLAB_LLAMA_URL yok, atlanıyor.'); return null; }
-    if (localUrl.endsWith('/')) localUrl = localUrl.slice(0, -1);
+    localUrl = String(localUrl).trim().replace(/\/+$/, '').replace(/\/v1$/i, '');
 
     var isCodeModel = (modelName.indexOf('coder') !== -1 || modelName.indexOf('phi4-mini-reasoning') !== -1 || modelName.indexOf('deepseek-r1') !== -1);
     var temperature = isCodeModel ? 0.2 : 0.55;
@@ -1981,7 +2005,7 @@ function isLikelyGibberish(text) {
 // ================================================================
 Parse.Cloud.define("callNvidiaNIM", async function (request) {
     var prompt = request.params.prompt;
-    var modelId = request.params.model || 'meta/llama-3.2-3b-instruct';
+    var modelId = request.params.model || 'openai/gpt-oss-20b';
     var maxTokens = request.params.maxTokens || 2048;
     if (!prompt) return null;
 
@@ -1991,6 +2015,7 @@ Parse.Cloud.define("callNvidiaNIM", async function (request) {
     if (!apiKey) { console.error('❌ NVIDIA_API_KEY yok!'); return null; }
     if (!baseUrl) baseUrl = 'https://integrate.api.nvidia.com/v1';
     baseUrl = String(baseUrl).trim().replace(/\/+$/, '').replace(/\/chat\/completions$/i, '');
+    if (!/\/v1$/i.test(baseUrl)) baseUrl += '/v1';
     if (!/^https:\/\//i.test(baseUrl)) {
         console.error('❌ NVIDIA_BASE_URL https:// ile başlamalı.');
         return null;
@@ -2143,7 +2168,7 @@ async function callCustomAIWithSingleKey(keyName, rawValue, prompt) {
         model = 'deepseek-chat';
         requestBody = { model: model, messages: [{ role: 'user', content: prompt }], temperature: 0.7, max_tokens: 1000 };
     } else if (lname.indexOf('gemini') !== -1 || lname.indexOf('google') !== -1) {
-        targetUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=' + rawValue;
+        targetUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + rawValue;
         authHeader = null;
         requestBody = { contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 1000 } };
     } else if (lname.indexOf('openrouter') !== -1 || lname.indexOf('router') !== -1) {
@@ -2153,7 +2178,7 @@ async function callCustomAIWithSingleKey(keyName, rawValue, prompt) {
         customHeaders['X-Title'] = 'AETHRION';
         requestBody = { model: model, messages: [{ role: 'user', content: prompt }], temperature: 0.7, max_tokens: 1000 };
     } else if (lname.indexOf('cohere') !== -1) {
-        targetUrl = 'https://api.cohere.ai/v2/chat';
+        targetUrl = 'https://api.cohere.com/v2/chat';
         model = 'command-r-plus-08-2024';
         requestBody = { model: model, messages: [{ role: 'user', content: prompt }], temperature: 0.7, max_tokens: 1000 };
     } else if (lname.indexOf('cerebras') !== -1) {
@@ -2259,50 +2284,56 @@ Parse.Cloud.define("superAI", async function (request) {
     var aiDeadlineMs = 50000;
     function aiTimeLeft() { return Math.max(0, aiDeadlineMs - (Date.now() - aiStartedAt)); }
     function aiCanContinue() { return aiTimeLeft() > 1000; }
+    var rotationSeed = Math.floor(Date.now() / 1000);
 
-    // KATMAN 1: 13 OLLAMA (her istekte en fazla iki aday; süre bütçesi korunur)
+    // KATMAN 1: 13 Ollama adayı; her istekte iki farklı aday döndürülür.
     var ollamaModels = [
         'qwen2.5:latest','qwen3:8b','llama3.2:latest','gemma3:4b','mistral:latest',
         'qwen3:4b','gemma2:latest','phi3.5:latest','deepseek-r1:latest','qwen2.5-coder:latest',
         'phi4-mini-reasoning:latest','qwen2.5vl:3b','granite3.3:2b'
     ];
-
     var localUrl = await getAPIKey('COLAB_LLAMA_URL');
     if (localUrl) {
-        console.log('🔄 KATMAN 1 - Ollama: süre sınırı içinde en fazla 2 model deneniyor...');
+        var ollamaStart = rotationSeed % ollamaModels.length;
+        console.log('🔄 KATMAN 1 - Ollama: dönüşümlü iki aday deneniyor.');
         for (var om = 0; om < Math.min(ollamaModels.length, 2) && aiCanContinue(); om++) {
+            var ollamaIndex = (ollamaStart + om) % ollamaModels.length;
+            var ollamaModel = ollamaModels[ollamaIndex];
             try {
-                var localReply = await _aeCloudRunWithTimeout('callLocalLlama', { prompt: prompt, model: ollamaModels[om] }, Math.min(7500, aiTimeLeft()));
-                if (localReply && localReply.length > 10) { console.log('✅ OLLAMA: ' + ollamaModels[om]); return cleanResponse(localReply); }
-            } catch (e) { console.warn('⚠️ Ollama ' + ollamaModels[om] + ' başarısız'); }
+                var localReply = await _aeCloudRunWithTimeout('callLocalLlama', { prompt: prompt, model: ollamaModel }, Math.min(4000, aiTimeLeft()));
+                if (localReply && localReply.length > 10) { console.log('✅ OLLAMA: ' + ollamaModel); return cleanResponse(localReply); }
+            } catch (e) { console.warn('⚠️ Ollama ' + ollamaModel + ' başarısız:', String(e && e.message || e)); }
         }
     }
 
-    // KATMAN 2: NVIDIA NIM
+    // KATMAN 2: NVIDIA NIM; yedi güncel adaydan dönüşümlü üç model denenir.
     var nvidiaModels = [
-        'meta/llama-3.3-70b-instruct','meta/llama-3.1-8b-instruct','qwen/qwen2.5-7b-instruct',
-        'qwen/qwen2.5-coder-32b-instruct','deepseek-ai/deepseek-r1-distill-llama-8b',
-        'google/gemma-2-2b-instruct','microsoft/phi-3.5-moe-instruct'
+        'openai/gpt-oss-20b','mistralai/mistral-nemotron','nvidia/nemotron-3.5-lightning-30b-a3b',
+        'google/gemma-4-31b-it','minimaxai/minimax-m3.1-flash',
+        'nvidia/nemotron-3-super-120b-a12b','nvidia/nemotron-3-ultra-550b-a55b'
     ];
-
     var nvidiaKey = await getAPIKey('NVIDIA_API_KEY');
     if (nvidiaKey) {
-        console.log('🔄 KATMAN 2 - NVIDIA NIM: süre sınırı içinde 7 model adayı sırayla deneniyor...');
-        for (var nm = 0; nm < nvidiaModels.length && aiCanContinue(); nm++) {
+        var nvidiaStart = rotationSeed % nvidiaModels.length;
+        console.log('🔄 KATMAN 2 - NVIDIA NIM: yedi güncel adaydan dönüşümlü üç model deneniyor.');
+        for (var nm = 0; nm < Math.min(3, nvidiaModels.length) && aiCanContinue(); nm++) {
+            var nvidiaIndex = (nvidiaStart + nm) % nvidiaModels.length;
+            var nvidiaModel = nvidiaModels[nvidiaIndex];
             try {
-                var nvidiaReply = await _aeCloudRunWithTimeout('callNvidiaNIM', { prompt: apiPrompt, model: nvidiaModels[nm] }, Math.min(4500, aiTimeLeft()));
-                if (nvidiaReply && nvidiaReply.length > 10) { console.log('✅ NIM: ' + nvidiaModels[nm]); return cleanResponse(nvidiaReply); }
-            } catch (e) { console.error('❌ NIM ' + nvidiaModels[nm] + ' başarısız:', String(e && e.message || e)); }
+                var nvidiaReply = await _aeCloudRunWithTimeout('callNvidiaNIM', { prompt: apiPrompt, model: nvidiaModel, maxTokens: 1024 }, Math.min(4500, aiTimeLeft()));
+                if (nvidiaReply && nvidiaReply.length > 10) { console.log('✅ NIM: ' + nvidiaModel); return cleanResponse(nvidiaReply); }
+            } catch (e) { console.error('❌ NIM ' + nvidiaModel + ' başarısız:', String(e && e.message || e)); }
         }
     }
 
-    // KATMAN 3: 8 Bulut API
+    // KATMAN 3: Sekiz bulut sağlayıcı; zaman her sağlayıcıya paylaştırılır.
     var apiModels = ['callGroq','callGemini','callDeepSeek','callDeepInfra','callOpenAI','callCerebras','callOpenRouter','callCohere'];
     for (var mi = 0; mi < apiModels.length && aiCanContinue(); mi++) {
         var model = apiModels[mi];
         try {
-            var result2 = await _aeCloudRunWithTimeout(model, { prompt: apiPrompt }, Math.min(7500, aiTimeLeft()));
+            var result2 = await _aeCloudRunWithTimeout(model, { prompt: apiPrompt }, Math.min(3500, aiTimeLeft()));
             if (result2 && result2.length > 10) { console.log('✅ ' + model); return cleanResponse(result2); }
+            console.warn('⚠️ ' + model + ' kullanılabilir bir yanıt döndürmedi.');
         } catch (e) { console.error('❌ ' + model + ' başarısız:', String(e && e.message || e)); }
     }
 
@@ -2938,7 +2969,7 @@ Parse.Cloud.define("vizyonAlScreenRead", async function (request) {
     var key = await getAPIKey('GEMINI_KEY');
     if (!key) return { success: false, error: 'GEMINI_KEY Config\'de tanımlı değil!' };
 
-    var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=' + key;
+    var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + key;
     try {
         var res = await fetch(url, {
             method: 'POST',
@@ -2984,7 +3015,7 @@ Parse.Cloud.define("vizyonAlLiveScreenStream", async function (request) {
     else if (mode === 'developer') question = 'Bu ekranda kod, terminal veya hata mesajı var mı? Varsa analiz et.';
     else question = 'Bu ekranda ne var? Çok kısa açıkla (max 2 cümle). Önceki: "' + previousDescription + '"';
 
-    var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=' + key;
+    var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + key;
     try {
         var res = await fetch(url, {
             method: 'POST',
@@ -3040,7 +3071,7 @@ Parse.Cloud.define("vizyonAlFileAnalyze", async function (request) {
             var key = await getAPIKey('GEMINI_KEY');
             if (!key) return { success: false, error: 'GEMINI_KEY eksik.' };
             var mimeType = fileType;
-            var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=' + key;
+            var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + key;
             var res = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
