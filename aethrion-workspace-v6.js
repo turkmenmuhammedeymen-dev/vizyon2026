@@ -33,10 +33,17 @@ function customWelcome(){
  document.body.classList.add('ae-shell-on','logged-in-user');
  var w=q('#aethrionExperienceWelcome'),dash=q('#dashboardArea');
  if(!w||!dash)return;
+ var current=window.currentUser||(window.Parse&&window.Parse.User&&window.Parse.User.current());
+ var saved={};try{saved=JSON.parse(localStorage.getItem('aethrion_user')||'{}')||{}}catch(e){}
+ function attr(key){try{return current&&typeof current.get==='function'?(current.get(key)||''):((current&&current[key])||'')}catch(e){return''}}
+ var role=String(attr('role')||attr('accountRole')||saved.role||saved.accountRole||'member').toLowerCase();
+ var plan=String(attr('plan')||attr('subscriptionPlan')||attr('package')||saved.plan||saved.subscriptionPlan||saved.package||'free').toUpperCase();
+ var roles={founder:'KURUCU',owner:'KURUCU',admin:'ADMIN',superadmin:'ADMIN',moderator:'MODERATÖR',designer:'MODERATÖR / TASARIMCI',beta:'BETA ÜYESİ',member:'ÜYE',user:'ÜYE'};
+ var identity=(roles[role]||'ÜYE')+'  ·  '+(plan==='FREE'?'ÜCRETSİZ':plan)+' PAKET';
  var name=String(userName()).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]});
  var title=q('.aew-name',w);
  if(!w.dataset.aeV6Built){
-  w.innerHTML='<div class="aew-eyebrow"><span class="aew-dot"></span>AETHRION · PERSONAL WORKSPACE</div><p class="aew-greeting">Çalışma alanınıza hoş geldiniz.</p><h1 class="aew-name" id="aewName">Hoş geldiniz,<br><em>'+name+'</em></h1><div class="aew-role">◈ Kişisel çalışma alanı</div><p class="aew-copy">Yapay zekâ, üretim araçları ve geliştirici kaynaklarınız tek bir düzenli çalışma alanında. Başlamak için soldaki menüden bir özellik seçin.</p><div class="aew-v6-hint"><b>⌘</b><span><strong>Çalışma alanları</strong><br>İhtiyacınız olan aracı sol menüden açın. Ana ekranınız sade kalır.</span></div>';
+  w.innerHTML='<div class="aew-eyebrow"><span class="aew-dot"></span>AETHRION · PERSONAL WORKSPACE</div><p class="aew-greeting">Çalışma alanınıza hoş geldiniz.</p><h1 class="aew-name" id="aewName">Hoş geldiniz,<br><em>'+name+'</em></h1><div class="aew-role">◈ '+esc(identity)+'</div><p class="aew-copy">Yapay zekâ, üretim araçları ve geliştirici kaynaklarınız tek bir düzenli çalışma alanında. Başlamak için soldaki menüden bir özellik seçin.</p><div class="aew-v6-hint"><b>⌘</b><span><strong>Çalışma alanları</strong><br>İhtiyacınız olan aracı sol menüden açın. Ana ekranınız sade kalır.</span></div>';
   w.dataset.aeV6Built='1';
  }else if(title){title.innerHTML='Hoş geldiniz,<br><em>'+name+'</em>'}
  qa('.aew-grid,.aew-actions,.aews-home-cta',w).forEach(function(el){el.remove()});
@@ -69,7 +76,7 @@ function isolateStage(){
 function showStage(label,desc,href){
  var h=stageHost();if(!h)return;
  var safeHref=String(href||'');
- var isFrame=!!safeHref&&safeHref.charAt(0)==='/'&&safeHref!=='/index.html#features'&&safeHref!=='#features';
+ var isFrame=!!safeHref&&!/^javascript:/i.test(safeHref)&&safeHref!=='/index.html#features'&&safeHref!=='./index.html#features'&&safeHref!=='#features';
  var detail=desc||'Bu çalışma alanı seçiminiz için hazırlandı.';
  h.stage.innerHTML='<div class="ae-ws-stage-head"><div><div class="ae-ws-stage-kicker">AETHRION WORKSPACE</div><h2>'+esc(label)+'</h2><p>'+esc(detail)+'</p></div>'+(isFrame?'<a class="ae-ws-open-tab" href="'+esc(safeHref)+'" target="_blank" rel="noopener noreferrer">Yeni sekmede aç ↗</a>':'<span class="ae-ws-stage-state"><i></i> Çalışma alanı</span>')+'</div>'+(isFrame?'<iframe class="ae-ws-stage-frame" title="'+esc(label)+'" src="'+esc(safeHref)+'" loading="eager" allow="microphone; camera; clipboard-read; clipboard-write; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>':'<div class="ae-ws-stage-empty"><div class="ae-ws-stage-emblem">A</div><h3>'+esc(label)+'</h3><p>Bu özellik uygulama paneli üzerinden açılır. Açılan paneli kapattığınızda sol menüden başka bir çalışma alanına geçebilir veya Ana ekran’a dönebilirsiniz.</p></div>');
  h.stage.style.setProperty('display','flex','important');
