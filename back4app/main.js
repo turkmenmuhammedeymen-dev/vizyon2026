@@ -869,7 +869,10 @@ Parse.Cloud.define("initSchemas", async function (request) {
         "FeatureUsage": ["user_email", "feature", "period", "period_key", "count", "last_updated"],
         "ClientLog": ["user_email", "level", "message", "meta", "url", "user_agent", "created_at_client"],
         "VideoStudioJob": ["user_email", "type", "input", "result", "download_url", "file_name", "status", "created_at_client"],
-        "SystemConfig": ["key", "value", "description", "updated_by"],
+        "SystemConfig": ["key", "value", "counter", "description", "updated_by"],
+        "AethrionAIUsage": ["user_email", "visitorKey", "date", "count"],
+        "AethrionProjectAudit": ["team_id", "actor_id", "actor_role", "action", "target_id", "target_label", "source", "privacy_scrubbed", "created_at_server", "previous_role", "new_role"],
+        "Reminder": ["user_email", "title", "date", "time", "is_sent", "created_at_client"],
         // ✅ [YENİ] İş İlanları Mağazası
         "JobListing": ["job_number", "title", "owner_email", "owner_name", "job_type", "description", "salary", "payment_method", "image_url", "status", "accepted_by", "accepted_at", "views", "is_active"],
         // ✅ [YENİ] AETHRION AI üzerinden oluşturulan V27 key'lerin güvenli tek-seferlik gösterimi
@@ -903,7 +906,7 @@ Parse.Cloud.define("initSchemas", async function (request) {
                            col === "total_lessons" || col === "order" || col === "correct_answer" ||
                            col === "streakCount" || col === "penalty_points" || col === "total_points" ||
                            col === "rank" || col === "usage_count" || col === "messageCount" ||
-                           col === "total_count" || col === "start_time" || col === "end_time" ||
+                           col === "total_count" || col === "counter" || col === "start_time" || col === "end_time" ||
                            col === "salary" || col === "views") {
                     dummy.set(col, 0);
                 } else if (col === "is_favorite" || col === "is_archived" || col === "is_trashed" ||
@@ -10375,14 +10378,14 @@ async function _nextJobNumber() {
     if (!cfg) {
         cfg = new Parse.Object('SystemConfig');
         cfg.set('key', 'job_listing_counter');
-        cfg.set('value', 0);
+        cfg.set('counter', 0);
         cfg.set('description', 'İş ilanı numara sayacı');
         await cfg.save(null, { useMasterKey: true });
     }
-    cfg.increment('value', 1); // atomik artış
+    cfg.increment('counter', 1); // atomik artış; SystemConfig.value başka ayarlarda nesne tutar
     await cfg.save(null, { useMasterKey: true });
     await cfg.fetch({ useMasterKey: true });
-    var n = Number(cfg.get('value')) || 1;
+    var n = Number(cfg.get('counter')) || 1;
     return 'ILN-' + new Date().getFullYear() + '-' + ('00000' + n).slice(-5);
 }
 
