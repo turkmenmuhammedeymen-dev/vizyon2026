@@ -1521,37 +1521,45 @@ dy>
     }
 
     // ===== İSTATİSTİKLERİ ÇEK =====
+    var communityStatsLoading = false;
+    var communityCommentsLoading = false;
+    function cloudCallWithTimeout(name, params, timeoutMs) {
+        var timer;
+        var timeout = new Promise(function (_, reject) {
+            timer = setTimeout(function () {
+                reject(new Error(name + ' servisi ' + Math.round(timeoutMs / 1000) + ' saniyede yanıt vermedi.'));
+            }, timeoutMs);
+        });
+        return Promise.race([Parse.Cloud.run(name, params || {}), timeout]).finally(function () {
+            clearTimeout(timer);
+        });
+    }
+
     async function updateStats() {
+        if (communityStatsLoading) return;
+        communityStatsLoading = true;
         try {
-            var results = await Promise.allSettled([
-                new Parse.Query(Parse.User).count(),
-                new Parse.Query('Comment').count(),
-                new Parse.Query('Team').count(),
-                new Parse.Query('Project').count()
-            ]);
-
-            var userCount = (results[0].status === 'fulfilled') ? results[0].value : 0;
-            var commentCount = (results[1].status === 'fulfilled') ? results[1].value : 0;
-            var teamCount = (results[2].status === 'fulfilled') ? results[2].value : 0;
-            var projectCount = (results[3].status === 'fulfilled') ? results[3].value : 0;
-
-            animateCounter(document.getElementById('statUsers'), userCount);
-            animateCounter(document.getElementById('statUsersEn'), userCount);
-            animateCounter(document.getElementById('statUsersAr'), userCount);
-
-            animateCounter(document.getElementById('statComments'), commentCount);
-            animateCounter(document.getElementById('statCommentsEn'), commentCount);
-            animateCounter(document.getElementById('statCommentsAr'), commentCount);
-
-            animateCounter(document.getElementById('statTeams'), teamCount);
-            animateCounter(document.getElementById('statTeamsEn'), teamCount);
-            animateCounter(document.getElementById('statTeamsAr'), teamCount);
-
-            animateCounter(document.getElementById('statProjects'), projectCount);
-            animateCounter(document.getElementById('statProjectsEn'), projectCount);
-            animateCounter(document.getElementById('statProjectsAr'), projectCount);
+            var result = await cloudCallWithTimeout('getPublicStats', {}, 10000);
+            if (!result || result.success !== true) {
+                throw new Error((result && result.error) || 'İstatistik servisi geçerli yanıt vermedi.');
+            }
+            var stats = result;
+            animateCounter(document.getElementById('statUsers'), stats.activeUsers);
+            animateCounter(document.getElementById('statUsersEn'), stats.activeUsers);
+            animateCounter(document.getElementById('statUsersAr'), stats.activeUsers);
+            animateCounter(document.getElementById('statComments'), stats.totalComments);
+            animateCounter(document.getElementById('statCommentsEn'), stats.totalComments);
+            animateCounter(document.getElementById('statCommentsAr'), stats.totalComments);
+            animateCounter(document.getElementById('statTeams'), stats.totalTeams);
+            animateCounter(document.getElementById('statTeamsEn'), stats.totalTeams);
+            animateCounter(document.getElementById('statTeamsAr'), stats.totalTeams);
+            animateCounter(document.getElementById('statProjects'), stats.totalProjects);
+            animateCounter(document.getElementById('statProjectsEn'), stats.totalProjects);
+            animateCounter(document.getElementById('statProjectsAr'), stats.totalProjects);
         } catch (e) {
-            console.log('İstatistikler güncellenemedi:', e.message);
+            console.error('Topluluk istatistikleri yüklenemedi:', e);
+        } finally {
+            communityStatsLoading = false;
         }
     }
 
@@ -1560,9 +1568,13 @@ dy>
         var feeds = ['liveFeed', 'liveFeedEn', 'liveFeedAr'];
 
         try {
-            var result = await Parse.Cloud.run('getComments', {});
-            var comments = [];
-            if (result && result.success) comments = result.comments || [];
+            if (communityCommentsLoading) return;
+            communityCommentsLoading = true;
+            var result = await cloudCallWithTimeout('getComments', {}, 10000);
+            if (!result || result.success !== true) {
+                throw new Error((result && result.error) || 'Yorum servisi geçerli yanıt vermedi.');
+            }
+            var comments = Array.isArray(result.comments) ? result.comments : [];
 
             var html = '';
             if (comments.length === 0) {
@@ -1605,6 +1617,18 @@ dy>
             });
         } catch (e) {
             console.error('Yorumlar yüklenirken hata:', e);
+            var errHtml = '<div style="color:var(--danger); text-align:center; padding:30px;">' +
+                '<i class="fas fa-exclamation-triangle" style="font-size:28px; display:block; margin-bottom:12px;"></i>' +
+                '⚠️ Yorumlar yüklenemedi: ' + escapeHtml(e.message) + '</div>';
+            feeds.forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) el.innerHTML = errHtml;
+            });
+        } finally {
+            communityCommentsLoading = false;
+        }
+        /* legacy catch block retained below only for compatibility */ 
+        if (false) {
             var errHtml = '<div style="color:var(--danger); text-align:center; padding:30px;">' +
                 '<i class="fas fa-exclamation-triangle" style="font-size:28px; display:block; margin-bottom:12px;"></i>' +
                 '⚠️ Yorumlar yüklenemedi: ' + escapeHtml(e.message) + '</div>';
