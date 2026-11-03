@@ -15,6 +15,34 @@
     return false;
   }
   function go(path) { if (path) w.location.href = path; }
+  function openSettingsPanel() {
+    var modal = byId('settingsModal');
+    if (!modal) {
+      modal = d.createElement('section');
+      modal.id = 'settingsModal';
+      modal.className = 'modal-overlay';
+      modal.setAttribute('role', 'dialog');
+      modal.setAttribute('aria-modal', 'true');
+      modal.setAttribute('aria-labelledby', 'aeSettingsTitle');
+      modal.innerHTML = '<div class="modal-content" style="width:min(760px,94vw);max-height:88vh;overflow:auto;background:var(--card,#111827);color:var(--text,#f4f6fb);border:1px solid var(--border,#334155);border-radius:20px;padding:24px"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><small style="letter-spacing:.16em;color:var(--accent2,#d8bd6a)">AETHRION ACCOUNT</small><h2 id="aeSettingsTitle" style="margin:6px 0">Ayarlar</h2><p style="margin:0;color:var(--text3,#9ca3af)">Hesap ve uygulama tercihleri</p></div><button type="button" data-ae-settings-close aria-label="Kapat">✕</button></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:22px"><label>Dil<select id="aeSettingsLanguage" style="display:block;width:100%;padding:12px;margin-top:7px"><option value="tr">Türkçe</option><option value="en">English</option><option value="es">Español</option><option value="ru">Русский</option><option value="fr">Français</option></select></label><label>Görünüm<select id="aeSettingsTheme" style="display:block;width:100%;padding:12px;margin-top:7px"><option value="dark">Koyu tema</option><option value="light">Açık tema</option></select></label></div><div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:22px"><button type="button" data-ae-settings-save class="btn-primary">Tercihleri kaydet</button><button type="button" data-ae-settings-security class="btn-secondary">Hesap ve oturum güvenliği</button><button type="button" data-ae-settings-logs class="btn-secondary">Sistem kayıtları</button></div><p style="font-size:12px;color:var(--text3,#9ca3af);margin-top:16px">Değişiklikler bu tarayıcıda saklanır. Hesap ve sunucu güvenliği ayarları ilgili yetkili servisler üzerinden yönetilir.</p></div>';
+      d.body.appendChild(modal);
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal || e.target.closest('[data-ae-settings-close]')) { modal.style.display='none'; modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); }
+        if (e.target.closest('[data-ae-settings-save]')) {
+          var lang=byId('aeSettingsLanguage'), theme=byId('aeSettingsTheme');
+          if(lang){try{localStorage.setItem('aethrion_language',lang.value)}catch(_){} if(typeof w.changeLanguage==='function')w.changeLanguage(lang.value)}
+          if(theme){d.documentElement.setAttribute('data-theme',theme.value);d.body.classList.toggle('dark-theme',theme.value==='dark');try{localStorage.setItem('aethrion_theme',theme.value)}catch(_){}}
+          w.showNotification&&w.showNotification('Tercihler kaydedildi.','success');
+        }
+        if (e.target.closest('[data-ae-settings-security]')) w.openParentSettings();
+        if (e.target.closest('[data-ae-settings-logs]')) w.openLogsPanel();
+      });
+    }
+    var lang=byId('aeSettingsLanguage'),theme=byId('aeSettingsTheme');
+    try{if(lang)lang.value=localStorage.getItem('aethrion_language')||'tr';if(theme)theme.value=localStorage.getItem('aethrion_theme')||'dark'}catch(_){}
+    modal.style.display='flex';modal.classList.add('open');modal.setAttribute('aria-hidden','false');
+    return true;
+  }
   function install(name, fn) { if (typeof w[name] !== 'function') w[name] = fn; }
   function closeDrawer() {
     var drawer = byId('aethrionExperienceDrawer'), backdrop = byId('aethrionExperienceBackdrop');
@@ -60,7 +88,7 @@
   install('toggleTeamPage', function () { go('/topluluk.html'); });
   install('openPersonalAssistant', function () { go('/aethrion-assistant.html'); });
   install('openContestPage', function () { go('/topluluk.html#contest'); });
-  install('openSettingsModal', function () { if (!w.openModal('settingsModal')) go('/ayarlar.html'); });
+  install('openSettingsModal', openSettingsPanel);
   install('openAccountInfo', function () { if (!scrollTo('accountInfoModal')) go('/hesap.html'); });
   install('openProfileModal', function () { if (!scrollTo('profileModal')) go('/hesap.html'); });
   install('toggleTheme', function () {
@@ -108,7 +136,7 @@
   install('openJobMarket', function () { go('/topluluk.html'); });
   install('openProfileModal', function () { if (!w.openModal('profileModal')) go('/hesap-ve-oturum-guvenligi.html'); });
   install('openAvatarCreator', function () { if (!scrollTo('avatarCreatorModal')) go('/hesap-ve-oturum-guvenligi.html'); });
-  install('openSettingsModal', function () { if (!scrollTo('settingsModal')) go('/hesap-ve-oturum-guvenligi.html'); });
+  install('openSettingsModal', openSettingsPanel);
   install('openVizyonAlPanel', function () { go('/aethrion-assistant.html'); });
   install('closeVizyonAlPanel', function () { var p = byId('vizyonAlPanel'); if (p) p.style.display = 'none'; else go('/aethrion-assistant.html'); });
   install('startVizyonAl', function () { go('/aethrion-assistant.html'); });
