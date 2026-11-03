@@ -4,7 +4,7 @@
 // ================================================================
 // ✅ BACK4APP UYUMLU (Parse Server Standard + Node.js)
 // ✅ OTOMATİK SCHEMA (Tüm sınıflar/kolonlar initSchemas'ta)
-// ✅ 21 AI MODELİ (13 Ollama + 8 Bulut API)
+// ✅ 28 AI MODELİ (13 Ollama + 7 NVIDIA NIM + 8 Bulut API)
 // ✅ A27 API ANAHTAR SİSTEMİ (AES-256-GCM)
 // ✅ AETHRION KOÇ ASİSTANI
 // ✅ AETHRION AI PANELİ (4 mod + ekran + sesli + dosya + sunum)
@@ -14,7 +14,7 @@
 // ✅ VİDEO STÜDYOSU (Senaryo/Reels/Analiz/Kesit)
 // ✅ AETHRION DEVRİYE (7/24)
 // ✅ 13 ZAMANLANMIŞ JOB
-// ✅ 160+ CLOUD FUNCTION
+// ✅ 271 CLOUD FUNCTION
 // ================================================================
 
 // ================================================================
@@ -4320,7 +4320,7 @@ Parse.Cloud.define("getComments", async function (request) {
                     user_role: c.get('user_role'),
                     comment: c.get('comment'),
                     rating: c.get('rating') || 0,
-                    createdAt: c.get('createdAt')
+                    createdAt: c.createdAt || null
                 };
             })
         };
@@ -10730,7 +10730,7 @@ console.log('🎯 v7.10.0 YENİLİKLERİ:');
 console.log('');
 console.log('  [BÖLÜM 1] TEMEL + AI + AETHRION AI:');
 console.log('    → Polyfills + Rate Limit + Fetch (Back4App)');
-console.log('    → 41 sınıf (4 YENİ: FeatureUsage, ClientLog, VideoStudioJob, SystemConfig)');
+console.log('    → 50 sınıf (AethrionAIUsage, AethrionProjectAudit, Reminder dahil)');
 console.log('    → initSchemas (TÜM sınıflar/kolonlar otomatik)');
 console.log('    → 8 bireysel AI + callLocalLlama (13 Ollama) + callNvidiaNIM (7)');
 console.log('    → superAI (3 katman: 13 Ollama + 7 NIM + 8 API = 28 MODEL)');
