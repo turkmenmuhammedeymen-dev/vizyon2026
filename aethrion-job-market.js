@@ -168,6 +168,7 @@
   w.closeJobMarket = function () {
     setOverlay('jobMarketOverlay', false);
     setOverlay('jobDetailOverlay', false);
+    if (d.body.classList.contains('ae-shell-on') && d.body.classList.contains('aews-feature-view') && typeof w.showWelcome === 'function') w.showWelcome();
   };
   w.openJobCreateForm = function () {
     return refreshLimit().then(function (limit) {
