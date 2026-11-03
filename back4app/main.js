@@ -5009,7 +5009,7 @@ Parse.Cloud.define("inviteToTeam", async function (request) {
     var teamId = user.get('teamId');
     if (!teamId) throw new Error('Önce takım oluşturun!');
     var email = String((request.params && request.params.email) || '').trim().toLowerCase();
-    if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) throw new Error('Geçerli bir e-posta adresi gerekli!');
+    if (!email || email.indexOf('@') <= 0 || email.lastIndexOf('.') < email.indexOf('@') + 2 || email.indexOf(' ') !== -1) throw new Error('Geçerli bir e-posta adresi gerekli!');
     if (email === String(user.get('email') || '').trim().toLowerCase()) throw new Error('Kendinize takım daveti gönderemezsiniz.');
 
     var recipientQuery = new Parse.Query(Parse.User);
