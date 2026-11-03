@@ -145,9 +145,183 @@
     try { sessionStorage.setItem('aethrion_ai_mode', String(mode || 'normal')); } catch (e) {}
   });
   install('removeVizyonAlFile', function () { var f = byId('vzFileInput'); if (f) f.value = ''; var p = byId('vzFilePreview'); if (p) p.style.display = 'none'; });
-  install('startScreenReading', function () { go('/aethrion-assistant.html'); });
-  install('startVizyonAlVoiceInput', function () { go('/aethrion-assistant.html'); });
-  install('sendVizyonAlMessage', function () { go('/aethrion-assistant.html'); });
+  function aiCloud(name, params) {
+    if (!w.Parse || !w.Parse.Cloud || typeof w.Parse.Cloud.run !== 'function') {
+      return Promise.reject(new Error('AETHRION bulut servisine ulaşılamıyor.'));
+    }
+    return w.Parse.Cloud.run(name, params || {});
+  }
+  function aiPanel() { return byId('vizyonAlPanel'); }
+  function aiChat() { return byId('vzChat'); }
+  function aiMessages() {
+    if (!Array.isArray(w.__aethrionAIChatMessages)) w.__aethrionAIChatMessages = [];
+    return w.__aethrionAIChatMessages;
+  }
+  function aiAppend(role, content) {
+    var chat = aiChat();
+    var item = { role: role === 'user' ? 'user' : 'assistant', text: String(content || ''), at: new Date().toISOString() };
+    aiMessages().push(item);
+    if (chat) {
+      var row = d.createElement('div');
+      row.className = 'vz-msg ' + (item.role === 'user' ? 'user' : 'bot');
+      var label = d.createElement('div');
+      label.className = 'vz-role';
+      label.textContent = item.role === 'user' ? 'SİZ' : '✨ AETHRION AI · 28 MODEL';
+      var body = d.createElement('div');
+      body.className = 'vz-message-body';
+      body.textContent = item.text;
+      body.style.whiteSpace = 'pre-wrap';
+      row.appendChild(label); row.appendChild(body); chat.appendChild(row);
+      chat.scrollTop = chat.scrollHeight;
+    }
+    return item;
+  }
+  function aiRender(messages) {
+    var chat = aiChat(); if (!chat) return;
+    chat.innerHTML = '';
+    w.__aethrionAIChatMessages = [];
+    (Array.isArray(messages) ? messages : []).forEach(function (m) {
+      if (!m) return;
+      var role = m.role || (m.is_ai ? 'assistant' : (m.from === 'user' ? 'user' : 'assistant'));
+      var text = m.text || m.content || m.message || '';
+      if (text) aiAppend(role === 'user' || role === 'human' ? 'user' : 'assistant', text);
+    });
+    if (!aiMessages().length) {
+      var welcome = d.createElement('div'); welcome.className = 'vz-msg bot';
+      welcome.innerHTML = '<div class="vz-role">✨ AETHRION AI · 28 MODEL</div><div class="vz-message-body">Merhaba! AETHRION AI sohbetine hoş geldin. Mesajını yazıp gönderebilirsin.</div>';
+      chat.appendChild(welcome);
+    }
+  }
+  function aiSaveHistory() {
+    var messages = aiMessages().map(function (m) { return { role: m.role, text: m.text, at: m.at }; });
+    return aiCloud('saveChatHistory', { messages: messages }).catch(function (e) {
+      console.warn('[AETHRION] Sohbet geçmişi kaydedilemedi:', e);
+    });
+  }
+  function aiHistoryPanel() {
+    var panel = aiPanel(); if (!panel) return null;
+    var history = byId('aeVizyonAIHistory');
+    if (!history) {
+      history = d.createElement('section'); history.id = 'aeVizyonAIHistory';
+      history.style.cssText = 'display:none;flex:0 0 auto;max-height:38vh;overflow:auto;padding:12px 16px;border-bottom:1px solid var(--border,rgba(255,255,255,.12));background:var(--card,#111827)';
+      history.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px"><strong style="color:var(--text,#fff)">Sohbet geçmişi</strong><button type="button" id="aeVizyonAIHistoryClose" aria-label="Geçmişi kapat">✕</button></div><div id="aeVizyonAIHistoryItems"></div>';
+      var main = byId('vzMainArea') || panel;
+      main.insertBefore(history, main.firstChild);
+      byId('aeVizyonAIHistoryClose').addEventListener('click', function () { history.style.display = 'none'; });
+    }
+    return history;
+  }
+  function aiLoadHistory() {
+    return aiCloud('getChatHistory', {}).then(function (result) {
+      var messages = result && Array.isArray(result.messages) ? result.messages : [];
+      if (messages.length) aiRender(messages);
+      return messages;
+    }).catch(function (e) {
+      console.warn('[AETHRION] Sohbet geçmişi yüklenemedi:', e);
+      return [];
+    });
+  }
+  install('loadConversationHistory', aiLoadHistory);
+  install('startConversation', function () { return w.newConversation(); });
+  install('newConversation', function () {
+    var current = aiMessages().slice();
+    if (current.length) {
+      var archives = [];
+      try { archives = JSON.parse(w.localStorage.getItem('aethrion_ai_archives_v1') || '[]') || []; } catch (_) {}
+      archives.unshift({ id: 'local-' + Date.now(), title: current.find(function (m) { return m.role === 'user'; })?.text?.slice(0, 54) || 'Önceki sohbet', createdAt: new Date().toISOString(), messages: current });
+      try { w.localStorage.setItem('aethrion_ai_archives_v1', JSON.stringify(archives.slice(0, 30))); } catch (_) {}
+    }
+    w.__aethrionAIChatMessages = [];
+    aiRender([]);
+    if (typeof w.openFullAIPanel === 'function') w.openFullAIPanel();
+    aiCloud('saveChatHistory', { messages: [] }).catch(function (e) { console.warn('[AETHRION] Yeni sohbet başlatıldı ancak bulut geçmişi sıfırlanamadı:', e); });
+    var input = byId('vzInput'); if (input) input.focus();
+    return true;
+  });
+  install('toggleConversationHistory', function () {
+    var panel = aiHistoryPanel(); if (!panel) { w.showNotification && w.showNotification('AETHRION sohbet paneli bulunamadı.', 'error'); return false; }
+    var opening = panel.style.display === 'none';
+    panel.style.display = opening ? 'block' : 'none';
+    if (!opening) return true;
+    var list = byId('aeVizyonAIHistoryItems'); if (!list) return true;
+    list.innerHTML = '';
+    var archives = [];
+    try { archives = JSON.parse(w.localStorage.getItem('aethrion_ai_archives_v1') || '[]') || []; } catch (_) {}
+    if (!archives.length) { list.textContent = 'Bu cihazda arşivlenmiş sohbet bulunmuyor.'; return true; }
+    archives.forEach(function (entry) {
+      var button = d.createElement('button'); button.type = 'button';
+      button.style.cssText = 'display:block;width:100%;text-align:left;padding:10px 12px;margin:5px 0;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:10px;background:transparent;color:var(--text,#fff);cursor:pointer';
+      button.textContent = (entry.title || 'Önceki sohbet') + ' · ' + new Date(entry.createdAt).toLocaleString('tr-TR');
+      button.addEventListener('click', function () {
+        w.__aethrionAIChatMessages = [];
+        aiRender(entry.messages || []);
+        panel.style.display = 'none';
+        if (typeof w.openFullAIPanel === 'function') w.openFullAIPanel();
+      });
+      list.appendChild(button);
+    });
+    return true;
+  });
+  install('toggleChatHistory', function () { return w.toggleConversationHistory(); });
+  install('sendVizyonAlMessage', async function () {
+    var input = byId('vzInput'), button = byId('vzSendBtn');
+    var message = input ? input.value.trim() : '';
+    if (!message) { if (input) input.focus(); return false; }
+    if (message.length > 4000) { w.showNotification && w.showNotification('Mesaj en fazla 4000 karakter olabilir.', 'warning'); return false; }
+    var activeMode = 'normal';
+    var selected = d.querySelector('#vizyonAlPanel [data-mode].active');
+    try { activeMode = (selected && selected.getAttribute('data-mode')) || w.sessionStorage.getItem('aethrion_ai_mode') || 'normal'; } catch (_) {}
+    if (input) input.value = '';
+    if (button) { button.disabled = true; button.textContent = 'Yanıt hazırlanıyor…'; }
+    aiAppend('user', message);
+    aiSaveHistory();
+    try {
+      var result = await aiCloud('vizyonAlChat', { message: message, mode: activeMode });
+      if (!result || result.success !== true) throw new Error(result && result.error || 'AETHRION AI yanıt üretemedi.');
+      aiAppend('assistant', result.reply || 'Yanıt alınamadı.');
+      await aiSaveHistory();
+      if (typeof w.refreshAethrionAIQuota === 'function') w.refreshAethrionAIQuota();
+    } catch (e) {
+      aiAppend('assistant', 'Mesaj gönderilemedi: ' + (e && e.message || 'Bilinmeyen hata'));
+      await aiSaveHistory();
+      w.showNotification && w.showNotification(e && e.message || 'AETHRION AI şu anda yanıt veremiyor.', 'error');
+    } finally {
+      if (button) { button.disabled = false; button.textContent = '⚡ Gönder'; }
+      if (input) input.focus();
+    }
+    return true;
+  });
+  install('startScreenReading', async function () {
+    if (!w.navigator.mediaDevices || typeof w.navigator.mediaDevices.getDisplayMedia !== 'function') {
+      w.showNotification && w.showNotification('Bu tarayıcı ekran paylaşımı desteklemiyor.', 'error'); return false;
+    }
+    try {
+      var stream = await w.navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 1 }, audio: false });
+      var track = stream.getVideoTracks()[0], settings = track && track.getSettings ? track.getSettings() : {};
+      var video = d.createElement('video'); video.muted = true; video.srcObject = stream; video.playsInline = true;
+      await video.play();
+      await new Promise(function (resolve) { if (video.videoWidth) resolve(); else video.onloadedmetadata = resolve; });
+      var scale = Math.min(1, 1600 / (video.videoWidth || 1600), 900 / (video.videoHeight || 900));
+      var canvas = d.createElement('canvas'); canvas.width = Math.max(1, Math.round((video.videoWidth || 1280) * scale)); canvas.height = Math.max(1, Math.round((video.videoHeight || 720) * scale));
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      stream.getTracks().forEach(function (t) { t.stop(); });
+      var data = canvas.toDataURL('image/jpeg', 0.72).split(',')[1];
+      aiAppend('user', 'Ekran görüntüsünü analiz et.');
+      var result = await aiCloud('vizyonAlScreenRead', { imageBase64: data, question: 'Ekrandaki içeriği açıkla; görünen metinleri, arayüz bölümlerini ve önemli bilgileri özetle.' });
+      if (!result || result.success !== true) throw new Error(result && result.error || 'Ekran analizi tamamlanamadı.');
+      aiAppend('assistant', result.reply || 'Ekran analizi yanıtı boş döndü.');
+      await aiSaveHistory();
+      return true;
+    } catch (e) {
+      w.showNotification && w.showNotification(e && e.message || 'Ekran okunamadı.', 'error');
+      return false;
+    }
+  });
+  install('startVizyonAlVoiceInput', function () {
+    if (typeof w.startVoiceInput === 'function') return w.startVoiceInput();
+    w.showNotification && w.showNotification('Sesli giriş bu tarayıcıda henüz bağlanmamış.', 'warning');
+    return false;
+  });
   install('openVoiceChatFullscreen', function () { go('/aethrion-assistant.html'); });
   install('closeVoiceChatFullscreen', function () { var p = byId('voiceChatFullscreen') || byId('vzVoiceFullscreen'); if (p) p.style.display = 'none'; else go('/aethrion-assistant.html'); });
   install('buyPackage', function () { w.showNotification && w.showNotification('Paket seçimi için önce hesabınıza giriş yapın.', 'warning'); w.openModal('register'); });
