@@ -57,27 +57,47 @@
     if (!grid) return;
     grid.replaceChildren();
     if (!items.length) {
-      var empty = textNode('div', 'job-market-empty', 'Bu filtrelerle eşleşen ilan bulunamadı.');
+      var empty = textNode('div', 'job-market-empty', '');
+      empty.appendChild(textNode('span', 'empty-icon', '📭'));
+      empty.appendChild(textNode('div', '', 'Bu filtrelerle eşleşen ilan bulunamadı.'));
       grid.appendChild(empty);
       return;
     }
     items.forEach(function (job) {
-      var card = textNode('article', 'job-card', '');
-      var top = textNode('div', 'job-card-top', '');
-      var number = textNode('span', 'job-number', job.job_number || 'ILN');
-      var status = textNode('span', 'job-status', job.status === 'accepted' ? 'Kabul edildi' : (job.status === 'closed' ? 'Kapalı' : 'Açık'));
-      top.append(number, status);
+      var statusClass = job.status === 'accepted' ? ' status-accepted' : (job.status === 'closed' ? ' status-closed' : '');
+      var card = textNode('article', 'job-card' + statusClass, '');
+      var header = textNode('div', 'job-card-header', '');
+      var number = textNode('span', 'job-card-number', job.job_number || 'ILN');
+      var rawType = String(job.job_type || 'Diğer').toLocaleLowerCase('tr-TR');
+      var typeKey = rawType === 'tasarım' ? 'tasarim' : rawType === 'çeviri' ? 'ceviri' : rawType === 'müzik' ? 'muzik' : rawType === '3d' ? '3d' : ['kod','video','yazar'].indexOf(rawType) >= 0 ? rawType : 'diger';
+      var type = textNode('span', 'job-card-type type-' + typeKey, job.job_type || 'Diğer');
+      header.append(number, type);
       var title = textNode('h3', 'job-card-title', job.title || job.job_type || 'İş ilanı');
-      var type = textNode('div', 'job-card-type', job.job_type || 'Diğer');
-      var desc = textNode('p', 'job-card-description', job.description || '');
-      var bottom = textNode('div', 'job-card-bottom', '');
-      var salary = textNode('strong', 'job-card-salary', (job.salary || 'Belirtilmedi') + ' A27 Puan');
-      var owner = textNode('span', 'job-card-owner', job.owner_name || 'AETHRION üyesi');
-      bottom.append(salary, owner);
+      var desc = textNode('p', 'job-card-desc', job.description || '');
+      card.append(header, title, desc);
+      if (job.image_url) {
+        var image = d.createElement('img');
+        image.className = 'job-card-image';
+        image.src = job.image_url;
+        image.alt = String(job.title || 'İş ilanı görseli');
+        image.loading = 'lazy';
+        card.appendChild(image);
+      }
+      var meta = textNode('div', 'job-card-meta', '');
+      var owner = textNode('div', 'job-card-owner', '');
+      var avatar = textNode('span', 'owner-avatar', String(job.owner_name || '?').slice(0, 1).toUpperCase());
+      var ownerName = textNode('span', '', job.owner_name || 'AETHRION üyesi');
+      owner.append(avatar, ownerName);
+      meta.appendChild(owner);
+      var footer = textNode('div', 'job-card-footer', '');
+      var salary = textNode('strong', 'job-card-salary', '');
+      salary.append(textNode('span', 'salary-icon', '🪙'), d.createTextNode((job.salary || 'Belirtilmedi') + ' A27 Puan'));
+      var views = textNode('span', 'job-card-views', '👁 ' + String(job.views || 0));
       var open = textNode('button', 'btn-secondary btn-sm', 'İlanı İncele →');
       open.type = 'button';
       open.addEventListener('click', function () { w.openJobDetail(job.id); });
-      card.append(top, title, type, desc, bottom, open);
+      footer.append(salary, views, open);
+      card.append(meta, footer);
       grid.appendChild(card);
     });
   }
