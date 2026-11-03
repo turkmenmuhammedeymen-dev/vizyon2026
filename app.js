@@ -34,6 +34,86 @@
     global.parseInitialized = false;
     console.error('[AETHRION] Back4App bootstrap failed:', error);
   }
+  // Real startup handshake: Parse.initialize() configures the browser SDK only;
+  // it does not prove that the deployed Back4App Cloud Code is reachable.
+  global.aethrionBackendHealth = global.aethrionBackendHealth || {
+    state: 'pending',
+    checkedAt: null,
+    error: null
+  };
+
+  global.checkAethrionBackend = async function (options) {
+    options = options || {};
+    var state = global.aethrionBackendHealth;
+    if (state.promise && !options.force) return state.promise;
+    state.state = 'checking';
+    state.error = null;
+
+    state.promise = (async function () {
+      try {
+        if (typeof global.initBack4app !== 'function') {
+          throw new Error('AETHRION Back4App başlatıcısı yüklenmedi.');
+        }
+        await global.initBack4app();
+        if (!global.Parse || !global.Parse.Cloud || typeof global.Parse.Cloud.run !== 'function') {
+          throw new Error('Parse Cloud SDK hazır değil.');
+        }
+
+        var timeoutId;
+        var timeout = new Promise(function (_, reject) {
+          timeoutId = global.setTimeout(function () {
+            reject(new Error('Back4App Cloud Code 10 saniye içinde yanıt vermedi.'));
+          }, 10000);
+        });
+        var result;
+        try {
+          result = await Promise.race([
+            global.Parse.Cloud.run('test', {}),
+            timeout
+          ]);
+        } finally {
+          global.clearTimeout(timeoutId);
+        }
+
+        if (!result || result.success !== true) {
+          throw new Error('Back4App Cloud Code sağlık kontrolü beklenen yanıtı vermedi.');
+        }
+        state.state = 'connected';
+        state.checkedAt = new Date().toISOString();
+        state.error = null;
+        global.dispatchEvent(new CustomEvent('aethrion:backend-status', {
+          detail: { state: 'connected', checkedAt: state.checkedAt }
+        }));
+        if (typeof global.showNotification === 'function') {
+          global.showNotification('Back4App bağlantısı kuruldu · AETHRION sistemi aktif.', 'success');
+        }
+        return true;
+      } catch (error) {
+        state.state = 'error';
+        state.checkedAt = new Date().toISOString();
+        state.error = String(error && error.message || error).slice(0, 300);
+        console.error('[AETHRION] Gerçek Back4App sağlık kontrolü başarısız:', error);
+        global.dispatchEvent(new CustomEvent('aethrion:backend-status', {
+          detail: { state: 'error', checkedAt: state.checkedAt, error: state.error }
+        }));
+        if (typeof global.showNotification === 'function') {
+          global.showNotification('Back4App bağlantısı doğrulanamadı: ' + state.error, 'error');
+        }
+        return false;
+      } finally {
+        state.promise = null;
+      }
+    })();
+    return state.promise;
+  };
+
+  // Deferred application scripts execute before window.load, so the notification
+  // runtime is available when this handshake reports its result.
+  global.addEventListener('load', function () {
+    global.setTimeout(function () {
+      global.checkAethrionBackend();
+    }, 350);
+  }, { once: true });
 })(window);
 
 
