@@ -320,7 +320,7 @@
       conversations.forEach(function (item) {
         var row = d.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 0;border-bottom:1px solid var(--border,rgba(255,255,255,.08))';
         var open = d.createElement('button'); open.type = 'button'; open.style.cssText = 'flex:1 1 180px;min-width:0;text-align:left;padding:10px 12px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:10px;background:transparent;color:var(--text,#fff);cursor:pointer';
-        var name = d.createElement('strong'); name.textContent = item.customName || (item.lastMessage ? String(item.lastMessage).slice(0,52) : 'Yeni sohbet'); name.style.display = 'block';
+        var name = d.createElement('strong'); name.textContent = String(item.customName || '').replace(/^AETHRION AI \\| /, '') || (item.lastMessage ? String(item.lastMessage).slice(0,52) : 'Yeni sohbet'); name.style.display = 'block';
         var date = d.createElement('small'); date.textContent = item.lastMessageTime ? new Date(item.lastMessageTime).toLocaleString('tr-TR') : 'Henüz mesaj yok'; date.style.cssText = 'display:block;margin-top:4px;color:var(--text3,#9ca3af)';
         open.appendChild(name); open.appendChild(date); open.addEventListener('click', function () { aiOpenConversation(item.id).catch(function (e) { w.showNotification && w.showNotification(e.message || 'Sohbet açılamadı.', 'error'); }); });
         var rename = d.createElement('button'); rename.type = 'button'; rename.textContent = 'Adlandır'; rename.title = 'Sohbeti yeniden adlandır';
