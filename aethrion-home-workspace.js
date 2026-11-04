@@ -54,6 +54,28 @@
 
     var title = p.querySelector('.vz-title');
     if (title) title.textContent = kind === 'agents' ? 'AETHRION AGENTS' : 'AETHRION AI';
+    // Sohbet yönetimi ana menüden çıkarıldı; yalnızca AETHRION AI panelinin içinde bulunur.
+    var aiTools = node('aeInlineAIControls');
+    if (!aiTools) {
+      aiTools = d.createElement('div');
+      aiTools.id = 'aeInlineAIControls';
+      aiTools.setAttribute('role', 'toolbar');
+      aiTools.setAttribute('aria-label', 'AETHRION AI sohbet araçları');
+      aiTools.style.cssText = 'display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;padding:8px 14px;border-bottom:1px solid var(--border,rgba(255,255,255,.1));background:var(--card,transparent)';
+      var header = p.querySelector('.vizyon-al-header') || p.firstElementChild || p;
+      header.insertAdjacentElement('afterend', aiTools);
+      function toolButton(id, label, title) {
+        var b = d.createElement('button'); b.type = 'button'; b.id = id; b.textContent = label; b.title = title;
+        b.style.cssText = 'padding:8px 12px;border:1px solid var(--border,rgba(255,255,255,.18));border-radius:10px;background:transparent;color:inherit;font:inherit;cursor:pointer';
+        return b;
+      }
+      var fresh = toolButton('aeInlineNewChat', '＋ Yeni Sohbet', 'Yeni AETHRION AI sohbeti başlat');
+      var history = toolButton('aeInlineChatHistory', '▤ Sohbet Geçmişi', 'Önceki AETHRION AI sohbetlerini aç');
+      fresh.addEventListener('click', function () { if (typeof w.newConversation === 'function') w.newConversation(); else notify('Yeni sohbet işlevi yüklenemedi.', 'error'); });
+      history.addEventListener('click', function () { if (typeof w.toggleConversationHistory === 'function') w.toggleConversationHistory(); else notify('Sohbet geçmişi işlevi yüklenemedi.', 'error'); });
+      aiTools.appendChild(fresh); aiTools.appendChild(history);
+    }
+    aiTools.style.display = kind === 'ai' ? 'flex' : 'none';
     var responsibility = node('aaResponsibilityArea');
     var main = node('vzMainArea');
     if (kind === 'agents') {
