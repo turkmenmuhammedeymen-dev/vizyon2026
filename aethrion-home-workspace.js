@@ -170,9 +170,9 @@
     var url;
     try { url = new URL(link.getAttribute('href') || '', w.location.href); } catch (_) { return; }
     if (url.origin !== w.location.origin) return;
-    var path = url.pathname.toLowerCase();
-    if (path === '/aethrion-ai.html') { event.preventDefault(); event.stopImmediatePropagation(); w.openFullAIPanel(); }
-    else if (path === '/aethrion-assistant.html') { event.preventDefault(); event.stopImmediatePropagation(); w.openAethrionAgentsPanel(); } else if (path === '/vizyon-al.html') { event.preventDefault(); event.stopImmediatePropagation(); w.openFullAIPanel(); }
+    var path = url.pathname.toLowerCase().replace(/\/+$/, '');
+    if (path.endsWith('/aethrion-ai.html')) { event.preventDefault(); event.stopImmediatePropagation(); w.openFullAIPanel(); }
+    else if (path.endsWith('/aethrion-assistant.html')) { event.preventDefault(); event.stopImmediatePropagation(); w.openAethrionAgentsPanel(); } else if (path.endsWith('/vizyon-al.html')) { event.preventDefault(); event.stopImmediatePropagation(); w.openFullAIPanel(); }
   }, true);
 
   d.addEventListener('keydown', function (event) {
