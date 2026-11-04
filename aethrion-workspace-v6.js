@@ -3,7 +3,7 @@
 'use strict';
 var fallback={
 'AETHRION AI':['openFullAIPanel','/aethrion-ai.html'],
-'AETHRION Agents':['openAethrionAlPanel','/aethrion-assistant.html'],
+'AETHRION Agents':['openAethrionAgentsPanel','/aethrion-assistant.html'],
 'AETHRION Coach':['openKocPanel','/aethrion-assistant.html'],
 'Model Kataloğu':['openModelsShowcase','/aethrion-ai.html#models'],
 '3D Studio':['open3DBuilder','/3d-studio.html'],
