@@ -4,7 +4,7 @@
 // ================================================================
 // ✅ BACK4APP UYUMLU (Parse Server Standard + Node.js)
 // ✅ OTOMATİK SCHEMA (Tüm sınıflar/kolonlar initSchemas'ta)
-// ✅ 28 AI MODELİ (13 Ollama + 7 NVIDIA NIM + 8 Bulut API)
+// ✅ 29 AI MODELİ (13 Ollama + 7 NVIDIA NIM + 8 Bulut API + 1 AETHRION-LLM)
 // ✅ A27 API ANAHTAR SİSTEMİ (AES-256-GCM)
 // ✅ AETHRION KOÇ ASİSTANI
 // ✅ AETHRION AI PANELİ (4 mod + ekran + sesli + dosya + sunum)
@@ -2009,8 +2009,8 @@ Parse.Cloud.define("callLocalLlama", async function (request) {
 Parse.Cloud.define("callAethrionLocalLLM", async function (request) {
     var prompt = String((request.params && request.params.prompt) || '').trim();
     if (!prompt) return null;
-    var localUrl = await getAPIKey('COLAB_LLAMA_URL');
-    var gatewayToken = _aethrionReadPrivateEnv('COLAB_LLAMA_TOKEN') || _aethrionReadPrivateEnv('AETHRION_GATEWAY_TOKEN') || _aethrionReadPrivateEnv('OLLAMA_GATEWAY_TOKEN');
+    var localUrl = await _aethrionGetGatewayUrl();
+    var gatewayToken = _aethrionGetGatewayToken();
     if (!localUrl || !gatewayToken) return null;
     if (localUrl.endsWith('/')) localUrl = localUrl.slice(0, -1);
     try {
@@ -2293,6 +2293,34 @@ async function callCustomAIWithSingleKey(keyName, rawValue, prompt) {
     } catch (e) { return { success: false, error: e.message }; }
 }
 
+// Public, non-secret model catalogue used by AETHRION AI and integrations.
+// IDs are passed to superAI as auto, ollama:<tag>, nvidia:<model-id>,
+// cloud:<provider>, or aethrion-llm.
+Parse.Cloud.define("aethrionGetModelCatalog", async function () {
+    var ollama = [
+        'granite3.3:2b', 'qwen2.5vl:3b', 'phi4-mini-reasoning:latest',
+        'gemma3:4b', 'qwen3:8b', 'qwen3:4b', 'qwen2.5-coder:1.5b',
+        'mistral:7b', 'phi3.5:latest', 'gemma2:2b', 'llama3.2:1b',
+        'deepseek-r1:1.5b', 'qwen2.5:3b'
+    ];
+    var nvidia = [
+        'meta/llama-3.3-70b-instruct', 'meta/llama-3.1-8b-instruct',
+        'qwen/qwen2.5-7b-instruct', 'qwen/qwen2.5-coder-32b-instruct',
+        'deepseek-ai/deepseek-r1-distill-llama-8b',
+        'google/gemma-2-2b-instruct', 'microsoft/phi-3.5-moe-instruct'
+    ];
+    var cloud = ['groq', 'gemini', 'deepseek', 'deepinfra', 'openai', 'cerebras', 'openrouter', 'cohere'];
+    return {
+        total: 29,
+        groups: [
+            { provider: 'ollama', count: 13, models: ollama.map(function (id) { return { id: 'ollama:' + id, name: id }; }) },
+            { provider: 'nvidia-nim', count: 7, models: nvidia.map(function (id) { return { id: 'nvidia:' + id, name: id }; }) },
+            { provider: 'cloud-api', count: 8, models: cloud.map(function (id) { return { id: 'cloud:' + id, name: id }; }) },
+            { provider: 'aethrion', count: 1, models: [{ id: 'aethrion-llm', name: 'AETHRION-LLM', status: 'pilot-quality-review' }] }
+        ]
+    };
+});
+
 // ================================================================
 // ========== superAI — bounded provider fallback =================
 // ================================================================
@@ -2414,20 +2442,16 @@ Parse.Cloud.define("superAI", async function (request) {
             : _aeSuperAIResponse('Seçilen bulut modeli yanıt veremedi. İlgili API anahtarı ve sağlayıcı durumunu kontrol et.', 'cloud-api', chosenCloud + ' (çevrimdışı)', includeMetadata);
     }
 
-    if (selectedModel === 'auto' && gatewayUrl && gatewayToken && aiCanContinue()) {
-        try {
-            var ownReply = await _aeCloudRunWithTimeout('callAethrionLocalLLM', { prompt: apiPrompt }, Math.min(9000, aiTimeLeft()));
-            if (ownReply && ownReply.length > 3) return _aeSuperAIResponse(ownReply, 'aethrion-llm', 'AETHRION-LLM', includeMetadata);
-        } catch (e) { console.warn('[AETHRION-LLM] Automatic fallback skipped:', String(e && e.message || e)); }
-    }
-
     if (gatewayUrl && gatewayToken) {
-        console.log('🔄 KATMAN 1 - Ollama: 13 model kataloğu hazır; otomatik modda ilk iki model deneniyor.');
-        for (var om = 0; om < Math.min(ollamaModels.length, 2) && aiCanContinue(); om++) {
+        // Quality-first automatic route: prioritize the two models that passed
+        // the latest basic Turkish factual smoke test. All 13 remain selectable.
+        var autoOllamaPriority = ['qwen3:8b', 'gemma3:4b'];
+        console.log('🔄 KATMAN 1 - Ollama: 13 model kayıtlı; otomatik modda kalite öncelikli 2 model deneniyor.');
+        for (var om = 0; om < autoOllamaPriority.length && aiCanContinue(); om++) {
             try {
-                var localReply = await _aeCloudRunWithTimeout('callLocalLlama', { prompt: apiPrompt, model: ollamaModels[om] }, Math.min(7500, aiTimeLeft()));
-                if (localReply && localReply.length > 10) { console.log('✅ OLLAMA: ' + ollamaModels[om]); return _aeSuperAIResponse(localReply, 'ollama', ollamaModels[om], includeMetadata); }
-            } catch (e) { console.warn('⚠️ Ollama ' + ollamaModels[om] + ' başarısız'); }
+                var localReply = await _aeCloudRunWithTimeout('callLocalLlama', { prompt: apiPrompt, model: autoOllamaPriority[om] }, Math.min(7500, aiTimeLeft()));
+                if (localReply && localReply.length > 10) { console.log('✅ OLLAMA: ' + autoOllamaPriority[om]); return _aeSuperAIResponse(localReply, 'ollama', autoOllamaPriority[om], includeMetadata); }
+            } catch (e) { console.warn('⚠️ Ollama ' + autoOllamaPriority[om] + ' başarısız'); }
         }
     }
 
@@ -2453,9 +2477,12 @@ Parse.Cloud.define("superAI", async function (request) {
         } catch (e) { console.error('❌ ' + model + ' başarısız:', String(e && e.message || e)); }
     }
 
+    // The from-scratch checkpoint is exposed as model 29 for explicit selection.
+    // It is not used as an automatic fallback until its Turkish output passes
+    // an independent quality benchmark; current pilot outputs are not reliable.
     return includeMetadata
-        ? { reply: '🧠 AETHRION AI: Üzgünüm, tüm modeller şu anda cevap veremiyor.', provider: 'none', model: 'none' }
-        : '🧠 AETHRION AI: Üzgünüm, tüm modeller şu anda cevap veremiyor.';
+        ? { reply: '🧠 AETHRION AI: Şu anda etkin sağlayıcılardan yanıt alınamadı. AETHRION-LLM pilot modeli ayrıca seçilebilir.', provider: 'none', model: 'none' }
+        : '🧠 AETHRION AI: Şu anda etkin sağlayıcılardan yanıt alınamadı.';
 });
 
 // ================================================================
@@ -2540,7 +2567,7 @@ Parse.Cloud.define("aethrionChat", async function (request) {
             return {
                 success: false,
                 code: 'AI_UNAVAILABLE',
-                error: '28 modelin hiçbiri şu anda yanıt veremedi. Günlük hakkın düşülmedi; biraz sonra tekrar dene.',
+                error: '29 modelin hiçbiri şu anda yanıt veremedi. Günlük hakkın düşülmedi; biraz sonra tekrar dene.',
                 limit: unlimited ? 'Sınırsız' : limit,
                 used: used,
                 remaining: unlimited ? 'Sınırsız' : Math.max(0, limit - used)
