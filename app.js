@@ -2112,7 +2112,7 @@ function openFeature(label){
  if(opened){document.body.classList.remove('aews-feature-view');var activeStage=q('#aethrionWorkspaceStage');if(activeStage)activeStage.style.setProperty('display','none','important');return}
  if(f[5]&&f[5]!=='./index.html#features'&&f[5]!=='#features'){
   var base=location.pathname.indexOf('/vizyon2026/')===0?'/vizyon2026/':'/';
-  location.href=new URL(String(f[5]).replace(/^\\/+/,''),location.origin+base).toString();return;
+  location.href=new URL(String(f[5]).replace(/^\/+/,''),location.origin+base).toString();return;
  }
  document.body.classList.remove('aews-feature-view');
  var emptyStage=q('#aethrionWorkspaceStage');if(emptyStage)emptyStage.style.setProperty('display','none','important');
