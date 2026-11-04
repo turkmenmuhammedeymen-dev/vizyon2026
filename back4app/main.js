@@ -1932,8 +1932,8 @@ Parse.Cloud.define("callLocalLlama", async function (request) {
     var modelName = request.params.model || 'qwen2.5:3b';
     var localUrl = await _aethrionGetGatewayUrl();
     var gatewayToken = _aethrionGetGatewayToken();
-    if (!localUrl) { console.log('⚠️ COLAB_LLAMA_URL yok, Ollama atlanıyor.'); return null; }
-    if (!gatewayToken) { console.warn('⚠️ COLAB_LLAMA_TOKEN özel sunucu değişkeni eksik; Ollama atlanıyor.'); return null; }
+    if (!localUrl) { console.log('⚠️ AETHRION_GATEWAY_URL yok, Ollama atlanıyor.'); return null; }
+    if (!gatewayToken) { console.warn('⚠️ AETHRION_GATEWAY_TOKEN özel Back4App ortam değişkeni eksik; Ollama atlanıyor.'); return null; }
     if (localUrl.endsWith('/')) localUrl = localUrl.slice(0, -1);
 
     var isCodeModel = (modelName.indexOf('coder') !== -1 || modelName.indexOf('phi4-mini-reasoning') !== -1 || modelName.indexOf('deepseek-r1') !== -1);
@@ -2293,6 +2293,37 @@ async function callCustomAIWithSingleKey(keyName, rawValue, prompt) {
     } catch (e) { return { success: false, error: e.message }; }
 }
 
+// Safe connectivity diagnostic. Never returns the Gateway bearer token.
+Parse.Cloud.define("aethrionGatewayStatus", async function (request) {
+    if (!request.user) throw new Error('Giriş yapmalısınız.');
+    var url = await _aethrionGetGatewayUrl();
+    var tokenConfigured = !!_aethrionGetGatewayToken();
+    if (!url) return { configured: false, tokenConfigured: tokenConfigured, reachable: false, error: 'AETHRION_GATEWAY_URL eksik veya geçersiz.' };
+    if (!tokenConfigured) return { configured: true, tokenConfigured: false, reachable: false, error: 'AETHRION_GATEWAY_TOKEN sunucu ortam değişkeni eksik.' };
+    try {
+        var response = await Parse.Cloud.httpRequest({
+            method: 'GET',
+            url: url + '/health',
+            headers: { 'skip_zrok_interstitial': '1', 'User-Agent': 'curl/8.0', 'Accept': 'application/json' },
+            timeout: 10000
+        });
+        var raw = response && response.text ? response.text : (response && response.buffer ? response.buffer.toString() : '');
+        var data = raw ? JSON.parse(raw) : {};
+        return {
+            configured: true,
+            tokenConfigured: true,
+            reachable: !!(data && data.status === 'ok'),
+            status: data.status || 'unknown',
+            ollama: data.ollama || null,
+            aethrion_llm_ready: data.aethrion_llm_ready === true,
+            device: data.device || null
+        };
+    } catch (error) {
+        console.warn('[AETHRION Gateway] Health check failed:', String(error && error.message || error));
+        return { configured: true, tokenConfigured: true, reachable: false, error: 'Gateway sağlık kontrolü başarısız. Tünel ve Kaggle oturumunu kontrol edin.' };
+    }
+});
+
 // Public, non-secret model catalogue used by AETHRION AI and integrations.
 // IDs are passed to superAI as auto, ollama:<tag>, nvidia:<model-id>,
 // cloud:<provider>, or aethrion-llm.
@@ -2386,7 +2417,7 @@ Parse.Cloud.define("superAI", async function (request) {
     function aiTimeLeft() { return Math.max(0, aiDeadlineMs - (Date.now() - aiStartedAt)); }
     function aiCanContinue() { return aiTimeLeft() > 1000; }
 
-    // AETHRION-LLM is attempted first in automatic mode when a trained checkpoint is available.
+    // AETHRION-LLM remains explicitly selectable; automatic mode excludes it until its pilot output passes a quality benchmark.
     var gatewayUrl = await _aethrionGetGatewayUrl();
     var gatewayToken = _aethrionGetGatewayToken();
     // Exact tags verified in the Kaggle Ollama runtime.
