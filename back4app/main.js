@@ -1957,7 +1957,9 @@ Parse.Cloud.define("callLocalLlama", async function (request) {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + gatewayToken,
-                'skip_zrok_interstitial': 'true'
+                'skip_zrok_interstitial': '1',
+                'User-Agent': 'curl/8.0',
+                'Accept': 'application/json'
             },
             body: JSON.stringify({
                 model: modelName,
@@ -2019,7 +2021,10 @@ Parse.Cloud.define("callAethrionLocalLLM", async function (request) {
             url: localUrl + '/llm/generate',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + gatewayToken
+                'Authorization': 'Bearer ' + gatewayToken,
+                'skip_zrok_interstitial': '1',
+                'User-Agent': 'curl/8.0',
+                'Accept': 'application/json'
             },
             body: JSON.stringify({
                 prompt: prompt,
@@ -2534,6 +2539,7 @@ Parse.Cloud.define("aethrionChat", async function (request) {
                 ? 'Ajan modundasın: uygulanabilir adımları planla; gerçekleştiremediğin harici işlemleri yaptığını iddia etme.\\n\\n'
                 : '';
     var prompt = modeInstruction + message;
+    var selectedModel = String((request.params && request.params.model) || 'auto');
 
     var user = request.user || null;
     var today = new Date();
@@ -2590,8 +2596,8 @@ Parse.Cloud.define("aethrionChat", async function (request) {
     await usage.save(null, { useMasterKey: true });
     var newUsed = used + 1;
     try {
-        var reply = await Parse.Cloud.run('superAI', { prompt: prompt }, { useMasterKey: true });
-        var replyText = String(reply == null ? '' : reply);
+        var aiResult = await Parse.Cloud.run('superAI', { prompt: prompt, model: selectedModel, includeMetadata: true }, { useMasterKey: true });
+        var replyText = String(aiResult && typeof aiResult === 'object' ? (aiResult.reply || '') : (aiResult == null ? '' : aiResult));
         if (!replyText || /tüm modeller şu anda cevap veremiyor|all models are currently unavailable/i.test(replyText)) {
             usage.increment('count', -1);
             await usage.save(null, { useMasterKey: true });
@@ -2607,6 +2613,8 @@ Parse.Cloud.define("aethrionChat", async function (request) {
         return {
             success: true,
             reply: replyText,
+            provider: aiResult && typeof aiResult === 'object' ? (aiResult.provider || 'unknown') : 'unknown',
+            model: aiResult && typeof aiResult === 'object' ? (aiResult.model || 'unknown') : 'unknown',
             limit: unlimited ? 'Sınırsız' : limit,
             used: newUsed,
             remaining: unlimited ? 'Sınırsız' : Math.max(0, limit - newUsed)
@@ -3827,7 +3835,7 @@ console.log('   → 8 Bireysel AI çağrısı (Groq, DeepSeek, vb.)');
 console.log('   → callLocalLlama (13 Ollama)');
 console.log('   → callNvidiaNIM (7 NIM)');
 console.log('   → callCustomAI + callCustomAIWithKeys');
-console.log('   → superAI (21 model, 3 katman)');
+console.log('   → superAI (29 model kataloğu, 3 harici katman + AETHRION-LLM pilot)');
 console.log('   → webSearch + sendEmail');
 console.log('   → getSiteInfoForVizyonAl');
 console.log('   → vizyonAlChat (4 mod) + DeepThink + Agent + Developer');
@@ -6051,11 +6059,16 @@ Parse.Cloud.define("kocChat", async function (request) {
         'Cevapların Türkçe, net, kısa ve motive edici olsun. ' + roleContext;
 
     var fullPrompt = systemPrompt + '\n\nKullanıcı mesajı: ' + message;
-
+    var selectedModel = String((request.params && request.params.model) || 'auto');
     var reply = '';
+    var usedProvider = 'unknown';
+    var usedModel = 'unknown';
     try {
-        reply = await Parse.Cloud.run('superAI', { prompt: fullPrompt }, { useMasterKey: true });
-        if (!reply || reply.length < 2) reply = 'Seni duydum kardeşim. Biraz daha detay verebilir misin? 🤝';
+        var coachResult = await Parse.Cloud.run('superAI', { prompt: fullPrompt, model: selectedModel, includeMetadata: true }, { useMasterKey: true });
+        reply = coachResult && typeof coachResult === 'object' ? String(coachResult.reply || '') : String(coachResult || '');
+        usedProvider = coachResult && typeof coachResult === 'object' ? (coachResult.provider || 'unknown') : 'unknown';
+        usedModel = coachResult && typeof coachResult === 'object' ? (coachResult.model || 'unknown') : 'unknown';
+        if (!reply || reply.length < 2) reply = 'Yanıt alınamadı. Lütfen tekrar dene.';
     } catch (e) {
         console.error('kocChat superAI hatası:', e.message);
         reply = 'Şu anda bir bağlantı sorunu yaşıyorum. Lütfen biraz sonra tekrar dene. 🤝';
@@ -6106,6 +6119,8 @@ Parse.Cloud.define("kocChat", async function (request) {
     return {
         success: true,
         reply: cleanResponse(reply),
+        provider: usedProvider,
+        model: usedModel,
         conversationId: conv.id,
         conversationTitle: conv.get('title'),
         limit: limit,
@@ -11001,7 +11016,7 @@ console.log('    → Polyfills + Rate Limit + Fetch (Back4App)');
 console.log('    → 50 sınıf (AethrionAIUsage, AethrionProjectAudit, Reminder dahil)');
 console.log('    → initSchemas (TÜM sınıflar/kolonlar otomatik)');
 console.log('    → 8 bireysel AI + callLocalLlama (13 Ollama) + callNvidiaNIM (7)');
-console.log('    → superAI (3 katman: 13 Ollama + 7 NIM + 8 API = 28 MODEL)');
+console.log('    → superAI (29 model kataloğu: 13 Ollama + 7 NIM + 8 API + 1 AETHRION-LLM pilot)');
 console.log('    → callCustomAI + callCustomAIWithKeys');
 console.log('    → webSearch + sendEmail (Google + Resend)');
 console.log('    → AETHRION AI: 4 mod (normal/deep/agent/developer)');
