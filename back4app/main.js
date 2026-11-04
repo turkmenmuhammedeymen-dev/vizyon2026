@@ -452,7 +452,8 @@ async function getAPIKey(keyName) {
         NVIDIA_API_KEY: ['NVIDIA_NIM_API_KEY'],
         NVIDIA_BASE_URL: ['NVIDIA_NIM_BASE_URL'],
         NVIDIA_NIM_BASE_URL: ['NVIDIA_BASE_URL'],
-        COLAB_LLAMA_URL: ['OLLAMA_URL', 'OLLAMA_BASE_URL', 'COLAB_LLAMA_BASE_URL']
+        COLAB_LLAMA_URL: ['OLLAMA_URL', 'OLLAMA_BASE_URL', 'COLAB_LLAMA_BASE_URL'],
+        COLAB_LLAMA_TOKEN: ['AETHRION_GATEWAY_TOKEN', 'OLLAMA_GATEWAY_TOKEN']
     };
     var primary = await getAethrionConfigValue(keyName);
     if (primary !== null && primary !== undefined && String(primary).trim()) return primary;
@@ -1909,9 +1910,11 @@ Parse.Cloud.define("callGemini", async function (request) {
 // ================================================================
 Parse.Cloud.define("callLocalLlama", async function (request) {
     var prompt = request.params.prompt;
-    var modelName = request.params.model || 'qwen2.5:latest';
+    var modelName = request.params.model || 'qwen2.5:3b';
     var localUrl = await getAPIKey('COLAB_LLAMA_URL');
-    if (!localUrl) { console.log('⚠️ COLAB_LLAMA_URL yok, atlanıyor.'); return null; }
+    var gatewayToken = _aethrionReadPrivateEnv('COLAB_LLAMA_TOKEN') || _aethrionReadPrivateEnv('AETHRION_GATEWAY_TOKEN') || _aethrionReadPrivateEnv('OLLAMA_GATEWAY_TOKEN');
+    if (!localUrl) { console.log('⚠️ COLAB_LLAMA_URL yok, Ollama atlanıyor.'); return null; }
+    if (!gatewayToken) { console.warn('⚠️ COLAB_LLAMA_TOKEN özel sunucu değişkeni eksik; Ollama atlanıyor.'); return null; }
     if (localUrl.endsWith('/')) localUrl = localUrl.slice(0, -1);
 
     var isCodeModel = (modelName.indexOf('coder') !== -1 || modelName.indexOf('phi4-mini-reasoning') !== -1 || modelName.indexOf('deepseek-r1') !== -1);
@@ -1931,10 +1934,10 @@ Parse.Cloud.define("callLocalLlama", async function (request) {
     try {
         var response = await Parse.Cloud.httpRequest({
             method: 'POST',
-            url: localUrl + '/v1/chat/completions',
+            url: localUrl + '/ollama/v1/chat/completions',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ollama',
+                'Authorization': 'Bearer ' + gatewayToken,
                 'skip_zrok_interstitial': 'true'
             },
             body: JSON.stringify({
@@ -1977,6 +1980,41 @@ Parse.Cloud.define("callLocalLlama", async function (request) {
         return null;
     } catch (e) {
         console.error('❌ Ollama bağlantı hatası (' + modelName + '):', e.message);
+        return null;
+    }
+});
+
+/* AETHRION-LLM: own from-scratch model API, exposed only through the authenticated Inrok gateway.
+ * The API returns { text }; it is available only when a trained checkpoint and tokenizer exist.
+ */
+Parse.Cloud.define("callAethrionLocalLLM", async function (request) {
+    var prompt = String((request.params && request.params.prompt) || '').trim();
+    if (!prompt) return null;
+    var localUrl = await getAPIKey('COLAB_LLAMA_URL');
+    var gatewayToken = _aethrionReadPrivateEnv('COLAB_LLAMA_TOKEN') || _aethrionReadPrivateEnv('AETHRION_GATEWAY_TOKEN') || _aethrionReadPrivateEnv('OLLAMA_GATEWAY_TOKEN');
+    if (!localUrl || !gatewayToken) return null;
+    if (localUrl.endsWith('/')) localUrl = localUrl.slice(0, -1);
+    try {
+        var response = await Parse.Cloud.httpRequest({
+            method: 'POST',
+            url: localUrl + '/llm/generate',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + gatewayToken
+            },
+            body: JSON.stringify({
+                prompt: prompt,
+                max_new_tokens: 256,
+                temperature: 0.7
+            }),
+            timeout: 12000
+        });
+        var rawText = response && response.text ? response.text : (response && response.buffer ? response.buffer.toString() : '');
+        if (!rawText) return null;
+        var data = JSON.parse(rawText);
+        return data && typeof data.text === 'string' && data.text.trim() ? data.text.trim() : null;
+    } catch (e) {
+        console.warn('[AETHRION-LLM] Model endpoint unavailable:', String(e && e.message || e));
         return null;
     }
 });
@@ -2259,9 +2297,16 @@ async function _aeCloudRunWithTimeout(functionName, params, timeoutMs) {
     }
 }
 
+function _aeSuperAIResponse(reply, provider, model, includeMetadata) {
+    var cleaned = cleanResponse(String(reply == null ? '' : reply));
+    return includeMetadata ? { reply: cleaned, provider: provider, model: model } : cleaned;
+}
+
 Parse.Cloud.define("superAI", async function (request) {
     var prompt = request.params.prompt;
-    if (!prompt) return 'Lütfen bir soru girin.';
+    var includeMetadata = !!(request.params && request.params.includeMetadata);
+    var selectedModel = String((request.params && request.params.model) || 'auto');
+    if (!prompt) return includeMetadata ? { reply: 'Lütfen bir soru girin.', provider: 'aethrion', model: 'none' } : 'Lütfen bir soru girin.';
 
     // ✅ [FIX A8] superAI'de rate limit yoktu (DDoS'a açık) — eklendi.
     // NOT: superAI fonksiyonu her yerde düz string döndürüyor, tutarlılık için
@@ -2284,7 +2329,7 @@ Parse.Cloud.define("superAI", async function (request) {
     if (lp.indexOf('dolar') !== -1 || lp.indexOf('haber') !== -1 || lp.indexOf('arama') !== -1 || lp.indexOf('hava') !== -1) {
         try {
             var result = await Parse.Cloud.run("webSearch", { query: prompt }, { useMasterKey: true });
-            if (result && result.indexOf('tanımlanmamış') === -1 && result.indexOf('yapılamadı') === -1) return cleanResponse(result);
+            if (result && result.indexOf('tanımlanmamış') === -1 && result.indexOf('yapılamadı') === -1) return _aeSuperAIResponse(result, 'web-search', 'Web Search', includeMetadata);
         } catch (e) { console.error('Web arama hatası:', e.message); }
     }
 
@@ -2294,20 +2339,42 @@ Parse.Cloud.define("superAI", async function (request) {
     function aiTimeLeft() { return Math.max(0, aiDeadlineMs - (Date.now() - aiStartedAt)); }
     function aiCanContinue() { return aiTimeLeft() > 1000; }
 
-    // KATMAN 1: 13 OLLAMA (her istekte en fazla iki aday; süre bütçesi korunur)
+    // AETHRION-LLM is attempted first in automatic mode when a trained checkpoint is available.
+    var gatewayUrl = await getAPIKey('COLAB_LLAMA_URL');
+    var gatewayToken = _aethrionReadPrivateEnv('COLAB_LLAMA_TOKEN') || _aethrionReadPrivateEnv('AETHRION_GATEWAY_TOKEN') || _aethrionReadPrivateEnv('OLLAMA_GATEWAY_TOKEN');
     var ollamaModels = [
-        'qwen2.5:latest','qwen3:8b','llama3.2:latest','gemma3:4b','mistral:latest',
-        'qwen3:4b','gemma2:latest','phi3.5:latest','deepseek-r1:latest','qwen2.5-coder:latest',
-        'phi4-mini-reasoning:latest','qwen2.5vl:3b','granite3.3:2b'
+        'deepseek-r1:1.5b', 'qwen2.5:3b', 'llama3.2:1b', 'gemma2:2b', 'phi3.5',
+        'mistral:7b', 'qwen2.5-coder:1.5b', 'qwen3:4b', 'qwen3:8b', 'gemma3:4b',
+        'phi4-mini-reasoning', 'qwen2.5vl:3b', 'granite3.3:2b'
     ];
 
-    var localUrl = await getAPIKey('COLAB_LLAMA_URL');
-    if (localUrl) {
-        console.log('🔄 KATMAN 1 - Ollama: süre sınırı içinde en fazla 2 model deneniyor...');
+    // Explicit model selection never silently switches to a different model.
+    if (selectedModel === 'aethrion-llm') {
+        var ownSelected = await _aeCloudRunWithTimeout('callAethrionLocalLLM', { prompt: apiPrompt }, Math.min(11000, aiTimeLeft()));
+        if (ownSelected && ownSelected.length > 3) return _aeSuperAIResponse(ownSelected, 'aethrion-llm', 'AETHRION-LLM', includeMetadata);
+        return _aeSuperAIResponse('AETHRION-LLM şu anda hazır değil. Kaggle oturumunda eğitilmiş checkpoint ve tokenizer bulunmalı; tünel açık olmalı.', 'aethrion-llm', 'AETHRION-LLM (çevrimdışı)', includeMetadata);
+    }
+    if (selectedModel.indexOf('ollama:') === 0) {
+        var chosenOllama = selectedModel.slice(7);
+        if (ollamaModels.indexOf(chosenOllama) === -1) return _aeSuperAIResponse('Seçilen Ollama modeli tanımlı değil.', 'aethrion', 'invalid-model', includeMetadata);
+        var chosenReply = await _aeCloudRunWithTimeout('callLocalLlama', { prompt: apiPrompt, model: chosenOllama }, Math.min(10000, aiTimeLeft()));
+        if (chosenReply && chosenReply.length > 3) return _aeSuperAIResponse(chosenReply, 'ollama', chosenOllama, includeMetadata);
+        return _aeSuperAIResponse('Seçilen Ollama modeli yanıt veremedi. Inrok tünelini, model indirme durumunu ve COLAB_LLAMA_TOKEN ayarını kontrol et.', 'ollama', chosenOllama + ' (çevrimdışı)', includeMetadata);
+    }
+
+    if (selectedModel === 'auto' && gatewayUrl && gatewayToken && aiCanContinue()) {
+        try {
+            var ownReply = await _aeCloudRunWithTimeout('callAethrionLocalLLM', { prompt: apiPrompt }, Math.min(9000, aiTimeLeft()));
+            if (ownReply && ownReply.length > 3) return _aeSuperAIResponse(ownReply, 'aethrion-llm', 'AETHRION-LLM', includeMetadata);
+        } catch (e) { console.warn('[AETHRION-LLM] Automatic fallback skipped:', String(e && e.message || e)); }
+    }
+
+    if (gatewayUrl && gatewayToken) {
+        console.log('🔄 KATMAN 1 - Ollama: 13 model kataloğu hazır; otomatik modda ilk iki model deneniyor.');
         for (var om = 0; om < Math.min(ollamaModels.length, 2) && aiCanContinue(); om++) {
             try {
-                var localReply = await _aeCloudRunWithTimeout('callLocalLlama', { prompt: prompt, model: ollamaModels[om] }, Math.min(7500, aiTimeLeft()));
-                if (localReply && localReply.length > 10) { console.log('✅ OLLAMA: ' + ollamaModels[om]); return cleanResponse(localReply); }
+                var localReply = await _aeCloudRunWithTimeout('callLocalLlama', { prompt: apiPrompt, model: ollamaModels[om] }, Math.min(7500, aiTimeLeft()));
+                if (localReply && localReply.length > 10) { console.log('✅ OLLAMA: ' + ollamaModels[om]); return _aeSuperAIResponse(localReply, 'ollama', ollamaModels[om], includeMetadata); }
             } catch (e) { console.warn('⚠️ Ollama ' + ollamaModels[om] + ' başarısız'); }
         }
     }
@@ -2325,7 +2392,7 @@ Parse.Cloud.define("superAI", async function (request) {
         for (var nm = 0; nm < nvidiaModels.length && aiCanContinue(); nm++) {
             try {
                 var nvidiaReply = await _aeCloudRunWithTimeout('callNvidiaNIM', { prompt: apiPrompt, model: nvidiaModels[nm] }, Math.min(4500, aiTimeLeft()));
-                if (nvidiaReply && nvidiaReply.length > 10) { console.log('✅ NIM: ' + nvidiaModels[nm]); return cleanResponse(nvidiaReply); }
+                if (nvidiaReply && nvidiaReply.length > 10) { console.log('✅ NIM: ' + nvidiaModels[nm]); return _aeSuperAIResponse(nvidiaReply, 'nvidia-nim', nvidiaModels[nm], includeMetadata); }
             } catch (e) { console.error('❌ NIM ' + nvidiaModels[nm] + ' başarısız:', String(e && e.message || e)); }
         }
     }
@@ -2336,11 +2403,13 @@ Parse.Cloud.define("superAI", async function (request) {
         var model = apiModels[mi];
         try {
             var result2 = await _aeCloudRunWithTimeout(model, { prompt: apiPrompt }, Math.min(7500, aiTimeLeft()));
-            if (result2 && result2.length > 10) { console.log('✅ ' + model); return cleanResponse(result2); }
+            if (result2 && result2.length > 10) { console.log('✅ ' + model); return _aeSuperAIResponse(result2, 'cloud-api', model, includeMetadata); }
         } catch (e) { console.error('❌ ' + model + ' başarısız:', String(e && e.message || e)); }
     }
 
-    return '🧠 AETHRION AI: Üzgünüm, tüm modeller şu anda cevap veremiyor.';
+    return includeMetadata
+        ? { reply: '🧠 AETHRION AI: Üzgünüm, tüm modeller şu anda cevap veremiyor.', provider: 'none', model: 'none' }
+        : '🧠 AETHRION AI: Üzgünüm, tüm modeller şu anda cevap veremiyor.';
 });
 
 // ================================================================
@@ -2905,11 +2974,15 @@ Parse.Cloud.define("vizyonAlChat", async function (request) {
     var fullPrompt = systemPrompt + '\n\n' + message;
 
     try {
-        var reply = await Parse.Cloud.run('superAI', { prompt: fullPrompt }, { useMasterKey: true });
-        if (!reply || reply.length < 2) reply = 'Şu anda cevap veremiyorum. Lütfen tekrar dene.';
+        var selectedModel = String((request.params && request.params.model) || 'auto');
+        var aiResult = await Parse.Cloud.run('superAI', { prompt: fullPrompt, model: selectedModel, includeMetadata: true }, { useMasterKey: true });
+        var reply = aiResult && typeof aiResult === 'object' ? aiResult.reply : aiResult;
+        if (!reply || String(reply).length < 2) reply = 'Şu anda cevap veremiyorum. Lütfen tekrar dene.';
         return {
             success: true,
-            reply: cleanResponse(reply),
+            reply: cleanResponse(String(reply)),
+            provider: aiResult && typeof aiResult === 'object' ? (aiResult.provider || 'unknown') : 'unknown',
+            model: aiResult && typeof aiResult === 'object' ? (aiResult.model || 'unknown') : 'unknown',
             mode: mode,
             timestamp: new Date().toISOString()
         };
