@@ -488,7 +488,7 @@ function loadWorkspaceShell() {
   }
   var core = document.querySelector('script[src*="aethrion-workspace-v5.js"]');
   if (!core) {
-   core = document.createElement('script'); core.id = 'aethrionWorkspaceV5Script'; core.src = './aethrion-workspace-v5.js'; core.async = false;
+   core = document.createElement('script'); core.id = 'aethrionWorkspaceV5Script'; core.src = './aethrion-workspace-v5.js?v=20261104-routing1'; core.async = false;
    core.addEventListener('load', loadV6, {once:true}); document.head.appendChild(core);
   } else if (window.__aewsClicks) {
    loadV6();
