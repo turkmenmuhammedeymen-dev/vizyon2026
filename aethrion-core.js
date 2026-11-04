@@ -86,6 +86,7 @@
   install('openA27ApiKeyGenerator', function () { go('/aethrion-developer.html'); });
   install('openJobMarket', function () { var p = byId('jobMarketOverlay'); if (!p) { go('/index.html#features'); return false; } p.classList.add('open', 'active'); p.style.setProperty('display', 'flex', 'important'); p.style.setProperty('visibility', 'visible', 'important'); p.style.setProperty('pointer-events', 'auto', 'important'); p.style.setProperty('position', 'fixed', 'important'); p.style.setProperty('inset', '0', 'important'); p.style.setProperty('z-index', '2147482000', 'important'); p.style.setProperty('overflow', 'auto', 'important'); d.body.style.overflow = 'hidden'; return true; });
   install('toggleTeamPage', function () { go('/topluluk.html'); });
+  install('openTeamWorkspace', function () { go('/aethrion-teams.html'); });
   install('openPersonalAssistant', function () { go('/aethrion-assistant.html'); });
   install('openContestPage', function () { go('/topluluk.html#contest'); });
   install('openSettingsModal', openSettingsPanel);
@@ -685,7 +686,7 @@
   install('deleteJobListing', function () { go('/topluluk.html'); });
   install('closeJobDetail', function () { var p = byId('jobDetailModal'); if (p) p.style.display = 'none'; });
   install('acceptJobListing', function () { go('/topluluk.html'); });
-  install('closeModelsShowcase', function () { var p = byId('modelsShowcaseModal'); if (p) p.style.display = 'none'; });
+  install('closeModelsShowcase', function () { var p = byId('modelsShowcaseOverlay') || byId('modelsShowcaseModal'); if (p) { p.classList.remove('open','active','show'); p.style.setProperty('display','none','important'); p.style.setProperty('visibility','hidden','important'); p.style.setProperty('pointer-events','none','important'); p.setAttribute('aria-hidden','true'); } d.body.style.overflow=''; return true; });
   install('closeCategoryPanel', function () { var p = byId('categoryPanelModal'); if (p) { p.style.setProperty('display', 'none', 'important'); p.style.setProperty('visibility', 'hidden', 'important'); p.style.setProperty('pointer-events', 'none', 'important'); p.classList.remove('open'); } });
   var jarvisRecognition = null, jarvisMuted = false, jarvisMicStream = null, jarvisMicContext = null, jarvisMicTimer = null, jarvisMicLevel = 0;
   function jarvisStatus(value) { var s = byId('jarvisStatus'); if (s) s.textContent = value; }
