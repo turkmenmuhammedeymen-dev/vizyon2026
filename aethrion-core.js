@@ -603,7 +603,7 @@
   });
   install('switchToSiteAI', function () { go('/aethrion-ai.html'); });
   install('openApiKeySelectionModal', function () { go('/aethrion-developer.html'); });
-  install('sendDashboardAI', function () { go('/aethrion-ai.html'); });
+  install('sendDashboardAI', async function () { var source = byId('dashboardAiInput'); var message = source ? String(source.value || '').trim() : ''; if (!message) { if (source) source.focus(); w.showNotification && w.showNotification('Önce AETHRION AI için bir mesaj yazın.', 'warning'); return false; } var target = byId('vzInput'); if (typeof w.openFullAIPanel === 'function') w.openFullAIPanel(); if (!target || typeof w.sendVizyonAlMessage !== 'function') { w.showNotification && w.showNotification('AETHRION AI sohbet paneli hazır değil. Sayfayı yenileyip tekrar deneyin.', 'error'); return false; } target.value = message; target.dispatchEvent(new Event('input', { bubbles: true })); if (source) source.value = ''; try { target.focus({ preventScroll: true }); } catch (_) { target.focus(); } return await w.sendVizyonAlMessage(); });
   install('speakLastAIResponse', function () { w.showNotification && w.showNotification('Önce AI yanıtı oluşturun.', 'warning'); });
   install('stopAIResponse', function () { if (w.speechSynthesis) w.speechSynthesis.cancel(); });
   install('setAssistantReminder', function () { w.showNotification && w.showNotification('Hatırlatıcı panelini açmak için AETHRION Assistant bölümüne gidin.', 'warning'); });
