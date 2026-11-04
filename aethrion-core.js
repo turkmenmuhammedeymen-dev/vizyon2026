@@ -235,16 +235,16 @@
     if (!Array.isArray(w.__aethrionAIChatMessages)) w.__aethrionAIChatMessages = [];
     return w.__aethrionAIChatMessages;
   }
-  function aiAppend(role, content) {
+  function aiAppend(role, content, source) {
     var chat = aiChat();
-    var item = { role: role === 'user' ? 'user' : 'assistant', text: String(content || ''), at: new Date().toISOString() };
+    var item = { role: role === 'user' ? 'user' : 'assistant', text: String(content || ''), source: source || null, at: new Date().toISOString() };
     aiMessages().push(item);
     if (chat) {
       var row = d.createElement('div');
       row.className = 'vz-msg ' + (item.role === 'user' ? 'user' : 'bot');
       var label = d.createElement('div');
       label.className = 'vz-role';
-      label.textContent = item.role === 'user' ? 'SİZ' : '✨ AETHRION AI · 28 MODEL';
+      label.textContent = item.role === 'user' ? 'SİZ' : (source && source.model ? '✨ AETHRION AI · ' + String(source.provider || 'model').toUpperCase() + ' · ' + String(source.model) : '✨ AETHRION AI · MODEL');
       var body = d.createElement('div');
       body.className = 'vz-message-body';
       body.textContent = item.text;
@@ -391,6 +391,8 @@
     if (!message) { if (input) input.focus(); return false; }
     if (message.length > 4000) { w.showNotification && w.showNotification('Mesaj en fazla 4000 karakter olabilir.', 'warning'); return false; }
     var activeMode = 'normal', selected = d.querySelector('#vizyonAlPanel [data-mode].active');
+    var modelPicker = byId('aethrionModelSelect');
+    var selectedModel = modelPicker ? String(modelPicker.value || 'auto') : 'auto';
     try { activeMode = (selected && selected.getAttribute('data-mode')) || w.sessionStorage.getItem('aethrion_ai_mode') || 'normal'; } catch (_) {}
     if (input) input.value = '';
     if (button) { button.disabled = true; button.textContent = 'Yanıt hazırlanıyor…'; }
@@ -398,11 +400,12 @@
     try {
       var conversationId = await aiCreateConversation();
       await aiCloud('sendMessage', { conversationId: conversationId, text: message });
-      var result = await aiCloud('vizyonAlChat', { message: message, mode: activeMode });
+      var result = await aiCloud('vizyonAlChat', { message: message, mode: activeMode, model: selectedModel });
       if (!result || result.success !== true) throw new Error(result && result.error || 'AETHRION AI yanıt üretemedi.');
       var reply = String(result.reply || 'Yanıt alınamadı.');
-      aiAppend('assistant', reply);
-      await aiCloud('sendAIMessage', { conversationId: conversationId, text: reply, fromName: 'AETHRION AI · 28 MODEL' });
+      var source = { provider: result.provider || 'unknown', model: result.model || 'unknown' };
+      aiAppend('assistant', reply, source);
+      await aiCloud('sendAIMessage', { conversationId: conversationId, text: reply, fromName: 'AETHRION AI · ' + source.provider + ' · ' + source.model });
       if (typeof w.refreshAethrionAIQuota === 'function') w.refreshAethrionAIQuota();
     } catch (e) {
       aiAppend('assistant', 'Mesaj gönderilemedi: ' + (e && e.message || 'Bilinmeyen hata'));
