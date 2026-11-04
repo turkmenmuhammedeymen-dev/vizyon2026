@@ -1002,7 +1002,7 @@ if (document.body && window.MutationObserver) {
 var GROUP_LABELS = { CORE: 'YAPAY ZEKÂ', CREATE: 'ÜRETİM ARAÇLARI', PLATFORM: 'PLATFORM', ADVANCED: 'GELİŞTİRİCİ ARAÇLARI', ACCOUNT: 'HESAP', OTHER: 'DİĞER ÖZELLİKLER' };
 var FALLBACK_FEATURES = [
  {group:'CORE',icon:'✦',name:'AETHRION AI',desc:'Yapay zekâ çalışma alanı',action:'openFullAIPanel'},
- {group:'CORE',icon:'◈',name:'AETHRION Agents',desc:'Ajan, ekran okuma ve dosya araçları',action:'openAethrionAlPanel'},
+ {group:'CORE',icon:'◈',name:'AETHRION Agents',desc:'Ajan, ekran okuma ve dosya araçları',action:'openAethrionAgentsPanel'},
  {group:'CORE',icon:'◎',name:'AETHRION Coach',desc:'Kişisel AI asistanı',action:'openKocPanel'},
  {group:'CORE',icon:'◉',name:'Model Kataloğu',desc:'Tanımlı model seçeneklerini incele',action:'openModelsShowcase'},
  {group:'CREATE',icon:'◇',name:'3D Studio',desc:'Üç boyutlu tasarım araçları',action:'open3DBuilder',href:'./3d-studio.html'},
