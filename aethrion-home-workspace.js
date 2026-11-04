@@ -154,8 +154,9 @@
     }
     return opened;
   };
+  w.openFullAIPanel = function () { return showChat('ai'); };
   w.openAethrionAI = w.openFullAIPanel;
-  w.openAethrionAlPanel = function () { return showChat('ai'); };
+  w.openAethrionAlPanel = w.openFullAIPanel;
   w.openVizyonAlPanel = w.openAethrionAlPanel;
   w.openAethrionAgentsPanel = function () { return showChat('agents'); };
   w.openKocPanel = function () {
