@@ -618,6 +618,29 @@
                 <button class="vz-file-preview-remove" onclick="window.removeVizyonAlFile()" title="Dosyayı Kaldır">×</button>
             </div>
 
+            <div class="aethrion-model-picker" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 14px;border-top:1px solid rgba(232,197,85,.16);background:rgba(8,10,18,.88);">
+                <label for="aethrionModelSelect" style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#e8c555;white-space:nowrap;">YANIT MODELİ</label>
+                <select id="aethrionModelSelect" aria-label="AETHRION yanıt modeli" style="min-width:220px;max-width:100%;flex:1;padding:9px 12px;border:1px solid rgba(232,197,85,.3);border-radius:10px;background:#111522;color:#f5f6fa;font:inherit;font-size:12px;">
+                    <option value="auto">Otomatik — AETHRION-LLM → Ollama → diğer sağlayıcılar</option>
+                    <option value="aethrion-llm">AETHRION-LLM — kendi modelimiz</option>
+                    <optgroup label="Ollama modelleri">
+                        <option value="ollama:deepseek-r1:1.5b">DeepSeek R1 · 1.5B</option>
+                        <option value="ollama:qwen2.5:3b">Qwen 2.5 · 3B</option>
+                        <option value="ollama:llama3.2:1b">Llama 3.2 · 1B</option>
+                        <option value="ollama:gemma2:2b">Gemma 2 · 2B</option>
+                        <option value="ollama:phi3.5">Phi 3.5</option>
+                        <option value="ollama:mistral:7b">Mistral · 7B</option>
+                        <option value="ollama:qwen2.5-coder:1.5b">Qwen 2.5 Coder · 1.5B</option>
+                        <option value="ollama:qwen3:4b">Qwen 3 · 4B</option>
+                        <option value="ollama:qwen3:8b">Qwen 3 · 8B</option>
+                        <option value="ollama:gemma3:4b">Gemma 3 · 4B</option>
+                        <option value="ollama:phi4-mini-reasoning">Phi 4 Mini Reasoning</option>
+                        <option value="ollama:qwen2.5vl:3b">Qwen 2.5 VL · 3B</option>
+                        <option value="ollama:granite3.3:2b">Granite 3.3 · 2B</option>
+                    </optgroup>
+                </select>
+                <span id="aethrionModelHint" style="font-size:10px;color:#9ba7bb;">Otomatik seçimde çalışan model yanıtın altında gösterilir.</span>
+            </div>
             <div class="vizyon-al-input-area">
                 <input type="file" id="vzFileInput" style="display:none;" accept="image/*,video/*,audio/*,application/pdf,.docx,.xlsx,.xls,.txt,.md,.js,.ts,.py,.html,.css,.json,.csv,.xml,.yaml,.yml,.log,.mp3,.wav,.ogg,.m4a,.aac,.mp4,.mov,.avi,.mkv,.webm" onchange="window.handleVizyonAlFileUpload(this)">
                 <button class="vz-mic-btn" id="vzFileBtn" onclick="document.getElementById('vzFileInput').click()" title="Dosya Yükle">📎</button>
@@ -3440,8 +3463,8 @@ def root():
     <!-- aethrion-experience.js is bundled in app.js; do not load a second event/splash controller. -->
     <!-- aethrion-auth-recovery.js is bundled in app.js; keep a single auth click dispatcher. -->
     <!-- Core application actions must load before menu/auth enhancements. -->
-    <script defer src="./aethrion-core.js?v=20261104-basepath3"></script>
-    <script defer src="./app.js?v=20261104-legacy-actions3"></script>
+    <script defer src="./aethrion-core.js?v=20261104-inrok-llm1"></script>
+    <script defer src="./app.js?v=20261104-inrok-llm1"></script>
     <script defer src="./aethrion-referral-leaderboard.js?v=20261103-leaderboardfix1"></script>
     <!-- Full-screen AI/Coach/Agents workspaces open in-page instead of redirecting away from the home experience. -->
     <script defer src="./aethrion-home-workspace.js?v=20261104-legacy-ai-route2"></script>
