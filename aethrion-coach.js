@@ -25,10 +25,35 @@
   brand.appendChild(brandName);brand.appendChild(brandSub);
   var actions=make('div','koc-head-actions');
   var limit=make('span','koc-limit','Haftalık kullanım yükleniyor…');limit.id='kocPanelLimitBadge';
+  var modelSelect=make('select');modelSelect.id='kocModelSelect';modelSelect.setAttribute('aria-label','Koç yanıt modeli');modelSelect.title='Koç yanıt modeli';
+  modelSelect.style.cssText='max-width:190px;min-width:125px;padding:8px 9px;border:1px solid rgba(217,189,105,.35);border-radius:9px;background:#10182b;color:#e8d08a;font:inherit;font-size:11px;';
+  var modelGroups=[
+   {label:'Otomatik (28 harici)',items:[['auto','Otomatik']]},
+   {label:'AETHRION özel model',items:[['aethrion-llm','AETHRION-LLM · pilot']]},
+   {label:'Ollama (13)',items:[
+    ['ollama:granite3.3:2b','Granite 3.3 2B'],['ollama:qwen2.5vl:3b','Qwen 2.5 VL 3B'],['ollama:phi4-mini-reasoning:latest','Phi 4 Mini Reasoning'],
+    ['ollama:gemma3:4b','Gemma 3 4B'],['ollama:qwen3:8b','Qwen 3 8B'],['ollama:qwen3:4b','Qwen 3 4B'],
+    ['ollama:qwen2.5-coder:1.5b','Qwen Coder 1.5B'],['ollama:mistral:7b','Mistral 7B'],['ollama:phi3.5:latest','Phi 3.5'],
+    ['ollama:gemma2:2b','Gemma 2 2B'],['ollama:llama3.2:1b','Llama 3.2 1B'],['ollama:deepseek-r1:1.5b','DeepSeek R1 1.5B'],['ollama:qwen2.5:3b','Qwen 2.5 3B']
+   ]},
+   {label:'NVIDIA NIM (7)',items:[
+    ['nvidia:meta/llama-3.3-70b-instruct','Llama 3.3 70B'],['nvidia:meta/llama-3.1-8b-instruct','Llama 3.1 8B'],
+    ['nvidia:qwen/qwen2.5-7b-instruct','Qwen 2.5 7B'],['nvidia:qwen/qwen2.5-coder-32b-instruct','Qwen Coder 32B'],
+    ['nvidia:deepseek-ai/deepseek-r1-distill-llama-8b','DeepSeek R1 Distill'],['nvidia:google/gemma-2-2b-instruct','Gemma 2 2B'],
+    ['nvidia:microsoft/phi-3.5-moe-instruct','Phi 3.5 MoE']
+   ]},
+   {label:'Bulut API (8)',items:[
+    ['cloud:groq','Groq'],['cloud:gemini','Google Gemini'],['cloud:deepseek','DeepSeek API'],['cloud:deepinfra','DeepInfra'],
+    ['cloud:openai','OpenAI'],['cloud:cerebras','Cerebras'],['cloud:openrouter','OpenRouter'],['cloud:cohere','Cohere']
+   ]}
+  ];
+  modelGroups.forEach(function(group){var optgroup=d.createElement('optgroup');optgroup.label=group.label;group.items.forEach(function(item){var option=d.createElement('option');option.value=item[0];option.textContent=item[1];optgroup.appendChild(option)});modelSelect.appendChild(optgroup)});
+  try{var savedModel=w.localStorage.getItem('aethrion_koc_model');if(savedModel&&modelSelect.querySelector('option[value="'+savedModel.replace(/"/g,'')+'"]'))modelSelect.value=savedModel}catch(_){}
+  modelSelect.addEventListener('change',function(){try{w.localStorage.setItem('aethrion_koc_model',modelSelect.value)}catch(_){}});
   var fresh=make('button','koc-btn','＋ Yeni sohbet');fresh.type='button';fresh.addEventListener('click',newConversation);
   var share=make('button','koc-btn','Paylaş');share.type='button';share.addEventListener('click',openKocShareModal);
   var closeBtn=make('button','koc-btn koc-close','×');closeBtn.type='button';closeBtn.setAttribute('aria-label','Coach panelini kapat');closeBtn.addEventListener('click',closeKocPanel);
-  actions.appendChild(limit);actions.appendChild(fresh);actions.appendChild(share);actions.appendChild(closeBtn);head.appendChild(brand);head.appendChild(actions);
+  actions.appendChild(limit);actions.appendChild(modelSelect);actions.appendChild(fresh);actions.appendChild(share);actions.appendChild(closeBtn);head.appendChild(brand);head.appendChild(actions);
   var layout=make('div','koc-layout'),side=make('aside','koc-side'),sideTop=make('div','koc-side-top','SOHBET GEÇMİŞİ'),history=make('div','koc-history');history.id='kocHistoryList';
   side.appendChild(sideTop);side.appendChild(history);
   var main=make('main','koc-main'),topic=make('div','koc-topic','Yeni sohbet');topic.id='kocCurrentTopic';
@@ -117,12 +142,13 @@
   appendMessage('user',message);input.value='';input.disabled=true;if(send)send.disabled=true;if(stop)stop.style.display='inline-flex';
   var id=++state.requestId,thinking=make('div','koc-thinking','AETHRION Coach yanıt hazırlıyor…');box.appendChild(thinking);box.scrollTop=box.scrollHeight;
   try{
-   var result=await cloud('kocChat',{message:message,conversationId:state.conversationId||null});
+   var modelPicker=byId('kocModelSelect'),selectedModel=modelPicker?String(modelPicker.value||'auto'):'auto';
+   var result=await cloud('kocChat',{message:message,conversationId:state.conversationId||null,model:selectedModel});
    if(id!==state.requestId)return false;
    thinking.remove();if(!result||result.success!==true)throw new Error(result&&result.error||'Coach şu anda yanıt veremedi.');
    state.conversationId=result.conversationId||state.conversationId;w.kocConversationId=state.conversationId;
    if(state.conversationId)try{w.localStorage.setItem('aethrion_koc_conv_id',state.conversationId)}catch(_){}
-   appendMessage('coach',result.reply||'Yanıt alınamadı.');
+   appendMessage('coach',(result.reply||'Yanıt alınamadı.')+(result.provider?'\n\nYanıt kaynağı: '+result.provider+' · '+(result.model||'model'):''));
    var topic=byId('kocCurrentTopic');if(topic&&result.conversationTitle)topic.textContent=result.conversationTitle;
    await Promise.all([loadKocHistory(),updateKocLimitBadge()]);
    return true;
