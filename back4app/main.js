@@ -452,7 +452,8 @@ async function getAPIKey(keyName) {
         NVIDIA_API_KEY: ['NVIDIA_NIM_API_KEY'],
         NVIDIA_BASE_URL: ['NVIDIA_NIM_BASE_URL'],
         NVIDIA_NIM_BASE_URL: ['NVIDIA_BASE_URL'],
-        COLAB_LLAMA_URL: ['OLLAMA_URL', 'OLLAMA_BASE_URL', 'COLAB_LLAMA_BASE_URL'],
+        AETHRION_GATEWAY_URL: ['COLAB_LLAMA_URL', 'OLLAMA_URL', 'OLLAMA_BASE_URL', 'COLAB_LLAMA_BASE_URL'],
+        COLAB_LLAMA_URL: ['AETHRION_GATEWAY_URL', 'OLLAMA_URL', 'OLLAMA_BASE_URL', 'COLAB_LLAMA_BASE_URL'],
         COLAB_LLAMA_TOKEN: ['AETHRION_GATEWAY_TOKEN', 'OLLAMA_GATEWAY_TOKEN']
     };
     var primary = await getAethrionConfigValue(keyName);
@@ -476,6 +477,24 @@ async function getAPIKey(keyName) {
         }
     }
     return null;
+}
+
+// Gateway URL is non-secret and may be stored in Back4App Config or a private
+// environment variable. The bearer token is private-env-only and is never
+// read from Parse.Config or returned to a client.
+async function _aethrionGetGatewayUrl() {
+    var url = await getAPIKey('AETHRION_GATEWAY_URL');
+    if (!url) url = await getAPIKey('COLAB_LLAMA_URL');
+    if (typeof url !== 'string') return null;
+    url = url.trim().replace(/\/+$/, '');
+    if (!/^https:\/\//i.test(url)) return null;
+    return url;
+}
+
+function _aethrionGetGatewayToken() {
+    return _aethrionReadPrivateEnv('AETHRION_GATEWAY_TOKEN')
+        || _aethrionReadPrivateEnv('COLAB_LLAMA_TOKEN')
+        || _aethrionReadPrivateEnv('OLLAMA_GATEWAY_TOKEN');
 }
 
 async function getPrivateFounderPass() {
@@ -1911,8 +1930,8 @@ Parse.Cloud.define("callGemini", async function (request) {
 Parse.Cloud.define("callLocalLlama", async function (request) {
     var prompt = request.params.prompt;
     var modelName = request.params.model || 'qwen2.5:3b';
-    var localUrl = await getAPIKey('COLAB_LLAMA_URL');
-    var gatewayToken = _aethrionReadPrivateEnv('COLAB_LLAMA_TOKEN') || _aethrionReadPrivateEnv('AETHRION_GATEWAY_TOKEN') || _aethrionReadPrivateEnv('OLLAMA_GATEWAY_TOKEN');
+    var localUrl = await _aethrionGetGatewayUrl();
+    var gatewayToken = _aethrionGetGatewayToken();
     if (!localUrl) { console.log('⚠️ COLAB_LLAMA_URL yok, Ollama atlanıyor.'); return null; }
     if (!gatewayToken) { console.warn('⚠️ COLAB_LLAMA_TOKEN özel sunucu değişkeni eksik; Ollama atlanıyor.'); return null; }
     if (localUrl.endsWith('/')) localUrl = localUrl.slice(0, -1);
@@ -2340,13 +2359,26 @@ Parse.Cloud.define("superAI", async function (request) {
     function aiCanContinue() { return aiTimeLeft() > 1000; }
 
     // AETHRION-LLM is attempted first in automatic mode when a trained checkpoint is available.
-    var gatewayUrl = await getAPIKey('COLAB_LLAMA_URL');
-    var gatewayToken = _aethrionReadPrivateEnv('COLAB_LLAMA_TOKEN') || _aethrionReadPrivateEnv('AETHRION_GATEWAY_TOKEN') || _aethrionReadPrivateEnv('OLLAMA_GATEWAY_TOKEN');
+    var gatewayUrl = await _aethrionGetGatewayUrl();
+    var gatewayToken = _aethrionGetGatewayToken();
+    // Exact tags verified in the Kaggle Ollama runtime.
     var ollamaModels = [
-        'deepseek-r1:1.5b', 'qwen2.5:3b', 'llama3.2:1b', 'gemma2:2b', 'phi3.5',
-        'mistral:7b', 'qwen2.5-coder:1.5b', 'qwen3:4b', 'qwen3:8b', 'gemma3:4b',
-        'phi4-mini-reasoning', 'qwen2.5vl:3b', 'granite3.3:2b'
+        'granite3.3:2b', 'qwen2.5vl:3b', 'phi4-mini-reasoning:latest',
+        'gemma3:4b', 'qwen3:8b', 'qwen3:4b', 'qwen2.5-coder:1.5b',
+        'mistral:7b', 'phi3.5:latest', 'gemma2:2b', 'llama3.2:1b',
+        'deepseek-r1:1.5b', 'qwen2.5:3b'
     ];
+    var nvidiaModels = [
+        'meta/llama-3.3-70b-instruct', 'meta/llama-3.1-8b-instruct',
+        'qwen/qwen2.5-7b-instruct', 'qwen/qwen2.5-coder-32b-instruct',
+        'deepseek-ai/deepseek-r1-distill-llama-8b',
+        'google/gemma-2-2b-instruct', 'microsoft/phi-3.5-moe-instruct'
+    ];
+    var cloudModelFunctions = {
+        groq: 'callGroq', gemini: 'callGemini', deepseek: 'callDeepSeek',
+        deepinfra: 'callDeepInfra', openai: 'callOpenAI', cerebras: 'callCerebras',
+        openrouter: 'callOpenRouter', cohere: 'callCohere'
+    };
 
     // Explicit model selection never silently switches to a different model.
     if (selectedModel === 'aethrion-llm') {
@@ -2357,9 +2389,29 @@ Parse.Cloud.define("superAI", async function (request) {
     if (selectedModel.indexOf('ollama:') === 0) {
         var chosenOllama = selectedModel.slice(7);
         if (ollamaModels.indexOf(chosenOllama) === -1) return _aeSuperAIResponse('Seçilen Ollama modeli tanımlı değil.', 'aethrion', 'invalid-model', includeMetadata);
-        var chosenReply = await _aeCloudRunWithTimeout('callLocalLlama', { prompt: apiPrompt, model: chosenOllama }, Math.min(10000, aiTimeLeft()));
+        if (!gatewayUrl || !gatewayToken) return _aeSuperAIResponse('Gateway yapılandırması eksik. AETHRION_GATEWAY_URL ve sunucu tarafındaki AETHRION_GATEWAY_TOKEN ayarlarını kontrol et.', 'ollama', chosenOllama + ' (yapılandırılmadı)', includeMetadata);
+        var chosenReply = await _aeCloudRunWithTimeout('callLocalLlama', { prompt: apiPrompt, model: chosenOllama }, Math.min(11000, aiTimeLeft()));
         if (chosenReply && chosenReply.length > 3) return _aeSuperAIResponse(chosenReply, 'ollama', chosenOllama, includeMetadata);
-        return _aeSuperAIResponse('Seçilen Ollama modeli yanıt veremedi. Inrok tünelini, model indirme durumunu ve COLAB_LLAMA_TOKEN ayarını kontrol et.', 'ollama', chosenOllama + ' (çevrimdışı)', includeMetadata);
+        return _aeSuperAIResponse('Seçilen Ollama modeli yanıt veremedi. Kaggle oturumu, Inrok tüneli ve Gateway token ayarını kontrol et.', 'ollama', chosenOllama + ' (çevrimdışı)', includeMetadata);
+    }
+
+    if (selectedModel.indexOf('nvidia:') === 0) {
+        var chosenNvidia = selectedModel.slice(7);
+        if (nvidiaModels.indexOf(chosenNvidia) === -1) return _aeSuperAIResponse('Seçilen NVIDIA NIM modeli tanımlı değil.', 'nvidia-nim', 'invalid-model', includeMetadata);
+        var chosenNvidiaReply = await _aeCloudRunWithTimeout('callNvidiaNIM', { prompt: apiPrompt, model: chosenNvidia }, Math.min(11000, aiTimeLeft()));
+        return chosenNvidiaReply && chosenNvidiaReply.length > 3
+            ? _aeSuperAIResponse(chosenNvidiaReply, 'nvidia-nim', chosenNvidia, includeMetadata)
+            : _aeSuperAIResponse('Seçilen NVIDIA NIM modeli yanıt veremedi. NVIDIA_API_KEY ve NIM erişimini kontrol et.', 'nvidia-nim', chosenNvidia + ' (çevrimdışı)', includeMetadata);
+    }
+
+    if (selectedModel.indexOf('cloud:') === 0) {
+        var chosenCloud = selectedModel.slice(6).toLowerCase();
+        var chosenCloudFunction = cloudModelFunctions[chosenCloud];
+        if (!chosenCloudFunction) return _aeSuperAIResponse('Seçilen bulut sağlayıcısı tanımlı değil.', 'cloud-api', 'invalid-model', includeMetadata);
+        var chosenCloudReply = await _aeCloudRunWithTimeout(chosenCloudFunction, { prompt: apiPrompt }, Math.min(11000, aiTimeLeft()));
+        return chosenCloudReply && chosenCloudReply.length > 3
+            ? _aeSuperAIResponse(chosenCloudReply, 'cloud-api', chosenCloud, includeMetadata)
+            : _aeSuperAIResponse('Seçilen bulut modeli yanıt veremedi. İlgili API anahtarı ve sağlayıcı durumunu kontrol et.', 'cloud-api', chosenCloud + ' (çevrimdışı)', includeMetadata);
     }
 
     if (selectedModel === 'auto' && gatewayUrl && gatewayToken && aiCanContinue()) {
@@ -2379,13 +2431,7 @@ Parse.Cloud.define("superAI", async function (request) {
         }
     }
 
-    // KATMAN 2: NVIDIA NIM
-    var nvidiaModels = [
-        'meta/llama-3.3-70b-instruct','meta/llama-3.1-8b-instruct','qwen/qwen2.5-7b-instruct',
-        'qwen/qwen2.5-coder-32b-instruct','deepseek-ai/deepseek-r1-distill-llama-8b',
-        'google/gemma-2-2b-instruct','microsoft/phi-3.5-moe-instruct'
-    ];
-
+    // KATMAN 2: NVIDIA NIM (7 registered models).
     var nvidiaKey = await getAPIKey('NVIDIA_API_KEY');
     if (nvidiaKey) {
         console.log('🔄 KATMAN 2 - NVIDIA NIM: süre sınırı içinde 7 model adayı sırayla deneniyor...');
@@ -2398,7 +2444,7 @@ Parse.Cloud.define("superAI", async function (request) {
     }
 
     // KATMAN 3: 8 Bulut API
-    var apiModels = ['callGroq','callGemini','callDeepSeek','callDeepInfra','callOpenAI','callCerebras','callOpenRouter','callCohere'];
+    var apiModels = Object.keys(cloudModelFunctions).map(function (key) { return cloudModelFunctions[key]; });
     for (var mi = 0; mi < apiModels.length && aiCanContinue(); mi++) {
         var model = apiModels[mi];
         try {
