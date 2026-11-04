@@ -2329,6 +2329,62 @@ Parse.Cloud.define("aethrionGatewayStatus", async function (request) {
     }
 });
 
+// Authenticated end-to-end Gateway smoke test. Requires a signed-in user.
+// Returns only short response previews; never returns the bearer token.
+Parse.Cloud.define("aethrionGatewaySmokeTest", async function (request) {
+    if (!request.user) throw new Error('Giriş yapmalısınız.');
+    var url = await _aethrionGetGatewayUrl();
+    var token = _aethrionGetGatewayToken();
+    if (!url || !token) return { success: false, error: 'Gateway URL veya sunucu token ayarı eksik.' };
+    var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+        'skip_zrok_interstitial': '1',
+        'User-Agent': 'curl/8.0',
+        'Accept': 'application/json'
+    };
+    var result = { success: false, ollama: { tested: false }, aethrion_llm: { tested: false } };
+    try {
+        var ollamaResponse = await Parse.Cloud.httpRequest({
+            method: 'POST',
+            url: url + '/ollama/v1/chat/completions',
+            headers: headers,
+            body: JSON.stringify({
+                model: 'gemma3:4b',
+                messages: [{ role: 'user', content: 'Sadece OK yaz.' }],
+                stream: false,
+                temperature: 0,
+                max_tokens: 8
+            }),
+            timeout: 18000
+        });
+        var ollamaRaw = ollamaResponse && ollamaResponse.text ? ollamaResponse.text : (ollamaResponse && ollamaResponse.buffer ? ollamaResponse.buffer.toString() : '');
+        var ollamaData = ollamaRaw ? JSON.parse(ollamaRaw) : {};
+        var ollamaReply = ollamaData && ollamaData.choices && ollamaData.choices[0] && ollamaData.choices[0].message
+            ? String(ollamaData.choices[0].message.content || '') : '';
+        result.ollama = { tested: true, http: ollamaResponse.status || 200, model: 'gemma3:4b', responded: !!ollamaReply, preview: ollamaReply.slice(0, 100) };
+    } catch (error) {
+        result.ollama = { tested: true, responded: false, error: 'Ollama isteği başarısız. Token, tünel ve model durumunu kontrol edin.' };
+    }
+    try {
+        var ownResponse = await Parse.Cloud.httpRequest({
+            method: 'POST',
+            url: url + '/llm/generate',
+            headers: headers,
+            body: JSON.stringify({ prompt: 'Merhaba.', max_new_tokens: 8, temperature: 0.5 }),
+            timeout: 18000
+        });
+        var ownRaw = ownResponse && ownResponse.text ? ownResponse.text : (ownResponse && ownResponse.buffer ? ownResponse.buffer.toString() : '');
+        var ownData = ownRaw ? JSON.parse(ownRaw) : {};
+        var ownText = ownData && typeof ownData.text === 'string' ? ownData.text : '';
+        result.aethrion_llm = { tested: true, http: ownResponse.status || 200, responded: !!ownText, quality: 'Ayrı kalite testi gerekir.' };
+    } catch (error) {
+        result.aethrion_llm = { tested: true, responded: false, error: 'AETHRION-LLM uç noktası yanıt vermedi. Checkpoint ve tokenizer durumunu kontrol edin.' };
+    }
+    result.success = !!(result.ollama && result.ollama.responded);
+    return result;
+});
+
 // Public, non-secret model catalogue used by AETHRION AI and integrations.
 // IDs are passed to superAI as auto, ollama:<tag>, nvidia:<model-id>,
 // cloud:<provider>, or aethrion-llm.
