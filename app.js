@@ -1994,7 +1994,7 @@ checkDueReminders();window.setInterval(checkDueReminders,15000);window.addEventL
 (function(){'use strict';
 var CORE=[
 ['YAPAY ZEKÂ','✦','AETHRION AI','28 model destekli ana sohbet alanı','openFullAIPanel',''],
-['YAPAY ZEKÂ','◈','AETHRION Agents','Ajanlar, ekran okuma ve dosya araçları','openAethrionAlPanel',''],
+['YAPAY ZEKÂ','◈','AETHRION Agents','Ajanlar, ekran okuma ve dosya araçları','openAethrionAgentsPanel',''],
 ['YAPAY ZEKÂ','📎','Dosya Analiz + Sunum','PDF, Word, Excel, görsel ve diğer dosyaları analiz et','openAethrionAlPanel',''],
 ['YAPAY ZEKÂ','🌐','Canlı Web Arama','Güncel web araştırması ve kaynaklı yanıtlar','openFullAIPanel',''],
 ['YAPAY ZEKÂ','◎','AETHRION Coach','Kişisel yapay zekâ koçu','openKocPanel',''],
@@ -2129,7 +2129,7 @@ wire();
 'use strict';
 var fallback={
 'AETHRION AI':['openFullAIPanel','./aethrion-ai.html'],
-'AETHRION Agents':['openAethrionAlPanel','./aethrion-assistant.html'],
+'AETHRION Agents':['openAethrionAgentsPanel','./aethrion-assistant.html'],
 'AETHRION Coach':['openKocPanel','./aethrion-assistant.html'],
 'Model Kataloğu':['openModelsShowcase','./aethrion-ai.html#models'],
 '3D Studio':['open3DBuilder','./3d-studio.html'],
@@ -2346,7 +2346,7 @@ function repairWorkspaceSurface(){
  qa('#aethrionFeaturesTrigger,#aethrionFeaturesButton,#aethrionFeaturesPanel,#aethrionExperienceDrawer,#aethrionExperienceBackdrop').forEach(function(node){if(node&&node.parentNode)node.parentNode.removeChild(node)});
  sidebar.setAttribute('aria-label','AETHRION özellik menüsü');
 }
-function boot(){installRouter();patchWelcome();installCloseRecovery();if(logged()){document.body.classList.add('ae-shell-on');hideTrigger();customWelcome();var logo=q('.aews-logo');if(logo&&!q('img',logo))logo.innerHTML='<img src="./aethrion-mark.svg" alt="AETHRION" draggable="false">'}repairWorkspaceSurface();syncOverlayState()}
+function boot(){/* Tek tıklama yönlendiricisi: v5 wire() kullanılır; v6 capture router çakışması kaldırıldı. */patchWelcome();installCloseRecovery();if(logged()){document.body.classList.add('ae-shell-on');hideTrigger();customWelcome();var logo=q('.aews-logo');if(logo&&!q('img',logo))logo.innerHTML='<img src="./aethrion-mark.svg" alt="AETHRION" draggable="false">'}repairWorkspaceSurface();syncOverlayState()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 [150,500,1000,1800,3000,5000].forEach(function(t){setTimeout(boot,t)});
 if(window.MutationObserver&&document.body){
