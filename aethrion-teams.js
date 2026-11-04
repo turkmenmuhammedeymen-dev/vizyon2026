@@ -1,4 +1,4 @@
-(function(){'use strict';var status=document.getElementById('teamsStatus'),select=document.getElementById('teamSelect'),members=document.getElementById('members'),audit=document.getElementById('audit'),summary=document.getElementById('teamSummary'),schedule=document.getElementById('teamSchedule'),aiUsage=document.getElementById('aiUsage');var chatMessages=document.getElementById('teamChatMessages'),chatForm=document.getElementById('teamChatForm'),chatInput=document.getElementById('teamChatInput'),chatFile=document.getElementById('teamChatFile'),chatFileLabel=document.getElementById('teamChatFileLabel'),chatSend=document.getElementById('teamChatSend'),selectedChatFile=null;
+(function(){'use strict';var status=document.getElementById('teamsStatus'),select=document.getElementById('teamSelect'),members=document.getElementById('members'),audit=document.getElementById('audit'),summary=document.getElementById('teamSummary'),schedule=document.getElementById('teamSchedule'),aiUsage=document.getElementById('aiUsage');var chatGif=document.getElementById('teamChatGif'),chatMessages=document.getElementById('teamChatMessages'),chatForm=document.getElementById('teamChatForm'),chatInput=document.getElementById('teamChatInput'),chatFile=document.getElementById('teamChatFile'),chatFileLabel=document.getElementById('teamChatFileLabel'),chatSend=document.getElementById('teamChatSend'),selectedChatFile=null;
 function el(t,c,x){var n=document.createElement(t);if(c)n.className=c;if(x!==undefined)n.textContent=String(x);return n}
 function say(t,k){status.textContent=t;status.dataset.kind=k||''}
 function P(){if(!window.Parse||!Parse.User||!Parse.User.current||!Parse.User.current())throw new Error('Giriş yapmalısın.');return Parse}
@@ -25,7 +25,7 @@ function renderTeamMessages(rows){
   var isAi=!!m.isAI||String(m.userEmail||'').toLowerCase()==='aethrion-ai@system.local';
   var c=el('article','ae-tool-card'+(isAi?' ae-tool-chat-ai':''));
   c.append(el('h3','',isAi?'AETHRION AI':(m.userName||m.userEmail||'Takım üyesi')));
-  if(m.message)c.append(el('p','',m.message));
+  if(m.message){var gifMatch=String(m.message).match(/^\\s*!\\[GIF\\]\\((https?:\\/\\/[^)]+)\\)\\s*$/i);if(gifMatch){var image=el('img','ae-tool-chat-gif');image.src=gifMatch[1];image.alt='Takım sohbetinde paylaşılan GIF';image.loading='lazy';image.referrerPolicy='no-referrer';image.style.cssText='display:block;max-width:min(100%,420px);max-height:300px;border-radius:12px;margin:8px 0';c.append(image)}else c.append(el('p','',m.message))}
   if(m.fileUrl){var a=el('a','ae-tool-chat-file',m.fileName||'Ekli dosyayı aç');a.href=m.fileUrl;a.target='_blank';a.rel='noopener noreferrer';c.append(a)}
   c.append(el('p','ae-tool-muted',m.createdAt?new Date(m.createdAt).toLocaleString():''));
   chatMessages.append(c);
@@ -69,6 +69,23 @@ if(chatForm)chatForm.addEventListener('submit',async function(event){
  }catch(e){say('Mesaj gönderilemedi: '+String(e&&e.message||e||'Bilinmeyen hata').slice(0,180),'error')}
  finally{if(chatSend)chatSend.disabled=false}
 });
+
+function openTeamGifPicker(){
+ var modal=document.getElementById('teamGifPicker');if(modal){modal.style.display='flex';return}
+ modal=el('div','ae-team-gif-modal');modal.id='teamGifPicker';modal.style.cssText='position:fixed;inset:0;z-index:2147483000;background:rgba(3,8,18,.82);display:flex;align-items:center;justify-content:center;padding:18px';
+ var panel=el('section','ae-tool-panel');panel.style.cssText='width:min(720px,96vw);max-height:85vh;overflow:auto;background:#0b1424;border:1px solid rgba(212,175,55,.35);border-radius:18px;padding:18px';
+ var head=el('div','');head.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:12px';
+ head.append(el('h2','',"Takım sohbetine GIF ekle"));var close=el('button','ae-tool-button','Kapat');close.type='button';close.onclick=function(){modal.style.display='none'};head.append(close);
+ var row=el('div','');row.style.cssText='display:flex;gap:8px;margin:12px 0';
+ var input=el('input','');input.type='search';input.placeholder='GIF ara…';input.style.cssText='flex:1;min-width:0;padding:11px;border-radius:10px';
+ var search=el('button','ae-tool-button','Ara');search.type='button';row.append(input,search);
+ var results=el('div','');results.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px';
+ panel.append(head,row,results);modal.append(panel);modal.addEventListener('click',function(e){if(e.target===modal)modal.style.display='none'});document.body.append(modal);
+ async function run(q){results.textContent='GIF’ler yükleniyor…';try{var data=await P().Cloud.run('searchGif',{query:q||'popüler'});var items=Array.isArray(data)?data:(data&&Array.isArray(data.results)?data.results:[]);results.textContent='';items.forEach(function(g){var url=g&&g.images&&g.images.fixed_height&&g.images.fixed_height.url;if(!url||!/^https?:\\/\\//i.test(url))return;var b=el('button','');b.type='button';b.style.cssText='padding:0;border:0;background:transparent;cursor:pointer';var img=el('img','');img.src=url;img.alt=g.title||'GIF';img.loading='lazy';img.style.cssText='width:100%;height:130px;object-fit:cover;border-radius:10px';b.append(img);b.onclick=async function(){b.disabled=true;try{await P().Cloud.run('aethrionSendTeamMessage',{teamId:select.value,message:'![GIF]('+url+')',fileBase64:'',fileName:'',fileType:''});modal.style.display='none';say('GIF takım sohbetine gönderildi.','success');await loadTeamMessages(select.value)}catch(e){say('GIF gönderilemedi: '+String(e&&e.message||e),'error')}finally{b.disabled=false}};results.append(b)});if(!results.children.length)results.textContent='GIF bulunamadı.'}catch(e){results.textContent='GIF araması başarısız: '+String(e&&e.message||e)}} 
+ search.onclick=function(){run(input.value.trim())};input.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();run(input.value.trim())}});run('popüler');
+}
+if(chatGif)chatGif.addEventListener('click',openTeamGifPicker);
+
 async function loadAiUsage(){
  if(!aiUsage)return;
  aiUsage.textContent='';
