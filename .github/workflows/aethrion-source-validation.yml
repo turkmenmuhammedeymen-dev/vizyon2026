@@ -21,6 +21,12 @@ jobs:
         run: node --check back4app/main.js
       - name: Check unified frontend JavaScript syntax
         run: node --check app.js
+      - name: Check workspace, experience and Team chat JavaScript syntax
+        run: |
+          node --check aethrion-workspace-v6.js
+          node --check aethrion-experience.js
+          node --check aethrion-core.js
+          node --check aethrion-teams.js
       - name: Verify canonical Back4App client configuration
         shell: bash
         run: |
