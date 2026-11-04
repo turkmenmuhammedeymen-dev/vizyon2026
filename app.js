@@ -1005,7 +1005,7 @@ var FALLBACK_FEATURES = [
  {group:'CORE',icon:'◈',name:'AETHRION Agents',desc:'Ajan, ekran okuma ve dosya araçları',action:'openAethrionAgentsPanel'},
  {group:'CORE',icon:'◎',name:'AETHRION Coach',desc:'Kişisel AI asistanı',action:'openKocPanel'},
  {group:'CORE',icon:'◉',name:'Model Kataloğu',desc:'Tanımlı model seçeneklerini incele',action:'openModelsShowcase'},
- {group:'CREATE',icon:'◇',name:'3D Studio',desc:'Üç boyutlu tasarım araçları',action:'open3DBuilder',href:'./3d-studio.html'},
+ {group:'CREATE',icon:'◇',name:'3D Studio',desc:'Üç boyutlu tasarım araçları',action:'open3DBuilder',href:'./3d-studio.html#demo'},
  {group:'CREATE',icon:'▶',name:'Video Editör',desc:'Video düzenleme çalışma alanı',action:'openVideoEditor'},
  {group:'CREATE',icon:'▣',name:'Video Stüdyosu',desc:'Video fikirleri ve üretim araçları',action:'openVideoStudio'},
  {group:'PLATFORM',icon:'⌂',name:'Topluluk ve Takımlar',desc:'Takım ve ortak proje alanları',action:'toggleTeamPage',href:'./topluluk.html'},
@@ -1019,7 +1019,7 @@ var FALLBACK_FEATURES = [
 var ROUTES = {
  openAethrionAlPanel:'./aethrion-assistant.html', openVizyonAlPanel:'./aethrion-assistant.html',
  openFullAIPanel:'./aethrion-ai.html', openAethrionAI:'./aethrion-ai.html', openKocPanel:'./aethrion-assistant.html',
- open3DBuilder:'./3d-studio.html', openA27ApiGuide:'./api.html', openV27ApiGuide:'./api.html',
+ open3DBuilder:'./3d-studio.html#demo', openA27ApiGuide:'./api.html', openV27ApiGuide:'./api.html',
  openA27ApiKeyGenerator:'./aethrion-developer.html', createA27ApiKey:'./aethrion-developer.html',
  openVideoEditor:'./index.html#features', openVideoStudio:'./index.html#features',
  openModelsShowcase:'', openTeamWorkspace:'./aethrion-teams.html', toggleTeamPage:'./topluluk.html',
@@ -1318,7 +1318,7 @@ function fallbackAction(action, name, href) {
  if (/^https?:\/\/vizyon2026\.vercel\.app(?=\/|$)/i.test(route)) route = route.replace(/^https?:\/\/vizyon2026\.vercel\.app/i, '');
  if (route && route.charAt(0) === '#') route = './index.html' + route;
  if (!route) {
-  if (/3d|üç boyut/i.test(name)) route = './3d-studio.html';
+  if (/3d|üç boyut/i.test(name)) route = './3d-studio.html#demo';
   else if (/api|anahtar/i.test(name)) route = './api.html';
   else if (/coach|koç|asistan/i.test(name)) route = './aethrion-assistant.html';
   else if (/ai|yapay zekâ|yapay zeka|model/i.test(name)) route = './aethrion-ai.html';
@@ -2011,7 +2011,7 @@ var CORE=[
 ['KATEGORİLER','👥','Sosyal Özellikler','Topluluk ve sosyal etkileşim modülleri','openCategoryPanel','','social'],
 ['KATEGORİLER','🎁','Vay Be!','Keşif ve eğlence modülleri','openCategoryPanel','','surprise'],
 ['KATEGORİLER','💰','Para Kazandıran Araçlar','Freelance, mağaza ve kazanç modülleri','openCategoryPanel','','earn'],
-['ÜRETİM','◇','3D Studio','Üç boyutlu tasarım ve üretim','open3DBuilder','./3d-studio.html'],
+['ÜRETİM','◇','3D Studio','Üç boyutlu tasarım ve üretim','open3DBuilder','./3d-studio.html#demo'],
 ['ÜRETİM','▶','Video Editör','Video düzenleme çalışma alanı','openVideoEditor',''],
 ['ÜRETİM','🎬','Video Stüdyosu','AI destekli senaryo, sahne planı ve video üretim akışı','openVideoStudio',''],
 ['ÜRETİM','▧','Görsel Üretimi','Görsel oluşturma araçları','scrollToImageGen',''],
@@ -2130,7 +2130,7 @@ var fallback={
 'AETHRION Agents':['openAethrionAgentsPanel','./aethrion-assistant.html'],
 'AETHRION Coach':['openKocPanel','./aethrion-assistant.html'],
 'Model Kataloğu':['openModelsShowcase','./aethrion-ai.html#models'],
-'3D Studio':['open3DBuilder','./3d-studio.html'],
+'3D Studio':['open3DBuilder','./3d-studio.html#demo'],
 'Video Editör':['openVideoEditor',''],
 'Video Stüdyosu':['openVideoStudio',''],
 'Görsel Üretimi':['scrollToImageGen',''],
