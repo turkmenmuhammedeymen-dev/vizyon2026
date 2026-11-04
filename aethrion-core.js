@@ -14,7 +14,7 @@
     }
     return false;
   }
-  function go(path) { if (path) w.location.href = path; }
+  function go(path) { if (!path) return; var base = w.location.pathname.indexOf('/vizyon2026/') === 0 ? '/vizyon2026/' : '/'; var clean = String(path).replace(/^\\/+/, ''); w.location.href = new URL(clean, w.location.origin + base).toString(); }
   function openSettingsPanel() {
     var modal = byId('settingsModal');
     if (!modal) {
