@@ -6,7 +6,7 @@ var FALLBACK_FEATURES = [
  {group:'CORE',icon:'◈',name:'AETHRION Agents',desc:'Ajan, ekran okuma ve dosya araçları',action:'openAethrionAgentsPanel'},
  {group:'CORE',icon:'◎',name:'AETHRION Coach',desc:'Kişisel AI asistanı',action:'openKocPanel'},
  {group:'CORE',icon:'◉',name:'Model Kataloğu',desc:'Tanımlı model seçeneklerini incele',action:'openModelsShowcase'},
- {group:'CREATE',icon:'◇',name:'3D Studio',desc:'Üç boyutlu tasarım araçları',action:'open3DBuilder',href:'./3d-studio.html'},
+ {group:'CREATE',icon:'◇',name:'3D Studio',desc:'Üç boyutlu tasarım araçları',action:'open3DBuilder',href:'./3d-studio.html#demo'},
  {group:'CREATE',icon:'▶',name:'Video Editör',desc:'Video düzenleme çalışma alanı',action:'openVideoEditor'},
  {group:'CREATE',icon:'▣',name:'Video Stüdyosu',desc:'Video fikirleri ve üretim araçları',action:'openVideoStudio'},
  {group:'PLATFORM',icon:'⌂',name:'Topluluk ve Takımlar',desc:'Takım ve ortak proje alanları',action:'toggleTeamPage',href:'/topluluk.html'},
@@ -20,7 +20,7 @@ var FALLBACK_FEATURES = [
 var ROUTES = {
  openAethrionAlPanel:'/aethrion-assistant.html', openVizyonAlPanel:'/aethrion-assistant.html',
  openFullAIPanel:'', openAethrionAI:'', openKocPanel:'/aethrion-assistant.html',
- open3DBuilder:'./3d-studio.html', openA27ApiGuide:'/api.html', openV27ApiGuide:'/api.html',
+ open3DBuilder:'./3d-studio.html#demo', openA27ApiGuide:'/api.html', openV27ApiGuide:'/api.html',
  openA27ApiKeyGenerator:'/api.html#keys', createA27ApiKey:'/api.html#keys',
  openVideoEditor:'/index.html#features', openVideoStudio:'/index.html#features',
  openModelsShowcase:'/aethrion-ai.html#models', toggleTeamPage:'/topluluk.html',
@@ -287,7 +287,7 @@ function fallbackAction(action, name, href) {
  if (/^https?:\/\/vizyon2026\.vercel\.app(?=\/|$)/i.test(route)) route = route.replace(/^https?:\/\/vizyon2026\.vercel\.app/i, '');
  if (route && route.charAt(0) === '#') route = './index.html' + route;
  if (!route) {
-  if (/3d|üç boyut/i.test(name)) route = '/3d-studio.html';
+  if (/3d|üç boyut/i.test(name)) route = '/3d-studio.html#demo';
   else if (/api|anahtar/i.test(name)) route = '/api.html';
   else if (/coach|koç|asistan/i.test(name)) route = '/aethrion-assistant.html';
   else if (/ai|yapay zekâ|yapay zeka|model/i.test(name)) route = '/aethrion-ai.html';
