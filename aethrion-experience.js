@@ -3,10 +3,10 @@
 var GROUP_LABELS = { CORE: 'YAPAY ZEKÂ', CREATE: 'ÜRETİM ARAÇLARI', PLATFORM: 'PLATFORM', ADVANCED: 'GELİŞTİRİCİ ARAÇLARI', ACCOUNT: 'HESAP', OTHER: 'DİĞER ÖZELLİKLER' };
 var FALLBACK_FEATURES = [
  {group:'CORE',icon:'✦',name:'AETHRION AI',desc:'Yapay zekâ çalışma alanı',action:'openFullAIPanel'},
- {group:'CORE',icon:'◈',name:'AETHRION Agents',desc:'Ajan, ekran okuma ve dosya araçları',action:'openAethrionAlPanel'},
+ {group:'CORE',icon:'◈',name:'AETHRION Agents',desc:'Ajan, ekran okuma ve dosya araçları',action:'openAethrionAgentsPanel'},
  {group:'CORE',icon:'◎',name:'AETHRION Coach',desc:'Kişisel AI asistanı',action:'openKocPanel'},
  {group:'CORE',icon:'◉',name:'Model Kataloğu',desc:'Tanımlı model seçeneklerini incele',action:'openModelsShowcase'},
- {group:'CREATE',icon:'◇',name:'3D Studio',desc:'Üç boyutlu tasarım araçları',action:'open3DBuilder',href:'/3d-studio.html'},
+ {group:'CREATE',icon:'◇',name:'3D Studio',desc:'Üç boyutlu tasarım araçları',action:'open3DBuilder',href:'./3d-studio.html'},
  {group:'CREATE',icon:'▶',name:'Video Editör',desc:'Video düzenleme çalışma alanı',action:'openVideoEditor'},
  {group:'CREATE',icon:'▣',name:'Video Stüdyosu',desc:'Video fikirleri ve üretim araçları',action:'openVideoStudio'},
  {group:'PLATFORM',icon:'⌂',name:'Topluluk ve Takımlar',desc:'Takım ve ortak proje alanları',action:'toggleTeamPage',href:'/topluluk.html'},
@@ -19,8 +19,8 @@ var FALLBACK_FEATURES = [
 ];
 var ROUTES = {
  openAethrionAlPanel:'/aethrion-assistant.html', openVizyonAlPanel:'/aethrion-assistant.html',
- openFullAIPanel:'/aethrion-ai.html', openAethrionAI:'/aethrion-ai.html', openKocPanel:'/aethrion-assistant.html',
- open3DBuilder:'/3d-studio.html', openA27ApiGuide:'/api.html', openV27ApiGuide:'/api.html',
+ openFullAIPanel:'', openAethrionAI:'', openKocPanel:'/aethrion-assistant.html',
+ open3DBuilder:'./3d-studio.html', openA27ApiGuide:'/api.html', openV27ApiGuide:'/api.html',
  openA27ApiKeyGenerator:'/api.html#keys', createA27ApiKey:'/api.html#keys',
  openVideoEditor:'/index.html#features', openVideoStudio:'/index.html#features',
  openModelsShowcase:'/aethrion-ai.html#models', toggleTeamPage:'/topluluk.html',
