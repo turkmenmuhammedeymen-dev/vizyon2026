@@ -48,7 +48,7 @@
    ]}
   ];
   modelGroups.forEach(function(group){var optgroup=d.createElement('optgroup');optgroup.label=group.label;group.items.forEach(function(item){var option=d.createElement('option');option.value=item[0];option.textContent=item[1];optgroup.appendChild(option)});modelSelect.appendChild(optgroup)});
-  try{var savedModel=w.localStorage.getItem('aethrion_koc_model');if(savedModel&&modelSelect.querySelector('option[value="'+savedModel.replace(/"/g,'')+'"]'))modelSelect.value=savedModel}catch(_){}
+  try{var savedModel=w.localStorage.getItem('aethrion_koc_model');if(savedModel){for(var oi=0;oi<modelSelect.options.length;oi++){if(modelSelect.options[oi].value===savedModel){modelSelect.value=savedModel;break}}}}catch(_){}
   modelSelect.addEventListener('change',function(){try{w.localStorage.setItem('aethrion_koc_model',modelSelect.value)}catch(_){}});
   var fresh=make('button','koc-btn','＋ Yeni sohbet');fresh.type='button';fresh.addEventListener('click',newConversation);
   var share=make('button','koc-btn','Paylaş');share.type='button';share.addEventListener('click',openKocShareModal);
