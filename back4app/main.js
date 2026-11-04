@@ -440,7 +440,41 @@ async function getAethrionConfigValue(keyName, options) {
 }
 
 async function getAPIKey(keyName) {
-    return getAethrionConfigValue(keyName);
+    var aliases = {
+        GROQ_KEY: ['GROQ_API_KEY'],
+        GEMINI_KEY: ['GEMINI_API_KEY', 'GOOGLE_API_KEY'],
+        DEEPSEEK_KEY: ['DEEPSEEK_API_KEY'],
+        DEEPINFRA_KEY: ['DEEPINFRA_API_KEY'],
+        OPENAI_KEY: ['OPENAI_API_KEY'],
+        CEREBRAS_KEY: ['CEREBRAS_API_KEY'],
+        OPENROUTER_KEY: ['OPENROUTER_API_KEY'],
+        COHERE_KEY: ['COHERE_API_KEY'],
+        NVIDIA_API_KEY: ['NVIDIA_NIM_API_KEY'],
+        NVIDIA_BASE_URL: ['NVIDIA_NIM_BASE_URL'],
+        NVIDIA_NIM_BASE_URL: ['NVIDIA_BASE_URL'],
+        COLAB_LLAMA_URL: ['OLLAMA_URL', 'OLLAMA_BASE_URL', 'COLAB_LLAMA_BASE_URL']
+    };
+    var primary = await getAethrionConfigValue(keyName);
+    if (primary !== null && primary !== undefined && String(primary).trim()) return primary;
+    var candidates = aliases[keyName] || [];
+    for (var i = 0; i < candidates.length; i++) {
+        try {
+            var envValue = _aethrionReadPrivateEnv(candidates[i]);
+            if (envValue !== null) {
+                console.log('[AETHRION Config] Provider key loaded through a compatible legacy alias: ' + keyName);
+                return envValue;
+            }
+            var config = await _aethrionGetParseConfig();
+            var value = config && typeof config.get === 'function' ? config.get(candidates[i]) : null;
+            if (value !== null && value !== undefined && String(value).trim()) {
+                console.log('[AETHRION Config] Provider key loaded through a compatible legacy alias: ' + keyName);
+                return value;
+            }
+        } catch (error) {
+            console.warn('[AETHRION Config] Alias lookup unavailable for ' + keyName + '.');
+        }
+    }
+    return null;
 }
 
 async function getPrivateFounderPass() {
@@ -11034,19 +11068,27 @@ Parse.Cloud.define("aethrionGetDiagnostics", async function (request) {
         try { if (typeof process !== "undefined" && process.env && process.env[name]) return process.env[name]; } catch (e) {}
         try { return config && config.get ? config.get(name) : null; } catch (e) { return null; }
     }
+    async function secretAny(names) {
+        for (var si = 0; si < names.length; si++) {
+            var candidate = await secret(names[si]);
+            if (candidate !== null && candidate !== undefined && String(candidate).trim()) return candidate;
+        }
+        return null;
+    }
     var providers = [
-        { key: "OPENAI_KEY", label: "OpenAI model erişimi", url: "https://api.openai.com/v1/models" },
-        { key: "DEEPSEEK_KEY", label: "DeepSeek model erişimi", url: "https://api.deepseek.com/models" },
-        { key: "GROQ_KEY", label: "Groq model erişimi", url: "https://api.groq.com/openai/v1/models" },
-        { key: "NVIDIA_API_KEY", label: "NVIDIA model erişimi", url: null },
-        { key: "OPENROUTER_KEY", label: "OpenRouter model erişimi", url: "https://openrouter.ai/api/v1/models" },
-        { key: "DEEPINFRA_KEY", label: "DeepInfra model erişimi", url: "https://api.deepinfra.com/v1/openai/models" },
-        { key: "CEREBRAS_KEY", label: "Cerebras model erişimi", url: "https://api.cerebras.ai/v1/models" },
-        { key: "GEMINI_KEY", label: "Gemini model erişimi", url: "https://generativelanguage.googleapis.com/v1beta/models", header: "x-goog-api-key" }
+        { key: "OPENAI_KEY", aliases: ["OPENAI_API_KEY"], label: "OpenAI model erişimi", url: "https://api.openai.com/v1/models" },
+        { key: "DEEPSEEK_KEY", aliases: ["DEEPSEEK_API_KEY"], label: "DeepSeek model erişimi", url: "https://api.deepseek.com/models" },
+        { key: "GROQ_KEY", aliases: ["GROQ_API_KEY"], label: "Groq model erişimi", url: "https://api.groq.com/openai/v1/models" },
+        { key: "NVIDIA_API_KEY", aliases: ["NVIDIA_NIM_API_KEY"], label: "NVIDIA model erişimi", url: null },
+        { key: "OPENROUTER_KEY", aliases: ["OPENROUTER_API_KEY"], label: "OpenRouter model erişimi", url: "https://openrouter.ai/api/v1/models" },
+        { key: "DEEPINFRA_KEY", aliases: ["DEEPINFRA_API_KEY"], label: "DeepInfra model erişimi", url: "https://api.deepinfra.com/v1/openai/models" },
+        { key: "CEREBRAS_KEY", aliases: ["CEREBRAS_API_KEY"], label: "Cerebras model erişimi", url: "https://api.cerebras.ai/v1/models" },
+        { key: "GEMINI_KEY", aliases: ["GEMINI_API_KEY", "GOOGLE_API_KEY"], label: "Gemini model erişimi", url: "https://generativelanguage.googleapis.com/v1beta/models", header: "x-goog-api-key" },
+        { key: "COHERE_KEY", aliases: ["COHERE_API_KEY"], label: "Cohere model erişimi", url: null }
     ];
     for (var pi = 0; pi < providers.length; pi++) {
         var provider = providers[pi];
-        var keyValue = await secret(provider.key);
+        var keyValue = await secretAny([provider.key].concat(provider.aliases || []));
         if (!keyValue) {
             add(provider.label, "warn", "Yapılandırma anahtarı bulunamadı veya bu ortamda görünür değil.");
             continue;
@@ -11055,7 +11097,7 @@ Parse.Cloud.define("aethrionGetDiagnostics", async function (request) {
             var result = await probe(provider.url, keyValue, provider.header);
             add(provider.label, result.ok ? "ok" : "bad", result.detail);
         } else if (provider.key === "NVIDIA_API_KEY") {
-            var base = await secret("NVIDIA_BASE_URL");
+            var base = await secretAny(["NVIDIA_BASE_URL", "NVIDIA_NIM_BASE_URL"]);
             if (base) {
                 var nvidiaBase = String(base); while (nvidiaBase.endsWith("/")) nvidiaBase = nvidiaBase.slice(0, -1);
                 var nvidiaResult = await probe(nvidiaBase + "/models", keyValue);
@@ -11097,6 +11139,10 @@ Parse.Cloud.define("aethrionGetDiagnostics", async function (request) {
             add("Vercel dağıtımı", "bad", "Vercel durum sorgusu başarısız veya zaman aşımına uğradı; ham hata ve token gösterilmedi.");
         }
     }
+    var ollamaUrl = await secretAny(["COLAB_LLAMA_URL", "OLLAMA_URL", "OLLAMA_BASE_URL", "COLAB_LLAMA_BASE_URL"]);
+    add("Ollama / Colab bağlantısı", ollamaUrl ? "warn" : "warn", ollamaUrl
+        ? "Bağlantı adresi yapılandırılmış. Gerçek model yanıtı için uç nokta ve model erişimi ayrıca doğrulanmalı."
+        : "COLAB_LLAMA_URL veya uyumlu OLLAMA_URL yapılandırması bulunamadı; yerel model katmanı atlanır.");
     add("Cloud Code", "ok", "Bu tanılama işlevinin yanıt vermesi, mevcut Cloud Code çağrısının çalıştığını doğrular.");
     return { success: true, generatedAt: new Date().toISOString(), checks: checks };
 });
