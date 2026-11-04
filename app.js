@@ -1965,7 +1965,7 @@ var P=window.Parse;if(!P||!P.Cloud||typeof P.Cloud.run!=='function'){status('AI 
 if(!P.User||!P.User.current||!P.User.current()){status('Önce AETHRION hesabına giriş yap.','error');return;}
 busy=true;input.value='';button.disabled=true;message('user',text);status(mode==='agent'?'JARVIS görevi değerlendiriyor…':'AETHRION AI yanıt hazırlıyor…','busy');
 try{
-var answer='';
+var answer='',sourceLabel='';
 if(selectedFile){
  var file=selectedFile;
  if(!text)text='Bu dosyayı oku, özetle ve önemli noktalarını açıkla.';
@@ -1979,9 +1979,10 @@ if(selectedFile){
  selectedFile=null;var fi=document.getElementById('aeJvFileInput');if(fi)fi.value='';var fl=document.getElementById('aeJvFileLabel');if(fl)fl.textContent='Yanıtları önemli konularda doğrula.';
 }else{
  message('user',text);
- var r=await P.Cloud.run('vizyonAlChat',{message:text,mode:mode});answer=typeof r==='string'?r:r&&(r.reply||r.response||r.text||r.message);if(!answer&&r&&r.success===false)throw new Error(r.error||'AI isteği başarısız oldu.');answer=answer||'AI yanıt döndürmedi. Daha sonra tekrar dene.';
+ var r=await P.Cloud.run('vizyonAlChat',{message:text,mode:mode,model:'auto'});answer=typeof r==='string'?r:r&&(r.reply||r.response||r.text||r.message);if(!answer&&r&&r.success===false)throw new Error(r.error||'AI isteği başarısız oldu.');answer=answer||'AI yanıt döndürmedi. Daha sonra tekrar dene.';if(r&&r.provider)sourceLabel='Yanıt kaynağı: '+String(r.provider)+' · '+String(r.model||'model');
 }
-message('assistant',String(answer));status('Yanıt hazır.','success');speak(String(answer));
+var finalAnswer=String(answer)+(sourceLabel?'\n\n'+sourceLabel:'');
+message('assistant',finalAnswer);status('Yanıt hazır.','success');speak(String(answer));
 }
 catch(e){message('assistant','İstek tamamlanamadı. Bağlantıyı veya AI hizmetini kontrol edip tekrar dene.');status(String(e&&e.message||e||'Bilinmeyen hata').slice(0,180),'error');}
 finally{busy=false;button.disabled=false;input.focus();}
