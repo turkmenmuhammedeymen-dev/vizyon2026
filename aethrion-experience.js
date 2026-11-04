@@ -484,7 +484,7 @@ function loadWorkspaceShell() {
   ensureCss('aethrionWorkspaceV6Css','aethrion-workspace-v6.css');
   function loadV6() {
    if (document.querySelector('script[src*="aethrion-workspace-v6.js"]')) return;
-   var v6 = document.createElement('script'); v6.id = 'aethrionWorkspaceV6Script'; v6.src = './aethrion-workspace-v6.js?v=20261104-routefix2'; v6.async = true; document.head.appendChild(v6);
+   var v6 = document.createElement('script'); v6.id = 'aethrionWorkspaceV6Script'; v6.src = './aethrion-workspace-v6.js?v=20261104-routefix3'; v6.async = true; document.head.appendChild(v6);
   }
   var core = document.querySelector('script[src*="aethrion-workspace-v5.js"]');
   if (!core) {
