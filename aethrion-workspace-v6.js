@@ -22,6 +22,7 @@ var fallback={
 'Oturumu kapat':['doLogout','']
 };
 function q(s,r){return(r||document).querySelector(s)}
+function sitePath(path){try{return new URL(String(path||'').replace(/^\/+/,''),window.location.href).toString()}catch(_){return String(path||'')}}
 function qa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
 function logged(){try{return!!((window.Parse&&Parse.User&&Parse.User.current())||window.currentUser||(document.body&&document.body.classList.contains('logged-in-user')))}catch(e){return!!(document.body&&document.body.classList.contains('logged-in-user'))}}
 function userName(){try{var u=window.currentUser||(window.Parse&&Parse.User&&Parse.User.current());if(u&&typeof u.get==='function')return u.get('name')||u.get('username_display')||(u.get('email')||'').split('@')[0]||'Üye'}catch(e){}try{var v=JSON.parse(localStorage.getItem('aethrion_user')||'null');return v&&(v.name||v.username)||'Üye'}catch(e){return'Üye'}}
@@ -75,7 +76,7 @@ function isolateStage(){
 }
 function showStage(label,desc,href){
  var h=stageHost();if(!h)return;
- var safeHref=String(href||'');
+ var safeHref=String(href||''); if(safeHref && !/^https?:\/\//i.test(safeHref) && safeHref.charAt(0)==='/') safeHref=sitePath(safeHref);
  var isFrame=!!safeHref&&!/^javascript:/i.test(safeHref)&&safeHref!=='/index.html#features'&&safeHref!=='./index.html#features'&&safeHref!=='#features';
  var detail=desc||'Bu çalışma alanı seçiminiz için hazırlandı.';
  h.stage.innerHTML='<div class="ae-ws-stage-head"><div><div class="ae-ws-stage-kicker">AETHRION WORKSPACE</div><h2>'+esc(label)+'</h2><p>'+esc(detail)+'</p></div>'+(isFrame?'<a class="ae-ws-open-tab" href="'+esc(safeHref)+'" target="_blank" rel="noopener noreferrer">Yeni sekmede aç ↗</a>':'<span class="ae-ws-stage-state"><i></i> Çalışma alanı</span>')+'</div>'+(isFrame?'<iframe class="ae-ws-stage-frame" title="'+esc(label)+'" src="'+esc(safeHref)+'" loading="eager" allow="microphone; camera; clipboard-read; clipboard-write; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>':'<div class="ae-ws-stage-empty"><div class="ae-ws-stage-emblem">A</div><h3>'+esc(label)+'</h3><p>Bu özellik uygulama paneli üzerinden açılır. Açılan paneli kapattığınızda sol menüden başka bir çalışma alanına geçebilir veya Ana ekran’a dönebilirsiniz.</p></div>');
@@ -108,7 +109,7 @@ function openFeature(label){
  }
  var href=String(f.href||'');
  if(/^https?:\/\/vizyon2026\.vercel\.app(?=\/|$)/i.test(href))href=href.replace(/^https?:\/\/vizyon2026\.vercel\.app/i,'');
- if(href&&href!=='/index.html#features'&&href!=='./index.html#features'&&href!=='#features'){
+ if(href&&href!=='/index.html#features'&&href!=='./index.html#features'&&href!=='#features'){ href=href.charAt(0)==='/'?sitePath(href):href;
   document.body.classList.add('aews-feature-view');showStage(label,'Özelliğin çalışma alanı açılıyor.',href);return;
  }
  document.body.classList.add('aews-feature-view');showStage(label,desc,'');
