@@ -1979,7 +1979,7 @@ if(selectedFile){
  selectedFile=null;var fi=document.getElementById('aeJvFileInput');if(fi)fi.value='';var fl=document.getElementById('aeJvFileLabel');if(fl)fl.textContent='Yanıtları önemli konularda doğrula.';
 }else{
  message('user',text);
- var r=await P.Cloud.run('vizyonAlChat',{message:text,mode:mode,model:'auto'});answer=typeof r==='string'?r:r&&(r.reply||r.response||r.text||r.message);if(!answer&&r&&r.success===false)throw new Error(r.error||'AI isteği başarısız oldu.');answer=answer||'AI yanıt döndürmedi. Daha sonra tekrar dene.';if(r&&r.provider)sourceLabel='Yanıt kaynağı: '+String(r.provider)+' · '+String(r.model||'model');
+ var modelPicker=document.getElementById('aethrionModelSelect'),selectedModel=modelPicker?String(modelPicker.value||'auto'):'auto';var r=await P.Cloud.run('vizyonAlChat',{message:text,mode:mode,model:selectedModel});answer=typeof r==='string'?r:r&&(r.reply||r.response||r.text||r.message);if(!answer&&r&&r.success===false)throw new Error(r.error||'AI isteği başarısız oldu.');answer=answer||'AI yanıt döndürmedi. Daha sonra tekrar dene.';if(r&&r.provider)sourceLabel='Yanıt kaynağı: '+String(r.provider)+' · '+String(r.model||'model');
 }
 var finalAnswer=String(answer)+(sourceLabel?'\n\n'+sourceLabel:'');
 message('assistant',finalAnswer);status('Yanıt hazır.','success');speak(String(answer));
