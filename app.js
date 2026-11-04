@@ -1022,7 +1022,7 @@ var ROUTES = {
  open3DBuilder:'./3d-studio.html', openA27ApiGuide:'./api.html', openV27ApiGuide:'./api.html',
  openA27ApiKeyGenerator:'./aethrion-developer.html', createA27ApiKey:'./aethrion-developer.html',
  openVideoEditor:'./index.html#features', openVideoStudio:'./index.html#features',
- openModelsShowcase:'./aethrion-ai.html#models', toggleTeamPage:'./topluluk.html',
+ openModelsShowcase:'', openTeamWorkspace:'./aethrion-teams.html', toggleTeamPage:'./topluluk.html',
  openContestPage:'./topluluk.html', scrollToAcademy:'./bana-ogret.html', openAcademy:'./bana-ogret.html',
  openDocumentation:'./dokumantasyon.html', openBlog:'./blog.html', openAbout:'./hakkimizda.html'
 };
@@ -2021,8 +2021,6 @@ var CORE=[
 ['PLATFORM','🏆','Aylık Yarışma','Aylık proje yarışmaları','openContestPage','./topluluk.html'],
 ['PLATFORM','💼','A27 İş İlanları Mağazası','İş ilanlarını görüntüle ve yönet','openJobMarket',''],
 ['PLATFORM','🪙','Puan Mağazası + Cüzdan','Puan, dijital mağaza ve cüzdan alanı','openMarket',''],
-['PLATFORM','💬','GIF + DM Sistemi','Topluluk mesajları ve GIF destekli iletişim','toggleTeamPage','./topluluk.html'],
-['PLATFORM','🎞️','Pexels GIF Ara','Topluluk sohbetinde paylaşmak için GIF ara','openGifPicker',''],
 ['PLATFORM','✎','AETHRION Akademi','Eğitim ve öğrenme alanı','openAcademy','./bana-ogret.html'],
 ['GELİŞTİRİCİ','⌘','A27 API Anahtarı','API anahtarı oluşturma ve yönetim','openA27ApiKeyGenerator','./aethrion-developer.html'],
 ['GELİŞTİRİCİ','↗','API Belgeleri','Geliştirici rehberi ve örnekler','openA27ApiGuide','./api.html'],
@@ -2043,7 +2041,7 @@ var CORE=[
 ['MODERATÖR','📨','Proje Talepleri','Moderatöre yönlendirilen proje talepleri','scrollToProjectRequests','','','moderator'],
 ['BETA','⚡','Beta Model Erişimi','Beta üyelerine tanımlı gelişmiş model erişimi','openModelsShowcase','','','beta'],
 ['BETA','🔑','Beta API Yönetimi','Beta üyelerine tanımlı API erişimi','openA27ApiKeyGenerator','./aethrion-developer.html','','beta'],
-['TEAM PAKETİ','👥','Team Ortak Çalışma','Takım çalışma ve ortak proje alanı','toggleTeamPage','./topluluk.html','','team'],
+['TEAM PAKETİ','👥','Team Ortak Çalışma','Takım sohbeti, üyeler, roller ve ortak proje alanı','openTeamWorkspace','./aethrion-teams.html','','team'],
 ['TEAM PAKETİ','💼','Team İş İlanları','Takım paketine ait ilan limitleriyle mağaza','openJobMarket','','','team'],
 ['PRO PAKETİ','🌟','Pro Video Stüdyosu','Pro paket video üretim hakları','openVideoStudio','','','pro'],
 ['PRO PAKETİ','💼','Pro İş İlanları','Pro paket ilan limitleriyle mağaza','openJobMarket','','','pro'],
