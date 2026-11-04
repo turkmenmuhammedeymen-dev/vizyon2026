@@ -1271,7 +1271,6 @@ function runAction(action, name, href) {
   location.reload(); return;
  }
  leaveWelcome();
- if (href && href !== 'javascript:void(0)') { location.href = href; return; }
  if (action === 'scrollToAcademy' || /academy|akademi|öğren/i.test(name)) {
   if (scrollToTarget(['#academy','#academySection','#academy-section','#aethrionAcademy','#courseList'])) return;
  }
@@ -1312,10 +1311,12 @@ function runAction(action, name, href) {
    return;
   } catch (error) { console.error('[AETHRION] Özellik başlatılamadı:', error); }
  }
- fallbackAction(action, name);
+ fallbackAction(action, name, href);
 }
-function fallbackAction(action, name) {
- var route = ROUTES[action] || '';
+function fallbackAction(action, name, href) {
+ var route = ROUTES[action] || (href && href !== 'javascript:void(0)' ? String(href) : '');
+ if (/^https?:\/\/vizyon2026\.vercel\.app(?=\/|$)/i.test(route)) route = route.replace(/^https?:\/\/vizyon2026\.vercel\.app/i, '');
+ if (route && route.charAt(0) === '#') route = './index.html' + route;
  if (!route) {
   if (/3d|üç boyut/i.test(name)) route = './3d-studio.html';
   else if (/api|anahtar/i.test(name)) route = './api.html';
