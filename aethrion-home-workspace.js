@@ -133,8 +133,9 @@
     return opened;
   };
   w.openAethrionAI = w.openFullAIPanel;
-  w.openAethrionAlPanel = function () { return showChat('agents'); };
+  w.openAethrionAlPanel = function () { return showChat('ai'); };
   w.openVizyonAlPanel = w.openAethrionAlPanel;
+  w.openAethrionAgentsPanel = function () { return showChat('agents'); };
   w.openKocPanel = function () {
     var koc = node('kocPanelOverlay');
     if (koc) { koc.classList.add('open'); koc.style.setProperty('display', 'flex', 'important'); return true; }
@@ -171,7 +172,7 @@
     if (url.origin !== w.location.origin) return;
     var path = url.pathname.toLowerCase();
     if (path === '/aethrion-ai.html') { event.preventDefault(); event.stopImmediatePropagation(); w.openFullAIPanel(); }
-    else if (path === '/aethrion-assistant.html' || path === '/vizyon-al.html') { event.preventDefault(); event.stopImmediatePropagation(); w.openAethrionAlPanel(); }
+    else if (path === '/aethrion-assistant.html') { event.preventDefault(); event.stopImmediatePropagation(); w.openAethrionAgentsPanel(); } else if (path === '/vizyon-al.html') { event.preventDefault(); event.stopImmediatePropagation(); w.openFullAIPanel(); }
   }, true);
 
   d.addEventListener('keydown', function (event) {
