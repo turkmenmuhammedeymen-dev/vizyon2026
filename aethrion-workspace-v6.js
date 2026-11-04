@@ -91,25 +91,28 @@ function openFeature(label){
  if(label==='Oturumu kapat'){if(typeof window.logout==='function')return window.logout();if(window.Parse&&Parse.User)return Parse.User.logOut().then(function(){location.reload()});location.reload();return}
  var desc=(Array.isArray(window.FEATURE_LIST)?window.FEATURE_LIST:[]).filter(function(x){return x&&String(x.name||x.title||'')===label})[0];
  desc=desc&&String(desc.desc||desc.description||'')||'Bu özellik AETHRION çalışma alanı üzerinden kullanılabilir.';
- if(f.href&&f.href!=='/index.html#features'&&f.href!=='#features'){document.body.classList.add('aews-feature-view');showStage(label,'Özelliğin çalışma alanı açılıyor.',f.href);return}
  if(/^scrollTo/.test(f.action||'')){
   document.body.classList.remove('aews-feature-view');var stage=q('#aethrionWorkspaceStage');if(stage)stage.style.setProperty('display','none','important');
   var main=q('#mainSite');if(main)main.style.removeProperty('display');
   var dash=q('#dashboardArea');if(dash)dash.style.removeProperty('display');
-  if(typeof window.safeFeatureCall==='function')window.safeFeatureCall(f.action,label,'');else if(typeof window[f.action]==='function')window[f.action]();
-  return;
+  if(typeof window.safeFeatureCall==='function'){window.safeFeatureCall(f.action,label,'');return}
+  if(typeof window[f.action]==='function'){window[f.action]();return}
  }
  if(f.action&&typeof window.safeFeatureCall==='function'){
   document.body.classList.remove('aews-feature-view');var stage2=q('#aethrionWorkspaceStage');if(stage2)stage2.style.setProperty('display','none','important');
-  window.safeFeatureCall(f.action,label,'');
-  return;
+  window.safeFeatureCall(f.action,label,'');return;
  }
  if(f.action&&typeof window[f.action]==='function'){
   document.body.classList.remove('aews-feature-view');var stage3=q('#aethrionWorkspaceStage');if(stage3)stage3.style.setProperty('display','none','important');
   window[f.action]();return;
  }
+ var href=String(f.href||'');
+ if(/^https?:\/\/vizyon2026\.vercel\.app(?=\/|$)/i.test(href))href=href.replace(/^https?:\/\/vizyon2026\.vercel\.app/i,'');
+ if(href&&href!=='/index.html#features'&&href!=='./index.html#features'&&href!=='#features'){
+  document.body.classList.add('aews-feature-view');showStage(label,'Özelliğin çalışma alanı açılıyor.',href);return;
+ }
  document.body.classList.add('aews-feature-view');showStage(label,desc,'');
- if(typeof window.showNotification==='function')window.showNotification('Bu özellik için doğrudan açılış bağlantısı tanımlanmamış.','warning');
+ if(typeof window.showNotification==='function')window.showNotification('Bu özelliğin paneli bulunamadı. Harici veya alakasız bir adrese yönlendirme yapılmadı.','warning');
 }
 function installRouter(){
  if(document.body.dataset.aeV6Router==='1')return;document.body.dataset.aeV6Router='1';
