@@ -69,12 +69,11 @@
   install('openFullAIPanel', function () { go('/aethrion-ai.html'); });
   install('openAethrionAI', function () { go('/aethrion-ai.html'); });
   install('openAethrionAlPanel', function () { go('/aethrion-assistant.html'); });
-  install('openVizyonAlPanel', function () { go('/aethrion-assistant.html'); });
   install('openKocPanel', function () { go('/aethrion-assistant.html'); });
   install('openModelsShowcase', function () { var p = byId('modelsShowcaseOverlay'); if (!p) { go('/aethrion-ai.html#models'); return false; } p.classList.add('open', 'active'); p.style.setProperty('display', 'flex', 'important'); p.style.setProperty('visibility', 'visible', 'important'); p.style.setProperty('pointer-events', 'auto', 'important'); p.style.setProperty('position', 'fixed', 'important'); p.style.setProperty('inset', '0', 'important'); p.style.setProperty('z-index', '2147482000', 'important'); d.body.style.overflow = 'hidden'; return true; });
   install('smartTranslate', function () { if (typeof w.openFullAIPanel === 'function') w.openFullAIPanel(); else go('/aethrion-ai.html'); var input = byId('vzInput'); if (input) { input.value = 'Akıllı çeviri: Çevirmemi istediğim metin için kaynak ve hedef dili sor, ardından anlamı ve tonu koruyarak çevir.'; input.dispatchEvent(new Event('input', { bubbles: true })); input.focus(); } });
-  install('open3DBuilder', function () { go('/3d-studio.html'); });
-  install('open3DStudio', function () { go('/3d-studio.html'); });
+  install('open3DBuilder', function () { go('/3d-studio.html#demo'); });
+  install('open3DStudio', function () { go('/3d-studio.html#demo'); });
   install('openVideoEditor', function () { var p = byId('videoEditorOverlay'); if (!p) { go('/index.html#features'); return false; } p.classList.add('open', 'active'); p.style.setProperty('display', 'flex', 'important'); p.style.setProperty('visibility', 'visible', 'important'); p.style.setProperty('pointer-events', 'auto', 'important'); p.style.setProperty('position', 'fixed', 'important'); p.style.setProperty('inset', '0', 'important'); p.style.setProperty('z-index', '2147482000', 'important'); p.style.setProperty('overflow', 'auto', 'important'); d.body.style.overflow = 'hidden'; return true; });
   install('openVideoStudio', function () { var opened = w.openVideoEditor(); var title = d.querySelector('#videoEditorOverlay .video-editor-title span'); if (title) title.textContent = 'VİDEO STÜDYOSU'; return opened; });
   install('openCodeEditor', function () { go('/kod-editoru.html'); });
@@ -473,9 +472,6 @@
     w.showNotification && w.showNotification('Şifre sıfırlama servisi hazır değil.', 'error');
   });
   install('goToAethrionHome', function () { go('/'); });
-  install('openVideoEditor', function () { go('/index.html#features'); });
-  install('openVideoStudio', function () { go('/index.html#features'); });
-  install('open3DBuilder', function () { go('/3d-studio.html'); });
   install('openMarket', function () { go('/topluluk.html'); });
   install('openPersonalAssistant', function () { go('/aethrion-assistant.html'); });
   install('openContestPage', function () { go('/topluluk.html'); });
