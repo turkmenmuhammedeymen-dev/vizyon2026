@@ -2045,8 +2045,6 @@ var CORE=[
 ['TEAM PAKETİ','💼','Team İş İlanları','Takım paketine ait ilan limitleriyle mağaza','openJobMarket','','','team'],
 ['PRO PAKETİ','🌟','Pro Video Stüdyosu','Pro paket video üretim hakları','openVideoStudio','','','pro'],
 ['PRO PAKETİ','💼','Pro İş İlanları','Pro paket ilan limitleriyle mağaza','openJobMarket','','','pro'],
-['YAPAY ZEKÂ','＋','Yeni Sohbet','Yeni AETHRION AI konuşması başlat','newConversation','./aethrion-ai.html'],
-['YAPAY ZEKÂ','▤','Sohbet Geçmişi','Önceki AI konuşmalarına eriş','toggleConversationHistory','./aethrion-ai.html'],
 ['YAPAY ZEKÂ','🎤','Sesli AI Girişi','Sesli sohbet ve konuşma araçları','openVoiceChatFullscreen',''],
 ['YAPAY ZEKÂ','👁','Ekran Okuma','Ekran içeriğini AI ile analiz et','startScreenReading',''],
 ['YAPAY ZEKÂ','📁','Dosya Analizi','Dosya ve belge analiz araçları','openAethrionAlPanel','./aethrion-assistant.html'],
