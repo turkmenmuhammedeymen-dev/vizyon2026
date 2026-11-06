@@ -809,6 +809,7 @@
       var check=d.createElement('input');check.type='checkbox';check.value=name;check.checked=index<4;
       labelEl.appendChild(check);var span=d.createElement('span');span.textContent=name;labelEl.appendChild(span);$('#aepMultiModels',body).appendChild(labelEl);
     });
+    m2.selectedIndex=1;
     $('#aepBattleGo',body).addEventListener('click',function(){
       var prompt=battlePrompt.value.trim();if(!prompt){note('Önce tartışma konusunu yaz.','warning');return;}
       var button=this;button.disabled=true;battleResults.textContent='Modeller yanıt hazırlıyor…';
