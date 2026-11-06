@@ -2075,7 +2075,8 @@ var CORE=[
 ['PLATFORM','👥','Takım Alanım','Katıldığın takımları, sohbeti ve ortak projeleri aç','openTeamWorkspace','./aethrion-teams.html'],
 ['PLATFORM','📨','Proje Talebi Oluştur','3D, kod veya görsel proje talebini ilet','openProjectRequestCreate',''],
 ['PLATFORM','🗂️','Arşivim','Arşivlediğin projeleri görüntüle ve geri yükle','openProjectsArchive',''],
-['PLATFORM','🗑️','Çöp Kutusu','Silinen projeleri geri yükle veya kalıcı sil','openProjectsTrash','']
+['PLATFORM','🗑️','Çöp Kutusu','Silinen projeleri geri yükle veya kalıcı sil','openProjectsTrash',''],
+['PLATFORM','🐛','Hata Bildir','Hataları açıklayıp destek ekibine ilet','openBugReport','']
 ];
 function q(s,r){return(r||document).querySelector(s)}function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function logged(){try{return!!((window.Parse&&Parse.User&&Parse.User.current())||window.currentUser||document.body.classList.contains('logged-in-user'))}catch(e){return document.body.classList.contains('logged-in-user')}}
