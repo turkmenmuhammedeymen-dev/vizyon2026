@@ -553,7 +553,9 @@
       if (!said) return;
       voiceLine(said, 'user'); voiceStatus('🧠 YANIT HAZIRLANIYOR');
       try {
-        var result = await aiCloud('aethrionChat', { message: said, mode: 'normal' });
+        var modelPicker = byId('aethrionModelSelect');
+        var selectedModel = modelPicker ? String(modelPicker.value || 'auto') : 'auto';
+        var result = await aiCloud('aethrionChat', { message: said, mode: 'normal', model: selectedModel });
         if (!result || result.success !== true) throw new Error(result && result.error || 'Yanıt alınamadı.');
         var reply = String(result.reply || 'Yanıt boş döndü.'); voiceLine(reply, 'assistant');
         if (w.speechSynthesis && w.SpeechSynthesisUtterance) { w.speechSynthesis.cancel(); var utterance = new w.SpeechSynthesisUtterance(reply); utterance.lang = 'tr-TR'; w.speechSynthesis.speak(utterance); }
