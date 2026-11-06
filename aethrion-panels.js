@@ -773,6 +773,26 @@
     st.classList.add('on');return true;
   }
 
+  function buildBugReportPanel(label,m){
+    var st=stage();setHead(st,label,'Hata bildirimi · açıklama ekle ve destek ekibine gönder');
+    var body=$('.aep-body',st);
+    body.innerHTML='<div class="aep-card"><h3>🐛 Hata bildir</h3><p class="aep-muted">Hatanın nerede oluştuğunu, hangi adımları izlediğini ve beklediğin sonucu anlat. E-posta, parola veya gizli anahtar ekleme.</p>'+
+      '<textarea id="aepBugDescription" class="aep-input" rows="6" maxlength="2500" placeholder="Hata açıklaması (en az 20 karakter)…"></textarea>'+
+      '<div class="aep-row"><button type="button" id="aepBugSend" class="aep-btn aep-primary">Bildirimi gönder</button><span id="aepBugStatus" class="aep-muted" role="status"></span></div></div>';
+    var input=$('#aepBugDescription',body),button=$('#aepBugSend',body),status=$('#aepBugStatus',body);
+    button.addEventListener('click',function(){
+      var description=input.value.trim();
+      if(description.length<20){status.textContent='Açıklama en az 20 karakter olmalı.';input.focus();return;}
+      button.disabled=true;status.textContent='Bildirim gönderiliyor…';
+      cloud('submitBugReport',{description:description}).then(function(result){
+        if(!result||result.success!==true)throw new Error(result&&result.message||'Hata bildirimi gönderilemedi.');
+        status.textContent=result.message||'Hata bildirimi alındı.';
+        input.value='';note(status.textContent,'success');
+      }).catch(function(error){status.textContent=String(error&&error.message||error);note(status.textContent,'error');}).then(function(){button.disabled=false;});
+    });
+    st.classList.add('on');return true;
+  }
+
   function buildBattlePanel(label,m){
     var st=stage();setHead(st,label,'İki modeli karşılaştır veya aynı isteği dört modele yönelt');
     var body=$('.aep-body',st);
@@ -871,7 +891,7 @@
     st.classList.add('on');
     return true;
   }
-  var BUILTIN = { 'Görsel Üretimi': buildImagePanel, 'Projelerim': buildProjectsPanel, 'Arşivim': buildProjectsPanel, 'Çöp Kutusu': buildProjectsPanel, '3D Studio': build3DStudioPanel, 'Proje Talebi Oluştur': buildProjectRequestCreatePanel, 'Proje Talepleri': buildProjectRequestsPanel, 'Günlük Görevler ve Seri': buildDailyTasksPanel, 'Zeka Testi': buildQuizPanel, 'Puan ve Davet': buildPointsPanel, 'Anketler ve Duyurular': buildCommunityPanel, 'Savaş Modu + Çoklu AI': buildBattlePanel };
+  var BUILTIN = { 'Görsel Üretimi': buildImagePanel, 'Projelerim': buildProjectsPanel, 'Arşivim': buildProjectsPanel, 'Çöp Kutusu': buildProjectsPanel, '3D Studio': build3DStudioPanel, 'Proje Talebi Oluştur': buildProjectRequestCreatePanel, 'Proje Talepleri': buildProjectRequestsPanel, 'Günlük Görevler ve Seri': buildDailyTasksPanel, 'Zeka Testi': buildQuizPanel, 'Puan ve Davet': buildPointsPanel, 'Anketler ve Duyurular': buildCommunityPanel, 'Savaş Modu + Çoklu AI': buildBattlePanel, 'Hata Bildir': buildBugReportPanel };
   function builtinFor(label, m) {
     if (BUILTIN[label]) return BUILTIN[label];
     if (m && m[4] === 'openCategoryPanel') return buildCategoryPanel;
