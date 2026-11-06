@@ -443,6 +443,22 @@
     });
   }
   function bootInboxUI() { if (document.body) installAethrionInboxUI(); }
+  window.openAethrionInbox = function () {
+    var panel = document.getElementById('aethrionInboxPanel');
+    var launcher = document.getElementById('aethrionInboxLauncher');
+    if (!panel || !launcher) {
+      if (typeof window.showNotification === 'function') window.showNotification('Gelen Kutusu arayüzü henüz yüklenmedi. Sayfayı yenileyin.', 'warning');
+      return false;
+    }
+    if (!panel.classList.contains('open')) launcher.click();
+    return true;
+  };
+  window.closeAethrionInbox = function () {
+    var panel = document.getElementById('aethrionInboxPanel');
+    if (!panel) return false;
+    panel.classList.remove('open');
+    return true;
+  };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootInboxUI, { once:true }); else bootInboxUI();
   window.addEventListener('aethrion:authenticated', function () {
     window.loadAethrionInboxItems();
