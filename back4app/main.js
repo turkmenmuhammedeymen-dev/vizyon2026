@@ -1378,12 +1378,8 @@ Parse.Cloud.define("handleProjectRequest", async function (request) {
 
     var inboxQuery = new Parse.Query(Inbox);
     inboxQuery.equalTo('request_id', requestId);
-    var receiverEmail = String(user.get('email') || '').trim().toLowerCase();
-    var escapedReceiverEmail = receiverEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\    var inboxQuery = new Parse.Query(Inbox);
-    inboxQuery.equalTo('request_id', requestId);
     inboxQuery.equalTo('receiver_email', user.get('email'));
-    inboxQuery.equalTo('type', 'project_request');');
-    inboxQuery.matches('receiver_email', '^' + escapedReceiverEmail + '
+    inboxQuery.equalTo('type', 'project_request');
     var inboxMsg = await inboxQuery.first({ useMasterKey: true });
     if (!inboxMsg) throw new Error('Bu talebi bulamadınız veya size ait değil!');
     if (inboxMsg.get('status') !== 'pending' && action !== 'send' && action !== 'cancel') throw new Error('Bu talep zaten işlenmiş!');
