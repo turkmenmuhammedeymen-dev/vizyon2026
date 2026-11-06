@@ -7806,9 +7806,15 @@ Parse.Cloud.define("applyJob", async function (request) {
 Parse.Cloud.define("submitBugReport", async function (request) {
     var user = request.user;
     if (!user) throw new Error('Giriş yapmalısınız!');
-    var description = request.params.description;
+    var description = String(request.params.description || '').trim();
     var screenshot = request.params.screenshot;
-    if (!description) throw new Error('Hata açıklaması gerekli!');
+    if (description.length < 20) throw new Error('Hata açıklaması en az 20 karakter olmalı.');
+    if (description.length > 2500) throw new Error('Hata açıklaması en fazla 2500 karakter olabilir.');
+    if (screenshot && (typeof screenshot !== 'string' || screenshot.length > 400000)) throw new Error('Ekran görüntüsü verisi geçersiz veya çok büyük.');
+
+    var reportRateKey = 'submitBugReport:' + String(user.get('email') || user.id).toLowerCase();
+    await checkRateLimit(reportRateKey, 3, 24 * 60 * 60 * 1000);
+    await recordAttempt(reportRateKey);
 
     var bug = new BugReport();
     bug.set('user_email', user.get('email'));
