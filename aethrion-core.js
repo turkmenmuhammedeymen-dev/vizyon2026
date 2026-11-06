@@ -72,7 +72,7 @@
   install('openKocPanel', function () { go('/aethrion-assistant.html'); });
   install('openModelsShowcase', function () { var p = byId('modelsShowcaseOverlay'); if (!p) { go('/aethrion-ai.html#models'); return false; } p.classList.add('open', 'active'); p.style.setProperty('display', 'flex', 'important'); p.style.setProperty('visibility', 'visible', 'important'); p.style.setProperty('pointer-events', 'auto', 'important'); p.style.setProperty('position', 'fixed', 'important'); p.style.setProperty('inset', '0', 'important'); p.style.setProperty('z-index', '2147482000', 'important'); d.body.style.overflow = 'hidden'; return true; });
   install('smartTranslate', function () { if (typeof w.openFullAIPanel === 'function') w.openFullAIPanel(); else go('/aethrion-ai.html'); var input = byId('vzInput'); if (input) { input.value = 'Akıllı çeviri: Çevirmemi istediğim metin için kaynak ve hedef dili sor, ardından anlamı ve tonu koruyarak çevir.'; input.dispatchEvent(new Event('input', { bubbles: true })); input.focus(); } });
-  install('open3DBuilder', function () { go('/3d-studio.html#demo'); });
+  install('open3DBuilder', function () { if (typeof w.aethrionOpenFeature === 'function') { w.aethrionOpenFeature('3D Studio'); return true; } go('/3d-studio.html#demo'); return true; });
   install('open3DStudio', function () { go('/3d-studio.html#demo'); });
   install('openVideoEditor', function () { var p = byId('videoEditorOverlay'); if (!p) { go('/index.html#features'); return false; } p.classList.add('open', 'active'); p.style.setProperty('display', 'flex', 'important'); p.style.setProperty('visibility', 'visible', 'important'); p.style.setProperty('pointer-events', 'auto', 'important'); p.style.setProperty('position', 'fixed', 'important'); p.style.setProperty('inset', '0', 'important'); p.style.setProperty('z-index', '2147482000', 'important'); p.style.setProperty('overflow', 'auto', 'important'); d.body.style.overflow = 'hidden'; return true; });
   install('openVideoStudio', function () { var opened = w.openVideoEditor(); var title = d.querySelector('#videoEditorOverlay .video-editor-title span'); if (title) title.textContent = 'VİDEO STÜDYOSU'; return opened; });
@@ -85,7 +85,7 @@
   install('openA27ApiKeyGenerator', function () { go('/aethrion-developer.html'); });
   install('openJobMarket', function () { var p = byId('jobMarketOverlay'); if (!p) { go('/index.html#features'); return false; } p.classList.add('open', 'active'); p.style.setProperty('display', 'flex', 'important'); p.style.setProperty('visibility', 'visible', 'important'); p.style.setProperty('pointer-events', 'auto', 'important'); p.style.setProperty('position', 'fixed', 'important'); p.style.setProperty('inset', '0', 'important'); p.style.setProperty('z-index', '2147482000', 'important'); p.style.setProperty('overflow', 'auto', 'important'); d.body.style.overflow = 'hidden'; return true; });
   install('toggleTeamPage', function () { go('/topluluk.html'); });
-  install('openTeamWorkspace', function () { go('/aethrion-teams.html'); });
+  install('openTeamWorkspace', function () { if (typeof w.aethrionOpenFeature === 'function') { w.aethrionOpenFeature('Takım Alanım'); return true; } go('/aethrion-teams.html'); return true; });
   install('openPersonalAssistant', function () { go('/aethrion-assistant.html'); });
   install('openContestPage', function () { go('/topluluk.html#contest'); });
   install('openSettingsModal', openSettingsPanel);
@@ -568,7 +568,7 @@
     if (typeof w.openVoiceChatFullscreen === 'function') w.openVoiceChatFullscreen();
     return w.toggleAethrionVoiceInput();
   });
-  install('scrollToProjectRequests', function () { if (!scrollTo('projectRequests')) go('/topluluk.html'); });
+  install('scrollToProjectRequests', function () { if (typeof w.aethrionOpenFeature === 'function') { w.aethrionOpenFeature('Proje Talepleri'); return true; } if (scrollTo('projectRequests')) return true; w.showNotification && w.showNotification('Proje talepleri çalışma alanı yüklenemedi. Ana sayfayı bir kez yenileyin.', 'warning'); return false; });
   install('newConversation', function () { go('/aethrion-ai.html'); });
   install('toggleConversationHistory', function () { var p = byId('conversationHistoryList') || byId('conversationHistoryItems'); if (p) p.hidden = !p.hidden; else go('/aethrion-ai.html'); });
   install('shareCurrentConversation', async function () {
