@@ -2062,16 +2062,20 @@ var CORE=[
 ['YAPAY ZEKÂ','✨','AETHRION AI · 4 Mod','Normal, Derin Düşünme, Ajan ve Yazılımcı çalışma alanı','openAethrionAlPanel','./aethrion-assistant.html'],
 ['YAPAY ZEKÂ','🧭','A27 Koç','A27 Koç sohbeti ve geçmişi','openKocPanel','./aethrion-assistant.html'],
 ['PLATFORM','📥','Gelen Kutusu','Davetler, hediyeler ve rol teklifleri','openAethrionInbox',''],
-['PLATFORM','📋','Günlük Görevler ve Puan','Günlük görev ve puan kazanma araçlarını keşfet','openCategoryPanel','','gamification'],
+['PLATFORM','📋','Günlük Görevler ve Seri','Günlük görevlerini tamamla ve seri ödülünü al','openDailyTasksPanel',''],
 ['PLATFORM','🔥','Günlük Seri ve Uzay Modu','Seri ve oyunlaştırma araçları','openCategoryPanel','','gamification'],
 ['PLATFORM','⚔️','Savaş Modu + Çoklu AI','AI karşılaştırma ve oyunlaştırma araçları','openCategoryPanel','','gamification'],
-['PLATFORM','🧠','Zeka Testi ve Quiz','Eğitim ve öğrenme araçları','openCategoryPanel','','education'],
-['PLATFORM','🎁','Davet Liderlik Tablosu','Davet edenler sıralaması ve referans alanı','', './index.html#mainReferralLeaderboard'],
+['PLATFORM','🧠','Zeka Testi','Günlük soruları yanıtla ve puan kazan','openQuizPanel',''],
+['PLATFORM','🎁','Puan ve Davet','Puan bakiyesi, seviye, davet kodu ve sıralama','openPointsPanel',''],
 ['PLATFORM','💰','Kazanç Araçları','Puan mağazası ve kazanç kategorisi','openCategoryPanel','','earn'],
-['PLATFORM','🗳️','Anketler','Topluluk anket alanı','', './index.html#pollContainer'],
+['PLATFORM','🗳️','Anketler ve Duyurular','Aktif anketlere oy ver ve duyuruları oku','openCommunityPanel',''],
 ['PLATFORM','📢','Duyurular','AETHRION duyuru panosu','', './index.html#announcementList'],
 ['PLATFORM','🐛','Destek ve Hata Bildirimi','Destek ve geri bildirim kanalı','openVizyonSupport','./iletisim.html'],
-['GELİŞTİRİCİ','🧰','Pro Araçları','Kod, yazı ve çeviri için AETHRION AI çalışma alanı','openAethrionAlPanel','./aethrion-assistant.html']
+['GELİŞTİRİCİ','🧰','Pro Araçları','Kod, yazı ve çeviri için AETHRION AI çalışma alanı','openAethrionAlPanel','./aethrion-assistant.html'],
+['PLATFORM','👥','Takım Alanım','Katıldığın takımları, sohbeti ve ortak projeleri aç','openTeamWorkspace','./aethrion-teams.html'],
+['PLATFORM','📨','Proje Talebi Oluştur','3D, kod veya görsel proje talebini ilet','openProjectRequestCreate',''],
+['PLATFORM','🗂️','Arşivim','Arşivlediğin projeleri görüntüle ve geri yükle','openProjectsArchive',''],
+['PLATFORM','🗑️','Çöp Kutusu','Silinen projeleri geri yükle veya kalıcı sil','openProjectsTrash','']
 ];
 function q(s,r){return(r||document).querySelector(s)}function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function logged(){try{return!!((window.Parse&&Parse.User&&Parse.User.current())||window.currentUser||document.body.classList.contains('logged-in-user'))}catch(e){return document.body.classList.contains('logged-in-user')}}
