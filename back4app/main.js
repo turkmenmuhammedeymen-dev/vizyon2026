@@ -7262,7 +7262,7 @@ Parse.Cloud.define("submitQuizAnswer", async function (request) {
         points = Math.max(0, Number(quiz.get('points_reward')) || 0);
     } else {
         var correctIndex = sampleAnswers[quizId];
-        if (correctIndex !== undefined && answerIndex <= 5) {
+        if (correctIndex !== undefined && answerIndex < 4) {
             correct = answerIndex === correctIndex;
             points = 10;
             if (quizId === 'q2') points = 15;
