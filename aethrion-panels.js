@@ -45,7 +45,8 @@
     'Dokümantasyon': './dokumantasyon.html',
     'Güvenlik ve Ebeveyn Ayarları': './hesap-ve-oturum-guvenligi.html',
     'Güvenlik Ayarları': './hesap-ve-oturum-guvenligi.html',
-    'Team Ortak Çalışma': './aethrion-teams.html'
+    'Team Ortak Çalışma': './aethrion-teams.html',
+    'Takım Alanım': './aethrion-teams.html'
   };
   /* Bu özellikler için uygulamanın kendi kapatma fonksiyonları (varsa). */
   var CLOSERS = ['closeJarvisMode', 'closeVideoEditor', 'closeModelsShowcase', 'closeJobMarket', 'closeJobCreateForm',
@@ -641,13 +642,13 @@
             var select = d.createElement('select'); select.className = 'aep-input'; select.style.maxWidth = '260px';
             var placeholder = d.createElement('option'); placeholder.value = ''; placeholder.textContent = 'Teslim edilecek projeyi seç'; select.appendChild(placeholder);
             var sendButton = d.createElement('button'); sendButton.type = 'button'; sendButton.className = 'aep-btn aep-primary'; sendButton.textContent = 'Projeyi gönder'; sendButton.disabled = true;
-            cloud('getUserProjectCount', {}).then(function () {
+            (function () {
               var q = new w.Parse.Query('Project'), user = curUser();
-              if (!user) throw new Error('Oturum bulunamadı.');
+              if (!user) return Promise.reject(new Error('Oturum bulunamadı.'));
               q.equalTo('user_email', user.get('email')); q.equalTo('type', item.project_type);
-              q.equalTo('is_trashed', false); q.equalTo('is_archived', false); q.descending('createdAt'); q.limit(100);
+              q.descending('createdAt'); q.limit(100);
               return q.find();
-            }).then(function (projects) {
+            })().then(function (projects) {
               projects.forEach(function (project) {
                 var option = d.createElement('option'); option.value = project.id; option.textContent = project.get('name') || 'İsimsiz proje'; select.appendChild(option);
               });
