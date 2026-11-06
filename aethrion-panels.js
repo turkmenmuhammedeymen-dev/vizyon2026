@@ -742,7 +742,7 @@
             if(!picked){status.textContent='Önce bir yanıt seç.';return}
             send.disabled=true;
             cloud('submitQuizAnswer',{quizId:question.id,answerIndex:Number(picked.value)}).then(function(result){
-              answered[question.id]=true; status.textContent=result.correct?'✅ Doğru! '+String(result.points_reward||0)+' puan kazandın.':'Bu yanıt doğru değil.';
+              answered[question.id]=true; status.textContent=result.alreadyAnswered?'Bu soruyu daha önce yanıtlamışsın.':(result.correct?'✅ Doğru! '+String(result.points_reward||0)+' puan kazandın.':'Bu yanıt doğru değil.');
               choices.querySelectorAll('input').forEach(function(input){input.disabled=true});
             }).catch(function(error){status.textContent='Yanıt gönderilemedi: '+String(error&&error.message||error);send.disabled=false});
           });
@@ -756,10 +756,12 @@
 
   function buildPointsPanel(label,m){
     var st=stage();setHead(st,label,'Puan, seviye ve davet kodun');
-    var body=$('.aep-body',st);body.innerHTML='<div class="aep-card"><h3>⭐ Puan hesabım</h3><p id="aepPointInfo" class="aep-muted">Yükleniyor…</p><div class="aep-row"><input id="aepReferralCode" class="aep-input" readonly placeholder="Davet kodu"><button id="aepReferralCopy" class="aep-btn">Kopyala</button></div><h3>🏆 Davet sıralaması</h3><div id="aepReferralBoard" class="aep-list">Yükleniyor…</div></div>';
+    var body=$('.aep-body',st);body.innerHTML='<div class="aep-card"><h3>⭐ Puan hesabım</h3><p id="aepPointInfo" class="aep-muted">Yükleniyor…</p><p id="aepWalletInfo" class="aep-muted">Cüzdan bakiyesi yükleniyor…</p><div class="aep-row"><input id="aepReferralCode" class="aep-input" readonly placeholder="Davet kodu"><button id="aepReferralCopy" class="aep-btn">Kopyala</button></div><h3>🏆 Davet sıralaması</h3><div id="aepReferralBoard" class="aep-list">Yükleniyor…</div></div>';
     var info=$('#aepPointInfo',body),code=$('#aepReferralCode',body),board=$('#aepReferralBoard',body);
-    Promise.all([cloud('getUserPoints',{}),cloud('generateReferralCode',{}),cloud('getReferralLeaderboard',{})]).then(function(values){
+    var walletInfo=$('#aepWalletInfo',body);
+    Promise.all([cloud('getUserPoints',{}),cloud('generateReferralCode',{}),cloud('getReferralLeaderboard',{}),cloud('getWalletBalance',{})]).then(function(values){
       info.textContent='Puan: '+String(values[0]&&values[0].points||0)+' · Seviye: '+String(values[0]&&values[0].level||'Çaylak');
+      walletInfo.textContent='Cüzdan bakiyesi: '+String(values[3]&&values[3].balance||0)+' TL · Bu alanda bakiye yalnızca görüntülenir.';
       code.value=values[1]&&values[1].referral_code||'';
       board.textContent='';
       (Array.isArray(values[2])?values[2]:[]).slice(0,20).forEach(function(user,index){
@@ -768,6 +770,52 @@
       if(!board.childNodes.length)board.textContent='Henüz sıralama verisi yok.';
     }).catch(function(error){info.textContent='Puan bilgisi alınamadı: '+String(error&&error.message||error);board.textContent='Davet tablosu yüklenemedi.'});
     $('#aepReferralCopy',body).addEventListener('click',function(){if(code.value&&navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(code.value).then(function(){note('Davet kodu kopyalandı.','success')}).catch(function(){note('Kopyalama başarısız.','warning')});});
+    st.classList.add('on');return true;
+  }
+
+  function buildBattlePanel(label,m){
+    var st=stage();setHead(st,label,'İki modeli karşılaştır veya aynı isteği dört modele yönelt');
+    var body=$('.aep-body',st);
+    var modelNames=['Groq','DeepSeek','OpenAI','OpenRouter','Cohere','Cerebras','Gemini','DeepInfra'];
+    body.innerHTML='<div class="aep-card"><h3>⚔️ AI Savaş Modu</h3><p class="aep-muted">Aynı konuyu iki model savunsun; yanıtları yan yana incele.</p>'+
+      '<textarea id="aepBattlePrompt" class="aep-input" rows="3" maxlength="3000" placeholder="Tartışılacak konuyu yaz…"></textarea>'+
+      '<div class="aep-row"><select id="aepBattleModel1" class="aep-input"></select><select id="aepBattleModel2" class="aep-input"></select><button id="aepBattleGo" class="aep-btn aep-primary">Savaşı başlat</button></div>'+
+      '<div id="aepBattleResults" class="aep-grid" aria-live="polite"></div><hr><h3>🧠 Çoklu AI</h3><p class="aep-muted">En fazla dört model seç.</p><div id="aepMultiModels" class="aep-grid"></div>'+
+      '<button id="aepMultiGo" type="button" class="aep-btn aep-primary">Seçilen modellere sor</button><div id="aepMultiResults" class="aep-list"></div></div>';
+    var m1=$('#aepBattleModel1',body),m2=$('#aepBattleModel2',body),battlePrompt=$('#aepBattlePrompt',body),battleResults=$('#aepBattleResults',body);
+    modelNames.forEach(function(name,index){
+      [m1,m2].forEach(function(select){var option=d.createElement('option');option.value=name;option.textContent=name;select.appendChild(option);});
+      var labelEl=d.createElement('label');labelEl.className='aep-item';
+      var check=d.createElement('input');check.type='checkbox';check.value=name;check.checked=index<4;
+      labelEl.appendChild(check);var span=d.createElement('span');span.textContent=name;labelEl.appendChild(span);$('#aepMultiModels',body).appendChild(labelEl);
+    });
+    $('#aepBattleGo',body).addEventListener('click',function(){
+      var prompt=battlePrompt.value.trim();if(!prompt){note('Önce tartışma konusunu yaz.','warning');return;}
+      var button=this;button.disabled=true;battleResults.textContent='Modeller yanıt hazırlıyor…';
+      cloud('battleMode',{prompt:prompt,model1:m1.value,model2:m2.value}).then(function(result){
+        if(!result||result.success!==true)throw new Error(result&&result.error||'Savaş sonucu alınamadı.');
+        battleResults.textContent='';
+        [[m1.value,result.model1_response],[m2.value,result.model2_response]].forEach(function(item){
+          var card=d.createElement('article');card.className='aep-card';var title=d.createElement('h3');title.textContent=item[0];card.appendChild(title);
+          var text=d.createElement('p');text.textContent=String(item[1]||'Yanıt yok');card.appendChild(text);battleResults.appendChild(card);
+        });
+        var winner=d.createElement('p');winner.className='aep-muted';winner.textContent='Sistem karşılaştırması: '+String(result.winner||'Kazanan belirlenmedi');battleResults.appendChild(winner);
+      }).catch(function(error){battleResults.textContent='İşlem yapılamadı: '+String(error&&error.message||error);}).then(function(){button.disabled=false;});
+    });
+    $('#aepMultiGo',body).addEventListener('click',function(){
+      var selected=Array.prototype.slice.call($('#aepMultiModels',body).querySelectorAll('input:checked')).map(function(input){return input.value;});
+      var prompt=battlePrompt.value.trim();if(!prompt){note('Önce sorunu yaz.','warning');return;}
+      if(!selected.length||selected.length>4){note('Bir ile dört model seçmelisin.','warning');return;}
+      var button=this,host=$('#aepMultiResults',body);button.disabled=true;host.textContent='Modeller yanıt hazırlıyor…';
+      cloud('multiAI',{prompt:prompt,models:selected}).then(function(result){
+        if(!result||result.success!==true)throw new Error(result&&result.error||'Çoklu AI yanıtı alınamadı.');
+        host.textContent='';
+        selected.forEach(function(name){
+          var row=d.createElement('article');row.className='aep-item';var title=d.createElement('strong');title.textContent=name;row.appendChild(title);
+          var text=d.createElement('p');text.textContent=String(result.responses&&result.responses[name]||'Yanıt alınamadı.');row.appendChild(text);host.appendChild(row);
+        });
+      }).catch(function(error){host.textContent='İşlem yapılamadı: '+String(error&&error.message||error);}).then(function(){button.disabled=false;});
+    });
     st.classList.add('on');return true;
   }
 
@@ -823,7 +871,7 @@
     st.classList.add('on');
     return true;
   }
-  var BUILTIN = { 'Görsel Üretimi': buildImagePanel, 'Projelerim': buildProjectsPanel, 'Arşivim': buildProjectsPanel, 'Çöp Kutusu': buildProjectsPanel, '3D Studio': build3DStudioPanel, 'Proje Talebi Oluştur': buildProjectRequestCreatePanel, 'Proje Talepleri': buildProjectRequestsPanel, 'Günlük Görevler ve Seri': buildDailyTasksPanel, 'Zeka Testi': buildQuizPanel, 'Puan ve Davet': buildPointsPanel, 'Anketler ve Duyurular': buildCommunityPanel };
+  var BUILTIN = { 'Görsel Üretimi': buildImagePanel, 'Projelerim': buildProjectsPanel, 'Arşivim': buildProjectsPanel, 'Çöp Kutusu': buildProjectsPanel, '3D Studio': build3DStudioPanel, 'Proje Talebi Oluştur': buildProjectRequestCreatePanel, 'Proje Talepleri': buildProjectRequestsPanel, 'Günlük Görevler ve Seri': buildDailyTasksPanel, 'Zeka Testi': buildQuizPanel, 'Puan ve Davet': buildPointsPanel, 'Anketler ve Duyurular': buildCommunityPanel, 'Savaş Modu + Çoklu AI': buildBattlePanel };
   function builtinFor(label, m) {
     if (BUILTIN[label]) return BUILTIN[label];
     if (m && m[4] === 'openCategoryPanel') return buildCategoryPanel;
