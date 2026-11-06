@@ -1389,6 +1389,7 @@ Parse.Cloud.define("handleProjectRequest", async function (request) {
     inboxQuery.equalTo('type', 'project_request');
     var inboxMsg = await inboxQuery.first({ useMasterKey: true });
     if (!inboxMsg) throw new Error('Bu talebi bulamadınız veya size ait değil!');
+    if (action === 'send' && inboxMsg.get('status') !== 'accepted') throw new Error('Projeyi göndermeden önce talebi kabul etmelisiniz!');
     if (inboxMsg.get('status') !== 'pending' && action !== 'send' && action !== 'cancel') throw new Error('Bu talep zaten işlenmiş!');
 
     if (action === 'cancel') {
