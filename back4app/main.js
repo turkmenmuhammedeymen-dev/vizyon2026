@@ -1286,11 +1286,16 @@ Parse.Cloud.define("getUserProjectCount", async function (request) {
 Parse.Cloud.define("createProjectRequest", async function (request) {
     var user = request.user;
     if (!user) throw new Error('Giriş yapmalısınız!');
-    var title = request.params.title;
-    var type = request.params.type;
-    var description = request.params.description;
-    if (!title || !type || !description) throw new Error('Başlık, tür ve açıklama gerekli!');
+    var title = String(request.params.title || '').trim();
+    var type = String(request.params.type || '').trim();
+    var description = String(request.params.description || '').trim();
+    if (title.length < 3 || title.length > 100 || description.length < 20 || description.length > 2500) {
+        throw new Error('Proje adı 3-100, açıklama 20-2500 karakter olmalı.');
+    }
     if (['3D', 'Kod', 'Görsel'].indexOf(type) === -1) throw new Error('Geçersiz proje türü!');
+    var requestRateKey = 'createProjectRequest:' + String(user.get('email') || user.id).toLowerCase();
+    await checkRateLimit(requestRateKey, 3, 24 * 60 * 60 * 1000);
+    await recordAttempt(requestRateKey);
 
     var moderatorQuery = new Parse.Query(Parse.User);
     moderatorQuery.equalTo('role', 'moderator');
@@ -1482,6 +1487,8 @@ Parse.Cloud.define("handleProjectRequest", async function (request) {
         var project2 = await projectQuery.get(projectId, { useMasterKey: true });
         if (!project2) throw new Error('Proje bulunamadı!');
         if (project2.get('user_email') !== user.get('email')) throw new Error('Bu proje size ait değil!');
+        if (String(project2.get('type') || '') !== String(inboxMsg.get('project_type') || '')) throw new Error('Gönderilecek projenin türü taleple eşleşmiyor!');
+        if (project2.get('is_archived') === true || project2.get('is_trashed') === true) throw new Error('Arşivde veya çöp kutusundaki proje teslim edilemez.');
         project2.set('user_email', senderEmail3);
         await project2.save(null, { useMasterKey: true });
         var sender3Query = new Parse.Query(Parse.User);
