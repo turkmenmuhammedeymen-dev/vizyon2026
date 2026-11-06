@@ -7219,7 +7219,7 @@ Parse.Cloud.define("getQuizQuestions", async function (request) {
     }
     return [
         { id: 'q1', question: 'Python\'da fonksiyon tanımlamak için hangi anahtar kelime kullanılır?', options: ['function', 'def', 'define', 'func'], points_reward: 10 },
-        { id: 'q2', question: 'AETHRION AI kaç modeli tek çatı altında birleştirir?', options: ['7', '13', '21', '30'], points_reward: 15 },
+        { id: 'q2', question: 'AETHRION AI kaç modeli tek çatı altında birleştirir?', options: ['7', '13', '21', '28'], points_reward: 15 },
         { id: 'q3', question: '3D model oluşturmak için hangi kütüphane kullanılır?', options: ['Three.js', 'React.js', 'Vue.js', 'Angular'], points_reward: 10 },
         { id: 'q4', question: 'Veri analizi için hangi Python kütüphanesi yaygın olarak kullanılır?', options: ['Pandas', 'NumPy', 'Matplotlib', 'Hepsi'], points_reward: 15 },
         { id: 'q5', question: 'V27 API anahtarı ücretsiz üye için kaç adet?', options: ['0', '1', '2', '5'], points_reward: 10 }
@@ -7229,36 +7229,61 @@ Parse.Cloud.define("getQuizQuestions", async function (request) {
 Parse.Cloud.define("submitQuizAnswer", async function (request) {
     var user = request.user;
     if (!user) throw new Error('Giriş yapmalısınız!');
-    var quizId = request.params.quizId;
-    var answerIndex = request.params.answerIndex;
+    var quizId = String(request.params.quizId || '').trim();
+    var answerIndex = Number(request.params.answerIndex);
+    if (!quizId || !Number.isInteger(answerIndex) || answerIndex < 0) throw new Error('Geçerli bir soru ve seçenek gerekli.');
 
     var sampleAnswers = {
-        'q1': 1, 'q2': 2, 'q3': 0, 'q4': 3, 'q5': 2,
+        'q1': 1, 'q2': 3, 'q3': 0, 'q4': 3, 'q5': 2,
         'q6': 0, 'q7': 2, 'q8': 1, 'q9': 1, 'q10': 1
     };
+    var completedAnswers = user.get('completed_quiz_answers') || [];
+    if (completedAnswers.indexOf(quizId) !== -1) {
+        return { success: true, correct: false, alreadyAnswered: true, message: 'Bu soruyu daha önce yanıtladınız.' };
+    }
 
     var query = new Parse.Query(Quiz);
-    var quiz = await query.get(quizId, { useMasterKey: true });
+    var quiz = null;
+    try {
+        quiz = await query.get(quizId, { useMasterKey: true });
+    } catch (lookupError) {
+        // The published sample questions (q1-q5) are not Parse Quiz object IDs.
+        // Their answer key is handled below; other missing IDs remain incorrect.
+        quiz = null;
+    }
+
     var correct = false;
     var points = 0;
-
     if (quiz) {
-        correct = (answerIndex === quiz.get('correct_answer'));
-        points = quiz.get('points_reward') || 0;
+        var expected = Number(quiz.get('correct_answer'));
+        var options = quiz.get('options') || [];
+        if (answerIndex >= options.length) throw new Error('Seçilen seçenek bu soru için geçerli değil.');
+        correct = Number.isInteger(expected) && answerIndex === expected;
+        points = Math.max(0, Number(quiz.get('points_reward')) || 0);
     } else {
         var correctIndex = sampleAnswers[quizId];
-        if (correctIndex !== undefined && answerIndex === correctIndex) {
-            correct = true;
+        if (correctIndex !== undefined && answerIndex <= 5) {
+            correct = answerIndex === correctIndex;
             points = 10;
+            if (quizId === 'q2') points = 15;
+            if (quizId === 'q4') points = 15;
         }
     }
 
-    if (correct) {
-        await addPointsWithBonus(user, points, 'Zeka testi doğru');
-        return { success: true, correct: true, points_reward: points, remaining_points: user.get('points') };
-    } else {
-        return { success: true, correct: false };
-    }
+    if (!correct) return { success: true, correct: false, message: 'Yanıt doğru değil.' };
+
+    // A completed-answer marker prevents the same question from awarding points repeatedly.
+    completedAnswers.push(quizId);
+    user.set('completed_quiz_answers', completedAnswers.slice(-200));
+    await user.save(null, { useMasterKey: true });
+    await addPointsWithBonus(user, points, 'Zeka testi doğru');
+    return {
+        success: true,
+        correct: true,
+        points_reward: points,
+        remaining_points: user.get('points'),
+        alreadyAnswered: false
+    };
 });
 
 // ================================================================
