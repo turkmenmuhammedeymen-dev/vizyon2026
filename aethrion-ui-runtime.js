@@ -439,6 +439,39 @@
           }); card.appendChild(button);
         });
       }
+      } else if (pending && item.type === 'project_request') {
+        [['Kabul et','accept'],['Reddet','reject'],['Devret','delegate']].forEach(function (action) {
+          var button = document.createElement('button'); button.type='button'; button.textContent=action[0];
+          button.addEventListener('click', async function () {
+            button.disabled=true;
+            try {
+              await window.Parse.Cloud.run('handleProjectRequest', { requestId:item.request_id, action:action[1] });
+              if (typeof window.showNotification === 'function') window.showNotification('Proje talebi güncellendi.','success');
+              await renderAethrionInbox();
+            } catch (error) {
+              button.disabled=false;
+              if (typeof window.showNotification === 'function') window.showNotification(String(error && error.message || error),'error');
+            }
+          });
+          card.appendChild(button);
+        });
+      } else if (pending && item.type === 'project_completed') {
+        [['Projeyi al','acceptProjectCompletion'],['Reddet','rejectProjectCompletion']].forEach(function (action) {
+          var button = document.createElement('button'); button.type='button'; button.textContent=action[0];
+          button.addEventListener('click', async function () {
+            button.disabled=true;
+            try {
+              await window.Parse.Cloud.run(action[1], { inboxId:item.id });
+              if (typeof window.showNotification === 'function') window.showNotification('Proje teslimi güncellendi.','success');
+              await renderAethrionInbox();
+            } catch (error) {
+              button.disabled=false;
+              if (typeof window.showNotification === 'function') window.showNotification(String(error && error.message || error),'error');
+            }
+          });
+          card.appendChild(button);
+        });
+      }
       host.appendChild(card);
     });
   }
