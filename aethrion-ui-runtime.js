@@ -438,7 +438,6 @@
             catch (error) { button.disabled=false; window.showNotification(String(error && error.message || error),'error'); }
           }); card.appendChild(button);
         });
-      }
       } else if (pending && item.type === 'project_request') {
         [['Kabul et','accept'],['Reddet','reject'],['Devret','delegate']].forEach(function (action) {
           var button = document.createElement('button'); button.type='button'; button.textContent=action[0];
