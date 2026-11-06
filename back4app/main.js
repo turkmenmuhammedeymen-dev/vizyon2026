@@ -1381,14 +1381,18 @@ Parse.Cloud.define("handleProjectRequest", async function (request) {
     var action = request.params.action;
     var projectId = request.params.projectId;
     if (!requestId || !action) throw new Error('Request ID ve action gerekli!');
-    if (['accept', 'reject', 'delegate', 'send', 'cancel'].indexOf(action) === -1) throw new Error('Geçersiz işlem!');
+    if (['accept', 'reject', 'delegate', 'send'].indexOf(action) === -1) throw new Error('Geçersiz işlem!');
 
     var inboxQuery = new Parse.Query(Inbox);
     inboxQuery.equalTo('request_id', requestId);
-    inboxQuery.equalTo('receiver_email', user.get('email'));
     inboxQuery.equalTo('type', 'project_request');
-    var inboxMsg = await inboxQuery.first({ useMasterKey: true });
+    var inboxMessages = await inboxQuery.find({ useMasterKey: true });
+    var currentEmail = String(user.get('email') || '').trim().toLowerCase();
+    var inboxMsg = inboxMessages.find(function (item) {
+        return String(item.get('receiver_email') || '').trim().toLowerCase() === currentEmail;
+    });
     if (!inboxMsg) throw new Error('Bu talebi bulamadınız veya size ait değil!');
+    if (['accept', 'reject', 'delegate', 'send'].indexOf(action) === -1) throw new Error('Geçersiz işlem!');
     if (action === 'send' && inboxMsg.get('status') !== 'accepted') throw new Error('Projeyi göndermeden önce talebi kabul etmelisiniz!');
     if (inboxMsg.get('status') !== 'pending' && action !== 'send' && action !== 'cancel') throw new Error('Bu talep zaten işlenmiş!');
 
