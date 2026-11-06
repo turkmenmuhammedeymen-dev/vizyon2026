@@ -568,8 +568,18 @@
     var st = stage();
     setHead(st, label, 'Üç boyutlu tasarım alanı · sahne, proje ve dışa aktarma');
     var body = $('.aep-body', st);
-    body.classList.add('is-frame');
-    body.innerHTML = '<iframe class="aep-frame" title="AETHRION 3D Studio" src="./3d-studio.html#demo" allow="fullscreen; clipboard-read; clipboard-write" referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+    body.innerHTML = '<div class="aep-card" style="max-width:none;margin:0 0 12px;padding:12px 16px">' +
+      '<div class="aep-row" style="margin:0">' +
+      '<button type="button" class="aep-btn aep-primary" data-aep-go="Projelerim">▤ Projelerim</button>' +
+      '<button type="button" class="aep-btn" data-aep-go="Arşivim">🗄️ Arşiv</button>' +
+      '<button type="button" class="aep-btn" data-aep-go="Çöp Kutusu">🗑️ Çöp Kutusu</button>' +
+      '<button type="button" class="aep-btn" data-aep-go="Görsel Üretimi">🖼️ Görsel Üret</button>' +
+      '<button type="button" class="aep-btn" data-aep-go="Kod Editörü">⌨️ Kod Editörü</button>' +
+      '</div></div>' +
+      '<iframe title="AETHRION 3D Studio" src="./3d-studio.html#demo" allow="fullscreen; clipboard-read; clipboard-write" referrerpolicy="strict-origin-when-cross-origin" style="display:block;width:100%;height:calc(100vh - 190px);min-height:620px;border:0;border-radius:14px;background:#070d17"></iframe>';
+    body.querySelectorAll('[data-aep-go]').forEach(function (button) {
+      button.addEventListener('click', function () { openFeature(button.getAttribute('data-aep-go')); });
+    });
     st.classList.add('on'); return true;
   }
 
@@ -649,7 +659,7 @@
               q.descending('createdAt'); q.limit(100);
               return q.find();
             })().then(function (projects) {
-              projects.forEach(function (project) {
+              projects.filter(function (project) { return project.get('is_trashed') !== true && project.get('is_archived') !== true; }).forEach(function (project) {
                 var option = d.createElement('option'); option.value = project.id; option.textContent = project.get('name') || 'İsimsiz proje'; select.appendChild(option);
               });
               if (!projects.length) { var opt=d.createElement('option'); opt.disabled=true; opt.textContent='Bu türde aktif proje bulunamadı'; select.appendChild(opt); }
@@ -881,6 +891,17 @@
     installStyles();
     installNavGuard();
     d.addEventListener('click', onClick, true);
+    w.addEventListener('aethrion:authenticated', function () {
+      w.setTimeout(function () {
+        if (!curUser()) return;
+        var dash = $('#dashboardArea'), main = $('#mainSite');
+        if (dash) { dash.style.setProperty('display', 'block', 'important'); dash.style.setProperty('visibility', 'visible', 'important'); }
+        if (main) main.style.setProperty('display', 'none', 'important');
+        d.body.classList.add('logged-in-user', 'ae-shell-on');
+        relocate();
+        if (!d.body.classList.contains('aews-feature-view') && typeof w.showWelcome === 'function') w.showWelcome();
+      }, 80);
+    });
     w.aethrionOpenFeature = openFeature;
     w.aethrionShowHome = showHome;
     [200, 1200, 3500].forEach(function (t) { setTimeout(relocate, t); });
