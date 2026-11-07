@@ -255,10 +255,11 @@
         if (!w.Parse || !w.Parse.Query) return Promise.resolve([]);
         var q = new w.Parse.Query('Project');
         q.equalTo('user_email', current.get('email'));
-        q.equalTo('is_trashed', false);
         q.descending('createdAt');
         q.limit(100);
-        return q.find().catch(function () { return []; });
+        return q.find().then(function (rows) {
+          return rows.filter(function (project) { return project.get('is_trashed') !== true && project.get('is_archived') !== true; });
+        }).catch(function () { return []; });
       }
       function button(text, action, requestId, projectSelect) {
         var b = d.createElement('button');
