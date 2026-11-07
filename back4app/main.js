@@ -2486,8 +2486,16 @@ Parse.Cloud.define("aethrionChat", async function (request) {
     await usage.save(null, { useMasterKey: true });
     var newUsed = used + 1;
     try {
-        var reply = await Parse.Cloud.run('superAI', { prompt: prompt }, { useMasterKey: true });
-        var replyText = String(reply == null ? '' : reply);
+        var selectedModel = String((request.params && request.params.model) || 'auto');
+        var aiResult = await Parse.Cloud.run('superAI', {
+            prompt: prompt,
+            model: selectedModel,
+            includeMetadata: true
+        }, { useMasterKey: true });
+        var replyValue = aiResult && typeof aiResult === 'object'
+            ? (aiResult.reply || aiResult.response || aiResult.text || '')
+            : aiResult;
+        var replyText = String(replyValue == null ? '' : replyValue);
         if (!replyText || /tüm modeller şu anda cevap veremiyor|all models are currently unavailable/i.test(replyText)) {
             usage.increment('count', -1);
             await usage.save(null, { useMasterKey: true });
@@ -2502,7 +2510,10 @@ Parse.Cloud.define("aethrionChat", async function (request) {
         }
         return {
             success: true,
-            reply: replyText,
+            reply: cleanResponse(replyText),
+            provider: aiResult && typeof aiResult === 'object' ? (aiResult.provider || 'unknown') : 'unknown',
+            model: aiResult && typeof aiResult === 'object' ? (aiResult.model || selectedModel) : selectedModel,
+            mode: mode,
             limit: unlimited ? 'Sınırsız' : limit,
             used: newUsed,
             remaining: unlimited ? 'Sınırsız' : Math.max(0, limit - newUsed)
