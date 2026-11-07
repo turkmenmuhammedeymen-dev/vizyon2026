@@ -34,18 +34,8 @@
     'Sohbet ve İşlem Geçmişi': { find: /AETHRION AI ASISTAN/i, then: 'toggleConversationHistory' }
   };
   var FRAME_MAP = {
-    '3D Studio': './3d-studio.html#demo',
-    'Kod Editörü': './kod-editoru.html',
-    'Topluluk ve Takımlar': './topluluk.html',
-    'Yorumlar ve Topluluk': './topluluk.html',
-    'AETHRION Akademi': './bana-ogret.html',
-    'A27 API Anahtarı': './aethrion-developer.html',
-    'Beta API Yönetimi': './aethrion-developer.html',
     'API Belgeleri': './api.html',
     'Dokümantasyon': './dokumantasyon.html',
-    'Güvenlik ve Ebeveyn Ayarları': './hesap-ve-oturum-guvenligi.html',
-    'Güvenlik Ayarları': './hesap-ve-oturum-guvenligi.html',
-    'Team Ortak Çalışma': './aethrion-teams.html'
   };
   /* Bu özellikler için uygulamanın kendi kapatma fonksiyonları (varsa). */
   var CLOSERS = ['closeJarvisMode', 'closeVideoEditor', 'closeModelsShowcase', 'closeJobMarket', 'closeJobCreateForm',
