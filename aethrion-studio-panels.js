@@ -100,7 +100,8 @@
         S + '.a3d-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}',
         S + '.a3d-bar textarea{flex:1 1 280px;min-height:46px;max-height:120px;padding:11px 13px;border-radius:12px;border:1px solid rgba(255,255,255,.2)!important;background:rgba(255,255,255,.08)!important;color:#fff!important;font:500 14px Inter,system-ui,sans-serif;resize:vertical}',
         S + '.a3d-bar textarea::placeholder{color:#8ea4bd}',
-        S + '.a3d-shapes{display:flex;gap:6px;flex-wrap:wrap}',
+        S + '.a3d-shapes{display:flex;gap:6px;flex-wrap:wrap;max-height:190px;overflow:auto;padding:6px;border:1px solid rgba(255,255,255,.1);border-radius:10px}',
+        S + '.a3d-shape-search{flex:1 1 100%;min-width:0;padding:10px 12px;border:1px solid rgba(255,255,255,.16);border-radius:10px;background:#0b1424;color:#eef4fb;font:500 13px Inter,system-ui,sans-serif}',
         S + '.a3d-side{display:flex;flex-direction:column;gap:12px;min-width:0}',
         S + '.a3d-box{border:1px solid rgba(255,255,255,.12);background:#101a2e;border-radius:14px;padding:12px}',
         S + '.a3d-box h4{margin:0 0 8px;font:800 14px Inter,system-ui,sans-serif;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:8px}',
@@ -127,8 +128,9 @@
     function projectQuery(f) {
       var u = user(); if (!w.Parse || !u) throw new Error('Projeleri görmek için giriş yapmalısın.');
       var q = new w.Parse.Query('Project');
-      q.equalTo('user_email', u.get('email')); q.equalTo('is_archived', f.archived); q.equalTo('is_trashed', f.trashed);
-      if (f.fav) q.equalTo('is_favorite', true);
+      q.equalTo('user_email', u.get('email'));
+      /* Legacy Project rows may not have is_archived/is_trashed fields yet.
+         Fetch the user's bounded set and filter in memory so old projects remain visible. */
       q.descending('createdAt'); q.limit(100);
       return q;
     }
@@ -140,6 +142,15 @@
       list.innerHTML = '<p class="aep-muted">Yükleniyor…</p>';
       var q; try { q = projectQuery(f); } catch (e) { list.innerHTML = empty(msgOf(e)); return; }
       q.find().then(function (rows) {
+        rows = rows.filter(function (p) {
+          var archived = p.get('is_archived') === true;
+          var trashed = p.get('is_trashed') === true;
+          var favorite = p.get('is_favorite') === true;
+          if (filterKey === 'trash') return trashed;
+          if (filterKey === 'arch') return archived && !trashed;
+          if (filterKey === 'fav') return favorite && !archived && !trashed;
+          return !archived && !trashed;
+        });
         if (!rows.length) { list.innerHTML = empty(f.empty); return; }
         list.innerHTML = rows.map(function (p) {
           var t = p.get('type') || '', acts = '';
@@ -209,7 +220,7 @@
       function requestsPane(p) {
         p.innerHTML = '<div class="aep-card"><h3>✉ Proje talebi gönder</h3><p class="aep-muted">Yapılmasını istediğin bir proje için talep oluştur; takım ve yetkililer görür.</p>' +
           '<label class="aes-field">Başlık<input id="aesRqTitle" maxlength="80"></label>' +
-          '<label class="aes-field">Tür<select id="aesRqType"><option>Web Sitesi</option><option>Mobil Uygulama</option><option>3D Model</option><option>Yapay Zekâ</option><option>Diğer</option></select></label>' +
+          '<label class="aes-field">Tür<select id="aesRqType"><option value="3D">🧊 3D Model</option><option value="Kod">⌨️ Kod / Web</option><option value="Görsel">🖼️ Görsel</option></select></label>' +
           '<label class="aes-field">Açıklama<textarea id="aesRqDesc" rows="4" maxlength="1500"></textarea></label>' +
           '<div class="aep-row"><button type="button" class="aep-btn aep-primary" id="aesRqGo">Talebi gönder</button></div></div>' +
           '<div class="aep-card"><h3>Taleplerim</h3><div class="aep-list" id="aesRqList"><p class="aep-muted">Yükleniyor…</p></div></div>';
@@ -234,6 +245,163 @@
     }
 
     /* ======================================================================
+     *  YETKİLİ PROJE TALEPLERİ — Moderatör / Admin / Kurucu
+     * ==================================================================== */
+    function buildStaffProjectRequests(label, m) {
+      styles();
+      var body = open(label, m, 'Sana atanmış proje taleplerini incele, kabul et, reddet veya devret');
+      var current = user();
+      if (!current) { loginCard(body, 'Proje taleplerini yönetmek'); return true; }
+      var role = String(current.get('role') || '').toLowerCase();
+      if (['admin', 'founder', 'moderator'].indexOf(role) === -1) {
+        body.innerHTML = '<div class="aep-card"><h3>🔒 Yetkili erişimi gerekli</h3><p class="aep-muted">Bu alan yalnızca Moderatör, Admin ve Kurucu hesaplarına açıktır.</p></div>';
+        return true;
+      }
+      body.innerHTML =
+        '<div class="aep-card"><div class="aep-row" style="justify-content:space-between"><div><h3>📨 Atanmış proje talepleri</h3><p class="aep-muted">Talepler önce moderatörlere yönlendirilir. Moderatör yoksa Admin ve Kuruculara iletilir. İlk kabul eden talebi üstlenir.</p></div><button type="button" class="aep-btn" id="aesStaffReqRefresh">↻ Yenile</button></div>' +
+        '<div class="aep-list" id="aesStaffReqList"><p class="aep-muted">Talepler yükleniyor…</p></div></div>';
+
+      var host = $('#aesStaffReqList', body);
+      function getProjects() {
+        if (!w.Parse || !w.Parse.Query) return Promise.resolve([]);
+        var q = new w.Parse.Query('Project');
+        q.equalTo('user_email', current.get('email'));
+        q.descending('createdAt');
+        q.limit(100);
+        return q.find().then(function (rows) {
+          return rows.filter(function (project) { return project.get('is_trashed') !== true && project.get('is_archived') !== true; });
+        }).catch(function () { return []; });
+      }
+      function button(text, action, requestId, projectSelect) {
+        var b = d.createElement('button');
+        b.type = 'button'; b.className = 'aep-btn'; b.textContent = text;
+        b.addEventListener('click', function () {
+          var params = { requestId: requestId, action: action };
+          if (action === 'send') {
+            params.projectId = projectSelect && projectSelect.value;
+            if (!params.projectId) { err('Önce göndereceğin tamamlanmış projeyi seç.'); return; }
+          }
+          busyBtn(b, call('handleProjectRequest', params)).then(function (r) {
+            note((r && r.message) || 'İşlem tamamlandı.');
+            load();
+          }, function (e) { err(msgOf(e)); });
+        });
+        return b;
+      }
+      function load() {
+        host.textContent = 'Proje talepleri yükleniyor…';
+        Promise.all([call('getInboxItems'), getProjects()]).then(function (values) {
+          var all = Array.isArray(values[0]) ? values[0] : [];
+          var projects = Array.isArray(values[1]) ? values[1] : [];
+          var items = all.filter(function (x) {
+            var status = String(x.status || 'pending').toLowerCase();
+            return x.type === 'project_request' && ['pending', 'accepted'].indexOf(status) !== -1;
+          });
+          host.replaceChildren();
+          if (!items.length) {
+            host.textContent = role === 'moderator'
+              ? 'Şu anda sana atanmış bekleyen proje talebi yok.'
+              : 'Şu anda hesabına atanmış proje talebi yok. Aktif moderatör varsa talepler önce moderatörlere gider.';
+            return;
+          }
+          items.forEach(function (item) {
+            var card = d.createElement('article'); card.className = 'aep-item'; card.style.display = 'block';
+            var title = d.createElement('h4'); title.className = 'aep-item-name'; title.textContent = item.project_title || 'İsimsiz proje talebi';
+            var meta = d.createElement('p'); meta.className = 'aep-muted';
+            meta.textContent = 'Tür: ' + (item.project_type || 'Belirtilmedi') + ' · Gönderen: ' + (item.sender_email || 'Bilinmiyor');
+            var desc = d.createElement('p'); desc.className = 'aep-muted'; desc.textContent = item.project_description || item.message || 'Açıklama bulunmuyor.';
+            var status = d.createElement('span'); status.className = 'aes-pill'; status.textContent = String(item.status || 'pending').toUpperCase();
+            var actions = d.createElement('div'); actions.className = 'aep-row';
+            card.appendChild(title); card.appendChild(meta); card.appendChild(desc); card.appendChild(status); card.appendChild(actions);
+            if (String(item.status || 'pending').toLowerCase() === 'pending') {
+              actions.appendChild(button('✓ Kabul et', 'accept', item.request_id));
+              actions.appendChild(button('Reddet', 'reject', item.request_id));
+              actions.appendChild(button('↗ Devret', 'delegate', item.request_id));
+            } else {
+              var select = d.createElement('select'); select.className = 'aep-input'; select.style.flex = '1';
+              var emptyOption = d.createElement('option'); emptyOption.value = ''; emptyOption.textContent = 'Tamamlanan projeyi seç…'; select.appendChild(emptyOption);
+              projects.forEach(function (project) {
+                var opt = d.createElement('option'); opt.value = project.id; opt.textContent = project.get('name') || project.get('title') || 'İsimsiz proje'; select.appendChild(opt);
+              });
+              actions.appendChild(select);
+              actions.appendChild(button('Projeyi talep edene gönder', 'send', item.request_id, select));
+            }
+            host.appendChild(card);
+          });
+        }).catch(function (e) {
+          host.textContent = 'Proje talepleri yüklenemedi: ' + msgOf(e);
+        });
+      }
+      $('#aesStaffReqRefresh', body).addEventListener('click', load);
+      load();
+      return true;
+    }
+
+    /* ======================================================================
+     *  SAVAŞ MODU + ÇOKLU AI
+     * ==================================================================== */
+    function buildBattlePanel(label, m) {
+      styles();
+      var body = open(label, m, 'İki modeli karşılaştır veya aynı soruyu dört farklı AI sağlayıcısına yönelt');
+      if (!user()) { loginCard(body, 'Savaş Modu ve Çoklu AI kullanmak'); return true; }
+      var modelNames = ['Groq', 'DeepSeek', 'OpenAI', 'OpenRouter', 'Cohere', 'Cerebras', 'Gemini', 'DeepInfra'];
+      tabs(body, [
+        { id: 'battle', label: '⚔️ Savaş Modu', render: battlePane },
+        { id: 'multi', label: '🧠 Çoklu AI', render: multiPane }
+      ]);
+      function battlePane(p) {
+        p.innerHTML = '<div class="aep-card"><h3>⚔️ AI vs AI</h3><label class="aes-field">Karşılaştırma konusu<textarea id="aesBattlePrompt" rows="3" maxlength="2000" placeholder="İki modelin karşılaştırmasını istediğin konuyu yaz…"></textarea></label><div class="aes-two"><label class="aes-field">Model 1<select id="aesBattleM1"></select></label><label class="aes-field">Model 2<select id="aesBattleM2"></select></label></div><button type="button" class="aep-btn aep-primary" id="aesBattleGo">⚔️ Karşılaştırmayı başlat</button><div id="aesBattleOut" style="margin-top:14px"></div></div>';
+        var one = $('#aesBattleM1', p), two = $('#aesBattleM2', p);
+        modelNames.forEach(function (name) { [one, two].forEach(function (select) { var opt = d.createElement('option'); opt.value = name; opt.textContent = name; select.appendChild(opt); }); });
+        one.value = 'Groq'; two.value = 'Gemini';
+        $('#aesBattleGo', p).addEventListener('click', function () {
+          var prompt = $('#aesBattlePrompt', p).value.trim(), out = $('#aesBattleOut', p);
+          if (!prompt) { err('Önce karşılaştırma konusunu yaz.'); return; }
+          out.textContent = 'İki model yanıt üretiyor…';
+          busyBtn(this, call('battleMode', { prompt: prompt, model1: one.value, model2: two.value })).then(function (r) {
+            if (!r || r.success !== true) throw new Error(r && r.error || 'Karşılaştırma tamamlanamadı.');
+            out.innerHTML = '';
+            var winner = d.createElement('p'); winner.className = 'aes-pill ok'; winner.textContent = '🏆 Uzunluk ölçütüne göre: ' + (r.winner || 'Belirlenemedi'); out.appendChild(winner);
+            [[one.value, r.model1_response], [two.value, r.model2_response]].forEach(function (entry) {
+              var card = d.createElement('div'); card.className = 'aep-card';
+              var heading = d.createElement('h4'); heading.textContent = entry[0];
+              var answer = d.createElement('p'); answer.style.whiteSpace = 'pre-wrap'; answer.textContent = String(entry[1] || 'Yanıt alınamadı.');
+              card.appendChild(heading); card.appendChild(answer); out.appendChild(card);
+            });
+          }).catch(function (e) { out.textContent = 'Karşılaştırma hatası: ' + msgOf(e); });
+        });
+      }
+      function multiPane(p) {
+        p.innerHTML = '<div class="aep-card"><h3>🧠 Çoklu AI karşılaştırması</h3><label class="aes-field">Sorun / istem<textarea id="aesMultiPrompt" rows="3" maxlength="2000" placeholder="Aynı soruyu seçtiğin modellere gönder…"></textarea></label><p class="aep-muted">2–4 sağlayıcı seçebilirsin.</p><div class="aes-3col" id="aesMultiModels"></div><button type="button" class="aep-btn aep-primary" id="aesMultiGo">⚡ Seçili modellere gönder</button><div id="aesMultiOut" style="margin-top:14px"></div></div>';
+        var modelBox = $('#aesMultiModels', p);
+        modelNames.forEach(function (name, index) {
+          var labelEl = d.createElement('label'); labelEl.className = 'aes-field'; labelEl.style.cssText = 'flex-direction:row;align-items:center;gap:8px;padding:8px;border:1px solid #dbe5ef;border-radius:10px;background:#f7f9fc;color:#172b43';
+          var checkbox = d.createElement('input'); checkbox.type = 'checkbox'; checkbox.value = name; checkbox.checked = ['Groq', 'DeepSeek', 'OpenAI', 'Gemini'].indexOf(name) !== -1; checkbox.dataset.model = name;
+          var textEl = d.createElement('span'); textEl.textContent = name;
+          labelEl.appendChild(checkbox); labelEl.appendChild(textEl); modelBox.appendChild(labelEl);
+        });
+        $('#aesMultiGo', p).addEventListener('click', function () {
+          var prompt = $('#aesMultiPrompt', p).value.trim(), out = $('#aesMultiOut', p);
+          var selected = Array.prototype.slice.call(modelBox.querySelectorAll('input[data-model]:checked')).map(function (el) { return el.value; });
+          if (!prompt) { err('Önce bir soru yaz.'); return; }
+          if (selected.length < 2 || selected.length > 4) { err('En az 2, en fazla 4 model seç.'); return; }
+          out.textContent = selected.length + ' model yanıt üretiyor…';
+          busyBtn(this, call('multiAI', { prompt: prompt, models: selected })).then(function (r) {
+            if (!r || r.success !== true) throw new Error(r && r.error || 'Çoklu AI yanıtı alınamadı.');
+            out.innerHTML = '';
+            selected.forEach(function (name) {
+              var card = d.createElement('div'); card.className = 'aep-card';
+              var heading = d.createElement('h4'); heading.textContent = name;
+              var answer = d.createElement('p'); answer.style.whiteSpace = 'pre-wrap'; answer.textContent = String((r.responses && r.responses[name]) || 'Yanıt alınamadı.');
+              card.appendChild(heading); card.appendChild(answer); out.appendChild(card);
+            });
+          }).catch(function (e) { out.textContent = 'Çoklu AI hatası: ' + msgOf(e); });
+        });
+      }
+      return true;
+    }
+
+    /* ======================================================================
      *  3D STUDIO
      * ==================================================================== */
     var SHAPES = {
@@ -248,6 +416,38 @@
       'Düğüm': function (T) { return new T.TorusKnotGeometry(.4, .14, 80, 12); },
       'Düzlem': function (T) { return new T.BoxGeometry(2, .06, 2); }
     };
+    /* 90+ gerçek geometrik varyant: Three.js primitive'leriyle yerel katalog.
+       Bunlar AI servisi kullanılamasa bile sahnede doğrudan oluşturulabilir. */
+    for (var sides = 3; sides <= 18; sides++) {
+      (function (n) {
+        SHAPES['Prizma ' + n + ' Kenar'] = function (T) { return new T.CylinderGeometry(.62, .62, 1, n, 1, false); };
+        SHAPES['Piramit ' + n + ' Kenar'] = function (T) { return new T.ConeGeometry(.66, 1, n, 1, false); };
+      })(sides);
+    }
+    for (var sphereSegments = 8; sphereSegments <= 30; sphereSegments += 2) {
+      (function (n) {
+        SHAPES['Küre ' + n + ' Segment'] = function (T) { return new T.SphereGeometry(.62, n, Math.max(6, Math.floor(n * .75))); };
+      })(sphereSegments);
+    }
+    for (var torusVariant = 0; torusVariant < 10; torusVariant++) {
+      (function (n) {
+        SHAPES['Torus Varyant ' + (n + 1)] = function (T) { return new T.TorusGeometry(.34 + n * .035, .06 + n * .009, 8 + n, 24 + n * 4); };
+      })(torusVariant);
+      (function (n) {
+        SHAPES['Düğüm Varyant ' + (n + 1)] = function (T) { return new T.TorusKnotGeometry(.36, .07 + n * .012, 48 + n * 8, 6 + n, 2 + (n % 4), 3 + (n % 5)); };
+      })(torusVariant);
+    }
+    for (var boxVariant = 0; boxVariant < 12; boxVariant++) {
+      (function (n) {
+        SHAPES['Dikdörtgen Kutu ' + (n + 1)] = function (T) { return new T.BoxGeometry(.55 + n * .07, .65 + ((n * 3) % 7) * .12, .5 + ((n * 5) % 9) * .09); };
+      })(boxVariant);
+    }
+    for (var flatVariant = 0; flatVariant < 4; flatVariant++) {
+      (function (n) {
+        SHAPES['Halka Plaka ' + (n + 1)] = function (T) { return new T.RingGeometry(.18 + n * .04, .55 + n * .05, 20 + n * 8); };
+        SHAPES['Düzlem ' + (n + 1)] = function (T) { return new T.PlaneGeometry(1 + n * .25, .8 + n * .2, 1 + n, 1 + n); };
+      })(flatVariant);
+    }
     function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
     function rng(seed) { var a = seed || 1; return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
     /* Açıklamaya göre ilkellerden oluşan model tarifleri: [şekil, renk, x,y,z, sx,sy,sz, rx,ry,rz] */
@@ -272,14 +472,14 @@
 
     function build3D(label, m) {
       styles();
-      var body = open(label, m, 'Yazıdan 3D model üret, şekillerle sahne kur, kaydet ve GLB olarak indir');
+      var body = open(label, m, '94+ şekil kütüphanesi · Yazıdan 3D model oluştur · Projelerini kaydet ve GLB indir');
       var u = user();
       body.innerHTML =
         '<div class="a3d"><div class="a3d-main">' +
         '<div class="a3d-bar"><textarea id="a3dPrompt" maxlength="400" placeholder="Ne üretmek istiyorsun? Örn. kırmızı araba, uzay roketi, ağaç, robot, ev…"></textarea>' +
         '<button type="button" class="aep-btn aep-primary" id="a3dGen">✨ 3D Oluştur</button></div>' +
         '<div class="a3d-view" id="a3dView"><div class="a3d-hud" id="a3dHud">Sürükle: döndür · Tekerlek: yakınlaştır</div></div>' +
-        '<div class="a3d-bar"><div class="a3d-shapes" id="a3dShapes"></div></div>' +
+        '<div class="a3d-bar"><input class="a3d-shape-search" id="a3dShapeSearch" type="search" placeholder="94+ şekil içinde ara…" aria-label="Şekil ara"><div class="a3d-shapes" id="a3dShapes"></div></div>' +
         '<div class="a3d-bar"><input type="color" id="a3dColor" value="#3d86ff" title="Yeni şekil rengi" aria-label="Renk">' +
         '<button type="button" class="aep-btn" id="a3dSpin">⟳ Otomatik döndür</button>' +
         '<button type="button" class="aep-btn" id="a3dWire">▦ Tel kafes</button>' +
@@ -355,7 +555,7 @@
       function addParts(parts) {
         parts.forEach(function (p) { addShape(p[0], p[1], [p[2], p[3], p[4]], [p[5], p[6], p[7]], [p[8] || 0, p[9] || 0, p[10] || 0]); });
       }
-      var shapesBox = $('#a3dShapes', body);
+      var shapesBox = $('#a3dShapes', body), shapeSearch = $('#a3dShapeSearch', body), shapeButtons = [];
       Object.keys(SHAPES).forEach(function (n) {
         var b = d.createElement('button'); b.type = 'button'; b.className = 'aep-btn'; b.textContent = '＋ ' + n;
         b.addEventListener('click', function () {
@@ -364,7 +564,13 @@
           setState(n + ' eklendi (' + shapesLog.length + ' şekil).');
         });
         shapesBox.appendChild(b);
+        shapeButtons.push({ name: n.toLocaleLowerCase('tr-TR'), button: b });
       });
+      if (shapeSearch) shapeSearch.addEventListener('input', function () {
+        var term = String(shapeSearch.value || '').toLocaleLowerCase('tr-TR').trim();
+        shapeButtons.forEach(function (entry) { entry.button.hidden = !!term && entry.name.indexOf(term) === -1; });
+      });
+      setState(Object.keys(SHAPES).length + ' şekil hazır.');
       $('#a3dSpin', body).addEventListener('click', function () { spin = !spin; setState(spin ? 'Otomatik döndürme açık.' : 'Otomatik döndürme kapalı.'); });
       $('#a3dWire', body).addEventListener('click', function () { wire = !wire; group.traverse(function (o) { if (o.material) o.material.wireframe = wire; }); });
       $('#a3dUndo', body).addEventListener('click', function () {
@@ -553,7 +759,7 @@
       tabs(body, [
         { id: 'courses', label: '🎓 Kurslar', render: coursesPane },
         { id: 'quiz', label: '❓ Quiz', render: quizPane }
-      ]);
+      ], label === 'Zeka Testi ve Quiz' ? 'quiz' : 'courses');
       function coursesPane(p) {
         p.innerHTML = '<div class="aep-card"><h3>🎓 Kurslar</h3><div class="aep-grid" id="aesCrs"><p class="aep-muted">Yükleniyor…</p></div></div><div id="aesLessons"></div>';
         call('getCourses').then(function (cs) {
@@ -672,7 +878,7 @@
         { id: 'daily', label: '📅 Günlük', render: dailyPane },
         { id: 'social', label: '🌐 Sosyal', render: socialPane },
         { id: 'streak', label: '🔥 Günlük seri', render: streakPane }
-      ]);
+      ], label === 'Günlük Seri ve Uzay Modu' ? 'streak' : 'daily');
       function listPane(p, title, fn, doneFn, textKey) {
         p.innerHTML = '<div class="aep-card"><h3>' + title + '</h3><div class="aep-list"><p class="aep-muted">Yükleniyor…</p></div></div>';
         var box = $('.aep-list', p);
@@ -1010,6 +1216,14 @@
     B['Aylık Yarışma'] = buildContest;
     B['Davet Liderlik Tablosu'] = buildReferral;
     B['Anketler'] = buildPolls;
+    B['Proje Talepleri'] = buildStaffProjectRequests;
+    B['Günlük Görevler ve Puan'] = buildTasks;
+    B['Günlük Seri ve Uzay Modu'] = buildTasks;
+    B['Zeka Testi ve Quiz'] = buildAcademy;
+    B['Savaş Modu + Çoklu AI'] = buildBattlePanel;
+    B['Kazanç Araçları'] = buildStore;
+    B['Davet Kodu'] = buildReferral;
+    w.openProjectRequestsPanel = function () { return P.openFeature('Proje Talepleri') === true; };
     B['Kod Editörü'] = buildCode;
     B['A27 API Anahtarı'] = buildApiKeys;
     B['Beta API Yönetimi'] = buildApiKeys;

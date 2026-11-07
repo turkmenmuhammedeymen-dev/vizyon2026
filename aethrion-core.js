@@ -230,6 +230,31 @@
     return w.Parse.Cloud.run(name, params || {});
   }
   function aiPanel() { return byId('vizyonAlPanel'); }
+  function refreshAethrionAIQuota() {
+    var panel = aiPanel();
+    if (!panel) return Promise.resolve(null);
+    var badge = byId('aeAIDailyQuota');
+    if (!badge) {
+      badge = d.createElement('div');
+      badge.id = 'aeAIDailyQuota';
+      badge.style.cssText = 'margin:8px 14px;padding:7px 11px;border-radius:10px;border:1px solid rgba(226,190,91,.28);background:rgba(226,190,91,.07);color:#d8c58e;font:600 12px Inter,system-ui,sans-serif';
+      var header = panel.querySelector('.vizyon-al-header');
+      if (header && header.parentNode) header.parentNode.insertBefore(badge, header.nextSibling);
+      else panel.insertBefore(badge, panel.firstChild);
+    }
+    return aiCloud('getAethrionAIQuota', {}).then(function (result) {
+      if (!result || result.success !== true) throw new Error(result && result.error || 'Kota bilgisi alınamadı.');
+      badge.textContent = result.limit === 'Sınırsız'
+        ? '⚡ Günlük AI hakkı: Sınırsız'
+        : '⚡ Günlük AI hakkı: ' + result.remaining + '/' + result.limit + ' kaldı';
+      return result;
+    }).catch(function (error) {
+      badge.textContent = 'Günlük AI hakkı şu anda doğrulanamıyor.';
+      console.warn('[AETHRION] AI quota status unavailable:', error);
+      return null;
+    });
+  }
+  w.refreshAethrionAIQuota = refreshAethrionAIQuota;
   function aiChat() { return byId('vzChat'); }
   function aiMessages() {
     if (!Array.isArray(w.__aethrionAIChatMessages)) w.__aethrionAIChatMessages = [];
@@ -397,24 +422,42 @@
     if (input) input.value = '';
     if (button) { button.disabled = true; button.textContent = 'Yanıt hazırlanıyor…'; }
     aiAppend('user', message);
+    var delivered = false;
     try {
-      var conversationId = await aiCreateConversation();
-      await aiCloud('sendMessage', { conversationId: conversationId, text: message });
-      var result = await aiCloud('vizyonAlChat', { message: message, mode: activeMode, model: selectedModel });
+      var conversationId = null;
+      var signedInUser = (w.Parse && w.Parse.User && w.Parse.User.current && w.Parse.User.current()) || null;
+      if (signedInUser) {
+        try {
+          conversationId = await aiCreateConversation();
+          await aiCloud('sendMessage', { conversationId: conversationId, text: message });
+        } catch (saveError) {
+          conversationId = null;
+          console.warn('[AETHRION] Sohbet geçmişi kaydedilemedi; yanıt yine de üretilecek:', saveError);
+        }
+      }
+      var result = await aiCloud('aethrionChat', { message: message, mode: activeMode, model: selectedModel });
       if (!result || result.success !== true) throw new Error(result && result.error || 'AETHRION AI yanıt üretemedi.');
       var reply = String(result.reply || 'Yanıt alınamadı.');
-      var source = { provider: result.provider || 'unknown', model: result.model || 'unknown' };
+      var source = { provider: result.provider || 'AETHRION AI', model: result.model || selectedModel || 'auto' };
       aiAppend('assistant', reply, source);
-      await aiCloud('sendAIMessage', { conversationId: conversationId, text: reply, fromName: 'AETHRION AI · ' + source.provider + ' · ' + source.model });
-      if (typeof w.refreshAethrionAIQuota === 'function') w.refreshAethrionAIQuota();
+      delivered = true;
+      if (conversationId) {
+        try {
+          await aiCloud('sendAIMessage', { conversationId: conversationId, text: reply, fromName: 'AETHRION AI · ' + source.provider + ' · ' + source.model });
+        } catch (saveReplyError) {
+          console.warn('[AETHRION] Yanıt geçmişe kaydedilemedi:', saveReplyError);
+        }
+      }
+      if (typeof w.refreshAethrionAIQuota === 'function') await w.refreshAethrionAIQuota();
     } catch (e) {
       aiAppend('assistant', 'Mesaj gönderilemedi: ' + (e && e.message || 'Bilinmeyen hata'));
       w.showNotification && w.showNotification(e && e.message || 'AETHRION AI şu anda yanıt veremiyor.', 'error');
+      if (typeof w.refreshAethrionAIQuota === 'function') w.refreshAethrionAIQuota();
     } finally {
       if (button) { button.disabled = false; button.textContent = '⚡ Gönder'; }
       if (input) input.focus();
     }
-    return true;
+    return delivered;
   });
   install('startScreenReading', async function () {
     var screenStream = null;

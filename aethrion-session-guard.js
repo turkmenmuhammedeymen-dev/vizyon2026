@@ -29,18 +29,17 @@
   function onLogin() {
     if (checking) return;
     checking = true;
-    var tries = 0;
-    (function wait() {
-      if (shellReady()) { checking = false; return; }
-      if (++tries < 6) { setTimeout(wait, 400); return; }
+    var key = 'aeLoginReload:' + who();
+    try {
+      if (w.sessionStorage.getItem(key)) { checking = false; return; }
+      w.sessionStorage.setItem(key, '1');
+    } catch (_) {}
+    /* A stale guest shell can look "ready" while still containing the old menu.
+       Rebuild the authenticated workspace once after Parse has persisted the session. */
+    w.setTimeout(function () {
       checking = false;
-      var key = 'aeLoginReload:' + who();
-      try {
-        if (w.sessionStorage.getItem(key)) return;
-        w.sessionStorage.setItem(key, '1');
-      } catch (_) {}
-      w.location.reload();
-    })();
+      try { w.location.reload(); } catch (_) {}
+    }, 900);
   }
   setInterval(function () {
     var now = who();
@@ -62,10 +61,7 @@
   function paintGuest() {
     var panel = d.getElementById('vizyonAlPanel');
     if (!panel) return;
-    var left = Math.max(0, GUEST_LIMIT - used());
-    var q = d.getElementById('aeAIDailyQuota');
     if (isGuest()) {
-      if (q) q.textContent = 'Misafir: kalan ' + left + '/' + GUEST_LIMIT;
       var b = d.getElementById('aeGuestBanner');
       if (!b) {
         b = d.createElement('div');
@@ -76,7 +72,7 @@
         var header = panel.querySelector('.vizyon-al-header');
         if (header && header.parentNode) header.parentNode.insertBefore(b, header.nextSibling); else panel.insertBefore(b, panel.firstChild);
       }
-      b.firstChild.textContent = '👤 Misafir modu: günde ' + GUEST_LIMIT + ' mesaj hakkın var (kalan: ' + left + '). Giriş yapınca daha fazla hak ve geçmiş kaydı gelir.';
+      b.firstChild.textContent = '👤 Misafir modu: günlük ' + GUEST_LIMIT + ' mesaj sınırı. Gerçek kalan hak sunucu kotasından gösterilir.';
     } else {
       var old = d.getElementById('aeGuestBanner'); if (old) old.remove();
     }

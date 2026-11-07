@@ -34,18 +34,8 @@
     'Sohbet ve İşlem Geçmişi': { find: /AETHRION AI ASISTAN/i, then: 'toggleConversationHistory' }
   };
   var FRAME_MAP = {
-    '3D Studio': './3d-studio.html#demo',
-    'Kod Editörü': './kod-editoru.html',
-    'Topluluk ve Takımlar': './topluluk.html',
-    'Yorumlar ve Topluluk': './topluluk.html',
-    'AETHRION Akademi': './bana-ogret.html',
-    'A27 API Anahtarı': './aethrion-developer.html',
-    'Beta API Yönetimi': './aethrion-developer.html',
     'API Belgeleri': './api.html',
     'Dokümantasyon': './dokumantasyon.html',
-    'Güvenlik ve Ebeveyn Ayarları': './hesap-ve-oturum-guvenligi.html',
-    'Güvenlik Ayarları': './hesap-ve-oturum-guvenligi.html',
-    'Team Ortak Çalışma': './aethrion-teams.html'
   };
   /* Bu özellikler için uygulamanın kendi kapatma fonksiyonları (varsa). */
   var CLOSERS = ['closeJarvisMode', 'closeVideoEditor', 'closeModelsShowcase', 'closeJobMarket', 'closeJobCreateForm',
@@ -515,7 +505,7 @@
   /* ---- Ana giriş: özelliği aç ---- */
   function openFeature(label) {
     var m = meta(label);
-    if (!m) { toast('Bu özellik bulunamadı: ' + label, 'warning'); return; }
+    if (!m) { toast('Bu özellik bulunamadı: ' + label, 'warning'); return false; }
     var action = m[4];
     if (action === 'doLogout') {
       if (typeof w.logout === 'function') return w.logout();
@@ -543,10 +533,11 @@
       /* Hiçbir panel açılamadıysa boş ekran bırakma: karşılama ekranına dön ve söyle. */
       showHome();
       toast('"' + label + '" paneli şu anda açılamadı.', 'warning');
-      return;
+      return false;
     }
     state.label = label;
     d.body.classList.add('aep-panel-on');
+    return true;
   }
 
   /* ---- Tıklamalar (yakalama aşamasında; eski yönlendiricilerden önce) ---- */
