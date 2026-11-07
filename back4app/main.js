@@ -2414,7 +2414,7 @@ Parse.Cloud.define("superAI", async function (request) {
 
 // ================================================================
 // ========== AETHRION AI CHAT + DAILY QUOTA =======================
-// Free: 24 messages/day. Pro: 2000/day. Team and elevated roles: unlimited.
+// Guest: 25 messages/day. Free member: 100 messages/day. Pro: 2000/day. Team and elevated roles: unlimited.
 // This wrapper is the supported frontend entry point; model credentials stay server-side.
 // ================================================================
 Parse.Cloud.define("aethrionChat", async function (request) {
@@ -2437,7 +2437,7 @@ Parse.Cloud.define("aethrionChat", async function (request) {
     var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
     var role = user ? String(user.get('role') || 'user').toLowerCase() : 'visitor';
     var plan = user ? String(user.get('plan') || 'free').toLowerCase() : 'free';
-    var unlimited = ['admin', 'founder', 'moderator'].indexOf(role) !== -1 || plan === 'team';
+    var unlimited = ['admin', 'founder', 'moderator', 'beta'].indexOf(role) !== -1 || plan === 'team';
     var limit = unlimited ? -1 : (plan === 'pro' ? 2000 : (user ? 100 : 25)); // ziyaretçi günde 25, üye günde 100 (eski kod)
     var identity = user ? String(user.get('email') || user.id) : String(request.ip || request.installationId || '');
     if (!identity) return { success: false, error: 'Ziyaretçi kimliği belirlenemedi. Sayfayı yenileyip tekrar deneyin.' };
@@ -2533,7 +2533,7 @@ Parse.Cloud.define("getAethrionAIQuota", async function (request) {
     var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
     var role = user ? String(user.get('role') || 'user').toLowerCase() : 'visitor';
     var plan = user ? String(user.get('plan') || 'free').toLowerCase() : 'free';
-    var unlimited = ['admin', 'founder', 'moderator'].indexOf(role) !== -1 || plan === 'team';
+    var unlimited = ['admin', 'founder', 'moderator', 'beta'].indexOf(role) !== -1 || plan === 'team';
     var limit = unlimited ? 'Sınırsız' : (plan === 'pro' ? 2000 : (user ? 100 : 25));
     var identity = user ? String(user.get('email') || user.id) : String(request.ip || request.installationId || '');
     if (!identity) return { success: false, error: 'Kullanım hakkı kontrol edilemedi.' };
