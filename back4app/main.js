@@ -7606,21 +7606,36 @@ async function runFinalizeContest() {
 // ================================================================
 Parse.Cloud.define("createPoll", async function (request) {
     var user = request.user;
-    if (!user || user.get('role') !== 'founder') throw new Error('Sadece kurucu anket oluşturabilir!');
+    if (!user || String(user.get('role') || '').toLowerCase() !== 'founder') throw new Error('Sadece kurucu anket oluşturabilir!');
 
-    var question = request.params.question;
-    var options = request.params.options;
-    var duration = request.params.duration;
-    if (!question || !options || options.length < 2) throw new Error('Soru ve en az 2 seçenek gerekli!');
+    var question = String(request.params.question || '').trim();
+    var rawOptions = request.params.options;
+    var duration = Number(request.params.duration);
+    if (!question || question.length > 200) throw new Error('Anket sorusu 1–200 karakter olmalı!');
+    if (!Array.isArray(rawOptions) || rawOptions.length < 2 || rawOptions.length > 8) throw new Error('2–8 seçenek gerekli!');
+    var options = rawOptions.map(function (option) { return String(option || '').trim(); });
+    if (options.some(function (option) { return !option || option.length > 80; })) throw new Error('Her seçenek 1–80 karakter olmalı!');
+    var normalized = options.map(function (option) { return option.toLocaleLowerCase('tr-TR'); });
+    if (new Set(normalized).size !== options.length) throw new Error('Anket seçenekleri birbirinden farklı olmalı!');
+    if (!Number.isInteger(duration) || duration < 1 || duration > 30) throw new Error('Anket süresi 1–30 gün arasında olmalı!');
+
+    /* Tek aktif anket kuralı: önceki aktif anketleri kapat, sonra yenisini oluştur. */
+    var activeQuery = new Parse.Query(Poll);
+    activeQuery.equalTo('is_active', true);
+    var previousPolls = await activeQuery.find({ useMasterKey: true });
+    for (var i = 0; i < previousPolls.length; i++) {
+        previousPolls[i].set('is_active', false);
+        await previousPolls[i].save(null, { useMasterKey: true });
+    }
 
     var poll = new Poll();
     poll.set('question', question);
     poll.set('options', options);
     poll.set('votes', options.map(function () { return 0; }));
     poll.set('voters', []);
-    poll.set('created_by_email', user.get('email'));
+    poll.set('created_by_email', user.get('email') || '');
     var endDate = new Date();
-    endDate.setDate(endDate.getDate() + (duration || 3));
+    endDate.setDate(endDate.getDate() + duration);
     poll.set('end_date', endDate);
     poll.set('is_active', true);
     await poll.save(null, { useMasterKey: true });
@@ -7631,69 +7646,123 @@ Parse.Cloud.define("getActivePoll", async function (request) {
     var query = new Parse.Query(Poll);
     query.equalTo('is_active', true);
     query.descending('createdAt');
-    var poll = await query.first({ useMasterKey: true });
-    if (!poll) return null;
-    if (poll.get('end_date') && new Date(poll.get('end_date')) < new Date()) {
-        poll.set('is_active', false);
-        await poll.save(null, { useMasterKey: true });
-        return null;
+    query.limit(50);
+    var polls = await query.find({ useMasterKey: true });
+    var now = new Date();
+    for (var i = 0; i < polls.length; i++) {
+        var poll = polls[i];
+        var endDate = poll.get('end_date');
+        if (endDate && new Date(endDate) < now) {
+            poll.set('is_active', false);
+            await poll.save(null, { useMasterKey: true });
+            continue;
+        }
+        return {
+            id: poll.id,
+            question: poll.get('question'),
+            options: poll.get('options') || [],
+            votes: poll.get('votes') || [],
+            end_date: endDate || null
+        };
     }
-    return {
-        id: poll.id,
-        question: poll.get('question'),
-        options: poll.get('options'),
-        votes: poll.get('votes'),
-        end_date: poll.get('end_date')
-    };
+    return null;
 });
 
 Parse.Cloud.define("votePoll", async function (request) {
     var user = request.user;
     if (!user) throw new Error('Giriş yapmalısınız!');
-    var optionIndex = request.params.optionIndex;
+    var optionIndex = Number(request.params.optionIndex);
+    if (!Number.isInteger(optionIndex)) throw new Error('Geçersiz seçenek!');
 
     var query = new Parse.Query(Poll);
     query.equalTo('is_active', true);
+    query.descending('createdAt');
     var poll = await query.first({ useMasterKey: true });
     if (!poll) throw new Error('Aktif anket yok!');
-    if (new Date(poll.get('end_date')) < new Date()) throw new Error('Anket süresi doldu!');
+    var endDate = poll.get('end_date');
+    if (endDate && new Date(endDate) < new Date()) {
+        poll.set('is_active', false);
+        await poll.save(null, { useMasterKey: true });
+        throw new Error('Anket süresi doldu!');
+    }
 
+    var options = poll.get('options') || [];
+    var votes = poll.get('votes') || [];
+    if (optionIndex < 0 || optionIndex >= options.length) throw new Error('Geçersiz seçenek!');
     var voters = poll.get('voters') || [];
     if (voters.some(function (v) { return v === user.id; })) throw new Error('Zaten oy kullandınız!');
 
     voters.push(user.id);
+    votes[optionIndex] = (Number(votes[optionIndex]) || 0) + 1;
     poll.set('voters', voters);
-    var votes = poll.get('votes') || [];
-    if (optionIndex < 0 || optionIndex >= votes.length) throw new Error('Geçersiz seçenek!');
-    votes[optionIndex] = (votes[optionIndex] || 0) + 1;
     poll.set('votes', votes);
     await poll.save(null, { useMasterKey: true });
-
     await addPointsWithBonus(user, 20, 'Anket oylama');
     return { success: true };
 });
 
 Parse.Cloud.define("deletePoll", async function (request) {
     var user = request.user;
-    if (!user || user.get('role') !== 'founder') throw new Error('Sadece kurucu silebilir!');
-    var query = new Parse.Query(Poll);
-    query.equalTo('is_active', true);
-    var poll = await query.first({ useMasterKey: true });
-    if (!poll) throw new Error('Aktif anket yok!');
+    if (!user || String(user.get('role') || '').toLowerCase() !== 'founder') throw new Error('Sadece kurucu silebilir!');
+    var poll = null;
+    if (request.params.pollId) {
+        var queryById = new Parse.Query(Poll);
+        poll = await queryById.get(String(request.params.pollId), { useMasterKey: true });
+    } else {
+        var activeQuery = new Parse.Query(Poll);
+        activeQuery.equalTo('is_active', true);
+        activeQuery.descending('createdAt');
+        poll = await activeQuery.first({ useMasterKey: true });
+    }
+    if (!poll) throw new Error('Anket bulunamadı!');
     await poll.destroy({ useMasterKey: true });
     return { success: true };
 });
 
 Parse.Cloud.define("editPoll", async function (request) {
     var user = request.user;
-    if (!user || user.get('role') !== 'founder') throw new Error('Sadece kurucu düzenleyebilir!');
-    var question = request.params.question;
-    if (!question) throw new Error('Soru gerekli!');
-    var query = new Parse.Query(Poll);
-    query.equalTo('is_active', true);
-    var poll = await query.first({ useMasterKey: true });
+    if (!user || String(user.get('role') || '').toLowerCase() !== 'founder') throw new Error('Sadece kurucu düzenleyebilir!');
+    var poll = null;
+    if (request.params.pollId) {
+        var queryById = new Parse.Query(Poll);
+        poll = await queryById.get(String(request.params.pollId), { useMasterKey: true });
+    } else {
+        var activeQuery = new Parse.Query(Poll);
+        activeQuery.equalTo('is_active', true);
+        activeQuery.descending('createdAt');
+        poll = await activeQuery.first({ useMasterKey: true });
+    }
     if (!poll) throw new Error('Aktif anket yok!');
+
+    var question = String(request.params.question || '').trim();
+    if (!question || question.length > 200) throw new Error('Anket sorusu 1–200 karakter olmalı!');
     poll.set('question', question);
+
+    if (request.params.options !== undefined) {
+        var rawOptions = request.params.options;
+        if (!Array.isArray(rawOptions) || rawOptions.length < 2 || rawOptions.length > 8) throw new Error('2–8 seçenek gerekli!');
+        var options = rawOptions.map(function (option) { return String(option || '').trim(); });
+        if (options.some(function (option) { return !option || option.length > 80; })) throw new Error('Her seçenek 1–80 karakter olmalı!');
+        var normalized = options.map(function (option) { return option.toLocaleLowerCase('tr-TR'); });
+        if (new Set(normalized).size !== options.length) throw new Error('Anket seçenekleri birbirinden farklı olmalı!');
+        var currentVotes = poll.get('votes') || [];
+        var totalVotes = currentVotes.reduce(function (sum, value) { return sum + (Number(value) || 0); }, 0);
+        var currentOptions = poll.get('options') || [];
+        var changed = JSON.stringify(options) !== JSON.stringify(currentOptions);
+        if (changed && totalVotes > 0) throw new Error('Oy kullanılmış ankette seçenekler değiştirilemez.');
+        if (changed) {
+            poll.set('options', options);
+            poll.set('votes', options.map(function () { return 0; }));
+            poll.set('voters', []);
+        }
+    }
+    if (request.params.duration !== undefined) {
+        var duration = Number(request.params.duration);
+        if (!Number.isInteger(duration) || duration < 1 || duration > 30) throw new Error('Anket süresi 1–30 gün arasında olmalı!');
+        var endDate = new Date();
+        endDate.setDate(endDate.getDate() + duration);
+        poll.set('end_date', endDate);
+    }
     await poll.save(null, { useMasterKey: true });
     return { success: true };
 });
@@ -7719,10 +7788,11 @@ Parse.Cloud.define("getAnnouncements", async function (request) {
 
 Parse.Cloud.define("addAnnouncement", async function (request) {
     var user = request.user;
-    if (!user || ['admin', 'founder'].indexOf(user.get('role')) === -1) throw new Error('Yetkiniz yok!');
-    var title = request.params.title;
-    var content = request.params.content;
-    if (!title || !content) throw new Error('Başlık ve içerik gerekli!');
+    var role = String(user && user.get('role') || '').toLowerCase();
+    if (!user || ['admin', 'founder'].indexOf(role) === -1) throw new Error('Yetkiniz yok!');
+    var title = String(request.params.title || '').trim();
+    var content = String(request.params.content || '').trim();
+    if (!title || title.length > 140 || !content || content.length > 5000) throw new Error('Başlık (1–140) ve içerik (1–5000) karakter olmalı!');
 
     var ann = new Announcement();
     ann.set('title_', title);
@@ -7734,8 +7804,10 @@ Parse.Cloud.define("addAnnouncement", async function (request) {
 
 Parse.Cloud.define("deleteAnnouncement", async function (request) {
     var user = request.user;
-    if (!user || ['admin', 'founder'].indexOf(user.get('role')) === -1) throw new Error('Yetkiniz yok!');
-    var announcementId = request.params.announcementId;
+    var role = String(user && user.get('role') || '').toLowerCase();
+    if (!user || ['admin', 'founder'].indexOf(role) === -1) throw new Error('Yetkiniz yok!');
+    var announcementId = String(request.params.announcementId || '').trim();
+    if (!announcementId) throw new Error('Duyuru kimliği gerekli!');
     var query = new Parse.Query(Announcement);
     var ann = await query.get(announcementId, { useMasterKey: true });
     if (!ann) throw new Error('Duyuru bulunamadı!');
@@ -7745,10 +7817,15 @@ Parse.Cloud.define("deleteAnnouncement", async function (request) {
 
 Parse.Cloud.define("editAnnouncement", async function (request) {
     var user = request.user;
-    if (!user || ['admin', 'founder'].indexOf(user.get('role')) === -1) throw new Error('Yetkiniz yok!');
-    var announcementId = request.params.announcementId;
-    var title = request.params.title;
-    var content = request.params.content;
+    var role = String(user && user.get('role') || '').toLowerCase();
+    if (!user || ['admin', 'founder'].indexOf(role) === -1) throw new Error('Yetkiniz yok!');
+    var announcementId = String(request.params.announcementId || '').trim();
+    var title = request.params.title === undefined ? undefined : String(request.params.title || '').trim();
+    var content = request.params.content === undefined ? undefined : String(request.params.content || '').trim();
+    if (!announcementId) throw new Error('Duyuru kimliği gerekli!');
+    if (title !== undefined && (!title || title.length > 140)) throw new Error('Başlık 1–140 karakter olmalı!');
+    if (content !== undefined && (!content || content.length > 5000)) throw new Error('İçerik 1–5000 karakter olmalı!');
+    if (title === undefined && content === undefined) throw new Error('Güncellenecek alan bulunamadı!');
     var query = new Parse.Query(Announcement);
     var ann = await query.get(announcementId, { useMasterKey: true });
     if (!ann) throw new Error('Duyuru bulunamadı!');
