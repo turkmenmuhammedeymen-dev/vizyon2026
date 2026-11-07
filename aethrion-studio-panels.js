@@ -338,6 +338,70 @@
     }
 
     /* ======================================================================
+     *  SAVAŞ MODU + ÇOKLU AI
+     * ==================================================================== */
+    function buildBattlePanel(label, m) {
+      styles();
+      var body = open(label, m, 'İki modeli karşılaştır veya aynı soruyu dört farklı AI sağlayıcısına yönelt');
+      if (!user()) { loginCard(body, 'Savaş Modu ve Çoklu AI kullanmak'); return true; }
+      var modelNames = ['Groq', 'DeepSeek', 'OpenAI', 'OpenRouter', 'Cohere', 'Cerebras', 'Gemini', 'DeepInfra'];
+      tabs(body, [
+        { id: 'battle', label: '⚔️ Savaş Modu', render: battlePane },
+        { id: 'multi', label: '🧠 Çoklu AI', render: multiPane }
+      ]);
+      function battlePane(p) {
+        p.innerHTML = '<div class="aep-card"><h3>⚔️ AI vs AI</h3><label class="aes-field">Karşılaştırma konusu<textarea id="aesBattlePrompt" rows="3" maxlength="2000" placeholder="İki modelin karşılaştırmasını istediğin konuyu yaz…"></textarea></label><div class="aes-two"><label class="aes-field">Model 1<select id="aesBattleM1"></select></label><label class="aes-field">Model 2<select id="aesBattleM2"></select></label></div><button type="button" class="aep-btn aep-primary" id="aesBattleGo">⚔️ Karşılaştırmayı başlat</button><div id="aesBattleOut" style="margin-top:14px"></div></div>';
+        var one = $('#aesBattleM1', p), two = $('#aesBattleM2', p);
+        modelNames.forEach(function (name) { [one, two].forEach(function (select) { var opt = d.createElement('option'); opt.value = name; opt.textContent = name; select.appendChild(opt); }); });
+        one.value = 'Groq'; two.value = 'Gemini';
+        $('#aesBattleGo', p).addEventListener('click', function () {
+          var prompt = $('#aesBattlePrompt', p).value.trim(), out = $('#aesBattleOut', p);
+          if (!prompt) { err('Önce karşılaştırma konusunu yaz.'); return; }
+          out.textContent = 'İki model yanıt üretiyor…';
+          busyBtn(this, call('battleMode', { prompt: prompt, model1: one.value, model2: two.value })).then(function (r) {
+            if (!r || r.success !== true) throw new Error(r && r.error || 'Karşılaştırma tamamlanamadı.');
+            out.innerHTML = '';
+            var winner = d.createElement('p'); winner.className = 'aes-pill ok'; winner.textContent = '🏆 Uzunluk ölçütüne göre: ' + (r.winner || 'Belirlenemedi'); out.appendChild(winner);
+            [[one.value, r.model1_response], [two.value, r.model2_response]].forEach(function (entry) {
+              var card = d.createElement('div'); card.className = 'aep-card';
+              var heading = d.createElement('h4'); heading.textContent = entry[0];
+              var answer = d.createElement('p'); answer.style.whiteSpace = 'pre-wrap'; answer.textContent = String(entry[1] || 'Yanıt alınamadı.');
+              card.appendChild(heading); card.appendChild(answer); out.appendChild(card);
+            });
+          }).catch(function (e) { out.textContent = 'Karşılaştırma hatası: ' + msgOf(e); });
+        });
+      }
+      function multiPane(p) {
+        p.innerHTML = '<div class="aep-card"><h3>🧠 Çoklu AI karşılaştırması</h3><label class="aes-field">Sorun / istem<textarea id="aesMultiPrompt" rows="3" maxlength="2000" placeholder="Aynı soruyu seçtiğin modellere gönder…"></textarea></label><p class="aep-muted">2–4 sağlayıcı seçebilirsin.</p><div class="aes-3col" id="aesMultiModels"></div><button type="button" class="aep-btn aep-primary" id="aesMultiGo">⚡ Seçili modellere gönder</button><div id="aesMultiOut" style="margin-top:14px"></div></div>';
+        var modelBox = $('#aesMultiModels', p);
+        modelNames.forEach(function (name, index) {
+          var labelEl = d.createElement('label'); labelEl.className = 'aes-field'; labelEl.style.cssText = 'flex-direction:row;align-items:center;gap:8px;padding:8px;border:1px solid #dbe5ef;border-radius:10px;background:#f7f9fc;color:#172b43';
+          var checkbox = d.createElement('input'); checkbox.type = 'checkbox'; checkbox.value = name; checkbox.checked = ['Groq', 'DeepSeek', 'OpenAI', 'Gemini'].indexOf(name) !== -1; checkbox.dataset.model = name;
+          var textEl = d.createElement('span'); textEl.textContent = name;
+          labelEl.appendChild(checkbox); labelEl.appendChild(textEl); modelBox.appendChild(labelEl);
+        });
+        $('#aesMultiGo', p).addEventListener('click', function () {
+          var prompt = $('#aesMultiPrompt', p).value.trim(), out = $('#aesMultiOut', p);
+          var selected = Array.prototype.slice.call(modelBox.querySelectorAll('input[data-model]:checked')).map(function (el) { return el.value; });
+          if (!prompt) { err('Önce bir soru yaz.'); return; }
+          if (selected.length < 2 || selected.length > 4) { err('En az 2, en fazla 4 model seç.'); return; }
+          out.textContent = selected.length + ' model yanıt üretiyor…';
+          busyBtn(this, call('multiAI', { prompt: prompt, models: selected })).then(function (r) {
+            if (!r || r.success !== true) throw new Error(r && r.error || 'Çoklu AI yanıtı alınamadı.');
+            out.innerHTML = '';
+            selected.forEach(function (name) {
+              var card = d.createElement('div'); card.className = 'aep-card';
+              var heading = d.createElement('h4'); heading.textContent = name;
+              var answer = d.createElement('p'); answer.style.whiteSpace = 'pre-wrap'; answer.textContent = String((r.responses && r.responses[name]) || 'Yanıt alınamadı.');
+              card.appendChild(heading); card.appendChild(answer); out.appendChild(card);
+            });
+          }).catch(function (e) { out.textContent = 'Çoklu AI hatası: ' + msgOf(e); });
+        });
+      }
+      return true;
+    }
+
+    /* ======================================================================
      *  3D STUDIO
      * ==================================================================== */
     var SHAPES = {
@@ -695,7 +759,7 @@
       tabs(body, [
         { id: 'courses', label: '🎓 Kurslar', render: coursesPane },
         { id: 'quiz', label: '❓ Quiz', render: quizPane }
-      ]);
+      ], label === 'Zeka Testi ve Quiz' ? 'quiz' : 'courses');
       function coursesPane(p) {
         p.innerHTML = '<div class="aep-card"><h3>🎓 Kurslar</h3><div class="aep-grid" id="aesCrs"><p class="aep-muted">Yükleniyor…</p></div></div><div id="aesLessons"></div>';
         call('getCourses').then(function (cs) {
@@ -814,7 +878,7 @@
         { id: 'daily', label: '📅 Günlük', render: dailyPane },
         { id: 'social', label: '🌐 Sosyal', render: socialPane },
         { id: 'streak', label: '🔥 Günlük seri', render: streakPane }
-      ]);
+      ], label === 'Günlük Seri ve Uzay Modu' ? 'streak' : 'daily');
       function listPane(p, title, fn, doneFn, textKey) {
         p.innerHTML = '<div class="aep-card"><h3>' + title + '</h3><div class="aep-list"><p class="aep-muted">Yükleniyor…</p></div></div>';
         var box = $('.aep-list', p);
@@ -1153,6 +1217,12 @@
     B['Davet Liderlik Tablosu'] = buildReferral;
     B['Anketler'] = buildPolls;
     B['Proje Talepleri'] = buildStaffProjectRequests;
+    B['Günlük Görevler ve Puan'] = buildTasks;
+    B['Günlük Seri ve Uzay Modu'] = buildTasks;
+    B['Zeka Testi ve Quiz'] = buildAcademy;
+    B['Savaş Modu + Çoklu AI'] = buildBattlePanel;
+    B['Kazanç Araçları'] = buildStore;
+    B['Davet Kodu'] = buildReferral;
     w.openProjectRequestsPanel = function () { return P.openFeature('Proje Talepleri') === true; };
     B['Kod Editörü'] = buildCode;
     B['A27 API Anahtarı'] = buildApiKeys;
