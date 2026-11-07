@@ -41,9 +41,9 @@
   var CLOSERS = ['closeJarvisMode', 'closeVideoEditor', 'closeModelsShowcase', 'closeJobMarket', 'closeJobCreateForm',
     'closeJobDetail', 'closeCategoryPanel', 'closeKocPanel', 'closeVizyonAlPanel', 'closeAethrionAlPanel', 'closeContestPage',
     'closeMarket', 'closeVoiceChatFullscreen', 'closeNotificationPanel', 'closeSettingsModal', 'closeAethrionInbox'];
-  var OVERLAY_SELECTORS = '#vizyonAlPanel,#vizyonAlBackdrop,#aaVoiceFullscreen,#videoEditorOverlay,#modelsShowcaseOverlay,' +
+  var OVERLAY_SELECTORS = '#vizyonAlPanel,#aethrionAlPanel,#vizyonAlBackdrop,#aaVoiceFullscreen,#voiceChatFullscreen,#videoEditorOverlay,#videoStudioOverlay,#modelsShowcaseOverlay,' +
     '#aethrionJarvisOverlay,#jobMarketOverlay,#jobCreateOverlay,#jobDetailOverlay,#categoryPanelModal,#kocPanelOverlay,' +
-    '#vizyonSupportPanel,#teamPage,#fullAIPanel,#contestPage,#marketModal,#downloadModal,#aethrionNotificationPanel,#aethrionInboxPanel,#settingsModal,#moderatorVideoToolModal,#aethrionAccountProfileModal,#profileModal';
+    '#vizyonSupportPanel,#teamPage,#fullAIPanel,#aethrionAiPanel,#contestPage,#marketModal,#marketOverlay,#downloadModal,#aethrionNotificationPanel,#aethrionInboxPanel,#settingsModal,#moderatorVideoToolModal,#aethrionAccountProfileModal,#profileModal';
 
   function $(s, r) { return (r || d).querySelector(s); }
   function $$(s, r) { return Array.prototype.slice.call((r || d).querySelectorAll(s)); }
@@ -183,7 +183,7 @@
     if (btn) { try { btn.click(); } catch (_) {} }
     ['open', 'active', 'show', 'visible'].forEach(function (c) { el.classList.remove(c); });
     var cs = w.getComputedStyle(el);
-    if (cs.display !== 'none') { el.style.setProperty('display', 'none', 'important'); el.setAttribute('data-aep-closed', '1'); }
+    if (cs.display !== 'none') { el.style.setProperty('display', 'none'); el.setAttribute('data-aep-closed', '1'); }
   }
   /* Ekranda büyük, sabit konumlu (modal/panel) katmanlar */
   function visibleFixed() {
@@ -207,7 +207,7 @@
       ['open', 'active', 'show', 'visible'].forEach(function (c) { el.classList.remove(c); });
       var cs = w.getComputedStyle(el);
       if (cs.display !== 'none') {
-        el.style.setProperty('display', 'none', 'important');
+        el.style.setProperty('display', 'none');
         el.setAttribute('data-aep-closed', '1');
       }
     });
@@ -282,19 +282,17 @@
     st.classList.add('on');
     return true;
   }
-  function rescueHidden() {
-    $$('[data-aep-closed]').forEach(function (el) { el.removeAttribute('data-aep-closed'); });
-    $$('[data-ae-display-saved]').forEach(function (el) {
-      var cls = el.className && el.className.toString ? el.className.toString() : '';
-      if (/(^|\s)(open|active|show)(\s|$)/.test(cls) && el.style.display === 'none') {
-        el.style.removeProperty('display');
-        el.removeAttribute('data-ae-display-saved');
-      }
+  function rescueHidden(targets) {
+    (targets || []).forEach(function (el) {
+      if (!el || !el.isConnected) return;
+      el.removeAttribute('data-aep-closed');
+      if (el.style.getPropertyValue('display') === 'none') el.style.removeProperty('display');
     });
   }
   /* Satır içi "göster" denmiş ama stil dosyası .open sınıfı olmadığı için gizlemişse sınıfı ekle. */
-  function fixHiddenModals() {
-    $$(OVERLAY_SELECTORS).forEach(function (el) {
+  function fixHiddenModals(targets) {
+    (targets || []).forEach(function (el) {
+      if (!el || !el.isConnected) return;
       var inl = el.style.getPropertyValue('display');
       if (!inl || inl === 'none') return;
       var cs = w.getComputedStyle(el);
@@ -304,37 +302,95 @@
       }
     });
   }
-  function openOverlay(label, m) {
-    $$('[data-aep-closed]').forEach(function (el) { el.style.removeProperty('display'); el.removeAttribute('data-aep-closed'); });
-    /* Uygulamanın kapatma işlevleri satır içi gizleme bırakır; açmadan önce temizle. */
-    $$(OVERLAY_SELECTORS).forEach(function (el) {
-      if (el.style.getPropertyValue('visibility') === 'hidden') el.style.removeProperty('visibility');
-      if (el.style.getPropertyValue('pointer-events') === 'none') el.style.removeProperty('pointer-events');
-      if (el.style.getPropertyValue('display') === 'none') el.style.removeProperty('display');
+  /* Her açma eylemi yalnızca kendi overlay hedefini geri açabilir.
+     Önceki sürüm bütün gizli katmanların display değerini temizlediği için
+     bildirim/gelen kutusu gibi ilgisiz pencereler de görünür olabiliyordu. */
+  var OPEN_TARGETS = {
+    openFullAIPanel: ['#fullAIPanel', '#aethrionAiPanel'],
+    openAethrionAlPanel: ['#vizyonAlPanel', '#aethrionAlPanel', '#fullAIPanel', '#aethrionAiPanel'],
+    openAethrionAgentsPanel: ['#vizyonAlPanel', '#aethrionAlPanel'],
+    openPersonalAssistant: ['#fullAIPanel', '#aethrionAiPanel'],
+    openKocPanel: ['#kocPanelOverlay'],
+    startJarvisMode: ['#aethrionJarvisOverlay'],
+    openVideoEditor: ['#videoEditorOverlay'],
+    openVideoStudio: ['#videoStudioOverlay', '#videoEditorOverlay'],
+    openModelsShowcase: ['#modelsShowcaseOverlay'],
+    openJobMarket: ['#jobMarketOverlay'],
+    openJobCreateForm: ['#jobCreateOverlay'],
+    openJobDetail: ['#jobDetailOverlay'],
+    openCategoryPanel: ['#categoryPanelModal'],
+    toggleTeamPage: ['#teamPage'],
+    openContestPage: ['#contestPage'],
+    openMarket: ['#marketModal', '#marketOverlay'],
+    openVoiceChatFullscreen: ['#aaVoiceFullscreen', '#voiceChatFullscreen'],
+    toggleNotificationPanel: ['#aethrionNotificationPanel'],
+    openSettingsModal: ['#settingsModal'],
+    openAethrionInbox: ['#aethrionInboxPanel'],
+    openVizyonSupport: ['#vizyonSupportPanel'],
+    openModeratorVideoTool: ['#moderatorVideoToolModal'],
+    openAccountInfo: ['#aethrionAccountProfileModal', '#profileModal'],
+    openProfileModal: ['#profileModal', '#aethrionAccountProfileModal'],
+    showDownloadOptions: ['#downloadModal']
+  };
+  function targetOverlays(action) {
+    var selectors = OPEN_TARGETS[action] || [];
+    var out = [];
+    selectors.forEach(function (selector) {
+      $$(selector).forEach(function (el) { if (out.indexOf(el) < 0) out.push(el); });
     });
+    return out;
+  }
+  function openOverlay(label, m) {
     var fn = m && m[4] && w[m[4]];
     if (typeof fn !== 'function') return false;
+    var targets = targetOverlays(m[4]);
+    /* Sadece seçilen özelliğin daha önce kapatılmış katmanını hazırla. */
+    targets.forEach(function (el) {
+      el.removeAttribute('data-aep-closed');
+      el.style.removeProperty('display');
+      el.style.removeProperty('visibility');
+      el.style.removeProperty('pointer-events');
+      el.setAttribute('aria-hidden', 'false');
+    });
     var before = visibleFixed();
     state.guard = true;
     var ok = true;
     var threw = false;
-    try { ok = fn.call(w, m[6]) !== false; } catch (e) { console.error('[AETHRION] Özellik açılamadı:', label, e); ok = false; threw = true; }
+    try {
+      ok = fn.call(w, m[6]) !== false;
+    } catch (e) {
+      console.error('[AETHRION] Özellik açılamadı:', label, e);
+      ok = false;
+      threw = true;
+    }
     var tok = state.token;
     if (!ok && !threw) {
-      /* Bazı işlevler false döndürse de paneli açar; gerçekten bir şey göründü mü diye bak. */
       setTimeout(function () {
         if (tok !== state.token) return;
-        var now = visibleFixed().filter(function (e) { return before.indexOf(e) < 0; });
-        if (now.length) { state.label = label; d.body.classList.add('aep-panel-on'); state.opened = now; }
-        else { showHome(); toast('"' + label + '" paneli şu anda açılamadı.', 'warning'); }
+        var now = visibleFixed().filter(function (el) { return before.indexOf(el) < 0; });
+        if (now.length) {
+          state.label = label;
+          d.body.classList.add('aep-panel-on');
+          state.opened = now;
+        } else {
+          showHome();
+          toast('"' + label + '" paneli şu anda açılamadı.', 'warning');
+        }
       }, 700);
       return true;
     }
     setTimeout(function () { state.guard = false; }, 600);
-    [30, 250, 700].forEach(function (t) { setTimeout(function () { if (tok === state.token) { rescueHidden(); relocate(); fixHiddenModals(); } }, t); });
+    [30, 250, 700].forEach(function (t) {
+      setTimeout(function () {
+        if (tok !== state.token) return;
+        rescueHidden(targets);
+        relocate();
+        fixHiddenModals(targets);
+      }, t);
+    });
     setTimeout(function () {
       if (tok !== state.token) return;
-      state.opened = visibleFixed().filter(function (e) { return before.indexOf(e) < 0; });
+      state.opened = visibleFixed().filter(function (el) { return before.indexOf(el) < 0; });
     }, 900);
     return ok;
   }

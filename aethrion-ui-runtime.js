@@ -156,10 +156,16 @@
     window.showNotification('Beta atama alanı bulunamadı; yönetici panelini kontrol edin.', 'warning');
   });
   install('openPollCreator', function () {
-    if (!focusField('pollQuestionInput')) window.showNotification('Anket oluşturma alanı bulunamadı.', 'warning');
+    if (window.__aethrionPanels && typeof window.__aethrionPanels.openFeature === 'function') return window.__aethrionPanels.openFeature('Anketler');
+    if (typeof window.aethrionOpenFeature === 'function') return window.aethrionOpenFeature('Anketler');
+    window.showNotification('Anket paneli henüz hazır değil. Sayfayı yenileyip tekrar deneyin.', 'warning');
+    return false;
   });
   install('openAnnouncementCreator', function () {
-    if (!focusField('announcementTitle')) window.showNotification('Duyuru oluşturma alanı bulunamadı.', 'warning');
+    if (window.__aethrionPanels && typeof window.__aethrionPanels.openFeature === 'function') return window.__aethrionPanels.openFeature('Duyurular');
+    if (typeof window.aethrionOpenFeature === 'function') return window.aethrionOpenFeature('Duyurular');
+    window.showNotification('Duyuru paneli henüz hazır değil. Sayfayı yenileyip tekrar deneyin.', 'warning');
+    return false;
   });
   install('openUserManagement', function () {
     if (typeof window.loadUserList === 'function') window.loadUserList();

@@ -3416,15 +3416,22 @@ try{ if(typeof window.votePoll!=="function"||__OVER.indexOf("votePoll")>=0) wind
 };}catch(e){console.warn("[legacy] votePoll",e);}
 try{ if(typeof window.createPoll!=="function"||__OVER.indexOf("createPoll")>=0) window.createPoll=async function () {
     if (!currentUser || currentUser.get('role') !== 'founder') return showNotification('Sadece kurucu anket oluşturabilir!', 'error');
-    var question = document.getElementById('pollQuestionInput').value.trim();
-    var optionsInputs = document.querySelectorAll('#pollOptionsInputs input');
+    var questionInput = document.getElementById('pollQuestionInput');
+    var optionsHost = document.getElementById('pollOptionsInputs');
+    var durationInput = document.getElementById('pollDuration');
+    if (!questionInput || !optionsHost || !durationInput) {
+        if (window.__aethrionPanels && typeof window.__aethrionPanels.openFeature === 'function') return window.__aethrionPanels.openFeature('Anketler');
+        return showNotification('Anket oluşturma alanı bulunamadı. Anketler panelini açın.', 'warning');
+    }
+    var question = questionInput.value.trim();
+    var optionsInputs = optionsHost.querySelectorAll('input');
     var options = [];
     optionsInputs.forEach(function (inp) {
         var val = inp.value.trim();
         if (val) options.push(val);
     });
     if (!question || options.length < 2) return showNotification('Soru ve en az 2 seçenek girin!', 'error');
-    var duration = parseInt(document.getElementById('pollDuration').value) || 3;
+    var duration = parseInt(durationInput.value, 10) || 3;
     try {
         await Parse.Cloud.run('createPoll', { question: question, options: options, duration: duration });
         showNotification('Anket oluşturuldu!', 'success');
@@ -3452,6 +3459,11 @@ try{ if(typeof window.editPoll!=="function"||__OVER.indexOf("editPoll")>=0) wind
 };}catch(e){console.warn("[legacy] editPoll",e);}
 try{ if(typeof window.addPollOption!=="function"||__OVER.indexOf("addPollOption")>=0) window.addPollOption=function () {
     var container = document.getElementById('pollOptionsInputs');
+    if (!container) {
+        if (window.__aethrionPanels && typeof window.__aethrionPanels.openFeature === 'function') window.__aethrionPanels.openFeature('Anketler');
+        else showNotification('Anket seçenek alanı bulunamadı.', 'warning');
+        return;
+    }
     var input = document.createElement('input');
     input.type = 'text';
     input.placeholder = 'Yeni seçenek';
@@ -3504,14 +3516,20 @@ try{ if(typeof window.addAnnouncement!=="function"||__OVER.indexOf("addAnnouncem
     if (!currentUser || (currentUser.get('role') !== 'admin' && currentUser.get('role') !== 'founder')) {
         return showNotification('Sadece admin ve kurucu duyuru yapabilir!', 'error');
     }
-    var title = document.getElementById('announcementTitle').value.trim();
-    var content = document.getElementById('announcementContent').value.trim();
+    var titleInput = document.getElementById('announcementTitle');
+    var contentInput = document.getElementById('announcementContent');
+    if (!titleInput || !contentInput) {
+        if (window.__aethrionPanels && typeof window.__aethrionPanels.openFeature === 'function') return window.__aethrionPanels.openFeature('Duyurular');
+        return showNotification('Duyuru oluşturma alanı bulunamadı. Duyurular panelini açın.', 'warning');
+    }
+    var title = titleInput.value.trim();
+    var content = contentInput.value.trim();
     if (!title || !content) return showNotification('Başlık ve içerik girin!', 'error');
     try {
         await Parse.Cloud.run('addAnnouncement', { title: title, content: content });
         showNotification('Duyuru yayınlandı!', 'success');
-        document.getElementById('announcementTitle').value = '';
-        document.getElementById('announcementContent').value = '';
+        titleInput.value = '';
+        contentInput.value = '';
         window.loadAnnouncements();
     } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
 };}catch(e){console.warn("[legacy] addAnnouncement",e);}
