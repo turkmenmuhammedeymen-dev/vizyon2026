@@ -127,8 +127,9 @@
     function projectQuery(f) {
       var u = user(); if (!w.Parse || !u) throw new Error('Projeleri görmek için giriş yapmalısın.');
       var q = new w.Parse.Query('Project');
-      q.equalTo('user_email', u.get('email')); q.equalTo('is_archived', f.archived); q.equalTo('is_trashed', f.trashed);
-      if (f.fav) q.equalTo('is_favorite', true);
+      q.equalTo('user_email', u.get('email'));
+      /* Legacy Project rows may not have is_archived/is_trashed fields yet.
+         Fetch the user's bounded set and filter in memory so old projects remain visible. */
       q.descending('createdAt'); q.limit(100);
       return q;
     }
@@ -140,6 +141,15 @@
       list.innerHTML = '<p class="aep-muted">Yükleniyor…</p>';
       var q; try { q = projectQuery(f); } catch (e) { list.innerHTML = empty(msgOf(e)); return; }
       q.find().then(function (rows) {
+        rows = rows.filter(function (p) {
+          var archived = p.get('is_archived') === true;
+          var trashed = p.get('is_trashed') === true;
+          var favorite = p.get('is_favorite') === true;
+          if (filterKey === 'trash') return trashed;
+          if (filterKey === 'arch') return archived && !trashed;
+          if (filterKey === 'fav') return favorite && !archived && !trashed;
+          return !archived && !trashed;
+        });
         if (!rows.length) { list.innerHTML = empty(f.empty); return; }
         list.innerHTML = rows.map(function (p) {
           var t = p.get('type') || '', acts = '';
