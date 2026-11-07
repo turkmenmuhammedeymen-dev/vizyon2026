@@ -515,7 +515,7 @@
   /* ---- Ana giriş: özelliği aç ---- */
   function openFeature(label) {
     var m = meta(label);
-    if (!m) { toast('Bu özellik bulunamadı: ' + label, 'warning'); return; }
+    if (!m) { toast('Bu özellik bulunamadı: ' + label, 'warning'); return false; }
     var action = m[4];
     if (action === 'doLogout') {
       if (typeof w.logout === 'function') return w.logout();
@@ -543,10 +543,11 @@
       /* Hiçbir panel açılamadıysa boş ekran bırakma: karşılama ekranına dön ve söyle. */
       showHome();
       toast('"' + label + '" paneli şu anda açılamadı.', 'warning');
-      return;
+      return false;
     }
     state.label = label;
     d.body.classList.add('aep-panel-on');
+    return true;
   }
 
   /* ---- Tıklamalar (yakalama aşamasında; eski yönlendiricilerden önce) ---- */
