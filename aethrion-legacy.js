@@ -3534,6 +3534,19 @@ try{ if(typeof window.editAnnouncement!=="function"||__OVER.indexOf("editAnnounc
         window.loadAnnouncements();
     } catch (e) { showNotification('Hata: ' + e.message, 'error'); }
 };}catch(e){console.warn("[legacy] editAnnouncement",e);}
+/* Public homepage sections must load for visitors too; the dashboard call above only runs after sign-in. */
+(function bootPublicCommunitySections() {
+    function refreshPublicSections() {
+        try { if (typeof window.loadPoll === 'function') window.loadPoll(); } catch (e) { console.warn('[AETHRION] Public poll refresh failed:', e); }
+        try { if (typeof window.loadAnnouncements === 'function') window.loadAnnouncements(); } catch (e) { console.warn('[AETHRION] Public announcement refresh failed:', e); }
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', refreshPublicSections, { once: true });
+    } else {
+        refreshPublicSections();
+    }
+    window.addEventListener('aethrion:authenticated', refreshPublicSections);
+})();
 try{ if(typeof window.loadCourses!=="function"||__OVER.indexOf("loadCourses")>=0) window.loadCourses=async function () {
     try {
         var result = await Parse.Cloud.run('getCourses', {});
