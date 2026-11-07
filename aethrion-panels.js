@@ -307,7 +307,7 @@
      bildirim/gelen kutusu gibi ilgisiz pencereler de görünür olabiliyordu. */
   var OPEN_TARGETS = {
     openFullAIPanel: ['#fullAIPanel', '#aethrionAiPanel'],
-    openAethrionAlPanel: ['#vizyonAlPanel', '#aethrionAlPanel'],
+    openAethrionAlPanel: ['#vizyonAlPanel', '#aethrionAlPanel', '#fullAIPanel', '#aethrionAiPanel'],
     openAethrionAgentsPanel: ['#vizyonAlPanel', '#aethrionAlPanel'],
     openPersonalAssistant: ['#fullAIPanel', '#aethrionAiPanel'],
     openKocPanel: ['#kocPanelOverlay'],
