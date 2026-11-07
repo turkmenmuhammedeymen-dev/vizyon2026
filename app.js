@@ -2055,7 +2055,6 @@ var CORE=[
 ['PLATFORM','💬','Yorumlar ve Topluluk','Topluluk yorumları ve etkileşim','toggleTeamPage','./topluluk.html'],
 ['PLATFORM','👥','Takım','Takım kur, koda katıl, sohbet et ve ortak görevleri yap','',''],
 ['PLATFORM','✅','Günlük ve Sosyal Görevler','Günlük/sosyal görevler ve günlük seri ödülü','',''],
-['PLATFORM','🔔','Bildirimler','Hesap bildirimlerini görüntüle','toggleNotificationPanel',''],
 ['PLATFORM','📩','Destek Merkezi','AETHRION destek kanalı','openVizyonSupport',''],
 ['PLATFORM','📥','Uygulamayı İndir','Desteklenen uygulama indirme seçenekleri','showDownloadOptions',''],
 ['GELİŞTİRİCİ','📊','Logs Sistemi','Pro, Team, Admin, Beta, Moderatör ve Kurucu erişimli sistem kayıtları','openLogsPanel','','','logs'],
@@ -2079,7 +2078,24 @@ var CORE=[
 function q(s,r){return(r||document).querySelector(s)}function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function logged(){try{return!!((window.Parse&&Parse.User&&Parse.User.current())||window.currentUser||document.body.classList.contains('logged-in-user'))}catch(e){return document.body.classList.contains('logged-in-user')}}
 function uname(){try{var u=window.currentUser||(window.Parse&&Parse.User&&Parse.User.current());return(u&&(u.get('name')||u.get('username_display')||u.get('email')))||'AETHRION Üyesi'}catch(e){return'AETHRION Üyesi'}}
-function accessInfo(){var u=window.currentUser||(window.Parse&&window.Parse.User&&window.Parse.User.current());var get=function(k){try{return u&&typeof u.get==='function'?u.get(k):(u&&u[k])||''}catch(e){return''}};var saved={};try{saved=JSON.parse(localStorage.getItem('aethrion_user')||'{}')||{}}catch(e){};var role=String(get('role')||get('accountRole')||saved.role||saved.accountRole||'member').toLowerCase().replace(/[ _-]+/g,'');var plan=String(get('plan')||get('subscriptionPlan')||get('package')||get('subscription')||saved.plan||saved.subscriptionPlan||saved.package||'free').toLowerCase().replace(/[ _-]+/g,'');return{role:role,plan:plan,founder:get('isFounder')===true||saved.isFounder===true,admin:get('isAdmin')===true||saved.isAdmin===true,moderator:get('isModerator')===true||saved.isModerator===true,beta:get('isBeta')===true||saved.isBeta===true}}function canSee(item){var gate=String(item[7]||'');if(!gate)return true;var a=accessInfo(),r=a.role,p=a.plan;var founder=a.founder||r==='founder'||r==='owner';var admin=founder||a.admin||r==='admin'||r==='superadmin';var moderator=admin||a.moderator||r==='moderator';var beta=admin||a.beta||r==='beta';if(gate==='founder')return founder;if(gate==='admin')return admin;if(gate==='moderator')return moderator;if(gate==='beta')return beta;if(gate==='team')return /team|takim|takimuyeligi/.test(p)||admin||moderator||beta;if(gate==='pro')return /pro|team|takim|takimuyeligi/.test(p)||admin||moderator||beta;if(gate==='logs')return /pro|team|takim|takimuyeligi/.test(p)||admin||moderator||beta;return false}function features(){var out=CORE.filter(canSee),src=Array.isArray(window.FEATURE_LIST)?window.FEATURE_LIST:[];src.forEach(function(x){if(!x)return;var n=String(x.name||x.title||'');if(!n||out.some(function(a){return a[2].toLocaleLowerCase('tr-TR')===n.toLocaleLowerCase('tr-TR')}))return;var item=[String(x.group||'DİĞER'),String(x.icon||'✦'),n,String(x.desc||x.description||'Çalışma alanını aç'),String(x.action||x.onclick||''),String(x.href||x.url||''),String(x.arg||''),String(x.access||x.role||x.plan||'')];if(canSee(item))out.push(item)});window.__aethrionWorkspaceMenuFeatures=out;return out}
+function accessInfo(){var u=window.currentUser||(window.Parse&&window.Parse.User&&window.Parse.User.current());var get=function(k){try{return u&&typeof u.get==='function'?u.get(k):(u&&u[k])||''}catch(e){return''}};var saved={};try{saved=JSON.parse(localStorage.getItem('aethrion_user')||'{}')||{}}catch(e){};var role=String(get('role')||get('accountRole')||saved.role||saved.accountRole||'member').toLowerCase().replace(/[ _-]+/g,'');var plan=String(get('plan')||get('subscriptionPlan')||get('package')||get('subscription')||saved.plan||saved.subscriptionPlan||saved.package||'free').toLowerCase().replace(/[ _-]+/g,'');return{role:role,plan:plan,founder:get('isFounder')===true||saved.isFounder===true,admin:get('isAdmin')===true||saved.isAdmin===true,moderator:get('isModerator')===true||saved.isModerator===true,beta:get('isBeta')===true||saved.isBeta===true}}function canSee(item){var gate=String(item[7]||'');if(!gate)return true;var a=accessInfo(),r=a.role,p=a.plan;var founder=a.founder||r==='founder'||r==='owner';var admin=founder||a.admin||r==='admin'||r==='superadmin';var moderator=admin||a.moderator||r==='moderator';var beta=admin||a.beta||r==='beta';if(gate==='founder')return founder;if(gate==='admin')return admin;if(gate==='moderator')return moderator;if(gate==='beta')return beta;if(gate==='team')return /team|takim|takimuyeligi/.test(p)||admin||moderator||beta;if(gate==='pro')return /pro|team|takim|takimuyeligi/.test(p)||admin||moderator||beta;if(gate==='logs')return /pro|team|takim|takimuyeligi/.test(p)||admin||moderator||beta;return false}function features(){
+var out=[],seen=Object.create(null),src=Array.isArray(window.FEATURE_LIST)?window.FEATURE_LIST:[];
+function add(item){
+ if(!item||!item[2]||!canSee(item))return;
+ var key=String(item[2]).trim().toLocaleLowerCase('tr-TR');
+ if(!key||seen[key])return;
+ seen[key]=true;out.push(item);
+}
+CORE.forEach(add);
+src.forEach(function(x){
+ if(!x)return;
+ var n=String(x.name||x.title||'').trim();if(!n)return;
+ var item=[String(x.group||'DİĞER'),String(x.icon||'✦'),n,String(x.desc||x.description||'Çalışma alanını aç'),String(x.action||x.onclick||''),String(x.href||x.url||''),String(x.arg||''),String(x.access||x.role||x.plan||'')];
+ add(item);
+});
+window.__aethrionWorkspaceMenuFeatures=out;
+return out
+}
 function navRender(filter){
 var nav=q('#aewsNav');if(!nav)return;
 var f=String(filter||'').toLocaleLowerCase('tr-TR'),groups={};
