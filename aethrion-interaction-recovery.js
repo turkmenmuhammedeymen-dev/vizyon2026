@@ -107,9 +107,9 @@
       header.insertBefore(p, header.lastElementChild || null);
     }
     if (result && result.remaining !== undefined) {
-      p.textContent = result.remaining === 'Sınırsız' ? 'Günlük hak: Sınırsız' : 'Günlük kalan: ' + result.remaining + '/' + (result.limit || 24);
+      p.textContent = result.remaining === 'Sınırsız' ? 'Günlük hak: Sınırsız' : 'Günlük kalan: ' + result.remaining + '/' + (result.limit || 100);
     } else {
-      p.textContent = 'Ücretsiz: 24 mesaj/gün';
+      p.textContent = 'Ücretsiz: 100 mesaj/gün';
     }
   }
   async function ensureParse() {

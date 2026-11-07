@@ -2438,7 +2438,7 @@ Parse.Cloud.define("aethrionChat", async function (request) {
     var role = user ? String(user.get('role') || 'user').toLowerCase() : 'visitor';
     var plan = user ? String(user.get('plan') || 'free').toLowerCase() : 'free';
     var unlimited = ['admin', 'founder', 'moderator'].indexOf(role) !== -1 || plan === 'team';
-    var limit = unlimited ? -1 : (plan === 'pro' ? 2000 : (user ? 24 : 5)); // giriş yapmamış ziyaretçi: günde 5
+    var limit = unlimited ? -1 : (plan === 'pro' ? 2000 : (user ? 100 : 25)); // ziyaretçi günde 25, üye günde 100 (eski kod)
     var identity = user ? String(user.get('email') || user.id) : String(request.ip || request.installationId || '');
     if (!identity) return { success: false, error: 'Ziyaretçi kimliği belirlenemedi. Sayfayı yenileyip tekrar deneyin.' };
 
@@ -2534,7 +2534,7 @@ Parse.Cloud.define("getAethrionAIQuota", async function (request) {
     var role = user ? String(user.get('role') || 'user').toLowerCase() : 'visitor';
     var plan = user ? String(user.get('plan') || 'free').toLowerCase() : 'free';
     var unlimited = ['admin', 'founder', 'moderator'].indexOf(role) !== -1 || plan === 'team';
-    var limit = unlimited ? 'Sınırsız' : (plan === 'pro' ? 2000 : (user ? 24 : 5));
+    var limit = unlimited ? 'Sınırsız' : (plan === 'pro' ? 2000 : (user ? 100 : 25));
     var identity = user ? String(user.get('email') || user.id) : String(request.ip || request.installationId || '');
     if (!identity) return { success: false, error: 'Kullanım hakkı kontrol edilemedi.' };
 

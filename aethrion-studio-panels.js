@@ -940,6 +940,61 @@
       return true;
     }
 
+    /* ======================================================================
+     *  DAVET LİDERLİK TABLOSU + ANKETLER
+     * ==================================================================== */
+    function buildReferral(label, m) {
+      styles();
+      var body = open(label, m, 'Davet kodun, davet edenlerin sıralaması ve kod kullanma');
+      body.innerHTML = '<div class="aes-wrap"><div class="aep-card"><h3>🎁 Davet kodun</h3><div class="aes-3col"><div class="aes-stat"><b id="aesRfCode">—</b><span>Kodun</span></div></div>' +
+        '<div class="aep-row"><button type="button" class="aep-btn aep-primary" id="aesRfGen">Kodumu göster / oluştur</button><button type="button" class="aep-btn" id="aesRfCopy">Kopyala</button></div>' +
+        '<label class="aes-field">Bir davet kodu kullan<input id="aesRfIn" maxlength="30"></label><div class="aep-row"><button type="button" class="aep-btn" id="aesRfApply">Kodu kullan</button></div></div>' +
+        '<div class="aep-card"><h3>🏅 Liderlik tablosu</h3><div class="aep-list" id="aesRfList"><p class="aep-muted">Yükleniyor…</p></div></div></div>';
+      call('getReferralLeaderboard').then(function (r) {
+        var it = Array.isArray(r) ? r : (r && (r.leaderboard || r.items || r.users)) || [];
+        $('#aesRfList', body).innerHTML = it.length ? it.map(function (x, i) {
+          return '<div class="aep-item"><span class="aep-item-name">#' + esc(x.rank || i + 1) + ' ' + esc(x.name || 'İsimsiz') + '</span><span class="aes-pill">' + esc(x.count || 0) + ' davet</span></div>';
+        }).join('') : empty('Henüz sıralama yok.');
+      }, function (e) { $('#aesRfList', body).innerHTML = empty('Sıralama yüklenemedi: ' + msgOf(e)); });
+      $('#aesRfGen', body).addEventListener('click', function () {
+        if (!user()) { err('Giriş yapmalısın.'); return; }
+        busyBtn(this, call('generateReferralCode')).then(function (r) { $('#aesRfCode', body).textContent = (r && r.referral_code) || '—'; }, function (e) { err(msgOf(e)); });
+      });
+      $('#aesRfCopy', body).addEventListener('click', function () {
+        var c = $('#aesRfCode', body).textContent; if (!c || c === '—') { err('Önce kodunu oluştur.'); return; }
+        try { navigator.clipboard.writeText(c).then(function () { note('Kod kopyalandı.'); }); } catch (_) { err('Kopyalanamadı.'); }
+      });
+      $('#aesRfApply', body).addEventListener('click', function () {
+        if (!user()) { err('Giriş yapmalısın.'); return; }
+        var c = $('#aesRfIn', body).value.trim(); if (!c) { err('Kod gir.'); return; }
+        busyBtn(this, call('applyReferral', { code: c })).then(function (r) { note((r && r.message) || 'Kod uygulandı.'); }, function (e) { err(msgOf(e)); });
+      });
+      return true;
+    }
+    function buildPolls(label, m) {
+      styles();
+      var body = open(label, m, 'Aktif topluluk anketi');
+      body.innerHTML = '<div class="aes-wrap"><div class="aep-card"><h3>🗳️ Anket</h3><div id="aesPl"><p class="aep-muted">Yükleniyor…</p></div></div></div>';
+      function load() {
+        call('getActivePoll').then(function (p) {
+          var box = $('#aesPl', body);
+          if (!p) { box.innerHTML = empty('Şu an aktif anket yok.'); return; }
+          var opts = p.options || [], votes = p.votes || [], total = votes.reduce(function (a, b) { return a + (Number(b) || 0); }, 0);
+          box.innerHTML = '<h4 style="margin:0 0 10px;color:#10243a">' + esc(p.question) + '</h4><div class="aep-list">' + opts.map(function (o, i) {
+            var v = Number(votes[i]) || 0, pc = total ? Math.round(v * 100 / total) : 0;
+            return '<div class="aep-item"><span class="aep-item-name">' + esc(o) + ' <span class="aes-pill">' + v + ' oy · %' + pc + '</span></span><button type="button" class="aep-btn" data-i="' + i + '">Oy ver</button></div>';
+          }).join('') + '</div>' + (p.end_date ? '<p class="aep-muted">Bitiş: ' + esc(fdate(p.end_date)) + '</p>' : '');
+        }, function (e) { $('#aesPl', body).innerHTML = empty('Anket yüklenemedi: ' + msgOf(e)); });
+      }
+      $('#aesPl', body).addEventListener('click', function (ev) {
+        var b = ev.target.closest('button[data-i]'); if (!b) return;
+        if (!user()) { err('Oy vermek için giriş yapmalısın.'); return; }
+        busyBtn(b, call('votePoll', { optionIndex: Number(b.getAttribute('data-i')) })).then(function () { note('Oyun kaydedildi.'); load(); }, function (e) { err(msgOf(e)); });
+      });
+      load();
+      return true;
+    }
+
     /* ---------- kayıt ---------- */
     var B = P.builtin;
     B['3D Studio'] = build3D;
@@ -953,6 +1008,8 @@
     B['Yorumlar ve Topluluk'] = buildCommunity;
     B['Duyurular'] = buildCommunity;
     B['Aylık Yarışma'] = buildContest;
+    B['Davet Liderlik Tablosu'] = buildReferral;
+    B['Anketler'] = buildPolls;
     B['Kod Editörü'] = buildCode;
     B['A27 API Anahtarı'] = buildApiKeys;
     B['Beta API Yönetimi'] = buildApiKeys;
