@@ -950,7 +950,6 @@
     B['AETHRION Akademi'] = buildAcademy;
     B['Puan Mağazası + Cüzdan'] = buildStore;
     B['Günlük ve Sosyal Görevler'] = buildTasks;
-    B['Gelen Kutusu'] = buildInbox;
     B['Yorumlar ve Topluluk'] = buildCommunity;
     B['Duyurular'] = buildCommunity;
     B['Aylık Yarışma'] = buildContest;

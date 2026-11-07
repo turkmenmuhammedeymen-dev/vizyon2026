@@ -50,10 +50,10 @@
   /* Bu özellikler için uygulamanın kendi kapatma fonksiyonları (varsa). */
   var CLOSERS = ['closeJarvisMode', 'closeVideoEditor', 'closeModelsShowcase', 'closeJobMarket', 'closeJobCreateForm',
     'closeJobDetail', 'closeCategoryPanel', 'closeKocPanel', 'closeVizyonAlPanel', 'closeAethrionAlPanel', 'closeContestPage',
-    'closeMarket', 'closeVoiceChatFullscreen', 'closeNotificationPanel', 'closeSettingsModal'];
+    'closeMarket', 'closeVoiceChatFullscreen', 'closeNotificationPanel', 'closeSettingsModal', 'closeAethrionInbox'];
   var OVERLAY_SELECTORS = '#vizyonAlPanel,#vizyonAlBackdrop,#aaVoiceFullscreen,#videoEditorOverlay,#modelsShowcaseOverlay,' +
     '#aethrionJarvisOverlay,#jobMarketOverlay,#jobCreateOverlay,#jobDetailOverlay,#categoryPanelModal,#kocPanelOverlay,' +
-    '#vizyonSupportPanel,#teamPage,#fullAIPanel,#contestPage,#marketModal,#downloadModal,#aethrionNotificationPanel,#settingsModal,#moderatorVideoToolModal,#aethrionAccountProfileModal,#profileModal';
+    '#vizyonSupportPanel,#teamPage,#fullAIPanel,#contestPage,#marketModal,#downloadModal,#aethrionNotificationPanel,#aethrionInboxPanel,#settingsModal,#moderatorVideoToolModal,#aethrionAccountProfileModal,#profileModal';
 
   function $(s, r) { return (r || d).querySelector(s); }
   function $$(s, r) { return Array.prototype.slice.call((r || d).querySelectorAll(s)); }
