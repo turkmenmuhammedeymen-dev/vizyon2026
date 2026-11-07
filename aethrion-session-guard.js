@@ -1,7 +1,7 @@
 /* AETHRION — oturum koruyucu
  * 1) Giriş yapılınca sayfa yenilemeden menü + çalışma alanı kurulmazsa sayfa bir kez otomatik yenilenir
  *    (oturum Parse tarafından saklandığı için kullanıcı giriş yapmış olarak açılır).
- * 2) Giriş yapmamış ziyaretçi için AI: günde 5 mesaj (giriş yapan ücretsiz kullanıcı: 24). Sınır dolunca giriş istenir.
+ * 2) Giriş yapmamış ziyaretçi için AI: günde 25 mesaj (giriş yapan ücretsiz kullanıcı: 100). Sınır dolunca giriş istenir.
  *    Sunucu tarafı sınırı back4app/main.js (aethrionChat) içinde ayrıca uygulanır.
  */
 (function (w, d) {
@@ -9,7 +9,7 @@
   if (w.__aethrionSessionGuard) return;
   w.__aethrionSessionGuard = true;
 
-  var GUEST_LIMIT = 5;
+  var GUEST_LIMIT = 25;
 
   function who() {
     try {
