@@ -100,7 +100,8 @@
         S + '.a3d-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}',
         S + '.a3d-bar textarea{flex:1 1 280px;min-height:46px;max-height:120px;padding:11px 13px;border-radius:12px;border:1px solid rgba(255,255,255,.2)!important;background:rgba(255,255,255,.08)!important;color:#fff!important;font:500 14px Inter,system-ui,sans-serif;resize:vertical}',
         S + '.a3d-bar textarea::placeholder{color:#8ea4bd}',
-        S + '.a3d-shapes{display:flex;gap:6px;flex-wrap:wrap}',
+        S + '.a3d-shapes{display:flex;gap:6px;flex-wrap:wrap;max-height:190px;overflow:auto;padding:6px;border:1px solid rgba(255,255,255,.1);border-radius:10px}',
+        S + '.a3d-shape-search{flex:1 1 100%;min-width:0;padding:10px 12px;border:1px solid rgba(255,255,255,.16);border-radius:10px;background:#0b1424;color:#eef4fb;font:500 13px Inter,system-ui,sans-serif}',
         S + '.a3d-side{display:flex;flex-direction:column;gap:12px;min-width:0}',
         S + '.a3d-box{border:1px solid rgba(255,255,255,.12);background:#101a2e;border-radius:14px;padding:12px}',
         S + '.a3d-box h4{margin:0 0 8px;font:800 14px Inter,system-ui,sans-serif;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:8px}',
@@ -351,6 +352,38 @@
       'Düğüm': function (T) { return new T.TorusKnotGeometry(.4, .14, 80, 12); },
       'Düzlem': function (T) { return new T.BoxGeometry(2, .06, 2); }
     };
+    /* 90+ gerçek geometrik varyant: Three.js primitive'leriyle yerel katalog.
+       Bunlar AI servisi kullanılamasa bile sahnede doğrudan oluşturulabilir. */
+    for (var sides = 3; sides <= 18; sides++) {
+      (function (n) {
+        SHAPES['Prizma ' + n + ' Kenar'] = function (T) { return new T.CylinderGeometry(.62, .62, 1, n, 1, false); };
+        SHAPES['Piramit ' + n + ' Kenar'] = function (T) { return new T.ConeGeometry(.66, 1, n, 1, false); };
+      })(sides);
+    }
+    for (var sphereSegments = 8; sphereSegments <= 30; sphereSegments += 2) {
+      (function (n) {
+        SHAPES['Küre ' + n + ' Segment'] = function (T) { return new T.SphereGeometry(.62, n, Math.max(6, Math.floor(n * .75))); };
+      })(sphereSegments);
+    }
+    for (var torusVariant = 0; torusVariant < 10; torusVariant++) {
+      (function (n) {
+        SHAPES['Torus Varyant ' + (n + 1)] = function (T) { return new T.TorusGeometry(.34 + n * .035, .06 + n * .009, 8 + n, 24 + n * 4); };
+      })(torusVariant);
+      (function (n) {
+        SHAPES['Düğüm Varyant ' + (n + 1)] = function (T) { return new T.TorusKnotGeometry(.36, .07 + n * .012, 48 + n * 8, 6 + n, 2 + (n % 4), 3 + (n % 5)); };
+      })(torusVariant);
+    }
+    for (var boxVariant = 0; boxVariant < 12; boxVariant++) {
+      (function (n) {
+        SHAPES['Dikdörtgen Kutu ' + (n + 1)] = function (T) { return new T.BoxGeometry(.55 + n * .07, .65 + ((n * 3) % 7) * .12, .5 + ((n * 5) % 9) * .09); };
+      })(boxVariant);
+    }
+    for (var flatVariant = 0; flatVariant < 4; flatVariant++) {
+      (function (n) {
+        SHAPES['Halka Plaka ' + (n + 1)] = function (T) { return new T.RingGeometry(.18 + n * .04, .55 + n * .05, 20 + n * 8); };
+        SHAPES['Düzlem ' + (n + 1)] = function (T) { return new T.PlaneGeometry(1 + n * .25, .8 + n * .2, 1 + n, 1 + n); };
+      })(flatVariant);
+    }
     function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
     function rng(seed) { var a = seed || 1; return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
     /* Açıklamaya göre ilkellerden oluşan model tarifleri: [şekil, renk, x,y,z, sx,sy,sz, rx,ry,rz] */
@@ -375,14 +408,14 @@
 
     function build3D(label, m) {
       styles();
-      var body = open(label, m, 'Yazıdan 3D model üret, şekillerle sahne kur, kaydet ve GLB olarak indir');
+      var body = open(label, m, '94+ şekil kütüphanesi · Yazıdan 3D model oluştur · Projelerini kaydet ve GLB indir');
       var u = user();
       body.innerHTML =
         '<div class="a3d"><div class="a3d-main">' +
         '<div class="a3d-bar"><textarea id="a3dPrompt" maxlength="400" placeholder="Ne üretmek istiyorsun? Örn. kırmızı araba, uzay roketi, ağaç, robot, ev…"></textarea>' +
         '<button type="button" class="aep-btn aep-primary" id="a3dGen">✨ 3D Oluştur</button></div>' +
         '<div class="a3d-view" id="a3dView"><div class="a3d-hud" id="a3dHud">Sürükle: döndür · Tekerlek: yakınlaştır</div></div>' +
-        '<div class="a3d-bar"><div class="a3d-shapes" id="a3dShapes"></div></div>' +
+        '<div class="a3d-bar"><input class="a3d-shape-search" id="a3dShapeSearch" type="search" placeholder="94+ şekil içinde ara…" aria-label="Şekil ara"><div class="a3d-shapes" id="a3dShapes"></div></div>' +
         '<div class="a3d-bar"><input type="color" id="a3dColor" value="#3d86ff" title="Yeni şekil rengi" aria-label="Renk">' +
         '<button type="button" class="aep-btn" id="a3dSpin">⟳ Otomatik döndür</button>' +
         '<button type="button" class="aep-btn" id="a3dWire">▦ Tel kafes</button>' +
@@ -458,7 +491,7 @@
       function addParts(parts) {
         parts.forEach(function (p) { addShape(p[0], p[1], [p[2], p[3], p[4]], [p[5], p[6], p[7]], [p[8] || 0, p[9] || 0, p[10] || 0]); });
       }
-      var shapesBox = $('#a3dShapes', body);
+      var shapesBox = $('#a3dShapes', body), shapeSearch = $('#a3dShapeSearch', body), shapeButtons = [];
       Object.keys(SHAPES).forEach(function (n) {
         var b = d.createElement('button'); b.type = 'button'; b.className = 'aep-btn'; b.textContent = '＋ ' + n;
         b.addEventListener('click', function () {
@@ -467,7 +500,13 @@
           setState(n + ' eklendi (' + shapesLog.length + ' şekil).');
         });
         shapesBox.appendChild(b);
+        shapeButtons.push({ name: n.toLocaleLowerCase('tr-TR'), button: b });
       });
+      if (shapeSearch) shapeSearch.addEventListener('input', function () {
+        var term = String(shapeSearch.value || '').toLocaleLowerCase('tr-TR').trim();
+        shapeButtons.forEach(function (entry) { entry.button.hidden = !!term && entry.name.indexOf(term) === -1; });
+      });
+      setState(Object.keys(SHAPES).length + ' şekil hazır.');
       $('#a3dSpin', body).addEventListener('click', function () { spin = !spin; setState(spin ? 'Otomatik döndürme açık.' : 'Otomatik döndürme kapalı.'); });
       $('#a3dWire', body).addEventListener('click', function () { wire = !wire; group.traverse(function (o) { if (o.material) o.material.wireframe = wire; }); });
       $('#a3dUndo', body).addEventListener('click', function () {
