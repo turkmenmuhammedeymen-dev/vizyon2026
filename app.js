@@ -2238,6 +2238,81 @@ function renderHomeCatalog(w){
   document.head.appendChild(style);
  }
 }
+function renderHomeCommunity(welcomeNode, forceRefresh){
+ if(!welcomeNode)return;
+ var host=document.getElementById('aewHomeCommunity');
+ if(!host){
+  host=document.createElement('section');
+  host.id='aewHomeCommunity';
+  host.className='aew-home-community';
+  host.innerHTML='<div class="aew-home-community-head"><div><span>TOPLULUK</span><h2>Duyurular ve anket</h2><p>Platformdaki güncel gelişmeleri tek yerde takip edin.</p></div></div><div class="aew-home-community-grid"><section class="aew-home-community-card"><div class="aew-home-community-card-head"><h3>🗳️ Aktif anket</h3><button type="button" data-aews-feature="Anketler">Anketlere git ↗</button></div><div id="aewHomePoll" class="aew-home-community-content">Anket bilgisi yükleniyor…</div></section><section class="aew-home-community-card"><div class="aew-home-community-card-head"><h3>📢 Son duyurular</h3><button type="button" data-aews-feature="Duyurular">Tüm duyurular ↗</button></div><div id="aewHomeAnnouncements" class="aew-home-community-content">Duyurular yükleniyor…</div></section></div>';
+  var catalog=document.getElementById('aewHomeCatalog');
+  if(catalog&&catalog.parentNode)catalog.parentNode.insertBefore(host,catalog.nextSibling);
+  else welcomeNode.appendChild(host);
+ }
+ if(!document.getElementById('aewHomeCommunityStyles')){
+  var style=document.createElement('style');
+  style.id='aewHomeCommunityStyles';
+  style.textContent='.aew-home-community{width:100%;max-width:1180px;margin:32px auto 44px;text-align:left}.aew-home-community-head{margin-bottom:14px}.aew-home-community-head>div>span{font:700 11px Inter,system-ui,sans-serif;letter-spacing:.16em;color:#c4a34b}.aew-home-community-head h2{margin:6px 0;color:var(--text,#f4f6fb);font:800 23px Inter,system-ui,sans-serif}.aew-home-community-head p{margin:0;color:var(--text3,#9ca3af);font:500 13px/1.5 Inter,system-ui,sans-serif}.aew-home-community-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.aew-home-community-card{min-width:0;padding:18px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:16px;background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.015))}.aew-home-community-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.aew-home-community-card-head h3{margin:0;color:var(--text,#f4f6fb);font:700 15px Inter,system-ui,sans-serif}.aew-home-community-card-head button{border:1px solid rgba(217,189,105,.4);border-radius:9px;padding:7px 10px;background:rgba(217,189,105,.08);color:var(--accent,#d9bd69);font:700 11px Inter,system-ui,sans-serif;cursor:pointer}.aew-home-community-content{margin-top:13px;color:var(--text2,#c7cfdd);font:500 13px/1.6 Inter,system-ui,sans-serif}.aew-home-community-item{padding:9px 0;border-top:1px solid var(--border,rgba(255,255,255,.1));overflow-wrap:anywhere}.aew-home-community-item:first-child{border-top:0;padding-top:0}.aew-home-community-item strong{display:block;color:var(--text,#f4f6fb);font-size:13px}.aew-home-community-item small{display:block;color:var(--text3,#9ca3af);font-size:11px}.aew-home-poll-option{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border,rgba(255,255,255,.08))}.aew-home-poll-option:last-child{border-bottom:0}@media(max-width:760px){.aew-home-community-grid{grid-template-columns:1fr}.aew-home-community-head h2{font-size:20px}}';
+  document.head.appendChild(style);
+ }
+ var pollHost=document.getElementById('aewHomePoll');
+ var announcementsHost=document.getElementById('aewHomeAnnouncements');
+ if(host.getAttribute('data-loading')==='1')return;
+ var last=Number(host.getAttribute('data-updated-at')||0);
+ if(!forceRefresh&&Date.now()-last<30000)return;
+ if(!window.Parse||!window.Parse.Cloud||typeof window.Parse.Cloud.run!=='function'){
+  if(pollHost)pollHost.textContent='Anket bilgisi şu anda alınamıyor.';
+  if(announcementsHost)announcementsHost.textContent='Duyurular şu anda alınamıyor.';
+  return;
+ }
+ host.setAttribute('data-loading','1');
+ Promise.all([
+  window.Parse.Cloud.run('getActivePoll',{}),
+  window.Parse.Cloud.run('getAnnouncements',{})
+ ]).then(function(results){
+  var poll=results[0],announcements=Array.isArray(results[1])?results[1]:[];
+  if(pollHost){
+   pollHost.textContent='';
+   if(!poll||!poll.question){
+    pollHost.textContent='Şu anda aktif anket yok.';
+   }else{
+    var question=document.createElement('strong');question.textContent=String(poll.question);pollHost.appendChild(question);
+    var options=Array.isArray(poll.options)?poll.options:[],votes=Array.isArray(poll.votes)?poll.votes:[];
+    var total=votes.reduce(function(sum,value){return sum+(Number(value)||0)},0);
+    options.forEach(function(option,index){
+     var count=Number(votes[index])||0,percent=total?Math.round(count*100/total):0;
+     var line=document.createElement('div');line.className='aew-home-poll-option';
+     var name=document.createElement('span');name.textContent=String(option);
+     var result=document.createElement('strong');result.textContent=percent+'% · '+count+' oy';
+     line.appendChild(name);line.appendChild(result);pollHost.appendChild(line);
+    });
+    var note=document.createElement('small');note.textContent=total+' oy kullanıldı. Oy vermek için Anketler panelini açın.';note.style.display='block';note.style.marginTop='8px';note.style.color='var(--text3,#9ca3af)';pollHost.appendChild(note);
+   }
+  }
+  if(announcementsHost){
+   announcementsHost.textContent='';
+   if(!announcements.length){
+    announcementsHost.textContent='Henüz duyuru yayınlanmadı.';
+   }else{
+    announcements.slice(0,3).forEach(function(item){
+     var row=document.createElement('div');row.className='aew-home-community-item';
+     var title=document.createElement('strong');title.textContent=String(item.title||'Duyuru');
+     var content=document.createElement('div');content.textContent=String(item.content||'');
+     content.style.whiteSpace='pre-wrap';content.style.marginTop='4px';
+     var date=document.createElement('small');date.textContent=item.createdAt?new Date(item.createdAt).toLocaleString('tr-TR'):'';
+     row.appendChild(title);row.appendChild(content);row.appendChild(date);announcementsHost.appendChild(row);
+    });
+   }
+  }
+  host.setAttribute('data-updated-at',String(Date.now()));
+ }).catch(function(error){
+  if(pollHost)pollHost.textContent='Anket bilgisi yüklenemedi.';
+  if(announcementsHost)announcementsHost.textContent='Duyurular yüklenemedi.';
+  console.warn('[AETHRION] Ana ekran topluluk özeti yüklenemedi:',error);
+ }).then(function(){host.removeAttribute('data-loading')});
+}
+window.refreshAethrionHomeCommunity=function(){var welcome=document.getElementById('aethrionExperienceWelcome');if(welcome)renderHomeCommunity(welcome,true)};
 function customWelcome(){
  if(!logged()||document.body.classList.contains('aews-feature-view'))return;
  document.body.classList.add('ae-shell-on','logged-in-user');
@@ -2256,6 +2331,7 @@ function customWelcome(){
  });
  w.style.setProperty('display','block','important');
  renderHomeCatalog(w);
+ renderHomeCommunity(w);
  var main=q('#mainSite');if(main)main.style.setProperty('display','none','important');
  var n=q('#aewsUserName');if(n)n.textContent=userName();
  var av=q('#aewsAvatar');if(av)av.textContent=userName().slice(0,1).toUpperCase();
