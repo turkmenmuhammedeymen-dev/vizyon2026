@@ -2039,7 +2039,7 @@ var CORE=[
 ['ADMIN','👥','Admin Takım Yönetimi','Takım ve üye yönetimi','','./aethrion-teams.html','','admin'],
 ['ADMIN','📋','Admin Logs Paneli','Sistem olayları ve kayıtlar','','./aethrion-status.html','','admin'],
 ['MODERATÖR','🎬','Video Kesit Aracı','Moderatör video kesit ve analiz aracı','openModeratorVideoTool','','','moderator'],
-['MODERATÖR','📨','Proje Talepleri','Moderatör, Admin ve Kurucuya atanmış proje taleplerini yönet','openProjectRequestsPanel','','','moderator'],
+['MODERATÖR','📨','Proje Talepleri','Moderatör, Admin ve Kurucuya atanmış proje taleplerini yönet','','','','moderator'],
 ['BETA','⚡','Beta Model Erişimi','Beta üyelerine tanımlı gelişmiş model erişimi','openModelsShowcase','','','beta'],
 ['BETA','🔑','Beta API Yönetimi','Beta üyelerine tanımlı API erişimi','openA27ApiKeyGenerator','./aethrion-developer.html','','beta'],
 ['TEAM PAKETİ','👥','Team Ortak Çalışma','Takım sohbeti, üyeler, roller ve ortak proje alanı','openTeamWorkspace','./aethrion-teams.html','','team'],
@@ -2116,6 +2116,8 @@ function callAction(action,label,arg){var aliases={openKocPanel:['openKocPanel',
 function openFeature(label){
  /* The v6 click dispatcher runs before the legacy bubble handler. Delegate to the canonical in-page panel router first so built-in panels never fall through to stale external-page routes. */
  if(window.__aethrionPanels&&typeof window.__aethrionPanels.openFeature==='function'){try{if(window.__aethrionPanels.openFeature(label)===true)return true}catch(panelError){console.error('[AETHRION] Canonical panel router failed:',label,panelError)}}
+ var panelOnly=['3D Studio','Görsel Üretimi','Projelerim','Takım','Team Ortak Çalışma','Topluluk ve Takımlar','Yorumlar ve Topluluk','AETHRION Akademi','Günlük ve Sosyal Görevler','Puan Mağazası + Cüzdan','Davet Liderlik Tablosu','Anketler','Proje Talepleri','Kod Editörü','A27 API Anahtarı','Beta API Yönetimi','Güvenlik ve Ebeveyn Ayarları','Güvenlik Ayarları'];
+ if(panelOnly.indexOf(label)!==-1){if(typeof window.showNotification==='function')window.showNotification('Bu özellik için uygulama içi panel yüklenemedi. Başka bir sayfaya yönlendirilmedi; sayfayı yenileyip tekrar dene.','warning');return false}
  var f=features().filter(function(a){return a[2]===label})[0];if(!f)return;
  document.body.classList.remove('aews-nav-open','aews-home-view');active(label);
  var toggle=q('#aewsMobileToggle');if(toggle)toggle.setAttribute('aria-expanded','false');
@@ -2276,6 +2278,8 @@ function home(){document.body.classList.remove('aews-nav-open','aews-feature-vie
 function openFeature(label){
  /* Canonical panel router owns restored legacy workspaces (3D, projects, Team, Academy, tasks, polls, referral and image tools). */
  if(window.__aethrionPanels&&typeof window.__aethrionPanels.openFeature==='function'){try{if(window.__aethrionPanels.openFeature(label)===true)return true}catch(panelError){console.error('[AETHRION] Canonical panel router failed:',label,panelError)}}
+ var panelOnly=['3D Studio','Görsel Üretimi','Projelerim','Takım','Team Ortak Çalışma','Topluluk ve Takımlar','Yorumlar ve Topluluk','AETHRION Akademi','Günlük ve Sosyal Görevler','Puan Mağazası + Cüzdan','Davet Liderlik Tablosu','Anketler','Proje Talepleri','Kod Editörü','A27 API Anahtarı','Beta API Yönetimi','Güvenlik ve Ebeveyn Ayarları','Güvenlik Ayarları'];
+ if(panelOnly.indexOf(label)!==-1){if(typeof window.showNotification==='function')window.showNotification('Bu özellik için uygulama içi panel yüklenemedi. Başka bir sayfaya yönlendirilmedi; sayfayı yenileyip tekrar dene.','warning');return false}
  var f=feature(label);document.body.classList.remove('aews-nav-open');setActive(label);
  if(label==='Oturumu kapat'){if(typeof window.logout==='function')return window.logout();if(window.Parse&&Parse.User)return Parse.User.logOut().then(function(){location.reload()});location.reload();return}
  var meta=(Array.isArray(window.FEATURE_LIST)?window.FEATURE_LIST:[]).filter(function(x){return x&&String(x.name||x.title||'')===label})[0];
