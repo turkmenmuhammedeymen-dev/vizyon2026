@@ -554,18 +554,40 @@
       return [];
     });
   }
+  function closeAethrionNotificationPanel() {
+    var panel = byId('aethrionNotificationPanel');
+    if (!panel) return false;
+    panel.style.display = 'none';
+    panel.setAttribute('aria-hidden', 'true');
+    return true;
+  }
+  install('closeAethrionNotificationPanel', closeAethrionNotificationPanel);
   install('toggleNotificationPanel', function () {
     var panel = byId('aethrionNotificationPanel');
     if (!panel) {
-      panel = d.createElement('section'); panel.id = 'aethrionNotificationPanel'; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-modal', 'true');
+      panel = d.createElement('section');
+      panel.id = 'aethrionNotificationPanel';
+      panel.className = 'aethrion-global-notification-panel';
+      panel.setAttribute('role', 'dialog');
+      panel.setAttribute('aria-modal', 'true');
+      panel.setAttribute('aria-label', 'Bildirimler');
+      panel.setAttribute('aria-hidden', 'true');
       panel.style.cssText = 'position:fixed;inset:0;z-index:2147483100;display:none;align-items:flex-start;justify-content:flex-end;padding:16px;background:rgba(2,6,16,.55);backdrop-filter:blur(7px)';
       panel.innerHTML = '<div style="width:min(440px,96vw);max-height:88vh;overflow:auto;padding:18px;border:1px solid var(--border,rgba(255,255,255,.14));border-radius:18px;background:var(--card,#111827);color:var(--text,#f4f6fb)"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><h3 style="margin:0">Bildirimler</h3><div><button type="button" id="aethrionNotificationRefresh">↻</button> <button type="button" id="aethrionNotificationClose" aria-label="Kapat">✕</button></div></div><div id="aethrionNotificationList" style="margin-top:12px"></div></div>';
-      panel.addEventListener('click', function (e) { if (e.target === panel || e.target.closest('#aethrionNotificationClose')) panel.style.display = 'none'; if (e.target.closest('#aethrionNotificationRefresh')) loadAethrionNotifications(); });
+      panel.addEventListener('click', function (e) {
+        if (e.target === panel || (e.target.closest && e.target.closest('#aethrionNotificationClose'))) closeAethrionNotificationPanel();
+        if (e.target.closest && e.target.closest('#aethrionNotificationRefresh')) loadAethrionNotifications();
+      });
       d.body.appendChild(panel);
     }
     var opening = panel.style.display === 'none' || !panel.style.display;
-    panel.style.display = opening ? 'flex' : 'none';
-    if (opening) loadAethrionNotifications();
+    if (opening) {
+      panel.style.display = 'flex';
+      panel.setAttribute('aria-hidden', 'false');
+      loadAethrionNotifications();
+    } else {
+      closeAethrionNotificationPanel();
+    }
     return true;
   });
   install('toggleChatHistory', function () { var p = byId('conversationHistoryList') || byId('conversationHistoryItems'); if (p) p.hidden = !p.hidden; else w.showNotification && w.showNotification('Sohbet geçmişi bu sayfada bulunmuyor.', 'warning'); });
