@@ -1006,10 +1006,11 @@
         $('#aesAnnSave', body).textContent = 'Yayınla';
         $('#aesAnnCancel', body).hidden = true;
       }
+      var itemsCache = [];
       function load() {
         call('getAnnouncements').then(function (items) {
-          items = Array.isArray(items) ? items : [];
-          list.innerHTML = items.length ? items.map(function (item) {
+          itemsCache = Array.isArray(items) ? items : [];
+          list.innerHTML = itemsCache.length ? itemsCache.map(function (item) {
             return '<article class="aep-item" data-ann-id="' + esc(item.id) + '" style="align-items:flex-start">' +
               '<div style="min-width:0;flex:1"><div class="aep-item-name">' + esc(item.title || 'Duyuru') + '</div>' +
               '<p class="aep-muted" style="white-space:pre-wrap;margin:6px 0 0">' + esc(item.content || '') + '</p>' +
@@ -1058,21 +1059,7 @@
           }
         });
       }
-      var itemsCache = [];
-      var originalLoad = load;
-      load = function () {
-        call('getAnnouncements').then(function (items) {
-          itemsCache = Array.isArray(items) ? items : [];
-          list.innerHTML = itemsCache.length ? itemsCache.map(function (item) {
-            return '<article class="aep-item" data-ann-id="' + esc(item.id) + '" style="align-items:flex-start">' +
-              '<div style="min-width:0;flex:1"><div class="aep-item-name">' + esc(item.title || 'Duyuru') + '</div>' +
-              '<p class="aep-muted" style="white-space:pre-wrap;margin:6px 0 0">' + esc(item.content || '') + '</p>' +
-              '<small class="aep-muted">' + esc(fdate(item.createdAt)) + '</small></div>' +
-              (canManage ? '<div class="aep-item-act"><button type="button" class="aep-btn" data-ann-action="edit">Düzenle</button>' +
-                '<button type="button" class="aep-btn" data-ann-action="delete">Sil</button></div>' : '') + '</article>';
-          }).join('') : empty('Henüz duyuru yayınlanmadı.');
-        }, function (e) { list.innerHTML = empty('Duyurular yüklenemedi: ' + msgOf(e)); });
-      };
+
       load();
       return true;
     }
