@@ -756,10 +756,13 @@
     function buildAcademy(label, m) {
       styles();
       var body = open(label, m, 'Kurslar, dersler ve bilgi yarışması; her adımda puan kazan');
-      tabs(body, [
-        { id: 'courses', label: '🎓 Kurslar', render: coursesPane },
-        { id: 'quiz', label: '❓ Quiz', render: quizPane }
-      ], label === 'Zeka Testi ve Quiz' ? 'quiz' : 'courses');
+      if (label === 'Zeka Testi ve Quiz') {
+        quizPane(body);
+      } else {
+        tabs(body, [
+          { id: 'courses', label: '🎓 Kurslar', render: coursesPane }
+        ], 'courses');
+      }
       function coursesPane(p) {
         p.innerHTML = '<div class="aep-card"><h3>🎓 Kurslar</h3><div class="aep-grid" id="aesCrs"><p class="aep-muted">Yükleniyor…</p></div></div><div id="aesLessons"></div>';
         call('getCourses').then(function (cs) {
@@ -874,11 +877,16 @@
       styles();
       var body = open(label, m, 'Günlük ve sosyal görevleri tamamla, seri ödülünü al');
       if (!user()) { loginCard(body, 'Görevleri görmek'); return true; }
-      tabs(body, [
-        { id: 'daily', label: '📅 Günlük', render: dailyPane },
-        { id: 'social', label: '🌐 Sosyal', render: socialPane },
-        { id: 'streak', label: '🔥 Günlük seri', render: streakPane }
-      ], label === 'Günlük Seri ve Uzay Modu' ? 'streak' : 'daily');
+      if (label === 'Günlük Seri ve Uzay Modu') {
+        streakPane(body);
+      } else if (label === 'Günlük Görevler ve Puan') {
+        dailyPane(body);
+      } else {
+        tabs(body, [
+          { id: 'daily', label: '📅 Günlük', render: dailyPane },
+          { id: 'social', label: '🌐 Sosyal', render: socialPane }
+        ], 'daily');
+      }
       function listPane(p, title, fn, doneFn, textKey) {
         p.innerHTML = '<div class="aep-card"><h3>' + title + '</h3><div class="aep-list"><p class="aep-muted">Yükleniyor…</p></div></div>';
         var box = $('.aep-list', p);
@@ -959,10 +967,7 @@
         annPane(body);
         return true;
       }
-      tabs(body, [
-        { id: 'comments', label: '💬 Yorumlar', render: commentsPane },
-        { id: 'teams', label: '👥 Takımlar', render: function (p) { p.innerHTML = '<div class="aep-card"><h3>👥 Takımlar</h3><p class="aep-muted">Takım kur, koda katıl, üyelerle yazış.</p><div class="aep-row"><button type="button" class="aep-btn aep-primary" id="aesGoTeam">Takım panelini aç</button></div></div>'; $('#aesGoTeam', p).onclick = function () { P.openFeature('Takım'); }; } }
-      ], 'comments');
+      commentsPane(body);
 
       function currentRole() {
         var u = user();
@@ -1242,32 +1247,49 @@
      * ==================================================================== */
     function buildReferral(label, m) {
       styles();
-      var body = open(label, m, 'Davet kodun, davet edenlerin sıralaması ve kod kullanma');
-      body.innerHTML = '<div class="aes-wrap"><div class="aep-card"><h3>🎁 Davet kodun</h3><div class="aes-3col"><div class="aes-stat"><b id="aesRfCode">—</b><span>Kodun</span></div></div>' +
+      var body = open(label, m, label === 'Davet Kodu' ? 'Davet kodunu yönet ve başkalarının kodunu kullan' : 'Davet edenler sıralaması');
+      if (label === 'Davet Liderlik Tablosu') {
+        body.innerHTML = '<div class="aep-card"><div class="aep-row" style="justify-content:space-between"><h3 style="margin:0">🏅 Davet liderlik tablosu</h3><button type="button" class="aep-btn" id="aesRfRefresh">↻ Yenile</button></div><div class="aep-list" id="aesRfList"><p class="aep-muted">Yükleniyor…</p></div></div>';
+        function loadLeaderboard() {
+          call('getReferralLeaderboard').then(function (r) {
+            var items = Array.isArray(r) ? r : (r && (r.leaderboard || r.items || r.users)) || [];
+            $('#aesRfList', body).innerHTML = items.length ? items.map(function (x, i) {
+              return '<div class="aep-item"><span class="aep-item-name">#' + esc(x.rank || i + 1) + ' ' + esc(x.name || 'İsimsiz') + '</span><span class="aes-pill">' + esc(x.count || 0) + ' davet</span></div>';
+            }).join('') : empty('Henüz sıralama yok.');
+          }, function (e) { $('#aesRfList', body).innerHTML = empty('Sıralama yüklenemedi: ' + msgOf(e)); });
+        }
+        $('#aesRfRefresh', body).addEventListener('click', loadLeaderboard);
+        loadLeaderboard();
+        return true;
+      }
+
+      body.innerHTML = '<div class="aep-card"><h3>🎟️ Davet kodun</h3><div class="aes-stat"><b id="aesRfCode">—</b><span>Kişisel davet kodun</span></div>' +
         '<div class="aep-row"><button type="button" class="aep-btn aep-primary" id="aesRfGen">Kodumu göster / oluştur</button><button type="button" class="aep-btn" id="aesRfCopy">Kopyala</button></div>' +
-        '<label class="aes-field">Bir davet kodu kullan<input id="aesRfIn" maxlength="30"></label><div class="aep-row"><button type="button" class="aep-btn" id="aesRfApply">Kodu kullan</button></div></div>' +
-        '<div class="aep-card"><h3>🏅 Liderlik tablosu</h3><div class="aep-list" id="aesRfList"><p class="aep-muted">Yükleniyor…</p></div></div></div>';
-      call('getReferralLeaderboard').then(function (r) {
-        var it = Array.isArray(r) ? r : (r && (r.leaderboard || r.items || r.users)) || [];
-        $('#aesRfList', body).innerHTML = it.length ? it.map(function (x, i) {
-          return '<div class="aep-item"><span class="aep-item-name">#' + esc(x.rank || i + 1) + ' ' + esc(x.name || 'İsimsiz') + '</span><span class="aes-pill">' + esc(x.count || 0) + ' davet</span></div>';
-        }).join('') : empty('Henüz sıralama yok.');
-      }, function (e) { $('#aesRfList', body).innerHTML = empty('Sıralama yüklenemedi: ' + msgOf(e)); });
+        '<label class="aes-field">Bir davet kodu kullan<input id="aesRfIn" maxlength="30" autocomplete="off" placeholder="Davet kodunu gir"></label><div class="aep-row"><button type="button" class="aep-btn" id="aesRfApply">Kodu kullan</button></div></div>';
       $('#aesRfGen', body).addEventListener('click', function () {
-        if (!user()) { err('Giriş yapmalısın.'); return; }
-        busyBtn(this, call('generateReferralCode')).then(function (r) { $('#aesRfCode', body).textContent = (r && r.referral_code) || '—'; }, function (e) { err(msgOf(e)); });
+        if (!user()) { err('Davet kodunu görmek için giriş yapmalısın.'); return; }
+        busyBtn(this, call('generateReferralCode')).then(function (r) {
+          $('#aesRfCode', body).textContent = (r && r.referral_code) || '—';
+        }, function (e) { err(msgOf(e)); });
       });
       $('#aesRfCopy', body).addEventListener('click', function () {
-        var c = $('#aesRfCode', body).textContent; if (!c || c === '—') { err('Önce kodunu oluştur.'); return; }
-        try { navigator.clipboard.writeText(c).then(function () { note('Kod kopyalandı.'); }); } catch (_) { err('Kopyalanamadı.'); }
+        var code = $('#aesRfCode', body).textContent;
+        if (!code || code === '—') { err('Önce davet kodunu oluştur.'); return; }
+        if (!navigator.clipboard || !navigator.clipboard.writeText) { err('Bu tarayıcıda pano erişimi kullanılamıyor.'); return; }
+        navigator.clipboard.writeText(code).then(function () { note('Davet kodu kopyalandı.'); }, function () { err('Davet kodu kopyalanamadı.'); });
       });
       $('#aesRfApply', body).addEventListener('click', function () {
-        if (!user()) { err('Giriş yapmalısın.'); return; }
-        var c = $('#aesRfIn', body).value.trim(); if (!c) { err('Kod gir.'); return; }
-        busyBtn(this, call('applyReferral', { code: c })).then(function (r) { note((r && r.message) || 'Kod uygulandı.'); }, function (e) { err(msgOf(e)); });
+        if (!user()) { err('Davet kodu kullanmak için giriş yapmalısın.'); return; }
+        var code = $('#aesRfIn', body).value.trim();
+        if (!code) { err('Davet kodu gir.'); return; }
+        busyBtn(this, call('applyReferral', { code: code })).then(function (r) {
+          note((r && r.message) || 'Davet kodu uygulandı.');
+          $('#aesRfIn', body).value = '';
+        }, function (e) { err(msgOf(e)); });
       });
       return true;
     }
+
     function buildPolls(label, m) {
       styles();
       var body = open(label, m, 'Aktif topluluk anketi');
@@ -1472,7 +1494,6 @@
     B['Günlük Seri ve Uzay Modu'] = buildTasks;
     B['Zeka Testi ve Quiz'] = buildAcademy;
     B['Savaş Modu + Çoklu AI'] = buildBattlePanel;
-    B['Kazanç Araçları'] = buildStore;
     B['Davet Kodu'] = buildReferral;
     w.openProjectRequestsPanel = function () { return P.openFeature('Proje Talepleri') === true; };
     B['Kod Editörü'] = buildCode;
