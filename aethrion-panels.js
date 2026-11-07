@@ -53,7 +53,7 @@
     'closeMarket', 'closeVoiceChatFullscreen', 'closeNotificationPanel', 'closeSettingsModal'];
   var OVERLAY_SELECTORS = '#vizyonAlPanel,#vizyonAlBackdrop,#aaVoiceFullscreen,#videoEditorOverlay,#modelsShowcaseOverlay,' +
     '#aethrionJarvisOverlay,#jobMarketOverlay,#jobCreateOverlay,#jobDetailOverlay,#categoryPanelModal,#kocPanelOverlay,' +
-    '#contestPage,#marketModal,#downloadModal,#aethrionNotificationPanel,#settingsModal,#moderatorVideoToolModal,#aethrionAccountProfileModal,#profileModal';
+    '#vizyonSupportPanel,#teamPage,#fullAIPanel,#contestPage,#marketModal,#downloadModal,#aethrionNotificationPanel,#settingsModal,#moderatorVideoToolModal,#aethrionAccountProfileModal,#profileModal';
 
   function $(s, r) { return (r || d).querySelector(s); }
   function $$(s, r) { return Array.prototype.slice.call((r || d).querySelectorAll(s)); }
@@ -503,6 +503,9 @@
     return true;
   }
   var BUILTIN = { 'Görsel Üretimi': buildImagePanel, 'Projelerim': buildProjectsPanel };
+  /* Ek paneller (aethrion-studio-panels.js) bu API ile BUILTIN listesine eklenir. */
+  w.__aethrionPanels = { stage: stage, setHead: setHead, $: $, $$: $$, esc: esc, cloud: cloud, curUser: curUser, note: note,
+    openFeature: function (l) { return openFeature(l); }, builtin: BUILTIN };
   function builtinFor(label, m) {
     if (BUILTIN[label]) return BUILTIN[label];
     if (m && m[4] === 'openCategoryPanel') return buildCategoryPanel;
