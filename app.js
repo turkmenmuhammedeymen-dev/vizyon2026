@@ -2069,6 +2069,7 @@ var CORE=[
 ['PLATFORM','⚔️','Savaş Modu + Çoklu AI','AI karşılaştırma ve oyunlaştırma araçları','openCategoryPanel','','gamification'],
 ['PLATFORM','🧠','Zeka Testi ve Quiz','Eğitim ve öğrenme araçları','openCategoryPanel','','education'],
 ['PLATFORM','🎁','Davet Liderlik Tablosu','Davet edenler sıralaması ve referans alanı','', './index.html#mainReferralLeaderboard'],
+['PLATFORM','🎟️','Davet Kodu','Davet kodunu görüntüle, oluştur ve başkalarının kodunu kullan','',''],
 ['PLATFORM','💰','Kazanç Araçları','Puan mağazası ve kazanç kategorisi','openCategoryPanel','','earn'],
 ['PLATFORM','🗳️','Anketler','Topluluk anket alanı','', './index.html#pollContainer'],
 ['PLATFORM','📢','Duyurular','AETHRION duyuru panosu','', './index.html#announcementList'],
@@ -2116,7 +2117,7 @@ function callAction(action,label,arg){var aliases={openKocPanel:['openKocPanel',
 function openFeature(label){
  /* The v6 click dispatcher runs before the legacy bubble handler. Delegate to the canonical in-page panel router first so built-in panels never fall through to stale external-page routes. */
  if(window.__aethrionPanels&&typeof window.__aethrionPanels.openFeature==='function'){try{if(window.__aethrionPanels.openFeature(label)===true)return true}catch(panelError){console.error('[AETHRION] Canonical panel router failed:',label,panelError)}}
- var panelOnly=['3D Studio','Görsel Üretimi','Projelerim','Takım','Team Ortak Çalışma','Topluluk ve Takımlar','Yorumlar ve Topluluk','AETHRION Akademi','Günlük ve Sosyal Görevler','Puan Mağazası + Cüzdan','Davet Liderlik Tablosu','Anketler','Proje Talepleri','Kod Editörü','A27 API Anahtarı','Beta API Yönetimi','Güvenlik ve Ebeveyn Ayarları','Güvenlik Ayarları'];
+ var panelOnly=['3D Studio','Görsel Üretimi','Projelerim','Takım','Team Ortak Çalışma','Topluluk ve Takımlar','Yorumlar ve Topluluk','AETHRION Akademi','Günlük ve Sosyal Görevler','Puan Mağazası + Cüzdan','Davet Liderlik Tablosu','Davet Kodu','Anketler','Proje Talepleri','Kod Editörü','A27 API Anahtarı','Beta API Yönetimi','Güvenlik ve Ebeveyn Ayarları','Güvenlik Ayarları','Savaş Modu + Çoklu AI','Günlük Görevler ve Puan','Günlük Seri ve Uzay Modu','Zeka Testi ve Quiz','Kazanç Araçları'];
  if(panelOnly.indexOf(label)!==-1){if(typeof window.showNotification==='function')window.showNotification('Bu özellik için uygulama içi panel yüklenemedi. Başka bir sayfaya yönlendirilmedi; sayfayı yenileyip tekrar dene.','warning');return false}
  var f=features().filter(function(a){return a[2]===label})[0];if(!f)return;
  document.body.classList.remove('aews-nav-open','aews-home-view');active(label);
@@ -2278,7 +2279,7 @@ function home(){document.body.classList.remove('aews-nav-open','aews-feature-vie
 function openFeature(label){
  /* Canonical panel router owns restored legacy workspaces (3D, projects, Team, Academy, tasks, polls, referral and image tools). */
  if(window.__aethrionPanels&&typeof window.__aethrionPanels.openFeature==='function'){try{if(window.__aethrionPanels.openFeature(label)===true)return true}catch(panelError){console.error('[AETHRION] Canonical panel router failed:',label,panelError)}}
- var panelOnly=['3D Studio','Görsel Üretimi','Projelerim','Takım','Team Ortak Çalışma','Topluluk ve Takımlar','Yorumlar ve Topluluk','AETHRION Akademi','Günlük ve Sosyal Görevler','Puan Mağazası + Cüzdan','Davet Liderlik Tablosu','Anketler','Proje Talepleri','Kod Editörü','A27 API Anahtarı','Beta API Yönetimi','Güvenlik ve Ebeveyn Ayarları','Güvenlik Ayarları'];
+ var panelOnly=['3D Studio','Görsel Üretimi','Projelerim','Takım','Team Ortak Çalışma','Topluluk ve Takımlar','Yorumlar ve Topluluk','AETHRION Akademi','Günlük ve Sosyal Görevler','Puan Mağazası + Cüzdan','Davet Liderlik Tablosu','Davet Kodu','Anketler','Proje Talepleri','Kod Editörü','A27 API Anahtarı','Beta API Yönetimi','Güvenlik ve Ebeveyn Ayarları','Güvenlik Ayarları','Savaş Modu + Çoklu AI','Günlük Görevler ve Puan','Günlük Seri ve Uzay Modu','Zeka Testi ve Quiz','Kazanç Araçları'];
  if(panelOnly.indexOf(label)!==-1){if(typeof window.showNotification==='function')window.showNotification('Bu özellik için uygulama içi panel yüklenemedi. Başka bir sayfaya yönlendirilmedi; sayfayı yenileyip tekrar dene.','warning');return false}
  var f=feature(label);document.body.classList.remove('aews-nav-open');setActive(label);
  if(label==='Oturumu kapat'){if(typeof window.logout==='function')return window.logout();if(window.Parse&&Parse.User)return Parse.User.logOut().then(function(){location.reload()});location.reload();return}
