@@ -7619,14 +7619,10 @@ Parse.Cloud.define("createPoll", async function (request) {
     if (new Set(normalized).size !== options.length) throw new Error('Anket seçenekleri birbirinden farklı olmalı!');
     if (!Number.isInteger(duration) || duration < 1 || duration > 30) throw new Error('Anket süresi 1–30 gün arasında olmalı!');
 
-    /* Tek aktif anket kuralı: önceki aktif anketleri kapat, sonra yenisini oluştur. */
+    /* Yeni anketi önce kaydet: kayıt başarısız olursa mevcut aktif anket kaybolmasın. */
     var activeQuery = new Parse.Query(Poll);
     activeQuery.equalTo('is_active', true);
     var previousPolls = await activeQuery.find({ useMasterKey: true });
-    for (var i = 0; i < previousPolls.length; i++) {
-        previousPolls[i].set('is_active', false);
-        await previousPolls[i].save(null, { useMasterKey: true });
-    }
 
     var poll = new Poll();
     poll.set('question', question);
@@ -7639,6 +7635,16 @@ Parse.Cloud.define("createPoll", async function (request) {
     poll.set('end_date', endDate);
     poll.set('is_active', true);
     await poll.save(null, { useMasterKey: true });
+
+    /* Yeni kayıt en güncel aktif ankettir; eski aktif kayıtları artık kapat. */
+    for (var i = 0; i < previousPolls.length; i++) {
+        try {
+            previousPolls[i].set('is_active', false);
+            await previousPolls[i].save(null, { useMasterKey: true });
+        } catch (deactivateError) {
+            console.error('[Poll] Eski anket kapatılamadı:', previousPolls[i].id, deactivateError);
+        }
+    }
     return { success: true, pollId: poll.id };
 });
 
