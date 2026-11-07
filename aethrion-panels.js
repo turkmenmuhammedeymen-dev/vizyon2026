@@ -282,14 +282,11 @@
     st.classList.add('on');
     return true;
   }
-  function rescueHidden() {
-    $$('[data-aep-closed]').forEach(function (el) { el.removeAttribute('data-aep-closed'); });
-    $$('[data-ae-display-saved]').forEach(function (el) {
-      var cls = el.className && el.className.toString ? el.className.toString() : '';
-      if (/(^|\s)(open|active|show)(\s|$)/.test(cls) && el.style.display === 'none') {
-        el.style.removeProperty('display');
-        el.removeAttribute('data-ae-display-saved');
-      }
+  function rescueHidden(targets) {
+    (targets || []).forEach(function (el) {
+      if (!el || !el.isConnected) return;
+      el.removeAttribute('data-aep-closed');
+      if (el.style.getPropertyValue('display') === 'none') el.style.removeProperty('display');
     });
   }
   /* Satır içi "göster" denmiş ama stil dosyası .open sınıfı olmadığı için gizlemişse sınıfı ekle. */
