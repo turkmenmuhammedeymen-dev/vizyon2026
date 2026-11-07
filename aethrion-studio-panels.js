@@ -960,6 +960,13 @@
         { id: 'ann', label: '📢 Duyurular', render: annPane },
         { id: 'teams', label: '👥 Takımlar', render: function (p) { p.innerHTML = '<div class="aep-card"><h3>👥 Takımlar</h3><p class="aep-muted">Takım kur, koda katıl, üyelerle yazış.</p><div class="aep-row"><button type="button" class="aep-btn aep-primary" id="aesGoTeam">Takım panelini aç</button></div></div>'; $('#aesGoTeam', p).onclick = function () { P.openFeature('Takım'); }; } }
       ], label === 'Duyurular' ? 'ann' : 'comments');
+
+      function currentRole() {
+        var u = user();
+        try { return String(u && (typeof u.get === 'function' ? u.get('role') : u.role) || '').toLowerCase(); }
+        catch (_) { return ''; }
+      }
+
       function commentsPane(p) {
         p.innerHTML = '<div class="aep-card"><h3>💬 Yorum yaz</h3><label class="aes-field">Puan<select id="aesCmR"><option value="5">★★★★★</option><option value="4">★★★★</option><option value="3">★★★</option><option value="2">★★</option><option value="1">★</option></select></label>' +
           '<textarea class="aep-input" id="aesCmT" rows="3" maxlength="500" placeholder="Düşüncelerini paylaş…"></textarea><div class="aep-row"><button type="button" class="aep-btn aep-primary" id="aesCmGo">Gönder</button></div></div>' +
@@ -979,14 +986,92 @@
         });
         load();
       }
+
       function annPane(p) {
-        p.innerHTML = '<div class="aep-card"><h3>📢 Duyurular</h3><div class="aep-list" id="aesAn"><p class="aep-muted">Yükleniyor…</p></div></div>';
-        call('getAnnouncements').then(function (a) {
-          a = Array.isArray(a) ? a : [];
-          $('#aesAn', p).innerHTML = a.length ? a.map(function (x) {
-            return '<div class="aep-item" style="align-items:flex-start"><span class="aep-item-name">' + esc(x.title) + '<br><small style="font-weight:500">' + esc(x.content) + '</small></span><small class="aep-muted">' + esc(fdate(x.createdAt)) + '</small></div>';
-          }).join('') : empty('Duyuru yok.');
-        }, function (e) { $('#aesAn', p).innerHTML = empty('Duyurular yüklenemedi: ' + msgOf(e)); });
+        var role = currentRole();
+        var canManage = role === 'admin' || role === 'founder';
+        var formHtml = canManage
+          ? '<div class="aep-card"><h3>📢 Duyuru oluştur / düzenle</h3><form id="aesAnForm">' +
+            '<input type="hidden" id="aesAnId" value="">' +
+            '<label class="aes-field">Başlık<input id="aesAnTitle" maxlength="120" required placeholder="Duyuru başlığı"></label>' +
+            '<label class="aes-field">Duyuru içeriği<textarea class="aep-input" id="aesAnContent" rows="4" maxlength="4000" required placeholder="Duyurunun içeriğini yaz…"></textarea></label>' +
+            '<div class="aep-row"><button type="submit" class="aep-btn aep-primary" id="aesAnSave">📢 Duyuruyu yayınla</button><button type="button" class="aep-btn" id="aesAnCancel" hidden>Vazgeç</button></div>' +
+            '<p class="aep-muted">Bu işlem ana sayfadaki Son Duyurular bölümünü de yeniler. Yetki sunucuda ayrıca doğrulanır.</p></form></div>'
+          : '';
+        p.innerHTML = formHtml + '<div class="aep-card"><div class="aep-row" style="justify-content:space-between"><h3 style="margin:0">📢 Son duyurular</h3><button type="button" class="aep-btn" id="aesAnRefresh">↻ Yenile</button></div><div class="aep-list" id="aesAn"><p class="aep-muted">Yükleniyor…</p></div></div>';
+
+        var announcements = [];
+        function resetForm() {
+          if (!canManage) return;
+          $('#aesAnId', p).value = '';
+          $('#aesAnTitle', p).value = '';
+          $('#aesAnContent', p).value = '';
+          $('#aesAnSave', p).textContent = '📢 Duyuruyu yayınla';
+          $('#aesAnCancel', p).hidden = true;
+        }
+        function load() {
+          var list = $('#aesAn', p);
+          list.innerHTML = '<p class="aep-muted">Duyurular yükleniyor…</p>';
+          return call('getAnnouncements').then(function (rows) {
+            announcements = Array.isArray(rows) ? rows : [];
+            list.innerHTML = announcements.length ? announcements.map(function (item) {
+              var actions = canManage
+                ? '<span class="aep-item-act"><button type="button" class="aep-btn" data-a="edit" data-id="' + esc(item.id) + '">✏️ Düzenle</button><button type="button" class="aep-btn" data-a="delete" data-id="' + esc(item.id) + '">🗑️ Sil</button></span>'
+                : '';
+              return '<article class="aep-item" style="align-items:flex-start"><div style="min-width:0;flex:1"><strong class="aep-item-name">' + esc(item.title || 'Duyuru') + '</strong><p style="margin:7px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;color:#425a72;font:500 13px/1.6 Inter,system-ui,sans-serif">' + esc(item.content || '') + '</p><small class="aep-muted">' + esc(fdate(item.createdAt)) + '</small></div>' + actions + '</article>';
+            }).join('') : empty('Henüz duyuru yok.');
+            if (typeof w.loadAnnouncements === 'function') w.loadAnnouncements();
+            return announcements;
+          }, function (e) {
+            list.innerHTML = empty('Duyurular yüklenemedi: ' + msgOf(e));
+            throw e;
+          });
+        }
+        if (canManage) {
+          $('#aesAnForm', p).addEventListener('submit', function (ev) {
+            ev.preventDefault();
+            var id = $('#aesAnId', p).value.trim();
+            var title = $('#aesAnTitle', p).value.trim();
+            var content = $('#aesAnContent', p).value.trim();
+            if (!title || !content) { err('Başlık ve duyuru içeriği boş olamaz.'); return; }
+            if (title.length > 120 || content.length > 4000) { err('Duyuru alanlarından biri izin verilen uzunluğu aşıyor.'); return; }
+            var save = $('#aesAnSave', p);
+            var operation = id ? 'editAnnouncement' : 'addAnnouncement';
+            busyBtn(save, call(operation, { announcementId: id || undefined, title: title, content: content })).then(function () {
+              note(id ? 'Duyuru güncellendi.' : 'Duyuru yayınlandı.');
+              resetForm();
+              load().catch(function () {});
+            }, function (e) { err(msgOf(e)); });
+          });
+          $('#aesAnCancel', p).addEventListener('click', resetForm);
+          $('#aesAn', p).addEventListener('click', function (ev) {
+            var button = ev.target.closest('button[data-a]');
+            if (!button) return;
+            var item = announcements.filter(function (x) { return String(x.id) === String(button.getAttribute('data-id')); })[0];
+            if (!item) { err('Duyuru kaydı bulunamadı. Listeyi yenileyin.'); return; }
+            if (button.getAttribute('data-a') === 'edit') {
+              $('#aesAnId', p).value = item.id;
+              $('#aesAnTitle', p).value = item.title || '';
+              $('#aesAnContent', p).value = item.content || '';
+              $('#aesAnSave', p).textContent = 'Değişiklikleri kaydet';
+              $('#aesAnCancel', p).hidden = false;
+              $('#aesAnTitle', p).focus();
+              return;
+            }
+            if (button.getAttribute('data-a') === 'delete') {
+              if (!w.confirm('Bu duyuru kalıcı olarak silinsin mi?')) return;
+              busyBtn(button, call('deleteAnnouncement', { announcementId: item.id })).then(function () {
+                note('Duyuru silindi.');
+                if ($('#aesAnId', p).value === item.id) resetForm();
+                load().catch(function () {});
+              }, function (e) { err(msgOf(e)); });
+            }
+          });
+          $('#aesAnRefresh', p).addEventListener('click', function () { load().catch(function (e) { err(msgOf(e)); }); });
+        } else {
+          $('#aesAnRefresh', p).addEventListener('click', function () { load().catch(function (e) { err(msgOf(e)); }); });
+        }
+        load().catch(function (e) { err(msgOf(e)); });
       }
       return true;
     }
@@ -1180,26 +1265,182 @@
     function buildPolls(label, m) {
       styles();
       var body = open(label, m, 'Aktif topluluk anketi');
-      body.innerHTML = '<div class="aes-wrap"><div class="aep-card"><h3>🗳️ Anket</h3><div id="aesPl"><p class="aep-muted">Yükleniyor…</p></div></div></div>';
-      function load() {
-        call('getActivePoll').then(function (p) {
-          var box = $('#aesPl', body);
-          if (!p) { box.innerHTML = empty('Şu an aktif anket yok.'); return; }
-          var opts = p.options || [], votes = p.votes || [], total = votes.reduce(function (a, b) { return a + (Number(b) || 0); }, 0);
-          box.innerHTML = '<h4 style="margin:0 0 10px;color:#10243a">' + esc(p.question) + '</h4><div class="aep-list">' + opts.map(function (o, i) {
-            var v = Number(votes[i]) || 0, pc = total ? Math.round(v * 100 / total) : 0;
-            return '<div class="aep-item"><span class="aep-item-name">' + esc(o) + ' <span class="aes-pill">' + v + ' oy · %' + pc + '</span></span><button type="button" class="aep-btn" data-i="' + i + '">Oy ver</button></div>';
-          }).join('') + '</div>' + (p.end_date ? '<p class="aep-muted">Bitiş: ' + esc(fdate(p.end_date)) + '</p>' : '');
-        }, function (e) { $('#aesPl', body).innerHTML = empty('Anket yüklenemedi: ' + msgOf(e)); });
+      var currentRole = (function () {
+        var u = user();
+        try { return String(u && (typeof u.get === 'function' ? u.get('role') : u.role) || '').toLowerCase(); }
+        catch (_) { return ''; }
+      })();
+      var isFounder = currentRole === 'founder';
+      var formHtml = isFounder
+        ? '<div class="aep-card"><h3>🗳️ Kurucu anket yönetimi</h3><form id="aesPollForm">' +
+          '<input type="hidden" id="aesPollId" value="">' +
+          '<label class="aes-field">Anket sorusu<input id="aesPollQuestion" maxlength="240" required placeholder="Topluluğa ne sormak istiyorsun?"></label>' +
+          '<div class="aes-field"><span>Seçenekler (2–8)</span><div id="aesPollOptions"></div></div>' +
+          '<div class="aep-row"><button type="button" class="aep-btn" id="aesPollAdd">＋ Seçenek ekle</button><label class="aes-field" style="margin:0">Süre<select id="aesPollDuration"><option value="1">1 gün</option><option value="3" selected>3 gün</option><option value="7">7 gün</option><option value="14">14 gün</option><option value="30">30 gün</option></select></label></div>' +
+          '<div class="aep-row"><button type="submit" class="aep-btn aep-primary" id="aesPollSave">Anketi yayınla</button><button type="button" class="aep-btn" id="aesPollCancel" hidden>Vazgeç</button></div>' +
+          '<p class="aep-muted">Seçenekler düzenlenirse önceki oylar sıfırlanır. Anket oluşturma ve yönetme yetkisi yalnızca kurucudadır.</p></form></div>'
+        : '';
+      body.innerHTML = '<div class="aes-wrap">' + formHtml + '<div class="aep-card"><div class="aep-row" style="justify-content:space-between"><h3 style="margin:0">🗳️ Aktif anket</h3><button type="button" class="aep-btn" id="aesPollRefresh">↻ Yenile</button></div><div id="aesPl"><p class="aep-muted">Yükleniyor…</p></div></div></div>';
+
+      var activePoll = null;
+      var optionsHost = isFounder ? $('#aesPollOptions', body) : null;
+      function setOptions(values) {
+        if (!isFounder) return;
+        var items = Array.isArray(values) && values.length ? values : ['', ''];
+        optionsHost.innerHTML = '';
+        items.slice(0, 8).forEach(function (value) {
+          var row = d.createElement('div');
+          row.className = 'aes-option-row';
+          var input = d.createElement('input');
+          input.type = 'text';
+          input.className = 'aep-input';
+          input.maxLength = 100;
+          input.placeholder = 'Seçenek';
+          input.value = String(value || '');
+          input.required = true;
+          var remove = d.createElement('button');
+          remove.type = 'button';
+          remove.className = 'aep-btn';
+          remove.textContent = 'Sil';
+          remove.setAttribute('aria-label', 'Seçeneği kaldır');
+          remove.setAttribute('data-remove-option', '1');
+          row.appendChild(input);
+          row.appendChild(remove);
+          optionsHost.appendChild(row);
+        });
+        updateRemoveButtons();
       }
+      function updateRemoveButtons() {
+        if (!isFounder) return;
+        var rows = optionsHost.querySelectorAll('.aes-option-row');
+        Array.prototype.forEach.call(rows, function (row) {
+          var remove = row.querySelector('[data-remove-option]');
+          if (remove) remove.disabled = rows.length <= 2;
+        });
+      }
+      function resetForm() {
+        if (!isFounder) return;
+        $('#aesPollId', body).value = '';
+        $('#aesPollQuestion', body).value = '';
+        $('#aesPollDuration', body).value = '3';
+        $('#aesPollSave', body).textContent = 'Anketi yayınla';
+        $('#aesPollCancel', body).hidden = true;
+        setOptions(['', '']);
+      }
+      function load() {
+        var box = $('#aesPl', body);
+        box.innerHTML = '<p class="aep-muted">Aktif anket yükleniyor…</p>';
+        return call('getActivePoll').then(function (poll) {
+          activePoll = poll || null;
+          if (!activePoll) {
+            box.innerHTML = empty('Şu anda aktif anket yok.');
+            if (isFounder) resetForm();
+            if (typeof w.loadPoll === 'function') w.loadPoll();
+            return null;
+          }
+          var options = Array.isArray(activePoll.options) ? activePoll.options : [];
+          var votes = Array.isArray(activePoll.votes) ? activePoll.votes : [];
+          var total = votes.reduce(function (sum, value) { return sum + (Number(value) || 0); }, 0);
+          var hasVoted = activePoll.hasVoted === true;
+          var loggedIn = !!user();
+          var rows = options.map(function (option, index) {
+            var count = Number(votes[index]) || 0;
+            var percent = total ? Math.round(count * 100 / total) : 0;
+            var disabled = !loggedIn || hasVoted;
+            var label = !loggedIn ? 'Giriş yapın' : (hasVoted ? 'Oy kullanıldı' : 'Oy ver');
+            return '<div class="aep-item"><div style="min-width:0;flex:1"><strong class="aep-item-name">' + esc(option) + '</strong><div style="height:7px;margin-top:7px;background:#e5edf5;border-radius:99px;overflow:hidden"><div style="height:100%;width:' + percent + '%;background:linear-gradient(90deg,#2c64d8,#6e9cff);border-radius:99px"></div></div><small class="aep-muted">' + count + ' oy · %' + percent + '</small></div><button type="button" class="aep-btn" data-i="' + index + '"' + (disabled ? ' disabled' : '') + '>' + label + '</button></div>';
+          }).join('');
+          var manage = isFounder
+            ? '<div class="aep-row"><button type="button" class="aep-btn" id="aesPollEdit">✏️ Anketi düzenle</button><button type="button" class="aep-btn" id="aesPollDelete">🗑️ Anketi sil</button></div>'
+            : '';
+          box.innerHTML = '<h4 style="margin:0 0 10px;color:#10243a">' + esc(activePoll.question) + '</h4><div class="aep-list">' + rows + '</div>' +
+            '<p class="aep-muted">' + total + ' oy kullanıldı.' + (activePoll.end_date ? ' · Bitiş: ' + esc(fdate(activePoll.end_date)) : '') + '</p>' +
+            (hasVoted ? '<p class="aep-muted">Bu ankette oyunu kullandın.</p>' : (!loggedIn ? '<p class="aep-muted">Oy kullanmak için giriş yapmalısın.</p>' : '')) + manage;
+
+          if (isFounder) {
+            $('#aesPollEdit', box).addEventListener('click', function () {
+              $('#aesPollId', body).value = activePoll.id || '';
+              $('#aesPollQuestion', body).value = activePoll.question || '';
+              $('#aesPollDuration', body).value = '3';
+              $('#aesPollSave', body).textContent = 'Değişiklikleri kaydet';
+              $('#aesPollCancel', body).hidden = false;
+              setOptions(options);
+              $('#aesPollQuestion', body).focus();
+            });
+            $('#aesPollDelete', box).addEventListener('click', function () {
+              if (!w.confirm('Aktif anket kalıcı olarak silinsin mi?')) return;
+              busyBtn(this, call('deletePoll', { pollId: activePoll.id })).then(function () {
+                note('Anket silindi.');
+                resetForm();
+                load();
+              }, function (e) { err(msgOf(e)); });
+            });
+          }
+          if (typeof w.loadPoll === 'function') w.loadPoll();
+          return activePoll;
+        }, function (e) {
+          box.innerHTML = empty('Anket yüklenemedi: ' + msgOf(e));
+          throw e;
+        });
+      }
+
+      if (isFounder) {
+        setOptions(['', '']);
+        $('#aesPollAdd', body).addEventListener('click', function () {
+          var rows = optionsHost.querySelectorAll('.aes-option-row');
+          if (rows.length >= 8) { err('En fazla 8 seçenek ekleyebilirsin.'); return; }
+          var values = Array.prototype.map.call(rows, function (row) { return row.querySelector('input').value; });
+          values.push('');
+          setOptions(values);
+        });
+        optionsHost.addEventListener('click', function (ev) {
+          if (!ev.target.closest('[data-remove-option]')) return;
+          var rows = optionsHost.querySelectorAll('.aes-option-row');
+          if (rows.length <= 2) return;
+          ev.target.closest('.aes-option-row').remove();
+          updateRemoveButtons();
+        });
+        $('#aesPollCancel', body).addEventListener('click', resetForm);
+        $('#aesPollForm', body).addEventListener('submit', function (ev) {
+          ev.preventDefault();
+          var question = $('#aesPollQuestion', body).value.trim();
+          var rows = optionsHost.querySelectorAll('.aes-option-row input');
+          var options = Array.prototype.map.call(rows, function (input) { return input.value.trim(); }).filter(Boolean);
+          var unique = Object.create(null);
+          options = options.filter(function (option) {
+            var key = option.toLocaleLowerCase('tr-TR');
+            if (unique[key]) return false;
+            unique[key] = true;
+            return true;
+          });
+          var duration = Number($('#aesPollDuration', body).value);
+          if (!question) { err('Anket sorusu gerekli.'); return; }
+          if (options.length < 2 || options.length > 8) { err('2 ile 8 arasında geçerli seçenek gir.'); return; }
+          if (!Number.isInteger(duration) || duration < 1 || duration > 30) { err('Anket süresi 1–30 gün arasında olmalı.'); return; }
+          var pollId = $('#aesPollId', body).value.trim();
+          var operation = pollId ? 'editPoll' : 'createPoll';
+          busyBtn($('#aesPollSave', body), call(operation, { pollId: pollId || undefined, question: question, options: options, duration: duration })).then(function (result) {
+            note(pollId ? (result && result.votesReset ? 'Anket güncellendi; seçenekler değiştiği için oylar sıfırlandı.' : 'Anket güncellendi.') : 'Anket yayınlandı.');
+            resetForm();
+            load();
+          }, function (e) { err(msgOf(e)); });
+        });
+      }
+      $('#aesPollRefresh', body).addEventListener('click', function () { load().catch(function (e) { err(msgOf(e)); }); });
       $('#aesPl', body).addEventListener('click', function (ev) {
-        var b = ev.target.closest('button[data-i]'); if (!b) return;
+        var button = ev.target.closest('button[data-i]');
+        if (!button) return;
         if (!user()) { err('Oy vermek için giriş yapmalısın.'); return; }
-        busyBtn(b, call('votePoll', { optionIndex: Number(b.getAttribute('data-i')) })).then(function () { note('Oyun kaydedildi.'); load(); }, function (e) { err(msgOf(e)); });
+        if (!activePoll || activePoll.hasVoted) { err('Bu ankette daha önce oy kullanmış olabilirsin. Listeyi yenile.'); return; }
+        busyBtn(button, call('votePoll', { pollId: activePoll.id, optionIndex: Number(button.getAttribute('data-i')) })).then(function () {
+          note('Oyun kaydedildi.');
+          load();
+        }, function (e) { err(msgOf(e)); });
       });
-      load();
+      load().catch(function (e) { err(msgOf(e)); });
       return true;
     }
+
 
     /* ---------- kayıt ---------- */
     var B = P.builtin;
