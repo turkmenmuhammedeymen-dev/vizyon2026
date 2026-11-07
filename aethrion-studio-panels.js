@@ -955,11 +955,14 @@
     function buildCommunity(label, m) {
       styles();
       var body = open(label, m, 'Topluluk yorumları ve duyurular');
+      if (label === 'Duyurular') {
+        annPane(body);
+        return true;
+      }
       tabs(body, [
         { id: 'comments', label: '💬 Yorumlar', render: commentsPane },
-        { id: 'ann', label: '📢 Duyurular', render: annPane },
         { id: 'teams', label: '👥 Takımlar', render: function (p) { p.innerHTML = '<div class="aep-card"><h3>👥 Takımlar</h3><p class="aep-muted">Takım kur, koda katıl, üyelerle yazış.</p><div class="aep-row"><button type="button" class="aep-btn aep-primary" id="aesGoTeam">Takım panelini aç</button></div></div>'; $('#aesGoTeam', p).onclick = function () { P.openFeature('Takım'); }; } }
-      ], label === 'Duyurular' ? 'ann' : 'comments');
+      ], 'comments');
 
       function currentRole() {
         var u = user();
@@ -1021,6 +1024,7 @@
               return '<article class="aep-item" style="align-items:flex-start"><div style="min-width:0;flex:1"><strong class="aep-item-name">' + esc(item.title || 'Duyuru') + '</strong><p style="margin:7px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;color:#425a72;font:500 13px/1.6 Inter,system-ui,sans-serif">' + esc(item.content || '') + '</p><small class="aep-muted">' + esc(fdate(item.createdAt)) + '</small></div>' + actions + '</article>';
             }).join('') : empty('Henüz duyuru yok.');
             if (typeof w.loadAnnouncements === 'function') w.loadAnnouncements();
+            if (typeof w.refreshAethrionHomeCommunity === 'function') w.refreshAethrionHomeCommunity();
             return announcements;
           }, function (e) {
             list.innerHTML = empty('Duyurular yüklenemedi: ' + msgOf(e));
@@ -1037,7 +1041,9 @@
             if (title.length > 120 || content.length > 4000) { err('Duyuru alanlarından biri izin verilen uzunluğu aşıyor.'); return; }
             var save = $('#aesAnSave', p);
             var operation = id ? 'editAnnouncement' : 'addAnnouncement';
-            busyBtn(save, call(operation, { announcementId: id || undefined, title: title, content: content })).then(function () {
+            var params = { title: title, content: content };
+            if (id) params.announcementId = id;
+            busyBtn(save, call(operation, params)).then(function () {
               note(id ? 'Duyuru güncellendi.' : 'Duyuru yayınlandı.');
               resetForm();
               load().catch(function () {});
@@ -1291,9 +1297,11 @@
         items.slice(0, 8).forEach(function (value) {
           var row = d.createElement('div');
           row.className = 'aes-option-row';
+          row.style.cssText = 'display:flex;gap:8px;align-items:center;margin:7px 0';
           var input = d.createElement('input');
           input.type = 'text';
           input.className = 'aep-input';
+          input.style.cssText = 'flex:1;min-width:0;margin:0';
           input.maxLength = 100;
           input.placeholder = 'Seçenek';
           input.value = String(value || '');
@@ -1336,6 +1344,7 @@
             box.innerHTML = empty('Şu anda aktif anket yok.');
             if (isFounder) resetForm();
             if (typeof w.loadPoll === 'function') w.loadPoll();
+            if (typeof w.refreshAethrionHomeCommunity === 'function') w.refreshAethrionHomeCommunity();
             return null;
           }
           var options = Array.isArray(activePoll.options) ? activePoll.options : [];
@@ -1377,6 +1386,7 @@
             });
           }
           if (typeof w.loadPoll === 'function') w.loadPoll();
+          if (typeof w.refreshAethrionHomeCommunity === 'function') w.refreshAethrionHomeCommunity();
           return activePoll;
         }, function (e) {
           box.innerHTML = empty('Anket yüklenemedi: ' + msgOf(e));
