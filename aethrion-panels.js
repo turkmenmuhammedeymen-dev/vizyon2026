@@ -40,7 +40,7 @@
   /* Bu özellikler için uygulamanın kendi kapatma fonksiyonları (varsa). */
   var CLOSERS = ['closeJarvisMode', 'closeVideoEditor', 'closeModelsShowcase', 'closeJobMarket', 'closeJobCreateForm',
     'closeJobDetail', 'closeCategoryPanel', 'closeKocPanel', 'closeVizyonAlPanel', 'closeAethrionAlPanel', 'closeContestPage',
-    'closeMarket', 'closeVoiceChatFullscreen', 'closeNotificationPanel', 'closeSettingsModal', 'closeAethrionInbox'];
+    'closeMarket', 'closeVoiceChatFullscreen', 'closeNotificationPanel', 'closeAethrionNotificationPanel', 'closeSettingsModal', 'closeAethrionInbox'];
   var OVERLAY_SELECTORS = '#vizyonAlPanel,#vizyonAlBackdrop,#aaVoiceFullscreen,#videoEditorOverlay,#modelsShowcaseOverlay,' +
     '#aethrionJarvisOverlay,#jobMarketOverlay,#jobCreateOverlay,#jobDetailOverlay,#categoryPanelModal,#kocPanelOverlay,' +
     '#vizyonSupportPanel,#teamPage,#fullAIPanel,#contestPage,#marketModal,#downloadModal,#aethrionNotificationPanel,#aethrionInboxPanel,#settingsModal,#moderatorVideoToolModal,#aethrionAccountProfileModal,#profileModal';
@@ -305,33 +305,45 @@
     });
   }
   function openOverlay(label, m) {
-    $$('[data-aep-closed]').forEach(function (el) { el.style.removeProperty('display'); el.removeAttribute('data-aep-closed'); });
-    /* Uygulamanın kapatma işlevleri satır içi gizleme bırakır; açmadan önce temizle. */
-    $$(OVERLAY_SELECTORS).forEach(function (el) {
-      if (el.style.getPropertyValue('visibility') === 'hidden') el.style.removeProperty('visibility');
-      if (el.style.getPropertyValue('pointer-events') === 'none') el.style.removeProperty('pointer-events');
-      if (el.style.getPropertyValue('display') === 'none') el.style.removeProperty('display');
-    });
+    /* Never unhide every overlay here. closeOverlays() has already closed the previous
+       feature. Each opener is responsible for showing only its own panel. */
     var fn = m && m[4] && w[m[4]];
     if (typeof fn !== 'function') return false;
     var before = visibleFixed();
     state.guard = true;
     var ok = true;
     var threw = false;
-    try { ok = fn.call(w, m[6]) !== false; } catch (e) { console.error('[AETHRION] Özellik açılamadı:', label, e); ok = false; threw = true; }
+    try {
+      ok = fn.call(w, m[6]) !== false;
+    } catch (e) {
+      console.error('[AETHRION] Özellik açılamadı:', label, e);
+      ok = false;
+      threw = true;
+    }
     var tok = state.token;
     if (!ok && !threw) {
-      /* Bazı işlevler false döndürse de paneli açar; gerçekten bir şey göründü mü diye bak. */
       setTimeout(function () {
         if (tok !== state.token) return;
         var now = visibleFixed().filter(function (e) { return before.indexOf(e) < 0; });
-        if (now.length) { state.label = label; d.body.classList.add('aep-panel-on'); state.opened = now; }
-        else { showHome(); toast('"' + label + '" paneli şu anda açılamadı.', 'warning'); }
+        if (now.length) {
+          state.label = label;
+          state.opened = now;
+          d.body.classList.add('aep-panel-on');
+        } else {
+          state.guard = false;
+          showHome();
+          toast('"' + label + '" paneli şu anda açılamadı.', 'warning');
+        }
       }, 700);
+      setTimeout(function () { if (tok === state.token) state.guard = false; }, 750);
       return true;
     }
-    setTimeout(function () { state.guard = false; }, 600);
-    [30, 250, 700].forEach(function (t) { setTimeout(function () { if (tok === state.token) { rescueHidden(); relocate(); fixHiddenModals(); } }, t); });
+    setTimeout(function () { if (tok === state.token) state.guard = false; }, 600);
+    [30, 250, 700].forEach(function (t) {
+      setTimeout(function () {
+        if (tok === state.token) relocate();
+      }, t);
+    });
     setTimeout(function () {
       if (tok !== state.token) return;
       state.opened = visibleFixed().filter(function (e) { return before.indexOf(e) < 0; });
