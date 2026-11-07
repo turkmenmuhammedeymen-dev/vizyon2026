@@ -29,18 +29,17 @@
   function onLogin() {
     if (checking) return;
     checking = true;
-    var tries = 0;
-    (function wait() {
-      if (shellReady()) { checking = false; return; }
-      if (++tries < 6) { setTimeout(wait, 400); return; }
+    var key = 'aeLoginReload:' + who();
+    try {
+      if (w.sessionStorage.getItem(key)) { checking = false; return; }
+      w.sessionStorage.setItem(key, '1');
+    } catch (_) {}
+    /* A stale guest shell can look "ready" while still containing the old menu.
+       Rebuild the authenticated workspace once after Parse has persisted the session. */
+    w.setTimeout(function () {
       checking = false;
-      var key = 'aeLoginReload:' + who();
-      try {
-        if (w.sessionStorage.getItem(key)) return;
-        w.sessionStorage.setItem(key, '1');
-      } catch (_) {}
-      w.location.reload();
-    })();
+      try { w.location.reload(); } catch (_) {}
+    }, 900);
   }
   setInterval(function () {
     var now = who();
