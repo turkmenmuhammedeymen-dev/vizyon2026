@@ -128,9 +128,8 @@
     function projectQuery(f) {
       var u = user(); if (!w.Parse || !u) throw new Error('Projeleri görmek için giriş yapmalısın.');
       var q = new w.Parse.Query('Project');
-      var ownerEmail = String(u.get('email') || '').trim().replace(/[.*+?^${}()|[\\]\\]/g, '\\\\q.equalTo('user_email', u.get('email'));
-      /* Legacy Project rows may not have is_archived/is_trashed fields yet.');
-      q.matches('user_email', '^' + ownerEmail + '
+      q.equalTo('user_email', u.get('email'));
+      /* Legacy Project rows may not have is_archived/is_trashed fields yet.
          Fetch the user's bounded set and filter in memory so old projects remain visible. */
       q.descending('createdAt'); q.limit(100);
       return q;
@@ -266,10 +265,8 @@
       function getProjects() {
         if (!w.Parse || !w.Parse.Query) return Promise.resolve([]);
         var q = new w.Parse.Query('Project');
-        var ownerEmail = String(current.get('email') || '').trim().replace(/[.*+?^${}()|[\\]\\]/g, '\\\\var q = new w.Parse.Query('Project');
         q.equalTo('user_email', current.get('email'));
-        q.descending('createdAt');');
-        q.matches('user_email', '^' + ownerEmail + '
+        q.descending('createdAt');
         q.limit(100);
         return q.find().then(function (rows) {
           return rows.filter(function (project) { return project.get('is_trashed') !== true && project.get('is_archived') !== true; });
