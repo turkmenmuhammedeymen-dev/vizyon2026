@@ -425,7 +425,7 @@
     var delivered = false;
     try {
       var conversationId = null;
-      var signedInUser = (w.Parse && w.Parse.User && w.Parse.User.current && w.Parse.User.current()) || w.currentUser || null;
+      var signedInUser = (w.Parse && w.Parse.User && w.Parse.User.current && w.Parse.User.current()) || null;
       if (signedInUser) {
         try {
           conversationId = await aiCreateConversation();
