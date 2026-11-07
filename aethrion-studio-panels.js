@@ -209,7 +209,7 @@
       function requestsPane(p) {
         p.innerHTML = '<div class="aep-card"><h3>✉ Proje talebi gönder</h3><p class="aep-muted">Yapılmasını istediğin bir proje için talep oluştur; takım ve yetkililer görür.</p>' +
           '<label class="aes-field">Başlık<input id="aesRqTitle" maxlength="80"></label>' +
-          '<label class="aes-field">Tür<select id="aesRqType"><option>Web Sitesi</option><option>Mobil Uygulama</option><option>3D Model</option><option>Yapay Zekâ</option><option>Diğer</option></select></label>' +
+          '<label class="aes-field">Tür<select id="aesRqType"><option value="3D">🧊 3D Model</option><option value="Kod">⌨️ Kod / Web</option><option value="Görsel">🖼️ Görsel</option></select></label>' +
           '<label class="aes-field">Açıklama<textarea id="aesRqDesc" rows="4" maxlength="1500"></textarea></label>' +
           '<div class="aep-row"><button type="button" class="aep-btn aep-primary" id="aesRqGo">Talebi gönder</button></div></div>' +
           '<div class="aep-card"><h3>Taleplerim</h3><div class="aep-list" id="aesRqList"><p class="aep-muted">Yükleniyor…</p></div></div>';
@@ -230,6 +230,98 @@
         });
         load();
       }
+      return true;
+    }
+
+    /* ======================================================================
+     *  YETKİLİ PROJE TALEPLERİ — Moderatör / Admin / Kurucu
+     * ==================================================================== */
+    function buildStaffProjectRequests(label, m) {
+      styles();
+      var body = open(label, m, 'Sana atanmış proje taleplerini incele, kabul et, reddet veya devret');
+      var current = user();
+      if (!current) { loginCard(body, 'Proje taleplerini yönetmek'); return true; }
+      var role = String(current.get('role') || '').toLowerCase();
+      if (['admin', 'founder', 'moderator'].indexOf(role) === -1) {
+        body.innerHTML = '<div class="aep-card"><h3>🔒 Yetkili erişimi gerekli</h3><p class="aep-muted">Bu alan yalnızca Moderatör, Admin ve Kurucu hesaplarına açıktır.</p></div>';
+        return true;
+      }
+      body.innerHTML =
+        '<div class="aep-card"><div class="aep-row" style="justify-content:space-between"><div><h3>📨 Atanmış proje talepleri</h3><p class="aep-muted">Talepler önce moderatörlere yönlendirilir. Moderatör yoksa Admin ve Kuruculara iletilir. İlk kabul eden talebi üstlenir.</p></div><button type="button" class="aep-btn" id="aesStaffReqRefresh">↻ Yenile</button></div>' +
+        '<div class="aep-list" id="aesStaffReqList"><p class="aep-muted">Talepler yükleniyor…</p></div></div>';
+
+      var host = $('#aesStaffReqList', body);
+      function getProjects() {
+        if (!w.Parse || !w.Parse.Query) return Promise.resolve([]);
+        var q = new w.Parse.Query('Project');
+        q.equalTo('user_email', current.get('email'));
+        q.equalTo('is_trashed', false);
+        q.descending('createdAt');
+        q.limit(100);
+        return q.find().catch(function () { return []; });
+      }
+      function button(text, action, requestId, projectSelect) {
+        var b = d.createElement('button');
+        b.type = 'button'; b.className = 'aep-btn'; b.textContent = text;
+        b.addEventListener('click', function () {
+          var params = { requestId: requestId, action: action };
+          if (action === 'send') {
+            params.projectId = projectSelect && projectSelect.value;
+            if (!params.projectId) { err('Önce göndereceğin tamamlanmış projeyi seç.'); return; }
+          }
+          busyBtn(b, call('handleProjectRequest', params)).then(function (r) {
+            note((r && r.message) || 'İşlem tamamlandı.');
+            load();
+          }, function (e) { err(msgOf(e)); });
+        });
+        return b;
+      }
+      function load() {
+        host.textContent = 'Proje talepleri yükleniyor…';
+        Promise.all([call('getInboxItems'), getProjects()]).then(function (values) {
+          var all = Array.isArray(values[0]) ? values[0] : [];
+          var projects = Array.isArray(values[1]) ? values[1] : [];
+          var items = all.filter(function (x) {
+            var status = String(x.status || 'pending').toLowerCase();
+            return x.type === 'project_request' && ['pending', 'accepted'].indexOf(status) !== -1;
+          });
+          host.replaceChildren();
+          if (!items.length) {
+            host.textContent = role === 'moderator'
+              ? 'Şu anda sana atanmış bekleyen proje talebi yok.'
+              : 'Şu anda hesabına atanmış proje talebi yok. Aktif moderatör varsa talepler önce moderatörlere gider.';
+            return;
+          }
+          items.forEach(function (item) {
+            var card = d.createElement('article'); card.className = 'aep-item'; card.style.display = 'block';
+            var title = d.createElement('h4'); title.className = 'aep-item-name'; title.textContent = item.project_title || 'İsimsiz proje talebi';
+            var meta = d.createElement('p'); meta.className = 'aep-muted';
+            meta.textContent = 'Tür: ' + (item.project_type || 'Belirtilmedi') + ' · Gönderen: ' + (item.sender_email || 'Bilinmiyor');
+            var desc = d.createElement('p'); desc.className = 'aep-muted'; desc.textContent = item.project_description || item.message || 'Açıklama bulunmuyor.';
+            var status = d.createElement('span'); status.className = 'aes-pill'; status.textContent = String(item.status || 'pending').toUpperCase();
+            var actions = d.createElement('div'); actions.className = 'aep-row';
+            card.appendChild(title); card.appendChild(meta); card.appendChild(desc); card.appendChild(status); card.appendChild(actions);
+            if (String(item.status || 'pending').toLowerCase() === 'pending') {
+              actions.appendChild(button('✓ Kabul et', 'accept', item.request_id));
+              actions.appendChild(button('Reddet', 'reject', item.request_id));
+              actions.appendChild(button('↗ Devret', 'delegate', item.request_id));
+            } else {
+              var select = d.createElement('select'); select.className = 'aep-input'; select.style.flex = '1';
+              var emptyOption = d.createElement('option'); emptyOption.value = ''; emptyOption.textContent = 'Tamamlanan projeyi seç…'; select.appendChild(emptyOption);
+              projects.forEach(function (project) {
+                var opt = d.createElement('option'); opt.value = project.id; opt.textContent = project.get('name') || project.get('title') || 'İsimsiz proje'; select.appendChild(opt);
+              });
+              actions.appendChild(select);
+              actions.appendChild(button('Projeyi talep edene gönder', 'send', item.request_id, select));
+            }
+            host.appendChild(card);
+          });
+        }).catch(function (e) {
+          host.textContent = 'Proje talepleri yüklenemedi: ' + msgOf(e);
+        });
+      }
+      $('#aesStaffReqRefresh', body).addEventListener('click', load);
+      load();
       return true;
     }
 
@@ -1010,6 +1102,8 @@
     B['Aylık Yarışma'] = buildContest;
     B['Davet Liderlik Tablosu'] = buildReferral;
     B['Anketler'] = buildPolls;
+    B['Proje Talepleri'] = buildStaffProjectRequests;
+    w.openProjectRequestsPanel = function () { return P.openFeature('Proje Talepleri') === true; };
     B['Kod Editörü'] = buildCode;
     B['A27 API Anahtarı'] = buildApiKeys;
     B['Beta API Yönetimi'] = buildApiKeys;
